@@ -19,41 +19,42 @@
 // movable. This is relevant, for example, when calling functions that
 // return a std::unique_ptr.
 
-#include "../tests.h"
+#include <deal.II/base/thread_management.h>
+
 #include <unistd.h>
 
-#include <deal.II/base/thread_management.h>
+#include "../tests.h"
 
 
 class X
 {
 public:
   // default constructor
-  X () :
-    value (13)
+  X() : value(13)
   {}
 
-  X (int i) :
-    value (i)
+  X(int i) : value(i)
   {}
 
   // delete the copy constructor
-  X (const X &) = delete;
+  X(const X &) = delete;
 
   // move constructor. sets the moved-from value to a recognizable
   // value
-  X (X &&x)
+  X(X &&x)
   {
-    value = x.value;
+    value   = x.value;
     x.value = 0;
   }
 
   // same idea about copy operators
-  X &operator = (const X &) = delete;
+  X &
+  operator=(const X &) = delete;
 
-  X &operator = (X &&x)
+  X &
+  operator=(X &&x)
   {
-    value = x.value;
+    value   = x.value;
     x.value = 0;
 
     return *this;
@@ -65,31 +66,30 @@ public:
 
 
 
-X foo ()
+X
+foo()
 {
   return X(42);
 }
 
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  Threads::Thread<X> t = Threads::new_thread (&foo);
+  Threads::Thread<X> t = Threads::new_thread(&foo);
 
   // wait for the thread to return and query its value
-  deallog << t.return_value().value
-          << std::endl;
+  deallog << t.return_value().value << std::endl;
 
   // we can't copy the return_value() object directly, but we can move
   // it. do so and check that we still get the correct value. then
   // also check that the value of the original return object has been
   // reset in the move constructor/operator
   X x = std::move(t.return_value());
-  deallog << x.value
-          << std::endl;
+  deallog << x.value << std::endl;
 
-  deallog << t.return_value().value
-          << std::endl;
+  deallog << t.return_value().value << std::endl;
 }

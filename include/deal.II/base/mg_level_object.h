@@ -17,8 +17,9 @@
 #define dealii_mg_level_object_h
 
 #include <deal.II/base/subscriptor.h>
-#include <vector>
+
 #include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -66,13 +67,13 @@ public:
    *
    * @pre minlevel <= maxlevel
    */
-  MGLevelObject (const unsigned int minlevel = 0,
-                 const unsigned int maxlevel = 0);
+  MGLevelObject(const unsigned int minlevel = 0,
+                const unsigned int maxlevel = 0);
 
   /**
    * Access object on level @p level.
    */
-  Object &operator[] (const unsigned int level);
+  Object &operator[](const unsigned int level);
 
   /**
    * Access object on level @p level.
@@ -80,7 +81,7 @@ public:
    * This function can be called on a @p const object, and
    * consequently returns a @p const reference.
    */
-  const Object &operator[] (const unsigned int level) const;
+  const Object &operator[](const unsigned int level) const;
 
   /**
    * Delete all previous contents of this object and reset its size according
@@ -93,8 +94,8 @@ public:
    *
    * @pre minlevel <= maxlevel
    */
-  void resize (const unsigned int new_minlevel,
-               const unsigned int new_maxlevel);
+  void
+  resize(const unsigned int new_minlevel, const unsigned int new_maxlevel);
 
   /**
    * Call <tt>operator = (s)</tt> on all objects stored by this object.
@@ -102,7 +103,8 @@ public:
    * this operation. This is, in particular, true for vectors and matrices
    * if @p d is zero, thereby zeroing out all vector or matrix entries.
    */
-  MGLevelObject<Object> &operator = (const double d);
+  MGLevelObject<Object> &
+  operator=(const double d);
 
   /**
    * Call @p clear on all objects stored by this object. This function
@@ -115,7 +117,8 @@ public:
    * @deprecated Use clear_elements () instead
    */
   DEAL_II_DEPRECATED
-  void clear();
+  void
+  clear();
 
   /**
    * Call @p clear on all objects stored by this object. This function
@@ -125,17 +128,20 @@ public:
    * template type to this class does not provide a
    * <code>clear()</code> member function.
    */
-  void clear_elements();
+  void
+  clear_elements();
 
   /**
    * The coarsest level for which this class stores a level object.
    */
-  unsigned int min_level () const;
+  unsigned int
+  min_level() const;
 
   /**
    * The highest level for which this class stores a level object.
    */
-  unsigned int max_level () const;
+  unsigned int
+  max_level() const;
 
   /**
    * Apply the action @p action to every object stored in here. The
@@ -148,12 +154,14 @@ public:
    * function pointer.
    */
   template <typename ActionFunctionObjectType>
-  void apply (ActionFunctionObjectType action);
+  void
+  apply(ActionFunctionObjectType action);
 
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -164,7 +172,7 @@ private:
   /**
    * Array of the objects to be held.
    */
-  std::vector<std::shared_ptr<Object> > objects;
+  std::vector<std::shared_ptr<Object>> objects;
 };
 
 
@@ -173,66 +181,63 @@ private:
 
 template <class Object>
 MGLevelObject<Object>::MGLevelObject(const unsigned int min,
-                                     const unsigned int max)
-  :
+                                     const unsigned int max) :
   minlevel(0)
 {
-  resize (min, max);
+  resize(min, max);
 }
 
 
 template <class Object>
-Object &
-MGLevelObject<Object>::operator[] (const unsigned int i)
+Object &MGLevelObject<Object>::operator[](const unsigned int i)
 {
-  Assert((i>=minlevel) && (i<minlevel+objects.size()),
-         ExcIndexRange (i, minlevel, minlevel+objects.size()));
-  return *objects[i-minlevel];
+  Assert((i >= minlevel) && (i < minlevel + objects.size()),
+         ExcIndexRange(i, minlevel, minlevel + objects.size()));
+  return *objects[i - minlevel];
 }
 
 
 template <class Object>
-const Object &
-MGLevelObject<Object>::operator[] (const unsigned int i) const
+const Object &MGLevelObject<Object>::operator[](const unsigned int i) const
 {
-  Assert((i>=minlevel) && (i<minlevel+objects.size()),
-         ExcIndexRange (i, minlevel, minlevel+objects.size()));
-  return *objects[i-minlevel];
+  Assert((i >= minlevel) && (i < minlevel + objects.size()),
+         ExcIndexRange(i, minlevel, minlevel + objects.size()));
+  return *objects[i - minlevel];
 }
 
 
 template <class Object>
 void
-MGLevelObject<Object>::resize (const unsigned int new_minlevel,
-                               const unsigned int new_maxlevel)
+MGLevelObject<Object>::resize(const unsigned int new_minlevel,
+                              const unsigned int new_maxlevel)
 {
-  Assert (new_minlevel <= new_maxlevel, ExcInternalError());
+  Assert(new_minlevel <= new_maxlevel, ExcInternalError());
   // note that on clear(), the
   // shared_ptr class takes care of
   // deleting the object it points to
   // by itself
-  objects.clear ();
+  objects.clear();
 
   minlevel = new_minlevel;
-  for (unsigned int i=0; i<new_maxlevel-new_minlevel+1; ++i)
-    objects.push_back(std::make_shared<Object> ());
+  for (unsigned int i = 0; i < new_maxlevel - new_minlevel + 1; ++i)
+    objects.push_back(std::make_shared<Object>());
 }
 
 
 template <class Object>
 MGLevelObject<Object> &
-MGLevelObject<Object>::operator = (const double d)
+MGLevelObject<Object>::operator=(const double d)
 {
-  typename std::vector<std::shared_ptr<Object> >::iterator v;
+  typename std::vector<std::shared_ptr<Object>>::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
-    **v=d;
+    **v = d;
   return *this;
 }
 
 
 template <class Object>
 void
-MGLevelObject<Object>::clear () // DEPRECATED
+MGLevelObject<Object>::clear() // DEPRECATED
 {
   // Avoid code duplication in deprecated call by calling replacing function
   clear_elements();
@@ -241,9 +246,9 @@ MGLevelObject<Object>::clear () // DEPRECATED
 
 template <class Object>
 void
-MGLevelObject<Object>::clear_elements ()
+MGLevelObject<Object>::clear_elements()
 {
-  typename std::vector<std::shared_ptr<Object> >::iterator v;
+  typename std::vector<std::shared_ptr<Object>>::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
     (*v)->clear();
 }
@@ -251,7 +256,7 @@ MGLevelObject<Object>::clear_elements ()
 
 template <class Object>
 unsigned int
-MGLevelObject<Object>::min_level () const
+MGLevelObject<Object>::min_level() const
 {
   return minlevel;
 }
@@ -259,7 +264,7 @@ MGLevelObject<Object>::min_level () const
 
 template <class Object>
 unsigned int
-MGLevelObject<Object>::max_level () const
+MGLevelObject<Object>::max_level() const
 {
   return minlevel + objects.size() - 1;
 }
@@ -267,23 +272,23 @@ MGLevelObject<Object>::max_level () const
 template <class Object>
 template <typename ActionFunctionObjectType>
 void
-MGLevelObject<Object>::apply (ActionFunctionObjectType action)
+MGLevelObject<Object>::apply(ActionFunctionObjectType action)
 {
   for (unsigned int lvl = min_level(); lvl <= max_level(); ++lvl)
     {
-      action (lvl, (*this)[lvl]);
+      action(lvl, (*this)[lvl]);
     }
 }
 
 
 template <class Object>
 std::size_t
-MGLevelObject<Object>::memory_consumption () const
+MGLevelObject<Object>::memory_consumption() const
 {
   std::size_t result = sizeof(*this);
-  typedef typename std::vector<std::shared_ptr<Object> >::const_iterator Iter;
+  typedef typename std::vector<std::shared_ptr<Object>>::const_iterator Iter;
   const Iter end = objects.end();
-  for (Iter o=objects.begin(); o!=end; ++o)
+  for (Iter o = objects.begin(); o != end; ++o)
     result += (*o)->memory_consumption();
 
   return result;

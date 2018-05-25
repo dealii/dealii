@@ -16,36 +16,36 @@
 
 // test IndexSet::is_contiguous and compress()
 
-#include "../tests.h"
-
 #include <deal.II/base/index_set.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  IndexSet index_set (10);
-  index_set.add_index (2);
-  index_set.add_index (3);
-  index_set.add_index (4);
+  IndexSet index_set(10);
+  index_set.add_index(2);
+  index_set.add_index(3);
+  index_set.add_index(4);
 
-  index_set.add_index (6);
-  index_set.add_index (7);
+  index_set.add_index(6);
+  index_set.add_index(7);
 
-  deallog << (index_set.is_contiguous() ? "true" : "false")
-          << std::endl;
-  AssertThrow (index_set.is_contiguous() == false, ExcInternalError());
+  deallog << (index_set.is_contiguous() ? "true" : "false") << std::endl;
+  AssertThrow(index_set.is_contiguous() == false, ExcInternalError());
 
-  for (unsigned int i=0; i<index_set.size(); ++i)
+  for (unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
             << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

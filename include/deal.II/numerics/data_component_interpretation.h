@@ -60,7 +60,7 @@ namespace DataComponentInterpretation
      */
     component_is_part_of_vector
   };
-}
+} // namespace DataComponentInterpretation
 
 
 DEAL_II_NAMESPACE_CLOSE

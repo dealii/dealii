@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/symmetric_tensor.h>
+
 #include <deal.II/physics/elasticity/standard_tensors.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -22,26 +23,25 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 const SymmetricTensor<2, dim>
-Physics::Elasticity::StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
+  Physics::Elasticity::StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
 
 
 
 template <int dim>
 const SymmetricTensor<4, dim>
-Physics::Elasticity::StandardTensors<dim>::S = identity_tensor<dim>();
+  Physics::Elasticity::StandardTensors<dim>::S = identity_tensor<dim>();
+
+
+
+template <int dim>
+const SymmetricTensor<4, dim> Physics::Elasticity::StandardTensors<dim>::IxI =
+  outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
 
 
 
 template <int dim>
 const SymmetricTensor<4, dim>
-Physics::Elasticity::StandardTensors<dim>::IxI = outer_product(unit_symmetric_tensor<dim>(),
-                                                 unit_symmetric_tensor<dim>());
-
-
-
-template <int dim>
-const SymmetricTensor<4, dim>
-Physics::Elasticity::StandardTensors<dim>::dev_P = deviator_tensor<dim>();
+  Physics::Elasticity::StandardTensors<dim>::dev_P = deviator_tensor<dim>();
 
 #endif // DOXYGEN
 

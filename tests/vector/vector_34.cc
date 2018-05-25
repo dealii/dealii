@@ -17,45 +17,50 @@
 
 // check Vector<double>::all_zero
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
   // set some elements of the vector
   double sum = 0;
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  for (unsigned int i = 0; i < v.size(); i += 1 + i)
     {
       v(i) = i;
-      sum += i*i*i;
+      sum += i * i * i;
     }
-  v.compress ();
+  v.compress();
 
   // set them to zero again
   v = 0;
 
   // then check all_zero
-  AssertThrow (v.all_zero() == true, ExcInternalError());
+  AssertThrow(v.all_zero() == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -68,7 +73,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

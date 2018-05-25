@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// test LAPACKFullMatrix::rank1_update() for rank1 downdate of a Cholesky factorization
+// test LAPACKFullMatrix::rank1_update() for rank1 downdate of a Cholesky
+// factorization
 
 /* MWE in Octave:
 A = pascal(4)
@@ -57,40 +58,41 @@ R2 =
 
 */
 
-#include "../tests.h"
-#include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+
+#include "../tests.h"
+#include "create_matrix.h"
 
 
 template <typename NumberType>
 void
 test()
 {
-  const unsigned int size = 4;
+  const unsigned int           size = 4;
   LAPACKFullMatrix<NumberType> A(size);
   A.set_property(LAPACKSupport::symmetric);
   Vector<NumberType> v(size);
 
-  A(0,0) = 1;
-  A(0,1) = 1;
-  A(0,2) = 1;
-  A(0,3) = 1;
-  A(1,0) = 1;
-  A(1,1) = 2;
-  A(1,2) = 3;
-  A(1,3) = 4;
-  A(2,0) = 1;
-  A(2,1) = 3;
-  A(2,2) = 6;
-  A(2,3) = 10;
-  A(3,0) = 1;
-  A(3,1) = 4;
-  A(3,2) =10;
-  A(3,3) = 20;
+  A(0, 0) = 1;
+  A(0, 1) = 1;
+  A(0, 2) = 1;
+  A(0, 3) = 1;
+  A(1, 0) = 1;
+  A(1, 1) = 2;
+  A(1, 2) = 3;
+  A(1, 3) = 4;
+  A(2, 0) = 1;
+  A(2, 1) = 3;
+  A(2, 2) = 6;
+  A(2, 3) = 10;
+  A(3, 0) = 1;
+  A(3, 1) = 4;
+  A(3, 2) = 10;
+  A(3, 3) = 20;
 
   v(0) = 3;
   v(1) = 2;
@@ -101,27 +103,27 @@ test()
 
   A.compute_cholesky_factorization();
   deallog << "Cholesky:" << std::endl;
-  A.print_formatted(deallog.get_file_stream(),5);
+  A.print_formatted(deallog.get_file_stream(), 5);
 
-  A.rank1_update(a,v);
+  A.rank1_update(a, v);
 
   deallog << "Cholesky updated:" << std::endl;
-  A.print_formatted(deallog.get_file_stream(),5);
+  A.print_formatted(deallog.get_file_stream(), 5);
 
   v /= 2.;
 
-  A.rank1_update(-1.,v);
+  A.rank1_update(-1., v);
 
   deallog << "Cholesky downdated:" << std::endl;
-  A.print_formatted(deallog.get_file_stream(),5);
-
+  A.print_formatted(deallog.get_file_stream(), 5);
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(5);
   deallog.attach(logfile);
 

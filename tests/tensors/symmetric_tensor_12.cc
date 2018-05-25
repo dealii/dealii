@@ -16,36 +16,37 @@
 
 // deviators are trace free by definition
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "dim=" << dim << std::endl;
 
-  SymmetricTensor<2,dim> t;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      t[i][j] = (1.+(i+1)*(j*2));
+  SymmetricTensor<2, dim> t;
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = i; j < dim; ++j)
+      t[i][j] = (1. + (i + 1) * (j * 2));
 
-  AssertThrow (trace(deviator(t)) < 1e-15*t.norm(),
-               ExcInternalError());
+  AssertThrow(trace(deviator(t)) < 1e-15 * t.norm(), ExcInternalError());
 }
 
 
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

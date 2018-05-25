@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -68,7 +69,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup functions
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999
  */
-template <typename Number=double>
+template <typename Number = double>
 class FunctionTime
 {
 public:
@@ -76,7 +77,7 @@ public:
    * Constructor. May take an initial value for the time variable, which
    * defaults to zero.
    */
-  FunctionTime (const Number initial_time = Number(0.0));
+  FunctionTime(const Number initial_time = Number(0.0));
 
   /**
    * Virtual destructor.
@@ -86,17 +87,20 @@ public:
   /**
    * Return the value of the time variable.
    */
-  Number get_time () const;
+  Number
+  get_time() const;
 
   /**
    * Set the time to <tt>new_time</tt>, overwriting the old value.
    */
-  virtual void set_time (const Number new_time);
+  virtual void
+  set_time(const Number new_time);
 
   /**
    * Advance the time by the given time step <tt>delta_t</tt>.
    */
-  virtual void advance_time (const Number delta_t);
+  virtual void
+  advance_time(const Number delta_t);
 
 private:
   /**
@@ -107,13 +111,14 @@ private:
 
 
 
-/*------------------------------ Inline functions ------------------------------*/
+/*------------------------------ Inline functions
+ * ------------------------------*/
 
 #ifndef DOXYGEN
 
 template <typename Number>
 inline Number
-FunctionTime<Number>::get_time () const
+FunctionTime<Number>::get_time() const
 {
   return time;
 }

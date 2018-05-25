@@ -19,15 +19,17 @@
 //   dealii::SparseMatrix<complex>
 //   dealii::FullMatrix<complex>
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/linear_operator.h>
@@ -35,13 +37,17 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.templates.h>
+
 #include <deal.II/numerics/matrix_tools.h>
 
 #include <complex>
 
+#include "../tests.h"
+
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
@@ -49,12 +55,12 @@ int main()
   static const int dim = 2;
 
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
   MappingQGeneric<dim> mapping_q1(1);
-  FE_Q<dim> q1(1);
-  DoFHandler<dim> dof_handler(triangulation);
+  FE_Q<dim>            q1(1);
+  DoFHandler<dim>      dof_handler(triangulation);
   dof_handler.distribute_dofs(q1);
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -66,8 +72,8 @@ int main()
 
   // use a real valued matrix and rely on the template overloads of vmult,
   // etc. to also work with std::complex<double>
-  SparseMatrix<double> a (sparsity_pattern);
-  SparseMatrix<double> b (sparsity_pattern);
+  SparseMatrix<double> a(sparsity_pattern);
+  SparseMatrix<double> b(sparsity_pattern);
 
   QGauss<dim> quadrature(4);
   MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, a);
@@ -80,7 +86,7 @@ int main()
   auto op_b = linear_operator<dealii::Vector<std::complex<double>>>(b);
 
   {
-    LinearOperator<dealii::Vector<std::complex<double>>> op_x (a);
+    LinearOperator<dealii::Vector<std::complex<double>>> op_x(a);
     op_a = a;
     op_b = b;
   }
@@ -91,7 +97,7 @@ int main()
   op_a.reinit_domain_vector(u, true);
   for (unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (std::complex<double>)(i+1);
+      u[i] = (std::complex<double>)(i + 1);
     }
 
   deallog << "u: " << u << std::endl;
@@ -137,8 +143,8 @@ int main()
 
   // operator*, operator*=
 
-  op_b.vmult(v,u);
-  op_a.vmult(w,v);
+  op_b.vmult(v, u);
+  op_a.vmult(w, v);
   deallog << "(A(Bu)): " << w << std::endl;
 
   (op_a * op_b).vmult(x, u);

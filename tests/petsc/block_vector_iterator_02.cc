@@ -17,12 +17,15 @@
 
 // like _01, except that we use operator[] instead of operator*
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_parallel_block_vector.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   PETScWrappers::MPI::BlockVector v(2, MPI_COMM_WORLD, 1, 1);
   v(0) = 1;
@@ -31,39 +34,39 @@ void test ()
   // first check reading through a const
   // iterator
   {
-    PETScWrappers::MPI::BlockVector::const_iterator i=v.begin();
-    AssertThrow (i[0] == 1, ExcInternalError());
-    AssertThrow (i[1] == 2, ExcInternalError());
+    PETScWrappers::MPI::BlockVector::const_iterator i = v.begin();
+    AssertThrow(i[0] == 1, ExcInternalError());
+    AssertThrow(i[1] == 2, ExcInternalError());
   }
 
   // same, but create iterator in a different
   // way
   {
-    PETScWrappers::MPI::BlockVector::const_iterator
-    i=const_cast<const PETScWrappers::MPI::BlockVector &>(v).begin();
-    AssertThrow (i[0] == 1, ExcInternalError());
-    AssertThrow (i[1] == 2, ExcInternalError());
+    PETScWrappers::MPI::BlockVector::const_iterator i =
+      const_cast<const PETScWrappers::MPI::BlockVector &>(v).begin();
+    AssertThrow(i[0] == 1, ExcInternalError());
+    AssertThrow(i[1] == 2, ExcInternalError());
   }
 
   // read through a read-write iterator
   {
     PETScWrappers::MPI::BlockVector::iterator i = v.begin();
-    AssertThrow (i[0] == 1, ExcInternalError());
-    AssertThrow (i[1] == 2, ExcInternalError());
+    AssertThrow(i[0] == 1, ExcInternalError());
+    AssertThrow(i[1] == 2, ExcInternalError());
   }
 
   // write through a read-write iterator
   {
     PETScWrappers::MPI::BlockVector::iterator i = v.begin();
-    i[0] = 2;
-    i[1] = 3;
+    i[0]                                        = 2;
+    i[1]                                        = 3;
   }
 
   // and read again
   {
     PETScWrappers::MPI::BlockVector::iterator i = v.begin();
-    AssertThrow (i[0] == 2, ExcInternalError());
-    AssertThrow (i[1] == 3, ExcInternalError());
+    AssertThrow(i[0] == 2, ExcInternalError());
+    AssertThrow(i[1] == 3, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;
@@ -71,21 +74,22 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        test ();
+        test();
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -98,7 +102,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

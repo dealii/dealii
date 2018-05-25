@@ -14,45 +14,54 @@
 // ---------------------------------------------------------------------
 
 
-// check   Tensor<rank,dim,std::complex<double> > operator * (const Tensor<rank,dim>     &t,
-//                                                            const std::complex<double>  factor)
+// check   Tensor<rank,dim,std::complex<double> > operator * (const
+// Tensor<rank,dim>     &t,
+//                                                            const
+//                                                            std::complex<double>
+//                                                            factor)
 // and
-// check   Tensor<rank,dim,std::complex<double> > operator * (const std::complex<double>  factor,
-//                                                            const Tensor<rank,dim>     &t)
+// check   Tensor<rank,dim,std::complex<double> > operator * (const
+// std::complex<double>  factor,
+//                                                            const
+//                                                            Tensor<rank,dim>
+//                                                            &t)
 // by multiplying on the left and on the right.
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test_tensor ()
+void
+test_tensor()
 {
   // a real tensor
-  Tensor<1,dim,double> t;
+  Tensor<1, dim, double> t;
 
-  for (unsigned int i=0; i<dim; ++i)
+  for (unsigned int i = 0; i < dim; ++i)
     {
-      t[i] = 2*i+dim+1;
+      t[i] = 2 * i + dim + 1;
     }
 
   // multiply on the right by a complex<double>
-  const Tensor<1,dim,std::complex<double> > right =
-    t * std::complex<double> (1,2);
+  const Tensor<1, dim, std::complex<double>> right =
+    t * std::complex<double>(1, 2);
 
   // multiply on the left by a complex<double>
-  const Tensor<1,dim,std::complex<double> > left  =
-    std::complex<double> (1,2) * t;
+  const Tensor<1, dim, std::complex<double>> left =
+    std::complex<double>(1, 2) * t;
 
   // they should yield the same result
-  Assert (left == right, ExcInternalError ());
+  Assert(left == right, ExcInternalError());
 
-  deallog << "dim = " << dim   << std::endl
-          << left << " : "     << right << std::endl;
+  deallog << "dim = " << dim << std::endl
+          << left << " : " << right << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
@@ -65,4 +74,3 @@ int main ()
 
   deallog << "OK" << std::endl;
 }
-

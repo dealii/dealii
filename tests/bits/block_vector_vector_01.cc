@@ -21,36 +21,40 @@
 // that did not honor the 'explicit' keyword on template constructors. this is
 // now autoconf'ed.
 
-#include "../tests.h"
 #include <deal.II/lac/block_vector.h>
 
+#include "../tests.h"
 
-void test (BlockVector<double> &v)
+
+void
+test(BlockVector<double> &v)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
-    v(i) = i+1.;
+  for (unsigned int i = 0; i < v.size(); ++i)
+    v(i) = i + 1.;
   BlockVector<float> w(v);
 
-  AssertThrow (w==v, ExcInternalError());
+  AssertThrow(w == v, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       std::vector<types::global_dof_index> block_sizes(2, 50);
-      BlockVector<double> v (block_sizes);
-      test (v);
+      BlockVector<double>                  v(block_sizes);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -63,7 +67,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

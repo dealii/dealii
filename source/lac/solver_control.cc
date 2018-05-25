@@ -16,6 +16,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/signaling_nan.h>
+
 #include <deal.II/lac/solver_control.h>
 
 #include <cmath>
@@ -26,11 +27,10 @@ DEAL_II_NAMESPACE_OPEN
 /*----------------------- SolverControl ---------------------------------*/
 
 
-SolverControl::SolverControl (const unsigned int maxiter,
-                              const double tolerance,
-                              const bool m_log_history,
-                              const bool m_log_result)
-  :
+SolverControl::SolverControl(const unsigned int maxiter,
+                             const double       tolerance,
+                             const bool         m_log_history,
+                             const bool         m_log_result) :
   maxsteps(maxiter),
   tol(tolerance),
   lcheck(failure),
@@ -49,13 +49,12 @@ SolverControl::SolverControl (const unsigned int maxiter,
 
 
 SolverControl::State
-SolverControl::check (const unsigned int step,
-                      const double check_value)
+SolverControl::check(const unsigned int step, const double check_value)
 {
   // if this is the first time we
   // come here, then store the
   // residual for later comparisons
-  if (step==0)
+  if (step == 0)
     {
       initial_val = check_value;
     }
@@ -66,10 +65,10 @@ SolverControl::check (const unsigned int step,
   lstep  = step;
   lvalue = check_value;
 
-  if (step==0)
+  if (step == 0)
     {
       if (check_failure)
-        failure_residual=relative_failure_residual*check_value;
+        failure_residual = relative_failure_residual * check_value;
 
       if (m_log_result)
         deallog << "Starting value " << check_value << std::endl;
@@ -81,20 +80,18 @@ SolverControl::check (const unsigned int step,
   if (check_value <= tol)
     {
       if (m_log_result)
-        deallog << "Convergence step " << step
-                << " value " << check_value << std::endl;
+        deallog << "Convergence step " << step << " value " << check_value
+                << std::endl;
       lcheck = success;
       return success;
     }
 
-  if ((step >= maxsteps) ||
-      std::isnan(check_value) ||
-      (check_failure && (check_value > failure_residual))
-     )
+  if ((step >= maxsteps) || std::isnan(check_value) ||
+      (check_failure && (check_value > failure_residual)))
     {
       if (m_log_result)
-        deallog << "Failure step " << step
-                << " value " << check_value << std::endl;
+        deallog << "Failure step " << step << " value " << check_value
+                << std::endl;
       lcheck = failure;
       return failure;
     }
@@ -134,31 +131,34 @@ SolverControl::last_step() const
 
 
 unsigned int
-SolverControl::log_frequency (unsigned int f)
+SolverControl::log_frequency(unsigned int f)
 {
-  if (f==0)
+  if (f == 0)
     f = 1;
   unsigned int old = m_log_frequency;
-  m_log_frequency = f;
+  m_log_frequency  = f;
   return old;
 }
 
 
 void
-SolverControl::enable_history_data ()
+SolverControl::enable_history_data()
 {
   history_data_enabled = true;
 }
 
 
 
-const std::vector<double> &SolverControl::get_history_data() const
+const std::vector<double> &
+SolverControl::get_history_data() const
 {
-  Assert (history_data_enabled, ExcHistoryDataRequired());
-  Assert (history_data.size() > 0,
-          ExcMessage("The SolverControl object was asked for the solver history "
-                     "data, but there is no data. Possibly you requested the data before the "
-                     "solver was run."));
+  Assert(history_data_enabled, ExcHistoryDataRequired());
+  Assert(
+    history_data.size() > 0,
+    ExcMessage(
+      "The SolverControl object was asked for the solver history "
+      "data, but there is no data. Possibly you requested the data before the "
+      "solver was run."));
 
   return history_data;
 }
@@ -171,12 +171,12 @@ SolverControl::average_reduction() const
   if (lstep == 0)
     return 0.;
 
-  Assert (history_data_enabled, ExcHistoryDataRequired());
-  Assert (history_data.size() > lstep, ExcInternalError());
-  Assert (history_data[0] > 0., ExcInternalError());
-  Assert (history_data[lstep] > 0., ExcInternalError());
+  Assert(history_data_enabled, ExcHistoryDataRequired());
+  Assert(history_data.size() > lstep, ExcInternalError());
+  Assert(history_data[0] > 0., ExcInternalError());
+  Assert(history_data[lstep] > 0., ExcInternalError());
 
-  return std::pow(history_data[lstep]/history_data[0], 1./lstep);
+  return std::pow(history_data[lstep] / history_data[0], 1. / lstep);
 }
 
 
@@ -184,12 +184,12 @@ SolverControl::average_reduction() const
 double
 SolverControl::step_reduction(unsigned int step) const
 {
-  Assert (history_data_enabled, ExcHistoryDataRequired());
-  Assert (history_data.size() > lstep, ExcInternalError());
-  Assert (step <=lstep, ExcIndexRange(step,1,lstep+1));
-  Assert (step>0, ExcIndexRange(step,1,lstep+1));
+  Assert(history_data_enabled, ExcHistoryDataRequired());
+  Assert(history_data.size() > lstep, ExcInternalError());
+  Assert(step <= lstep, ExcIndexRange(step, 1, lstep + 1));
+  Assert(step > 0, ExcIndexRange(step, 1, lstep + 1));
 
-  return history_data[step]/history_data[step-1];
+  return history_data[step] / history_data[step - 1];
 }
 
 
@@ -201,42 +201,41 @@ SolverControl::final_reduction() const
 
 
 void
-SolverControl::declare_parameters (ParameterHandler &param)
+SolverControl::declare_parameters(ParameterHandler &param)
 {
-  param.declare_entry ("Max steps", "100", Patterns::Integer());
-  param.declare_entry ("Tolerance", "1.e-10", Patterns::Double());
-  param.declare_entry ("Log history", "false", Patterns::Bool());
-  param.declare_entry ("Log frequency", "1", Patterns::Integer());
-  param.declare_entry ("Log result", "true", Patterns::Bool());
+  param.declare_entry("Max steps", "100", Patterns::Integer());
+  param.declare_entry("Tolerance", "1.e-10", Patterns::Double());
+  param.declare_entry("Log history", "false", Patterns::Bool());
+  param.declare_entry("Log frequency", "1", Patterns::Integer());
+  param.declare_entry("Log result", "true", Patterns::Bool());
 }
 
 
-void SolverControl::parse_parameters (ParameterHandler &param)
+void
+SolverControl::parse_parameters(ParameterHandler &param)
 {
-  set_max_steps (param.get_integer("Max steps"));
-  set_tolerance (param.get_double("Tolerance"));
-  log_history (param.get_bool("Log history"));
-  log_result (param.get_bool("Log result"));
-  log_frequency (param.get_integer("Log frequency"));
+  set_max_steps(param.get_integer("Max steps"));
+  set_tolerance(param.get_double("Tolerance"));
+  log_history(param.get_bool("Log history"));
+  log_result(param.get_bool("Log result"));
+  log_frequency(param.get_integer("Log frequency"));
 }
 
 /*----------------------- ReductionControl ---------------------------------*/
 
 
 ReductionControl::ReductionControl(const unsigned int n,
-                                   const double tol,
-                                   const double red,
-                                   const bool m_log_history,
-                                   const bool m_log_result)
-  :
-  SolverControl (n, tol, m_log_history, m_log_result),
+                                   const double       tol,
+                                   const double       red,
+                                   const bool         m_log_history,
+                                   const bool         m_log_result) :
+  SolverControl(n, tol, m_log_history, m_log_result),
   reduce(red),
   reduced_tol(numbers::signaling_nan<double>())
 {}
 
 
-ReductionControl::ReductionControl (const SolverControl &c)
-  :
+ReductionControl::ReductionControl(const SolverControl &c) :
   SolverControl(c),
   reduce(numbers::signaling_nan<double>()),
   reduced_tol(numbers::signaling_nan<double>())
@@ -246,7 +245,7 @@ ReductionControl::ReductionControl (const SolverControl &c)
 
 
 ReductionControl &
-ReductionControl::operator= (const SolverControl &c)
+ReductionControl::operator=(const SolverControl &c)
 {
   SolverControl::operator=(c);
   set_reduction(0.);
@@ -256,13 +255,12 @@ ReductionControl::operator= (const SolverControl &c)
 
 
 SolverControl::State
-ReductionControl::check (const unsigned int step,
-                         const double check_value)
+ReductionControl::check(const unsigned int step, const double check_value)
 {
   // if this is the first time we
   // come here, then store the
   // residual for later comparisons
-  if (step==0)
+  if (step == 0)
     {
       initial_val = check_value;
       reduced_tol = check_value * reduce;
@@ -275,8 +273,8 @@ ReductionControl::check (const unsigned int step,
   if (check_value <= reduced_tol)
     {
       if (m_log_result)
-        deallog << "Convergence step " << step
-                << " value " << check_value << std::endl;
+        deallog << "Convergence step " << step << " value " << check_value
+                << std::endl;
       lstep  = step;
       lvalue = check_value;
       lcheck = success;
@@ -293,18 +291,18 @@ ReductionControl::check (const unsigned int step,
 
 
 void
-ReductionControl::declare_parameters (ParameterHandler &param)
+ReductionControl::declare_parameters(ParameterHandler &param)
 {
-  SolverControl::declare_parameters (param);
+  SolverControl::declare_parameters(param);
   param.declare_entry("Reduction", "1.e-2", Patterns::Double());
 }
 
 
 void
-ReductionControl::parse_parameters (ParameterHandler &param)
+ReductionControl::parse_parameters(ParameterHandler &param)
 {
-  SolverControl::parse_parameters (param);
-  set_reduction (param.get_double("Reduction"));
+  SolverControl::parse_parameters(param);
+  set_reduction(param.get_double("Reduction"));
 }
 
 
@@ -313,25 +311,23 @@ ReductionControl::parse_parameters (ParameterHandler &param)
 
 IterationNumberControl::IterationNumberControl(const unsigned int n,
                                                const double       tolerance,
-                                               const bool m_log_history,
-                                               const bool m_log_result)
-  :
-  SolverControl (n, tolerance, m_log_history, m_log_result) {}
-
+                                               const bool         m_log_history,
+                                               const bool m_log_result) :
+  SolverControl(n, tolerance, m_log_history, m_log_result)
+{}
 
 
 
 SolverControl::State
-IterationNumberControl::check (const unsigned int step,
-                               const double check_value)
+IterationNumberControl::check(const unsigned int step, const double check_value)
 {
   // check whether the given number of iterations was reached, and return
   // success in that case. Otherwise, go on to the check of the base class.
   if (step >= this->maxsteps)
     {
       if (m_log_result)
-        deallog << "Convergence step " << step
-                << " value " << check_value << std::endl;
+        deallog << "Convergence step " << step << " value " << check_value
+                << std::endl;
       lstep  = step;
       lvalue = check_value;
 
@@ -345,24 +341,23 @@ IterationNumberControl::check (const unsigned int step,
 /*------------------------ ConsecutiveControl -------------------------------*/
 
 
-ConsecutiveControl::ConsecutiveControl(const unsigned int n,
-                                       const double       tolerance,
-                                       const unsigned int n_consecutive_iterations,
-                                       const bool m_log_history,
-                                       const bool m_log_result)
-  :
-  SolverControl (n, tolerance, m_log_history, m_log_result),
+ConsecutiveControl::ConsecutiveControl(
+  const unsigned int n,
+  const double       tolerance,
+  const unsigned int n_consecutive_iterations,
+  const bool         m_log_history,
+  const bool         m_log_result) :
+  SolverControl(n, tolerance, m_log_history, m_log_result),
   n_consecutive_iterations(n_consecutive_iterations),
   n_converged_iterations(0)
 {
-  AssertThrow(n_consecutive_iterations>0,
+  AssertThrow(n_consecutive_iterations > 0,
               ExcMessage("n_consecutive_iterations should be positive"));
 }
 
 
 
-ConsecutiveControl::ConsecutiveControl (const SolverControl &c)
-  :
+ConsecutiveControl::ConsecutiveControl(const SolverControl &c) :
   SolverControl(c),
   n_consecutive_iterations(1),
   n_converged_iterations(0)
@@ -371,30 +366,29 @@ ConsecutiveControl::ConsecutiveControl (const SolverControl &c)
 
 
 ConsecutiveControl &
-ConsecutiveControl::operator= (const SolverControl &c)
+ConsecutiveControl::operator=(const SolverControl &c)
 {
-  SolverControl::operator=(c);
+  SolverControl::operator  =(c);
   n_consecutive_iterations = 1;
-  n_converged_iterations = 0;
+  n_converged_iterations   = 0;
   return *this;
 }
 
 
 
 SolverControl::State
-ConsecutiveControl::check (const unsigned int step,
-                           const double check_value)
+ConsecutiveControl::check(const unsigned int step, const double check_value)
 {
   // reset the counter if ConsecutiveControl is being reused
-  if (step==0)
+  if (step == 0)
     n_converged_iterations = 0;
   else
     {
       // check two things:
       // (i)  steps are ascending without repetitions
       // (ii) user started from zero even when solver is being reused.
-      Assert (step-1 == lstep,
-              ExcMessage("steps should be ascending integers."));
+      Assert(step - 1 == lstep,
+             ExcMessage("steps should be ascending integers."));
     }
 
   SolverControl::State state = SolverControl::check(step, check_value);

@@ -18,48 +18,50 @@
 // 2007-03-02, that illustrates that bicgstab can't handle early
 // success
 
-#include "../tests.h"
-#include "../testmatrix.h"
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/sparse_ilu.h>
-#include <deal.II/lac/solver_bicgstab.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/sparse_ilu.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+
+#include "../testmatrix.h"
+#include "../tests.h"
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
   GrowingVectorMemory<> mem;
-  SolverControl control(100, 1.e-3);
-  SolverBicgstab<> bicgstab(control, mem);
+  SolverControl         control(100, 1.e-3);
+  SolverBicgstab<>      bicgstab(control, mem);
 
-  SparsityPattern sparsity_pattern(4,4,4);
-  for (unsigned int i=0; i<4; ++i)
-    for (unsigned int j=0; j<4; ++j)
-      sparsity_pattern.add(i,j);
+  SparsityPattern sparsity_pattern(4, 4, 4);
+  for (unsigned int i = 0; i < 4; ++i)
+    for (unsigned int j = 0; j < 4; ++j)
+      sparsity_pattern.add(i, j);
   sparsity_pattern.compress();
 
   SparseMatrix<double> M(sparsity_pattern);
-  M.set(0,0,21.1);
-  M.set(0,1,0);
-  M.set(0,2,0);
-  M.set(0,3,0);
-  M.set(1,1,7.033333333);
-  M.set(1,0,0);
-  M.set(1,2,0);
-  M.set(1,3,3.516666667);
-  M.set(2,2,21.1);
-  M.set(2,0,0);
-  M.set(2,1,0);
-  M.set(2,3,0);
-  M.set(3,3,7.033333333);
-  M.set(3,0,0);
-  M.set(3,1,3.516666667);
-  M.set(3,2,0);
+  M.set(0, 0, 21.1);
+  M.set(0, 1, 0);
+  M.set(0, 2, 0);
+  M.set(0, 3, 0);
+  M.set(1, 1, 7.033333333);
+  M.set(1, 0, 0);
+  M.set(1, 2, 0);
+  M.set(1, 3, 3.516666667);
+  M.set(2, 2, 21.1);
+  M.set(2, 0, 0);
+  M.set(2, 1, 0);
+  M.set(2, 3, 0);
+  M.set(3, 3, 7.033333333);
+  M.set(3, 0, 0);
+  M.set(3, 1, 3.516666667);
+  M.set(3, 2, 0);
 
   Vector<double> rhs(4);
   rhs(0) = rhs(2) = 0;
@@ -69,21 +71,19 @@ int main()
   SparseILU<double>::AdditionalData data;
   data.use_this_sparsity = &sparsity_pattern;
   SparseILU<double> ilu;
-  ilu.initialize (M, data);
+  ilu.initialize(M, data);
 
-  Vector<double> solution (4);
+  Vector<double> solution(4);
   // this would fail with elements of
   // the solution vector being set to
   // NaN before Roger's suggested
   // change
-  bicgstab.solve (M, solution, rhs, ilu);
+  bicgstab.solve(M, solution, rhs, ilu);
 
-  for (unsigned int i=0; i<4; ++i)
+  for (unsigned int i = 0; i < 4; ++i)
     deallog << solution(i) << std::endl;
 
-  Vector<double> res (4);
-  M.residual (res, solution, rhs);
-  deallog << "residual=" << res.l2_norm()
-          << std::endl;
+  Vector<double> res(4);
+  M.residual(res, solution, rhs);
+  deallog << "residual=" << res.l2_norm() << std::endl;
 }
-

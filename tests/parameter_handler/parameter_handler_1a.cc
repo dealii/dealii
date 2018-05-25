@@ -18,27 +18,31 @@
 // check the Patterns::List pattern with a separator different from the
 // default ','
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+#include "../tests.h"
+
+void
+check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "-1 xyz 0",
-                     Patterns::List(Patterns::Integer(-1,1),2,3,"xyz"));
+  prm.declare_entry("test_1",
+                    "-1 xyz 0",
+                    Patterns::List(Patterns::Integer(-1, 1), 2, 3, "xyz"));
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_1a.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_1a.prm");
 
   return 0;
 }

@@ -21,12 +21,12 @@
 #include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  std::abort ();
+  std::abort();
 
   deallog << "OK" << std::endl;
 }
-

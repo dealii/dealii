@@ -17,24 +17,27 @@
 
 // check Vector<double>::size()
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 static unsigned int counter = 0;
 
 template <typename Number>
-void fill (Vector<Number> &v)
+void
+fill(Vector<Number> &v)
 {
   v = 0;
   for (unsigned int i = 0; i < v.size(); i++)
-    v(i) = counter + i*2;
+    v(i) = counter + i * 2;
 
   ++counter;
 }
 
 
 template <typename Number>
-void test (const std::vector<unsigned int> &size_sequence)
+void
+test(const std::vector<unsigned int> &size_sequence)
 {
   Vector<Number> v, v_old;
   for (unsigned int j = 0; j < size_sequence.size(); ++j)
@@ -50,14 +53,16 @@ void test (const std::vector<unsigned int> &size_sequence)
           v.grow_or_shrink(s);
           for (unsigned int i = 0; i < check_s; ++i)
             AssertThrow(v(i) == v_old(i),
-                        ExcMessage("s=" + std::to_string(s) + " i=" + std::to_string(i) + " " +
-                                   std::to_string(v(i)) + "!=" + std::to_string(v_old(i))));
+                        ExcMessage("s=" + std::to_string(s) +
+                                   " i=" + std::to_string(i) + " " +
+                                   std::to_string(v(i)) +
+                                   "!=" + std::to_string(v_old(i))));
 
           for (unsigned int i = check_s; i < s; ++i)
             AssertThrow(v(i) == 0.,
-                        ExcMessage("s=" + std::to_string(s) + " i=" + std::to_string(i) + " " +
+                        ExcMessage("s=" + std::to_string(s) +
+                                   " i=" + std::to_string(i) + " " +
                                    std::to_string(v(i)) + "!=0"));
-
         }
 
       fill(v);
@@ -70,10 +75,13 @@ void test (const std::vector<unsigned int> &size_sequence)
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  const std::vector<unsigned int> size_sequence = {{1,2,3,5,4,7,9,7,11,15,220,19,18,17,16,40,35,129,300,287}};
+  const std::vector<unsigned int> size_sequence = {
+    {1,   2,  3,  5,  4,  7,  9,  7,   11,  15,
+     220, 19, 18, 17, 16, 40, 35, 129, 300, 287}};
   test<double>(size_sequence);
 }

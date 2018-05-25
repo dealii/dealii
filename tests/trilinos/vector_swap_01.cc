@@ -19,29 +19,33 @@
  */
 
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_vector.h>
+
 #include <iostream>
 #include <vector>
 
-void print(TrilinosWrappers::MPI::Vector &v)
+#include "../tests.h"
+
+void
+print(TrilinosWrappers::MPI::Vector &v)
 {
-  deallog << "size= " << v.size()
-          << " el(0)= " << v(0)
+  deallog << "size= " << v.size() << " el(0)= " << v(0)
           << " l2norm()= " << v.l2_norm() << std::endl;
 }
 
 
-void test ()
+void
+test()
 {
   TrilinosWrappers::MPI::Vector v;
   v.reinit(complete_index_set(5), MPI_COMM_WORLD);
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     v(i) = 1;
   TrilinosWrappers::MPI::Vector w;
   w.reinit(complete_index_set(9), MPI_COMM_WORLD);
-  for (unsigned int i=0; i<w.size(); ++i)
+  for (unsigned int i = 0; i < w.size(); ++i)
     w(i) = 2;
 
 
@@ -52,34 +56,37 @@ void test ()
 
   deallog << "**swap**" << std::endl;
 
-  swap(v,w);
+  swap(v, w);
 
   deallog << "v: ";
   print(v);
   deallog << "w: ";
   print(w);
 
-  Assert (v.size()==9, ExcInternalError());
+  Assert(v.size() == 9, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -92,7 +99,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

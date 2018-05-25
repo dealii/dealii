@@ -23,7 +23,8 @@
 
 #include "../tests.h"
 
-int main ()
+int
+main()
 {
   initlog();
 #ifdef DEBUG
@@ -32,4 +33,3 @@ int main ()
   deallog << "DEBUG undefined!" << std::endl;
 #endif
 }
-

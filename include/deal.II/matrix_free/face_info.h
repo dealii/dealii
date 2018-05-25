@@ -108,9 +108,10 @@ namespace internal
       /**
        * Return the memory consumption of the present data structure.
        */
-      std::size_t memory_consumption() const
+      std::size_t
+      memory_consumption() const
       {
-        return sizeof (*this);
+        return sizeof(*this);
       }
     };
 
@@ -127,40 +128,43 @@ namespace internal
        * Clear all data fields to be in a state similar to after having
        * called the default constructor.
        */
-      void clear()
+      void
+      clear()
       {
-        faces = std::vector<FaceToCellTopology<vectorization_width> >();
-        cell_and_face_to_plain_faces.reinit(TableIndices<3>(0,0,0));
-        cell_and_face_boundary_id.reinit(TableIndices<3>(0,0,0));
+        faces = std::vector<FaceToCellTopology<vectorization_width>>();
+        cell_and_face_to_plain_faces.reinit(TableIndices<3>(0, 0, 0));
+        cell_and_face_boundary_id.reinit(TableIndices<3>(0, 0, 0));
       }
 
       /**
        * Return the memory consumption of the present data structure.
        */
-      std::size_t memory_consumption() const
+      std::size_t
+      memory_consumption() const
       {
-        return sizeof (faces) + cell_and_face_to_plain_faces.memory_consumption()
-               + cell_and_face_boundary_id.memory_consumption();
+        return sizeof(faces) +
+               cell_and_face_to_plain_faces.memory_consumption() +
+               cell_and_face_boundary_id.memory_consumption();
       }
 
       /**
        * Vectorized storage of interior faces, linking to the two cells in the
        * vectorized cell storage.
        */
-      std::vector<FaceToCellTopology<vectorization_width> > faces;
+      std::vector<FaceToCellTopology<vectorization_width>> faces;
 
       /**
        * This table translates a triple of the macro cell number, the index of a
        * face within a cell and the index within the cell batch of vectorization
        * into the index within the @p faces array.
        */
-      ::dealii::Table<3,unsigned int> cell_and_face_to_plain_faces;
+      ::dealii::Table<3, unsigned int> cell_and_face_to_plain_faces;
 
       /**
        * Stores the boundary ids of the faces in vectorized format using the
        * same indexing as the cell_and_face_to_plain_faces data structure
        */
-      ::dealii::Table<3,types::boundary_id> cell_and_face_boundary_id;
+      ::dealii::Table<3, types::boundary_id> cell_and_face_boundary_id;
     };
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal

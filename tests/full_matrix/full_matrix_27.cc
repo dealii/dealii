@@ -23,14 +23,12 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<number> m(10,10),n;
-  make_matrix (n);
-  m.add (n, 2., 3, 4, 2, 3);
-  print_matrix (m);
+  FullMatrix<number> m(10, 10), n;
+  make_matrix(n);
+  m.add(n, 2., 3, 4, 2, 3);
+  print_matrix(m);
 }
-

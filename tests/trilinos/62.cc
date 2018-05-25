@@ -17,47 +17,53 @@
 
 // check TrilinosWrappers::SparseMatrix::clear ()
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::SparseMatrix &m)
+
+void
+test(TrilinosWrappers::SparseMatrix &m)
 {
-  AssertThrow (m.m() != 0, ExcInternalError());
-  AssertThrow (m.n() != 0, ExcInternalError());
+  AssertThrow(m.m() != 0, ExcInternalError());
+  AssertThrow(m.n() != 0, ExcInternalError());
 
-  m.clear ();
+  m.clear();
 
-  AssertThrow (m.m() == 0, ExcInternalError());
-  AssertThrow (m.n() == 0, ExcInternalError());
+  AssertThrow(m.m() == 0, ExcInternalError());
+  AssertThrow(m.n() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
     {
       {
-        TrilinosWrappers::SparseMatrix v (100U,100U,5U);
-        test (v);
+        TrilinosWrappers::SparseMatrix v(100U, 100U, 5U);
+        test(v);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -70,7 +76,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

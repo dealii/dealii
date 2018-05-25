@@ -14,30 +14,31 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/logstream.h>
-#include <deal.II/lac/vector_memory.h>
-
-#include <deal.II/algorithms/operator.templates.h>
 #include <deal.II/algorithms/newton.templates.h>
+#include <deal.II/algorithms/operator.templates.h>
 #include <deal.II/algorithms/theta_timestepping.templates.h>
 
-#include <deal.II/lac/vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/parameter_handler.h>
+
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/la_vector.h>
-#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace Algorithms
 {
-  void OperatorBase::notify(const Event &e)
+  void
+  OperatorBase::notify(const Event &e)
   {
     notifications += e;
   }
@@ -45,12 +46,12 @@ namespace Algorithms
 
 
   void
-  OperatorBase::clear_events ()
+  OperatorBase::clear_events()
   {
     notifications.clear();
   }
 
 #include "operator.inst"
-}
+} // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE

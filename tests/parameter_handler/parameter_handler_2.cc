@@ -18,27 +18,28 @@
 // check the Patterns::List pattern. this particular test failed at
 // one point in time with an assertion due to a pretty stupid bug.
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   initlog();
 
   ParameterHandler prm;
-  prm.enter_subsection ("Testing");
-  prm.declare_entry ("Function",
-                     "a",
-                     Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
-  prm.leave_subsection ();
+  prm.enter_subsection("Testing");
+  prm.declare_entry(
+    "Function", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
+  prm.leave_subsection();
 
   prm.parse_input(SOURCE_DIR "/prm/parameter_handler_2.prm");
 
   std::string list;
-  prm.enter_subsection ("Testing");
-  list = prm.get ("Function");
-  prm.leave_subsection ();
+  prm.enter_subsection("Testing");
+  list = prm.get("Function");
+  prm.leave_subsection();
 
   deallog << list << std::endl;
 

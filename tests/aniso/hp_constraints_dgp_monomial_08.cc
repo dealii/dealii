@@ -15,7 +15,8 @@
 
 
 
-// check that computation of hp constraints works for DGP_Monomial elements correctly
+// check that computation of hp constraints works for DGP_Monomial elements
+// correctly
 
 char logname[] = "output";
 
@@ -24,11 +25,12 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   hp::FECollection<dim> fe;
-  for (unsigned int i=0; i<4; ++i)
-    fe.push_back (FE_DGPMonomial<dim>(i));
+  for (unsigned int i = 0; i < 4; ++i)
+    fe.push_back(FE_DGPMonomial<dim>(i));
 
-  test_with_hanging_nodes_random_aniso (fe);
+  test_with_hanging_nodes_random_aniso(fe);
 }

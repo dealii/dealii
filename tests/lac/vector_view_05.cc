@@ -15,9 +15,10 @@
 
 // check VectorView::checkReadWriteConstructor
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_view.h>
+
+#include "../tests.h"
 
 template <typename number>
 void
@@ -38,8 +39,8 @@ checkReadWriteConstructor(Vector<number> &V)
   deallog << std::endl;
 
   deallog
-      << "Incrementing Vector<number> elements using Read-write handle of VectorView<number>"
-      << std::endl;
+    << "Incrementing Vector<number> elements using Read-write handle of VectorView<number>"
+    << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     VV(i) = VV(i) + 1;
 
@@ -66,4 +67,3 @@ main()
 
   checkReadWriteConstructor<double>(V1);
 }
-

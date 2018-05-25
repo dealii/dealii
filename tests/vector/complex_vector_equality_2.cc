@@ -15,48 +15,52 @@
 
 
 
-// check Vector<std::complex<double> >::operator==(Vector<std::complex<double> >) for vectors that are
-// equal
+// check Vector<std::complex<double> >::operator==(Vector<std::complex<double>
+// >) for vectors that are equal
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<std::complex<double> > &v,
-           Vector<std::complex<double> > &w)
+
+void
+test(Vector<std::complex<double>> &v, Vector<std::complex<double>> &w)
 {
   // set only certain elements of each
   // vector
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      v(i) = std::complex<double> (i, i+1.);
-      if (i%3 == 0)
-        w(i) = std::complex<double> (i+1., i+2.);
+      v(i) = std::complex<double>(i, i + 1.);
+      if (i % 3 == 0)
+        w(i) = std::complex<double>(i + 1., i + 2.);
     }
   // but then copy elements and make sure the
   // vectors are actually equal
   v = w;
-  AssertThrow (v==w, ExcInternalError());
+  AssertThrow(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<std::complex<double> > v (100);
-      Vector<std::complex<double> > w (100);
-      test (v,w);
+      Vector<std::complex<double>> v(100);
+      Vector<std::complex<double>> w(100);
+      test(v, w);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -69,7 +73,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

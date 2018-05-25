@@ -19,24 +19,26 @@
 // ConstraintMatrix::distribute_local_to_global for row and column indices
 // with different constraints on the rows and columns.
 
+#include <deal.II/base/function.h>
+
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/full_matrix.h>
+
+#include <complex>
+#include <iostream>
+
 #include "../tests.h"
 
-#include <deal.II/base/function.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/constraint_matrix.h>
-
-#include <iostream>
-#include <complex>
-
-void test ()
+void
+test()
 {
-  FullMatrix<double> local(2,2);
-  local(0,0) = 8.;
-  local(0,1) = 2.;
-  local(1,0) = -2.;
-  local(1,1) = 12.;
-  FullMatrix<double> global1(4,6), global2(4,6);
-  ConstraintMatrix cm1, cm2;
+  FullMatrix<double> local(2, 2);
+  local(0, 0) = 8.;
+  local(0, 1) = 2.;
+  local(1, 0) = -2.;
+  local(1, 1) = 12.;
+  FullMatrix<double> global1(4, 6), global2(4, 6);
+  ConstraintMatrix   cm1, cm2;
   cm1.add_line(2);
   cm1.add_entry(2, 1, 0.5);
   cm1.add_entry(2, 3, 0.5);
@@ -60,7 +62,8 @@ void test ()
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 

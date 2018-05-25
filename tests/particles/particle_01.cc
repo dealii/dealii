@@ -17,12 +17,14 @@
 
 // check the creation and destruction of particles
 
-#include "../tests.h"
 #include <deal.II/particles/particle.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   {
     Particles::Particle<dim> particle;
@@ -41,7 +43,8 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
   test<2>();

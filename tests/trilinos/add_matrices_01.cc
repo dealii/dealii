@@ -19,50 +19,55 @@
 // pattern (and where the sparsity pattern of the calling matrix is more
 // inclusive which is necessary for the operation to succeed)
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0) deallog << "numproc=" << numproc << std::endl;
+  if (myid == 0)
+    deallog << "numproc=" << numproc << std::endl;
 
 
   // each processor owns 3 indices
-  IndexSet local_owned(numproc*3);
-  local_owned.add_range(myid*3,myid*3+3);
+  IndexSet local_owned(numproc * 3);
+  local_owned.add_range(myid * 3, myid * 3 + 3);
 
   // Create sparsity patterns
   TrilinosWrappers::SparsityPattern sp1(local_owned, MPI_COMM_WORLD),
-                   sp2(local_owned, MPI_COMM_WORLD);
+    sp2(local_owned, MPI_COMM_WORLD);
 
-  for (unsigned int i=myid*3; i<myid*3+3; ++i)
-    for (unsigned int j=0; j<local_owned.size(); ++j)
-      if ((i+j) % 2 == 1)
+  for (unsigned int i = myid * 3; i < myid * 3 + 3; ++i)
+    for (unsigned int j = 0; j < local_owned.size(); ++j)
+      if ((i + j) % 2 == 1)
         {
-          sp1.add (i,j);
-          if (j%2 == 0)
-            sp2.add(i,j);
+          sp1.add(i, j);
+          if (j % 2 == 0)
+            sp2.add(i, j);
         }
 
-  sp1.compress ();
+  sp1.compress();
   sp2.compress();
 
   // create matrices by adding some elements into the respective positions
   TrilinosWrappers::SparseMatrix m1(sp1), m2(sp2);
-  for (unsigned int i=myid*3; i<myid*3+3; ++i)
-    for (unsigned int j=0; j<local_owned.size(); ++j)
-      if ((i+j) % 2 == 1)
+  for (unsigned int i = myid * 3; i < myid * 3 + 3; ++i)
+    for (unsigned int j = 0; j < local_owned.size(); ++j)
+      if ((i + j) % 2 == 1)
         {
-          m1.add (i,j, i+j);
-          if (j%2 == 0)
-            m2.add(i,j, i+2*j+1);
+          m1.add(i, j, i + j);
+          if (j % 2 == 0)
+            m2.add(i, j, i + 2 * j + 1);
         }
   m1.compress(VectorOperation::add);
   m2.compress(VectorOperation::add);
@@ -71,19 +76,20 @@ void test ()
 
   // Check for correctness of entries (all floating point comparisons should
   // be exact)
-  for (unsigned int i=myid*3; i<myid*3+3; ++i)
-    for (unsigned int j=0; j<local_owned.size(); ++j)
-      if ((i+j) % 2 == 1 && j%2 == 0)
+  for (unsigned int i = myid * 3; i < myid * 3 + 3; ++i)
+    for (unsigned int j = 0; j < local_owned.size(); ++j)
+      if ((i + j) % 2 == 1 && j % 2 == 0)
         {
-          Assert(m1.el(i,j) == (double)i+j+2*i+4*j+2, ExcInternalError());
+          Assert(m1.el(i, j) == (double)i + j + 2 * i + 4 * j + 2,
+                 ExcInternalError());
         }
-      else if ((i+j) % 2 == 1)
+      else if ((i + j) % 2 == 1)
         {
-          Assert(m1.el(i,j) == (double)i+j, ExcInternalError());
+          Assert(m1.el(i, j) == (double)i + j, ExcInternalError());
         }
       else
         {
-          Assert(m1.el(i,j) == 0., ExcInternalError());
+          Assert(m1.el(i, j) == 0., ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
@@ -91,19 +97,22 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -116,7 +125,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -15,53 +15,57 @@
 
 
 
-// this tests a failure in the design of the block sparse matrix iterators: falling
-// off the end of the matrix does not yield the iterator provided by the end()
-// function
+// this tests a failure in the design of the block sparse matrix iterators:
+// falling off the end of the matrix does not yield the iterator provided by the
+// end() function
+
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 
 #include "../tests.h"
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/block_sparse_matrix.h>
 
 
-void test ()
+void
+test()
 {
-  BlockSparsityPattern bsp (2,2);
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
-      bsp.block(i,j).reinit (1,1,1);
-  bsp.collect_sizes ();
-  bsp.compress ();
+  BlockSparsityPattern bsp(2, 2);
+  for (unsigned int i = 0; i < 2; ++i)
+    for (unsigned int j = 0; j < 2; ++j)
+      bsp.block(i, j).reinit(1, 1, 1);
+  bsp.collect_sizes();
+  bsp.compress();
 
   BlockSparseMatrix<double> m(bsp);
 
   // advance it to the end of the matrix
   BlockSparseMatrix<double>::const_iterator it = m.begin();
-  for (unsigned int i=0; i<4; ++i)
+  for (unsigned int i = 0; i < 4; ++i)
     ++it;
 
   // now also get an end iterator
   BlockSparseMatrix<double>::const_iterator it2 = m.end();
 
   // make sure that the two of them match
-  AssertThrow (it == it2, ExcInternalError());
+  AssertThrow(it == it2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -74,7 +78,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

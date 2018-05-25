@@ -18,14 +18,16 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
+
 #include <deal.II/base/auto_derivative_function.h>
-#include <deal.II/base/tensor.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_local_storage.h>
-#include <vector>
+
 #include <map>
 #include <memory>
+#include <vector>
 
 namespace mu
 {
@@ -35,7 +37,8 @@ namespace mu
 DEAL_II_NAMESPACE_OPEN
 
 
-template <typename> class Vector;
+template <typename>
+class Vector;
 
 
 /**
@@ -204,9 +207,9 @@ public:
    * before the initialize() method has been called, then an exception
    * is thrown.
    */
-  FunctionParser (const unsigned int n_components = 1,
-                  const double       initial_time = 0.0,
-                  const double       h = 1e-8);
+  FunctionParser(const unsigned int n_components = 1,
+                 const double       initial_time = 0.0,
+                 const double       h            = 1e-8);
 
   /**
    * Destructor. Explicitly delete the FunctionParser objects (there is one
@@ -258,10 +261,11 @@ public:
    * method in this case is dim+1. The value of this parameter defaults to
    * false, i.e. do not consider time.
    */
-  void initialize (const std::string              &vars,
-                   const std::vector<std::string> &expressions,
-                   const ConstMap                 &constants,
-                   const bool time_dependent = false);
+  void
+  initialize(const std::string &             vars,
+             const std::vector<std::string> &expressions,
+             const ConstMap &                constants,
+             const bool                      time_dependent = false);
 
   /**
    * Initialize the function. Same as above, but accepts a string rather than
@@ -270,19 +274,19 @@ public:
    * this method is called and the number of components successfully parsed
    * does not match the number of components of the base function.
    */
-  void initialize (const std::string &vars,
-                   const std::string &expression,
-                   const ConstMap    &constants,
-                   const bool time_dependent = false);
+  void
+  initialize(const std::string &vars,
+             const std::string &expression,
+             const ConstMap &   constants,
+             const bool         time_dependent = false);
 
   /**
    * A function that returns default names for variables, to be used in the
    * first argument of the initialize() functions: it returns "x" in 1d, "x,y"
    * in 2d, and "x,y,z" in 3d.
    */
-  static
-  std::string
-  default_variable_names ();
+  static std::string
+  default_variable_names();
 
   /**
    * Return the value of the function at the given point. Unless there is only
@@ -290,8 +294,8 @@ public:
    * component you want to have evaluated; it defaults to zero, i.e. the first
    * component.
    */
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const override;
+  virtual double
+  value(const Point<dim> &p, const unsigned int component = 0) const override;
 
   /**
    * Return all components of a vector-valued function at the given point @p
@@ -299,23 +303,25 @@ public:
    *
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
-  virtual void vector_value (const Point<dim>   &p,
-                             Vector<double>     &values) const override;
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &values) const override;
 
   /**
    * @addtogroup Exceptions
    * @{
    */
-  DeclException2 (ExcParseError,
-                  int, char *,
-                  << "Parsing Error at Column " << arg1
-                  << ". The parser said: " << arg2);
+  DeclException2(ExcParseError,
+                 int,
+                 char *,
+                 << "Parsing Error at Column " << arg1
+                 << ". The parser said: " << arg2);
 
-  DeclException2 (ExcInvalidExpressionSize,
-                  int, int,
-                  << "The number of components (" << arg1
-                  << ") is not equal to the number of expressions ("
-                  << arg2 << ").");
+  DeclException2(ExcInvalidExpressionSize,
+                 int,
+                 int,
+                 << "The number of components (" << arg1
+                 << ") is not equal to the number of expressions (" << arg2
+                 << ").");
 
   //@}
 
@@ -324,21 +330,23 @@ private:
   /**
    * Place for the variables for each thread
    */
-  mutable Threads::ThreadLocalStorage<std::vector<double> > vars;
+  mutable Threads::ThreadLocalStorage<std::vector<double>> vars;
 
   /**
    * The muParser objects for each thread (and one for each component). We are
    * storing a unique_ptr so that we don't need to include the definition of
    * mu::Parser in this header.
    */
-#if TBB_VERSION_MAJOR >= 4
-  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser> > > fp;
-#else
+#  if TBB_VERSION_MAJOR >= 4
+  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser>>>
+    fp;
+#  else
   // older TBBs have a bug in which they want to return thread-local
   // objects by value. this doesn't work for std::unique_ptr, so use a
   // std::shared_ptr
-  mutable Threads::ThreadLocalStorage<std::vector<std::shared_ptr<mu::Parser> > > fp;
-#endif
+  mutable Threads::ThreadLocalStorage<std::vector<std::shared_ptr<mu::Parser>>>
+    fp;
+#  endif
 
   /**
    * An array to keep track of all the constants, required to initialize fp in
@@ -364,7 +372,8 @@ private:
    * already been called by testing whether 'fp.get().size()==0' (not
    * initialized) or >0 (already initialized).
    */
-  void init_muparser() const;
+  void
+  init_muparser() const;
 #endif
 
   /**
@@ -386,18 +395,18 @@ private:
 
 template <int dim>
 std::string
-FunctionParser<dim>::default_variable_names ()
+FunctionParser<dim>::default_variable_names()
 {
   switch (dim)
     {
-    case 1:
-      return "x";
-    case 2:
-      return "x,y";
-    case 3:
-      return "x,y,z";
-    default:
-      Assert (false, ExcNotImplemented());
+      case 1:
+        return "x";
+      case 2:
+        return "x,y";
+      case 3:
+        return "x,y,z";
+      default:
+        Assert(false, ExcNotImplemented());
     }
   return "";
 }
@@ -407,5 +416,3 @@ FunctionParser<dim>::default_variable_names ()
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
-

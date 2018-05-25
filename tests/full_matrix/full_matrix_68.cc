@@ -23,14 +23,12 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m, n;
-  make_matrix (m);
-  make_matrix (n);
-  deallog << (m==n) << std::endl;
+  make_matrix(m);
+  make_matrix(n);
+  deallog << (m == n) << std::endl;
 }
-

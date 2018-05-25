@@ -22,7 +22,8 @@
 #include "../tests.h"
 #include "generalized_interpolation.h"
 
-int main ()
+int
+main()
 {
   deallog.depth_console(3);
 

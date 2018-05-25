@@ -21,26 +21,27 @@
 
 // all include files you need here
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
 #include <string>
 
-int main ()
+int
+main()
 {
-  const int dim = 2;
+  const int dim      = 2;
   const int spacedim = 3;
 
   initlog();
 
   Triangulation<dim, spacedim> tria;
-  GridGenerator::torus (tria, 1.5, .5);
+  GridGenerator::torus(tria, 1.5, .5);
   tria.refine_global(2);
 
   GridOut grid_out;
-  grid_out.write_gnuplot (tria, deallog.get_file_stream());
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
 
   return 0;
 }

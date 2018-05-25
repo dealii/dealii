@@ -21,8 +21,9 @@
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=1; p<6-dim; ++p)
-    test_no_hanging_nodes (FE_Q_Hierarchical<dim>(p), p);
+  for (unsigned int p = 1; p < 6 - dim; ++p)
+    test_no_hanging_nodes(FE_Q_Hierarchical<dim>(p), p);
 }

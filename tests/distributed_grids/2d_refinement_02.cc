@@ -33,79 +33,82 @@
 // so this is what we also give as argument to the mesh with which we
 // compare
 
-#include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/intergrid_map.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/intergrid_map.h>
+
+#include "../tests.h"
+#include "coarse_grid_common.h"
 
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
-  Triangulation<dim> tr2 (Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim>                        tr2(
+    Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(tr);
-  tr.refine_global (1);
+  tr.refine_global(1);
 
   GridGenerator::hyper_cube(tr2);
-  tr2.refine_global (1);
+  tr2.refine_global(1);
 
-  Assert (tr.n_active_cells() == tr2.n_active_cells(),
-          ExcInternalError());
+  Assert(tr.n_active_cells() == tr2.n_active_cells(), ExcInternalError());
 
 
-  for (unsigned int i=0; i<15-2*dim; ++i)
+  for (unsigned int i = 0; i < 15 - 2 * dim; ++i)
     {
-      std::vector<bool> flags (tr.n_active_cells(), false);
+      std::vector<bool> flags(tr.n_active_cells(), false);
       {
         const unsigned int x = Testing::rand() % flags.size();
         deallog << "Refining cell " << x << std::endl;
         flags[x] = true;
       }
 
-      InterGridMap<Triangulation<dim> > intergrid_map;
-      intergrid_map.make_mapping (tr, tr2);
+      InterGridMap<Triangulation<dim>> intergrid_map;
+      intergrid_map.make_mapping(tr, tr2);
 
       // refine tr and tr2
-      unsigned int index=0;
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = tr.begin_active();
-           cell != tr.end(); ++cell, ++index)
+      unsigned int index = 0;
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             tr.begin_active();
+           cell != tr.end();
+           ++cell, ++index)
         if (flags[index])
           {
             cell->set_refine_flag();
             intergrid_map[cell]->set_refine_flag();
           }
-      Assert (index == tr.n_active_cells(), ExcInternalError());
-      tr.execute_coarsening_and_refinement ();
-      tr2.execute_coarsening_and_refinement ();
+      Assert(index == tr.n_active_cells(), ExcInternalError());
+      tr.execute_coarsening_and_refinement();
+      tr2.execute_coarsening_and_refinement();
 
       write_vtk(tr, "1");
       deallog << std::endl;
 
-      deallog << i << " Number of cells: "
-              << tr.n_active_cells() << ' '
-              << tr2.n_active_cells()
-              << std::endl;
+      deallog << i << " Number of cells: " << tr.n_active_cells() << ' '
+              << tr2.n_active_cells() << std::endl;
 
       assert_tria_equal(tr, tr2);
-
     }
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -113,6 +116,4 @@ int main(int argc, char *argv[])
   deallog.push("2d");
   test<2>(logfile);
   deallog.pop();
-
-
 }

@@ -24,28 +24,29 @@
 */
 
 
-#include "../tests.h"
-
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 using namespace std;
 
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim> &tria)
+void
+save_mesh(const Triangulation<dim, spacedim> &tria)
 {
   GridOut grid_out;
-  grid_out.write_ucd (tria, deallog.get_file_stream());
+  grid_out.write_ucd(tria, deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main()
 {
-
   ofstream logfile("output");
   deallog.attach(logfile);
 
@@ -53,50 +54,48 @@ int main ()
     // Extract the whole boundary of a hyper-cube
     const int dim = 2;
 
-    deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
-    map< Triangulation<dim-1,dim>::cell_iterator,
-         Triangulation<dim,dim>::face_iterator>
-         surface_to_volume_mapping;
+    deallog << "Testing hyper_cube in dim: " << dim << "..." << endl;
+    map<Triangulation<dim - 1, dim>::cell_iterator,
+        Triangulation<dim, dim>::face_iterator>
+      surface_to_volume_mapping;
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
     volume_mesh.begin_active()->face(0)->set_boundary_id(1);
-    volume_mesh.refine_global (1);
+    volume_mesh.refine_global(1);
 
     save_mesh(volume_mesh);
 
-    Triangulation<dim-1,dim> boundary_mesh;
+    Triangulation<dim - 1, dim> boundary_mesh;
 
-    surface_to_volume_mapping
-      = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
+    surface_to_volume_mapping =
+      GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
 
     save_mesh(boundary_mesh);
-
   }
 
   {
     // Extract the whole boundary of a hyper-cube
     const int dim = 3;
 
-    deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
-    map< Triangulation<dim-1,dim>::cell_iterator,
-         Triangulation<dim,dim>::face_iterator>
-         surface_to_volume_mapping;
+    deallog << "Testing hyper_cube in dim: " << dim << "..." << endl;
+    map<Triangulation<dim - 1, dim>::cell_iterator,
+        Triangulation<dim, dim>::face_iterator>
+      surface_to_volume_mapping;
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
     volume_mesh.begin_active()->face(0)->set_boundary_id(1);
-    volume_mesh.refine_global (1);
+    volume_mesh.refine_global(1);
 
     save_mesh(volume_mesh);
 
-    Triangulation<dim-1,dim> boundary_mesh;
+    Triangulation<dim - 1, dim> boundary_mesh;
 
-    surface_to_volume_mapping
-      = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
+    surface_to_volume_mapping =
+      GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
 
     save_mesh(boundary_mesh);
-
   }
 
 
@@ -104,32 +103,28 @@ int main ()
     // Extract a piece of the boundary of a hyper-cube
 
     const int dim = 3;
-    deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
+    deallog << "Testing hyper_cube in dim: " << dim << "..." << endl;
 
-    map< Triangulation<dim-1,dim>::cell_iterator,
-         Triangulation<dim,dim>::face_iterator>
-         surface_to_volume_mapping;
+    map<Triangulation<dim - 1, dim>::cell_iterator,
+        Triangulation<dim, dim>::face_iterator>
+      surface_to_volume_mapping;
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
     volume_mesh.begin_active()->face(0)->set_boundary_id(1);
-    volume_mesh.refine_global (1);
+    volume_mesh.refine_global(1);
 
     save_mesh(volume_mesh);
 
-    Triangulation<dim-1,dim> boundary_mesh;
-    set<types::boundary_id> boundary_ids;
+    Triangulation<dim - 1, dim> boundary_mesh;
+    set<types::boundary_id>     boundary_ids;
     boundary_ids.insert(0);
 
-    surface_to_volume_mapping
-      = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh,
-                                              boundary_ids);
+    surface_to_volume_mapping = GridGenerator::extract_boundary_mesh(
+      volume_mesh, boundary_mesh, boundary_ids);
 
     save_mesh(boundary_mesh);
-
   }
-
-
 
 
 

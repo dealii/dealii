@@ -18,71 +18,78 @@
 // check that we can fix up faces if we get distorted cells because a
 // face is out of whack
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_reordering.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_values.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
 class MyManifold : public Manifold<dim>
 {
-  virtual std::unique_ptr<Manifold<dim> > clone() const override
+  virtual std::unique_ptr<Manifold<dim>>
+  clone() const override
   {
-    return std::unique_ptr<Manifold<dim> >(new MyManifold<dim>());
+    return std::unique_ptr<Manifold<dim>>(new MyManifold<dim>());
   }
 
   virtual Point<dim>
-  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+  get_new_point_on_line(
+    const typename Triangulation<dim>::line_iterator &line) const
   {
-    deallog << "Finding point between "
-            << line->vertex(0) << " and "
+    deallog << "Finding point between " << line->vertex(0) << " and "
             << line->vertex(1) << std::endl;
 
-    return Point<dim>(0,0.5,0.9);
+    return Point<dim>(0, 0.5, 0.9);
   }
 
   virtual Point<dim>
-  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
+  get_new_point_on_quad(
+    const typename Triangulation<dim>::quad_iterator &) const
   {
-    Assert (false, ExcInternalError());
-    return Point<dim>(0,0,1.25);
+    Assert(false, ExcInternalError());
+    return Point<dim>(0, 0, 1.25);
   }
 };
 
 
 
 template <int dim>
-void check ()
+void
+check()
 {
   MyManifold<dim> my_manifold;
 
   // create two cubes
-  Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
+  Triangulation<dim> coarse_grid(Triangulation<dim>::none, true);
 
   std::vector<unsigned int> sub(dim, 1);
   sub[0] = 2;
-  Point<dim> p1 (-1,0,0), p2(1,1,1);
+  Point<dim> p1(-1, 0, 0), p2(1, 1, 1);
   GridGenerator::subdivided_hyper_rectangle(coarse_grid, sub, p1, p2, true);
 
   // set bottom middle edge to use MyManifold
-  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    for (unsigned int e=0; e<GeometryInfo<dim-1>::faces_per_cell; ++e)
+  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int e = 0; e < GeometryInfo<dim - 1>::faces_per_cell; ++e)
       if (coarse_grid.begin_active()->face(f)->line(e)->center()[0] == 0)
         if (coarse_grid.begin_active()->face(f)->line(e)->center()[1] == 0.5)
           if (coarse_grid.begin_active()->face(f)->line(e)->center()[2] == 0)
-            coarse_grid.begin_active()->face(f)->line(e)->set_manifold_id (99);
-  coarse_grid.set_manifold (99, my_manifold);
+            coarse_grid.begin_active()->face(f)->line(e)->set_manifold_id(99);
+  coarse_grid.set_manifold(99, my_manifold);
 
   // now try to refine this one
   // cell. we should not get an exception, but keep it to make sure the
@@ -96,35 +103,29 @@ void check ()
       deallog << "Found " << dcv.distorted_cells.size() << " distorted cells"
               << std::endl;
 
-      Assert (dcv.distorted_cells.size() == 2,
-              ExcInternalError());
+      Assert(dcv.distorted_cells.size() == 2, ExcInternalError());
 
-      typename Triangulation<dim>::DistortedCellList
-      subset = GridTools::fix_up_distorted_child_cells (dcv,
-                                                        coarse_grid);
+      typename Triangulation<dim>::DistortedCellList subset =
+        GridTools::fix_up_distorted_child_cells(dcv, coarse_grid);
       deallog << "Found " << subset.distorted_cells.size()
-              << " cells that are still distorted"
-              << std::endl;
+              << " cells that are still distorted" << std::endl;
 
-      Assert (subset.distorted_cells.size() == 0,
-              ExcInternalError());
+      Assert(subset.distorted_cells.size() == 0, ExcInternalError());
     }
 
-  Assert (coarse_grid.n_levels() == 2, ExcInternalError());
-  Assert (coarse_grid.n_active_cells() == 2*1<<dim, ExcInternalError());
+  Assert(coarse_grid.n_levels() == 2, ExcInternalError());
+  Assert(coarse_grid.n_active_cells() == 2 * 1 << dim, ExcInternalError());
 
   // output the coordinates of the
   // child cells
-  GridOut().write_gnuplot (coarse_grid, deallog.get_file_stream());
+  GridOut().write_gnuplot(coarse_grid, deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check<3> ();
+  check<3>();
 }
-
-
-

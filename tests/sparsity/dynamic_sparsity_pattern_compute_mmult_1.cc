@@ -19,12 +19,14 @@
 // check DynamicSparsityPattern::compute_mmult_pattern(). Test if multiplication
 // with each combination of SparsityPatternTypes is possible.
 
-#include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   // create different (dynamic) sparsity pattern and add entries at
   // destinct locations. Check if mmultiplication creates entries at the right
@@ -39,48 +41,46 @@ void test ()
 
   bool test_failed = false;
 
-  DynamicSparsityPattern dyn_left (M,N),
-                         dyn_right (N,O);
+  DynamicSparsityPattern dyn_left(M, N), dyn_right(N, O);
 
   DynamicSparsityPattern out;
 
-  SparsityPattern left,
-                  right;
+  SparsityPattern left, right;
 
   // add manually entries to pattern
-  for (unsigned int i=0; i<M; i+=m_entries)
-    for (unsigned int j=0; j<N; j+=n_entries)
-      dyn_left.add (i,j);
+  for (unsigned int i = 0; i < M; i += m_entries)
+    for (unsigned int j = 0; j < N; j += n_entries)
+      dyn_left.add(i, j);
   // add manually entries to pattern
-  for (unsigned int i=0; i<N; i+=n_entries)
-    for (unsigned int j=0; j<O; j+=o_entries)
-      dyn_right.add (i,j);
+  for (unsigned int i = 0; i < N; i += n_entries)
+    for (unsigned int j = 0; j < O; j += o_entries)
+      dyn_right.add(i, j);
   // copy DynamicSparsityPattern to SparsityPattern
   left.copy_from(dyn_left);
   right.copy_from(dyn_right);
   // test DynamicSparsityPattern and DynamicSparsityPattern
-  out.compute_mmult_pattern(dyn_left,dyn_right);
-  for (unsigned int i=0; i<M; i+=m_entries)
-    for (unsigned int j=0; j<O; j+=o_entries)
-      if (!out.exists(i,j))
+  out.compute_mmult_pattern(dyn_left, dyn_right);
+  for (unsigned int i = 0; i < M; i += m_entries)
+    for (unsigned int j = 0; j < O; j += o_entries)
+      if (!out.exists(i, j))
         test_failed = true;
   // test SparsityPattern and DynamicSparsityPattern
-  out.compute_mmult_pattern(left,dyn_right);
-  for (unsigned int i=0; i<M; i+=m_entries)
-    for (unsigned int j=0; j<O; j+=o_entries)
-      if (!out.exists(i,j))
+  out.compute_mmult_pattern(left, dyn_right);
+  for (unsigned int i = 0; i < M; i += m_entries)
+    for (unsigned int j = 0; j < O; j += o_entries)
+      if (!out.exists(i, j))
         test_failed = true;
   // test DynamicSparsityPattern and SparsityPattern
-  out.compute_mmult_pattern(dyn_left,right);
-  for (unsigned int i=0; i<M; i+=m_entries)
-    for (unsigned int j=0; j<O; j+=o_entries)
-      if (!out.exists(i,j))
+  out.compute_mmult_pattern(dyn_left, right);
+  for (unsigned int i = 0; i < M; i += m_entries)
+    for (unsigned int j = 0; j < O; j += o_entries)
+      if (!out.exists(i, j))
         test_failed = true;
   // test SparsityPattern and SparsityPattern
-  out.compute_mmult_pattern(left,right);
-  for (unsigned int i=0; i<M; i+=m_entries)
-    for (unsigned int j=0; j<O; j+=o_entries)
-      if (!out.exists(i,j))
+  out.compute_mmult_pattern(left, right);
+  for (unsigned int i = 0; i < M; i += m_entries)
+    for (unsigned int j = 0; j < O; j += o_entries)
+      if (!out.exists(i, j))
         test_failed = true;
 
   Assert(!test_failed, ExcInternalError());
@@ -89,10 +89,11 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
   return 0;
 }

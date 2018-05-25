@@ -16,31 +16,37 @@
 // Test PackagedOperation for
 //   dealii::SparseMatrix<double> with LinearOperator
 
-#include "../tests.h"
-
 #include <deal.II/lac/packaged_operation.h>
+
+#include "../tests.h"
 
 // and a _lot_ of stuff to create a linera oprator
 #include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
+
 #include <deal.II/numerics/matrix_tools.h>
 
 using namespace dealii;
 
 
-void test_applies(std::string description,
-                  const PackagedOperation<Vector<double> > &expr)
+void
+test_applies(std::string                              description,
+             const PackagedOperation<Vector<double>> &expr)
 {
   // test apply
   Vector<double> tmp = expr;
@@ -54,7 +60,8 @@ void test_applies(std::string description,
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
@@ -64,12 +71,12 @@ int main()
   // Create mass marix M, and an iterative inverse MInv:
 
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
   MappingQGeneric<dim> mapping_q1(1);
-  FE_Q<dim> q1(1);
-  DoFHandler<dim> dof_handler(triangulation);
+  FE_Q<dim>            q1(1);
+  DoFHandler<dim>      dof_handler(triangulation);
   dof_handler.distribute_dofs(q1);
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -79,17 +86,17 @@ int main()
   sparsity_pattern.copy_from(dsp);
   sparsity_pattern.compress();
 
-  SparseMatrix<double> m (sparsity_pattern);
+  SparseMatrix<double> m(sparsity_pattern);
 
   QGauss<dim> quadrature(4);
   MatrixCreator::create_mass_matrix(mapping_q1, dof_handler, quadrature, m);
 
   auto M = linear_operator(m);
 
-  SolverControl solver_control (1000, 1e-12);
-  SolverCG<> solver (solver_control);
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
 
-  auto MInv =  inverse_operator(M, solver, PreconditionIdentity());
+  auto MInv = inverse_operator(M, solver, PreconditionIdentity());
 
   // Tests:
 
@@ -97,7 +104,7 @@ int main()
   M.reinit_domain_vector(u, true);
   for (unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double)(i + 1);
     }
 
   deallog << "u: " << u << std::endl;

@@ -14,20 +14,19 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/la_vector.h>
-#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_element_access.h>
 
-#include <deal.II/numerics/vector_tools.h>
-
 #include <deal.II/numerics/point_value_history.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <algorithm>
 
@@ -39,94 +38,97 @@ namespace internal
 {
   namespace PointValueHistoryImplementation
   {
-/// Only a constructor needed for this class (a struct really)
+    /// Only a constructor needed for this class (a struct really)
     template <int dim>
-    PointGeometryData<dim>
-    ::PointGeometryData (const Point <dim> &new_requested_location,
-                         const std::vector <Point <dim> > &new_locations,
-                         const std::vector <types::global_dof_index> &new_sol_indices)
+    PointGeometryData<dim>::PointGeometryData(
+      const Point<dim> &                          new_requested_location,
+      const std::vector<Point<dim>> &             new_locations,
+      const std::vector<types::global_dof_index> &new_sol_indices)
     {
-      requested_location = new_requested_location;
+      requested_location      = new_requested_location;
       support_point_locations = new_locations;
-      solution_indices = new_sol_indices;
+      solution_indices        = new_sol_indices;
     }
-  }
-}
+  } // namespace PointValueHistoryImplementation
+} // namespace internal
 
 
 
 template <int dim>
-PointValueHistory<dim>
-::PointValueHistory (const unsigned int n_independent_variables) :
-  n_indep (n_independent_variables)
+PointValueHistory<dim>::PointValueHistory(
+  const unsigned int n_independent_variables) :
+  n_indep(n_independent_variables)
 {
-  closed = false;
-  cleared = false;
+  closed                = false;
+  cleared               = false;
   triangulation_changed = false;
-  have_dof_handler = false;
+  have_dof_handler      = false;
 
   // make a vector for keys
-  dataset_key = std::vector <double> (); // initialize the std::vector
+  dataset_key = std::vector<double>(); // initialize the std::vector
 
   // make a vector of independent values
-  independent_values
-    = std::vector<std::vector <double> > (n_indep, std::vector <double> (0));
-  indep_names = std::vector <std::string> ();
+  independent_values =
+    std::vector<std::vector<double>>(n_indep, std::vector<double>(0));
+  indep_names = std::vector<std::string>();
 }
 
 
 
 template <int dim>
-PointValueHistory<dim>::PointValueHistory (const DoFHandler<dim> &dof_handler,
-                                           const unsigned int n_independent_variables) :
-  dof_handler (&dof_handler),
-  n_indep (n_independent_variables)
+PointValueHistory<dim>::PointValueHistory(
+  const DoFHandler<dim> &dof_handler,
+  const unsigned int     n_independent_variables) :
+  dof_handler(&dof_handler),
+  n_indep(n_independent_variables)
 {
-  closed = false;
-  cleared = false;
+  closed                = false;
+  cleared               = false;
   triangulation_changed = false;
-  have_dof_handler = true;
+  have_dof_handler      = true;
 
   // make a vector to store keys
-  dataset_key = std::vector <double> (); // initialize the std::vector
+  dataset_key = std::vector<double>(); // initialize the std::vector
 
   // make a vector for the independent values
-  independent_values
-    = std::vector<std::vector <double> > (n_indep, std::vector <double> (0));
-  indep_names = std::vector <std::string> ();
+  independent_values =
+    std::vector<std::vector<double>>(n_indep, std::vector<double>(0));
+  indep_names = std::vector<std::string>();
 
-  tria_listener = dof_handler.get_triangulation().signals.any_change.connect (std::bind (&PointValueHistory<dim>::tria_change_listener,
-                  std::ref(*this)));
+  tria_listener = dof_handler.get_triangulation().signals.any_change.connect(
+    std::bind(&PointValueHistory<dim>::tria_change_listener, std::ref(*this)));
 }
 
 
 
 template <int dim>
-PointValueHistory<dim>::PointValueHistory (const PointValueHistory &point_value_history)
+PointValueHistory<dim>::PointValueHistory(
+  const PointValueHistory &point_value_history)
 {
-  dataset_key = point_value_history.dataset_key;
-  independent_values = point_value_history.independent_values;
-  indep_names = point_value_history.indep_names;
-  data_store = point_value_history.data_store;
-  component_mask = point_value_history.component_mask;
+  dataset_key         = point_value_history.dataset_key;
+  independent_values  = point_value_history.independent_values;
+  indep_names         = point_value_history.indep_names;
+  data_store          = point_value_history.data_store;
+  component_mask      = point_value_history.component_mask;
   component_names_map = point_value_history.component_names_map;
   point_geometry_data = point_value_history.point_geometry_data;
 
-  closed = point_value_history.closed;
+  closed  = point_value_history.closed;
   cleared = point_value_history.cleared;
 
   dof_handler = point_value_history.dof_handler;
 
   triangulation_changed = point_value_history.triangulation_changed;
-  have_dof_handler = point_value_history.have_dof_handler;
-  n_indep = point_value_history.n_indep;
+  have_dof_handler      = point_value_history.have_dof_handler;
+  n_indep               = point_value_history.n_indep;
 
   // What to do with tria_listener?
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_triangulation().signals.any_change.connect (std::bind     (&PointValueHistory<dim>::tria_change_listener,
-                      std::ref(*this)));
+      tria_listener =
+        dof_handler->get_triangulation().signals.any_change.connect(std::bind(
+          &PointValueHistory<dim>::tria_change_listener, std::ref(*this)));
     }
 }
 
@@ -134,104 +136,102 @@ PointValueHistory<dim>::PointValueHistory (const PointValueHistory &point_value_
 
 template <int dim>
 PointValueHistory<dim> &
-PointValueHistory<dim>::operator= (const PointValueHistory &point_value_history)
+PointValueHistory<dim>::operator=(const PointValueHistory &point_value_history)
 {
-  dataset_key = point_value_history.dataset_key;
-  independent_values = point_value_history.independent_values;
-  indep_names = point_value_history.indep_names;
-  data_store = point_value_history.data_store;
-  component_mask = point_value_history.component_mask;
+  dataset_key         = point_value_history.dataset_key;
+  independent_values  = point_value_history.independent_values;
+  indep_names         = point_value_history.indep_names;
+  data_store          = point_value_history.data_store;
+  component_mask      = point_value_history.component_mask;
   component_names_map = point_value_history.component_names_map;
   point_geometry_data = point_value_history.point_geometry_data;
 
-  closed = point_value_history.closed;
+  closed  = point_value_history.closed;
   cleared = point_value_history.cleared;
 
   dof_handler = point_value_history.dof_handler;
 
   triangulation_changed = point_value_history.triangulation_changed;
-  have_dof_handler = point_value_history.have_dof_handler;
-  n_indep = point_value_history.n_indep;
+  have_dof_handler      = point_value_history.have_dof_handler;
+  n_indep               = point_value_history.n_indep;
 
   // What to do with tria_listener?
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_triangulation().signals.any_change.connect (std::bind     (&PointValueHistory<dim>::tria_change_listener,
-                      std::ref(*this)));
+      tria_listener =
+        dof_handler->get_triangulation().signals.any_change.connect(std::bind(
+          &PointValueHistory<dim>::tria_change_listener, std::ref(*this)));
     }
 
-  return * this;
+  return *this;
 }
 
 
 
 template <int dim>
-PointValueHistory<dim>
-::~PointValueHistory ()
+PointValueHistory<dim>::~PointValueHistory()
 {
   if (have_dof_handler)
     {
-      tria_listener.disconnect ();
+      tria_listener.disconnect();
     }
 }
 
 
 
 template <int dim>
-void PointValueHistory<dim>
-::add_point (const Point <dim> &location)
+void
+PointValueHistory<dim>::add_point(const Point<dim> &location)
 {
   // can't be closed to add additional points
   // or vectors
-  AssertThrow (!closed, ExcInvalidState ());
-  AssertThrow (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-  AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+  AssertThrow(!closed, ExcInvalidState());
+  AssertThrow(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   // Implementation assumes that support
   // points locations are dofs locations
-  AssertThrow (dof_handler->get_fe().has_support_points (), ExcNotImplemented ());
+  AssertThrow(dof_handler->get_fe().has_support_points(), ExcNotImplemented());
 
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in
   // this case the quadrature points are
   // forced to be the support points of the
   // FE.
-  Quadrature<dim>
-  support_point_quadrature (dof_handler->get_fe().get_unit_support_points ());
-  FEValues<dim> fe_values (dof_handler->get_fe(),
-                           support_point_quadrature,
-                           update_quadrature_points);
-  unsigned int n_support_points
-    = dof_handler->get_fe().get_unit_support_points ().size ();
-  unsigned int n_components
-    = dof_handler->get_fe(0).n_components ();
+  Quadrature<dim> support_point_quadrature(
+    dof_handler->get_fe().get_unit_support_points());
+  FEValues<dim> fe_values(
+    dof_handler->get_fe(), support_point_quadrature, update_quadrature_points);
+  unsigned int n_support_points =
+    dof_handler->get_fe().get_unit_support_points().size();
+  unsigned int n_components = dof_handler->get_fe(0).n_components();
 
   // set up a loop over all the cells in the
   // DoFHandler
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler->begin_active ();
-  typename DoFHandler<dim>::active_cell_iterator
-  endc = dof_handler->end ();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+    dof_handler->begin_active();
+  typename DoFHandler<dim>::active_cell_iterator endc = dof_handler->end();
 
   // default values to be replaced as closer
   // points are found however they need to be
   // consistent in case they are actually
   // chosen
   typename DoFHandler<dim>::active_cell_iterator current_cell = cell;
-  std::vector <unsigned int> current_fe_index (n_components, 0); // need one index per component
-  fe_values.reinit (cell);
-  std::vector <Point <dim> > current_points (n_components, Point <dim > ());
-  for (unsigned int support_point = 0;
-       support_point < n_support_points; support_point++)
+  std::vector<unsigned int>                      current_fe_index(n_components,
+                                             0); // need one index per component
+  fe_values.reinit(cell);
+  std::vector<Point<dim>> current_points(n_components, Point<dim>());
+  for (unsigned int support_point = 0; support_point < n_support_points;
+       support_point++)
     {
       // setup valid data in the empty
       // vectors
-      unsigned int component
-        = dof_handler->get_fe().system_to_component_index (support_point).first;
-      current_points [component] = fe_values.quadrature_point (support_point);
-      current_fe_index [component] = support_point;
+      unsigned int component =
+        dof_handler->get_fe().system_to_component_index(support_point).first;
+      current_points[component]   = fe_values.quadrature_point(support_point);
+      current_fe_index[component] = support_point;
     }
 
   // check each cell to find a suitable
@@ -246,32 +246,32 @@ void PointValueHistory<dim>
 
   for (; cell != endc; cell++)
     {
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
-      for (unsigned int support_point = 0;
-           support_point < n_support_points; support_point++)
+      for (unsigned int support_point = 0; support_point < n_support_points;
+           support_point++)
         {
-          unsigned int component
-            = dof_handler->get_fe().system_to_component_index (support_point).first;
-          Point<dim> test_point
-            = fe_values.quadrature_point (support_point);
+          unsigned int component = dof_handler->get_fe()
+                                     .system_to_component_index(support_point)
+                                     .first;
+          Point<dim> test_point = fe_values.quadrature_point(support_point);
 
-          if (location.distance (test_point) <
-              location.distance (current_points [component]))
+          if (location.distance(test_point) <
+              location.distance(current_points[component]))
             {
               // save the data
-              current_points [component] = test_point;
-              current_cell = cell;
-              current_fe_index [component] = support_point;
+              current_points[component]   = test_point;
+              current_cell                = cell;
+              current_fe_index[component] = support_point;
             }
         }
     }
 
 
-  std::vector<types::global_dof_index>
-  local_dof_indices (dof_handler->get_fe().dofs_per_cell);
-  std::vector <types::global_dof_index> new_solution_indices;
-  current_cell->get_dof_indices (local_dof_indices);
+  std::vector<types::global_dof_index> local_dof_indices(
+    dof_handler->get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> new_solution_indices;
+  current_cell->get_dof_indices(local_dof_indices);
   // there is an implicit assumption here
   // that all the closest support point to
   // the requested point for all finite
@@ -292,33 +292,36 @@ void PointValueHistory<dim>
   // a vector of points, and does not seem to
   // be intrinsicly faster than this method.
   for (unsigned int component = 0;
-       component < dof_handler->get_fe(0).n_components (); component++)
+       component < dof_handler->get_fe(0).n_components();
+       component++)
     {
-      new_solution_indices
-      .push_back (local_dof_indices[current_fe_index [component]]);
+      new_solution_indices.push_back(
+        local_dof_indices[current_fe_index[component]]);
     }
 
   internal::PointValueHistoryImplementation::PointGeometryData<dim>
-  new_point_geometry_data (location, current_points, new_solution_indices);
-  point_geometry_data.push_back (new_point_geometry_data);
+    new_point_geometry_data(location, current_points, new_solution_indices);
+  point_geometry_data.push_back(new_point_geometry_data);
 
-  std::map <std::string, std::vector <std::vector <double> > >::iterator
-  data_store_begin = data_store.begin ();
-  for (; data_store_begin != data_store.end (); ++data_store_begin)
+  std::map<std::string, std::vector<std::vector<double>>>::iterator
+    data_store_begin = data_store.begin();
+  for (; data_store_begin != data_store.end(); ++data_store_begin)
     {
       // add an extra row to each vector
       // entry
-      const ComponentMask &current_mask = (component_mask.find (data_store_begin->first))->second;
+      const ComponentMask &current_mask =
+        (component_mask.find(data_store_begin->first))->second;
       unsigned int n_stored = current_mask.n_selected_components();
-      data_store_begin->second.resize(data_store_begin->second.size() + n_stored);
+      data_store_begin->second.resize(data_store_begin->second.size() +
+                                      n_stored);
     }
 }
 
 
 
 template <int dim>
-void PointValueHistory<dim>
-::add_points (const std::vector <Point <dim> > &locations)
+void
+PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
 {
   // This algorithm adds points in the same
   // order as they appear in the vector
@@ -326,30 +329,34 @@ void PointValueHistory<dim>
   // so do not change order added!
 
   // can't be closed to add additional points or vectors
-  AssertThrow (!closed, ExcInvalidState ());
-  AssertThrow (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-  AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+  AssertThrow(!closed, ExcInvalidState());
+  AssertThrow(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
 
   // Implementation assumes that support
   // points locations are dofs locations
-  AssertThrow (dof_handler->get_fe().has_support_points (), ExcNotImplemented ());
+  AssertThrow(dof_handler->get_fe().has_support_points(), ExcNotImplemented());
 
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in
   // this case the quadrature points are
   // forced to be the support points of the
   // FE.
-  Quadrature<dim> support_point_quadrature (dof_handler->get_fe().get_unit_support_points ());
-  FEValues<dim> fe_values (dof_handler->get_fe(), support_point_quadrature, update_quadrature_points);
-  unsigned int n_support_points = dof_handler->get_fe().get_unit_support_points ().size ();
-  unsigned int n_components = dof_handler->get_fe(0).n_components ();
+  Quadrature<dim> support_point_quadrature(
+    dof_handler->get_fe().get_unit_support_points());
+  FEValues<dim> fe_values(
+    dof_handler->get_fe(), support_point_quadrature, update_quadrature_points);
+  unsigned int n_support_points =
+    dof_handler->get_fe().get_unit_support_points().size();
+  unsigned int n_components = dof_handler->get_fe(0).n_components();
 
   // set up a loop over all the cells in the
   // DoFHandler
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler->begin_active ();
-  typename DoFHandler<dim>::active_cell_iterator endc = dof_handler->end ();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+    dof_handler->begin_active();
+  typename DoFHandler<dim>::active_cell_iterator endc = dof_handler->end();
 
   // default values to be replaced as closer
   // points are found however they need to be
@@ -358,21 +365,26 @@ void PointValueHistory<dim>
   // previously single vectors were used
 
   // need to store one value per point per component
-  std::vector <typename DoFHandler<dim>::active_cell_iterator > current_cell (locations.size (), cell);
+  std::vector<typename DoFHandler<dim>::active_cell_iterator> current_cell(
+    locations.size(), cell);
 
-  fe_values.reinit (cell);
-  std::vector <Point <dim> > temp_points (n_components, Point <dim > ());
-  std::vector <unsigned int> temp_fe_index (n_components, 0);
-  for (unsigned int support_point = 0; support_point < n_support_points; support_point++)
+  fe_values.reinit(cell);
+  std::vector<Point<dim>>   temp_points(n_components, Point<dim>());
+  std::vector<unsigned int> temp_fe_index(n_components, 0);
+  for (unsigned int support_point = 0; support_point < n_support_points;
+       support_point++)
     {
       // setup valid data in the empty
       // vectors
-      unsigned int component = dof_handler->get_fe().system_to_component_index (support_point).first;
-      temp_points [component] = fe_values.quadrature_point (support_point);
-      temp_fe_index [component] = support_point;
+      unsigned int component =
+        dof_handler->get_fe().system_to_component_index(support_point).first;
+      temp_points[component]   = fe_values.quadrature_point(support_point);
+      temp_fe_index[component] = support_point;
     }
-  std::vector <std::vector <Point <dim> > > current_points (locations.size (), temp_points); // give a valid start point
-  std::vector <std::vector <unsigned int> > current_fe_index (locations.size (), temp_fe_index);
+  std::vector<std::vector<Point<dim>>> current_points(
+    locations.size(), temp_points); // give a valid start point
+  std::vector<std::vector<unsigned int>> current_fe_index(locations.size(),
+                                                          temp_fe_index);
 
   // check each cell to find suitable support
   // points
@@ -385,142 +397,161 @@ void PointValueHistory<dim>
   // because it operates on a set of points.
   for (; cell != endc; cell++)
     {
-      fe_values.reinit (cell);
-      for (unsigned int support_point = 0; support_point < n_support_points; support_point++)
+      fe_values.reinit(cell);
+      for (unsigned int support_point = 0; support_point < n_support_points;
+           support_point++)
         {
-          unsigned int component = dof_handler->get_fe().system_to_component_index (support_point).first;
-          Point<dim> test_point = fe_values.quadrature_point (support_point);
+          unsigned int component = dof_handler->get_fe()
+                                     .system_to_component_index(support_point)
+                                     .first;
+          Point<dim> test_point = fe_values.quadrature_point(support_point);
 
-          for (unsigned int point = 0; point < locations.size (); point++)
+          for (unsigned int point = 0; point < locations.size(); point++)
             {
-              if (locations[point].distance (test_point) < locations[point].distance (current_points[point][component]))
+              if (locations[point].distance(test_point) <
+                  locations[point].distance(current_points[point][component]))
                 {
                   // save the data
-                  current_points[point][component] = test_point;
-                  current_cell[point] = cell;
+                  current_points[point][component]   = test_point;
+                  current_cell[point]                = cell;
                   current_fe_index[point][component] = support_point;
                 }
             }
         }
     }
 
-  std::vector<types::global_dof_index> local_dof_indices (dof_handler->get_fe().dofs_per_cell);
-  for (unsigned int point = 0; point < locations.size (); point++)
+  std::vector<types::global_dof_index> local_dof_indices(
+    dof_handler->get_fe().dofs_per_cell);
+  for (unsigned int point = 0; point < locations.size(); point++)
     {
-      current_cell[point]->get_dof_indices (local_dof_indices);
+      current_cell[point]->get_dof_indices(local_dof_indices);
       std::vector<types::global_dof_index> new_solution_indices;
 
-      for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
+      for (unsigned int component = 0;
+           component < dof_handler->get_fe(0).n_components();
+           component++)
         {
-          new_solution_indices.push_back (local_dof_indices[current_fe_index[point][component]]);
+          new_solution_indices.push_back(
+            local_dof_indices[current_fe_index[point][component]]);
         }
 
-      internal::PointValueHistoryImplementation::PointGeometryData<dim> new_point_geometry_data (locations[point], current_points[point], new_solution_indices);
+      internal::PointValueHistoryImplementation::PointGeometryData<dim>
+        new_point_geometry_data(
+          locations[point], current_points[point], new_solution_indices);
 
-      point_geometry_data.push_back (new_point_geometry_data);
+      point_geometry_data.push_back(new_point_geometry_data);
 
-      std::map <std::string, std::vector <std::vector <double> > >::iterator
-      data_store_begin = data_store.begin ();
-      for (; data_store_begin != data_store.end (); ++data_store_begin)
+      std::map<std::string, std::vector<std::vector<double>>>::iterator
+        data_store_begin = data_store.begin();
+      for (; data_store_begin != data_store.end(); ++data_store_begin)
         {
           // add an extra row to each vector
           // entry
-          const ComponentMask current_mask = (component_mask.find (data_store_begin->first))->second;
+          const ComponentMask current_mask =
+            (component_mask.find(data_store_begin->first))->second;
           unsigned int n_stored = current_mask.n_selected_components();
-          data_store_begin->second.resize(data_store_begin->second.size() + n_stored);
+          data_store_begin->second.resize(data_store_begin->second.size() +
+                                          n_stored);
         }
     }
 }
 
 
 
-
-
-
 template <int dim>
-void PointValueHistory<dim>
-::add_field_name (const std::string &vector_name,
-                  const ComponentMask &mask)
+void
+PointValueHistory<dim>::add_field_name(const std::string &  vector_name,
+                                       const ComponentMask &mask)
 {
   // can't be closed to add additional points
   // or vectors
-  AssertThrow (!closed, ExcInvalidState ());
-  AssertThrow (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-  AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+  AssertThrow(!closed, ExcInvalidState());
+  AssertThrow(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   // insert a component mask that is always of the right size
   if (mask.represents_the_all_selected_mask() == false)
-    component_mask.insert (std::make_pair (vector_name, mask));
+    component_mask.insert(std::make_pair(vector_name, mask));
   else
-    component_mask.insert (std::make_pair (vector_name,
-                                           ComponentMask(std::vector<bool>(dof_handler->get_fe(0).n_components(), true))));
+    component_mask.insert(
+      std::make_pair(vector_name,
+                     ComponentMask(std::vector<bool>(
+                       dof_handler->get_fe(0).n_components(), true))));
 
   // insert an empty vector of strings
   // to ensure each field has an entry
   // in the map
-  std::pair <std::string, std::vector <std::string> >
-  empty_names (vector_name, std::vector <std::string> ());
-  component_names_map.insert (empty_names);
+  std::pair<std::string, std::vector<std::string>> empty_names(
+    vector_name, std::vector<std::string>());
+  component_names_map.insert(empty_names);
 
   // make and add a new vector
   // point_geometry_data.size() long
-  std::pair<std::string, std::vector <std::vector <double> > > pair_data;
+  std::pair<std::string, std::vector<std::vector<double>>> pair_data;
   pair_data.first = vector_name;
-  const unsigned int n_stored = (mask.represents_the_all_selected_mask() == false
-                                 ?
-                                 mask.n_selected_components()
-                                 :
-                                 dof_handler->get_fe(0).n_components());
+  const unsigned int n_stored =
+    (mask.represents_the_all_selected_mask() == false ?
+       mask.n_selected_components() :
+       dof_handler->get_fe(0).n_components());
 
-  int n_datastreams = point_geometry_data.size () * n_stored; // each point has n_stored sub parts
-  std::vector < std::vector <double> > vector_size (n_datastreams,
-                                                    std::vector <double> (0));
+  int n_datastreams =
+    point_geometry_data.size() * n_stored; // each point has n_stored sub parts
+  std::vector<std::vector<double>> vector_size(n_datastreams,
+                                               std::vector<double>(0));
   pair_data.second = vector_size;
-  data_store.insert (pair_data);
+  data_store.insert(pair_data);
 }
 
 
 template <int dim>
-void PointValueHistory<dim>
-::add_field_name(const std::string &vector_name, const unsigned int n_components)
+void
+PointValueHistory<dim>::add_field_name(const std::string &vector_name,
+                                       const unsigned int n_components)
 {
-  std::vector <bool> temp_mask (n_components, true);
-  add_field_name (vector_name, temp_mask);
+  std::vector<bool> temp_mask(n_components, true);
+  add_field_name(vector_name, temp_mask);
 }
 
 
 template <int dim>
-void PointValueHistory<dim>
-::add_component_names(const std::string &vector_name,
-                      const std::vector <std::string> &component_names)
+void
+PointValueHistory<dim>::add_component_names(
+  const std::string &             vector_name,
+  const std::vector<std::string> &component_names)
 {
-  typename std::map <std::string, std::vector <std::string> >::iterator names = component_names_map.find(vector_name);
-  Assert (names != component_names_map.end(), ExcMessage("vector_name not in class"));
+  typename std::map<std::string, std::vector<std::string>>::iterator names =
+    component_names_map.find(vector_name);
+  Assert(names != component_names_map.end(),
+         ExcMessage("vector_name not in class"));
 
-  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
-  Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
+  typename std::map<std::string, ComponentMask>::iterator mask =
+    component_mask.find(vector_name);
+  Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
   unsigned int n_stored = mask->second.n_selected_components();
   (void)n_stored;
-  Assert (component_names.size() == n_stored, ExcDimensionMismatch (component_names.size(), n_stored));
+  Assert(component_names.size() == n_stored,
+         ExcDimensionMismatch(component_names.size(), n_stored));
 
   names->second = component_names;
 }
 
 
 template <int dim>
-void PointValueHistory<dim>
-::add_independent_names(const std::vector <std::string> &independent_names)
+void
+PointValueHistory<dim>::add_independent_names(
+  const std::vector<std::string> &independent_names)
 {
-  Assert (independent_names.size() == n_indep, ExcDimensionMismatch (independent_names.size(), n_indep));
+  Assert(independent_names.size() == n_indep,
+         ExcDimensionMismatch(independent_names.size(), n_indep));
 
   indep_names = independent_names;
 }
 
 
 template <int dim>
-void PointValueHistory<dim>
-::close ()
+void
+PointValueHistory<dim>::close()
 {
   closed = true;
 }
@@ -528,11 +559,11 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-void PointValueHistory<dim>
-::clear ()
+void
+PointValueHistory<dim>::clear()
 {
-  cleared = true;
-  dof_handler = nullptr;
+  cleared          = true;
+  dof_handler      = nullptr;
   have_dof_handler = false;
 }
 
@@ -551,48 +582,62 @@ void PointValueHistory<dim>
 template <int dim>
 template <typename VectorType>
 void
-PointValueHistory<dim>::evaluate_field (const std::string &vector_name,
-                                        const VectorType  &solution)
+PointValueHistory<dim>::evaluate_field(const std::string &vector_name,
+                                       const VectorType & solution)
 {
   // must be closed to add data to internal
   // members.
-  Assert (closed, ExcInvalidState ());
-  Assert (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-  AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+  Assert(closed, ExcInvalidState());
+  Assert(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
-  if (n_indep != 0) // hopefully this will get optimized, can't test independent_values[0] unless n_indep > 0
+  if (n_indep != 0) // hopefully this will get optimized, can't test
+                    // independent_values[0] unless n_indep > 0
     {
-      Assert (std::abs ((int) dataset_key.size () - (int) independent_values[0].size ()) < 2, ExcDataLostSync ());
+      Assert(std::abs((int)dataset_key.size() -
+                      (int)independent_values[0].size()) < 2,
+             ExcDataLostSync());
     }
   // Look up the field name and get an
   // iterator for the map. Doing this
   // up front means that it only needs
   // to be done once and also allows us
   // to check vector_name is in the map.
-  typename std::map <std::string, std::vector <std::vector <double> > >::iterator data_store_field = data_store.find(vector_name);
-  Assert (data_store_field != data_store.end(), ExcMessage("vector_name not in class"));
+  typename std::map<std::string, std::vector<std::vector<double>>>::iterator
+    data_store_field = data_store.find(vector_name);
+  Assert(data_store_field != data_store.end(),
+         ExcMessage("vector_name not in class"));
   // Repeat for component_mask
-  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
-  Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
+  typename std::map<std::string, ComponentMask>::iterator mask =
+    component_mask.find(vector_name);
+  Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
 
-  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe(0).n_components ());
+  unsigned int n_stored =
+    mask->second.n_selected_components(dof_handler->get_fe(0).n_components());
 
-  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
+  typename std::vector<
+    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
+    point = point_geometry_data.begin();
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end();
+       ++point, ++data_store_index)
     {
       // Look up the components to add
       // in the component_mask, and
       // access the data associated with
       // those components
 
-      for (unsigned int store_index = 0, comp = 0; comp < dof_handler->get_fe(0).n_components (); comp++)
+      for (unsigned int store_index = 0, comp = 0;
+           comp < dof_handler->get_fe(0).n_components();
+           comp++)
         {
           if (mask->second[comp])
             {
               unsigned int solution_index = point->solution_indices[comp];
-              data_store_field->second[data_store_index * n_stored + store_index].push_back (
-                internal::ElementAccess<VectorType>::get(solution,solution_index));
+              data_store_field
+                ->second[data_store_index * n_stored + store_index]
+                .push_back(internal::ElementAccess<VectorType>::get(
+                  solution, solution_index));
               store_index++;
             }
         }
@@ -601,80 +646,99 @@ PointValueHistory<dim>::evaluate_field (const std::string &vector_name,
 
 
 
-
-
 template <int dim>
 template <typename VectorType>
 void
-PointValueHistory<dim>::evaluate_field (const std::vector <std::string> &vector_names,
-                                        const VectorType                &solution,
-                                        const DataPostprocessor< dim>   &data_postprocessor,
-                                        const Quadrature<dim>           &quadrature)
+PointValueHistory<dim>::evaluate_field(
+  const std::vector<std::string> &vector_names,
+  const VectorType &              solution,
+  const DataPostprocessor<dim> &  data_postprocessor,
+  const Quadrature<dim> &         quadrature)
 {
   // must be closed to add data to internal
   // members.
-  Assert (closed, ExcInvalidState ());
-  Assert (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-  if (n_indep != 0) // hopefully this will get optimized, can't test independent_values[0] unless n_indep > 0
+  Assert(closed, ExcInvalidState());
+  Assert(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  if (n_indep != 0) // hopefully this will get optimized, can't test
+                    // independent_values[0] unless n_indep > 0
     {
-      Assert (std::abs ((int) dataset_key.size () - (int) independent_values[0].size ()) < 2, ExcDataLostSync ());
+      Assert(std::abs((int)dataset_key.size() -
+                      (int)independent_values[0].size()) < 2,
+             ExcDataLostSync());
     }
 
   // Make an FEValues object
-  const UpdateFlags update_flags = data_postprocessor.get_needed_update_flags() | update_quadrature_points;
-  Assert (!(update_flags & update_normal_vectors),
-          ExcMessage("The update of normal vectors may not be requested for evaluation of "
-                     "data on cells via DataPostprocessor."));
-  FEValues<dim> fe_values (dof_handler->get_fe(), quadrature, update_flags);
-  unsigned int n_components = dof_handler->get_fe(0).n_components ();
-  unsigned int n_quadrature_points = quadrature.size();
+  const UpdateFlags update_flags =
+    data_postprocessor.get_needed_update_flags() | update_quadrature_points;
+  Assert(
+    !(update_flags & update_normal_vectors),
+    ExcMessage(
+      "The update of normal vectors may not be requested for evaluation of "
+      "data on cells via DataPostprocessor."));
+  FEValues<dim> fe_values(dof_handler->get_fe(), quadrature, update_flags);
+  unsigned int  n_components        = dof_handler->get_fe(0).n_components();
+  unsigned int  n_quadrature_points = quadrature.size();
 
   unsigned int n_output_variables = data_postprocessor.get_names().size();
 
   // declare some temp objects for evaluating the solution at quadrature
   // points. we will either need the scalar or vector version in the code
   // below
-  std::vector<typename VectorType::value_type >                   scalar_solution_values (n_quadrature_points);
-  std::vector<Tensor< 1, dim, typename VectorType::value_type > > scalar_solution_gradients (n_quadrature_points);
-  std::vector<Tensor< 2, dim, typename VectorType::value_type > > scalar_solution_hessians (n_quadrature_points);
+  std::vector<typename VectorType::value_type> scalar_solution_values(
+    n_quadrature_points);
+  std::vector<Tensor<1, dim, typename VectorType::value_type>>
+    scalar_solution_gradients(n_quadrature_points);
+  std::vector<Tensor<2, dim, typename VectorType::value_type>>
+    scalar_solution_hessians(n_quadrature_points);
 
-  std::vector< Vector< typename VectorType::value_type > >
-  vector_solution_values (n_quadrature_points, Vector <typename VectorType::value_type> (n_components));
+  std::vector<Vector<typename VectorType::value_type>> vector_solution_values(
+    n_quadrature_points, Vector<typename VectorType::value_type>(n_components));
 
-  std::vector< std::vector< Tensor< 1, dim, typename VectorType::value_type > > >
-  vector_solution_gradients (n_quadrature_points,
-                             std::vector< Tensor< 1, dim, typename VectorType::value_type > > (n_components,
-                                 Tensor< 1, dim, typename VectorType::value_type >()));
+  std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
+    vector_solution_gradients(
+      n_quadrature_points,
+      std::vector<Tensor<1, dim, typename VectorType::value_type>>(
+        n_components, Tensor<1, dim, typename VectorType::value_type>()));
 
-  std::vector< std::vector< Tensor< 2, dim, typename VectorType::value_type > > >
-  vector_solution_hessians (n_quadrature_points,
-                            std::vector< Tensor< 2, dim, typename VectorType::value_type > > (n_components,
-                                Tensor< 2, dim, typename VectorType::value_type >()));
+  std::vector<std::vector<Tensor<2, dim, typename VectorType::value_type>>>
+    vector_solution_hessians(
+      n_quadrature_points,
+      std::vector<Tensor<2, dim, typename VectorType::value_type>>(
+        n_components, Tensor<2, dim, typename VectorType::value_type>()));
 
   // Loop over points and find correct cell
-  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
+  typename std::vector<
+    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
+    point = point_geometry_data.begin();
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end();
+       ++point, ++data_store_index)
     {
       // we now have a point to query, need to know what cell it is in
-      const Point <dim> requested_location = point->requested_location;
-      const typename DoFHandler<dim>::active_cell_iterator cell
-        = GridTools::find_active_cell_around_point (StaticMappingQ1<dim>::mapping, *dof_handler, requested_location).first;
+      const Point<dim> requested_location = point->requested_location;
+      const typename DoFHandler<dim>::active_cell_iterator cell =
+        GridTools::find_active_cell_around_point(
+          StaticMappingQ1<dim>::mapping, *dof_handler, requested_location)
+          .first;
 
 
-      fe_values.reinit (cell);
-      std::vector< Vector< double > > computed_quantities (1, Vector <double> (n_output_variables)); // just one point needed
+      fe_values.reinit(cell);
+      std::vector<Vector<double>> computed_quantities(
+        1, Vector<double>(n_output_variables)); // just one point needed
 
       // find the closest quadrature point
-      std::vector<Point<dim> > quadrature_points = fe_values.get_quadrature_points();
-      double distance = cell->diameter ();
+      std::vector<Point<dim>> quadrature_points =
+        fe_values.get_quadrature_points();
+      double       distance       = cell->diameter();
       unsigned int selected_point = 0;
       for (unsigned int q_point = 0; q_point < n_quadrature_points; q_point++)
         {
-          if (requested_location.distance (quadrature_points[q_point]) < distance)
+          if (requested_location.distance(quadrature_points[q_point]) <
+              distance)
             {
               selected_point = q_point;
-              distance = requested_location.distance (quadrature_points[q_point]);
+              distance =
+                requested_location.distance(quadrature_points[q_point]);
             }
         }
 
@@ -696,69 +760,72 @@ PointValueHistory<dim>::evaluate_field (const std::vector <std::string> &vector_
           // data types
           if (update_flags & update_values)
             {
-              fe_values.get_function_values (solution,
-                                             scalar_solution_values);
-              postprocessor_input.solution_values
-                = std::vector<double> (1, scalar_solution_values[selected_point]);
+              fe_values.get_function_values(solution, scalar_solution_values);
+              postprocessor_input.solution_values =
+                std::vector<double>(1, scalar_solution_values[selected_point]);
             }
           if (update_flags & update_gradients)
             {
-              fe_values.get_function_gradients (solution,
-                                                scalar_solution_gradients);
-              postprocessor_input.solution_gradients
-                = std::vector<Tensor<1,dim>> (1, scalar_solution_gradients[selected_point]);
+              fe_values.get_function_gradients(solution,
+                                               scalar_solution_gradients);
+              postprocessor_input.solution_gradients =
+                std::vector<Tensor<1, dim>>(
+                  1, scalar_solution_gradients[selected_point]);
             }
           if (update_flags & update_hessians)
             {
-              fe_values.get_function_hessians (solution,
-                                               scalar_solution_hessians);
-              postprocessor_input.solution_hessians
-                = std::vector<Tensor<2,dim>> (1, scalar_solution_hessians[selected_point]);
+              fe_values.get_function_hessians(solution,
+                                              scalar_solution_hessians);
+              postprocessor_input.solution_hessians =
+                std::vector<Tensor<2, dim>>(
+                  1, scalar_solution_hessians[selected_point]);
             }
 
           // then also set the single evaluation point
-          postprocessor_input.evaluation_points
-            = std::vector<Point<dim>>(1, quadrature_points[selected_point]);
+          postprocessor_input.evaluation_points =
+            std::vector<Point<dim>>(1, quadrature_points[selected_point]);
 
           // and finally do the postprocessing
           data_postprocessor.evaluate_scalar_field(postprocessor_input,
                                                    computed_quantities);
         }
-      else     // The case of a vector FE
+      else // The case of a vector FE
         {
           // exact same idea as above
           DataPostprocessorInputs::Vector<dim> postprocessor_input;
 
           if (update_flags & update_values)
             {
-              fe_values.get_function_values (solution,
-                                             vector_solution_values);
-              postprocessor_input.solution_values.resize (1, Vector<double>(n_components));
-              std::copy (vector_solution_values[selected_point].begin(),
-                         vector_solution_values[selected_point].end(),
-                         postprocessor_input.solution_values[0].begin());
+              fe_values.get_function_values(solution, vector_solution_values);
+              postprocessor_input.solution_values.resize(
+                1, Vector<double>(n_components));
+              std::copy(vector_solution_values[selected_point].begin(),
+                        vector_solution_values[selected_point].end(),
+                        postprocessor_input.solution_values[0].begin());
             }
           if (update_flags & update_gradients)
             {
-              fe_values.get_function_gradients (solution,
-                                                vector_solution_gradients);
-              postprocessor_input.solution_gradients.resize (1, std::vector<Tensor<1,dim>>(n_components));
-              std::copy (vector_solution_gradients[selected_point].begin(),
-                         vector_solution_gradients[selected_point].end(),
-                         postprocessor_input.solution_gradients[0].begin());
+              fe_values.get_function_gradients(solution,
+                                               vector_solution_gradients);
+              postprocessor_input.solution_gradients.resize(
+                1, std::vector<Tensor<1, dim>>(n_components));
+              std::copy(vector_solution_gradients[selected_point].begin(),
+                        vector_solution_gradients[selected_point].end(),
+                        postprocessor_input.solution_gradients[0].begin());
             }
           if (update_flags & update_hessians)
             {
-              fe_values.get_function_hessians (solution,
-                                               vector_solution_hessians);
-              postprocessor_input.solution_hessians.resize (1, std::vector<Tensor<2,dim>>(n_components));
-              std::copy (vector_solution_hessians[selected_point].begin(),
-                         vector_solution_hessians[selected_point].end(),
-                         postprocessor_input.solution_hessians[0].begin());
+              fe_values.get_function_hessians(solution,
+                                              vector_solution_hessians);
+              postprocessor_input.solution_hessians.resize(
+                1, std::vector<Tensor<2, dim>>(n_components));
+              std::copy(vector_solution_hessians[selected_point].begin(),
+                        vector_solution_hessians[selected_point].end(),
+                        postprocessor_input.solution_hessians[0].begin());
             }
 
-          postprocessor_input.evaluation_points
-            = std::vector<Point<dim>>(1, quadrature_points[selected_point]);
+          postprocessor_input.evaluation_points =
+            std::vector<Point<dim>>(1, quadrature_points[selected_point]);
 
           data_postprocessor.evaluate_vector_field(postprocessor_input,
                                                    computed_quantities);
@@ -767,24 +834,35 @@ PointValueHistory<dim>::evaluate_field (const std::vector <std::string> &vector_
 
       // we now have the data and need to save it
       // loop over data names
-      typename std::vector<std::string>::const_iterator name = vector_names.begin();
+      typename std::vector<std::string>::const_iterator name =
+        vector_names.begin();
       for (; name != vector_names.end(); ++name)
         {
-          typename std::map <std::string, std::vector <std::vector <double> > >::iterator data_store_field = data_store.find(*name);
-          Assert (data_store_field != data_store.end(), ExcMessage("vector_name not in class"));
+          typename std::map<std::string,
+                            std::vector<std::vector<double>>>::iterator
+            data_store_field = data_store.find(*name);
+          Assert(data_store_field != data_store.end(),
+                 ExcMessage("vector_name not in class"));
           // Repeat for component_mask
-          typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(*name);
-          Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
+          typename std::map<std::string, ComponentMask>::iterator mask =
+            component_mask.find(*name);
+          Assert(mask != component_mask.end(),
+                 ExcMessage("vector_name not in class"));
 
-          unsigned int n_stored = mask->second.n_selected_components(n_output_variables);
+          unsigned int n_stored =
+            mask->second.n_selected_components(n_output_variables);
 
           // Push back computed quantities according
           // to the component_mask.
-          for (unsigned int store_index = 0, comp = 0; comp < n_output_variables; comp++)
+          for (unsigned int store_index = 0, comp = 0;
+               comp < n_output_variables;
+               comp++)
             {
               if (mask->second[comp])
                 {
-                  data_store_field->second[data_store_index * n_stored + store_index].push_back (computed_quantities[0](comp));
+                  data_store_field
+                    ->second[data_store_index * n_stored + store_index]
+                    .push_back(computed_quantities[0](comp));
                   store_index++;
                 }
             }
@@ -796,65 +874,81 @@ PointValueHistory<dim>::evaluate_field (const std::vector <std::string> &vector_
 
 template <int dim>
 template <typename VectorType>
-void PointValueHistory<dim>
-::evaluate_field (const std::string            &vector_name,
-                  const VectorType             &solution,
-                  const DataPostprocessor<dim> &data_postprocessor,
-                  const Quadrature<dim>        &quadrature)
+void
+PointValueHistory<dim>::evaluate_field(
+  const std::string &           vector_name,
+  const VectorType &            solution,
+  const DataPostprocessor<dim> &data_postprocessor,
+  const Quadrature<dim> &       quadrature)
 {
-  std::vector <std::string> vector_names;
-  vector_names.push_back (vector_name);
-  evaluate_field (vector_names, solution, data_postprocessor, quadrature);
+  std::vector<std::string> vector_names;
+  vector_names.push_back(vector_name);
+  evaluate_field(vector_names, solution, data_postprocessor, quadrature);
 }
 
 
 
 template <int dim>
 template <typename VectorType>
-void PointValueHistory<dim>
-::evaluate_field_at_requested_location (const std::string &vector_name,
-                                        const VectorType  &solution)
+void
+PointValueHistory<dim>::evaluate_field_at_requested_location(
+  const std::string &vector_name,
+  const VectorType & solution)
 {
   typedef typename VectorType::value_type number;
   // must be closed to add data to internal
   // members.
-  Assert (closed, ExcInvalidState ());
-  Assert (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
+  Assert(closed, ExcInvalidState());
+  Assert(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
 
-  if (n_indep != 0) // hopefully this will get optimized, can't test independent_values[0] unless n_indep > 0
+  if (n_indep != 0) // hopefully this will get optimized, can't test
+                    // independent_values[0] unless n_indep > 0
     {
-      Assert (std::abs ((int) dataset_key.size () - (int) independent_values[0].size ()) < 2, ExcDataLostSync ());
+      Assert(std::abs((int)dataset_key.size() -
+                      (int)independent_values[0].size()) < 2,
+             ExcDataLostSync());
     }
   // Look up the field name and get an
   // iterator for the map. Doing this
   // up front means that it only needs
   // to be done once and also allows us
   // to check vector_name is in the map.
-  typename std::map <std::string, std::vector <std::vector <double> > >::iterator data_store_field = data_store.find(vector_name);
-  Assert (data_store_field != data_store.end(), ExcMessage("vector_name not in class"));
+  typename std::map<std::string, std::vector<std::vector<double>>>::iterator
+    data_store_field = data_store.find(vector_name);
+  Assert(data_store_field != data_store.end(),
+         ExcMessage("vector_name not in class"));
   // Repeat for component_mask
-  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
-  Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
+  typename std::map<std::string, ComponentMask>::iterator mask =
+    component_mask.find(vector_name);
+  Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
 
-  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe(0).n_components ());
+  unsigned int n_stored =
+    mask->second.n_selected_components(dof_handler->get_fe(0).n_components());
 
-  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  Vector <number> value (dof_handler->get_fe(0).n_components());
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
+  typename std::vector<
+    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
+                 point = point_geometry_data.begin();
+  Vector<number> value(dof_handler->get_fe(0).n_components());
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end();
+       ++point, ++data_store_index)
     {
       // Make a Vector <double> for the value
       // at the point. It will have as many
       // components as there are in the fe.
-      VectorTools::point_value (*dof_handler, solution, point->requested_location, value);
+      VectorTools::point_value(
+        *dof_handler, solution, point->requested_location, value);
 
       // Look up the component_mask and add
       // in components according to that mask
-      for (unsigned int store_index = 0, comp = 0; comp < mask->second.size(); comp++)
+      for (unsigned int store_index = 0, comp = 0; comp < mask->second.size();
+           comp++)
         {
           if (mask->second[comp])
             {
-              data_store_field->second[data_store_index * n_stored + store_index].push_back (value (comp));
+              data_store_field
+                ->second[data_store_index * n_stored + store_index]
+                .push_back(value(comp));
               store_index++;
             }
         }
@@ -863,52 +957,57 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-void PointValueHistory<dim>
-::start_new_dataset (double key)
+void
+PointValueHistory<dim>::start_new_dataset(double key)
 {
   // must be closed to add data to internal
   // members.
-  Assert (closed, ExcInvalidState ());
-  Assert (!cleared, ExcInvalidState ());
-  Assert (deep_check (false), ExcDataLostSync ());
+  Assert(closed, ExcInvalidState());
+  Assert(!cleared, ExcInvalidState());
+  Assert(deep_check(false), ExcDataLostSync());
 
-  dataset_key.push_back (key);
+  dataset_key.push_back(key);
 }
 
 
 
 template <int dim>
-void PointValueHistory<dim>
-::push_back_independent (const std::vector <double> &indep_values)
+void
+PointValueHistory<dim>::push_back_independent(
+  const std::vector<double> &indep_values)
 {
   // must be closed to add data to internal
   // members.
-  Assert (closed, ExcInvalidState ());
-  Assert (!cleared, ExcInvalidState ());
-  Assert (indep_values.size () == n_indep, ExcDimensionMismatch (indep_values.size (), n_indep));
-  Assert (n_indep != 0, ExcNoIndependent ());
-  Assert (std::abs ((int) dataset_key.size () - (int) independent_values[0].size ()) < 2, ExcDataLostSync ());
+  Assert(closed, ExcInvalidState());
+  Assert(!cleared, ExcInvalidState());
+  Assert(indep_values.size() == n_indep,
+         ExcDimensionMismatch(indep_values.size(), n_indep));
+  Assert(n_indep != 0, ExcNoIndependent());
+  Assert(std::abs((int)dataset_key.size() - (int)independent_values[0].size()) <
+           2,
+         ExcDataLostSync());
 
   for (unsigned int component = 0; component < n_indep; component++)
-    independent_values[component].push_back (indep_values[component]);
+    independent_values[component].push_back(indep_values[component]);
 }
 
 
 
 template <int dim>
-void PointValueHistory<dim>
-::write_gnuplot (const std::string &base_name,
-                 const std::vector <Point <dim> > &postprocessor_locations)
+void
+PointValueHistory<dim>::write_gnuplot(
+  const std::string &            base_name,
+  const std::vector<Point<dim>> &postprocessor_locations)
 {
-  AssertThrow (closed, ExcInvalidState ());
-  AssertThrow (!cleared, ExcInvalidState ());
-  AssertThrow (deep_check (true), ExcDataLostSync ());
+  AssertThrow(closed, ExcInvalidState());
+  AssertThrow(!cleared, ExcInvalidState());
+  AssertThrow(deep_check(true), ExcDataLostSync());
 
   // write inputs to a file
   if (n_indep != 0)
     {
-      std::string filename = base_name + "_indep.gpl";
-      std::ofstream to_gnuplot (filename.c_str ());
+      std::string   filename = base_name + "_indep.gpl";
+      std::ofstream to_gnuplot(filename.c_str());
 
       to_gnuplot << "# Data independent of mesh location\n";
 
@@ -919,7 +1018,7 @@ void PointValueHistory<dim>
         {
           for (unsigned int name = 0; name < indep_names.size(); name++)
             {
-              to_gnuplot << "<" << indep_names [name] << "> ";
+              to_gnuplot << "<" << indep_names[name] << "> ";
             }
           to_gnuplot << "\n";
         }
@@ -932,7 +1031,7 @@ void PointValueHistory<dim>
           to_gnuplot << "\n";
         }
       // write general data stored
-      for (unsigned int key = 0; key < dataset_key.size (); key++)
+      for (unsigned int key = 0; key < dataset_key.size(); key++)
         {
           to_gnuplot << dataset_key[key];
 
@@ -943,7 +1042,7 @@ void PointValueHistory<dim>
           to_gnuplot << "\n";
         }
 
-      to_gnuplot.close ();
+      to_gnuplot.close();
     }
 
 
@@ -951,8 +1050,12 @@ void PointValueHistory<dim>
   // write points to a file
   if (have_dof_handler)
     {
-      AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-      AssertThrow (postprocessor_locations.size() == 0 || postprocessor_locations.size() == point_geometry_data.size(), ExcDimensionMismatch (postprocessor_locations.size(), point_geometry_data.size()));
+      AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+      AssertThrow(postprocessor_locations.size() == 0 ||
+                    postprocessor_locations.size() ==
+                      point_geometry_data.size(),
+                  ExcDimensionMismatch(postprocessor_locations.size(),
+                                       point_geometry_data.size()));
       // We previously required the
       // number of dofs to remain the
       // same to provide some sort of
@@ -965,35 +1068,47 @@ void PointValueHistory<dim>
       // method. Note that the support point
       // information is not meaningful if
       // the number of dofs has changed.
-      //AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+      // AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
 
-      typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-      for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
+      typename std::vector<internal::PointValueHistoryImplementation::
+                             PointGeometryData<dim>>::iterator point =
+        point_geometry_data.begin();
+      for (unsigned int data_store_index = 0;
+           point != point_geometry_data.end();
+           ++point, ++data_store_index)
         {
           // for each point, open a file to
           // be written to
-          std::string filename = base_name + "_" + Utilities::int_to_string (data_store_index, 2) + ".gpl"; // store by order pushed back
+          std::string filename = base_name + "_" +
+                                 Utilities::int_to_string(data_store_index, 2) +
+                                 ".gpl"; // store by order pushed back
           // due to
           // Utilities::int_to_string(data_store_index,
           // 2) call, can handle up to 100
           // points
-          std::ofstream to_gnuplot (filename.c_str ());
+          std::ofstream to_gnuplot(filename.c_str());
 
           // put helpful info about the
           // support point into the file as
           // comments
-          to_gnuplot << "# Requested location: " << point->requested_location << "\n";
+          to_gnuplot << "# Requested location: " << point->requested_location
+                     << "\n";
           to_gnuplot << "# DoF_index : Support location (for each component)\n";
-          for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
+          for (unsigned int component = 0;
+               component < dof_handler->get_fe(0).n_components();
+               component++)
             {
-              to_gnuplot << "# " << point->solution_indices[component] << " : " << point->support_point_locations [component] << "\n";
+              to_gnuplot << "# " << point->solution_indices[component] << " : "
+                         << point->support_point_locations[component] << "\n";
             }
           if (triangulation_changed)
-            to_gnuplot << "# (Original components and locations, may be invalidated by mesh change.)\n";
+            to_gnuplot
+              << "# (Original components and locations, may be invalidated by mesh change.)\n";
 
           if (postprocessor_locations.size() != 0)
             {
-              to_gnuplot << "# Postprocessor location: " << postprocessor_locations[data_store_index];
+              to_gnuplot << "# Postprocessor location: "
+                         << postprocessor_locations[data_store_index];
               if (triangulation_changed)
                 to_gnuplot << " (may be approximate)\n";
             }
@@ -1007,7 +1122,7 @@ void PointValueHistory<dim>
             {
               for (unsigned int name = 0; name < indep_names.size(); name++)
                 {
-                  to_gnuplot << "<" << indep_names [name] << "> ";
+                  to_gnuplot << "<" << indep_names[name] << "> ";
                 }
             }
           else
@@ -1018,33 +1133,41 @@ void PointValueHistory<dim>
                 }
             }
 
-          for (std::map <std::string, std::vector <std::vector <double> > >::iterator
-               data_store_begin = data_store.begin (); data_store_begin != data_store.end (); ++data_store_begin)
+          for (std::map<std::string, std::vector<std::vector<double>>>::iterator
+                 data_store_begin = data_store.begin();
+               data_store_begin != data_store.end();
+               ++data_store_begin)
             {
-              typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
+              typename std::map<std::string, ComponentMask>::iterator mask =
+                component_mask.find(data_store_begin->first);
               unsigned int n_stored = mask->second.n_selected_components();
-              std::vector <std::string> names = (component_names_map.find (data_store_begin->first))->second;
+              std::vector<std::string> names =
+                (component_names_map.find(data_store_begin->first))->second;
 
               if (names.size() > 0)
                 {
-                  AssertThrow (names.size() == n_stored, ExcDimensionMismatch (names.size(), n_stored));
-                  for (unsigned int component = 0; component < names.size(); component++)
+                  AssertThrow(names.size() == n_stored,
+                              ExcDimensionMismatch(names.size(), n_stored));
+                  for (unsigned int component = 0; component < names.size();
+                       component++)
                     {
                       to_gnuplot << "<" << names[component] << "> ";
                     }
                 }
               else
                 {
-                  for (unsigned int component = 0; component < n_stored; component++)
+                  for (unsigned int component = 0; component < n_stored;
+                       component++)
                     {
-                      to_gnuplot << "<" << data_store_begin->first << "_" << component << "> ";
+                      to_gnuplot << "<" << data_store_begin->first << "_"
+                                 << component << "> ";
                     }
                 }
             }
           to_gnuplot << "\n";
 
           // write data stored for the point
-          for (unsigned int key = 0; key < dataset_key.size (); key++)
+          for (unsigned int key = 0; key < dataset_key.size(); key++)
             {
               to_gnuplot << dataset_key[key];
 
@@ -1053,22 +1176,30 @@ void PointValueHistory<dim>
                   to_gnuplot << " " << independent_values[component][key];
                 }
 
-              for (std::map <std::string, std::vector <std::vector <double> > >::iterator
-                   data_store_begin = data_store.begin ();
-                   data_store_begin != data_store.end (); ++data_store_begin)
+              for (std::map<std::string,
+                            std::vector<std::vector<double>>>::iterator
+                     data_store_begin = data_store.begin();
+                   data_store_begin != data_store.end();
+                   ++data_store_begin)
                 {
-                  typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
+                  typename std::map<std::string, ComponentMask>::iterator mask =
+                    component_mask.find(data_store_begin->first);
                   unsigned int n_stored = mask->second.n_selected_components();
 
-                  for (unsigned int component = 0; component < n_stored; component++)
+                  for (unsigned int component = 0; component < n_stored;
+                       component++)
                     {
-                      to_gnuplot << " " << (data_store_begin->second)[data_store_index * n_stored + component][key];
+                      to_gnuplot
+                        << " "
+                        << (data_store_begin
+                              ->second)[data_store_index * n_stored + component]
+                                       [key];
                     }
                 }
               to_gnuplot << "\n";
             }
 
-          to_gnuplot.close ();
+          to_gnuplot.close();
         }
     }
 }
@@ -1076,23 +1207,27 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-Vector<double> PointValueHistory<dim>
-::mark_support_locations ()
+Vector<double>
+PointValueHistory<dim>::mark_support_locations()
 {
   // a method to put a one at each point on
   // the grid where a location is defined
-  AssertThrow (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-  AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+  AssertThrow(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
-  Vector<double> dof_vector (dof_handler->n_dofs ());
+  Vector<double> dof_vector(dof_handler->n_dofs());
 
-  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (; point != point_geometry_data.end (); ++point)
+  typename std::vector<
+    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
+    point = point_geometry_data.begin();
+  for (; point != point_geometry_data.end(); ++point)
     {
-      for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
+      for (unsigned int component = 0;
+           component < dof_handler->get_fe(0).n_components();
+           component++)
         {
-          dof_vector (point->solution_indices[component]) = 1;
+          dof_vector(point->solution_indices[component]) = 1;
         }
     }
   return dof_vector;
@@ -1100,86 +1235,104 @@ Vector<double> PointValueHistory<dim>
 
 
 template <int dim>
-void PointValueHistory<dim>
-::get_support_locations (std::vector <std::vector<Point <dim> > > &locations)
+void
+PointValueHistory<dim>::get_support_locations(
+  std::vector<std::vector<Point<dim>>> &locations)
 {
-  AssertThrow (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
-  AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+  AssertThrow(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
-  std::vector <std::vector <Point <dim> > > actual_points;
-  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  std::vector<std::vector<Point<dim>>> actual_points;
+  typename std::vector<
+    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
+    point = point_geometry_data.begin();
 
-  for (; point != point_geometry_data.end (); ++point)
+  for (; point != point_geometry_data.end(); ++point)
     {
-      actual_points.push_back (point->support_point_locations);
+      actual_points.push_back(point->support_point_locations);
     }
   locations = actual_points;
 }
 
 
 template <int dim>
-void PointValueHistory<dim>
-::get_points (std::vector <std::vector<Point <dim> > > &locations)
+void
+PointValueHistory<dim>::get_points(
+  std::vector<std::vector<Point<dim>>> &locations)
 {
-  get_support_locations (locations);
+  get_support_locations(locations);
 }
 
 
 template <int dim>
-void PointValueHistory<dim>
-::get_postprocessor_locations (const Quadrature<dim> &quadrature, std::vector<Point <dim> > &locations)
+void
+PointValueHistory<dim>::get_postprocessor_locations(
+  const Quadrature<dim> &  quadrature,
+  std::vector<Point<dim>> &locations)
 {
-  Assert (!cleared, ExcInvalidState ());
-  AssertThrow (have_dof_handler, ExcDoFHandlerRequired ());
+  Assert(!cleared, ExcInvalidState());
+  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
 
-  locations = std::vector<Point <dim> > ();
+  locations = std::vector<Point<dim>>();
 
-  FEValues<dim> fe_values (dof_handler->get_fe(), quadrature, update_quadrature_points);
-  unsigned int n_quadrature_points = quadrature.size();
-  std::vector<Point<dim> > evaluation_points;
+  FEValues<dim> fe_values(
+    dof_handler->get_fe(), quadrature, update_quadrature_points);
+  unsigned int            n_quadrature_points = quadrature.size();
+  std::vector<Point<dim>> evaluation_points;
 
   // Loop over points and find correct cell
-  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
+  typename std::vector<
+    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
+    point = point_geometry_data.begin();
+  for (unsigned int data_store_index = 0; point != point_geometry_data.end();
+       ++point, ++data_store_index)
     {
       // we now have a point to query,
       // need to know what cell it is in
-      Point <dim> requested_location = point->requested_location;
-      typename DoFHandler<dim>::active_cell_iterator cell = GridTools::find_active_cell_around_point (StaticMappingQ1<dim>::mapping, *dof_handler, requested_location).first;
-      fe_values.reinit (cell);
+      Point<dim> requested_location = point->requested_location;
+      typename DoFHandler<dim>::active_cell_iterator cell =
+        GridTools::find_active_cell_around_point(
+          StaticMappingQ1<dim>::mapping, *dof_handler, requested_location)
+          .first;
+      fe_values.reinit(cell);
 
-      evaluation_points = fe_values.get_quadrature_points();
-      double distance = cell->diameter ();
+      evaluation_points           = fe_values.get_quadrature_points();
+      double       distance       = cell->diameter();
       unsigned int selected_point = 0;
 
       for (unsigned int q_point = 0; q_point < n_quadrature_points; q_point++)
         {
-          if (requested_location.distance (evaluation_points[q_point]) < distance)
+          if (requested_location.distance(evaluation_points[q_point]) <
+              distance)
             {
               selected_point = q_point;
-              distance = requested_location.distance (evaluation_points[q_point]);
+              distance =
+                requested_location.distance(evaluation_points[q_point]);
             }
         }
 
-      locations.push_back (evaluation_points[selected_point]);
+      locations.push_back(evaluation_points[selected_point]);
     }
 }
 
 
 template <int dim>
-void PointValueHistory<dim>
-::status (std::ostream &out)
+void
+PointValueHistory<dim>::status(std::ostream &out)
 {
   out << "***PointValueHistory status output***\n\n";
   out << "Closed: " << closed << "\n";
   out << "Cleared: " << cleared << "\n";
   out << "Triangulation_changed: " << triangulation_changed << "\n";
   out << "Have_dof_handler: " << have_dof_handler << "\n";
-  out << "Geometric Data" << "\n";
+  out << "Geometric Data"
+      << "\n";
 
-  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  if (point == point_geometry_data.end ())
+  typename std::vector<
+    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
+    point = point_geometry_data.begin();
+  if (point == point_geometry_data.end())
     {
       out << "No points stored currently\n";
     }
@@ -1187,13 +1340,17 @@ void PointValueHistory<dim>
     {
       if (!cleared)
         {
-          for (; point != point_geometry_data.end (); ++point)
+          for (; point != point_geometry_data.end(); ++point)
             {
-              out << "# Requested location: " << point->requested_location << "\n";
+              out << "# Requested location: " << point->requested_location
+                  << "\n";
               out << "# DoF_index : Support location (for each component)\n";
-              for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
+              for (unsigned int component = 0;
+                   component < dof_handler->get_fe(0).n_components();
+                   component++)
                 {
-                  out << point->solution_indices[component] << " : " << point->support_point_locations [component] << "\n";
+                  out << point->solution_indices[component] << " : "
+                      << point->support_point_locations[component] << "\n";
                 }
               out << "\n";
             }
@@ -1205,15 +1362,16 @@ void PointValueHistory<dim>
     }
   out << "\n";
 
-  if (independent_values.size () != 0)
+  if (independent_values.size() != 0)
     {
-      out << "Independent value(s): " << independent_values.size () << " : " << independent_values[0].size () << "\n";
+      out << "Independent value(s): " << independent_values.size() << " : "
+          << independent_values[0].size() << "\n";
       if (indep_names.size() > 0)
         {
           out << "Names: ";
           for (unsigned int name = 0; name < indep_names.size(); name++)
             {
-              out << "<" << indep_names [name] << "> ";
+              out << "<" << indep_names[name] << "> ";
             }
           out << "\n";
         }
@@ -1223,37 +1381,48 @@ void PointValueHistory<dim>
       out << "No independent values stored\n";
     }
 
-  std::map <std::string, std::vector <std::vector <double> > >::iterator
-  data_store_begin = data_store.begin ();
+  std::map<std::string, std::vector<std::vector<double>>>::iterator
+    data_store_begin = data_store.begin();
   if (data_store_begin != data_store.end())
     {
-      out << "Mnemonic: data set size (mask size, n true components) : n data sets\n";
+      out
+        << "Mnemonic: data set size (mask size, n true components) : n data sets\n";
     }
-  for (; data_store_begin != data_store.end (); ++data_store_begin)
+  for (; data_store_begin != data_store.end(); ++data_store_begin)
     {
       // Find field mnemonic
       std::string vector_name = data_store_begin->first;
-      typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
-      Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
-      typename std::map <std::string, std::vector <std::string> >::iterator component_names = component_names_map.find(vector_name);
-      Assert (component_names != component_names_map.end(), ExcMessage("vector_name not in class"));
+      typename std::map<std::string, ComponentMask>::iterator mask =
+        component_mask.find(vector_name);
+      Assert(mask != component_mask.end(),
+             ExcMessage("vector_name not in class"));
+      typename std::map<std::string, std::vector<std::string>>::iterator
+        component_names = component_names_map.find(vector_name);
+      Assert(component_names != component_names_map.end(),
+             ExcMessage("vector_name not in class"));
 
-      if (data_store_begin->second.size () != 0)
+      if (data_store_begin->second.size() != 0)
         {
-          out << data_store_begin->first << ": " << data_store_begin->second.size () << " (";
-          out << mask->second.size() << ", " << mask->second.n_selected_components() << ") : ";
-          out << (data_store_begin->second)[0].size () << "\n";
+          out << data_store_begin->first << ": "
+              << data_store_begin->second.size() << " (";
+          out << mask->second.size() << ", "
+              << mask->second.n_selected_components() << ") : ";
+          out << (data_store_begin->second)[0].size() << "\n";
         }
       else
         {
-          out << data_store_begin->first << ": " << data_store_begin->second.size () << " (";
-          out << mask->second.size() << ", " << mask->second.n_selected_components() << ") : ";
-          out << "No points added" << "\n";
+          out << data_store_begin->first << ": "
+              << data_store_begin->second.size() << " (";
+          out << mask->second.size() << ", "
+              << mask->second.n_selected_components() << ") : ";
+          out << "No points added"
+              << "\n";
         }
       // add names, if available
       if (component_names->second.size() > 0)
         {
-          for (unsigned int name = 0; name < component_names->second.size(); name++)
+          for (unsigned int name = 0; name < component_names->second.size();
+               name++)
             {
               out << "<" << component_names->second[name] << "> ";
             }
@@ -1267,8 +1436,8 @@ void PointValueHistory<dim>
 
 
 template <int dim>
-bool PointValueHistory<dim>
-::deep_check (const bool strict)
+bool
+PointValueHistory<dim>::deep_check(const bool strict)
 {
   // test ways that it can fail, if control
   // reaches last statement return true
@@ -1276,20 +1445,19 @@ bool PointValueHistory<dim>
     {
       if (n_indep != 0)
         {
-          if (dataset_key.size () != independent_values[0].size ())
+          if (dataset_key.size() != independent_values[0].size())
             {
               return false;
             }
         }
-      std::map <std::string, std::vector <std::vector <double> > >::iterator
-      data_store_begin = data_store.begin ();
+      std::map<std::string, std::vector<std::vector<double>>>::iterator
+        data_store_begin = data_store.begin();
       if (have_dof_handler)
         {
-          for (; data_store_begin != data_store.end (); ++data_store_begin)
+          for (; data_store_begin != data_store.end(); ++data_store_begin)
             {
-              Assert (data_store_begin->second.size() > 0,
-                      ExcInternalError());
-              if ((data_store_begin->second)[0].size () != dataset_key.size ())
+              Assert(data_store_begin->second.size() > 0, ExcInternalError());
+              if ((data_store_begin->second)[0].size() != dataset_key.size())
                 return false;
               // this loop only tests one
               // member for each name,
@@ -1303,7 +1471,8 @@ bool PointValueHistory<dim>
     }
   if (n_indep != 0)
     {
-      if (std::abs ((int) dataset_key.size () - (int) independent_values[0].size ()) >= 2)
+      if (std::abs((int)dataset_key.size() -
+                   (int)independent_values[0].size()) >= 2)
         {
           return false;
         }
@@ -1311,14 +1480,14 @@ bool PointValueHistory<dim>
 
   if (have_dof_handler)
     {
-      std::map <std::string, std::vector <std::vector <double> > >::iterator
-      data_store_begin = data_store.begin ();
-      for (; data_store_begin != data_store.end (); ++data_store_begin)
+      std::map<std::string, std::vector<std::vector<double>>>::iterator
+        data_store_begin = data_store.begin();
+      for (; data_store_begin != data_store.end(); ++data_store_begin)
         {
-          Assert (data_store_begin->second.size() > 0,
-                  ExcInternalError());
+          Assert(data_store_begin->second.size() > 0, ExcInternalError());
 
-          if (std::abs ((int) (data_store_begin->second)[0].size () - (int) dataset_key.size ()) >= 2)
+          if (std::abs((int)(data_store_begin->second)[0].size() -
+                       (int)dataset_key.size()) >= 2)
             return false;
           // this loop only tests one member
           // for each name, i.e. checks the
@@ -1333,8 +1502,8 @@ bool PointValueHistory<dim>
 
 
 template <int dim>
-void PointValueHistory<dim>
-::tria_change_listener ()
+void
+PointValueHistory<dim>::tria_change_listener()
 {
   // this function is called by the
   // Triangulation whenever something

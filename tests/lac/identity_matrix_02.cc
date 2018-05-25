@@ -17,10 +17,11 @@
 // check conversion constructor from IdentityMatrix to FullMatrix
 
 
-#include "../tests.h"
-#include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 template <typename number>
@@ -28,41 +29,42 @@ void
 check_vmult()
 {
   FullMatrix<number> M(IdentityMatrix(4));
-  Vector<number> u(4);
-  Vector<number> v(4);
+  Vector<number>     u(4);
+  Vector<number>     v(4);
 
-  for (unsigned int i=0; i<4; ++i)
-    u(i) = i+1;
+  for (unsigned int i = 0; i < 4; ++i)
+    u(i) = i + 1;
 
-  M.vmult(v,u);
-  Assert (v == u, ExcInternalError());
-  for (unsigned int i=0; i<v.size(); ++i)
+  M.vmult(v, u);
+  Assert(v == u, ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 
-  M.vmult_add(v,u);
+  M.vmult_add(v, u);
   v /= 2;
-  Assert (v == u, ExcInternalError());
-  for (unsigned int i=0; i<v.size(); ++i)
+  Assert(v == u, ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 
-  M.Tvmult(v,u);
-  Assert (v == u, ExcInternalError());
-  for (unsigned int i=0; i<v.size(); ++i)
+  M.Tvmult(v, u);
+  Assert(v == u, ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 
-  M.Tvmult_add(v,u);
+  M.Tvmult_add(v, u);
   v /= 2;
-  Assert (v == u, ExcInternalError());
-  for (unsigned int i=0; i<v.size(); ++i)
+  Assert(v == u, ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

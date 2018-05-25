@@ -17,51 +17,52 @@
 // test the PETSc SparseDirectMumps solver
 
 
-#include "../tests.h"
-#include "../testmatrix.h"
-#include <iostream>
-#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_solver.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/vector_memory.h>
+
+#include <iostream>
 #include <typeinfo>
 
+#include "../testmatrix.h"
+#include "../tests.h"
 
 
-int main(int argc, char **argv)
+
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(4);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
     const unsigned int size = 32;
-    unsigned int dim = (size-1)*(size-1);
+    unsigned int       dim  = (size - 1) * (size - 1);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
     // Make matrix
-    FDMatrix testproblem(size, size);
-    PETScWrappers::SparseMatrix  A(dim, dim, 5);
+    FDMatrix                    testproblem(size, size);
+    PETScWrappers::SparseMatrix A(dim, dim, 5);
     testproblem.five_point(A);
 
     IndexSet indices(dim);
     indices.add_range(0, dim);
-    PETScWrappers::MPI::Vector  f(indices, MPI_COMM_WORLD);
-    PETScWrappers::MPI::Vector  u(indices, MPI_COMM_WORLD);
+    PETScWrappers::MPI::Vector f(indices, MPI_COMM_WORLD);
+    PETScWrappers::MPI::Vector u(indices, MPI_COMM_WORLD);
     u = 0.;
     f = 1.;
-    A.compress (VectorOperation::insert);
+    A.compress(VectorOperation::insert);
 
-    SolverControl cn;
+    SolverControl                    cn;
     PETScWrappers::SparseDirectMUMPS solver(cn);
-//    solver.set_symmetric_mode(true);
-    solver.solve(A,u,f);
+    //    solver.set_symmetric_mode(true);
+    solver.solve(A, u, f);
 
-    PETScWrappers::MPI::Vector  tmp(indices, MPI_COMM_WORLD);
-    deallog << "residual = " << A.residual (tmp, u, f)
-            << std::endl;
+    PETScWrappers::MPI::Vector tmp(indices, MPI_COMM_WORLD);
+    deallog << "residual = " << A.residual(tmp, u, f) << std::endl;
   }
-
 }

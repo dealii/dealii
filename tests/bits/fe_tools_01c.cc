@@ -17,16 +17,19 @@
 
 // common framework for the various fe_tools_*.cc tests
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_tools.h>
+
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_tools.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <string>
+
+#include "../tests.h"
 
 
 // check invertability of the map from
@@ -37,29 +40,22 @@
 
 template <int dim>
 void
-check (const FE_Q<dim>   &fe,
-       const std::string &name)
+check(const FE_Q<dim> &fe, const std::string &name)
 {
-  deallog << "Checking " << name
-          << " in " << dim << "d:"
-          << std::endl;
+  deallog << "Checking " << name << " in " << dim << "d:" << std::endl;
 
   std::vector<unsigned int> n1(fe.dofs_per_cell);
-  FETools::hierarchic_to_lexicographic_numbering (fe, n1);
+  FETools::hierarchic_to_lexicographic_numbering(fe, n1);
 
   std::vector<unsigned int> n2(fe.dofs_per_cell);
-  FETools::lexicographic_to_hierarchic_numbering (fe, n2);
+  FETools::lexicographic_to_hierarchic_numbering(fe, n2);
 
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     {
-      Assert (n1[i] < fe.dofs_per_cell,
-              ExcInternalError());
-      Assert (n2[i] < fe.dofs_per_cell,
-              ExcInternalError());
-      Assert (n1[n2[i]] == i,
-              ExcInternalError());
-      Assert (n2[n1[i]] == i,
-              ExcInternalError());
+      Assert(n1[i] < fe.dofs_per_cell, ExcInternalError());
+      Assert(n2[i] < fe.dofs_per_cell, ExcInternalError());
+      Assert(n1[n2[i]] == i, ExcInternalError());
+      Assert(n2[n1[i]] == i, ExcInternalError());
 
       deallog << n1[n2[i]] << " ";
     }
@@ -68,16 +64,17 @@ check (const FE_Q<dim>   &fe,
 
 
 
+#define CHECK(EL, deg, dim) \
+  {                         \
+    FE_##EL<dim> EL(deg);   \
+    check(EL, #EL #deg);    \
+  }
 
-
-#define CHECK(EL,deg,dim)\
-  { FE_ ## EL<dim> EL(deg);   \
-    check(EL, #EL #deg); }
-
-#define CHECK_ALL(EL,deg)\
-  { CHECK(EL,deg,1); \
-    CHECK(EL,deg,2); \
-    CHECK(EL,deg,3); \
+#define CHECK_ALL(EL, deg) \
+  {                        \
+    CHECK(EL, deg, 1);     \
+    CHECK(EL, deg, 2);     \
+    CHECK(EL, deg, 3);     \
   }
 
 
@@ -87,19 +84,20 @@ main()
   try
     {
       std::ofstream logfile("output");
-      deallog << std::setprecision (2);
+      deallog << std::setprecision(2);
       deallog.attach(logfile);
 
-      CHECK_ALL(Q,1);
-      CHECK_ALL(Q,2);
-      CHECK_ALL(Q,3);
-      CHECK_ALL(Q,4);
+      CHECK_ALL(Q, 1);
+      CHECK_ALL(Q, 2);
+      CHECK_ALL(Q, 3);
+      CHECK_ALL(Q, 4);
 
       return 0;
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -111,7 +109,8 @@ main()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl
@@ -121,4 +120,3 @@ main()
       return 1;
     };
 }
-

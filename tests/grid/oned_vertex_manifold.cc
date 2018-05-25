@@ -15,12 +15,14 @@
 
 // Test vertex manifold ids in 1D.
 
-#include "../tests.h"
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog(true);
 
@@ -38,19 +40,16 @@ int main()
 
   for (const auto cell : triangulation.active_cell_iterators())
     {
-      deallog << "current cell manifold id: "
-              << cell->manifold_id()
+      deallog << "current cell manifold id: " << cell->manifold_id()
               << std::endl;
 
-      for (unsigned int vertex_n = 0; vertex_n < GeometryInfo<1>::vertices_per_cell;
+      for (unsigned int vertex_n = 0;
+           vertex_n < GeometryInfo<1>::vertices_per_cell;
            ++vertex_n)
         {
-          deallog << "current vertex: "
-                  << cell->vertex(vertex_n)
-                  << std::endl;
+          deallog << "current vertex: " << cell->vertex(vertex_n) << std::endl;
           deallog << "current vertex manifold id: "
-                  << cell->face(vertex_n)->manifold_id()
-                  << std::endl;
+                  << cell->face(vertex_n)->manifold_id() << std::endl;
         }
     }
 }

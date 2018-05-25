@@ -21,7 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace CUDAWrappers
 {
-#include "cuda_matrix_free.inst"
+#  include "cuda_matrix_free.inst"
 }
 
 DEAL_II_NAMESPACE_CLOSE

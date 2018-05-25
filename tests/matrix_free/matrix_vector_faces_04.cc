@@ -19,30 +19,33 @@
 // the same implementation with MeshWorker. This example uses a hyperball mesh
 // with both hanging nodes and curved boundaries
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
+
 #include <deal.II/fe/fe_dgq.h>
+
+#include "../tests.h"
 
 std::ofstream logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_ball (tria);
-  tria.refine_global(4-dim);
+  GridGenerator::hyper_ball(tria);
+  tria.refine_global(4 - dim);
   tria.begin_active()->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  FE_DGQ<dim> fe (fe_degree);
-  DoFHandler<dim> dof (tria);
+  FE_DGQ<dim>     fe(fe_degree);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   constraints.close();
 
   // test with threads enabled as well
-  do_test<dim, fe_degree, fe_degree+1, double> (dof, constraints, true);
+  do_test<dim, fe_degree, fe_degree + 1, double>(dof, constraints, true);
 }

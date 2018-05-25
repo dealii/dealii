@@ -21,4 +21,3 @@ DEAL_II_NAMESPACE_OPEN
 #include "function_time.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-

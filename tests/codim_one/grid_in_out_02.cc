@@ -17,35 +17,37 @@
 
 // like grid_in_out but write in gnuplot format
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 
 #include <string>
+
+#include "../tests.h"
 
 std::ofstream logfile("output");
 
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
   Triangulation<dim, spacedim> tria;
-  GridIn<dim, spacedim> gi;
-  gi.attach_triangulation (tria);
-  std::ifstream in (filename.c_str());
-  gi.read_ucd (in);
+  GridIn<dim, spacedim>        gi;
+  gi.attach_triangulation(tria);
+  std::ifstream in(filename.c_str());
+  gi.read_ucd(in);
 
   GridOut grid_out;
-  grid_out.write_gnuplot (tria, logfile);
+  grid_out.write_gnuplot(tria, logfile);
 }
 
-int main ()
+int
+main()
 {
   deallog.attach(logfile);
 
-  test<2,3>(SOURCE_DIR "/grids/square.inp");
-  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");
+  test<2, 3>(SOURCE_DIR "/grids/square.inp");
+  test<2, 3>(SOURCE_DIR "/grids/sphere_1.inp");
 
   return 0;
 }
-

@@ -14,27 +14,33 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/block_sparse_matrix.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/full_matrix.h>
+
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 using namespace dealii;
 
@@ -44,54 +50,60 @@ class MixedElastoPlasticity
 {
 public:
   MixedElastoPlasticity(const unsigned int degree);
-  void run();
+  void
+  run();
+
 private:
-  void make_grid_and_dofs();
-  void assemble_system();
+  void
+  make_grid_and_dofs();
+  void
+  assemble_system();
 
   const unsigned int degree;
   const unsigned int n_stress_components; // components of stress
-  const unsigned int n_gamma_components; // scalar plastic multiplier
+  const unsigned int n_gamma_components;  // scalar plastic multiplier
 
   Triangulation<dim> triangulation;
-  FESystem<dim> fe;
-  DoFHandler<dim> dof_handler;
+  FESystem<dim>      fe;
+  DoFHandler<dim>    dof_handler;
 
-  BlockSparsityPattern sparsity_pattern;
+  BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> system_matrix;
-  BlockVector<double> solution;
+  BlockVector<double>       solution;
 };
 
 
 
 template <int dim>
-MixedElastoPlasticity<dim>::MixedElastoPlasticity(const unsigned int degree):
+MixedElastoPlasticity<dim>::MixedElastoPlasticity(const unsigned int degree) :
   degree(degree),
-  n_stress_components((dim*(dim + 1)) / 2),
+  n_stress_components((dim * (dim + 1)) / 2),
   n_gamma_components(1),
-  fe( FE_Q<dim>(degree), n_stress_components,
-      FE_Q<dim>(degree), n_gamma_components),
+  fe(FE_Q<dim>(degree),
+     n_stress_components,
+     FE_Q<dim>(degree),
+     n_gamma_components),
   dof_handler(triangulation)
-{
-}
+{}
 
 
 
 template <int dim>
-void MixedElastoPlasticity<dim>::make_grid_and_dofs()
+void
+MixedElastoPlasticity<dim>::make_grid_and_dofs()
 {
   GridGenerator::hyper_cube(triangulation, 0, 1);
   triangulation.refine_global(0);
 
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Number of stress components: "
-          << n_stress_components
-          << "\tNumber of gamma components: "
-          << n_gamma_components << std::endl;
+  deallog << "Number of stress components: " << n_stress_components
+          << "\tNumber of gamma components: " << n_gamma_components
+          << std::endl;
 
   // stress -> 0 gamma -> 1
-  std::vector<unsigned int> block_component(n_stress_components + n_gamma_components, 1);
+  std::vector<unsigned int> block_component(
+    n_stress_components + n_gamma_components, 1);
   for (unsigned int ii = 0; ii < n_stress_components; ii++)
     block_component[ii] = 0;
 
@@ -101,19 +113,13 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
   DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
 
   const unsigned int n_stress_dof = dofs_per_block[0];
-  const unsigned int n_gamma_dof = dofs_per_block[1];
+  const unsigned int n_gamma_dof  = dofs_per_block[1];
 
-  deallog << "Number of active cells: "
-          << triangulation.n_active_cells()
+  deallog << "Number of active cells: " << triangulation.n_active_cells()
           << std::endl
-          << "Total number of cells: "
-          << triangulation.n_cells()
-          << std::endl
-          << "Number of degrees of freedom: "
-          << dof_handler.n_dofs()
-          << " = (" << n_stress_dof << " + "
-          << n_gamma_dof << ")"
-          << std::endl;
+          << "Total number of cells: " << triangulation.n_cells() << std::endl
+          << "Number of degrees of freedom: " << dof_handler.n_dofs() << " = ("
+          << n_stress_dof << " + " << n_gamma_dof << ")" << std::endl;
 
   {
     BlockDynamicSparsityPattern csp(2, 2);
@@ -139,13 +145,15 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
 
 
 template <int dim>
-void MixedElastoPlasticity<dim>::assemble_system()
+void
+MixedElastoPlasticity<dim>::assemble_system()
 {
   QGauss<dim> quadrature_formula(1);
 
-  FEValues<dim> fe_values(fe, quadrature_formula,
-                          update_values | update_gradients
-                          | update_quadrature_points | update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   deallog << "dofs_per_cell: " << fe.dofs_per_cell << std::endl;
@@ -153,70 +161,73 @@ void MixedElastoPlasticity<dim>::assemble_system()
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
   const FEValuesExtractors::SymmetricTensor<2> stress(0);
-  const FEValuesExtractors::Scalar gamma(n_stress_components);
+  const FEValuesExtractors::Scalar             gamma(n_stress_components);
 
-  deallog   << "fe.dofs_per_cell: " << fe.dofs_per_cell
-            << "\tquadrature_formula.size(): " << quadrature_formula.size()
-            << std::endl;
+  deallog << "fe.dofs_per_cell: " << fe.dofs_per_cell
+          << "\tquadrature_formula.size(): " << quadrature_formula.size()
+          << std::endl;
 
   // constant stress and constant gamma distribution across cell
   const double stress_value = 125.0;
-  const double gamma_value = 1.0;
+  const double gamma_value  = 1.0;
 
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+    dof_handler.begin_active();
   {
-    fe_values.reinit (cell);
-    cell->get_dof_indices (local_dof_indices);
+    fe_values.reinit(cell);
+    cell->get_dof_indices(local_dof_indices);
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       {
-        // 0 = stress (symmetric 2nd order tensor), 1 = Gamma (scalar) interpolation fields
+        // 0 = stress (symmetric 2nd order tensor), 1 = Gamma (scalar)
+        // interpolation fields
         const unsigned int i_group = fe.system_to_base_index(i).first.first;
         // the index of the non-zero shape function
         const unsigned int i_index = fe.system_to_base_index(i).first.second;
         // the support point (node) id
         const unsigned int i_node = fe.system_to_base_index(i).second;
 
-        deallog << "\t" << i << "\t" << i_group << "\t" << i_index << "\t" << i_node;
+        deallog << "\t" << i << "\t" << i_group << "\t" << i_index << "\t"
+                << i_node;
 
 
         if (i_group == 0) // if i corresponds to tensor stress
           solution(local_dof_indices[i]) = stress_value;
-        else  // i corresponds to scalar gamma
+        else // i corresponds to scalar gamma
           solution(local_dof_indices[i]) = gamma_value;
 
         deallog << "\t" << solution(local_dof_indices[i]) << std::endl;
       }
 
 
-    std::vector<Tensor<1,dim> > local_divergences (quadrature_formula.size());
-    std::vector<SymmetricTensor<2,dim> > local_values (quadrature_formula.size());
-    std::vector<double > local_scalar_values (quadrature_formula.size());
+    std::vector<Tensor<1, dim>> local_divergences(quadrature_formula.size());
+    std::vector<SymmetricTensor<2, dim>> local_values(
+      quadrature_formula.size());
+    std::vector<double> local_scalar_values(quadrature_formula.size());
 
-    fe_values.reinit (dof_handler.begin_active());
-    fe_values[stress].get_function_values (solution, local_values);
-    fe_values[stress].get_function_divergences (solution, local_divergences);
-    fe_values[gamma].get_function_values (solution, local_scalar_values);
+    fe_values.reinit(dof_handler.begin_active());
+    fe_values[stress].get_function_values(solution, local_values);
+    fe_values[stress].get_function_divergences(solution, local_divergences);
+    fe_values[gamma].get_function_values(solution, local_scalar_values);
 
     // expect the nodal stress value at the quadrature point
     // constant stress field, therefore expect zero divergence
-    // constant gamma field, therefore nodal value should equal value at quadrature point
-    for (unsigned int q=0; q<quadrature_formula.size(); ++q)
+    // constant gamma field, therefore nodal value should equal value at
+    // quadrature point
+    for (unsigned int q = 0; q < quadrature_formula.size(); ++q)
       {
-        deallog << local_values[q]
-                << std::endl
-                << local_divergences[q]
-                << std::endl
-                << local_scalar_values[q]
-                << std::endl;
+        deallog << local_values[q] << std::endl
+                << local_divergences[q] << std::endl
+                << local_scalar_values[q] << std::endl;
 
         for (unsigned int m = 0; m < dim; m++)
           {
-            for (unsigned int n = 0; n< dim; n++)
-              AssertThrow ( (local_values[q])[m][n] == stress_value, ExcInternalError());
+            for (unsigned int n = 0; n < dim; n++)
+              AssertThrow((local_values[q])[m][n] == stress_value,
+                          ExcInternalError());
 
-            AssertThrow ( (local_divergences[q])[m] == 0.0, ExcInternalError());
-            AssertThrow ( local_scalar_values[q] == gamma_value, ExcInternalError());
-
+            AssertThrow((local_divergences[q])[m] == 0.0, ExcInternalError());
+            AssertThrow(local_scalar_values[q] == gamma_value,
+                        ExcInternalError());
           }
       }
   }
@@ -225,7 +236,8 @@ void MixedElastoPlasticity<dim>::assemble_system()
 
 
 template <int dim>
-void MixedElastoPlasticity<dim>::run()
+void
+MixedElastoPlasticity<dim>::run()
 {
   make_grid_and_dofs();
   assemble_system();
@@ -233,16 +245,16 @@ void MixedElastoPlasticity<dim>::run()
 
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (3);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(3);
 
   deallog.attach(logfile);
 
-  MixedElastoPlasticity < 3 > elasto_plasticity(1);
+  MixedElastoPlasticity<3> elasto_plasticity(1);
   elasto_plasticity.run();
 
   return 0;
 }
-

@@ -17,37 +17,41 @@
 
 // check querying matrix sizes
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_full_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test (PETScWrappers::FullMatrix &m)
+
+void
+test(PETScWrappers::FullMatrix &m)
 {
-  AssertThrow (m.m() == 5, ExcInternalError());
-  AssertThrow (m.n() == 5, ExcInternalError());
+  AssertThrow(m.m() == 5, ExcInternalError());
+  AssertThrow(m.n() == 5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::FullMatrix m (5,5);
-        test (m);
+        PETScWrappers::FullMatrix m(5, 5);
+        test(m);
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -60,7 +64,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

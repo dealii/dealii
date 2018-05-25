@@ -19,16 +19,15 @@
 
 #include <deal.II/base/config.h>
 
-
-#  include <memory>
+#include <memory>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
-  using std::shared_ptr;
+  using std::dynamic_pointer_cast;
   using std::enable_shared_from_this;
   using std::make_shared;
-  using std::dynamic_pointer_cast;
-}
+  using std::shared_ptr;
+} // namespace std_cxx11
 DEAL_II_NAMESPACE_CLOSE
 
 

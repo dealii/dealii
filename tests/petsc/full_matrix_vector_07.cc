@@ -17,75 +17,79 @@
 
 // check FullMatrix::matrix_norm_square
 
-#include "../tests.h"
-#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_full_matrix.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (PETScWrappers::MPI::Vector &v,
-           PETScWrappers::MPI::Vector &w,
-           PETScWrappers::MPI::Vector &x)
+
+void
+test(PETScWrappers::MPI::Vector &v,
+     PETScWrappers::MPI::Vector &w,
+     PETScWrappers::MPI::Vector &x)
 {
-  PETScWrappers::FullMatrix m(v.size(),v.size());
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      m.set (i,j, i+2*j);
+  PETScWrappers::FullMatrix m(v.size(), v.size());
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.m(); ++j)
+      m.set(i, j, i + 2 * j);
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
-      w(i) = i+1;
+      w(i) = i + 1;
     }
 
-  m.compress (VectorOperation::insert);
-  v.compress (VectorOperation::insert);
-  w.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
+  v.compress(VectorOperation::insert);
+  w.compress(VectorOperation::insert);
 
   // x=w-Mv
-  const double s = m.residual (x, v, w);
+  const double s = m.residual(x, v, w);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (v(i) == i, ExcInternalError());
-      AssertThrow (w(i) == i+1, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
+      AssertThrow(w(i) == i + 1, ExcInternalError());
 
-      double result = i+1;
-      for (unsigned int j=0; j<m.m(); ++j)
-        result -= (i+2*j)*j;
+      double result = i + 1;
+      for (unsigned int j = 0; j < m.m(); ++j)
+        result -= (i + 2 * j) * j;
 
-      AssertThrow (x(i) == result, ExcInternalError());
+      AssertThrow(x(i) == result, ExcInternalError());
     }
 
-  AssertThrow (s == x.l2_norm(), ExcInternalError());
+  AssertThrow(s == x.l2_norm(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         IndexSet indices(100);
         indices.add_range(0, 100);
-        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
-        PETScWrappers::MPI::Vector w (indices, MPI_COMM_WORLD);
-        PETScWrappers::MPI::Vector x (indices, MPI_COMM_WORLD);
-        test (v,w,x);
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector w(indices, MPI_COMM_WORLD);
+        PETScWrappers::MPI::Vector x(indices, MPI_COMM_WORLD);
+        test(v, w, x);
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -98,7 +102,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

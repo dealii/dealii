@@ -19,9 +19,9 @@
 
 #include <deal.II/base/config.h>
 
-#include <vector>
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -53,61 +53,70 @@ namespace Algorithms
      * identifier to it. The result of this function should be stored for
      * later use.
      */
-    static Event assign (const char *name);
+    static Event
+    assign(const char *name);
 
     /**
      * If you forgot to store the result of assign, here is how to retrieve it
      * knowing the name.
      */
-//      static Event find(const std::string& name);
+    //      static Event find(const std::string& name);
 
     /**
      * Constructor, generating a clear Event.
      */
-    Event ();
+    Event();
 
     /**
      * Clear all flags
      */
-    void clear();
+    void
+    clear();
 
     /**
      * Set all flags
      */
-    void all();
+    void
+    all();
 
     /**
      * Add the flags of the other event
      */
-    Event &operator += (const Event &event);
+    Event &
+    operator+=(const Event &event);
 
     /**
      * Clear the flags of the other event
      */
-    Event &operator -= (const Event &event);
+    Event &
+    operator-=(const Event &event);
 
     /**
      * Test whether all the flags set in the other Event are also set in this
      * one.
      */
-    bool test (const Event &event) const;
+    bool
+    test(const Event &event) const;
 
     /**
      * Return <tt>true</tt> if any event is set.
      */
-    bool any () const;
+    bool
+    any() const;
 
     /**
      * List the flags to a stream.
      */
     template <class OS>
-    void print (OS &os) const;
+    void
+    print(OS &os) const;
 
     /**
      * List all assigned events.
      */
     template <class OS>
-    static void print_assigned (OS &os);
+    static void
+    print_assigned(OS &os);
 
   private:
     /**
@@ -124,7 +133,7 @@ namespace Algorithms
     /**
      * The names of registered events
      */
-//TODO: This static field must be guarded by a mutex to be thread-safe!
+    // TODO: This static field must be guarded by a mutex to be thread-safe!
     static std::vector<std::string> names;
   };
 
@@ -157,35 +166,35 @@ namespace Algorithms
      * The time stepping scheme has changed the time step size.
      */
     extern const Event new_timestep_size;
-  }
+  } // namespace Events
 
 
-//----------------------------------------------------------------------//
+  //----------------------------------------------------------------------//
 
 
-  inline
-  bool
-  Event::any () const
+  inline bool
+  Event::any() const
   {
-    if (all_true) return true;
-    for (std::vector<bool>::const_iterator i=flags.begin();
-         i != flags.end(); ++i)
-      if (*i) return true;
+    if (all_true)
+      return true;
+    for (std::vector<bool>::const_iterator i = flags.begin(); i != flags.end();
+         ++i)
+      if (*i)
+        return true;
     return false;
   }
 
 
-  inline
-  bool
-  Event::test (const Event &event) const
+  inline bool
+  Event::test(const Event &event) const
   {
-
     // First, test all_true in this
-    if (all_true) return true;
+    if (all_true)
+      return true;
 
-    const unsigned int n = flags.size();
-    const unsigned int m = event.flags.size();
-    const unsigned int n_min = (n<m)?n:m;
+    const unsigned int n     = flags.size();
+    const unsigned int m     = event.flags.size();
+    const unsigned int n_min = (n < m) ? n : m;
 
     // Now, if all_true set in the
     // other, then all must be true
@@ -200,19 +209,21 @@ namespace Algorithms
         // Test all flags separately
         // and return false if one is
         // not set
-        for (std::vector<bool>::const_iterator i=flags.begin();
-             i != flags.end(); ++i)
-          if (!*i) return false;
+        for (std::vector<bool>::const_iterator i = flags.begin();
+             i != flags.end();
+             ++i)
+          if (!*i)
+            return false;
         // All flags are set
         return true;
       }
 
     // Finally, compare each flag
     // separately
-    for (unsigned int i=0; i<n_min; ++i)
+    for (unsigned int i = 0; i < n_min; ++i)
       if (event.flags[i] && !flags[i])
         return false;
-    for (unsigned int i=n_min; i<m; ++i)
+    for (unsigned int i = n_min; i < m; ++i)
       if (event.flags[i])
         return false;
     return true;
@@ -220,64 +231,65 @@ namespace Algorithms
 
 
 
-  inline
-  Event &Event::operator += (const Event &event)
+  inline Event &
+  Event::operator+=(const Event &event)
   {
     all_true |= event.all_true;
-    if (all_true) return *this;
+    if (all_true)
+      return *this;
 
     if (flags.size() < event.flags.size())
       flags.resize(event.flags.size());
-    for (unsigned int i=0; i<event.flags.size(); ++i)
+    for (unsigned int i = 0; i < event.flags.size(); ++i)
       flags[i] = flags[i] || event.flags[i];
 
     return *this;
   }
 
 
-  inline
-  Event &Event::operator -= (const Event &event)
+  inline Event &
+  Event::operator-=(const Event &event)
   {
-    if (!event.any()) return *this;
+    if (!event.any())
+      return *this;
 
     all_true = false;
     if (event.all_true)
       {
-        for (std::vector<bool>::iterator i=flags.begin();
-             i != flags.end(); ++i)
+        for (std::vector<bool>::iterator i = flags.begin(); i != flags.end();
+             ++i)
           *i = false;
         return *this;
       }
 
     if (flags.size() < event.flags.size())
       flags.resize(event.flags.size());
-    for (unsigned int i=0; i<event.flags.size(); ++i)
-      if (event.flags[i]) flags[i] = false;
+    for (unsigned int i = 0; i < event.flags.size(); ++i)
+      if (event.flags[i])
+        flags[i] = false;
 
     return *this;
   }
 
 
   template <class OS>
-  inline
-  void
-  Event::print (OS &os) const
+  inline void
+  Event::print(OS &os) const
   {
     if (all_true)
       os << " ALL";
 
-    for (unsigned int i=0; i<flags.size(); ++i)
+    for (unsigned int i = 0; i < flags.size(); ++i)
       if (flags[i])
         os << ' ' << names[i];
   }
 
 
   template <class OS>
-  inline
-  void
-  Event::print_assigned (OS &os)
+  inline void
+  Event::print_assigned(OS &os)
   {
-    for (unsigned int i=0; i<names.size(); ++i)
+    for (unsigned int i = 0; i < names.size(); ++i)
       os << i << '\t' << names[i] << std::endl;
   }
 
@@ -288,12 +300,13 @@ namespace Algorithms
    * @relatesalso Event
    */
   template <class OS>
-  OS &operator << (OS &o, const Event &e)
+  OS &
+  operator<<(OS &o, const Event &e)
   {
     e.print(o);
     return o;
   }
-}
+} // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE
 

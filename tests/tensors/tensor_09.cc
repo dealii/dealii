@@ -17,10 +17,12 @@
 // check generic contract variants tha allow to specify the indices which
 // will be contracted.
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
 
-int main ()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 

@@ -15,18 +15,21 @@
 
 // verify that Patterns::List objects can be copied
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
 #include <memory>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
   {
     // create one pattern and a copy of it
-    Patterns::List list(Patterns::Integer(-1,42), 2, 3);
-    Patterns::List list2 (list);
+    Patterns::List list(Patterns::Integer(-1, 42), 2, 3);
+    Patterns::List list2(list);
 
     // both now go out of scope -- ensure that their destruction does
     // not lead to memory corruption

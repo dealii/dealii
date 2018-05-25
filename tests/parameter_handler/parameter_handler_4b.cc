@@ -20,11 +20,13 @@
 // not lead to empty itemized environments in the latex output, which are not
 // valid
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   try
     {
@@ -32,13 +34,14 @@ int main ()
       deallog.attach(logfile);
 
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
-      prm.leave_subsection ();
-      prm.print_parameters (logfile, ParameterHandler::LaTeX);
+      prm.enter_subsection("Testing");
+      prm.leave_subsection();
+      prm.print_parameters(logfile, ParameterHandler::LaTeX);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -51,7 +54,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

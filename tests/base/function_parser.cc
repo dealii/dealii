@@ -18,14 +18,18 @@
 // This program tests the functionality of the function parser
 // wrapper.
 
-#include "../tests.h"
-#include <map>
-#include <deal.II/base/point.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/point.h>
+
+#include <deal.II/lac/vector.h>
+
+#include <map>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -45,56 +49,44 @@ int main ()
 
   // Concatenate the declared expressions, to test the second way of
   // initializing
-  std::string concatenated="cos(pi*y)";
+  std::string concatenated = "cos(pi*y)";
   // Now test each possibility
-  for (unsigned int i=1; i<=expressions.size(); ++i)
+  for (unsigned int i = 1; i <= expressions.size(); ++i)
     {
       try
         {
           {
             FunctionParser<2> function(i);
-            function.initialize(variables,
-                                expressions,
-                                constants);
-            deallog << "Initialize Succeeded with dim = 2, "
-                    << i << " components, "
-                    << expressions.size() << " expressions, "
+            function.initialize(variables, expressions, constants);
+            deallog << "Initialize Succeeded with dim = 2, " << i
+                    << " components, " << expressions.size() << " expressions, "
                     << variables << " as variables." << std::endl;
           }
         }
       catch (...)
         {
-          deallog << "Initialize Failed with dim = 2, "
-                  << i << " components, "
-                  << expressions.size() << " expressions, "
-                  << variables << " as variables." << std::endl;
+          deallog << "Initialize Failed with dim = 2, " << i << " components, "
+                  << expressions.size() << " expressions, " << variables
+                  << " as variables." << std::endl;
         }
 
       try
         {
           {
             FunctionParser<2> function_bis(i);
-            function_bis.initialize(variables,
-                                    concatenated,
-                                    constants);
-            deallog << "Initialize Succeeded with dim = 2, "
-                    << i << " components, "
-                    << concatenated << " as function and "
+            function_bis.initialize(variables, concatenated, constants);
+            deallog << "Initialize Succeeded with dim = 2, " << i
+                    << " components, " << concatenated << " as function and "
                     << variables << " as variables." << std::endl;
           }
         }
       catch (...)
         {
-          deallog << "Initialize Failed with dim = 2, "
-                  << i << " components, "
-                  << concatenated  << " as function and "
-                  << variables << " as variables." << std::endl;
+          deallog << "Initialize Failed with dim = 2, " << i << " components, "
+                  << concatenated << " as function and " << variables
+                  << " as variables." << std::endl;
         }
 
-      concatenated += "; " + expressions[i-1];
+      concatenated += "; " + expressions[i - 1];
     }
 }
-
-
-
-

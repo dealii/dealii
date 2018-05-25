@@ -18,12 +18,16 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/smartpointer.h>
+
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/vector_memory.h>
+
 #include <deal.II/multigrid/mg_smoother.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -44,8 +48,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2005
  */
 template <typename MatrixType, class RelaxationType, typename number>
-class MGSmootherBlock
-  : public MGSmoother<BlockVector<number> >
+class MGSmootherBlock : public MGSmoother<BlockVector<number>>
 {
 public:
   /**
@@ -55,21 +58,21 @@ public:
    * Constructor. Sets memory and smoothing parameters.
    */
   DEAL_II_DEPRECATED
-  MGSmootherBlock (VectorMemory<BlockVector<number> > &mem,
-                   const unsigned int                   steps     = 1,
-                   const bool                           variable  = false,
-                   const bool                           symmetric = false,
-                   const bool                           transpose = false,
-                   const bool                           reverse   = false);
+  MGSmootherBlock(VectorMemory<BlockVector<number>> &mem,
+                  const unsigned int                 steps     = 1,
+                  const bool                         variable  = false,
+                  const bool                         symmetric = false,
+                  const bool                         transpose = false,
+                  const bool                         reverse   = false);
 
   /**
    * Constructor.
    */
-  MGSmootherBlock (const unsigned int                   steps     = 1,
-                   const bool                           variable  = false,
-                   const bool                           symmetric = false,
-                   const bool                           transpose = false,
-                   const bool                           reverse   = false);
+  MGSmootherBlock(const unsigned int steps     = 1,
+                  const bool         variable  = false,
+                  const bool         symmetric = false,
+                  const bool         transpose = false,
+                  const bool         reverse   = false);
 
   /**
    * Initialize for matrices. The parameter <tt>matrices</tt> can be any
@@ -85,42 +88,47 @@ public:
    * operator for each level.
    */
   template <class MGMatrixType, class MGRelaxationType>
-  void initialize (const MGMatrixType     &matrices,
-                   const MGRelaxationType &smoothers);
+  void
+  initialize(const MGMatrixType &matrices, const MGRelaxationType &smoothers);
 
   /**
    * Empty all vectors.
    */
-  void clear ();
+  void
+  clear();
 
   /**
    * Switch on/off reversed. This is mutually exclusive with transpose().
    */
-  void set_reverse (const bool);
+  void
+  set_reverse(const bool);
 
   /**
    * Implementation of the interface for @p Multigrid. This function does
    * nothing, which by comparison with the definition of this function means
    * that the smoothing operator equals the null operator.
    */
-  virtual void smooth (const unsigned int         level,
-                       BlockVector<number>       &u,
-                       const BlockVector<number> &rhs) const;
+  virtual void
+  smooth(const unsigned int         level,
+         BlockVector<number> &      u,
+         const BlockVector<number> &rhs) const;
 
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
+
 private:
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<LinearOperator<BlockVector<number> > > matrices;
+  MGLevelObject<LinearOperator<BlockVector<number>>> matrices;
 
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<LinearOperator<BlockVector<number> > > smoothers;
+  MGLevelObject<LinearOperator<BlockVector<number>>> smoothers;
 
   /**
    * Reverse?
@@ -130,7 +138,9 @@ private:
   /**
    * Memory for auxiliary vectors.
    */
-  SmartPointer<VectorMemory<BlockVector<number> >, MGSmootherBlock<MatrixType, RelaxationType, number > > mem;
+  SmartPointer<VectorMemory<BlockVector<number>>,
+               MGSmootherBlock<MatrixType, RelaxationType, number>>
+    mem;
 };
 
 /**@}*/
@@ -140,43 +150,40 @@ private:
 #ifndef DOXYGEN
 
 template <typename MatrixType, class RelaxationType, typename number>
-inline
-MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock
-(VectorMemory<BlockVector<number> > &mem,
- const unsigned int                  steps,
- const bool                          variable,
- const bool                          symmetric,
- const bool                          transpose,
- const bool                          reverse)
-  : MGSmoother<BlockVector<number> >(steps, variable, symmetric, transpose),
-    reverse(reverse),
-    mem(&mem)
+inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(
+  VectorMemory<BlockVector<number>> &mem,
+  const unsigned int                 steps,
+  const bool                         variable,
+  const bool                         symmetric,
+  const bool                         transpose,
+  const bool                         reverse) :
+  MGSmoother<BlockVector<number>>(steps, variable, symmetric, transpose),
+  reverse(reverse),
+  mem(&mem)
 {}
 
 template <typename MatrixType, class RelaxationType, typename number>
-inline
-MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock
-(const unsigned int                  steps,
- const bool                          variable,
- const bool                          symmetric,
- const bool                          transpose,
- const bool                          reverse)
-  : MGSmoother<BlockVector<number> >(steps, variable, symmetric, transpose),
-    reverse(reverse),
-    mem(&this->vector_memory)
+inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(
+  const unsigned int steps,
+  const bool         variable,
+  const bool         symmetric,
+  const bool         transpose,
+  const bool         reverse) :
+  MGSmoother<BlockVector<number>>(steps, variable, symmetric, transpose),
+  reverse(reverse),
+  mem(&this->vector_memory)
 {}
 
 
 template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RelaxationType, number>::clear ()
+MGSmootherBlock<MatrixType, RelaxationType, number>::clear()
 {
-  unsigned int i=matrices.min_level(),
-               max_level=matrices.max_level();
-  for (; i<=max_level; ++i)
+  unsigned int i = matrices.min_level(), max_level = matrices.max_level();
+  for (; i <= max_level; ++i)
     {
-      smoothers[i] = LinearOperator<BlockVector<number> >();
-      matrices[i] = LinearOperator<BlockVector<number> >();
+      smoothers[i] = LinearOperator<BlockVector<number>>();
+      matrices[i]  = LinearOperator<BlockVector<number>>();
     }
 }
 
@@ -184,8 +191,9 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::clear ()
 template <typename MatrixType, class RelaxationType, typename number>
 template <class MGMatrixType, class MGRelaxationType>
 inline void
-MGSmootherBlock<MatrixType, RelaxationType, number>::initialize (const MGMatrixType &m,
-    const MGRelaxationType &s)
+MGSmootherBlock<MatrixType, RelaxationType, number>::initialize(
+  const MGMatrixType &    m,
+  const MGRelaxationType &s)
 {
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
@@ -193,22 +201,22 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::initialize (const MGMatrixT
   matrices.resize(min, max);
   smoothers.resize(min, max);
 
-  for (unsigned int i=min; i<=max; ++i)
+  for (unsigned int i = min; i <= max; ++i)
     {
       // Workaround: Unfortunately, not every "m[i]" object has a
       // rich enough interface to populate reinit_(domain|range)_vector.
       // Thus, apply an empty LinearOperator exemplar.
-      matrices[i] = linear_operator<BlockVector<number> >(
-                      LinearOperator<BlockVector<number> >(), m[i]);
-      smoothers[i] = linear_operator<BlockVector<number> >(matrices[i], s[i]);
+      matrices[i] = linear_operator<BlockVector<number>>(
+        LinearOperator<BlockVector<number>>(), m[i]);
+      smoothers[i] = linear_operator<BlockVector<number>>(matrices[i], s[i]);
     }
 }
 
 
 template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RelaxationType, number>::
-set_reverse (const bool flag)
+MGSmootherBlock<MatrixType, RelaxationType, number>::set_reverse(
+  const bool flag)
 {
   reverse = flag;
 }
@@ -216,32 +224,31 @@ set_reverse (const bool flag)
 
 template <typename MatrixType, class RelaxationType, typename number>
 inline std::size_t
-MGSmootherBlock<MatrixType, RelaxationType, number>::
-memory_consumption () const
+MGSmootherBlock<MatrixType, RelaxationType, number>::memory_consumption() const
 {
-  return sizeof(*this)
-         + matrices.memory_consumption()
-         + smoothers.memory_consumption()
-         + this->vector_memory.memory_consumption();
+  return sizeof(*this) + matrices.memory_consumption() +
+         smoothers.memory_consumption() +
+         this->vector_memory.memory_consumption();
 }
 
 
 template <typename MatrixType, class RelaxationType, typename number>
 inline void
-MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(const unsigned int         level,
-                                                            BlockVector<number>       &u,
-                                                            const BlockVector<number> &rhs) const
+MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(
+  const unsigned int         level,
+  BlockVector<number> &      u,
+  const BlockVector<number> &rhs) const
 {
   LogStream::Prefix prefix("Smooth");
 
   unsigned int maxlevel = matrices.max_level();
-  unsigned int steps2 = this->steps;
+  unsigned int steps2   = this->steps;
 
   if (this->variable)
-    steps2 *= (1<<(maxlevel-level));
+    steps2 *= (1 << (maxlevel - level));
 
-  typename VectorMemory<BlockVector<number> >::Pointer r(*this->mem);
-  typename VectorMemory<BlockVector<number> >::Pointer d(*this->mem);
+  typename VectorMemory<BlockVector<number>>::Pointer r(*this->mem);
+  typename VectorMemory<BlockVector<number>>::Pointer d(*this->mem);
   r->reinit(u);
   d->reinit(u);
 
@@ -249,18 +256,18 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(const unsigned int  
   if (this->symmetric && (steps2 % 2 == 0))
     T = false;
 
-  for (unsigned int i=0; i<steps2; ++i)
+  for (unsigned int i = 0; i < steps2; ++i)
     {
       if (T)
         {
-          matrices[level].vmult(*r,u);
-          r->sadd(-1.,1.,rhs);
+          matrices[level].vmult(*r, u);
+          r->sadd(-1., 1., rhs);
           smoothers[level].Tvmult(*d, *r);
         }
       else
         {
-          matrices[level].vmult(*r,u);
-          r->sadd(-1.,1.,rhs);
+          matrices[level].vmult(*r, u);
+          r->sadd(-1., 1., rhs);
           smoothers[level].vmult(*d, *r);
         }
       u += *d;

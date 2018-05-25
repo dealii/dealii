@@ -17,25 +17,28 @@
 // check GridTools::distort_random for parallel::shared::Triangulation
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/distributed/shared_tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/numerics/data_out.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
-void test1 (const bool keep_boundary)
+void
+test1(const bool keep_boundary)
 {
   const unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  parallel::shared::Triangulation<dim> tria (MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
-  GridTools::distort_random (0.1, tria, keep_boundary);
+  GridTools::distort_random(0.1, tria, keep_boundary);
 
   deallog << "dim=" << dim << ", keep_boundary=" << keep_boundary << std::endl;
   std::string filename;
@@ -46,7 +49,7 @@ void test1 (const bool keep_boundary)
   filename += Utilities::int_to_string(dim);
 
   std::stringstream ss;
-  GridOut().write_gnuplot (tria, ss);
+  GridOut().write_gnuplot(tria, ss);
   const std::string local_grid = ss.str();
   deallog << checksum(local_grid.begin(), local_grid.end()) << std::endl;
 
@@ -55,16 +58,18 @@ void test1 (const bool keep_boundary)
 
 
 
-int main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   MPILogInitAll log_all;
 
-  test1<2> (true);
-  test1<2> (false);
-  test1<3> (true);
-  test1<3> (false);
+  test1<2>(true);
+  test1<2>(false);
+  test1<3>(true);
+  test1<3>(false);
 
   return 0;
 }

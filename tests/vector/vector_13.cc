@@ -17,50 +17,54 @@
 
 // check Vector<double>::operator() in add-mode
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
   // actually wrote elements to
-  std::vector<bool> pattern (v.size(), false);
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  std::vector<bool> pattern(v.size(), false);
+  for (unsigned int i = 0; i < v.size(); i += 1 + i)
     {
       v(i) += i;
       pattern[i] = true;
     }
 
-  v.compress ();
+  v.compress();
 
   // check that they are ok, and this time
   // all of them
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow ((((pattern[i] == true) && (v(i) == i))
-                  ||
-                  ((pattern[i] == false) && (v(i) == 0))),
-                 ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow((((pattern[i] == true) && (v(i) == i)) ||
+                 ((pattern[i] == false) && (v(i) == 0))),
+                ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -73,7 +77,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

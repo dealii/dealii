@@ -16,29 +16,33 @@
 
 // test Utilities::MPI::sum() for sparse matrix
 
-#include "../tests.h"
-#include "../testmatrix.h"
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/base/mpi.h>
 
+#include <deal.II/lac/sparse_matrix.h>
+
+#include "../testmatrix.h"
+#include "../tests.h"
 
 
-void test()
+
+void
+test()
 {
-  const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int size = 50;
 
-  FDMatrix testproblem (size, size);
-  unsigned int dim = (size-1) * (size-1);
+  FDMatrix     testproblem(size, size);
+  unsigned int dim = (size - 1) * (size - 1);
 
   SparsityPattern sparsity(dim, dim, size);
   testproblem.five_point_structure(sparsity);
   sparsity.compress();
 
   SparseMatrix<double> matrix(sparsity);
-  const double val = std::pow(10,myid);
+  const double         val = std::pow(10, myid);
   for (SparsityPattern::const_iterator it = sparsity.begin();
-       it != sparsity.end(); ++it)
+       it != sparsity.end();
+       ++it)
     {
       const auto i = (*it).row();
       const auto j = (*it).column();
@@ -47,7 +51,7 @@ void test()
     }
 
   // compare with FullMatrix:
-  FullMatrix<double> full(dim,dim);
+  FullMatrix<double> full(dim, dim);
   full.copy_from(matrix);
 
   // deallog << "Local:" << std::endl;
@@ -59,31 +63,31 @@ void test()
   Utilities::MPI::sum(full, MPI_COMM_WORLD, full);
 
   for (SparsityPattern::const_iterator it = sparsity.begin();
-       it != sparsity.end(); ++it)
+       it != sparsity.end();
+       ++it)
     {
       const auto i = (*it).row();
       const auto j = (*it).column();
-      AssertThrow (matrix(i,j) == full(i,j),
-                   ExcMessage(std::to_string(matrix(i,j)) +
-                              " != " +
-                              std::to_string(full(i,j)) +
-                              " for i=" + std::to_string(i) +
-                              " j=" + std::to_string(j)
-                             ));
+      AssertThrow(matrix(i, j) == full(i, j),
+                  ExcMessage(std::to_string(matrix(i, j)) +
+                             " != " + std::to_string(full(i, j)) + " for i=" +
+                             std::to_string(i) + " j=" + std::to_string(j)));
     }
 
   deallog << "Ok" << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   // MPILogInitAll log;
   // test();
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
       test();

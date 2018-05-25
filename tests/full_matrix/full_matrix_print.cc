@@ -16,15 +16,16 @@
 
 // verify that FullMatrix::print saves the stream state around the output
 
-#include "../tests.h"
-
 #include <deal.II/lac/full_matrix.h>
 
-const double entries[9] = { 11.1,12.2,13.3,21.456,22.12345678901,23,31,32,33 };
+#include "../tests.h"
+
+const double entries[9] =
+  {11.1, 12.2, 13.3, 21.456, 22.12345678901, 23, 31, 32, 33};
 
 
 int
-main ()
+main()
 {
   initlog();
   std::ostream &logfile = deallog.get_file_stream();
@@ -32,7 +33,7 @@ main ()
   deallog << std::setprecision(3);
   logfile << numbers::PI << std::endl;
 
-  FullMatrix<double> T(3,3,entries);
+  FullMatrix<double> T(3, 3, entries);
 
   // try writing to a regular stream
   T.print(logfile, 15, 8);

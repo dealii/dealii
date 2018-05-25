@@ -20,12 +20,16 @@
 // note that the cylinder boundary is not even the problem here!
 
 /*
-5: An error occurred in line <4586> of file </scratch/deal-trunk/deal.II/include/deal.II/numerics/vector_tools.templates.h> in function
-5:     void dealii::VectorTools::compute_no_normal_flux_constraints(const DoFHandlerType<dim, spacedim>&, unsigned int, const std::set<types::boundary_id>&, dealii::ConstraintMatrix&, const dealii::Mapping<dim, spacedim>&) [with int dim = 3; DoFHandlerType = dealii::DoFHandler; int spacedim = 3]
-5: The violated condition was:
-5:     contribution->second.size() == dim-1
-5: The name and call sequence of the exception was:
-5:     ExcNotImplemented()
+5: An error occurred in line <4586> of file
+</scratch/deal-trunk/deal.II/include/deal.II/numerics/vector_tools.templates.h>
+in function 5:     void
+dealii::VectorTools::compute_no_normal_flux_constraints(const
+DoFHandlerType<dim, spacedim>&, unsigned int, const
+std::set<types::boundary_id>&, dealii::ConstraintMatrix&, const
+dealii::Mapping<dim, spacedim>&) [with int dim = 3; DoFHandlerType =
+dealii::DoFHandler; int spacedim = 3] 5: The violated condition was: 5:
+contribution->second.size() == dim-1 5: The name and call sequence of the
+exception was: 5:     ExcNotImplemented()
 
  */
 
@@ -51,28 +55,34 @@
 // one cell contributed twice and another only once. this has been
 // fixed now by simply ignoring the one that contributes only once.
 
-#include "../tests.h"
-
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/data_out.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/mapping_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
+
 
 template <int dim>
-void run()
+void
+run()
 {
   Triangulation<dim> tria;
 
   // indicator 6 = cylinder
-  GridGenerator::hyper_cube_with_cylindrical_hole (tria, 0.25, 0.5, 0.5, 1, true);
+  GridGenerator::hyper_cube_with_cylindrical_hole(
+    tria, 0.25, 0.5, 0.5, 1, true);
   tria.reset_manifold(0);
 
   /*  std::string filename = "Mesh.eps";
@@ -81,19 +91,17 @@ void run()
   grid_out.write_eps (tria, output);
   */
 
-  FESystem<dim> fe(FE_Q<dim>(1), dim);
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FESystem<dim>   fe(FE_Q<dim>(1), dim);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
+  ConstraintMatrix             constraints;
   std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert (0); // x=0
-  no_normal_flux_boundaries.insert (5); // z=1
+  no_normal_flux_boundaries.insert(0); // x=0
+  no_normal_flux_boundaries.insert(5); // z=1
 
-  VectorTools::compute_no_normal_flux_constraints
-  (dof_handler, 0,
-   no_normal_flux_boundaries,
-   constraints);
+  VectorTools::compute_no_normal_flux_constraints(
+    dof_handler, 0, no_normal_flux_boundaries, constraints);
 
   constraints.print(deallog.get_file_stream());
 
@@ -104,12 +112,13 @@ void run()
 }
 
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  logfile.precision (7);
+  std::ofstream logfile("output");
+  logfile.precision(7);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
 
-  run<3> ();
+  run<3>();
 }

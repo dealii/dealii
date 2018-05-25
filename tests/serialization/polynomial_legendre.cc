@@ -16,30 +16,34 @@
 
 // check serialization for Legendre
 
-#include "serialization.h"
 #include <deal.II/base/polynomial.h>
+
 #include <boost/serialization/vector.hpp>
 
+#include "serialization.h"
 
-void test ()
+
+void
+test()
 {
-  unsigned int degree1 = 3;
+  unsigned int          degree1 = 3;
   Polynomials::Legendre p1(degree1);
 
-  unsigned int degree2 = 5;
+  unsigned int          degree2 = 5;
   Polynomials::Legendre p2(degree2);
 
-  verify (p1, p2);
+  verify(p1, p2);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

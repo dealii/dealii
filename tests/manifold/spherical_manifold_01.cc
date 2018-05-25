@@ -13,13 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-// Check SphericalManifold for get_intermediate_point and get_tangent_vector issues.
+// Check SphericalManifold for get_intermediate_point and get_tangent_vector
+// issues.
+
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/utilities.h>
+
+#include <deal.II/grid/manifold_lib.h>
 
 #include "../tests.h"
-
-#include <deal.II/base/utilities.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/base/quadrature.h>
 
 int
 main()
@@ -30,15 +32,16 @@ main()
   // double radius = center.norm();
 
   {
-    Point<2> center(0.0, 0.0);
-    const SphericalManifold<2,2> manifold(center);
+    Point<2>                      center(0.0, 0.0);
+    const SphericalManifold<2, 2> manifold(center);
 
     Point<2> P1(1.0, 0.0);
     Point<2> P2(0.0, 1.0);
 
     Point<2> Q = manifold.get_intermediate_point(P1, P2, .5);
 
-    deallog << "=================================" << std::endl;;
+    deallog << "=================================" << std::endl;
+    ;
     deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
@@ -50,7 +53,7 @@ main()
     deallog << manifold.get_intermediate_point(P1, Q, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, Q, .5) << std::endl;
     deallog << manifold.get_intermediate_point(P1, Q, .75) << std::endl;
-    deallog << manifold.get_intermediate_point(P1, P2,.5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .5) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .5) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .75) << std::endl;
@@ -58,15 +61,16 @@ main()
   }
 
   {
-    Point<2> center(0.0, 0.0);
-    const SphericalManifold<1,2> manifold(center);
+    Point<2>                      center(0.0, 0.0);
+    const SphericalManifold<1, 2> manifold(center);
 
     Point<2> P1(1.0, 0.0);
     Point<2> P2(0.0, 1.0);
 
     Point<2> Q = manifold.get_intermediate_point(P1, P2, .5);
 
-    deallog << "=================================" << std::endl;;
+    deallog << "=================================" << std::endl;
+    ;
     deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
@@ -78,7 +82,7 @@ main()
     deallog << manifold.get_intermediate_point(P1, Q, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, Q, .5) << std::endl;
     deallog << manifold.get_intermediate_point(P1, Q, .75) << std::endl;
-    deallog << manifold.get_intermediate_point(P1, P2,.5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .5) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .5) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .75) << std::endl;
@@ -86,15 +90,16 @@ main()
   }
 
   {
-    Point<3> center(0.0, 0.0, 0.0);
-    const SphericalManifold<2,3> manifold(center);
+    Point<3>                      center(0.0, 0.0, 0.0);
+    const SphericalManifold<2, 3> manifold(center);
 
     Point<3> P1(1.0, 0.0, 0.0);
     Point<3> P2(0.0, 0.0, 1.0);
 
     Point<3> Q = manifold.get_intermediate_point(P1, P2, .5);
 
-    deallog << "=================================" << std::endl;;
+    deallog << "=================================" << std::endl;
+    ;
     deallog << manifold.get_intermediate_point(P1, P2, .125) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, P2, .375) << std::endl;
@@ -106,7 +111,7 @@ main()
     deallog << manifold.get_intermediate_point(P1, Q, .25) << std::endl;
     deallog << manifold.get_intermediate_point(P1, Q, .5) << std::endl;
     deallog << manifold.get_intermediate_point(P1, Q, .75) << std::endl;
-    deallog << manifold.get_intermediate_point(P1, P2,.5) << std::endl;
+    deallog << manifold.get_intermediate_point(P1, P2, .5) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .25) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .5) << std::endl;
     deallog << manifold.get_intermediate_point(Q, P2, .75) << std::endl;
@@ -114,33 +119,36 @@ main()
   }
 
   {
-    Point<3> center(0.0, 0.0, 0.0);
-    const SphericalManifold<3,3> manifold(center);
+    Point<3>                      center(0.0, 0.0, 0.0);
+    const SphericalManifold<3, 3> manifold(center);
 
     Point<3> P1(2.0, 0.0, 0.0);
-    Point<3> P2(0.0, std::sqrt(2), std::sqrt(2) );
+    Point<3> P2(0.0, std::sqrt(2), std::sqrt(2));
 
     Point<3> Q = manifold.get_intermediate_point(P1, P2, .5);
 
     const unsigned int num_points = 20;
-    deallog << "=================================" << std::endl;;
-    for (unsigned int i = 0; i<num_points; i++)
-      deallog << manifold.get_intermediate_point(P1, P2, (1.0*i)/(num_points-1)) << std::endl;
+    deallog << "=================================" << std::endl;
+    ;
+    for (unsigned int i = 0; i < num_points; i++)
+      deallog << manifold.get_intermediate_point(
+                   P1, P2, (1.0 * i) / (num_points - 1))
+              << std::endl;
     deallog << "=================================" << std::endl;
   }
 
   {
-    Point<3> center(0.0, 0.0, 0.0);
-    const SphericalManifold<3,3> manifold(center);
+    Point<3>                      center(0.0, 0.0, 0.0);
+    const SphericalManifold<3, 3> manifold(center);
 
     Point<3> P1(1.0, 0.0, 0.0);
     Point<3> P2(0.0, 1.0, 0.0);
     Point<3> P3(0.0, 0.0, 1.0);
 
-    std::vector<Point<3> > points1(3);
-    std::vector<Point<3> > points2(3);
-    std::vector<Point<3> > points3(3);
-    std::vector<double > weights(3);
+    std::vector<Point<3>> points1(3);
+    std::vector<Point<3>> points2(3);
+    std::vector<Point<3>> points3(3);
+    std::vector<double>   weights(3);
 
     points1[0] = P1;
     points1[1] = P2;
@@ -154,9 +162,9 @@ main()
     points3[1] = P3;
     points3[2] = P1;
 
-    weights[0] = 1.0/3.0;
-    weights[1] = 1.0/3.0;
-    weights[2] = 1.0/3.0;
+    weights[0] = 1.0 / 3.0;
+    weights[1] = 1.0 / 3.0;
+    weights[2] = 1.0 / 3.0;
 
     Point<3> Q = manifold.get_new_point(make_array_view(points1),
                                         make_array_view(weights));
@@ -167,9 +175,10 @@ main()
 
     Point<3> P5(0.707107, 0.707107, 0.0);
     Point<3> P4(0.0, 0.0, 1.0);
-    Point<3> R = manifold.get_intermediate_point(P5, P4, 2.0/3.0);
+    Point<3> R = manifold.get_intermediate_point(P5, P4, 2.0 / 3.0);
 
-    deallog << "=================================" << std::endl;;
+    deallog << "=================================" << std::endl;
+    ;
     deallog << Q << std::endl;
     deallog << S << std::endl;
     deallog << T << std::endl;
@@ -177,6 +186,7 @@ main()
     deallog << "=================================" << std::endl;
   }
 
-  // Quadrature (const std::vector< Point< dim > > &points, const std::vector< double > &weights);
+  // Quadrature (const std::vector< Point< dim > > &points, const std::vector<
+  // double > &weights);
   return 0;
 }

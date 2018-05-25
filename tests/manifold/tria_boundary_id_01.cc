@@ -19,27 +19,29 @@
 // exactly: with the old boundary compatibility code (removed for the 9.0
 // release) boundary ids may be treated as manifold ids. Make sure that this
 // no longer happens.
-#include "../tests.h"
-
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <fstream>
 
+#include "../tests.h"
+
 using namespace dealii;
 
 template <typename Stream, int dim>
-void print_triangulation_data(Stream &stream,
-                              const Triangulation<dim> &triangulation)
+void
+print_triangulation_data(Stream &                  stream,
+                         const Triangulation<dim> &triangulation)
 {
-// Boundary id count
-  std::map<int,int> boundary_id_count;
-  std::map<int,int> manifold_id_count;
+  // Boundary id count
+  std::map<int, int> boundary_id_count;
+  std::map<int, int> manifold_id_count;
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+           ++face)
         {
           if (cell->face(face)->at_boundary())
             {
@@ -62,37 +64,33 @@ void print_triangulation_data(Stream &stream,
 
   for (const auto &pair : boundary_id_count)
     {
-      stream
-          << "  Boundary: " << pair.first
-          << "  ;"
-          << "  Number of faces: " << pair.second
-          << "\n";
+      stream << "  Boundary: " << pair.first << "  ;"
+             << "  Number of faces: " << pair.second << "\n";
     }
   for (const auto &pair : manifold_id_count)
     {
-      stream
-          << "  Manifold: " << pair.first
-          << "  ;"
-          << "  Number of faces: " << pair.second
-          << "\n";
+      stream << "  Manifold: " << pair.first << "  ;"
+             << "  Number of faces: " << pair.second << "\n";
     }
 
   stream << std::endl;
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
-  const int dim = 2;
+  const int          dim                  = 2;
   const unsigned int n_global_refinements = 1;
 
   // Create a geometry with flat and curved boundaries
-  const double inner_radius = 0.25;
-  const double outer_radius = 0.5;
-  const double tol = 1e-6;
+  const double       inner_radius = 0.25;
+  const double       outer_radius = 0.5;
+  const double       tol          = 1e-6;
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube_with_cylindrical_hole (tria, inner_radius, outer_radius);
+  GridGenerator::hyper_cube_with_cylindrical_hole(
+    tria, inner_radius, outer_radius);
   tria.reset_all_manifolds();
 
   // Enumerate the flat boundaries and the curved one separately. Also provide
@@ -101,11 +99,14 @@ int main ()
   const types::manifold_id curved_manifold_id = 1;
   for (const auto &cell : tria.active_cell_iterators())
     {
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+           ++face)
         {
           if (cell->face(face)->at_boundary())
             {
-              for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
+              for (unsigned int vertex = 0;
+                   vertex < GeometryInfo<dim>::vertices_per_face;
+                   ++vertex)
                 {
                   const Point<dim> pt_vertex = cell->face(face)->vertex(vertex);
 

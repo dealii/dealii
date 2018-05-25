@@ -17,25 +17,30 @@
 // procedure shared among all generalized_interpolation_* tests.
 
 #include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
+
 #include <deal.II/lac/vector.h>
-#include <deal.II/numerics/vector_tools.h>
+
 #include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/vector_tools.h>
 
 template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int n_comp, const unsigned int q)
-    : Function<dim>(n_comp), q(q)
-  {
-  }
+  F(const unsigned int n_comp, const unsigned int q) :
+    Function<dim>(n_comp),
+    q(q)
+  {}
 
-  virtual double value(const Point<dim> &p, const unsigned int) const
+  virtual double
+  value(const Point<dim> &p, const unsigned int) const
   {
     double v = 0;
     for (unsigned int d = 0; d < dim; ++d)
@@ -49,11 +54,12 @@ private:
 };
 
 template <int dim, typename T>
-void test(const FiniteElement<dim> &fe,
-          const T &f,
-          const unsigned int order_mapping,
-          bool distort_mesh,
-          bool print_function_values = false)
+void
+test(const FiniteElement<dim> &fe,
+     const T &                 f,
+     const unsigned int        order_mapping,
+     bool                      distort_mesh,
+     bool                      print_function_values = false)
 {
   deallog << "dim " << dim << " " << fe.get_name() << std::endl;
 
@@ -88,8 +94,7 @@ void test(const FiniteElement<dim> &fe,
   Functions::FEFieldFunction<dim> f2(dof_handler, interpolant, mapping);
 
   Vector<double> interpolant2(dof_handler.n_dofs());
-  VectorTools::interpolate(
-    mapping, dof_handler, f2, interpolant2);
+  VectorTools::interpolate(mapping, dof_handler, f2, interpolant2);
 
   interpolant2 -= interpolant;
   deallog << "Check projection property: " << interpolant2.linfty_norm()

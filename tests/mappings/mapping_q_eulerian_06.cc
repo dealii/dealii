@@ -22,26 +22,30 @@
 
 // all include files you need here
 
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q_eulerian.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_eulerian.h>
-#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/grid/tria.h>
 
 #include <string>
 
 std::ofstream logfile("output");
 
-void test(unsigned int degree)
+void
+test(unsigned int degree)
 {
-  const unsigned int dim = 1;
-  const unsigned int spacedim = 1;
+  const unsigned int           dim      = 1;
+  const unsigned int           spacedim = 1;
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria, 0, 1);
-  FE_Q<dim, spacedim> fe(QIterated<1>(QTrapez<1>(),degree));
+  FE_Q<dim, spacedim> fe(QIterated<1>(QTrapez<1>(), degree));
 
   DoFHandler<dim, spacedim> shift_dh(tria);
 
@@ -49,33 +53,34 @@ void test(unsigned int degree)
 
   // Shift just the interior points but not the boundary points
   Vector<double> shift(shift_dh.n_dofs());
-  for (unsigned int i=2; i<=degree; ++i)
+  for (unsigned int i = 2; i <= degree; ++i)
     shift(i) = 0.1;
 
-  QGauss<dim> quad(degree+1);
-  MappingQEulerian<dim,Vector<double>,spacedim> mapping(degree, shift_dh, shift);
+  QGauss<dim>                                     quad(degree + 1);
+  MappingQEulerian<dim, Vector<double>, spacedim> mapping(
+    degree, shift_dh, shift);
 
-  Triangulation<dim,spacedim>::active_cell_iterator cell=tria.begin_active(),
-                                                    endc=tria.end() ;
+  Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active(),
+                                                     endc = tria.end();
   Point<spacedim> real;
-  Point<dim> unit;
-  double eps = 1e-10;
-  for (; cell!=endc; ++cell)
+  Point<dim>      unit;
+  double          eps = 1e-10;
+  for (; cell != endc; ++cell)
     {
-      deallog<<cell<< std::endl;
-      for (unsigned int q=0; q<quad.size(); ++q)
+      deallog << cell << std::endl;
+      for (unsigned int q = 0; q < quad.size(); ++q)
         {
           real = mapping.transform_unit_to_real_cell(cell, quad.point(q));
           unit = mapping.transform_real_to_unit_cell(cell, real);
-          deallog<<quad.point(q)<< " -> " << real << std::endl;
-          if ( (unit-quad.point(q)).norm()>eps)
-            deallog<<quad.point(q)<< " != " << unit << std::endl;
+          deallog << quad.point(q) << " -> " << real << std::endl;
+          if ((unit - quad.point(q)).norm() > eps)
+            deallog << quad.point(q) << " != " << unit << std::endl;
         }
     }
-
 }
 
-int main ()
+int
+main()
 {
   deallog.attach(logfile);
 

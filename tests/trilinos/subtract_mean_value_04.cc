@@ -17,34 +17,39 @@
 
 // check VectorTools::subtract_mean_value() for Trilinos vectors
 
-#include "../tests.h"
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+
 #include <deal.II/numerics/vector_tools.h>
+
 #include <vector>
 
+#include "../tests.h"
+
 template <class VectorType>
-void test (VectorType &v)
+void
+test(VectorType &v)
 {
   // set some elements of the vector
   unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  for (unsigned int i=5*my_id; i<5*(my_id+1); ++i)
+  for (unsigned int i = 5 * my_id; i < 5 * (my_id + 1); ++i)
     {
       v(i) = i;
     }
-  v.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
 
   // then check the norm
   VectorTools::subtract_mean_value(v);
-  AssertThrow (std::fabs(v.mean_value()) < 1e-10*v.l2_norm(),
-               ExcInternalError());
+  AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(),
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();
 
   unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -52,29 +57,30 @@ int main (int argc, char *argv[])
   try
     {
       IndexSet local_range(10);
-      local_range.add_range(5*my_id,5*(my_id+1));
+      local_range.add_range(5 * my_id, 5 * (my_id + 1));
       {
-        TrilinosWrappers::MPI::Vector v1 (local_range, MPI_COMM_WORLD);
+        TrilinosWrappers::MPI::Vector v1(local_range, MPI_COMM_WORLD);
         test(v1);
 
-        LinearAlgebra::ReadWriteVector<double> v_tmp (local_range);
-        LinearAlgebra::EpetraWrappers::Vector v2 (local_range, MPI_COMM_WORLD);
+        LinearAlgebra::ReadWriteVector<double> v_tmp(local_range);
+        LinearAlgebra::EpetraWrappers::Vector  v2(local_range, MPI_COMM_WORLD);
         v_tmp.import(v1, VectorOperation::insert);
         v2.import(v_tmp, VectorOperation::insert);
         VectorTools::subtract_mean_value(v2);
-        AssertThrow (std::fabs(v2.mean_value()) < 1e-10*v2.l2_norm(),
-                     ExcInternalError());
+        AssertThrow(std::fabs(v2.mean_value()) < 1e-10 * v2.l2_norm(),
+                    ExcInternalError());
         deallog << "OK" << std::endl;
       }
       {
-        TrilinosWrappers::MPI::BlockVector v (std::vector<IndexSet>(1, local_range),
-                                              MPI_COMM_WORLD);
+        TrilinosWrappers::MPI::BlockVector v(
+          std::vector<IndexSet>(1, local_range), MPI_COMM_WORLD);
         test(v);
       }
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -87,7 +93,8 @@ int main (int argc, char *argv[])
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

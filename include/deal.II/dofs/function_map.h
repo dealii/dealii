@@ -17,11 +17,13 @@
 #define dealii_function_map_h
 
 #include <deal.II/base/config.h>
+
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int spacedim, typename RangeNumberType> class Function;
+template <int spacedim, typename RangeNumberType>
+class Function;
 
 
 
@@ -70,7 +72,7 @@ template <int spacedim, typename RangeNumberType> class Function;
  * @ingroup functions
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
-template <int dim,typename Number=double>
+template <int dim, typename Number = double>
 struct FunctionMap
 {
   /**
@@ -78,7 +80,7 @@ struct FunctionMap
    * (as that would ambiguate a possible constructor of this class), name it
    * in the fashion of the standard container local typedefs.
    */
-  typedef std::map<types::boundary_id, const Function<dim,Number>*> type;
+  typedef std::map<types::boundary_id, const Function<dim, Number> *> type;
 };
 
 DEAL_II_NAMESPACE_CLOSE

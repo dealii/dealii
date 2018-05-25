@@ -32,7 +32,7 @@ namespace internal
     // split into enough chunks and the problem becomes badly balanced. the
     // tests are documented at https://github.com/dealii/dealii/issues/2496
     unsigned int minimum_parallel_grain_size = 4096;
-  }
+  } // namespace VectorImplementation
 
 
   namespace SparseMatrixImplementation
@@ -46,16 +46,15 @@ namespace internal
     // any more for anything but very small matrices that we don't care that
     // much about anyway.
     unsigned int minimum_parallel_grain_size = 256;
-  }
-}
+  } // namespace SparseMatrixImplementation
+} // namespace internal
 
 namespace parallel
 {
   namespace internal
   {
 #ifdef DEAL_II_WITH_THREADS
-    TBBPartitioner::TBBPartitioner()
-      :
+    TBBPartitioner::TBBPartitioner() :
       my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
       in_use(false)
     {}
@@ -64,9 +63,10 @@ namespace parallel
 
     TBBPartitioner::~TBBPartitioner()
     {
-      AssertNothrow(in_use == false,
-                    ExcInternalError("A vector partitioner goes out of scope, but "
-                                     "it appears to be still in use."));
+      AssertNothrow(
+        in_use == false,
+        ExcInternalError("A vector partitioner goes out of scope, but "
+                         "it appears to be still in use."));
     }
 
 
@@ -85,7 +85,8 @@ namespace parallel
 
 
     void
-    TBBPartitioner::release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p)
+    TBBPartitioner::release_one_partitioner(
+      std::shared_ptr<tbb::affinity_partitioner> &p)
     {
       if (p.get() == my_partitioner.get())
         {
@@ -96,9 +97,8 @@ namespace parallel
 #else
     TBBPartitioner::TBBPartitioner() = default;
 #endif
-  }
-}
-
+  } // namespace internal
+} // namespace parallel
 
 
 

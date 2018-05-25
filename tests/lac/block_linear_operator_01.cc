@@ -15,29 +15,33 @@
 
 // Tests for block_operator
 
-#include "../tests.h"
-
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q_generic.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
+
 #include <deal.II/lac/block_linear_operator.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-#define PRINTME(name, var) \
+#include "../tests.h"
+
+#define PRINTME(name, var)                              \
   deallog << "Block vector: " name << ":" << std::endl; \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i) \
+  for (unsigned int i = 0; i < var.n_blocks(); ++i)     \
     deallog << "[block " << i << " ]  " << var.block(i);
 
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
@@ -45,25 +49,24 @@ int main()
   static const int dim = 2;
 
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
   MappingQGeneric<dim> mapping_q1(1);
-  FESystem<dim> fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1);
-  DoFHandler<dim> dof_handler(triangulation);
+  FESystem<dim>        fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1);
+  DoFHandler<dim>      dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dofs_per_component (2);
-  DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
-  const unsigned int n_u = dofs_per_component[0],
-                     n_p = dofs_per_component[1];
+  std::vector<types::global_dof_index> dofs_per_component(2);
+  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  const unsigned int n_u = dofs_per_component[0], n_p = dofs_per_component[1];
 
   BlockDynamicSparsityPattern dsp(2, 2);
-  dsp.block(0, 0).reinit (n_u, n_u);
-  dsp.block(1, 0).reinit (n_p, n_u);
-  dsp.block(0, 1).reinit (n_u, n_p);
-  dsp.block(1, 1).reinit (n_p, n_p);
+  dsp.block(0, 0).reinit(n_u, n_u);
+  dsp.block(1, 0).reinit(n_p, n_u);
+  dsp.block(0, 1).reinit(n_u, n_p);
+  dsp.block(1, 1).reinit(n_p, n_p);
 
   for (unsigned int i = 0; i < n_u; ++i)
     {
@@ -78,13 +81,13 @@ int main()
   for (unsigned int i = 0; i < n_p; ++i)
     for (unsigned int j = 0; j < n_p; ++j)
       dsp.block(1, 1).add(i, j);
-  dsp.collect_sizes ();
+  dsp.collect_sizes();
 
   BlockSparsityPattern sparsity_pattern;
   sparsity_pattern.copy_from(dsp);
   sparsity_pattern.compress();
 
-  BlockSparseMatrix<double> a (sparsity_pattern);
+  BlockSparseMatrix<double> a(sparsity_pattern);
 
   // Come up with some simple, but non-trivial structure:
 
@@ -108,17 +111,15 @@ int main()
   auto op_b10 = linear_operator(a.block(1, 0));
   auto op_b11 = linear_operator(a.block(1, 1));
 
-  std::array<std::array<decltype(op_b00), 2>, 2> temp
-  {
-    {op_b00, op_b01, op_b10, op_b11}
-  };
+  std::array<std::array<decltype(op_b00), 2>, 2> temp{
+    {op_b00, op_b01, op_b10, op_b11}};
   auto op_b = block_operator<2, 2, BlockVector<double>>(temp);
 
   {
     // also test copy and reference assignment to a LinearOperator
     LinearOperator<BlockVector<double>> &op_x1 = op_b;
     LinearOperator<BlockVector<double>>  op_x2 = op_b;
-    LinearOperator<BlockVector<double>> op_x3(op_b);
+    LinearOperator<BlockVector<double>>  op_x3(op_b);
   }
 
   // vmult:
@@ -127,7 +128,7 @@ int main()
   op_a.reinit_domain_vector(u, false);
   for (unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double)(i + 1);
     }
 
   PRINTME("u", u);
@@ -187,16 +188,14 @@ int main()
 
   // And finally complicated block structures:
 
-  std::array<std::array<decltype(op_b00), 3>, 3> temp2
-  {
-    {op_b00, op_b01, op_b00, op_b10, op_b11, op_b10, op_b10, op_b11, op_b10}
-  };
+  std::array<std::array<decltype(op_b00), 3>, 3> temp2{
+    {op_b00, op_b01, op_b00, op_b10, op_b11, op_b10, op_b10, op_b11, op_b10}};
   auto op_upp_x_upu = block_operator<3, 3, BlockVector<double>>(temp2);
 
   op_upp_x_upu.reinit_domain_vector(u, false);
   for (unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double)(i + 1);
     }
   PRINTME("u", u);
 
@@ -208,16 +207,12 @@ int main()
   op_upp_x_upu.vmult_add(v, u);
   PRINTME("v", v);
 
-  std::array<std::array<decltype(op_b01), 1>, 3> temp3
-  {
-    {op_b01, op_b11, op_b11}
-  };
+  std::array<std::array<decltype(op_b01), 1>, 3> temp3{
+    {op_b01, op_b11, op_b11}};
   auto op_upp_x_p = block_operator<3, 1, BlockVector<double>>(temp3);
 
-  std::array<std::array<decltype(op_b01), 3>, 1> temp4
-  {
-    {op_b00, op_b01, op_b00}
-  };
+  std::array<std::array<decltype(op_b01), 3>, 1> temp4{
+    {op_b00, op_b01, op_b00}};
   auto op_u_x_upu = block_operator<1, 3, BlockVector<double>>(temp4);
 
   auto op_long = op_u_x_upu * transpose_operator(op_upp_x_upu) * op_upp_x_p;
@@ -225,7 +220,7 @@ int main()
   op_long.reinit_domain_vector(u, false);
   for (unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double)(i + 1);
     }
   PRINTME("u", u);
 
@@ -236,8 +231,4 @@ int main()
   v = 0.;
   op_long.vmult_add(v, u);
   PRINTME("v", v);
-
 }
-
-
-

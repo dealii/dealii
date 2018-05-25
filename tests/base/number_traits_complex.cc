@@ -16,59 +16,61 @@
 
 // check numbers::NumberTraits for real data types
 
-#include "../tests.h"
 #include <limits>
 #include <typeinfo>
 
+#include "../tests.h"
+
 // replace type names found on MAC OS
-std::string cleanup_type(const std::string &in)
+std::string
+cleanup_type(const std::string &in)
 {
   std::string ret = in;
-  ret = Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");
-  ret = Utilities::replace_in_string(ret, "NSt3__17complexIdEE", "St7complexIdE");
-  ret = Utilities::replace_in_string(ret, "NSt3__17complexIeEE", "St7complexIeE");
+  ret =
+    Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");
+  ret =
+    Utilities::replace_in_string(ret, "NSt3__17complexIdEE", "St7complexIdE");
+  ret =
+    Utilities::replace_in_string(ret, "NSt3__17complexIeEE", "St7complexIeE");
   return ret;
 }
 
 
 template <typename number>
-void check (const number &x)
+void
+check(const number &x)
 {
-  deallog << "typeid(x).name() = "
-          << cleanup_type(typeid(x).name())
+  deallog << "typeid(x).name() = " << cleanup_type(typeid(x).name())
           << std::endl;
 
   deallog << "typeid(NumberTraits<number>::real_type).name() = "
           << typeid(typename numbers::NumberTraits<number>::real_type).name()
           << std::endl;
 
-  deallog << numbers::NumberTraits<number>::conjugate (x)
-          << std::endl;
+  deallog << numbers::NumberTraits<number>::conjugate(x) << std::endl;
 
-  deallog << numbers::NumberTraits<number>::abs_square (x)
-          << std::endl;
+  deallog << numbers::NumberTraits<number>::abs_square(x) << std::endl;
 
-  deallog << numbers::NumberTraits<number>::abs (x)
-          << std::endl;
+  deallog << numbers::NumberTraits<number>::abs(x) << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  check (std::complex<float>(1.5, 2.5));
-  check (std::complex<float>(-1.5, -2.5));
+  check(std::complex<float>(1.5, 2.5));
+  check(std::complex<float>(-1.5, -2.5));
 
-  check (std::complex<double>(1.5, 2.5));
-  check (std::complex<double>(-1.5, -2.5));
+  check(std::complex<double>(1.5, 2.5));
+  check(std::complex<double>(-1.5, -2.5));
 
-  check (std::complex<long double>(1.5, 2.5));
-  check (std::complex<long double>(-1.5, -2.5));
+  check(std::complex<long double>(1.5, 2.5));
+  check(std::complex<long double>(-1.5, -2.5));
 
   return 0;
 }
-

@@ -20,7 +20,8 @@
 #include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -28,4 +29,3 @@ int main ()
 
   deallog << "OK" << std::endl;
 }
-

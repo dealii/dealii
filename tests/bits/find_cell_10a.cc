@@ -21,81 +21,75 @@
 // norm to measure progress in a Newton search is inadequate. we need to take a
 // variable norm that keeps the elongation of the cell in mind.
 
-#include "../tests.h"
-
-
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/fe/mapping_q.h>
 #include <deal.II/base/function.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/grid/grid_in.h>
+#include <deal.II/fe/mapping_q.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <time.h>
 
 #include <iostream>
 #include <list>
-#include <string>
 #include <sstream>
-#include <time.h>
+#include <string>
+
+#include "../tests.h"
 
 using namespace dealii;
 
 
 void create_coarse_grid(Triangulation<2> &coarse_grid)
 {
-
-  static const Point<2> vertices_1[]
-    = {  Point<2> (9.6982181981258408e-02, 1.1255621492491609e+03),//0
-         Point<2> (6.1219285295807092e-02, 1.1256062663438720e+03),//1
-         Point<2> (0.00000, 1.1255179557007179e+03),//2
-         Point<2> (0.00000, 1.1255994426210491e+03),//3
-      };
-  const unsigned int
-  n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
-
-  const std::vector<Point<2> > vertices (&vertices_1[0],
-                                         &vertices_1[n_vertices]);
-
-  static const int cell_vertices[][GeometryInfo<2>::vertices_per_cell]
-  = {{0, 1, 2, 3}
+  static const Point<2> vertices_1[] = {
+    Point<2>(9.6982181981258408e-02, 1.1255621492491609e+03), // 0
+    Point<2>(6.1219285295807092e-02, 1.1256062663438720e+03), // 1
+    Point<2>(0.00000, 1.1255179557007179e+03),                // 2
+    Point<2>(0.00000, 1.1255994426210491e+03),                // 3
   };
-  const unsigned int
-  n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+  const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
 
-  std::vector<CellData<2> > cells (n_cells, CellData<2>());
-  for (unsigned int i=0; i<n_cells; ++i)
+  const std::vector<Point<2>> vertices(&vertices_1[0], &vertices_1[n_vertices]);
+
+  static const int cell_vertices[][GeometryInfo<2>::vertices_per_cell] = {
+    {0, 1, 2, 3}};
+  const unsigned int n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+
+  std::vector<CellData<2>> cells(n_cells, CellData<2>());
+  for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (unsigned int j=0;
-           j<GeometryInfo<2>::vertices_per_cell;
-           ++j)
+      for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
 
-  coarse_grid.create_triangulation (vertices,
-                                    cells,
-                                    SubCellData());
+  coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
 
-void test()
+void
+test()
 {
   deallog << std::scientific;
   deallog.precision(16);
 
-  Point< 2 > ePos;
+  Point<2> ePos;
   ePos(0) = 0.0653630060373507487669897386695;
   ePos(1) = 1125.59175030825804242340382189;
 
-  MappingQ<2> mapping(1);
-  MappingQGeneric<2> &mapping2 = StaticMappingQ1< 2 >::mapping;
+  MappingQ<2>         mapping(1);
+  MappingQGeneric<2> &mapping2 = StaticMappingQ1<2>::mapping;
 
-  Triangulation<2>     triangulation;
+  Triangulation<2> triangulation;
   create_coarse_grid(triangulation); // first Tria with just one cell
 
   Triangulation<2>::active_cell_iterator it = triangulation.begin();
@@ -111,7 +105,8 @@ void test()
   deallog << "done" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 

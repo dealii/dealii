@@ -13,17 +13,19 @@
 //
 //-----------------------------------------------------------
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
-  Triangulation<2,3> tria;
-  GridIn<2,3> gridin;
+  Triangulation<2, 3> tria;
+  GridIn<2, 3>        gridin;
   gridin.attach_triangulation(tria);
   gridin.read_assimp(SOURCE_DIR "/grids/torus.obj", -1, true, 1e-3);
 

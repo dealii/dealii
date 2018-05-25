@@ -21,55 +21,57 @@
 // side.
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/hp/fe_collection.h>
 
 #include <iostream>
 
+#include "../tests.h"
+
 using namespace dealii;
 
 template <int dim>
-void test (unsigned p1, unsigned p2)
+void
+test(unsigned p1, unsigned p2)
 {
   // create a mesh like this (viewed
   // from top, if in 3d):
   // *----*----*
   // | p1 | p2 |
   // *----*----*
-  Triangulation<dim>     triangulation;
-  std::vector<unsigned int> subdivisions (dim, 1);
+  Triangulation<dim>        triangulation;
+  std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle (triangulation, subdivisions,
-                                             Point<dim>(),
-                                             (dim == 3 ?
-                                              Point<dim>(2,1,1) :
-                                              Point<dim>(2,1)));
-  (++triangulation.begin_active())->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
+  GridGenerator::subdivided_hyper_rectangle(
+    triangulation,
+    subdivisions,
+    Point<dim>(),
+    (dim == 3 ? Point<dim>(2, 1, 1) : Point<dim>(2, 1)));
+  (++triangulation.begin_active())->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 
   hp::FECollection<dim> fe;
-  fe.push_back (FE_Nedelec<dim>(p1));
-  fe.push_back (FE_Nedelec<dim>(p2));
+  fe.push_back(FE_Nedelec<dim>(p1));
+  fe.push_back(FE_Nedelec<dim>(p2));
 
-  deallog << "Testing " << fe[0].get_name()
-          << " vs. " << fe[1].get_name()
+  deallog << "Testing " << fe[0].get_name() << " vs. " << fe[1].get_name()
           << std::endl;
 
-  FullMatrix<double> face_int_matrix(fe[1].dofs_per_face,
-                                     fe[0].dofs_per_face);
+  FullMatrix<double> face_int_matrix(fe[1].dofs_per_face, fe[0].dofs_per_face);
 
   fe[0].get_face_interpolation_matrix(fe[1], face_int_matrix);
 
   bool is_zero_column = true;
-  for (unsigned int i=0; i<face_int_matrix.n(); ++i)
+  for (unsigned int i = 0; i < face_int_matrix.n(); ++i)
     {
       is_zero_column = true;
-      for (unsigned int j=0; j<face_int_matrix.m(); ++j)
+      for (unsigned int j = 0; j < face_int_matrix.m(); ++j)
         {
           if (fabs(face_int_matrix(j, i)) > 1e-10)
             {
@@ -80,8 +82,7 @@ void test (unsigned p1, unsigned p2)
 
       if (is_zero_column)
         {
-          deallog << "Column " << i
-                  << " has no non-zero elements."
+          deallog << "Column " << i << " has no non-zero elements."
                   << std::endl;
         }
     }
@@ -92,14 +93,14 @@ void test (unsigned p1, unsigned p2)
     deallog << "Failed" << std::endl;
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
   test<3>(0, 1);
   test<3>(1, 2);
-  //test<3>(2, 3);
-  //test<3>(3, 4);
+  // test<3>(2, 3);
+  // test<3>(3, 4);
   return 0;
 }
-

@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -79,37 +80,40 @@ public:
    * Default constructor. Creates a zero-sized matrix that should be resized
    * later on using the reinit() function.
    */
-  IdentityMatrix ();
+  IdentityMatrix();
 
   /**
    * Constructor. Creates a identity matrix of size #n.
    */
-  IdentityMatrix (const size_type n);
+  IdentityMatrix(const size_type n);
 
   /**
    * Resize the matrix to be of size #n by #n.
    */
-  void reinit (const size_type n);
+  void
+  reinit(const size_type n);
 
   /**
    * Number of rows of this matrix. For the present matrix, the number of rows
    * and columns are equal, of course.
    */
-  size_type m () const;
+  size_type
+  m() const;
 
   /**
    * Number of columns of this matrix. For the present matrix, the number of
    * rows and columns are equal, of course.
    */
-  size_type n () const;
+  size_type
+  n() const;
 
   /**
    * Matrix-vector multiplication. For the present case, this of course
    * amounts to simply copying the input vector to the output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void vmult (OutVectorType      &out,
-              const InVectorType &in) const;
+  void
+  vmult(OutVectorType &out, const InVectorType &in) const;
 
   /**
    * Matrix-vector multiplication with addition to the output vector. For the
@@ -117,8 +121,8 @@ public:
    * the output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void vmult_add (OutVectorType      &out,
-                  const InVectorType &in) const;
+  void
+  vmult_add(OutVectorType &out, const InVectorType &in) const;
 
   /**
    * Matrix-vector multiplication with the transpose matrix. For the present
@@ -126,8 +130,8 @@ public:
    * output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void Tvmult (OutVectorType      &out,
-               const InVectorType &in) const;
+  void
+  Tvmult(OutVectorType &out, const InVectorType &in) const;
 
 
   /**
@@ -136,10 +140,10 @@ public:
    * adding the input vector to the output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void Tvmult_add (OutVectorType      &out,
-                   const InVectorType &in) const;
-private:
+  void
+  Tvmult_add(OutVectorType &out, const InVectorType &in) const;
 
+private:
   /**
    * Number of rows and columns of this matrix.
    */
@@ -148,48 +152,38 @@ private:
 
 
 
-
 // ------------------------- inline and template functions -------------
 #ifndef DOXYGEN
 
 
-inline
-IdentityMatrix::IdentityMatrix ()
-  :
-  size (0)
+inline IdentityMatrix::IdentityMatrix() : size(0)
 {}
 
 
 
-inline
-IdentityMatrix::IdentityMatrix (const size_type n)
-  :
-  size (n)
+inline IdentityMatrix::IdentityMatrix(const size_type n) : size(n)
 {}
 
 
 
-inline
-void
-IdentityMatrix::reinit (const size_type n)
+inline void
+IdentityMatrix::reinit(const size_type n)
 {
   size = n;
 }
 
 
 
-inline
-IdentityMatrix::size_type
-IdentityMatrix::m () const
+inline IdentityMatrix::size_type
+IdentityMatrix::m() const
 {
   return size;
 }
 
 
 
-inline
-IdentityMatrix::size_type
-IdentityMatrix::n () const
+inline IdentityMatrix::size_type
+IdentityMatrix::n() const
 {
   return size;
 }
@@ -197,13 +191,11 @@ IdentityMatrix::n () const
 
 
 template <typename OutVectorType, typename InVectorType>
-inline
-void
-IdentityMatrix::vmult (OutVectorType      &out,
-                       const InVectorType &in) const
+inline void
+IdentityMatrix::vmult(OutVectorType &out, const InVectorType &in) const
 {
-  Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
-  Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
+  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
 
   out = in;
 }
@@ -211,13 +203,11 @@ IdentityMatrix::vmult (OutVectorType      &out,
 
 
 template <typename OutVectorType, typename InVectorType>
-inline
-void
-IdentityMatrix::vmult_add (OutVectorType      &out,
-                           const InVectorType &in) const
+inline void
+IdentityMatrix::vmult_add(OutVectorType &out, const InVectorType &in) const
 {
-  Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
-  Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
+  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
 
   out += in;
 }
@@ -225,13 +215,11 @@ IdentityMatrix::vmult_add (OutVectorType      &out,
 
 
 template <typename OutVectorType, typename InVectorType>
-inline
-void
-IdentityMatrix::Tvmult (OutVectorType      &out,
-                        const InVectorType &in) const
+inline void
+IdentityMatrix::Tvmult(OutVectorType &out, const InVectorType &in) const
 {
-  Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
-  Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
+  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
 
   out = in;
 }
@@ -239,13 +227,11 @@ IdentityMatrix::Tvmult (OutVectorType      &out,
 
 
 template <typename OutVectorType, typename InVectorType>
-inline
-void
-IdentityMatrix::Tvmult_add (OutVectorType      &out,
-                            const InVectorType &in) const
+inline void
+IdentityMatrix::Tvmult_add(OutVectorType &out, const InVectorType &in) const
 {
-  Assert (out.size() == size, ExcDimensionMismatch (out.size(), size));
-  Assert (in.size() == size, ExcDimensionMismatch (in.size(), size));
+  Assert(out.size() == size, ExcDimensionMismatch(out.size(), size));
+  Assert(in.size() == size, ExcDimensionMismatch(in.size(), size));
 
   out += in;
 }

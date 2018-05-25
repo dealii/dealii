@@ -15,21 +15,21 @@
 
 
 
-#include "../tests.h"
+#include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/parameter_acceptor.h>
+
+#include "../tests.h"
 
 class FirstClass : public ParameterAcceptor
 {
 public:
-  FirstClass(const std::string &name = "First Class"):
-    ParameterAcceptor(name)
+  FirstClass(const std::string &name = "First Class") : ParameterAcceptor(name)
   {
-    add_parameter("First int",   f_i);
-    add_parameter("First double",f_d);
-    add_parameter("First bool",  f_b);
-    add_parameter("First string",f_s);
+    add_parameter("First int", f_i);
+    add_parameter("First double", f_d);
+    add_parameter("First bool", f_b);
+    add_parameter("First string", f_s);
   };
 
 private:
@@ -42,13 +42,13 @@ private:
 class SecondClass : public ParameterAcceptor
 {
 public:
-  SecondClass(const std::string &name = "Second Class"):
+  SecondClass(const std::string &name = "Second Class") :
     ParameterAcceptor(name)
   {
-    add_parameter("Second int",   s_i);
-    add_parameter("Second double",s_d);
-    add_parameter("Second bool",  s_b);
-    add_parameter("Second string",s_s);
+    add_parameter("Second int", s_i);
+    add_parameter("Second double", s_d);
+    add_parameter("Second bool", s_b);
+    add_parameter("Second string", s_s);
   };
 
 private:
@@ -58,14 +58,16 @@ private:
   std::string s_s = "bye bye";
 };
 
-int main ()
+int
+main()
 {
   initlog();
 
   FirstClass  f;
   SecondClass s;
   std::string output_name = "used_parameter_acceptor_04.prm";
-  ParameterAcceptor::initialize(SOURCE_DIR "/parameter_acceptor_parameters/parameter_acceptor_04.prm", output_name);
+  ParameterAcceptor::initialize(
+    SOURCE_DIR "/parameter_acceptor_parameters/parameter_acceptor_04.prm",
+    output_name);
   ParameterAcceptor::prm.log_parameters(deallog);
-
 }

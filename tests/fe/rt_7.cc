@@ -16,19 +16,24 @@
 
 // RT(2) had some problems with shape functions...
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
+
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <vector>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/vector.h>
+
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 #define PRECISION 8
 
@@ -39,31 +44,32 @@ void
 plot_shape_functions(const unsigned int degree)
 {
   FE_RaviartThomas<dim> fe_rt(degree);
-  Triangulation<dim> tr;
+  Triangulation<dim>    tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
 
-  DoFHandler<dim> dof(tr);
+  DoFHandler<dim>                         dof(tr);
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(fe_rt);
 
-  QTrapez<1> q_trapez;
-  const unsigned int div=10;
-  QIterated<dim> q(q_trapez, div);
-  FEValues<dim> fe(fe_rt, q, update_values|update_gradients|update_quadrature_points);
+  QTrapez<1>         q_trapez;
+  const unsigned int div = 10;
+  QIterated<dim>     q(q_trapez, div);
+  FEValues<dim>      fe(
+    fe_rt, q, update_values | update_gradients | update_quadrature_points);
   fe.reinit(c);
 
-  Assert (fe.get_fe().n_components() == dim, ExcInternalError());
+  Assert(fe.get_fe().n_components() == dim, ExcInternalError());
 
-  for (unsigned int q_point=0; q_point<q.size(); ++q_point)
+  for (unsigned int q_point = 0; q_point < q.size(); ++q_point)
     {
-      if (q_point % QIterated<1>(q_trapez,div).size() == 0)
+      if (q_point % QIterated<1>(q_trapez, div).size() == 0)
         deallog << std::endl;
 
       deallog << fe.quadrature_point(q_point) << " ";
 
-      for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)
-        for (unsigned int c=0; c<fe.get_fe().n_components(); ++c)
-          deallog << " " << fe.shape_value_component(i,q_point,c);
+      for (unsigned int i = 0; i < fe_rt.dofs_per_cell; ++i)
+        for (unsigned int c = 0; c < fe.get_fe().n_components(); ++c)
+          deallog << " " << fe.shape_value_component(i, q_point, c);
 
       deallog << std::endl;
     }
@@ -73,7 +79,7 @@ plot_shape_functions(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

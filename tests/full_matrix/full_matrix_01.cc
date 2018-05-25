@@ -23,13 +23,11 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
-  print_matrix (m);
+  make_matrix(m);
+  print_matrix(m);
 }
-

@@ -34,25 +34,25 @@ namespace Threads
     static std::atomic<unsigned int> n_existing_threads_counter(1);
 
 
-    void register_thread ()
+    void
+    register_thread()
     {
       ++n_existing_threads_counter;
     }
 
 
 
-    void deregister_thread ()
+    void
+    deregister_thread()
     {
       --n_existing_threads_counter;
-      Assert (n_existing_threads_counter >= 1,
-              ExcInternalError());
+      Assert(n_existing_threads_counter >= 1, ExcInternalError());
     }
 
 
 
-    [[noreturn]]
-    void handle_std_exception (const std::exception &exc)
-    {
+    [[noreturn]] void
+    handle_std_exception(const std::exception &exc) {
       // lock the following context
       // to ensure that we don't
       // print things over each other
@@ -64,16 +64,18 @@ namespace Threads
       {
         Mutex::ScopedLock lock(mutex);
 
-        std::cerr << std::endl << std::endl
-                  << "---------------------------------------------------------"
-                  << std::endl
-                  << "In one of the sub-threads of this program, an exception\n"
-                  << "was thrown and not caught. Since exceptions do not\n"
-                  << "propagate to the main thread, the library has caught it.\n"
-                  << "The information carried by this exception is given below.\n"
-                  << std::endl
-                  << "---------------------------------------------------------"
-                  << std::endl;
+        std::cerr
+          << std::endl
+          << std::endl
+          << "---------------------------------------------------------"
+          << std::endl
+          << "In one of the sub-threads of this program, an exception\n"
+          << "was thrown and not caught. Since exceptions do not\n"
+          << "propagate to the main thread, the library has caught it.\n"
+          << "The information carried by this exception is given below.\n"
+          << std::endl
+          << "---------------------------------------------------------"
+          << std::endl;
         std::cerr << "Exception message: " << std::endl
                   << "  " << exc.what() << std::endl
                   << "Exception type: " << std::endl
@@ -83,13 +85,12 @@ namespace Threads
                   << std::endl;
       }
 
-      std::abort ();
+      std::abort();
     }
 
 
 
-    [[noreturn]]
-    void handle_unknown_exception ()
+      [[noreturn]] void handle_unknown_exception()
     {
       // lock the following context
       // to ensure that we don't
@@ -102,33 +103,37 @@ namespace Threads
       {
         Mutex::ScopedLock lock(mutex);
 
-        std::cerr << std::endl << std::endl
-                  << "---------------------------------------------------------"
-                  << std::endl
-                  << "In one of the sub-threads of this program, an exception\n"
-                  << "was thrown and not caught. Since exceptions do not\n"
-                  << "propagate to the main thread, the library has caught it.\n"
-                  << std::endl
-                  << "---------------------------------------------------------"
-                  << std::endl;
+        std::cerr
+          << std::endl
+          << std::endl
+          << "---------------------------------------------------------"
+          << std::endl
+          << "In one of the sub-threads of this program, an exception\n"
+          << "was thrown and not caught. Since exceptions do not\n"
+          << "propagate to the main thread, the library has caught it.\n"
+          << std::endl
+          << "---------------------------------------------------------"
+          << std::endl;
         std::cerr << "Type of exception is unknown, but not std::exception.\n"
                   << "No additional information is available.\n"
                   << "---------------------------------------------------------"
                   << std::endl;
       }
-      std::abort ();
+      std::abort();
     }
-  }
+  } // namespace internal
 
 
 
-  unsigned int n_existing_threads ()
+  unsigned int
+  n_existing_threads()
   {
     return internal::n_existing_threads_counter;
   }
 
 
-  unsigned int this_thread_id ()
+  unsigned int
+  this_thread_id()
   {
 #ifdef SYS_gettid
     const pid_t this_id = syscall(SYS_gettid);
@@ -144,12 +149,10 @@ namespace Threads
 
 
 #ifndef DEAL_II_WITH_THREADS
-  DummyBarrier::DummyBarrier (const unsigned int  count,
-                              const char *,
-                              void *)
+  DummyBarrier::DummyBarrier(const unsigned int count, const char *, void *)
   {
     (void)count;
-    Assert (count == 1, ExcBarrierSizeNotUseful(count));
+    Assert(count == 1, ExcBarrierSizeNotUseful(count));
   }
 
 
@@ -157,20 +160,20 @@ namespace Threads
 #  ifdef DEAL_II_USE_MT_POSIX
 
 
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-  PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
-                                          const char *,
-                                          void *)
+#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+  PosixThreadBarrier::PosixThreadBarrier(const unsigned int count,
+                                         const char *,
+                                         void *)
   {
-    pthread_barrier_init (&barrier, nullptr, count);
+    pthread_barrier_init(&barrier, nullptr, count);
   }
 
-#else
+#    else
 
-  PosixThreadBarrier::PosixThreadBarrier (const unsigned int  count,
-                                          const char *,
-                                          void *)
-    : count (count)
+  PosixThreadBarrier::PosixThreadBarrier(const unsigned int count,
+                                         const char *,
+                                         void *) :
+    count(count)
   {
     // throw an exception unless we
     // have the special case that a
@@ -178,37 +181,37 @@ namespace Threads
     // then waiting for a barrier is
     // a no-op, and we don't need the
     // POSIX functionality
-    AssertThrow (count == 1,
-                 ExcMessage ("Your local POSIX installation does not support\n"
-                             "POSIX barriers. You will not be able to use\n"
-                             "this class, but the rest of the threading\n"
-                             "functionality is available."));
+    AssertThrow(count == 1,
+                ExcMessage("Your local POSIX installation does not support\n"
+                           "POSIX barriers. You will not be able to use\n"
+                           "this class, but the rest of the threading\n"
+                           "functionality is available."));
   }
-#endif
+#    endif
 
 
 
-  PosixThreadBarrier::~PosixThreadBarrier ()
+  PosixThreadBarrier::~PosixThreadBarrier()
   {
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-    pthread_barrier_destroy (&barrier);
-#else
+#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+    pthread_barrier_destroy(&barrier);
+#    else
     // unless the barrier is a no-op,
     // complain again (how did we get
     // here then?)
     if (count != 1)
-      std::abort ();
-#endif
+      std::abort();
+#    endif
   }
 
 
 
   int
-  PosixThreadBarrier::wait ()
+  PosixThreadBarrier::wait()
   {
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
-    return pthread_barrier_wait (&barrier);
-#else
+#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+    return pthread_barrier_wait(&barrier);
+#    else
     // in the special case, this
     // function is a no-op. otherwise
     // complain about the missing
@@ -217,12 +220,11 @@ namespace Threads
       return 0;
     else
       {
-        std::abort ();
+        std::abort();
         return 1;
       };
-#endif
+#    endif
   }
-
 
 
 
@@ -231,40 +233,41 @@ namespace Threads
 
 
 
-  std::vector<std::pair<unsigned int,unsigned int> >
-  split_interval (const unsigned int begin,
-                  const unsigned int end,
-                  const unsigned int n_intervals)
+  std::vector<std::pair<unsigned int, unsigned int>>
+  split_interval(const unsigned int begin,
+                 const unsigned int end,
+                 const unsigned int n_intervals)
   {
-    Assert (end >= begin, ExcInternalError());
+    Assert(end >= begin, ExcInternalError());
 
-    const unsigned int n_elements              = end-begin;
+    const unsigned int n_elements              = end - begin;
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
 
-    std::vector<std::pair<unsigned int,unsigned int> > return_values (n_intervals);
+    std::vector<std::pair<unsigned int, unsigned int>> return_values(
+      n_intervals);
 
     return_values[0].first = begin;
-    for (unsigned int i=0; i<n_intervals; ++i)
+    for (unsigned int i = 0; i < n_intervals; ++i)
       {
-        if (i != n_intervals-1)
+        if (i != n_intervals - 1)
           {
-            return_values[i].second = (return_values[i].first
-                                       + n_elements_per_interval);
+            return_values[i].second =
+              (return_values[i].first + n_elements_per_interval);
             // distribute residual in
             // division equally among
             // the first few
             // subintervals
             if (i < residual)
               ++return_values[i].second;
-            return_values[i+1].first = return_values[i].second;
+            return_values[i + 1].first = return_values[i].second;
           }
         else
           return_values[i].second = end;
       };
     return return_values;
   }
-}   // end namespace Thread
+} // namespace Threads
 
 
 DEAL_II_NAMESPACE_CLOSE

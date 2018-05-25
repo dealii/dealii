@@ -14,17 +14,21 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
+
 #include <memory>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
   // create a pattern and match a string
-  const auto &pattern = Patterns::Tuple(";", Patterns::Integer(), Patterns::Double(), Patterns::Anything());
+  const auto &pattern = Patterns::Tuple(
+    ";", Patterns::Integer(), Patterns::Double(), Patterns::Anything());
   const std::string desc = pattern.description();
 
   deallog << desc << std::endl;

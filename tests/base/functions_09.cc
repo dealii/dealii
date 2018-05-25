@@ -16,8 +16,9 @@
 
 // Test ConstantTensorFunction
 
-#include "../tests.h"
 #include <deal.II/base/tensor_function.h>
+
+#include "../tests.h"
 
 
 
@@ -25,10 +26,11 @@
 template <int rank, int dim>
 struct FillTensor
 {
-  static void fill_tensor(Tensor<rank, dim> &tensor, int base)
+  static void
+  fill_tensor(Tensor<rank, dim> &tensor, int base)
   {
     for (int i = 0; i < dim; ++i)
-      FillTensor<rank-1,dim>::fill_tensor(tensor[i], 10 * base + i);
+      FillTensor<rank - 1, dim>::fill_tensor(tensor[i], 10 * base + i);
   }
 };
 
@@ -48,11 +50,12 @@ struct FillTensor<1, dim>
 template <int rank, int dim>
 struct PrintTensor
 {
-  static void print_tensor(const Tensor<rank, dim> &tensor)
+  static void
+  print_tensor(const Tensor<rank, dim> &tensor)
   {
     for (int i = 0; i < dim; ++i)
       {
-        PrintTensor<rank-1,dim>::print_tensor(tensor[i]);
+        PrintTensor<rank - 1, dim>::print_tensor(tensor[i]);
         deallog << " ";
       }
   }
@@ -61,7 +64,8 @@ struct PrintTensor
 template <int dim>
 struct PrintTensor<1, dim>
 {
-  static void print_tensor(const Tensor<1, dim> &tensor)
+  static void
+  print_tensor(const Tensor<1, dim> &tensor)
   {
     for (int i = 0; i < dim; ++i)
       deallog << tensor[i] << " ";
@@ -71,16 +75,17 @@ struct PrintTensor<1, dim>
 
 
 template <int rank, int dim>
-void check ()
+void
+check()
 {
-  deallog << "ConstantTensorFunction<"
-          << rank << ", " << dim << ">:" << std::endl;
+  deallog << "ConstantTensorFunction<" << rank << ", " << dim
+          << ">:" << std::endl;
 
   Tensor<rank, dim> value;
   FillTensor<rank, dim>::fill_tensor(value, 0);
 
   ConstantTensorFunction<rank, dim> tensor_function(value);
-  TensorFunction<rank, dim> *foo = &tensor_function;
+  TensorFunction<rank, dim> *       foo = &tensor_function;
 
 
   Point<dim> point;
@@ -88,23 +93,23 @@ void check ()
     point(i) = i;
 
   deallog << "->value:" << std::endl;
-  PrintTensor<rank, dim>::print_tensor( foo->value(point) );
+  PrintTensor<rank, dim>::print_tensor(foo->value(point));
   deallog << std::endl;
 
   deallog << "->gradient:" << std::endl;
-  PrintTensor<rank+1, dim>::print_tensor( foo->gradient(point) );
+  PrintTensor<rank + 1, dim>::print_tensor(foo->gradient(point));
   deallog << std::endl;
 
 
-  std::vector<Point<dim> > points;
+  std::vector<Point<dim>> points;
   points.push_back(point);
 
   for (int i = 0; i < dim; ++i)
-    point(i) = dim-i;
+    point(i) = dim - i;
   points.push_back(point);
 
-  std::vector<Tensor<rank, dim> > tensors;
-  std::vector<Tensor<rank + 1, dim> > gradients;
+  std::vector<Tensor<rank, dim>>     tensors;
+  std::vector<Tensor<rank + 1, dim>> gradients;
   tensors.resize(2);
   gradients.resize(2);
 
@@ -125,25 +130,25 @@ void check ()
 
 
 
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 
-  check<1,1>();
-  check<2,1>();
-  check<3,1>();
-  check<4,1>();
+  check<1, 1>();
+  check<2, 1>();
+  check<3, 1>();
+  check<4, 1>();
 
-  check<1,2>();
-  check<2,2>();
-  check<3,2>();
-  check<4,2>();
+  check<1, 2>();
+  check<2, 2>();
+  check<3, 2>();
+  check<4, 2>();
 
-  check<1,3>();
-  check<2,3>();
-  check<3,3>();
-  check<4,3>();
+  check<1, 3>();
+  check<2, 3>();
+  check<3, 3>();
+  check<4, 3>();
 }
-

@@ -15,11 +15,9 @@
 
 // Check that dealii::SolverCG works with CUDAWrappers::SparseMatrix
 
-#include "../tests.h"
-#include "../testmatrix.h"
-
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/exceptions.h>
+
 #include <deal.II/lac/cuda_sparse_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/read_write_vector.h>
@@ -27,13 +25,17 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
 
-void test(Utilities::CUDA::Handle &cuda_handle)
+#include "../testmatrix.h"
+#include "../tests.h"
+
+void
+test(Utilities::CUDA::Handle &cuda_handle)
 {
   // Build the sparse matrix on the host
-  const unsigned int problem_size = 10;
-  unsigned int size  = (problem_size-1)*(problem_size-1);
-  FDMatrix testproblem(problem_size, problem_size);
-  SparsityPattern structure(size, size, 5);
+  const unsigned int   problem_size = 10;
+  unsigned int         size         = (problem_size - 1) * (problem_size - 1);
+  FDMatrix             testproblem(problem_size, problem_size);
+  SparsityPattern      structure(size, size, 5);
   SparseMatrix<double> A;
   testproblem.five_point_structure(structure);
   structure.compress();
@@ -42,20 +44,20 @@ void test(Utilities::CUDA::Handle &cuda_handle)
 
   // Solve on the host
   PreconditionIdentity prec_no;
-  SolverControl control(100, 1.e-10);
-  SolverCG<> cg_host(control);
-  Vector<double> sol_host(size);
-  Vector<double> rhs_host(size);
-  for (unsigned int i=0; i<size; ++i)
+  SolverControl        control(100, 1.e-10);
+  SolverCG<>           cg_host(control);
+  Vector<double>       sol_host(size);
+  Vector<double>       rhs_host(size);
+  for (unsigned int i = 0; i < size; ++i)
     rhs_host[i] = static_cast<double>(i);
   cg_host.solve(A, sol_host, rhs_host, prec_no);
 
   // Solve on the device
-  CUDAWrappers::SparseMatrix<double> A_dev(cuda_handle, A);
+  CUDAWrappers::SparseMatrix<double>          A_dev(cuda_handle, A);
   LinearAlgebra::CUDAWrappers::Vector<double> sol_dev(size);
   LinearAlgebra::CUDAWrappers::Vector<double> rhs_dev(size);
-  LinearAlgebra::ReadWriteVector<double> rw_vector(size);
-  for (unsigned int i=0; i<size; ++i)
+  LinearAlgebra::ReadWriteVector<double>      rw_vector(size);
+  for (unsigned int i = 0; i < size; ++i)
     rw_vector[i] = static_cast<double>(i);
   rhs_dev.import(rw_vector, VectorOperation::insert);
   SolverCG<LinearAlgebra::CUDAWrappers::Vector<double>> cg_dev(control);
@@ -63,11 +65,13 @@ void test(Utilities::CUDA::Handle &cuda_handle)
 
   // Check the result
   rw_vector.import(sol_dev, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(std::fabs(rw_vector[i] - sol_host[i])<1e-8, ExcInternalError());
+  for (unsigned int i = 0; i < size; ++i)
+    AssertThrow(std::fabs(rw_vector[i] - sol_host[i]) < 1e-8,
+                ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);
@@ -75,7 +79,7 @@ int main()
   Utilities::CUDA::Handle cuda_handle;
   test(cuda_handle);
 
-  deallog << "OK" <<std::endl;
+  deallog << "OK" << std::endl;
 
   return 0;
 }

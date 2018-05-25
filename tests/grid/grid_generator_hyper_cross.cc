@@ -15,20 +15,23 @@
 
 // Test output for GridGenerator::hyper_cross()
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
-void dim_2(std::ostream &os)
+void
+dim_2(std::ostream &os)
 {
-  const unsigned int d=2;
-  Triangulation<d> tr;
+  const unsigned int d = 2;
+  Triangulation<d>   tr;
 
-  std::vector<unsigned int> sizes(2*d);
+  std::vector<unsigned int> sizes(2 * d);
   sizes[0] = 3;
   sizes[1] = 0;
   sizes[2] = 2;
@@ -39,12 +42,13 @@ void dim_2(std::ostream &os)
   gout.write_vtk(tr, os);
 }
 
-void dim_3(std::ostream &os)
+void
+dim_3(std::ostream &os)
 {
-  const unsigned int d=3;
-  Triangulation<d> tr;
+  const unsigned int d = 3;
+  Triangulation<d>   tr;
 
-  std::vector<unsigned int> sizes(2*d);
+  std::vector<unsigned int> sizes(2 * d);
   sizes[0] = 5;
   sizes[1] = 1;
   sizes[2] = 4;
@@ -58,7 +62,8 @@ void dim_3(std::ostream &os)
 }
 
 
-int main()
+int
+main()
 {
   initlog(true);
   std::ostream &logfile = deallog.get_file_stream();

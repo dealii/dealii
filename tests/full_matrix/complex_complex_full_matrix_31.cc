@@ -16,8 +16,8 @@
 
 
 // check FullMatrix::add_col. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// complex-valued matrices and vectors; this time we actually store complex
+// values in them
 
 
 #include "../tests.h"
@@ -25,13 +25,12 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
-  m.add_col (2, 3.141, 3);
-  print_matrix (m);
+  FullMatrix<std::complex<number>> m;
+  make_complex_matrix(m);
+  m.add_col(2, 3.141, 3);
+  print_matrix(m);
 }

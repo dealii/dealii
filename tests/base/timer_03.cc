@@ -15,16 +15,18 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/base/timer.h>
+
+#include "../tests.h"
 
 // compute the ratio of two measurements and compare to
 // the expected value.
 
-void compare (double t1, double t2, double ratio)
+void
+compare(double t1, double t2, double ratio)
 {
-  double r = t2/t1;
-  double d = std::fabs(r-ratio) / ratio;
+  double r = t2 / t1;
+  double d = std::fabs(r - ratio) / ratio;
 
   // relative error < 25%?
   if (d <= .25)
@@ -37,10 +39,11 @@ void compare (double t1, double t2, double ratio)
     }
 }
 
-void match(double v1, double v2)
+void
+match(double v1, double v2)
 {
   double eps = 1.0e-6;
-  if (std::fabs(v1-v2)<eps)
+  if (std::fabs(v1 - v2) < eps)
     {
       deallog << "OK" << std::endl;
     }
@@ -53,34 +56,34 @@ void match(double v1, double v2)
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn(unsigned int n)
 {
-  for (unsigned int i=0 ; i<n ; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j=1 ; j<100000 ; ++j)
+      for (unsigned int j = 1; j < 100000; ++j)
         {
-          s += 1./j * i;
+          s += 1. / j * i;
         }
     }
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  Timer t1,t2;
-  TimerOutput tO(std::cout,
-                 TimerOutput::summary,
-                 TimerOutput::cpu_times);
+  Timer       t1, t2;
+  TimerOutput tO(std::cout, TimerOutput::summary, TimerOutput::cpu_times);
 
   tO.enter_section("Section1");
   tO.enter_section("Section2");
-  burn (50);
+  burn(50);
   tO.exit_section("Section2");
   tO.enter_section("Section2");
-  burn (50);
+  burn(50);
   tO.exit_section("Section2");
   tO.exit_section("Section1");
 
@@ -104,6 +107,6 @@ int main ()
   else
     deallog << "ERROR - total wall time 0" << std::endl;
 
-  compare (cpu_times["Section1"],cpu_times["Section2"],1.);
-  compare (wall_times["Section1"],wall_times["Section2"],1.);
+  compare(cpu_times["Section1"], cpu_times["Section2"], 1.);
+  compare(wall_times["Section1"], wall_times["Section2"], 1.);
 }

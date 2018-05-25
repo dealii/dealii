@@ -17,24 +17,25 @@
 // Similar to polynomial_lagrange_order, but for Legendre interpolation
 // This tests the stability of the polynomial evaluation
 
-#include "../tests.h"
-
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
+
+#include "../tests.h"
 
 
 using namespace Polynomials;
 
 
-void check_at_one (const std::vector<Polynomial<double> > &p)
+void
+check_at_one(const std::vector<Polynomial<double>> &p)
 {
   deallog << "Function value of polynomial at right end point: ";
-  for (unsigned int i=0; i<p.size(); ++i)
+  for (unsigned int i = 0; i < p.size(); ++i)
     {
       deallog << '.';
       const double y = p[i].value(1.);
-      if (std::fabs(y-std::sqrt(2*i+1)) > 1e-13*std::sqrt(2*i+1))
-        deallog << "Error1  lg y=" << std::log10(std::fabs(y-1.))
+      if (std::fabs(y - std::sqrt(2 * i + 1)) > 1e-13 * std::sqrt(2 * i + 1))
+        deallog << "Error1  lg y=" << std::log10(std::fabs(y - 1.))
                 << std::endl;
     }
   deallog << std::endl;
@@ -43,17 +44,18 @@ void check_at_one (const std::vector<Polynomial<double> > &p)
 
 
 void
-check_poly (const unsigned int n)
+check_poly(const unsigned int n)
 {
-  deallog << "Degree: " << n+1 << std::endl;
-  std::vector<Polynomial<double> > p = Legendre::generate_complete_basis(n);
-  check_at_one (p);
+  deallog << "Degree: " << n + 1 << std::endl;
+  std::vector<Polynomial<double>> p = Legendre::generate_complete_basis(n);
+  check_at_one(p);
   deallog << std::endl;
 }
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

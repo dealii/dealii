@@ -18,20 +18,20 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
-#include <map>
-#include <vector>
-#include <string>
-#include <fstream>
-
-#include <ostream>
-
-#include <boost/variant.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/split_member.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/serialization/split_member.hpp>
+#include <boost/variant.hpp>
+
+#include <fstream>
+#include <map>
+#include <ostream>
+#include <string>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -54,14 +54,14 @@ namespace internal
     /**
      * Default constructor.
      */
-    TableEntry () = default;
+    TableEntry() = default;
 
     /**
      * Constructor. Initialize this table element with the value
      * <code>t</code>.
      */
     template <typename T>
-    TableEntry (const T &t);
+    TableEntry(const T &t);
 
     /**
      * Return the value stored by this object. The template type T must be one
@@ -70,7 +70,8 @@ namespace internal
      * object.
      */
     template <typename T>
-    T get () const;
+    T
+    get() const;
 
     /**
      * Return the numeric value of this object if data has been stored in it
@@ -78,7 +79,8 @@ namespace internal
      *
      * @return double
      */
-    double get_numeric_value () const;
+    double
+    get_numeric_value() const;
 
     /**
      * Cache the contained value with the given formatting and return it. The
@@ -87,13 +89,15 @@ namespace internal
      * The cache needs to be invalidated with this routine if the formatting
      * of the column changes.
      */
-    void cache_string(bool scientific, unsigned int precision) const;
+    void
+    cache_string(bool scientific, unsigned int precision) const;
 
     /**
      * Return the value cached using cache_string(). This is just a wrapper
      * around cached_value.
      */
-    const std::string &get_cached_string() const;
+    const std::string &
+    get_cached_string() const;
 
 
     /**
@@ -101,21 +105,24 @@ namespace internal
      * value but with a value that is default constructed for this data type.
      * This is used to pad columns below previously set ones.
      */
-    TableEntry get_default_constructed_copy() const;
+    TableEntry
+    get_default_constructed_copy() const;
 
     /**
      * Write the data of this object to a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void save (Archive &ar, const unsigned int version) const;
+    void
+    save(Archive &ar, const unsigned int version) const;
 
     /**
      * Read the data of this object from a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void load (Archive &ar, const unsigned int version);
+    void
+    load(Archive &ar, const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -123,7 +130,9 @@ namespace internal
     /**
      * Abbreviation for the data type stored by this object.
      */
-    typedef boost::variant<int,unsigned int,unsigned long long int,double,std::string> value_type;
+    typedef boost::
+      variant<int, unsigned int, unsigned long long int, double, std::string>
+        value_type;
 
     /**
      * Stored value.
@@ -137,7 +146,7 @@ namespace internal
 
     friend class dealii::TableHandler;
   };
-}
+} // namespace internal
 
 
 /**
@@ -344,7 +353,7 @@ public:
   /**
    * Constructor.
    */
-  TableHandler ();
+  TableHandler();
 
 
   /**
@@ -368,7 +377,8 @@ public:
    * large code bases in which parts of the code base are only
    * executed based on run-time parameters.)
    */
-  void declare_column (const std::string &key);
+  void
+  declare_column(const std::string &key);
 
   /**
    * Adds a column (if not yet existent) with the key <tt>key</tt> and adds
@@ -377,8 +387,8 @@ public:
    * std::string</code> or a compiler error will result.
    */
   template <typename T>
-  void add_value (const std::string &key,
-                  const T            value);
+  void
+  add_value(const std::string &key, const T value);
 
   /**
    * If a row is only partially filled, then set all elements of that
@@ -393,13 +403,15 @@ public:
    * conceptually the function "completes" the current row, though its
    * use case is to "start" a new row.
    */
-  void start_new_row ();
+  void
+  start_new_row();
 
   /**
    * Switch auto-fill mode on or off. See the general documentation of this
    * class for a description of what auto-fill mode does.
    */
-  void set_auto_fill_mode (const bool state);
+  void
+  set_auto_fill_mode(const bool state);
 
   /**
    * Creates a supercolumn (if not yet existent) and includes column to it.
@@ -413,8 +425,9 @@ public:
    * column that is added to the supercolumn. Within the supercolumn the order
    * of output follows the order the columns are added to the supercolumn.
    */
-  void add_column_to_supercolumn (const std::string &key,
-                                  const std::string &superkey);
+  void
+  add_column_to_supercolumn(const std::string &key,
+                            const std::string &superkey);
 
   /**
    * Change the order of columns and supercolumns in the table.
@@ -432,48 +445,52 @@ public:
    * call this function with the next five columns and again <tt>write_*</tt>,
    * and so on.
    */
-  void set_column_order (const std::vector<std::string> &new_order);
+  void
+  set_column_order(const std::vector<std::string> &new_order);
 
   /**
    * Set the <tt>precision</tt> e.g. double or float variables are written
    * with. <tt>precision</tt> is the same as in calling
    * <tt>out<<setprecision(precision)</tt>.
    */
-  void set_precision (const std::string &key,
-                      const unsigned int precision);
+  void
+  set_precision(const std::string &key, const unsigned int precision);
 
   /**
    * Set the <tt>scientific_flag</tt>. True means scientific, false means
    * fixed point notation.
    */
-  void set_scientific (const std::string &key,
-                       const bool         scientific);
+  void
+  set_scientific(const std::string &key, const bool scientific);
 
   /**
    * Set the caption of the column <tt>key</tt> for tex output. You may want
    * to chose this different from <tt>key</tt>, if it contains formulas or
    * similar constructs.
    */
-  void set_tex_caption (const std::string &key,
-                        const std::string &tex_caption);
+  void
+  set_tex_caption(const std::string &key, const std::string &tex_caption);
 
   /**
    * Set the tex caption of the entire <tt>table</tt> for tex output.
    */
-  void set_tex_table_caption (const std::string &table_caption);
+  void
+  set_tex_table_caption(const std::string &table_caption);
 
   /**
    * Set the label of this <tt>table</tt> for tex output.
    */
-  void set_tex_table_label (const std::string &table_label);
+  void
+  set_tex_table_label(const std::string &table_label);
 
   /**
    * Set the caption the supercolumn <tt>superkey</tt> for tex output.
    * You may want to chose this different from <tt>superkey</tt>, if it
    * contains formulas or similar constructs.
    */
-  void set_tex_supercaption (const std::string &superkey,
-                             const std::string &tex_supercaption);
+  void
+  set_tex_supercaption(const std::string &superkey,
+                       const std::string &tex_supercaption);
 
   /**
    * Set the tex output format of a column, e.g. <tt>c</tt>, <tt>r</tt>,
@@ -481,8 +498,8 @@ public:
    * function is not called for a column, the default is preset to be
    * <tt>c</tt>.
    */
-  void set_tex_format (const std::string &key,
-                       const std::string &format="c");
+  void
+  set_tex_format(const std::string &key, const std::string &format = "c");
 
   /**
    * Write table as formatted text to the given stream. The text is formatted
@@ -495,8 +512,9 @@ public:
    * The second argument indicates how column keys are to be displayed. See
    * the description of TextOutputFormat for more information
    */
-  void write_text (std::ostream &out,
-                   const TextOutputFormat format = table_with_headers) const;
+  void
+  write_text(std::ostream &         out,
+             const TextOutputFormat format = table_with_headers) const;
 
   /**
    * Write table as a tex file. If @p with_header is set to false, then no
@@ -505,27 +523,31 @@ public:
    * included into an existing tex file using a command like
    * <code>\\input{table_file}</code>.
    */
-  void write_tex (std::ostream &file, const bool with_header=true) const;
+  void
+  write_tex(std::ostream &file, const bool with_header = true) const;
 
   /**
    * Clear the rows of the table, i.e. calls clear() on all the underlying
    * storage data structures.
    */
-  void clear ();
+  void
+  clear();
 
   /**
    * Remove all values added at the current row. This is useful when, for
    * example, a time-step is rejected and all data recorded about it needs to
    * be discarded.
    */
-  void clear_current_row ();
+  void
+  clear_current_row();
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization.
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 
   /**
    * @addtogroup Exceptions
@@ -535,43 +557,46 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcColumnNotExistent,
-                  std::string,
-                  << "Column <" << arg1 << "> does not exist.");
+  DeclException1(ExcColumnNotExistent,
+                 std::string,
+                 << "Column <" << arg1 << "> does not exist.");
 
   /**
    * Exception
    */
-  DeclException1 (ExcSuperColumnNotExistent,
-                  std::string,
-                  << "Supercolumn <" << arg1 << "> does not exist.");
+  DeclException1(ExcSuperColumnNotExistent,
+                 std::string,
+                 << "Supercolumn <" << arg1 << "> does not exist.");
 
   /**
    * Exception
    */
-  DeclException1 (ExcColumnOrSuperColumnNotExistent,
-                  std::string,
-                  << "Column or supercolumn <" << arg1 << "> does not exist.");
+  DeclException1(ExcColumnOrSuperColumnNotExistent,
+                 std::string,
+                 << "Column or supercolumn <" << arg1 << "> does not exist.");
 
   /**
    * Exception
    */
-  DeclException4 (ExcWrongNumberOfDataEntries,
-                  std::string, int, std::string, int,
-                  << "Column <" << arg1 << "> has " << arg2
-                  << " rows, but Column <" << arg3 << "> has " << arg4 << " rows.");
+  DeclException4(ExcWrongNumberOfDataEntries,
+                 std::string,
+                 int,
+                 std::string,
+                 int,
+                 << "Column <" << arg1 << "> has " << arg2
+                 << " rows, but Column <" << arg3 << "> has " << arg4
+                 << " rows.");
 
   /**
    * Exception
    */
-  DeclException1 (ExcUndefinedTexFormat,
-                  std::string,
-                  << "<" << arg1 << "> is not a tex column format. Use "
-                  << "'l', 'c', or 'r' to indicate left, centered, or "
-                  << "right aligned text.");
+  DeclException1(ExcUndefinedTexFormat,
+                 std::string,
+                 << "<" << arg1 << "> is not a tex column format. Use "
+                 << "'l', 'c', or 'r' to indicate left, centered, or "
+                 << "right aligned text.");
   //@}
 protected:
-
   /**
    * Structure encapsulating all the data that is needed to describe one
    * column of a table.
@@ -581,27 +606,30 @@ protected:
     /**
      * Constructor needed by <tt>std::map</tt>.
      */
-    Column ();
+    Column();
 
     /**
      * Constructor.
      */
-    Column (const std::string &tex_caption);
+    Column(const std::string &tex_caption);
 
     /**
      * Pad this column with default constructed elements to the number of rows
      * given by the argument.
      */
-    void pad_column_below (const unsigned int length);
+    void
+    pad_column_below(const unsigned int length);
 
     /**
      * Read or write the data of this object to or from a stream for the
      * purpose of serialization.
      */
     template <class Archive>
-    void save(Archive &ar, const unsigned int version) const;
+    void
+    save(Archive &ar, const unsigned int version) const;
     template <class Archive>
-    void load(Archive &ar, const unsigned int version);
+    void
+    load(Archive &ar, const unsigned int version);
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 
@@ -609,7 +637,8 @@ protected:
      * Invalidates the string cache of all the entries and recomputes the
      * maximum length max_length.
      */
-    void invalidate_cache();
+    void
+    invalidate_cache();
 
     /**
      * List of entries within this column. Values are always immediately
@@ -669,19 +698,21 @@ protected:
    * This function implicitly checks the consistency of the data. The result
    * is returned in <tt>sel_columns</tt>.
    */
-  void get_selected_columns (std::vector<std::string> &sel_columns) const;
+  void
+  get_selected_columns(std::vector<std::string> &sel_columns) const;
 
   /**
    * Builtin function, that gives the number of rows in the table and that
    * checks if the number of rows is equal in every column. This function is
    * e.g. called before writing output.
    */
-  unsigned int n_rows() const;
+  unsigned int
+  n_rows() const;
 
   /**
-   * A variable storing the column and supercolumn keys in the order desired by the user.
-   * By default this is the order of adding the columns. This order may be
-   * changed by set_column_order().
+   * A variable storing the column and supercolumn keys in the order desired by
+   * the user. By default this is the order of adding the columns. This order
+   * may be changed by set_column_order().
    */
   std::vector<std::string> column_order;
 
@@ -692,7 +723,7 @@ protected:
    * functions can be const, even though they may pad columns below if
    * auto_fill_mode is on.
    */
-  mutable std::map<std::string,Column> columns;
+  mutable std::map<std::string, Column> columns;
 
   /**
    * A map from each supercolumn key to the keys of its subcolumns in the right
@@ -702,11 +733,11 @@ protected:
    * Note that we do not use a <tt>multimap</tt> here since the order of
    * column keys for each supercolumn key is relevant.
    */
-  std::map<std::string, std::vector<std::string> > supercolumns;
+  std::map<std::string, std::vector<std::string>> supercolumns;
 
   /**
-   * A map from the supercolumn keys to the captions of the supercolumns that are
-   * used in tex output.
+   * A map from the supercolumn keys to the captions of the supercolumns that
+   * are used in tex output.
    *
    * By default these are just the supercolumn keys but they may be changed by
    * <tt>set_tex_supercaptions(...)</tt>.
@@ -732,14 +763,13 @@ protected:
 namespace internal
 {
   template <typename T>
-  TableEntry::TableEntry (const T &t)
-    :
-    value (t)
+  TableEntry::TableEntry(const T &t) : value(t)
   {}
 
 
   template <typename T>
-  T TableEntry::get () const
+  T
+  TableEntry::get() const
   {
     // we don't quite know the data type in 'value', but
     // it must be one of the ones in the type list of the
@@ -753,7 +783,9 @@ namespace internal
       }
     catch (...)
       {
-        Assert(false, ExcMessage ("This TableEntry object does not store a datum of type T"));
+        Assert(false,
+               ExcMessage(
+                 "This TableEntry object does not store a datum of type T"));
         throw;
       }
   }
@@ -761,8 +793,8 @@ namespace internal
 
 
   template <class Archive>
-  void TableEntry::save (Archive &ar,
-                         const unsigned int) const
+  void
+  TableEntry::save(Archive &ar, const unsigned int) const
   {
     // write first an identifier for the kind
     // of data stored and then the actual
@@ -770,127 +802,133 @@ namespace internal
     if (const int *p = boost::get<int>(&value))
       {
         char c = 'i';
-        ar &c & *p;
+        ar &c &*p;
       }
     else if (const unsigned int *p = boost::get<unsigned int>(&value))
       {
         char c = 'u';
-        ar &c & *p;
+        ar &c &*p;
       }
     else if (const double *p = boost::get<double>(&value))
       {
         char c = 'd';
-        ar &c & *p;
+        ar &c &*p;
       }
     else if (const std::string *p = boost::get<std::string>(&value))
       {
         char c = 's';
-        ar &c & *p;
+        ar &c &*p;
       }
-    else if (const unsigned long long int *p = boost::get<unsigned long long int>(&value))
+    else if (const unsigned long long int *p =
+               boost::get<unsigned long long int>(&value))
       {
         char c = 'l';
-        ar &c & *p;
+        ar &c &*p;
       }
     else
-      Assert (false, ExcInternalError());
+      Assert(false, ExcInternalError());
   }
 
 
 
   template <class Archive>
-  void TableEntry::load (Archive &ar,
-                         const unsigned int)
+  void
+  TableEntry::load(Archive &ar, const unsigned int)
   {
     // following what we do in the save()
     // function, first read in the data type
     // as a one-character id, and then read
     // the data
     char c;
-    ar &c;
+    ar & c;
 
     switch (c)
       {
-      case 'i':
-      {
-        int val;
-        ar &val;
-        value = val;
-        break;
-      }
+        case 'i':
+          {
+            int val;
+            ar &val;
+            value = val;
+            break;
+          }
 
-      case 'u':
-      {
-        unsigned int val;
-        ar &val;
-        value = val;
-        break;
-      }
+        case 'u':
+          {
+            unsigned int val;
+            ar &         val;
+            value = val;
+            break;
+          }
 
-      case 'd':
-      {
-        double val;
-        ar &val;
-        value = val;
-        break;
-      }
+        case 'd':
+          {
+            double val;
+            ar &   val;
+            value = val;
+            break;
+          }
 
-      case 's':
-      {
-        std::string val;
-        ar &val;
-        value = val;
-        break;
-      }
+        case 's':
+          {
+            std::string val;
+            ar &        val;
+            value = val;
+            break;
+          }
 
-      case 'l':
-      {
-        unsigned long long int val;
-        ar &val;
-        value = val;
-        break;
-      }
+        case 'l':
+          {
+            unsigned long long int val;
+            ar &                   val;
+            value = val;
+            break;
+          }
 
-      default:
-        Assert (false, ExcInternalError());
+        default:
+          Assert(false, ExcInternalError());
       }
   }
-}
+} // namespace internal
 
 
 
 template <typename T>
-void TableHandler::add_value (const std::string &key,
-                              const T            value)
+void
+TableHandler::add_value(const std::string &key, const T value)
 {
   // see if the column already exists
   if (columns.find(key) == columns.end())
-    declare_column (key);
+    declare_column(key);
 
   if (auto_fill_mode == true)
     {
       // follow the algorithm given in the introduction to this class
       // of padding columns as necessary
       unsigned int max_col_length = 0;
-      for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
-        max_col_length = std::max(max_col_length,
-                                  static_cast<unsigned int>(p->second.entries.size()));
+      for (std::map<std::string, Column>::iterator p = columns.begin();
+           p != columns.end();
+           ++p)
+        max_col_length = std::max(
+          max_col_length, static_cast<unsigned int>(p->second.entries.size()));
 
-      while (columns[key].entries.size()+1 < max_col_length)
+      while (columns[key].entries.size() + 1 < max_col_length)
         {
-          columns[key].entries.push_back (internal::TableEntry(T()));
+          columns[key].entries.push_back(internal::TableEntry(T()));
           internal::TableEntry &entry = columns[key].entries.back();
           entry.cache_string(columns[key].scientific, columns[key].precision);
-          columns[key].max_length = std::max(columns[key].max_length, static_cast<unsigned int>(entry.get_cached_string().length()));
+          columns[key].max_length = std::max(
+            columns[key].max_length,
+            static_cast<unsigned int>(entry.get_cached_string().length()));
         }
     }
 
   // now push the value given to this function
-  columns[key].entries.push_back (internal::TableEntry(value));
+  columns[key].entries.push_back(internal::TableEntry(value));
   internal::TableEntry &entry = columns[key].entries.back();
   entry.cache_string(columns[key].scientific, columns[key].precision);
-  columns[key].max_length = std::max(columns[key].max_length,
-                                     static_cast<unsigned int>(entry.get_cached_string().length()));
+  columns[key].max_length =
+    std::max(columns[key].max_length,
+             static_cast<unsigned int>(entry.get_cached_string().length()));
 }
 
 
@@ -899,11 +937,7 @@ template <class Archive>
 void
 TableHandler::Column::save(Archive &ar, const unsigned int /*version*/) const
 {
-  ar &entries &tex_caption
-  & tex_format &precision
-  & scientific
-  & flag
-  & max_length;
+  ar &entries &tex_caption &tex_format &precision &scientific &flag &max_length;
 }
 
 
@@ -912,25 +946,17 @@ template <class Archive>
 void
 TableHandler::Column::load(Archive &ar, const unsigned int /*version*/)
 {
-  ar &entries &tex_caption
-  & tex_format &precision
-  & scientific
-  & flag
-  & max_length;
+  ar &entries &tex_caption &tex_format &precision &scientific &flag &max_length;
   invalidate_cache();
 }
 
 
 template <class Archive>
 void
-TableHandler::serialize(Archive &ar,
-                        const unsigned int)
+TableHandler::serialize(Archive &ar, const unsigned int)
 {
-  ar &column_order &columns
-  & supercolumns &tex_supercaptions
-  & tex_table_caption
-  & tex_table_label
-  & auto_fill_mode;
+  ar &column_order &columns &supercolumns &tex_supercaptions &tex_table_caption
+    &tex_table_label &auto_fill_mode;
 }
 
 

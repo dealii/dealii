@@ -28,30 +28,30 @@
 // |  |  |     |
 // x--x--x-----x
 
-#include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
+
+#include "../tests.h"
 
 
 
-
-
-void check (Triangulation<2> &tria)
+void check(Triangulation<2> &tria)
 {
-  for (unsigned i=0; i<tria.n_vertices(); i++)
+  for (unsigned i = 0; i < tria.n_vertices(); i++)
     {
-      std::vector<Triangulation<2>::active_cell_iterator>
-      cells = GridTools::find_cells_adjacent_to_vertex(tria, i);
+      std::vector<Triangulation<2>::active_cell_iterator> cells =
+        GridTools::find_cells_adjacent_to_vertex(tria, i);
 
-      deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": " << cells.size() << " cells" << std::endl;
+      deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": "
+              << cells.size() << " cells" << std::endl;
 
-      for (unsigned c=0; c<cells.size(); c++)
+      for (unsigned c = 0; c < cells.size(); c++)
         {
-          for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+          for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
             deallog << "<" << cells[c]->vertex(v) << "> ";
           deallog << std::endl;
         }
@@ -59,18 +59,19 @@ void check (Triangulation<2> &tria)
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       Triangulation<2> coarse_grid;
-      GridGenerator::hyper_cube (coarse_grid);
-      coarse_grid.refine_global (1);
+      GridGenerator::hyper_cube(coarse_grid);
+      coarse_grid.refine_global(1);
       coarse_grid.begin_active()->set_refine_flag();
       coarse_grid.execute_coarsening_and_refinement();
-      check (coarse_grid);
+      check(coarse_grid);
     }
   catch (const std::exception &exc)
     {

@@ -18,9 +18,12 @@
 #define dealii_mesh_worker_local_results_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
-#include <deal.II/lac/matrix_block.h>
+
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/matrix_block.h>
+
 #include <deal.II/meshworker/vector_selector.h>
 
 #include <functional>
@@ -214,7 +217,8 @@ namespace MeshWorker
      * This number is set to a nonzero value by Assember::CellsAndFaces
      *
      */
-    unsigned int n_values () const;
+    unsigned int
+    n_values() const;
 
     /**
      * The number of vectors.
@@ -222,87 +226,102 @@ namespace MeshWorker
      * This number is set to a nonzero value by Assember::ResidualSimple and
      * Assember::ResidualLocalBlocksToGlobalBlocks.
      */
-    unsigned int n_vectors () const;
+    unsigned int
+    n_vectors() const;
 
     /**
      * The number of matrices.
      */
-    unsigned int n_matrices () const;
+    unsigned int
+    n_matrices() const;
 
     /**
      * The number of quadrature points in quadrature_values().
      */
-    unsigned int n_quadrature_points() const;
+    unsigned int
+    n_quadrature_points() const;
 
     /**
      * The number of values in each quadrature point in quadrature_values().
      */
-    unsigned int n_quadrature_values() const;
+    unsigned int
+    n_quadrature_values() const;
 
     /**
      * Access scalar value at index @p i.
      */
-    number &value(unsigned int i);
+    number &
+    value(unsigned int i);
 
     /**
      * Read scalar value at index @p i.
      */
-    number value(unsigned int i) const;
+    number
+    value(unsigned int i) const;
 
     /**
      * Access vector at index @p i.
      */
-    BlockVector<number> &vector(unsigned int i);
+    BlockVector<number> &
+    vector(unsigned int i);
 
     /**
      * Read vector at index @p i.
      */
-    const BlockVector<number> &vector(unsigned int i) const;
+    const BlockVector<number> &
+    vector(unsigned int i) const;
 
     /**
      * Access matrix at index @p i. For results on internal faces, a true
      * value for @p external refers to the flux between cells, while false
      * refers to entries coupling inside the cell.
      */
-    MatrixBlock<FullMatrix<number> > &matrix(unsigned int i, bool external = false);
+    MatrixBlock<FullMatrix<number>> &
+    matrix(unsigned int i, bool external = false);
 
     /**
      * Read matrix at index @p i. For results on internal faces, a true value
      * for @p external refers to the flux between cells, while false refers to
      * entries coupling inside the cell.
      */
-    const MatrixBlock<FullMatrix<number> > &matrix(unsigned int i, bool external = false) const;
+    const MatrixBlock<FullMatrix<number>> &
+    matrix(unsigned int i, bool external = false) const;
 
     /**
      * Access to the vector #quadrature_data of data in quadrature points,
      * organized such that there is a vector for each point, containing one
      * entry for each component.
      */
-    Table<2, number> &quadrature_values();
+    Table<2, number> &
+    quadrature_values();
 
     /**
      * Access the <i>i</i>th value at quadrature point <i>k</i>
      */
-    number &quadrature_value(unsigned int k, unsigned int i);
+    number &
+    quadrature_value(unsigned int k, unsigned int i);
 
     /**
      * Read the <i>i</i>th value at quadrature point <i>k</i>
      */
-    number quadrature_value(unsigned int k, unsigned int i) const;
+    number
+    quadrature_value(unsigned int k, unsigned int i) const;
 
     /**
      * Initialize the vector with scalar values.
      *
      * @note This function is usually only called by the assembler.
      */
-    void initialize_numbers(const unsigned int n);
+    void
+    initialize_numbers(const unsigned int n);
 
     /**
      * Initialize the vector with vector values.
      *
      * @note This function is usually only called by the assembler.
      */
-    void initialize_vectors(const unsigned int n);
+    void
+    initialize_vectors(const unsigned int n);
 
     /**
      * Allocate @p n local matrices. Additionally, set their block row and
@@ -311,7 +330,8 @@ namespace MeshWorker
      *
      * @note This function is usually only called by the assembler.
      */
-    void initialize_matrices(unsigned int n, bool both);
+    void
+    initialize_matrices(unsigned int n, bool both);
 
     /**
      * Allocate a local matrix for each of the global ones in @p matrices.
@@ -321,8 +341,9 @@ namespace MeshWorker
      * @note This function is usually only called by the assembler.
      */
     template <typename MatrixType>
-    void initialize_matrices(const MatrixBlockVector<MatrixType> &matrices,
-                             bool both);
+    void
+    initialize_matrices(const MatrixBlockVector<MatrixType> &matrices,
+                        bool                                 both);
 
     /**
      * Allocate a local matrix for each of the global level objects in @p
@@ -332,29 +353,34 @@ namespace MeshWorker
      * @note This function is usually only called by the assembler.
      */
     template <typename MatrixType>
-    void initialize_matrices(const MGMatrixBlockVector<MatrixType> &matrices,
-                             bool both);
+    void
+    initialize_matrices(const MGMatrixBlockVector<MatrixType> &matrices,
+                        bool                                   both);
 
     /**
      * Initialize quadrature values to <tt>nv</tt> values in <tt>np</tt>
      * quadrature points.
      */
-    void initialize_quadrature(unsigned int np, unsigned int nv);
+    void
+    initialize_quadrature(unsigned int np, unsigned int nv);
 
     /**
      * Reinitialize matrices for new cell. Does not resize any of the data
      * vectors stored in this object, but resizes the vectors in #R and the
      * matrices in #M1 and #M2 for hp and sets them to zero.
      */
-    void reinit(const BlockIndices &local_sizes);
+    void
+    reinit(const BlockIndices &local_sizes);
 
     template <class StreamType>
-    void print_debug(StreamType &os) const;
+    void
+    print_debug(StreamType &os) const;
 
     /**
      * The memory used by this object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
   private:
     /**
@@ -366,13 +392,13 @@ namespace MeshWorker
      * The local vectors. This field is public, so that local integrators can
      * write to it.
      */
-    std::vector<BlockVector<number> > R;
+    std::vector<BlockVector<number>> R;
 
     /**
      * The local matrices coupling degrees of freedom in the cell itself or
      * within the first cell on a face.
      */
-    std::vector<MatrixBlock<FullMatrix<number> > > M1;
+    std::vector<MatrixBlock<FullMatrix<number>>> M1;
 
     /**
      * The local matrices coupling test functions on the cell with trial
@@ -380,7 +406,7 @@ namespace MeshWorker
      *
      * Only used on interior faces.
      */
-    std::vector<MatrixBlock<FullMatrix<number> > > M2;
+    std::vector<MatrixBlock<FullMatrix<number>>> M2;
 
     /**
      * Values in quadrature points for writing into patch data.
@@ -388,7 +414,7 @@ namespace MeshWorker
     Table<2, number> quadrature_data;
   };
 
-//----------------------------------------------------------------------//
+  //----------------------------------------------------------------------//
 
   template <typename number>
   inline void
@@ -409,23 +435,23 @@ namespace MeshWorker
   template <typename number>
   template <typename MatrixType>
   inline void
-  LocalResults<number>::initialize_matrices
-  (const MatrixBlockVector<MatrixType> &matrices,
-   bool                                 both)
+  LocalResults<number>::initialize_matrices(
+    const MatrixBlockVector<MatrixType> &matrices,
+    bool                                 both)
   {
     M1.resize(matrices.size());
     if (both)
       M2.resize(matrices.size());
-    for (unsigned int i=0; i<matrices.size(); ++i)
+    for (unsigned int i = 0; i < matrices.size(); ++i)
       {
         const unsigned int row = matrices.block(i).row;
         const unsigned int col = matrices.block(i).column;
 
-        M1[i].row = row;
+        M1[i].row    = row;
         M1[i].column = col;
         if (both)
           {
-            M2[i].row = row;
+            M2[i].row    = row;
             M2[i].column = col;
           }
       }
@@ -435,24 +461,24 @@ namespace MeshWorker
   template <typename number>
   template <typename MatrixType>
   inline void
-  LocalResults<number>::initialize_matrices
-  (const MGMatrixBlockVector<MatrixType> &matrices,
-   bool                                   both)
+  LocalResults<number>::initialize_matrices(
+    const MGMatrixBlockVector<MatrixType> &matrices,
+    bool                                   both)
   {
     M1.resize(matrices.size());
     if (both)
       M2.resize(matrices.size());
-    for (unsigned int i=0; i<matrices.size(); ++i)
+    for (unsigned int i = 0; i < matrices.size(); ++i)
       {
-        const MGLevelObject<MatrixBlock<MatrixType> > &o = matrices.block(i);
-        const unsigned int row = o[o.min_level()].row;
+        const MGLevelObject<MatrixBlock<MatrixType>> &o = matrices.block(i);
+        const unsigned int row                          = o[o.min_level()].row;
         const unsigned int col = o[o.min_level()].column;
 
-        M1[i].row = row;
+        M1[i].row    = row;
         M1[i].column = col;
         if (both)
           {
-            M2[i].row = row;
+            M2[i].row    = row;
             M2[i].column = col;
           }
       }
@@ -462,18 +488,18 @@ namespace MeshWorker
   template <typename number>
   inline void
   LocalResults<number>::initialize_matrices(const unsigned int n,
-                                            const bool both)
+                                            const bool         both)
   {
     M1.resize(n);
     if (both)
       M2.resize(n);
-    for (unsigned int i=0; i<n; ++i)
+    for (unsigned int i = 0; i < n; ++i)
       {
-        M1[i].row = 0;
+        M1[i].row    = 0;
         M1[i].column = 0;
         if (both)
           {
-            M2[i].row = 0;
+            M2[i].row    = 0;
             M2[i].column = 0;
           }
       }
@@ -489,8 +515,7 @@ namespace MeshWorker
 
 
   template <typename number>
-  inline
-  unsigned int
+  inline unsigned int
   LocalResults<number>::n_values() const
   {
     return J.size();
@@ -498,8 +523,7 @@ namespace MeshWorker
 
 
   template <typename number>
-  inline
-  unsigned int
+  inline unsigned int
   LocalResults<number>::n_vectors() const
   {
     return R.size();
@@ -507,8 +531,7 @@ namespace MeshWorker
 
 
   template <typename number>
-  inline
-  unsigned int
+  inline unsigned int
   LocalResults<number>::n_matrices() const
   {
     return M1.size();
@@ -516,8 +539,7 @@ namespace MeshWorker
 
 
   template <typename number>
-  inline
-  unsigned int
+  inline unsigned int
   LocalResults<number>::n_quadrature_points() const
   {
     return quadrature_data.n_rows();
@@ -525,8 +547,7 @@ namespace MeshWorker
 
 
   template <typename number>
-  inline
-  unsigned int
+  inline unsigned int
   LocalResults<number>::n_quadrature_values() const
   {
     return quadrature_data.n_cols();
@@ -534,52 +555,47 @@ namespace MeshWorker
 
 
   template <typename number>
-  inline
-  number &
+  inline number &
   LocalResults<number>::value(unsigned int i)
   {
-    AssertIndexRange(i,J.size());
+    AssertIndexRange(i, J.size());
     return J[i];
   }
 
 
   template <typename number>
-  inline
-  BlockVector<number> &
+  inline BlockVector<number> &
   LocalResults<number>::vector(unsigned int i)
   {
-    AssertIndexRange(i,R.size());
+    AssertIndexRange(i, R.size());
     return R[i];
   }
 
 
   template <typename number>
-  inline
-  MatrixBlock<FullMatrix<number> > &
+  inline MatrixBlock<FullMatrix<number>> &
   LocalResults<number>::matrix(unsigned int i, bool external)
   {
     if (external)
       {
-        AssertIndexRange(i,M2.size());
+        AssertIndexRange(i, M2.size());
         return M2[i];
       }
-    AssertIndexRange(i,M1.size());
+    AssertIndexRange(i, M1.size());
     return M1[i];
   }
 
 
   template <typename number>
-  inline
-  number &
+  inline number &
   LocalResults<number>::quadrature_value(unsigned int k, unsigned int i)
   {
-    return quadrature_data(k,i);
+    return quadrature_data(k, i);
   }
 
 
   template <typename number>
-  inline
-  Table<2, number> &
+  inline Table<2, number> &
   LocalResults<number>::quadrature_values()
   {
     return quadrature_data;
@@ -587,46 +603,42 @@ namespace MeshWorker
 
 
   template <typename number>
-  inline
-  number
+  inline number
   LocalResults<number>::value(unsigned int i) const
   {
-    AssertIndexRange(i,J.size());
+    AssertIndexRange(i, J.size());
     return J[i];
   }
 
 
   template <typename number>
-  inline
-  const BlockVector<number> &
+  inline const BlockVector<number> &
   LocalResults<number>::vector(unsigned int i) const
   {
-    AssertIndexRange(i,R.size());
+    AssertIndexRange(i, R.size());
     return R[i];
   }
 
 
   template <typename number>
-  inline
-  const MatrixBlock<FullMatrix<number> > &
+  inline const MatrixBlock<FullMatrix<number>> &
   LocalResults<number>::matrix(unsigned int i, bool external) const
   {
     if (external)
       {
-        AssertIndexRange(i,M2.size());
+        AssertIndexRange(i, M2.size());
         return M2[i];
       }
-    AssertIndexRange(i,M1.size());
+    AssertIndexRange(i, M1.size());
     return M1[i];
   }
 
 
   template <typename number>
-  inline
-  number
+  inline number
   LocalResults<number>::quadrature_value(unsigned int k, unsigned int i) const
   {
-    return quadrature_data(k,i);
+    return quadrature_data(k, i);
   }
 
 
@@ -637,26 +649,26 @@ namespace MeshWorker
   {
     os << "J: " << J.size() << std::endl;
     os << "R: " << R.size() << std::endl;
-    for (unsigned int i=0; i<R.size(); ++i)
+    for (unsigned int i = 0; i < R.size(); ++i)
       {
         os << "  " << R[i].n_blocks() << " -";
-        for (unsigned int j=0; j<R[i].n_blocks(); ++j)
+        for (unsigned int j = 0; j < R[i].n_blocks(); ++j)
           os << ' ' << R[i].block(j).size();
         os << std::endl;
       }
     os << "M: " << M1.size() << " face " << M2.size() << std::endl;
-    for (unsigned int i=0; i<M1.size(); ++i)
+    for (unsigned int i = 0; i < M1.size(); ++i)
       {
-        os << "  " << M1[i].row << "," << M1[i].column
-           << " " << M1[i].matrix.m() << 'x' << M1[i].matrix.n();
+        os << "  " << M1[i].row << "," << M1[i].column << " "
+           << M1[i].matrix.m() << 'x' << M1[i].matrix.n();
         if (i < M2.size())
-          os << " face " << M2[i].row << "," << M2[i].column
-             << " " << M2[i].matrix.m() << 'x' << M2[i].matrix.n();
+          os << " face " << M2[i].row << "," << M2[i].column << " "
+             << M2[i].matrix.m() << 'x' << M2[i].matrix.n();
         os << std::endl;
       }
   }
 
-}
+} // namespace MeshWorker
 
 
 DEAL_II_NAMESPACE_CLOSE

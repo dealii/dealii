@@ -148,8 +148,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Integrators
  */
 namespace LocalIntegrators
-{
-}
+{}
 
 DEAL_II_NAMESPACE_CLOSE
 

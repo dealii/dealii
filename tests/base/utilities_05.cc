@@ -16,47 +16,46 @@
 
 // Utilities::get_integer_at_position
 
-#include "../tests.h"
+#include <deal.II/base/utilities.h>
+
 #include <sstream>
 
-#include <deal.II/base/utilities.h>
+#include "../tests.h"
 
 using namespace dealii;
 
 
 
-
-void test ()
+void
+test()
 {
   int number = 5;
-  for (unsigned int i=0; i<7; ++i)
+  for (unsigned int i = 0; i < 7; ++i)
     {
       std::ostringstream s;
       s << "test test" << number << "test test";
 
-      AssertThrow (Utilities::get_integer_at_position (s.str(),
-                                                       9).first
-                   == number,
-                   ExcInternalError());
-      AssertThrow (Utilities::get_integer_at_position (s.str(),
-                                                       9).second
-                   == i+1,
-                   ExcInternalError());
+      AssertThrow(Utilities::get_integer_at_position(s.str(), 9).first ==
+                    number,
+                  ExcInternalError());
+      AssertThrow(Utilities::get_integer_at_position(s.str(), 9).second ==
+                    i + 1,
+                  ExcInternalError());
 
-      deallog << i << ' ' << Utilities::get_integer_at_position (s.str(),
-                                                                 9).first
+      deallog << i << ' '
+              << Utilities::get_integer_at_position(s.str(), 9).first
               << std::endl;
 
-      number = number*10 + i;
+      number = number * 10 + i;
     }
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

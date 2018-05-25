@@ -16,21 +16,21 @@
 #include <deal.II/base/config.h>
 
 // Required for instantiation of template functions
-#include <deal.II/differentiation/ad/adolc_product_types.h>
-#include <deal.II/differentiation/ad/sacado_product_types.h>
-
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/symmetric_tensor.templates.h>
+
+#include <deal.II/differentiation/ad/adolc_product_types.h>
+#include <deal.II/differentiation/ad/sacado_product_types.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 // provide definitions for static members
 template <int rank, int dim, typename Number>
-const unsigned int SymmetricTensor<rank,dim,Number>::dimension;
+const unsigned int SymmetricTensor<rank, dim, Number>::dimension;
 
 template <int rank, int dim, typename Number>
-const unsigned int SymmetricTensor<rank,dim,Number>::n_independent_components;
+const unsigned int SymmetricTensor<rank, dim, Number>::n_independent_components;
 
 
 // explicit instantiations

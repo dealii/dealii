@@ -19,10 +19,10 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/matrix_free/task_info.h>

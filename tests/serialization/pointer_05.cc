@@ -19,49 +19,45 @@
 //
 // similar to the _03 and _04 tests, but bury the pointer somewhere
 
-#include "serialization.h"
-
 #include <boost/serialization/utility.hpp>
+
 #include <typeinfo>
+
+#include "serialization.h"
 
 int object_number = 1;
 
 class C
 {
 public:
-  C ()
+  C()
   {
     object_number = ::object_number++;
-    deallog << "Default constructor. Object number "
-            << object_number
+    deallog << "Default constructor. Object number " << object_number
             << std::endl;
   }
 
-  C (const C &)
+  C(const C &)
   {
     object_number = ::object_number++;
-    deallog << "copy constructor. Object number "
-            << object_number
-            << std::endl;
+    deallog << "copy constructor. Object number " << object_number << std::endl;
   }
 
-  ~C ()
+  ~C()
   {
-    deallog << "destructor. Object number "
-            << object_number
-            << std::endl;
+    deallog << "destructor. Object number " << object_number << std::endl;
   }
 
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int version)
+  void
+  serialize(Archive &ar, const unsigned int version)
   {
-    deallog << "Serializing object number "
-            << object_number
-            << " via " << typeid(Archive).name()
-            << std::endl;
+    deallog << "Serializing object number " << object_number << " via "
+            << typeid(Archive).name() << std::endl;
   }
 
-  bool operator == (const C &) const
+  bool
+  operator==(const C &) const
   {
     return true;
   }
@@ -75,12 +71,14 @@ struct P
 {
   C *c;
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int)
+  void
+  serialize(Archive &ar, const unsigned int)
   {
     ar &c;
   }
 
-  bool operator == (const P &p) const
+  bool
+  operator==(const P &p) const
   {
     // there is no useful operation we
     // can do here for the purposes of
@@ -92,18 +90,19 @@ struct P
 
 
 
-void test ()
+void
+test()
 {
   {
-    C *c = new C();
-    std::pair<P,P> pair_1, pair_2;
-    pair_1.first.c = c;
+    C *             c = new C();
+    std::pair<P, P> pair_1, pair_2;
+    pair_1.first.c  = c;
     pair_1.second.c = c;
 
-    pair_2.first.c = nullptr;
+    pair_2.first.c  = nullptr;
     pair_2.second.c = nullptr;
 
-    verify (pair_1, pair_2);
+    verify(pair_1, pair_2);
 
     // boost::serialize should have
     // recognized that the two pointers in
@@ -111,8 +110,8 @@ void test ()
     // consequently re-create only one object
     // that the two components of the
     // re-created pair point to
-    AssertThrow (pair_2.first.c == pair_2.second.c, ExcInternalError());
-    AssertThrow (object_number == 3, ExcInternalError());
+    AssertThrow(pair_2.first.c == pair_2.second.c, ExcInternalError());
+    AssertThrow(object_number == 3, ExcInternalError());
 
     // destroy the newly created object. this
     // must succeed and would likely throw
@@ -125,13 +124,14 @@ void test ()
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

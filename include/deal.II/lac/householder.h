@@ -17,18 +17,20 @@
 #define dealii_householder_h
 
 
-#include <cmath>
 #include <deal.II/base/config.h>
+
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector_memory.h>
 
+#include <cmath>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
-template <typename number> class Vector;
+template <typename number>
+class Vector;
 
 
 /*! @addtogroup Matrix2
@@ -86,13 +88,13 @@ public:
   /**
    * Create an empty object.
    */
-  Householder () = default;
+  Householder() = default;
 
   /**
    * Create an object holding the QR-decomposition of the matrix $A$.
    */
   template <typename number2>
-  Householder (const FullMatrix<number2> &A);
+  Householder(const FullMatrix<number2> &A);
 
   /**
    * Compute the QR-decomposition of the given matrix $A$.
@@ -101,7 +103,7 @@ public:
    */
   template <typename number2>
   void
-  initialize (const FullMatrix<number2> &A);
+  initialize(const FullMatrix<number2> &A);
 
   /**
    * Solve the least-squares problem for the right hand side <tt>src</tt>. The
@@ -114,30 +116,32 @@ public:
    * return.
    */
   template <typename number2>
-  double least_squares (Vector<number2> &dst,
-                        const Vector<number2> &src) const;
+  double
+  least_squares(Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * This function does the same as the previous one, but for BlockVectors.
    */
   template <typename number2>
-  double least_squares (BlockVector<number2> &dst,
-                        const BlockVector<number2> &src) const;
+  double
+  least_squares(BlockVector<number2> &      dst,
+                const BlockVector<number2> &src) const;
 
   /**
    * A wrapper to least_squares(), implementing the standard MatrixType
    * interface.
    */
   template <class VectorType>
-  void vmult (VectorType &dst,
-              const VectorType &src) const;
+  void
+  vmult(VectorType &dst, const VectorType &src) const;
 
   /**
    * A wrapper to least_squares() that implements multiplication with
    * the transpose matrix.
    */
   template <class VectorType>
-  void Tvmult (VectorType &dst, const VectorType &src) const;
+  void
+  Tvmult(VectorType &dst, const VectorType &src) const;
 
 
 private:
@@ -168,49 +172,50 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
   const size_type m = M.n_rows(), n = M.n_cols();
   storage.reinit(m, n);
   storage.fill(M);
-  Assert (!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
+  Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
   diagonal.resize(m);
 
   // m > n, src.n() = m
-  Assert (storage.n_cols() <= storage.n_rows(),
-          ExcDimensionMismatch(storage.n_cols(), storage.n_rows()));
+  Assert(storage.n_cols() <= storage.n_rows(),
+         ExcDimensionMismatch(storage.n_cols(), storage.n_rows()));
 
-  for (size_type j=0 ; j<n ; ++j)
+  for (size_type j = 0; j < n; ++j)
     {
-      number2 sigma = 0;
+      number2   sigma = 0;
       size_type i;
       // sigma = ||v||^2
-      for (i=j ; i<m ; ++i)
-        sigma += storage(i,j)*storage(i,j);
+      for (i = j; i < m; ++i)
+        sigma += storage(i, j) * storage(i, j);
       // We are ready if the column is
       // empty. Are we?
-      if (std::fabs(sigma) < 1.e-15) return;
+      if (std::fabs(sigma) < 1.e-15)
+        return;
 
-      number2 s = (storage(j,j) < 0) ? std::sqrt(sigma) : -std::sqrt(sigma);
+      number2 s = (storage(j, j) < 0) ? std::sqrt(sigma) : -std::sqrt(sigma);
       //
-      number2 beta = std::sqrt(1./(sigma-s*storage(j,j)));
+      number2 beta = std::sqrt(1. / (sigma - s * storage(j, j)));
 
       // Make column j the Householder
       // vector, store first entry in
       // diagonal
-      diagonal[j] = beta*(storage(j,j) - s);
-      storage(j,j) = s;
+      diagonal[j]   = beta * (storage(j, j) - s);
+      storage(j, j) = s;
 
-      for (i=j+1 ; i<m ; ++i)
-        storage(i,j) *= beta;
+      for (i = j + 1; i < m; ++i)
+        storage(i, j) *= beta;
 
 
       // For all subsequent columns do
       // the Householder reflection
-      for (size_type k=j+1 ; k<n ; ++k)
+      for (size_type k = j + 1; k < n; ++k)
         {
-          number2 sum = diagonal[j]*storage(j,k);
-          for (i=j+1 ; i<m ; ++i)
-            sum += storage(i,j)*storage(i,k);
+          number2 sum = diagonal[j] * storage(j, k);
+          for (i = j + 1; i < m; ++i)
+            sum += storage(i, j) * storage(i, k);
 
-          storage(j,k) -= sum*this->diagonal[j];
-          for (i=j+1 ; i<m ; ++i)
-            storage(i,k) -= sum*storage(i,j);
+          storage(j, k) -= sum * this->diagonal[j];
+          for (i = j + 1; i < m; ++i)
+            storage(i, k) -= sum * storage(i, j);
         }
     }
 }
@@ -229,37 +234,37 @@ Householder<number>::Householder(const FullMatrix<number2> &M)
 template <typename number>
 template <typename number2>
 double
-Householder<number>::least_squares (Vector<number2> &dst,
-                                    const Vector<number2> &src) const
+Householder<number>::least_squares(Vector<number2> &      dst,
+                                   const Vector<number2> &src) const
 {
-  Assert (!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
+  Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
   AssertDimension(dst.size(), storage.n());
   AssertDimension(src.size(), storage.m());
 
   const size_type m = storage.m(), n = storage.n();
 
-  GrowingVectorMemory<Vector<number2> > mem;
-  typename VectorMemory<Vector<number2> >::Pointer aux (mem);
+  GrowingVectorMemory<Vector<number2>>            mem;
+  typename VectorMemory<Vector<number2>>::Pointer aux(mem);
   aux->reinit(src, true);
   *aux = src;
   // m > n, m = src.n, n = dst.n
 
   // Multiply Q_n ... Q_2 Q_1 src
   // Where Q_i = I - v_i v_i^T
-  for (size_type j=0; j<n; ++j)
+  for (size_type j = 0; j < n; ++j)
     {
       // sum = v_i^T dst
-      number2 sum = diagonal[j]* (*aux)(j);
-      for (size_type i=j+1 ; i<m ; ++i)
-        sum += static_cast<number2>(storage(i,j))*(*aux)(i);
+      number2 sum = diagonal[j] * (*aux)(j);
+      for (size_type i = j + 1; i < m; ++i)
+        sum += static_cast<number2>(storage(i, j)) * (*aux)(i);
       // dst -= v * sum
-      (*aux)(j) -= sum*diagonal[j];
-      for (size_type i=j+1 ; i<m ; ++i)
-        (*aux)(i) -= sum*static_cast<number2>(storage(i,j));
+      (*aux)(j) -= sum * diagonal[j];
+      for (size_type i = j + 1; i < m; ++i)
+        (*aux)(i) -= sum * static_cast<number2>(storage(i, j));
     }
   // Compute norm of residual
   number2 sum = 0.;
-  for (size_type i=n ; i<m ; ++i)
+  for (size_type i = n; i < m; ++i)
     sum += (*aux)(i) * (*aux)(i);
   AssertIsFinite(sum);
 
@@ -274,50 +279,50 @@ Householder<number>::least_squares (Vector<number2> &dst,
 template <typename number>
 template <typename number2>
 double
-Householder<number>::least_squares (BlockVector<number2> &dst,
-                                    const BlockVector<number2> &src) const
+Householder<number>::least_squares(BlockVector<number2> &      dst,
+                                   const BlockVector<number2> &src) const
 {
-  Assert (!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
+  Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
   AssertDimension(dst.size(), storage.n());
   AssertDimension(src.size(), storage.m());
 
   const size_type m = storage.m(), n = storage.n();
 
-  GrowingVectorMemory<BlockVector<number2> > mem;
-  typename VectorMemory<BlockVector<number2> >::Pointer aux (mem);
+  GrowingVectorMemory<BlockVector<number2>>            mem;
+  typename VectorMemory<BlockVector<number2>>::Pointer aux(mem);
   aux->reinit(src, true);
   *aux = src;
   // m > n, m = src.n, n = dst.n
 
   // Multiply Q_n ... Q_2 Q_1 src
   // Where Q_i = I-v_i v_i^T
-  for (size_type j=0; j<n; ++j)
+  for (size_type j = 0; j < n; ++j)
     {
       // sum = v_i^T dst
-      number2 sum = diagonal[j]* (*aux)(j);
-      for (size_type i=j+1 ; i<m ; ++i)
-        sum += storage(i,j)*(*aux)(i);
+      number2 sum = diagonal[j] * (*aux)(j);
+      for (size_type i = j + 1; i < m; ++i)
+        sum += storage(i, j) * (*aux)(i);
       // dst -= v * sum
-      (*aux)(j) -= sum*diagonal[j];
-      for (size_type i=j+1 ; i<m ; ++i)
-        (*aux)(i) -= sum*storage(i,j);
+      (*aux)(j) -= sum * diagonal[j];
+      for (size_type i = j + 1; i < m; ++i)
+        (*aux)(i) -= sum * storage(i, j);
     }
   // Compute norm of residual
   number2 sum = 0.;
-  for (size_type i=n ; i<m ; ++i)
+  for (size_type i = n; i < m; ++i)
     sum += (*aux)(i) * (*aux)(i);
   AssertIsFinite(sum);
 
-  //backward works for
-  //Vectors only, so copy
-  //them before
+  // backward works for
+  // Vectors only, so copy
+  // them before
   Vector<number2> v_dst, v_aux;
   v_dst = dst;
   v_aux = *aux;
   // Compute solution
   storage.backward(v_dst, v_aux);
-  //copy the result back
-  //to the BlockVector
+  // copy the result back
+  // to the BlockVector
   dst = v_dst;
 
   return std::sqrt(sum);
@@ -327,16 +332,16 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
 template <typename number>
 template <class VectorType>
 void
-Householder<number>::vmult (VectorType &dst, const VectorType &src) const
+Householder<number>::vmult(VectorType &dst, const VectorType &src) const
 {
-  least_squares (dst, src);
+  least_squares(dst, src);
 }
 
 
 template <typename number>
 template <class VectorType>
 void
-Householder<number>::Tvmult (VectorType &, const VectorType &) const
+Householder<number>::Tvmult(VectorType &, const VectorType &) const
 {
   Assert(false, ExcNotImplemented());
 }

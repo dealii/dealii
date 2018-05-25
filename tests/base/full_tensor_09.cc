@@ -16,23 +16,25 @@
 
 // test the determinant code
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  Tensor<2,dim> t;
+  Tensor<2, dim> t;
 
   // choose the same symmetric tensor
   // as in symmetric_tensor_09
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      t[i][j] = t[j][i] = (1.+(i+1)*(j*2));
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = i; j < dim; ++j)
+      t[i][j] = t[j][i] = (1. + (i + 1) * (j * 2));
 
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = 0; j < dim; ++j)
       deallog << i << ' ' << j << ' ' << t[i][j] << std::endl;
 
   deallog << determinant(t) << std::endl;
@@ -40,15 +42,15 @@ void test ()
 
 
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

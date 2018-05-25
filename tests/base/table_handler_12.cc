@@ -19,15 +19,17 @@
 // which we print
 
 
-#include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -40,7 +42,7 @@ int main ()
   // table output to 2
   TableHandler table;
   table.add_value("key", 0.123456789);
-  table.set_precision ("key", 2);
+  table.set_precision("key", 2);
 
   // now output the table...
   table.write_text(logfile);

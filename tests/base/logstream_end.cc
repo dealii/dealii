@@ -22,11 +22,13 @@
 // left over when it is destroyed
 
 
-#include "../tests.h"
 #include <limits>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -35,7 +37,7 @@ int main()
     LogStream log;
 
     log.attach(logfile);
-    log.log_thread_id (false);
+    log.log_thread_id(false);
 
     log << "This should be printed!";
   }

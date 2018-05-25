@@ -17,49 +17,52 @@
 
 // check SparseMatrix::add(other, factor)
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_sparse_matrix.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  const unsigned int s = 10;
-  PETScWrappers::SparseMatrix m(s,s,s);
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<=i; ++j)
-      m.set (i,j, i+2*j);
+  const unsigned int          s = 10;
+  PETScWrappers::SparseMatrix m(s, s, s);
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j <= i; ++j)
+      m.set(i, j, i + 2 * j);
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
-  PETScWrappers::SparseMatrix m2(s,s,s);
-  m2.set(0,1,5.0);
-  for (unsigned int i=0; i<m2.m(); ++i)
-    m2.set(i,i,1.0+ i);
-  m2.compress (VectorOperation::insert);
+  PETScWrappers::SparseMatrix m2(s, s, s);
+  m2.set(0, 1, 5.0);
+  for (unsigned int i = 0; i < m2.m(); ++i)
+    m2.set(i, i, 1.0 + i);
+  m2.compress(VectorOperation::insert);
 
   // we now print the matrix m,
   // print after adding m2, and then subtract m2 again
   // to get the original matrix back.
 
-  deallog << "before: " << m(0,1) << std::endl;
-  for (unsigned int i=0; i<s; ++i)
-    deallog << m(i,i) << " ";
+  deallog << "before: " << m(0, 1) << std::endl;
+  for (unsigned int i = 0; i < s; ++i)
+    deallog << m(i, i) << " ";
   deallog << std::endl;
 
-  m.add(m2,1.0);
+  m.add(m2, 1.0);
 
-  deallog << "after: " << m(0,1) << std::endl;
-  for (unsigned int i=0; i<s; ++i)
-    deallog << m(i,i) << " ";
+  deallog << "after: " << m(0, 1) << std::endl;
+  for (unsigned int i = 0; i < s; ++i)
+    deallog << m(i, i) << " ";
   deallog << std::endl;
 
-  m.add(m2,-1.0);
+  m.add(m2, -1.0);
 
-  deallog << "back to original: " << m(0,1) << std::endl;
-  for (unsigned int i=0; i<s; ++i)
-    deallog << m(i,i) << " ";
+  deallog << "back to original: " << m(0, 1) << std::endl;
+  for (unsigned int i = 0; i < s; ++i)
+    deallog << m(i, i) << " ";
   deallog << std::endl;
 
   deallog << "OK" << std::endl;
@@ -67,11 +70,11 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  test ();
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  test();
 }

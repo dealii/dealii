@@ -17,27 +17,31 @@
 
 // test TrilinosWrappers::SparseMatrix::iterator semantics
 
-#include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/utilities.h>
+
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/la_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  const unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int my_id   = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   const unsigned int n_rows = 3;
   const unsigned int n_cols = 4;
 
-  IndexSet row_partitioning (n_rows);
-  IndexSet col_partitioning (n_cols);
+  IndexSet row_partitioning(n_rows);
+  IndexSet col_partitioning(n_cols);
 
   if (n_procs == 1)
     {
@@ -61,22 +65,22 @@ void test ()
         }
     }
   else
-    Assert (false, ExcNotImplemented());
+    Assert(false, ExcNotImplemented());
 
-  TrilinosWrappers::SparsityPattern sp (row_partitioning,
-                                        col_partitioning, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(
+    row_partitioning, col_partitioning, MPI_COMM_WORLD);
   if (my_id == 0)
     {
-      sp.add (0, 0);
-      sp.add (0, 2);
+      sp.add(0, 0);
+      sp.add(0, 2);
     }
   if ((n_procs == 1) || (my_id == 1))
-    sp.add(2,3);
+    sp.add(2, 3);
   sp.compress();
 
   TrilinosWrappers::SparseMatrix A;
-  A.reinit (sp);
-  if (my_id==0)
+  A.reinit(sp);
+  if (my_id == 0)
     {
       A.set(0, 0, 0.1);
       A.set(0, 2, 0.2);
@@ -85,7 +89,7 @@ void test ()
     {
       A.set(0, 0, 0.1);
       A.set(0, 2, 0.2);
-      A.set(2,3, 0.3);
+      A.set(2, 3, 0.3);
     }
 
   A.compress(VectorOperation::insert);
@@ -94,34 +98,32 @@ void test ()
   // matrix, just make sure
   if (my_id == 0)
     {
-      for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(0);
+      for (TrilinosWrappers::SparseMatrix::iterator p = A.begin(0);
            p != A.end(0);
            ++p)
         {
-          AssertThrow (p->row() == 0, ExcInternalError());
+          AssertThrow(p->row() == 0, ExcInternalError());
           if (p->column() == 0)
-            AssertThrow (p->value() == 0.1, ExcInternalError())
-            else if (p->column() == 2)
-              AssertThrow (p->value() == 0.2, ExcInternalError())
-              else
-                // well, we didn't write here, so the only thing that
-                // should be in there is a zero
-                AssertThrow (p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 0.1,
+                        ExcInternalError()) else if (p->column() == 2)
+              AssertThrow(p->value() == 0.2, ExcInternalError()) else
+              // well, we didn't write here, so the only thing that
+              // should be in there is a zero
+              AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
   else
     {
-      for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(2);
+      for (TrilinosWrappers::SparseMatrix::iterator p = A.begin(2);
            p != A.end(2);
            ++p)
         {
-          AssertThrow (p->row() == 2, ExcInternalError());
+          AssertThrow(p->row() == 2, ExcInternalError());
           if (p->column() == 3)
-            AssertThrow (p->value() == 0.3, ExcInternalError())
-            else
+            AssertThrow(p->value() == 0.3, ExcInternalError()) else
               // well, we didn't write here, so the only thing that
               // should be in there is a zero
-              AssertThrow (p->value() == 0.0, ExcInternalError());
+              AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
 
@@ -131,71 +133,67 @@ void test ()
   // yet:
   if (my_id == 0)
     {
-      A.set (2, 3, 42.);
-      for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(0);
+      A.set(2, 3, 42.);
+      for (TrilinosWrappers::SparseMatrix::iterator p = A.begin(0);
            p != A.end(0);
            ++p)
         {
-          AssertThrow (p->row() == 0, ExcInternalError());
+          AssertThrow(p->row() == 0, ExcInternalError());
           if (p->column() == 0)
-            AssertThrow (p->value() == 0.1, ExcInternalError())
-            else if (p->column() == 2)
-              AssertThrow (p->value() == 0.2, ExcInternalError())
-              else
-                // well, we didn't write here, so the only thing that
-                // should be in there is a zero
-                AssertThrow (p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 0.1,
+                        ExcInternalError()) else if (p->column() == 2)
+              AssertThrow(p->value() == 0.2, ExcInternalError()) else
+              // well, we didn't write here, so the only thing that
+              // should be in there is a zero
+              AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
   else
     {
-      A.set (0, 0, 108.);
-      for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(2);
+      A.set(0, 0, 108.);
+      for (TrilinosWrappers::SparseMatrix::iterator p = A.begin(2);
            p != A.end(2);
            ++p)
         {
-          AssertThrow (p->row() == 2, ExcInternalError());
+          AssertThrow(p->row() == 2, ExcInternalError());
           if (p->column() == 3)
-            AssertThrow (p->value() == 0.3, ExcInternalError())
-            else
+            AssertThrow(p->value() == 0.3, ExcInternalError()) else
               // well, we didn't write here, so the only thing that
               // should be in there is a zero
-              AssertThrow (p->value() == 0.0, ExcInternalError());
+              AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
 
   // then call compress() and ensure that we get the correct values
-  A.compress (VectorOperation::insert);
+  A.compress(VectorOperation::insert);
   if (my_id == 0)
     {
-      for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(0);
+      for (TrilinosWrappers::SparseMatrix::iterator p = A.begin(0);
            p != A.end(0);
            ++p)
         {
-          AssertThrow (p->row() == 0, ExcInternalError());
+          AssertThrow(p->row() == 0, ExcInternalError());
           if (p->column() == 0)
-            AssertThrow (p->value() == 108, ExcInternalError())
-            else if (p->column() == 2)
-              AssertThrow (p->value() == 0.2, ExcInternalError())
-              else
-                // well, we didn't write here, so the only thing that
-                // should be in there is a zero
-                AssertThrow (p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 108,
+                        ExcInternalError()) else if (p->column() == 2)
+              AssertThrow(p->value() == 0.2, ExcInternalError()) else
+              // well, we didn't write here, so the only thing that
+              // should be in there is a zero
+              AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
   else
     {
-      for (TrilinosWrappers::SparseMatrix::iterator p=A.begin(2);
+      for (TrilinosWrappers::SparseMatrix::iterator p = A.begin(2);
            p != A.end(2);
            ++p)
         {
-          AssertThrow (p->row() == 2, ExcInternalError());
+          AssertThrow(p->row() == 2, ExcInternalError());
           if (p->column() == 3)
-            AssertThrow (p->value() == 42, ExcInternalError())
-            else
+            AssertThrow(p->value() == 42, ExcInternalError()) else
               // well, we didn't write here, so the only thing that
               // should be in there is a zero
-              AssertThrow (p->value() == 0.0, ExcInternalError());
+              AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
 
@@ -205,12 +203,14 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int       myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)
@@ -222,5 +222,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

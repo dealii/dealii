@@ -16,10 +16,11 @@
 
 // like _05, but with graph coloring
 
-#include "../tests.h"
-
 #include <deal.II/base/work_stream.h>
+
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 Vector<double> result(100);
@@ -35,73 +36,80 @@ struct CopyData
 };
 
 
-void worker (const std::vector<unsigned int>::iterator &i,
-             ScratchData &,
-             CopyData &ad)
+void
+worker(const std::vector<unsigned int>::iterator &i,
+       ScratchData &,
+       CopyData &ad)
 {
   ad.computed = *i * 2;
 }
 
-void copier (const CopyData &ad)
+void
+copier(const CopyData &ad)
 {
-  // write into the five elements of 'result' starting at ad.computed%result.size()
-  for (unsigned int j=0; j<5; ++j)
-    result((ad.computed+j) % result.size()) += ad.computed;
+  // write into the five elements of 'result' starting at
+  // ad.computed%result.size()
+  for (unsigned int j = 0; j < 5; ++j)
+    result((ad.computed + j) % result.size()) += ad.computed;
 }
 
 
 // the function that computes conflicts
 std::vector<types::global_dof_index>
-conflictor (const std::vector<unsigned int>::iterator &i)
+conflictor(const std::vector<unsigned int>::iterator &i)
 {
   std::vector<types::global_dof_index> conflicts;
-  const unsigned int ad_computed = *i * 2;
-  for (unsigned int j=0; j<5; ++j)
-    conflicts.push_back ((ad_computed+j) % result.size());
+  const unsigned int                   ad_computed = *i * 2;
+  for (unsigned int j = 0; j < 5; ++j)
+    conflicts.push_back((ad_computed + j) % result.size());
 
   return conflicts;
 }
 
 
 
-void test ()
+void
+test()
 {
   std::vector<unsigned int> v;
-  for (unsigned int i=0; i<200; ++i)
-    v.push_back (i);
+  for (unsigned int i = 0; i < 200; ++i)
+    v.push_back(i);
 
-  WorkStream::run (GraphColoring::make_graph_coloring (v.begin(), v.end(),
-                                                       std::function<std::vector<types::global_dof_index>
-                                                       (const std::vector<unsigned int>::iterator &)>
-                                                       (&conflictor)),
-                   &worker, &copier,
-                   ScratchData(),
-                   CopyData());
+  WorkStream::run(
+    GraphColoring::make_graph_coloring(
+      v.begin(),
+      v.end(),
+      std::function<std::vector<types::global_dof_index>(
+        const std::vector<unsigned int>::iterator &)>(&conflictor)),
+    &worker,
+    &copier,
+    ScratchData(),
+    CopyData());
 
   // now simulate what we should have gotten
   Vector<double> comp(result.size());
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
       const unsigned int ad_computed = v[i] * 2;
-      for (unsigned int j=0; j<5; ++j)
-        comp((ad_computed+j) % result.size()) += ad_computed;
+      for (unsigned int j = 0; j < 5; ++j)
+        comp((ad_computed + j) % result.size()) += ad_computed;
     }
 
 
   // and compare
-  for (unsigned int i=0; i<result.size(); ++i)
-    AssertThrow (result(i) == comp(i), ExcInternalError());
+  for (unsigned int i = 0; i < result.size(); ++i)
+    AssertThrow(result(i) == comp(i), ExcInternalError());
 
-  for (unsigned int i=0; i<result.size(); ++i)
+  for (unsigned int i = 0; i < result.size(); ++i)
     deallog << result(i) << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

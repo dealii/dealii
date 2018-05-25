@@ -18,35 +18,39 @@
 // compare collective setting of elements in a trilinos matrix using
 // TrilinosWrappers::SparseMatrix::set() with element-wise setting
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::SparseMatrix &m)
+
+void
+test(TrilinosWrappers::SparseMatrix &m)
 {
   // first set a few entries one-by-one
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.n(); ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        m.set(i, j, i * j * .5 + .5);
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
-  TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), m.n()/3+1);
+  TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), m.n() / 3 + 1);
 
   // now set the same elements row-wise
   {
-    std::vector<types::global_dof_index> col_indices (m.n()/3+1);
-    std::vector<double> col_values (m.n()/3+1);
-    for (unsigned int i=0; i<m.m(); ++i)
+    std::vector<types::global_dof_index> col_indices(m.n() / 3 + 1);
+    std::vector<double>                  col_values(m.n() / 3 + 1);
+    for (unsigned int i = 0; i < m.m(); ++i)
       {
         unsigned int col_index = 0;
         // count the number of elements in this
         // row
-        for (unsigned int j=0; j<m.n(); ++j)
-          if ((i+2*j+1) % 3 == 0)
+        for (unsigned int j = 0; j < m.n(); ++j)
+          if ((i + 2 * j + 1) % 3 == 0)
             ++col_index;
 
         col_indices.resize(col_index);
@@ -54,15 +58,15 @@ void test (TrilinosWrappers::SparseMatrix &m)
         col_index = 0;
 
         // extract column values
-        for (unsigned int j=0; j<m.n(); ++j)
-          if ((i+2*j+1) % 3 == 0)
+        for (unsigned int j = 0; j < m.n(); ++j)
+          if ((i + 2 * j + 1) % 3 == 0)
             {
               col_indices[col_index] = j;
-              col_values[col_index] =  i*j*.5+.5;
+              col_values[col_index]  = i * j * .5 + .5;
               col_index++;
             }
 
-        m2.set (i, col_indices, col_values);
+        m2.set(i, col_indices, col_values);
       }
   }
 
@@ -75,29 +79,32 @@ void test (TrilinosWrappers::SparseMatrix &m)
   // matrix in order to check whether all
   // elements really are zero.
   double norm = m2.frobenius_norm();
-  AssertThrow (norm == 0, ExcInternalError());
+  AssertThrow(norm == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
       {
-        TrilinosWrappers::SparseMatrix m (5U,5U,3U);
-        test (m);
+        TrilinosWrappers::SparseMatrix m(5U, 5U, 3U);
+        test(m);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -110,7 +117,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

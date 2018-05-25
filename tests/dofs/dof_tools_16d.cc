@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/lac/block_sparsity_pattern.h>
+
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <deal.II/lac/block_sparsity_pattern.h>
 
 // check
 //   DoFTools::
@@ -29,77 +30,75 @@
 
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // test doesn't make much sense if
   // no boundary dofs exist
   if (dof_handler.get_fe().dofs_per_face == 0)
     return;
 
-  std::vector<types::global_dof_index> map (dof_handler.n_dofs());
-  std::set<types::boundary_id> set;
-  set.insert (0);
-  DoFTools::map_dof_to_boundary_indices (dof_handler, set, map);
+  std::vector<types::global_dof_index> map(dof_handler.n_dofs());
+  std::set<types::boundary_id>         set;
+  set.insert(0);
+  DoFTools::map_dof_to_boundary_indices(dof_handler, set, map);
 
   typename FunctionMap<dim>::type boundary_ids;
   boundary_ids[0] = nullptr;
-  const types::global_dof_index n_boundary_dofs = dof_handler.n_boundary_dofs(boundary_ids);
-  const unsigned int n_blocks = std::min (
-                                  static_cast<types::global_dof_index>(dof_handler.get_fe().n_components()),
-                                  n_boundary_dofs);
-  BlockDynamicSparsityPattern sp (n_blocks,
-                                  n_blocks);
+  const types::global_dof_index n_boundary_dofs =
+    dof_handler.n_boundary_dofs(boundary_ids);
+  const unsigned int n_blocks = std::min(
+    static_cast<types::global_dof_index>(dof_handler.get_fe().n_components()),
+    n_boundary_dofs);
+  BlockDynamicSparsityPattern sp(n_blocks, n_blocks);
   // split dofs almost arbitrarily to
   // blocks
   std::vector<types::global_dof_index> dofs_per_block(n_blocks);
-  for (unsigned int i=0; i<n_blocks-1; ++i)
-    dofs_per_block[i] = n_boundary_dofs/n_blocks;
-  dofs_per_block.back() = (n_boundary_dofs -
-                           (n_boundary_dofs/n_blocks)*(n_blocks-1));
+  for (unsigned int i = 0; i < n_blocks - 1; ++i)
+    dofs_per_block[i] = n_boundary_dofs / n_blocks;
+  dofs_per_block.back() =
+    (n_boundary_dofs - (n_boundary_dofs / n_blocks) * (n_blocks - 1));
 
-  for (unsigned int i=0; i<n_blocks; ++i)
-    for (unsigned int j=0; j<n_blocks; ++j)
-      sp.block(i,j).reinit(dofs_per_block[i],
-                           dofs_per_block[j]);
-  sp.collect_sizes ();
+  for (unsigned int i = 0; i < n_blocks; ++i)
+    for (unsigned int j = 0; j < n_blocks; ++j)
+      sp.block(i, j).reinit(dofs_per_block[i], dofs_per_block[j]);
+  sp.collect_sizes();
 
-  DoFTools::make_boundary_sparsity_pattern (dof_handler, boundary_ids,
-                                            map, sp);
-  sp.compress ();
+  DoFTools::make_boundary_sparsity_pattern(dof_handler, boundary_ids, map, sp);
+  sp.compress();
 
   // write out 20 lines of this
   // pattern (if we write out the
   // whole pattern, the output file
   // would be in the range of 40 MB)
-  for (unsigned int l=0; l<20; ++l)
+  for (unsigned int l = 0; l < 20; ++l)
     {
-      const unsigned int line = l*(sp.n_rows()/20);
-      std::pair<unsigned int,unsigned int>
-      block_row = sp.get_row_indices().global_to_local(line);
-      for (unsigned int col=0; col<n_blocks; ++col)
+      const unsigned int                    line = l * (sp.n_rows() / 20);
+      std::pair<unsigned int, unsigned int> block_row =
+        sp.get_row_indices().global_to_local(line);
+      for (unsigned int col = 0; col < n_blocks; ++col)
         {
-          for (unsigned int c=0;
-               c<sp.block(block_row.first,col).row_length(block_row.second);
+          for (unsigned int c = 0;
+               c < sp.block(block_row.first, col).row_length(block_row.second);
                ++c)
-            deallog << sp.block(block_row.first,col).column_number(block_row.second,c)
+            deallog << sp.block(block_row.first, col)
+                         .column_number(block_row.second, c)
                     << " ";
           deallog << std::endl;
         }
     }
 
   // write out some other indicators
-  for (unsigned int r=0; r<n_blocks; ++r)
-    for (unsigned int c=0; c<n_blocks; ++c)
+  for (unsigned int r = 0; r < n_blocks; ++r)
+    for (unsigned int c = 0; c < n_blocks; ++c)
       {
-        const DynamicSparsityPattern &x = sp.block(r,c);
-        deallog << x.bandwidth () << std::endl
-                << x.max_entries_per_row () << std::endl
-                << x.n_nonzero_elements () << std::endl;
+        const DynamicSparsityPattern &x = sp.block(r, c);
+        deallog << x.bandwidth() << std::endl
+                << x.max_entries_per_row() << std::endl
+                << x.n_nonzero_elements() << std::endl;
 
         unsigned int hash = 0;
-        for (unsigned int l=0; l<x.n_rows(); ++l)
-          hash += l*x.row_length(l);
+        for (unsigned int l = 0; l < x.n_rows(); ++l)
+          hash += l * x.row_length(l);
         deallog << hash << std::endl;
       }
 }
-

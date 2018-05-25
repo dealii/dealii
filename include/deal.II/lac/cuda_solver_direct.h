@@ -19,10 +19,11 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_CUDA
-#include <deal.II/base/cuda.h>
-#include <deal.II/lac/cuda_sparse_matrix.h>
-#include <deal.II/lac/cuda_vector.h>
-#include <deal.II/lac/solver_control.h>
+#  include <deal.II/base/cuda.h>
+
+#  include <deal.II/lac/cuda_sparse_matrix.h>
+#  include <deal.II/lac/cuda_vector.h>
+#  include <deal.II/lac/solver_control.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -47,16 +48,15 @@ namespace CUDAWrappers
       /**
        * Set the additional data field to the desired solver.
        */
-      explicit
-      AdditionalData (const std::string &solver_type = "LU_dense");
+      explicit AdditionalData(const std::string &solver_type = "LU_dense");
 
       /**
        * Set the solver type. Possibilities are:
        * <ul>
-       * <li> "Cholesky" which performs a Cholesky decomposition on the device </li>
-       * <li> "LU_dense" which converts the sparse matrix to a dense matrix and
-       * uses LU factorization </li>
-       * <li> "LU_host" which uses LU factorization on the host </li>
+       * <li> "Cholesky" which performs a Cholesky decomposition on the device
+       * </li> <li> "LU_dense" which converts the sparse matrix to a dense
+       * matrix and uses LU factorization </li> <li> "LU_host" which uses LU
+       * factorization on the host </li>
        * </ul>
        */
       std::string solver_type;
@@ -66,8 +66,8 @@ namespace CUDAWrappers
      * Constructor. Takes the solver control object and creates the solver.
      */
     SolverDirect(const Utilities::CUDA::Handle &handle,
-                 SolverControl &cn,
-                 const AdditionalData &data = AdditionalData());
+                 SolverControl &                cn,
+                 const AdditionalData &         data = AdditionalData());
 
     /**
      * Destructor.
@@ -77,14 +77,16 @@ namespace CUDAWrappers
     /**
      * Solve the linear system <tt>Ax=b</tt>.
      */
-    void solve(const SparseMatrix<Number> &A,
-               LinearAlgebra::CUDAWrappers::Vector<Number> &x,
-               const LinearAlgebra::CUDAWrappers::Vector<Number> &b);
+    void
+    solve(const SparseMatrix<Number> &                       A,
+          LinearAlgebra::CUDAWrappers::Vector<Number> &      x,
+          const LinearAlgebra::CUDAWrappers::Vector<Number> &b);
 
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+    SolverControl &
+    control() const;
 
   private:
     /**
@@ -105,7 +107,7 @@ namespace CUDAWrappers
      */
     const AdditionalData additional_data;
   };
-}
+} // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 

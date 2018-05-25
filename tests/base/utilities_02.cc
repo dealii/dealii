@@ -16,30 +16,31 @@
 
 // test Utilities::fixed_power
 
-#include "../tests.h"
-
 #include <deal.II/base/utilities.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  deallog << Utilities::fixed_power<dim> (2) << std::endl;
-  deallog << Utilities::fixed_power<dim> (-2) << std::endl;
-  deallog << Utilities::fixed_power<dim> (2.5) << std::endl;
-  deallog << Utilities::fixed_power<dim> (-2.5) << std::endl;
+  deallog << Utilities::fixed_power<dim>(2) << std::endl;
+  deallog << Utilities::fixed_power<dim>(-2) << std::endl;
+  deallog << Utilities::fixed_power<dim>(2.5) << std::endl;
+  deallog << Utilities::fixed_power<dim>(-2.5) << std::endl;
   deallog << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
-  test<4> ();
+  test<1>();
+  test<2>();
+  test<3>();
+  test<4>();
 }

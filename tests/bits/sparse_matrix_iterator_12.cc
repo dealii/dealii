@@ -17,55 +17,58 @@
 
 // like sparse_matrix_iterator_11, but for const_iterators
 
-#include "../tests.h"
-#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+
+#include "../tests.h"
 
 
-void test ()
+void
+test()
 {
   // create a sparsity pattern with totally
   // empty lines (not even diagonals, since
   // not quadratic)
-  SparsityPattern sparsity(4,5,1);
-  sparsity.add (1,1);
-  sparsity.add (3,1);
-  sparsity.compress ();
+  SparsityPattern sparsity(4, 5, 1);
+  sparsity.add(1, 1);
+  sparsity.add(3, 1);
+  sparsity.compress();
 
   // attach a sparse matrix to it
   SparseMatrix<double> A(sparsity);
 
-  SparseMatrix<double>::const_iterator k = A.begin(),
-                                       j = ++A.begin();
+  SparseMatrix<double>::const_iterator k = A.begin(), j = ++A.begin();
 
-  AssertThrow (k < j, ExcInternalError());
-  AssertThrow (j > k, ExcInternalError());
+  AssertThrow(k < j, ExcInternalError());
+  AssertThrow(j > k, ExcInternalError());
 
-  AssertThrow (!(j < k), ExcInternalError());
-  AssertThrow (!(k > j), ExcInternalError());
+  AssertThrow(!(j < k), ExcInternalError());
+  AssertThrow(!(k > j), ExcInternalError());
 
-  AssertThrow (k != j, ExcInternalError());
-  AssertThrow (!(k == j), ExcInternalError());
+  AssertThrow(k != j, ExcInternalError());
+  AssertThrow(!(k == j), ExcInternalError());
 
-  AssertThrow (k == k, ExcInternalError());
-  AssertThrow (!(k != k), ExcInternalError());
+  AssertThrow(k == k, ExcInternalError());
+  AssertThrow(!(k != k), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -78,7 +81,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

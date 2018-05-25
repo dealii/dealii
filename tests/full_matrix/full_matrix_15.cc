@@ -23,13 +23,11 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_matrix(m);
   deallog << m.l1_norm() << std::endl;
 }
-

@@ -24,10 +24,10 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
@@ -52,65 +52,67 @@
 using namespace dealii;
 // Like FESeries::linear_regression. Included here so that this test can also
 // be run with older versions of deal.II.
-double regression_slope(const std::vector<double> &x,
-                        const std::vector<double> &y)
+double
+regression_slope(const std::vector<double> &x, const std::vector<double> &y)
 {
-  FullMatrix<double> K(2,2), invK(2,2);
+  FullMatrix<double> K(2, 2), invK(2, 2);
   Vector<double>     X(2), B(2);
 
-  Assert (x.size() == y.size(),
-          ExcMessage("x and y are expected to have the same size"));
+  Assert(x.size() == y.size(),
+         ExcMessage("x and y are expected to have the same size"));
 
-  Assert (x.size() >= 2,
-          dealii::ExcMessage("at least two points are required for linear regression fit"));
+  Assert(x.size() >= 2,
+         dealii::ExcMessage(
+           "at least two points are required for linear regression fit"));
 
-  double sum_1 = 0.0,
-         sum_x = 0.0,
-         sum_x2= 0.0,
-         sum_y = 0.0,
-         sum_xy= 0.0;
+  double sum_1 = 0.0, sum_x = 0.0, sum_x2 = 0.0, sum_y = 0.0, sum_xy = 0.0;
 
   for (unsigned int i = 0; i < x.size(); i++)
     {
-      sum_1  += 1.0;
-      sum_x  += x[i];
-      sum_x2 += x[i]*x[i];
-      sum_y  += y[i];
-      sum_xy += x[i]*y[i];
+      sum_1 += 1.0;
+      sum_x += x[i];
+      sum_x2 += x[i] * x[i];
+      sum_y += y[i];
+      sum_xy += x[i] * y[i];
     }
 
-  K(0,0) = sum_1;
-  K(0,1) = sum_x;
-  K(1,0) = sum_x;
-  K(1,1) = sum_x2;
+  K(0, 0) = sum_1;
+  K(0, 1) = sum_x;
+  K(1, 0) = sum_x;
+  K(1, 1) = sum_x2;
 
-  B(0)   = sum_y;
-  B(1)   = sum_xy;
+  B(0) = sum_y;
+  B(1) = sum_xy;
 
   invK.invert(K);
-  invK.vmult(X,B,false);
+  invK.vmult(X, B, false);
 
   return X(1);
 }
 
 
-double zvalue (const double x, const double y)
+double
+zvalue(const double x, const double y)
 {
   double xh = x * 5., yh = y * 5.;
-  return (xh * exp(-xh*xh - yh*yh)) / 10.;
+  return (xh * exp(-xh * xh - yh * yh)) / 10.;
 }
 
 template <int dim>
-class Geometry: public ChartManifold<dim>
+class Geometry : public ChartManifold<dim>
 {
 public:
-  virtual Point<dim> pull_back(const Point<dim> &space_point) const override;
-  virtual Point<dim> push_forward(const Point<dim> &chart_point) const override;
-  virtual std::unique_ptr<Manifold<dim> >clone() const override;
+  virtual Point<dim>
+  pull_back(const Point<dim> &space_point) const override;
+  virtual Point<dim>
+  push_forward(const Point<dim> &chart_point) const override;
+  virtual std::unique_ptr<Manifold<dim>>
+  clone() const override;
 };
 
 template <int dim>
-Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
+Point<dim>
+Geometry<dim>::pull_back(const Point<dim> &space_point) const
 {
   const double d = space_point[dim - 1];
   const double z = zvalue(space_point[0], dim == 3 ? space_point[1] : 0);
@@ -130,10 +132,11 @@ Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
 }
 
 template <int dim>
-Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
+Point<dim>
+Geometry<dim>::push_forward(const Point<dim> &chart_point) const
 {
   const double d_hat = chart_point[dim - 1];
-  const double z = zvalue(chart_point[0], dim == 3 ? chart_point[1] : 0);
+  const double z     = zvalue(chart_point[0], dim == 3 ? chart_point[1] : 0);
 
   double d = 0.;
   if (d_hat <= 0)
@@ -150,10 +153,10 @@ Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
 }
 
 template <int dim>
-std::unique_ptr<Manifold<dim> >
+std::unique_ptr<Manifold<dim>>
 Geometry<dim>::clone() const
 {
-  return std_cxx14::make_unique<Geometry<dim> >();
+  return std_cxx14::make_unique<Geometry<dim>>();
 }
 
 
@@ -161,38 +164,42 @@ template <int dim>
 class TranscendentalManufacturedSolution : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p, const unsigned int /*component*/) const
+  virtual double
+  value(const Point<dim> &p, const unsigned int /*component*/) const
   {
-    return std::cos(p[0]) + 2.0*std::sin(2*p[1]);
+    return std::cos(p[0]) + 2.0 * std::sin(2 * p[1]);
   }
 };
 
 
 
-
 template <int dim>
-void create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
+void
+create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
 {
-  GridGenerator::hyper_cube (triangulation, -1.0, 1.0);
-  GridTools::transform (std::bind(&Geometry<dim>::push_forward,
-                                  std::cref(geometry),
-                                  std::placeholders::_1),
-                        triangulation);
+  GridGenerator::hyper_cube(triangulation, -1.0, 1.0);
+  GridTools::transform(std::bind(&Geometry<dim>::push_forward,
+                                 std::cref(geometry),
+                                 std::placeholders::_1),
+                       triangulation);
 
   triangulation.set_manifold(0, geometry);
-  for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
-       cell!=triangulation.end(); ++cell)
+  for (Triangulation<3>::active_cell_iterator cell =
+         triangulation.begin_active();
+       cell != triangulation.end();
+       ++cell)
     cell->set_all_manifold_ids(0);
 }
 
 
 
 template <int dim>
-void test(const FiniteElement<dim> &fe)
+void
+test(const FiniteElement<dim> &fe)
 {
-  Geometry<dim> geometry;
+  Geometry<dim>                           geometry;
   TranscendentalManufacturedSolution<dim> fe_function;
-  ConstraintMatrix constraints;
+  ConstraintMatrix                        constraints;
   constraints.close();
 
   deallog << "FE degree: " << fe.degree << std::endl;
@@ -214,48 +221,57 @@ void test(const FiniteElement<dim> &fe)
           dof_handler.initialize(triangulation, fe);
 
           Vector<double> v(dof_handler.n_dofs());
-          VectorTools::project(mapping, dof_handler, constraints,
-                               QGauss<dim>(fe.degree + (mapping_p + 2)/2), fe_function, v);
+          VectorTools::project(mapping,
+                               dof_handler,
+                               constraints,
+                               QGauss<dim>(fe.degree + (mapping_p + 2) / 2),
+                               fe_function,
+                               v);
 
           Vector<double> diff(triangulation.n_active_cells());
-          VectorTools::integrate_difference(mapping, dof_handler, v, fe_function, diff,
-                                            // superconvergence with QGauss(k + 1)
-                                            // QGauss<dim>(fe.degree + 2),
-                                            // normal convergence with QIterated
-                                            QIterated<dim>(QGauss<1>(fe.degree + 1), 2),
-                                            VectorTools::L2_norm);
-          log_refinements.push_back(std::log10(std::pow(2.0, -double(refinement_n))));
+          VectorTools::integrate_difference(
+            mapping,
+            dof_handler,
+            v,
+            fe_function,
+            diff,
+            // superconvergence with QGauss(k + 1)
+            // QGauss<dim>(fe.degree + 2),
+            // normal convergence with QIterated
+            QIterated<dim>(QGauss<1>(fe.degree + 1), 2),
+            VectorTools::L2_norm);
+          log_refinements.push_back(
+            std::log10(std::pow(2.0, -double(refinement_n))));
           log_l2_errors.push_back(std::log10(diff.l2_norm()));
           if (log_refinements.size() > 1)
             {
               deallog << "current slope: "
-                      << (*(log_l2_errors.end() - 1) - *(log_l2_errors.end() - 2))
-                      /(*(log_refinements.end() - 1) - *(log_refinements.end() - 2))
+                      << (*(log_l2_errors.end() - 1) -
+                          *(log_l2_errors.end() - 2)) /
+                           (*(log_refinements.end() - 1) -
+                            *(log_refinements.end() - 2))
                       << std::endl;
             }
         }
-      deallog << "Last number of DoFs: "
-              << dof_handler.n_dofs()
-              << std::endl;
-      deallog << "Last L2 error: "
-              << std::pow(10.0, log_l2_errors.back())
+      deallog << "Last number of DoFs: " << dof_handler.n_dofs() << std::endl;
+      deallog << "Last L2 error: " << std::pow(10.0, log_l2_errors.back())
               << std::endl;
       deallog << "regression slope: "
-              << regression_slope(log_refinements, log_l2_errors)
-              << std::endl;
+              << regression_slope(log_refinements, log_l2_errors) << std::endl;
     }
 }
 
-int main ()
+int
+main()
 {
   initlog();
-  deallog << std::setprecision (5);
-  deallog.depth_console (0);
+  deallog << std::setprecision(5);
+  deallog.depth_console(0);
 
   const static unsigned dim = 3;
 
   for (unsigned p = 1; p < 4; ++p)
     {
-      test<dim>(FE_Q<dim>(QGaussLobatto<1>(p+1)));
+      test<dim>(FE_Q<dim>(QGaussLobatto<1>(p + 1)));
     }
 }

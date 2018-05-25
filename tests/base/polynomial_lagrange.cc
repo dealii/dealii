@@ -16,27 +16,28 @@
 
 // Test Lagrange interpolation
 
-#include "../tests.h"
-
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include "../tests.h"
+
 using namespace Polynomials;
 
-void check_interpolation (const std::vector<Polynomial<double> > &p,
-                          const std::vector<Point<1> > &x)
+void
+check_interpolation(const std::vector<Polynomial<double>> &p,
+                    const std::vector<Point<1>> &          x)
 {
-  for (unsigned int i=0; i<p.size(); ++i)
+  for (unsigned int i = 0; i < p.size(); ++i)
     {
       deallog << i;
-      for (unsigned int k=0; k<x.size(); ++k)
+      for (unsigned int k = 0; k < x.size(); ++k)
         {
           deallog << '.';
           const double y = p[i].value(x[k](0));
           if (i == k)
             {
-              if (std::fabs(y-1.) > 2.e-10)
-                deallog << "Error1  lg y=" << std::log10(std::fabs(y-1.))
+              if (std::fabs(y - 1.) > 2.e-10)
+                deallog << "Error1  lg y=" << std::log10(std::fabs(y - 1.))
                         << std::endl;
             }
           else
@@ -52,35 +53,38 @@ void check_interpolation (const std::vector<Polynomial<double> > &p,
 
 
 void
-check_poly (const Quadrature<1> &q)
+check_poly(const Quadrature<1> &q)
 {
   deallog << "Points: " << q.size() << std::endl;
-  std::vector<Polynomial<double> > p = generate_complete_Lagrange_basis(q.get_points());
+  std::vector<Polynomial<double>> p =
+    generate_complete_Lagrange_basis(q.get_points());
   check_interpolation(p, q.get_points());
 }
 
 
 void
-check_lge (unsigned int n)
+check_lge(unsigned int n)
 {
-  deallog << "Points: " << n+1 << std::endl;
-  std::vector<Polynomial<double> > p = LagrangeEquidistant::generate_complete_basis(n);
-  std::vector<Point<1> > x(n+1);
-  const double h = 1./n;
-  for (unsigned int i=0; i<=n; ++i)
-    x[i](0) = h*i;
+  deallog << "Points: " << n + 1 << std::endl;
+  std::vector<Polynomial<double>> p =
+    LagrangeEquidistant::generate_complete_basis(n);
+  std::vector<Point<1>> x(n + 1);
+  const double          h = 1. / n;
+  for (unsigned int i = 0; i <= n; ++i)
+    x[i](0) = h * i;
   check_interpolation(p, x);
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  QTrapez<1> trapez;
-  QSimpson<1> simpson;
+  QTrapez<1>   trapez;
+  QSimpson<1>  simpson;
   QIterated<1> equi7(trapez, 6);
   QIterated<1> equi10(trapez, 9);
 

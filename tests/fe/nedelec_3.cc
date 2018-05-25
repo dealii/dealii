@@ -14,30 +14,34 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
+
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <vector>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 #define PRECISION 2
 
 
 
-
 template <int dim>
 inline void
-check (const unsigned int p)
+check(const unsigned int p)
 {
   deallog << dim << "-D" << std::endl;
 
@@ -45,7 +49,7 @@ check (const unsigned int p)
   GridGenerator::hyper_cube(tr, 0., 1.);
 
   // work on a once-refined grid
-  tr.refine_global (1);
+  tr.refine_global(1);
 
   FE_Nedelec<dim> fe_ned(p);
   DoFHandler<dim> dof(tr);
@@ -55,48 +59,46 @@ check (const unsigned int p)
   // coarse grid (with shape function
   // values equal to the index of the
   // line)
-  Vector<double> coarse_grid_values (fe_ned.dofs_per_cell);
-  for (unsigned int i=0; i<coarse_grid_values.size(); ++i)
+  Vector<double> coarse_grid_values(fe_ned.dofs_per_cell);
+  for (unsigned int i = 0; i < coarse_grid_values.size(); ++i)
     coarse_grid_values(i) = i;
 
   // then transfer this function
   // from the coarse grid to the
   // child cells.
-  Vector<double> values (dof.n_dofs());
-  for (typename DoFHandler<dim>::active_cell_iterator
-       c = dof.begin_active();
-       c!=dof.end(); ++c)
+  Vector<double> values(dof.n_dofs());
+  for (typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active();
+       c != dof.end();
+       ++c)
     {
-      Vector<double> tmp (fe_ned.dofs_per_cell);
-      fe_ned.get_prolongation_matrix (c->index()).vmult (tmp, coarse_grid_values);
-      c->set_dof_values (tmp, values);
+      Vector<double> tmp(fe_ned.dofs_per_cell);
+      fe_ned.get_prolongation_matrix(c->index()).vmult(tmp, coarse_grid_values);
+      c->set_dof_values(tmp, values);
     };
 
 
   // then output these values at the
   // quadrature points of all cells
   // of the finer grid
-  QTrapez<dim> quadrature;
-  std::vector<Vector<double> > shape_values (quadrature.size(),
-                                             Vector<double>(dim));
-  FEValues<dim> fe(fe_ned, quadrature,
-                   update_values|update_quadrature_points);
+  QTrapez<dim>                quadrature;
+  std::vector<Vector<double>> shape_values(quadrature.size(),
+                                           Vector<double>(dim));
+  FEValues<dim>               fe(
+    fe_ned, quadrature, update_values | update_quadrature_points);
 
-  for (typename DoFHandler<dim>::active_cell_iterator
-       c = dof.begin_active();
-       c!=dof.end(); ++c)
+  for (typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active();
+       c != dof.end();
+       ++c)
     {
       deallog << "  CELL " << c << std::endl;
       fe.reinit(c);
-      fe.get_function_values (values, shape_values);
+      fe.get_function_values(values, shape_values);
 
-      for (unsigned int q=0; q<quadrature.size(); ++q)
+      for (unsigned int q = 0; q < quadrature.size(); ++q)
         {
-          deallog << ", xq=" << fe.quadrature_point(q)
-                  << ", f=[";
-          for (unsigned int d=0; d<dim; ++d)
-            deallog << (d==0 ? "" : " ")
-                    << shape_values[q](d);
+          deallog << ", xq=" << fe.quadrature_point(q) << ", f=[";
+          for (unsigned int d = 0; d < dim; ++d)
+            deallog << (d == 0 ? "" : " ") << shape_values[q](d);
 
           deallog << "]" << std::endl;
         };
@@ -109,18 +111,15 @@ check (const unsigned int p)
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
   deallog << "Degree 0: " << std::endl;
-  check<2> (0);
-  check<3> (0);
+  check<2>(0);
+  check<3>(0);
   deallog << "Degree 1: " << std::endl;
-  check<2> (1);
-  check<3> (1);
+  check<2>(1);
+  check<3>(1);
   return 0;
 }
-
-
-

@@ -17,13 +17,15 @@
 // calculated by the system clock. This verifies that we fixed a bug where the
 // wall time was doubled.
 
-#include "../tests.h"
 #include <deal.II/base/timer.h>
 
 #include <chrono>
 #include <thread>
 
-int main (int argc, char **argv)
+#include "../tests.h"
+
+int
+main(int argc, char **argv)
 {
   initlog();
 
@@ -35,9 +37,12 @@ int main (int argc, char **argv)
   const auto t1 = std::chrono::system_clock::now();
 
   // verify that the timer wall time is not double the manually calculated one
-  AssertThrow(std::abs(double(std::chrono::duration_cast<std::chrono::seconds>(t1 - t0).count()) -
-                       timer.wall_time()) < 0.5,
-              ExcMessage("The measured times should be close."));
+  AssertThrow(
+    std::abs(
+      double(
+        std::chrono::duration_cast<std::chrono::seconds>(t1 - t0).count()) -
+      timer.wall_time()) < 0.5,
+    ExcMessage("The measured times should be close."));
 
   deallog << "OK" << std::endl;
 }

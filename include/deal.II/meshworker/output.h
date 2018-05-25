@@ -17,11 +17,13 @@
 #ifndef dealii_mesh_worker_output_h
 #define dealii_mesh_worker_output_h
 
-#include <deal.II/meshworker/dof_info.h>
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/base/mg_level_object.h>
+
+#include <deal.II/meshworker/dof_info.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -30,7 +32,6 @@ namespace MeshWorker
 {
   namespace Assembler
   {
-
     /**
      * A class that, instead of assembling into a matrix or vector, outputs
      * the results on a cell to a gnuplot patch.
@@ -71,14 +72,15 @@ namespace MeshWorker
        * of the points. Nevertheless, it is up to the user to set these values
        * to whatever is desired.
        */
-      void initialize (const unsigned int n_points,
-                       const unsigned int n_vectors);
+      void
+      initialize(const unsigned int n_points, const unsigned int n_vectors);
 
       /**
        * Set the stream #os to which data is written. If no stream is selected
        * with this function, data goes to @p deallog.
        */
-      void initialize_stream (std::ostream &stream);
+      void
+      initialize_stream(std::ostream &stream);
 
       /**
        * Initialize the local data in the DoFInfo object used later for
@@ -88,20 +90,22 @@ namespace MeshWorker
        * interior or boundary face.
        */
       template <int dim>
-      void initialize_info(DoFInfo<dim> &info, bool face);
+      void
+      initialize_info(DoFInfo<dim> &info, bool face);
 
       /**
        * Write the patch to the output stream.
        */
       template <int dim>
-      void assemble(const DoFInfo<dim> &info);
+      void
+      assemble(const DoFInfo<dim> &info);
 
       /**
        * @warning Not implemented yet
        */
       template <int dim>
-      void assemble(const DoFInfo<dim> &info1,
-                    const DoFInfo<dim> &info2);
+      void
+      assemble(const DoFInfo<dim> &info1, const DoFInfo<dim> &info2);
 
     private:
       /**
@@ -109,14 +113,16 @@ namespace MeshWorker
        * has been called, or to @p deallog if no pointer has been set.
        */
       template <typename T>
-      void write(const T &t) const;
+      void
+      write(const T &t) const;
 
       /**
        * Write an end-of-line marker either to the stream #os, if
        * initialize_stream has been called, or to @p deallog if no pointer has
        * been set.
        */
-      void write_endl () const;
+      void
+      write_endl() const;
 
       /**
        * The number of output components in each point.
@@ -133,7 +139,7 @@ namespace MeshWorker
       std::ostream *os;
     };
 
-//----------------------------------------------------------------------//
+    //----------------------------------------------------------------------//
 
     template <typename T>
     inline void
@@ -156,9 +162,7 @@ namespace MeshWorker
     }
 
 
-    inline
-    GnuplotPatch::GnuplotPatch()
-      :
+    inline GnuplotPatch::GnuplotPatch() :
       n_vectors(numbers::invalid_unsigned_int),
       n_points(numbers::invalid_unsigned_int),
       os(nullptr)
@@ -166,16 +170,15 @@ namespace MeshWorker
 
 
     inline void
-    GnuplotPatch::initialize (const unsigned int np,
-                              const unsigned int nv)
+    GnuplotPatch::initialize(const unsigned int np, const unsigned int nv)
     {
       n_vectors = nv;
-      n_points = np;
+      n_points  = np;
     }
 
 
     inline void
-    GnuplotPatch::initialize_stream (std::ostream &stream)
+    GnuplotPatch::initialize_stream(std::ostream &stream)
     {
       os = &stream;
     }
@@ -186,9 +189,11 @@ namespace MeshWorker
     GnuplotPatch::initialize_info(DoFInfo<dim> &info, bool face)
     {
       if (face)
-        info.initialize_quadrature(Utilities::fixed_power<dim-1>(n_points), n_vectors+dim);
+        info.initialize_quadrature(Utilities::fixed_power<dim - 1>(n_points),
+                                   n_vectors + dim);
       else
-        info.initialize_quadrature(Utilities::fixed_power<dim>(n_points), n_vectors+dim);
+        info.initialize_quadrature(Utilities::fixed_power<dim>(n_points),
+                                   n_vectors + dim);
     }
 
 
@@ -198,28 +203,29 @@ namespace MeshWorker
     {
       const unsigned int np = info.n_quadrature_points();
       const unsigned int nv = info.n_quadrature_values();
-      const unsigned int patch_dim = (info.face_number == numbers::invalid_unsigned_int)
-                                     ? dim : (dim-1);
+      const unsigned int patch_dim =
+        (info.face_number == numbers::invalid_unsigned_int) ? dim : (dim - 1);
       const unsigned int row_length = n_points;
       // If patches are 1D, end the
       // patch after a row, else end
       // it after a square
-      const unsigned int row_length2 = (patch_dim==1) ? row_length : (row_length*row_length);
+      const unsigned int row_length2 =
+        (patch_dim == 1) ? row_length : (row_length * row_length);
 
-//      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
-      AssertDimension(nv, n_vectors+dim);
+      //      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
+      AssertDimension(nv, n_vectors + dim);
 
 
-      for (unsigned int k=0; k<np; ++k)
+      for (unsigned int k = 0; k < np; ++k)
         {
           if (k % row_length == 0)
             write_endl();
           if (k % row_length2 == 0)
             write_endl();
 
-          for (unsigned int i=0; i<nv; ++i)
+          for (unsigned int i = 0; i < nv; ++i)
             {
-              write(info.quadrature_value(k,i));
+              write(info.quadrature_value(k, i));
               write('\t');
             }
           write_endl();
@@ -234,8 +240,8 @@ namespace MeshWorker
       assemble(info1);
       assemble(info2);
     }
-  }
-}
+  } // namespace Assembler
+} // namespace MeshWorker
 
 DEAL_II_NAMESPACE_CLOSE
 

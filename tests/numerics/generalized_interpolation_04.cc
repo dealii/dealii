@@ -24,7 +24,8 @@
 #include "../tests.h"
 #include "generalized_interpolation.h"
 
-int main ()
+int
+main()
 {
   initlog();
 

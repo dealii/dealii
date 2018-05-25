@@ -17,51 +17,56 @@
 // test TriaAccessor<0,dim,spacedim>
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 
-void test ()
+void
+test()
 {
   Triangulation<2> tria;
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global (2);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(2);
 
-  for (Triangulation<2>::vertex_iterator
-       vertex_it = tria.begin_vertex(); vertex_it != tria.end_vertex();
+  for (Triangulation<2>::vertex_iterator vertex_it = tria.begin_vertex();
+       vertex_it != tria.end_vertex();
        ++vertex_it)
-    deallog << vertex_it->center() <<std::endl;
+    deallog << vertex_it->center() << std::endl;
   deallog << std::endl;
 
-  for (Triangulation<2>::active_cell_iterator
-       cell = tria.begin_active(); cell != tria.end(); ++cell)
+  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active();
+       cell != tria.end();
+       ++cell)
     {
-      for (unsigned int i=0; i<4; ++i)
-        deallog << cell->vertex_iterator(i)->center() <<std::endl;
+      for (unsigned int i = 0; i < 4; ++i)
+        deallog << cell->vertex_iterator(i)->center() << std::endl;
       deallog << std::endl;
     }
 
-  for (Triangulation<2>::active_cell_iterator
-       cell = tria.begin_active(); cell != tria.end(); ++cell)
-    for (unsigned int i=0; i<4; ++i)
+  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active();
+       cell != tria.end();
+       ++cell)
+    for (unsigned int i = 0; i < 4; ++i)
       {
-        for (unsigned int j=0; j<2; ++j)
-          deallog << cell->line(i)->vertex_iterator(j)->center() <<std::endl;
+        for (unsigned int j = 0; j < 2; ++j)
+          deallog << cell->line(i)->vertex_iterator(j)->center() << std::endl;
         deallog << std::endl;
       }
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 
   return 0;
 }

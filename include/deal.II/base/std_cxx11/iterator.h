@@ -18,13 +18,13 @@
 
 #include <deal.II/base/config.h>
 
-#  include <iterator>
+#include <iterator>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
   using std::begin;
   using std::end;
-}
+} // namespace std_cxx11
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

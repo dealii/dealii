@@ -17,8 +17,8 @@
 #define dealii_qprojector_h
 
 
-#include <deal.II/base/quadrature.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/quadrature.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -80,16 +80,17 @@ public:
    * Define a typedef for a quadrature that acts on an object of one dimension
    * less. For cells, this would then be a face quadrature.
    */
-  typedef Quadrature<dim-1> SubQuadrature;
+  typedef Quadrature<dim - 1> SubQuadrature;
 
   /**
    * Compute the quadrature points on the cell if the given quadrature formula
    * is used on face <tt>face_no</tt>. For further details, see the general
    * doc for this class.
    */
-  static void project_to_face (const SubQuadrature &quadrature,
-                               const unsigned int      face_no,
-                               std::vector<Point<dim> > &q_points);
+  static void
+  project_to_face(const SubQuadrature &    quadrature,
+                  const unsigned int       face_no,
+                  std::vector<Point<dim>> &q_points);
 
   /**
    * Compute the cell quadrature formula corresponding to using
@@ -97,8 +98,7 @@ public:
    * the general doc for this class.
    */
   static Quadrature<dim>
-  project_to_face (const SubQuadrature &quadrature,
-                   const unsigned int      face_no);
+  project_to_face(const SubQuadrature &quadrature, const unsigned int face_no);
 
   /**
    * Compute the quadrature points on the cell if the given quadrature formula
@@ -109,11 +109,13 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    */
-  static void project_to_subface (const SubQuadrature       &quadrature,
-                                  const unsigned int         face_no,
-                                  const unsigned int         subface_no,
-                                  std::vector<Point<dim> >  &q_points,
-                                  const RefinementCase<dim-1> &ref_case=RefinementCase<dim-1>::isotropic_refinement);
+  static void
+  project_to_subface(const SubQuadrature &          quadrature,
+                     const unsigned int             face_no,
+                     const unsigned int             subface_no,
+                     std::vector<Point<dim>> &      q_points,
+                     const RefinementCase<dim - 1> &ref_case =
+                       RefinementCase<dim - 1>::isotropic_refinement);
 
   /**
    * Compute the cell quadrature formula corresponding to using
@@ -125,10 +127,11 @@ public:
    * same as those of the original rule.
    */
   static Quadrature<dim>
-  project_to_subface (const SubQuadrature       &quadrature,
-                      const unsigned int         face_no,
-                      const unsigned int         subface_no,
-                      const RefinementCase<dim-1> &ref_case=RefinementCase<dim-1>::isotropic_refinement);
+  project_to_subface(const SubQuadrature &          quadrature,
+                     const unsigned int             face_no,
+                     const unsigned int             subface_no,
+                     const RefinementCase<dim - 1> &ref_case =
+                       RefinementCase<dim - 1>::isotropic_refinement);
 
   /**
    * Take a face quadrature formula and generate a cell quadrature formula
@@ -147,7 +150,7 @@ public:
    * each face, in order to cope possibly different orientations of the mesh.
    */
   static Quadrature<dim>
-  project_to_all_faces (const SubQuadrature &quadrature);
+  project_to_all_faces(const SubQuadrature &quadrature);
 
   /**
    * Take a face quadrature formula and generate a cell quadrature formula
@@ -163,7 +166,7 @@ public:
    * in FESubfaceValues.
    */
   static Quadrature<dim>
-  project_to_all_subfaces (const SubQuadrature &quadrature);
+  project_to_all_subfaces(const SubQuadrature &quadrature);
 
   /**
    * Project a given quadrature formula to a child of a cell. You may want to
@@ -175,10 +178,9 @@ public:
    * fraction of the cell, the weights of the resulting object are divided by
    * GeometryInfo<dim>::children_per_cell.
    */
-  static
-  Quadrature<dim>
-  project_to_child (const Quadrature<dim>  &quadrature,
-                    const unsigned int      child_no);
+  static Quadrature<dim>
+  project_to_child(const Quadrature<dim> &quadrature,
+                   const unsigned int     child_no);
 
   /**
    * Project a quadrature rule to all children of a cell. Similarly to
@@ -189,19 +191,17 @@ public:
    * The child numbering is the same as the children would be numbered upon
    * refinement of the cell.
    */
-  static
-  Quadrature<dim>
-  project_to_all_children (const Quadrature<dim>  &quadrature);
+  static Quadrature<dim>
+  project_to_all_children(const Quadrature<dim> &quadrature);
 
   /**
    * Project the one dimensional rule <tt>quadrature</tt> to the straight line
    * connecting the points <tt>p1</tt> and <tt>p2</tt>.
    */
-  static
-  Quadrature<dim>
+  static Quadrature<dim>
   project_to_line(const Quadrature<1> &quadrature,
-                  const Point<dim> &p1,
-                  const Point<dim> &p2);
+                  const Point<dim> &   p1,
+                  const Point<dim> &   p2);
 
   /**
    * Since the project_to_all_faces() and project_to_all_subfaces() functions
@@ -223,7 +223,7 @@ public:
      * index, since you didn't give a valid descriptor of the cell, face, or
      * subface you wanted.
      */
-    DataSetDescriptor ();
+    DataSetDescriptor();
 
     /**
      * Static function to generate the offset of a cell. Since we only have
@@ -231,7 +231,8 @@ public:
      * carry this function around for consistency with the other static
      * functions.
      */
-    static DataSetDescriptor cell ();
+    static DataSetDescriptor
+    cell();
 
     /**
      * Static function to generate an offset object for a given face of a cell
@@ -243,13 +244,12 @@ public:
      * dimensional face quadrature formula (the one that has been projected
      * onto the faces) has.
      */
-    static
-    DataSetDescriptor
-    face (const unsigned int face_no,
-          const bool         face_orientation,
-          const bool         face_flip,
-          const bool         face_rotation,
-          const unsigned int n_quadrature_points);
+    static DataSetDescriptor
+    face(const unsigned int face_no,
+         const bool         face_orientation,
+         const bool         face_flip,
+         const bool         face_rotation,
+         const unsigned int n_quadrature_points);
 
     /**
      * Static function to generate an offset object for a given subface of a
@@ -263,15 +263,15 @@ public:
      *
      * Through the last argument anisotropic refinement can be respected.
      */
-    static
-    DataSetDescriptor
-    subface (const unsigned int face_no,
-             const unsigned int subface_no,
-             const bool         face_orientation,
-             const bool         face_flip,
-             const bool         face_rotation,
-             const unsigned int n_quadrature_points,
-             const internal::SubfaceCase<dim> ref_case=internal::SubfaceCase<dim>::case_isotropic);
+    static DataSetDescriptor
+    subface(const unsigned int               face_no,
+            const unsigned int               subface_no,
+            const bool                       face_orientation,
+            const bool                       face_flip,
+            const bool                       face_rotation,
+            const unsigned int               n_quadrature_points,
+            const internal::SubfaceCase<dim> ref_case =
+              internal::SubfaceCase<dim>::case_isotropic);
 
     /**
      * Conversion operator to an integer denoting the offset of the first
@@ -279,7 +279,7 @@ public:
      * onto faces and subfaces. This conversion operator allows us to use
      * offset descriptor objects in place of integer offsets.
      */
-    operator unsigned int () const;
+    operator unsigned int() const;
 
   private:
     /**
@@ -291,7 +291,7 @@ public:
      * This is the real constructor, but it is private and thus only available
      * to the static member functions above.
      */
-    DataSetDescriptor (const unsigned int dataset_offset);
+    DataSetDescriptor(const unsigned int dataset_offset);
   };
 
 private:
@@ -302,7 +302,8 @@ private:
    * This function is necessary for projecting a 2d quadrature rule onto the
    * faces of a 3d cube, since there we need both orientations.
    */
-  static Quadrature<2> reflect (const Quadrature<2> &q);
+  static Quadrature<2>
+  reflect(const Quadrature<2> &q);
 
   /**
    * Given a quadrature object in 2d, rotate all quadrature points by @p
@@ -313,8 +314,8 @@ private:
    * faces of a 3d cube, since there we need all rotations to account for
    * face_flip and face_rotation of non-standard faces.
    */
-  static Quadrature<2> rotate (const Quadrature<2> &q,
-                               const unsigned int n_times);
+  static Quadrature<2>
+  rotate(const Quadrature<2> &q, const unsigned int n_times);
 };
 
 /*@}*/
@@ -325,27 +326,22 @@ private:
 
 
 template <int dim>
-inline
-QProjector<dim>::DataSetDescriptor::
-DataSetDescriptor (const unsigned int dataset_offset)
-  :
-  dataset_offset (dataset_offset)
+inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor(
+  const unsigned int dataset_offset) :
+  dataset_offset(dataset_offset)
 {}
 
 
 template <int dim>
-inline
-QProjector<dim>::DataSetDescriptor::
-DataSetDescriptor ()
-  :
-  dataset_offset (numbers::invalid_unsigned_int)
+inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor() :
+  dataset_offset(numbers::invalid_unsigned_int)
 {}
 
 
 
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::cell ()
+QProjector<dim>::DataSetDescriptor::cell()
 {
   return 0;
 }
@@ -353,8 +349,7 @@ QProjector<dim>::DataSetDescriptor::cell ()
 
 
 template <int dim>
-inline
-QProjector<dim>::DataSetDescriptor::operator unsigned int () const
+inline QProjector<dim>::DataSetDescriptor::operator unsigned int() const
 {
   return dataset_offset;
 }
@@ -367,54 +362,54 @@ QProjector<dim>::DataSetDescriptor::operator unsigned int () const
 
 template <>
 void
-QProjector<1>::project_to_face (const Quadrature<0> &,
-                                const unsigned int,
-                                std::vector<Point<1> > &);
+QProjector<1>::project_to_face(const Quadrature<0> &,
+                               const unsigned int,
+                               std::vector<Point<1>> &);
 template <>
 void
-QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
-                                const unsigned int        face_no,
-                                std::vector<Point<2> >   &q_points);
+QProjector<2>::project_to_face(const Quadrature<1> &  quadrature,
+                               const unsigned int     face_no,
+                               std::vector<Point<2>> &q_points);
 template <>
 void
-QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
-                                const unsigned int      face_no,
-                                std::vector<Point<3> > &q_points);
+QProjector<3>::project_to_face(const Quadrature<2> &  quadrature,
+                               const unsigned int     face_no,
+                               std::vector<Point<3>> &q_points);
 
 template <>
 Quadrature<1>
-QProjector<1>::project_to_all_faces (const Quadrature<0> &quadrature);
+QProjector<1>::project_to_all_faces(const Quadrature<0> &quadrature);
 
 
 template <>
 void
-QProjector<1>::project_to_subface (const Quadrature<0> &,
-                                   const unsigned int,
-                                   const unsigned int,
-                                   std::vector<Point<1> > &,
-                                   const RefinementCase<0> &);
+QProjector<1>::project_to_subface(const Quadrature<0> &,
+                                  const unsigned int,
+                                  const unsigned int,
+                                  std::vector<Point<1>> &,
+                                  const RefinementCase<0> &);
 template <>
 void
-QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
-                                   const unsigned int      face_no,
-                                   const unsigned int      subface_no,
-                                   std::vector<Point<2> > &q_points,
-                                   const RefinementCase<1> &);
+QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
+                                  const unsigned int     face_no,
+                                  const unsigned int     subface_no,
+                                  std::vector<Point<2>> &q_points,
+                                  const RefinementCase<1> &);
 template <>
 void
-QProjector<3>::project_to_subface (const Quadrature<2>       &quadrature,
-                                   const unsigned int         face_no,
-                                   const unsigned int         subface_no,
-                                   std::vector<Point<3> >    &q_points,
-                                   const RefinementCase<2> &face_ref_case);
+QProjector<3>::project_to_subface(const Quadrature<2> &    quadrature,
+                                  const unsigned int       face_no,
+                                  const unsigned int       subface_no,
+                                  std::vector<Point<3>> &  q_points,
+                                  const RefinementCase<2> &face_ref_case);
 
 template <>
 Quadrature<1>
-QProjector<1>::project_to_all_subfaces (const Quadrature<0> &quadrature);
+QProjector<1>::project_to_all_subfaces(const Quadrature<0> &quadrature);
 
 template <>
-QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
-                         const unsigned int   n_copies);
+QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
+                        const unsigned int   n_copies);
 
 
 #endif // DOXYGEN

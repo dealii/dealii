@@ -16,14 +16,18 @@
 // check that assigning one invalid iterator to another works. this
 // test is for hp::DoFHandler
 
-#include "../tests.h"
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/hp/dof_handler.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void check ()
+void
+check()
 {
   typename hp::DoFHandler<dim>::active_cell_iterator invalid_1;
 
@@ -38,7 +42,8 @@ void check ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -17,48 +17,49 @@
 // Create a Triangulation, interpolate its boundary points to a close
 // smooth BSpline, and use that as a Boundary Descriptor.
 
-#include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/opencascade/boundary_lib.h>
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-
-#include <gp_Pnt.hxx>
-#include <gp_Dir.hxx>
-#include <gp_Ax2.hxx>
-#include <GC_MakeCircle.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
-#include <TopoDS_Wire.hxx>
+#include <GC_MakeCircle.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopoDS_Wire.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Pnt.hxx>
+
+#include "../tests.h"
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   // The curve passing through the vertices of the unit square.
-  std::vector<Point<3> > vertices;
-  vertices.push_back(Point<3>(0,0,0));
-  vertices.push_back(Point<3>(1,0,0));
-  vertices.push_back(Point<3>(1,1,0));
-  vertices.push_back(Point<3>(0,1,0));
+  std::vector<Point<3>> vertices;
+  vertices.push_back(Point<3>(0, 0, 0));
+  vertices.push_back(Point<3>(1, 0, 0));
+  vertices.push_back(Point<3>(1, 1, 0));
+  vertices.push_back(Point<3>(0, 1, 0));
   TopoDS_Shape shape = interpolation_curve(vertices, Point<3>(), true);
 
   // Create a boundary projector.
-  NormalProjectionBoundary<2,3> boundary_line(shape);
+  NormalProjectionBoundary<2, 3> boundary_line(shape);
 
   // The unit square.
-  Triangulation<2,3> tria;
+  Triangulation<2, 3> tria;
   GridGenerator::hyper_cube(tria);
 
   // Set the exterior boundary
@@ -75,7 +76,7 @@ int main ()
 
   // You can open the generated file with gmsh.
   GridOut gridout;
-  gridout.write_msh (tria, logfile);
+  gridout.write_msh(tria, logfile);
 
   return 0;
 }

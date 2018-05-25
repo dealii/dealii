@@ -24,37 +24,41 @@
 // inspecting the code in FEFieldFunction but the (same) exception is
 // triggered in a different place
 
-#include "../tests.h"
-
 #include <deal.II/base/utilities.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/grid/manifold_lib.h>
+
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/numerics/fe_field_function.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/fe/fe_system.h>
+
+#include "../tests.h"
 
 
 template <int dim>
 class F : public Function<dim>
 {
 public:
-  F() : Function<dim>(2) {}
+  F() : Function<dim>(2)
+  {}
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double> &v) const
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &v) const
   {
     v[0] = p[0];
     v[1] = 0;
   }
 
-  virtual void vector_gradient (const Point<dim> &p,
-                                std::vector<Tensor<1,dim> > &v) const
+  virtual void
+  vector_gradient(const Point<dim> &p, std::vector<Tensor<1, dim>> &v) const
   {
-    v[0] = 0;
-    v[1] = 0;
+    v[0]    = 0;
+    v[1]    = 0;
     v[0][0] = 1;
   }
 };
@@ -62,16 +66,17 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   const SphericalManifold<dim> boundary_description;
 
-  Triangulation<dim>   triangulation;
-  GridGenerator::hyper_ball (triangulation);
-  triangulation.set_manifold (0, boundary_description);
-  triangulation.refine_global (1);
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_ball(triangulation);
+  triangulation.set_manifold(0, boundary_description);
+  triangulation.refine_global(1);
 
-  FESystem<dim> fe(FE_Q<dim> (2),2);
+  FESystem<dim>   fe(FE_Q<dim>(2), 2);
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
@@ -80,9 +85,9 @@ void test()
   // can be represented exactly, so
   // that we can compare again later
   Vector<double> solution(dof_handler.n_dofs());
-  VectorTools::interpolate (dof_handler, F<dim>(), solution);
+  VectorTools::interpolate(dof_handler, F<dim>(), solution);
 
-  Functions::FEFieldFunction<2> fe_function (dof_handler, solution);
+  Functions::FEFieldFunction<2> fe_function(dof_handler, solution);
 
   // add only one points but also set
   // the active cell to one that
@@ -99,33 +104,23 @@ void test()
   // cell, and the inverse mapping
   // does not converge
   Point<dim> point(-0.27999999999999992, -0.62999999999999989);
-  fe_function.set_active_cell (typename DoFHandler<dim>::active_cell_iterator
-                               (&triangulation,
-                                1,
-                                4,
-                                &dof_handler));
+  fe_function.set_active_cell(typename DoFHandler<dim>::active_cell_iterator(
+    &triangulation, 1, 4, &dof_handler));
 
-  std::vector<Tensor<1,dim> > m(2);
-  fe_function.vector_gradient (point, m);
+  std::vector<Tensor<1, dim>> m(2);
+  fe_function.vector_gradient(point, m);
 
-  AssertThrow (std::fabs(m[0][0] - 1)
-               <
-               1e-10 * std::fabs(m[0][0] + 1),
-               ExcInternalError());
-  AssertThrow (std::fabs(m[0][1])
-               <
-               1e-10,
-               ExcInternalError());
-  AssertThrow (m[1].norm()
-               <
-               1e-10,
-               ExcInternalError());
+  AssertThrow(std::fabs(m[0][0] - 1) < 1e-10 * std::fabs(m[0][0] + 1),
+              ExcInternalError());
+  AssertThrow(std::fabs(m[0][1]) < 1e-10, ExcInternalError());
+  AssertThrow(m[1].norm() < 1e-10, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -133,4 +128,3 @@ int main ()
 
   return 0;
 }
-

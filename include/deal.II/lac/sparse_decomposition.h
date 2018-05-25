@@ -17,6 +17,7 @@
 #define dealii_sparse_decomposition_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/lac/sparse_matrix.h>
 
 #include <cmath>
@@ -107,7 +108,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>,
-  public virtual Subscriptor
+                              public virtual Subscriptor
 {
 protected:
   /**
@@ -116,7 +117,7 @@ protected:
    * Call the initialize() function before using this object as preconditioner
    * (vmult()).
    */
-  SparseLUDecomposition ();
+  SparseLUDecomposition();
 
 public:
   /**
@@ -128,13 +129,14 @@ public:
    * Destruction. Mark the destructor pure to ensure that this class isn't
    * used directly, but only its derived classes.
    */
-  virtual ~SparseLUDecomposition () override = 0;
+  virtual ~SparseLUDecomposition() override = 0;
 
   /**
    * Deletes all member variables. Leaves the class in the state that it had
    * directly after calling the constructor
    */
-  virtual void clear() override;
+  virtual void
+  clear() override;
 
   /**
    * Parameters for SparseDecomposition.
@@ -145,10 +147,10 @@ public:
     /**
      * Constructor. For the parameters' description, see below.
      */
-    AdditionalData (const double strengthen_diagonal=0,
-                    const unsigned int extra_off_diagonals=0,
-                    const bool use_previous_sparsity=false,
-                    const SparsityPattern *use_this_sparsity=nullptr);
+    AdditionalData(const double           strengthen_diagonal   = 0,
+                   const unsigned int     extra_off_diagonals   = 0,
+                   const bool             use_previous_sparsity = false,
+                   const SparsityPattern *use_this_sparsity     = nullptr);
 
     /**
      * <code>strengthen_diag</code> times the sum of absolute row entries is
@@ -209,28 +211,32 @@ public:
    * (using the <code>vmult</code> function of derived classes).
    */
   template <typename somenumber>
-  void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData parameters);
+  void
+  initialize(const SparseMatrix<somenumber> &matrix,
+             const AdditionalData            parameters);
 
   /**
    * Return whether the object is empty. It calls the inherited
    * SparseMatrix::empty() function.
    */
-  bool empty () const;
+  bool
+  empty() const;
 
   /**
    * Return the dimension of the codomain (or range) space. It calls the
    * inherited SparseMatrix::m() function. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m() const;
 
   /**
    * Return the dimension of the domain space. It calls the  inherited
    * SparseMatrix::n() function. Note that the matrix is of dimension $m
    * \times n$.
    */
-  size_type n () const;
+  size_type
+  n() const;
 
   /**
    * Adding Matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i> with
@@ -240,8 +246,8 @@ public:
    *
    */
   template <class OutVector, class InVector>
-  void vmult_add (OutVector &dst,
-                  const InVector &src) const;
+  void
+  vmult_add(OutVector &dst, const InVector &src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add <i>M<sup>T</sup>*src</i> to
@@ -251,14 +257,15 @@ public:
    * Source and destination must not be the same vector.
    */
   template <class OutVector, class InVector>
-  void Tvmult_add (OutVector &dst,
-                   const InVector &src) const;
+  void
+  Tvmult_add(OutVector &dst, const InVector &src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t
+  memory_consumption() const;
 
   /**
    * @addtogroup Exceptions
@@ -268,10 +275,10 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidStrengthening,
-                  double,
-                  << "The strengthening parameter " << arg1
-                  << " is not greater or equal than zero!");
+  DeclException1(ExcInvalidStrengthening,
+                 double,
+                 << "The strengthening parameter " << arg1
+                 << " is not greater or equal than zero!");
   //@}
 protected:
   /**
@@ -279,7 +286,8 @@ protected:
    * pattern remains unchanged.
    */
   template <typename somenumber>
-  void copy_from (const SparseMatrix<somenumber> &matrix);
+  void
+  copy_from(const SparseMatrix<somenumber> &matrix);
 
   /**
    * Performs the strengthening loop. For each row calculates the sum of
@@ -287,7 +295,8 @@ protected:
    * (through get_strengthen_diagonal()) sf and multiplies the diagonal entry
    * with <code>sf+1</code>.
    */
-  virtual void strengthen_diagonal_impl ();
+  virtual void
+  strengthen_diagonal_impl();
 
   /**
    * In the decomposition phase, computes a strengthening factor for the
@@ -298,12 +307,13 @@ protected:
    * <code>strengthen_diagonal</code>'s value. This variable is set to
    * a nonzero value in several of the derived classes.
    */
-  virtual number get_strengthen_diagonal(const number rowsum, const size_type row) const;
+  virtual number
+  get_strengthen_diagonal(const number rowsum, const size_type row) const;
 
   /**
    * The default strengthening value, returned by get_strengthen_diagonal().
    */
-  double  strengthen_diagonal;
+  double strengthen_diagonal;
 
   /**
    * For every row in the underlying SparsityPattern, this array contains a
@@ -315,10 +325,10 @@ protected:
   /**
    * Fills the #prebuilt_lower_bound array.
    */
-  void prebuild_lower_bound ();
+  void
+  prebuild_lower_bound();
 
 private:
-
   /**
    * In general this pointer is zero except for the case that no
    * SparsityPattern is given to this class. Then, a SparsityPattern is
@@ -338,9 +348,9 @@ private:
 
 template <typename number>
 inline number
-SparseLUDecomposition<number>::
-get_strengthen_diagonal(const number /*rowsum*/,
-                        const size_type /*row*/) const
+SparseLUDecomposition<number>::get_strengthen_diagonal(
+  const number /*rowsum*/,
+  const size_type /*row*/) const
 {
   return strengthen_diagonal;
 }
@@ -349,7 +359,7 @@ get_strengthen_diagonal(const number /*rowsum*/,
 
 template <typename number>
 inline bool
-SparseLUDecomposition<number>::empty () const
+SparseLUDecomposition<number>::empty() const
 {
   return SparseMatrix<number>::empty();
 }
@@ -357,7 +367,7 @@ SparseLUDecomposition<number>::empty () const
 
 template <typename number>
 inline typename SparseLUDecomposition<number>::size_type
-SparseLUDecomposition<number>::m () const
+SparseLUDecomposition<number>::m() const
 {
   return SparseMatrix<number>::m();
 }
@@ -365,7 +375,7 @@ SparseLUDecomposition<number>::m () const
 
 template <typename number>
 inline typename SparseLUDecomposition<number>::size_type
-SparseLUDecomposition<number>::n () const
+SparseLUDecomposition<number>::n() const
 {
   return SparseMatrix<number>::n();
 }
@@ -377,8 +387,8 @@ SparseLUDecomposition<number>::n () const
 template <typename number>
 template <class OutVector, class InVector>
 inline void
-SparseLUDecomposition<number>::vmult_add (OutVector &dst,
-                                          const InVector &src) const
+SparseLUDecomposition<number>::vmult_add(OutVector &     dst,
+                                         const InVector &src) const
 {
   OutVector tmp;
   tmp.reinit(dst);
@@ -393,8 +403,8 @@ SparseLUDecomposition<number>::vmult_add (OutVector &dst,
 template <typename number>
 template <class OutVector, class InVector>
 inline void
-SparseLUDecomposition<number>::Tvmult_add (OutVector &dst,
-                                           const InVector &src) const
+SparseLUDecomposition<number>::Tvmult_add(OutVector &     dst,
+                                          const InVector &src) const
 {
   OutVector tmp;
   tmp.reinit(dst);
@@ -406,12 +416,11 @@ SparseLUDecomposition<number>::Tvmult_add (OutVector &dst,
 
 
 template <typename number>
-SparseLUDecomposition<number>::
-AdditionalData::AdditionalData (const double strengthen_diag,
-                                const unsigned int extra_off_diag,
-                                const bool use_prev_sparsity,
-                                const SparsityPattern *use_this_spars)
-  :
+SparseLUDecomposition<number>::AdditionalData::AdditionalData(
+  const double           strengthen_diag,
+  const unsigned int     extra_off_diag,
+  const bool             use_prev_sparsity,
+  const SparsityPattern *use_this_spars) :
   strengthen_diagonal(strengthen_diag),
   extra_off_diagonals(extra_off_diag),
   use_previous_sparsity(use_prev_sparsity),

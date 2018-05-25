@@ -17,53 +17,46 @@
 // test Utilities::split_string_list with a string that only contains
 // the delimiter and, possibly, spaces
 
-#include "../tests.h"
-
 #include <deal.II/base/utilities.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   // verify the documented behavior of eating trailing delimiters
   {
-    deallog << Utilities::split_string_list (",").size()
-            << std::endl;
-    deallog << Utilities::split_string_list (" , ").size()
-            << std::endl;
+    deallog << Utilities::split_string_list(",").size() << std::endl;
+    deallog << Utilities::split_string_list(" , ").size() << std::endl;
   }
 
   {
-    deallog << Utilities::split_string_list (",,").size()
-            << std::endl;
-    deallog << Utilities::split_string_list (" , , ").size()
-            << std::endl;
+    deallog << Utilities::split_string_list(",,").size() << std::endl;
+    deallog << Utilities::split_string_list(" , , ").size() << std::endl;
   }
 
   // try some more esoteric cases:
   {
-    deallog << Utilities::split_string_list (" , , ", ' ').size()
-            << std::endl;
+    deallog << Utilities::split_string_list(" , , ", ' ').size() << std::endl;
   }
 
   {
-    deallog << Utilities::split_string_list (" ", ' ').size()
-            << std::endl;
-    deallog << Utilities::split_string_list ("   ", ' ').size()
-            << std::endl;
+    deallog << Utilities::split_string_list(" ", ' ').size() << std::endl;
+    deallog << Utilities::split_string_list("   ", ' ').size() << std::endl;
   }
 
-  Assert (Utilities::split_string_list(" ; ", ';').size() == 1,
-          ExcInternalError());
-  Assert (Utilities::split_string_list(" ; ", ';')[0] == "",
-          ExcInternalError());
+  Assert(Utilities::split_string_list(" ; ", ';').size() == 1,
+         ExcInternalError());
+  Assert(Utilities::split_string_list(" ; ", ';')[0] == "", ExcInternalError());
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

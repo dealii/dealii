@@ -16,19 +16,20 @@
 
 // test that an ArrayView to an empty array view can actually be copied
 
-#include "../tests.h"
-
 #include <deal.II/base/array_view.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   std::vector<int> v(10);
 
-  ArrayView<int> a (&v[4], 0);
+  ArrayView<int> a(&v[4], 0);
   ArrayView<int> b = a;
 
-  ArrayView<int> c (nullptr, 0);
+  ArrayView<int> c(nullptr, 0);
   ArrayView<int> d = a;
 
   deallog << "OK" << std::endl;
@@ -36,10 +37,10 @@ void test ()
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

@@ -18,49 +18,51 @@
 // Use a circular domain with boundary mappings, and determine cell for points
 // close to the boundary
 
-#include "../tests.h"
 #include <deal.II/base/numbers.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/fe/mapping_q.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
-void check (Triangulation<2> &tria)
+
+void check(Triangulation<2> &tria)
 {
   MappingQ<2> map(5);
 
   // Test for a number of points, every ten degrees
-  for (unsigned int i=0; i<200; i++)
+  for (unsigned int i = 0; i < 200; i++)
     {
-      Point<2> p(std::sin((double)i/100.*numbers::PI), std::cos((double)i/100.*numbers::PI));
-      p *= 1.-1e-8;
+      Point<2> p(std::sin((double)i / 100. * numbers::PI),
+                 std::cos((double)i / 100. * numbers::PI));
+      p *= 1. - 1e-8;
 
-      std::pair<Triangulation<2>::active_cell_iterator, Point<2> > cell
-        = GridTools::find_active_cell_around_point (map, tria, p);
+      std::pair<Triangulation<2>::active_cell_iterator, Point<2>> cell =
+        GridTools::find_active_cell_around_point(map, tria, p);
 
       deallog << cell.first << std::endl;
-      for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
         deallog << "< " << cell.first->vertex(v) << " > ";
       deallog << "[ " << cell.second << " ] ";
 
       // Now transform back and check distance
-      Point<2> pp = map.transform_unit_to_real_cell(cell.first, GeometryInfo<2>::project_to_unit_cell(cell.second));
+      Point<2> pp = map.transform_unit_to_real_cell(
+        cell.first, GeometryInfo<2>::project_to_unit_cell(cell.second));
       deallog << pp.distance(p) << std::endl;
-      Assert (pp.distance(p) < 5.e-12,
-              ExcInternalError());
+      Assert(pp.distance(p) < 5.e-12, ExcInternalError());
     }
-
-
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
   deallog << std::scientific;
@@ -68,13 +70,10 @@ int main ()
 
   {
     Triangulation<2> coarse_grid;
-    GridGenerator::hyper_ball (coarse_grid);
+    GridGenerator::hyper_ball(coarse_grid);
     static const SphericalManifold<2> boundary;
-    coarse_grid.set_manifold (0, boundary);
-    coarse_grid.refine_global (2);
-    check (coarse_grid);
+    coarse_grid.set_manifold(0, boundary);
+    coarse_grid.refine_global(2);
+    check(coarse_grid);
   }
 }
-
-
-

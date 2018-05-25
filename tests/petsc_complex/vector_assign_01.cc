@@ -16,31 +16,34 @@
 
 
 // See notes in petsc/vector_assign_01.cc
-#include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (PETScWrappers::MPI::Vector &v,
-           PETScWrappers::MPI::Vector &w)
+
+void
+test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
-  for (unsigned int k=0; k<v.size(); ++k)
-    v(k) = std::complex<double> (k,k*k);
+  for (unsigned int k = 0; k < v.size(); ++k)
+    v(k) = std::complex<double>(k, k * k);
 
   // copy elements by reference
-  for (unsigned int k=0; k<v.size(); ++k)
+  for (unsigned int k = 0; k < v.size(); ++k)
     w(k) = v(k);
 
   // check that they're equal
-  AssertThrow (v==w, ExcInternalError());
+  AssertThrow(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -49,15 +52,15 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::MPI::Vector v (MPI_COMM_WORLD, 100, 100);
-        PETScWrappers::MPI::Vector w (MPI_COMM_WORLD, 100, 100);
-        test (v,w);
+        PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, 100, 100);
+        PETScWrappers::MPI::Vector w(MPI_COMM_WORLD, 100, 100);
+        test(v, w);
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -70,7 +73,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

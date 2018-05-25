@@ -21,27 +21,30 @@
 // contributions from interior faces but the algorithm should have get them to
 // zero)
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
+
 #include <deal.II/fe/fe_q.h>
+
+#include "../tests.h"
 
 std::ofstream logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global(5-dim);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(5 - dim);
 
-  FE_Q<dim> fe (fe_degree);
-  DoFHandler<dim> dof (tria);
+  FE_Q<dim>       fe(fe_degree);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   constraints.close();
 
   // test with threads enabled as well
-  do_test<dim, fe_degree, fe_degree+1, double> (dof, constraints, false);
+  do_test<dim, fe_degree, fe_degree + 1, double>(dof, constraints, false);
 }

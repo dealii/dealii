@@ -15,16 +15,19 @@
 
 // Check Convert<tuple>::to_pattern()
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
+
 #include <memory>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
-  auto a = std::make_tuple(Point<3>(), double(3.5), std::string("ciao"));
+  auto        a = std::make_tuple(Point<3>(), double(3.5), std::string("ciao"));
   const auto &pattern = Patterns::Tools::Convert<decltype(a)>::to_pattern();
 
   deallog << pattern->description() << std::endl;

@@ -15,6 +15,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+
 #include <deal.II/dofs/dof_faces.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -25,26 +26,26 @@ namespace internal
   namespace DoFHandlerImplementation
   {
     std::size_t
-    DoFFaces<1>::memory_consumption () const
+    DoFFaces<1>::memory_consumption() const
     {
       return 0;
     }
 
 
     std::size_t
-    DoFFaces<2>::memory_consumption () const
+    DoFFaces<2>::memory_consumption() const
     {
-      return MemoryConsumption::memory_consumption (lines);
+      return MemoryConsumption::memory_consumption(lines);
     }
 
 
     std::size_t
-    DoFFaces<3>::memory_consumption () const
+    DoFFaces<3>::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption (quads) +
-              MemoryConsumption::memory_consumption (lines) );
+      return (MemoryConsumption::memory_consumption(quads) +
+              MemoryConsumption::memory_consumption(lines));
     }
-  }
-}
+  } // namespace DoFHandlerImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

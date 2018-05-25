@@ -41,33 +41,39 @@
 // above.
 
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/lac/vector.h>
+
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
+
+#include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_face.h>
-#include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 using namespace dealii;
 
 
 template <int dim>
-void test(VectorTools::NormType norm, double exp = 2.0)
+void
+test(VectorTools::NormType norm, double exp = 2.0)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
-  FESystem<dim> fe(FE_Q<dim>(1), 1,
-                   FE_FaceQ<dim>(1), 1);
+  FESystem<dim>   fe(FE_Q<dim>(1), 1, FE_FaceQ<dim>(1), 1);
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
 
@@ -78,32 +84,32 @@ void test(VectorTools::NormType norm, double exp = 2.0)
   // because it's a face element, so this refusal actually makes sense
   // -- and thus leaves the signaling NaNs from the original invalid
   // initialization.)
-  Vector<double> solution (dofh.n_dofs ());
+  Vector<double> solution(dofh.n_dofs());
 
-  Vector<double> cellwise_errors (tria.n_active_cells());
-  QIterated<dim> quadrature (QTrapez<1>(), 2);
+  Vector<double> cellwise_errors(tria.n_active_cells());
+  QIterated<dim> quadrature(QTrapez<1>(), 2);
 
-  const ComponentSelectFunction<dim> component_mask (1, 2);
-  VectorTools::integrate_difference (dofh,
-                                     solution,
-                                     ZeroFunction<dim>(2),
-                                     cellwise_errors,
-                                     quadrature,
-                                     norm,
-                                     &component_mask,
-                                     exp);
+  const ComponentSelectFunction<dim> component_mask(1, 2);
+  VectorTools::integrate_difference(dofh,
+                                    solution,
+                                    ZeroFunction<dim>(2),
+                                    cellwise_errors,
+                                    quadrature,
+                                    norm,
+                                    &component_mask,
+                                    exp);
 
-  const double error
-    = VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
+  const double error =
+    VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
 
-  deallog << "computed: " << error
-          << std::endl;
+  deallog << "computed: " << error << std::endl;
 }
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << "L2_norm:" << std::endl;
   test<dim>(VectorTools::L2_norm);
@@ -133,7 +139,8 @@ void test()
 }
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   test<3>();

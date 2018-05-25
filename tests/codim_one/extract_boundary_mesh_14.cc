@@ -16,31 +16,33 @@
 
 // check a bug in extract boundary mesh for a specific grid.
 
-#include "../tests.h"
-
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
-void test()
+void
+test()
 {
-  const int dim=2;
+  const int dim = 2;
 
-  Triangulation<dim>   triangulation;
-  GridIn<dim>          gi;
+  Triangulation<dim> triangulation;
+  GridIn<dim>        gi;
   gi.attach_triangulation(triangulation);
 
-  std::ifstream infile(SOURCE_DIR "/../grid/grids/unstructured_refined_ball.msh");
+  std::ifstream infile(SOURCE_DIR
+                       "/../grid/grids/unstructured_refined_ball.msh");
   gi.read_msh(infile);
 
   // now extract the surface mesh
-  Triangulation<dim-1,dim> triangulation_surface;
-  GridGenerator::extract_boundary_mesh(triangulation,triangulation_surface);
+  Triangulation<dim - 1, dim> triangulation_surface;
+  GridGenerator::extract_boundary_mesh(triangulation, triangulation_surface);
 
   GridOut().write_gnuplot(triangulation_surface, deallog.get_file_stream());
 
@@ -49,7 +51,8 @@ void test()
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 

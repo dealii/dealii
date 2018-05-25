@@ -16,12 +16,13 @@
 
 // test for C++11 move operations on AlignedVector<unsigned int>
 
-#include "../tests.h"
-
 #include <deal.II/base/aligned_vector.h>
 
+#include "../tests.h"
 
-void test()
+
+void
+test()
 {
   typedef AlignedVector<unsigned int> VEC;
 
@@ -55,11 +56,12 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 
   return 0;
 }

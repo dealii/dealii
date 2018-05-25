@@ -19,32 +19,44 @@
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
+
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/lac/block_vector_base.h>
+
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/block_vector_base.h>
+
 #include <deal.II/particles/particle_iterator.h>
+
 #include "../tests.h"
 
-int main ()
+int
+main()
 {
   initlog();
 
-  typedef std::iterator_traits<TriaRawIterator<TriaAccessor<2,2,2>>>::iterator_category    tria_raw_iterator_category;
-  typedef std::iterator_traits<TriaIterator<TriaAccessor<2,2,2>>>::iterator_category       tria_iterator_category;
-  typedef std::iterator_traits<TriaActiveIterator<TriaAccessor<2,2,2>>>::iterator_category tria_active_iterator_category;
+  typedef std::iterator_traits<TriaRawIterator<TriaAccessor<2, 2, 2>>>::
+    iterator_category tria_raw_iterator_category;
+  typedef std::iterator_traits<TriaIterator<TriaAccessor<2, 2, 2>>>::
+    iterator_category tria_iterator_category;
+  typedef std::iterator_traits<TriaActiveIterator<TriaAccessor<2, 2, 2>>>::
+    iterator_category tria_active_iterator_category;
 
-  typedef std::iterator_traits<Particles::ParticleIterator<2>>::iterator_category   particle_category;
+  typedef std::iterator_traits<
+    Particles::ParticleIterator<2>>::iterator_category particle_category;
 
-  typedef std::iterator_traits<IteratorRange<Particles::ParticleIterator<2>>::IteratorOverIterators>::iterator_category iterator_over_iterator_category;
+  typedef std::iterator_traits<IteratorRange<
+    Particles::ParticleIterator<2>>::IteratorOverIterators>::iterator_category
+    iterator_over_iterator_category;
 
-  typedef std::iterator_traits<internal::BlockVectorIterators::Iterator<BlockVector<double>, false>>::iterator_category block_vector_base_iterator_category;
+  typedef std::iterator_traits<
+    internal::BlockVectorIterators::Iterator<BlockVector<double>, false>>::
+    iterator_category block_vector_base_iterator_category;
 
-  typedef std::iterator_traits<IndexSet::IntervalIterator>::iterator_category intervall_iterator_category;
-  typedef std::iterator_traits<IndexSet::ElementIterator>::iterator_category   element_iterator_category;
+  typedef std::iterator_traits<IndexSet::IntervalIterator>::iterator_category
+    intervall_iterator_category;
+  typedef std::iterator_traits<IndexSet::ElementIterator>::iterator_category
+    element_iterator_category;
 
   deallog << "OK" << std::endl;
 }
-
-
-

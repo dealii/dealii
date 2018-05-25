@@ -14,30 +14,30 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_trilinos_sparsity_pattern_h
-#define dealii_trilinos_sparsity_pattern_h
+#  define dealii_trilinos_sparsity_pattern_h
 
 
-#include <deal.II/base/config.h>
+#  include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/subscriptor.h>
-#  include <deal.II/base/index_set.h>
-#  include <deal.II/lac/exceptions.h>
+#    include <deal.II/base/index_set.h>
+#    include <deal.II/base/subscriptor.h>
 
-#  include <vector>
-#  include <cmath>
-#  include <memory>
+#    include <deal.II/lac/exceptions.h>
 
+#    include <Epetra_FECrsGraph.h>
+#    include <Epetra_Map.h>
 
-#  include <Epetra_FECrsGraph.h>
-#  include <Epetra_Map.h>
-#  ifdef DEAL_II_WITH_MPI
-#    include <Epetra_MpiComm.h>
-#    include <mpi.h>
-#  else
-#    include <Epetra_SerialComm.h>
-#  endif
+#    include <cmath>
+#    include <memory>
+#    include <vector>
+#    ifdef DEAL_II_WITH_MPI
+#      include <Epetra_MpiComm.h>
+#      include <mpi.h>
+#    else
+#      include <Epetra_SerialComm.h>
+#    endif
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -81,39 +81,44 @@ namespace TrilinosWrappers
       /**
        * Constructor.
        */
-      Accessor (const SparsityPattern *sparsity_pattern,
-                const size_type        row,
-                const size_type        index);
+      Accessor(const SparsityPattern *sparsity_pattern,
+               const size_type        row,
+               const size_type        index);
 
       /**
        * Row number of the element represented by this object.
        */
-      size_type row() const;
+      size_type
+      row() const;
 
       /**
        * Index in row of the element represented by this object.
        */
-      size_type index() const;
+      size_type
+      index() const;
 
       /**
        * Column number of the element represented by this object.
        */
-      size_type column() const;
+      size_type
+      column() const;
 
       /**
        * Exception
        */
-      DeclException0 (ExcBeyondEndOfSparsityPattern);
+      DeclException0(ExcBeyondEndOfSparsityPattern);
 
       /**
        * Exception
        */
-      DeclException3 (ExcAccessToNonlocalRow,
-                      size_type, size_type, size_type,
-                      << "You tried to access row " << arg1
-                      << " of a distributed sparsity pattern, "
-                      << " but only rows " << arg2 << " through " << arg3
-                      << " are stored locally and can be accessed.");
+      DeclException3(ExcAccessToNonlocalRow,
+                     size_type,
+                     size_type,
+                     size_type,
+                     << "You tried to access row " << arg1
+                     << " of a distributed sparsity pattern, "
+                     << " but only rows " << arg2 << " through " << arg3
+                     << " are stored locally and can be accessed.");
 
     private:
       /**
@@ -143,14 +148,15 @@ namespace TrilinosWrappers
        * performance, we keep a shared pointer to these entries so that more
        * than one accessor can access this data if necessary.
        */
-      std::shared_ptr<const std::vector<size_type> > colnum_cache;
+      std::shared_ptr<const std::vector<size_type>> colnum_cache;
 
       /**
        * Discard the old row caches (they may still be used by other
        * accessors) and generate new ones for the row pointed to presently by
        * this accessor.
        */
-      void visit_present_row ();
+      void
+      visit_present_row();
 
       /**
        * Make enclosing class a friend.
@@ -175,61 +181,66 @@ namespace TrilinosWrappers
        * Constructor. Create an iterator into the matrix @p matrix for the
        * given row and the index within it.
        */
-      Iterator (const SparsityPattern *sparsity_pattern,
-                const size_type        row,
-                const size_type        index);
+      Iterator(const SparsityPattern *sparsity_pattern,
+               const size_type        row,
+               const size_type        index);
 
       /**
        * Copy constructor.
        */
-      Iterator (const Iterator &i);
+      Iterator(const Iterator &i);
 
       /**
        * Prefix increment.
        */
-      Iterator &operator++ ();
+      Iterator &
+      operator++();
 
       /**
        * Postfix increment.
        */
-      Iterator operator++ (int);
+      Iterator
+      operator++(int);
 
       /**
        * Dereferencing operator.
        */
-      const Accessor &operator* () const;
+      const Accessor &operator*() const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor *operator-> () const;
+      const Accessor *operator->() const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
-      bool operator == (const Iterator &) const;
+      bool
+      operator==(const Iterator &) const;
 
       /**
        * Inverse of <tt>==</tt>.
        */
-      bool operator != (const Iterator &) const;
+      bool
+      operator!=(const Iterator &) const;
 
       /**
        * Comparison operator. Result is true if either the first row number is
        * smaller or if the row numbers are equal and the first index is
        * smaller.
        */
-      bool operator < (const Iterator &) const;
+      bool
+      operator<(const Iterator &) const;
 
       /**
        * Exception
        */
-      DeclException2 (ExcInvalidIndexWithinRow,
-                      size_type, size_type,
-                      << "Attempt to access element " << arg2
-                      << " of row " << arg1
-                      << " which doesn't have that many elements.");
+      DeclException2(ExcInvalidIndexWithinRow,
+                     size_type,
+                     size_type,
+                     << "Attempt to access element " << arg2 << " of row "
+                     << arg1 << " which doesn't have that many elements.");
 
     private:
       /**
@@ -240,7 +251,7 @@ namespace TrilinosWrappers
       friend class TrilinosWrappers::SparsityPattern;
     };
 
-  }
+  } // namespace SparsityPatternIterators
 
 
   /**
@@ -264,7 +275,6 @@ namespace TrilinosWrappers
   class SparsityPattern : public Subscriptor
   {
   public:
-
     /**
      * Declare type for container size.
      */
@@ -278,11 +288,11 @@ namespace TrilinosWrappers
     /**
      * @name Basic constructors and initialization.
      */
-//@{
+    //@{
     /**
      * Default constructor. Generates an empty (zero-size) sparsity pattern.
      */
-    SparsityPattern ();
+    SparsityPattern();
 
     /**
      * Generate a sparsity pattern that is completely stored locally, having
@@ -298,9 +308,9 @@ namespace TrilinosWrappers
      * for the deal.II DynamicSparsityPattern classes. However, a good
      * estimate will reduce the setup time of the sparsity pattern.
      */
-    SparsityPattern (const size_type  m,
-                     const size_type  n,
-                     const size_type  n_entries_per_row = 0);
+    SparsityPattern(const size_type m,
+                    const size_type n,
+                    const size_type n_entries_per_row = 0);
 
     /**
      * Generate a sparsity pattern that is completely stored locally, having
@@ -310,26 +320,26 @@ namespace TrilinosWrappers
      * The vector <tt>n_entries_per_row</tt> specifies the number of entries
      * in each row (an information usually not available, though).
      */
-    SparsityPattern (const size_type               m,
-                     const size_type               n,
-                     const std::vector<size_type> &n_entries_per_row);
+    SparsityPattern(const size_type               m,
+                    const size_type               n,
+                    const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Move constructor. Create a new sparse matrix by stealing the internal
      * data.
      */
-    SparsityPattern (SparsityPattern &&other) noexcept;
+    SparsityPattern(SparsityPattern &&other) noexcept;
 
     /**
      * Copy constructor. Sets the calling sparsity pattern to be the same as
      * the input sparsity pattern.
      */
-    SparsityPattern (const SparsityPattern &input_sparsity_pattern);
+    SparsityPattern(const SparsityPattern &input_sparsity_pattern);
 
     /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
-    virtual ~SparsityPattern () override = default;
+    virtual ~SparsityPattern() override = default;
 
     /**
      * Initialize a sparsity pattern that is completely stored locally, having
@@ -343,9 +353,9 @@ namespace TrilinosWrappers
      * will reduce the setup time of the sparsity pattern.
      */
     void
-    reinit (const size_type  m,
-            const size_type  n,
-            const size_type  n_entries_per_row = 0);
+    reinit(const size_type m,
+           const size_type n,
+           const size_type n_entries_per_row = 0);
 
     /**
      * Initialize a sparsity pattern that is completely stored locally, having
@@ -356,16 +366,16 @@ namespace TrilinosWrappers
      * in each row.
      */
     void
-    reinit (const size_type               m,
-            const size_type               n,
-            const std::vector<size_type> &n_entries_per_row);
+    reinit(const size_type               m,
+           const size_type               n,
+           const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Copy function. Sets the calling sparsity pattern to be the same as the
      * input sparsity pattern.
      */
     void
-    copy_from (const SparsityPattern &input_sparsity_pattern);
+    copy_from(const SparsityPattern &input_sparsity_pattern);
 
     /**
      * Copy function from one of the deal.II sparsity patterns. If used in
@@ -374,7 +384,7 @@ namespace TrilinosWrappers
      */
     template <typename SparsityPatternType>
     void
-    copy_from (const SparsityPatternType &nontrilinos_sparsity_pattern);
+    copy_from(const SparsityPatternType &nontrilinos_sparsity_pattern);
 
     /**
      * Copy operator. This operation is only allowed for empty objects, to
@@ -382,7 +392,8 @@ namespace TrilinosWrappers
      * the compiler. Use copy_from() instead if you know that you really want
      * to copy a sparsity pattern with non-trivial content.
      */
-    SparsityPattern &operator = (const SparsityPattern &input_sparsity_pattern);
+    SparsityPattern &
+    operator=(const SparsityPattern &input_sparsity_pattern);
 
     /**
      * Release all memory and return to a state just like after having called
@@ -391,7 +402,8 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    void clear ();
+    void
+    clear();
 
     /**
      * In analogy to our own SparsityPattern class, this function compresses
@@ -402,12 +414,13 @@ namespace TrilinosWrappers
      * the structure is fixed. This is a collective operation, i.e., it needs
      * to be run on all processors when used in parallel.
      */
-    void compress ();
-//@}
+    void
+    compress();
+    //@}
     /**
      * @name Constructors and initialization using an Epetra_Map description
      */
-//@{
+    //@{
 
     /**
      * Constructor for a square sparsity pattern using an Epetra_map for the
@@ -424,8 +437,8 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     DEAL_II_DEPRECATED
-    SparsityPattern (const Epetra_Map &parallel_partitioning,
-                     const size_type   n_entries_per_row = 0);
+    SparsityPattern(const Epetra_Map &parallel_partitioning,
+                    const size_type   n_entries_per_row = 0);
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -440,8 +453,8 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     DEAL_II_DEPRECATED
-    SparsityPattern (const Epetra_Map             &parallel_partitioning,
-                     const std::vector<size_type> &n_entries_per_row);
+    SparsityPattern(const Epetra_Map &            parallel_partitioning,
+                    const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -462,9 +475,9 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     DEAL_II_DEPRECATED
-    SparsityPattern (const Epetra_Map   &row_parallel_partitioning,
-                     const Epetra_Map   &col_parallel_partitioning,
-                     const size_type     n_entries_per_row = 0);
+    SparsityPattern(const Epetra_Map &row_parallel_partitioning,
+                    const Epetra_Map &col_parallel_partitioning,
+                    const size_type   n_entries_per_row = 0);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -480,9 +493,9 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     DEAL_II_DEPRECATED
-    SparsityPattern (const Epetra_Map             &row_parallel_partitioning,
-                     const Epetra_Map             &col_parallel_partitioning,
-                     const std::vector<size_type> &n_entries_per_row);
+    SparsityPattern(const Epetra_Map &            row_parallel_partitioning,
+                    const Epetra_Map &            col_parallel_partitioning,
+                    const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Reinitialization function for generating a square sparsity pattern
@@ -502,8 +515,8 @@ namespace TrilinosWrappers
      */
     DEAL_II_DEPRECATED
     void
-    reinit (const Epetra_Map &parallel_partitioning,
-            const size_type   n_entries_per_row = 0);
+    reinit(const Epetra_Map &parallel_partitioning,
+           const size_type   n_entries_per_row = 0);
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -519,8 +532,8 @@ namespace TrilinosWrappers
      */
     DEAL_II_DEPRECATED
     void
-    reinit (const Epetra_Map             &parallel_partitioning,
-            const std::vector<size_type> &n_entries_per_row);
+    reinit(const Epetra_Map &            parallel_partitioning,
+           const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This reinit function is similar to the one above, but it now takes two
@@ -542,9 +555,9 @@ namespace TrilinosWrappers
      */
     DEAL_II_DEPRECATED
     void
-    reinit (const Epetra_Map   &row_parallel_partitioning,
-            const Epetra_Map   &col_parallel_partitioning,
-            const size_type     n_entries_per_row = 0);
+    reinit(const Epetra_Map &row_parallel_partitioning,
+           const Epetra_Map &col_parallel_partitioning,
+           const size_type   n_entries_per_row = 0);
 
     /**
      * This reinit function is similar to the one above, but it now takes two
@@ -561,9 +574,9 @@ namespace TrilinosWrappers
      */
     DEAL_II_DEPRECATED
     void
-    reinit (const Epetra_Map             &row_parallel_partitioning,
-            const Epetra_Map             &col_parallel_partitioning,
-            const std::vector<size_type> &n_entries_per_row);
+    reinit(const Epetra_Map &            row_parallel_partitioning,
+           const Epetra_Map &            col_parallel_partitioning,
+           const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -576,12 +589,11 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename SparsityPatternType>
-    DEAL_II_DEPRECATED
-    void
-    reinit (const Epetra_Map          &row_parallel_partitioning,
-            const Epetra_Map          &col_parallel_partitioning,
-            const SparsityPatternType &nontrilinos_sparsity_pattern,
-            const bool                 exchange_data = false);
+    DEAL_II_DEPRECATED void
+    reinit(const Epetra_Map &         row_parallel_partitioning,
+           const Epetra_Map &         col_parallel_partitioning,
+           const SparsityPatternType &nontrilinos_sparsity_pattern,
+           const bool                 exchange_data = false);
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -594,16 +606,15 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename SparsityPatternType>
-    DEAL_II_DEPRECATED
-    void
-    reinit (const Epetra_Map          &parallel_partitioning,
-            const SparsityPatternType &nontrilinos_sparsity_pattern,
-            const bool                 exchange_data = false);
-//@}
+    DEAL_II_DEPRECATED void
+    reinit(const Epetra_Map &         parallel_partitioning,
+           const SparsityPatternType &nontrilinos_sparsity_pattern,
+           const bool                 exchange_data = false);
+    //@}
     /**
      * @name Constructors and initialization using an IndexSet description
      */
-//@{
+    //@{
 
     /**
      * Constructor for a square sparsity pattern using an IndexSet and an MPI
@@ -616,9 +627,9 @@ namespace TrilinosWrappers
      * will avoid repeated allocation of memory, which considerably increases
      * the performance when creating the sparsity pattern.
      */
-    SparsityPattern (const IndexSet  &parallel_partitioning,
-                     const MPI_Comm  &communicator = MPI_COMM_WORLD,
-                     const size_type  n_entries_per_row = 0);
+    SparsityPattern(const IndexSet &parallel_partitioning,
+                    const MPI_Comm &communicator      = MPI_COMM_WORLD,
+                    const size_type n_entries_per_row = 0);
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -630,9 +641,9 @@ namespace TrilinosWrappers
      * knowing the indices of nonzero entries, which the sparsity pattern is
      * designed to describe.
      */
-    SparsityPattern (const IndexSet                  &parallel_partitioning,
-                     const MPI_Comm                  &communicator,
-                     const std::vector<size_type> &n_entries_per_row);
+    SparsityPattern(const IndexSet &              parallel_partitioning,
+                    const MPI_Comm &              communicator,
+                    const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -648,10 +659,10 @@ namespace TrilinosWrappers
      * The number of columns entries per row is specified as the maximum
      * number of entries argument.
      */
-    SparsityPattern (const IndexSet  &row_parallel_partitioning,
-                     const IndexSet  &col_parallel_partitioning,
-                     const MPI_Comm  &communicator = MPI_COMM_WORLD,
-                     const size_type  n_entries_per_row = 0);
+    SparsityPattern(const IndexSet &row_parallel_partitioning,
+                    const IndexSet &col_parallel_partitioning,
+                    const MPI_Comm &communicator      = MPI_COMM_WORLD,
+                    const size_type n_entries_per_row = 0);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -664,10 +675,10 @@ namespace TrilinosWrappers
      * the same processor. The vector <tt>n_entries_per_row</tt> specifies the
      * number of entries in each row of the newly generated matrix.
      */
-    SparsityPattern (const IndexSet               &row_parallel_partitioning,
-                     const IndexSet               &col_parallel_partitioning,
-                     const MPI_Comm               &communicator,
-                     const std::vector<size_type> &n_entries_per_row);
+    SparsityPattern(const IndexSet &              row_parallel_partitioning,
+                    const IndexSet &              col_parallel_partitioning,
+                    const MPI_Comm &              communicator,
+                    const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This constructor constructs general sparsity patterns, possible non-
@@ -695,11 +706,11 @@ namespace TrilinosWrappers
      * thread-safety can be ensured (as long as the user makes sure to never
      * write into the same matrix row simultaneously, of course).
      */
-    SparsityPattern (const IndexSet  &row_parallel_partitioning,
-                     const IndexSet  &col_parallel_partitioning,
-                     const IndexSet  &writable_rows,
-                     const MPI_Comm  &communicator = MPI_COMM_WORLD,
-                     const size_type  n_entries_per_row = 0);
+    SparsityPattern(const IndexSet &row_parallel_partitioning,
+                    const IndexSet &col_parallel_partitioning,
+                    const IndexSet &writable_rows,
+                    const MPI_Comm &communicator      = MPI_COMM_WORLD,
+                    const size_type n_entries_per_row = 0);
 
     /**
      * Reinitialization function for generating a square sparsity pattern
@@ -717,9 +728,9 @@ namespace TrilinosWrappers
      * function.
      */
     void
-    reinit (const IndexSet  &parallel_partitioning,
-            const MPI_Comm  &communicator = MPI_COMM_WORLD,
-            const size_type  n_entries_per_row = 0);
+    reinit(const IndexSet &parallel_partitioning,
+           const MPI_Comm &communicator      = MPI_COMM_WORLD,
+           const size_type n_entries_per_row = 0);
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -732,9 +743,9 @@ namespace TrilinosWrappers
      * describe.
      */
     void
-    reinit (const IndexSet               &parallel_partitioning,
-            const MPI_Comm               &communicator,
-            const std::vector<size_type> &n_entries_per_row);
+    reinit(const IndexSet &              parallel_partitioning,
+           const MPI_Comm &              communicator,
+           const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This reinit function is similar to the one above, but it now takes two
@@ -753,10 +764,10 @@ namespace TrilinosWrappers
      * <tt>n_entries_per_row</tt>.
      */
     void
-    reinit (const IndexSet  &row_parallel_partitioning,
-            const IndexSet  &col_parallel_partitioning,
-            const MPI_Comm  &communicator = MPI_COMM_WORLD,
-            const size_type  n_entries_per_row = 0);
+    reinit(const IndexSet &row_parallel_partitioning,
+           const IndexSet &col_parallel_partitioning,
+           const MPI_Comm &communicator      = MPI_COMM_WORLD,
+           const size_type n_entries_per_row = 0);
 
     /**
      * This reinit function is used to specify general matrices, possibly non-
@@ -784,21 +795,21 @@ namespace TrilinosWrappers
      * to never write into the same matrix row simultaneously, of course).
      */
     void
-    reinit (const IndexSet  &row_parallel_partitioning,
-            const IndexSet  &col_parallel_partitioning,
-            const IndexSet  &writeable_rows,
-            const MPI_Comm  &communicator = MPI_COMM_WORLD,
-            const size_type  n_entries_per_row = 0);
+    reinit(const IndexSet &row_parallel_partitioning,
+           const IndexSet &col_parallel_partitioning,
+           const IndexSet &writeable_rows,
+           const MPI_Comm &communicator      = MPI_COMM_WORLD,
+           const size_type n_entries_per_row = 0);
 
     /**
      * Same as before, but now using a vector <tt>n_entries_per_row</tt> for
      * specifying the number of entries in each row of the sparsity pattern.
      */
     void
-    reinit (const IndexSet               &row_parallel_partitioning,
-            const IndexSet               &col_parallel_partitioning,
-            const MPI_Comm               &communicator,
-            const std::vector<size_type> &n_entries_per_row);
+    reinit(const IndexSet &              row_parallel_partitioning,
+           const IndexSet &              col_parallel_partitioning,
+           const MPI_Comm &              communicator,
+           const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and the
@@ -811,11 +822,11 @@ namespace TrilinosWrappers
      */
     template <typename SparsityPatternType>
     void
-    reinit (const IndexSet            &row_parallel_partitioning,
-            const IndexSet            &col_parallel_partitioning,
-            const SparsityPatternType &nontrilinos_sparsity_pattern,
-            const MPI_Comm            &communicator  = MPI_COMM_WORLD,
-            const bool                 exchange_data = false);
+    reinit(const IndexSet &           row_parallel_partitioning,
+           const IndexSet &           col_parallel_partitioning,
+           const SparsityPatternType &nontrilinos_sparsity_pattern,
+           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const bool                 exchange_data = false);
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -827,36 +838,40 @@ namespace TrilinosWrappers
      */
     template <typename SparsityPatternType>
     void
-    reinit (const IndexSet            &parallel_partitioning,
-            const SparsityPatternType &nontrilinos_sparsity_pattern,
-            const MPI_Comm            &communicator  = MPI_COMM_WORLD,
-            const bool                 exchange_data = false);
-//@}
+    reinit(const IndexSet &           parallel_partitioning,
+           const SparsityPatternType &nontrilinos_sparsity_pattern,
+           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const bool                 exchange_data = false);
+    //@}
     /**
      * @name Information on the sparsity pattern
      */
-//@{
+    //@{
 
     /**
      * Return the state of the sparsity pattern, i.e., whether compress()
      * needs to be called after an operation requiring data exchange.
      */
-    bool is_compressed () const;
+    bool
+    is_compressed() const;
 
     /**
      * Return the maximum number of entries per row on the current processor.
      */
-    unsigned int max_entries_per_row () const;
+    unsigned int
+    max_entries_per_row() const;
 
     /**
      * Return the number of rows in this sparsity pattern.
      */
-    size_type n_rows () const;
+    size_type
+    n_rows() const;
 
     /**
      * Return the number of columns in this sparsity pattern.
      */
-    size_type n_cols () const;
+    size_type
+    n_cols() const;
 
     /**
      * Return the local dimension of the sparsity pattern, i.e. the number of
@@ -867,7 +882,8 @@ namespace TrilinosWrappers
      * To figure out which elements exactly are stored locally, use
      * local_range().
      */
-    unsigned int local_size () const;
+    unsigned int
+    local_size() const;
 
     /**
      * Return a pair of indices indicating which rows of this sparsity pattern
@@ -878,23 +894,26 @@ namespace TrilinosWrappers
      * <tt>n=local_size()</tt>.
      */
     std::pair<size_type, size_type>
-    local_range () const;
+    local_range() const;
 
     /**
      * Return whether @p index is in the local range or not, see also
      * local_range().
      */
-    bool in_local_range (const size_type index) const;
+    bool
+    in_local_range(const size_type index) const;
 
     /**
      * Return the number of nonzero elements of this sparsity pattern.
      */
-    size_type n_nonzero_elements () const;
+    size_type
+    n_nonzero_elements() const;
 
     /**
      * Number of entries in a specific row.
      */
-    size_type row_length (const size_type row) const;
+    size_type
+    row_length(const size_type row) const;
 
     /**
      * Compute the bandwidth of the matrix represented by this structure. The
@@ -902,58 +921,63 @@ namespace TrilinosWrappers
      * represents a nonzero entry of the matrix. Consequently, the maximum
      * bandwidth a $n\times m$ matrix can have is $\max\{n-1,m-1\}$.
      */
-    size_type bandwidth () const;
+    size_type
+    bandwidth() const;
 
     /**
      * Return whether the object is empty. It is empty if no memory is
      * allocated, which is the same as when both dimensions are zero.
      */
-    bool empty () const;
+    bool
+    empty() const;
 
     /**
      * Return whether the index (<i>i,j</i>) exists in the sparsity pattern
      * (i.e., it may be non-zero) or not.
      */
-    bool exists (const size_type i,
-                 const size_type j) const;
+    bool
+    exists(const size_type i, const size_type j) const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object. Currently not implemented for this class.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
-//@}
+    //@}
     /**
      * @name Adding entries
      */
-//@{
+    //@{
     /**
      * Add the element (<i>i,j</i>) to the sparsity pattern.
      */
-    void add (const size_type i,
-              const size_type j);
+    void
+    add(const size_type i, const size_type j);
 
 
     /**
      * Add several elements in one row to the sparsity pattern.
      */
     template <typename ForwardIterator>
-    void add_entries (const size_type  row,
-                      ForwardIterator  begin,
-                      ForwardIterator  end,
-                      const bool       indices_are_sorted = false);
-//@}
+    void
+    add_entries(const size_type row,
+                ForwardIterator begin,
+                ForwardIterator end,
+                const bool      indices_are_sorted = false);
+    //@}
     /**
      * @name Access of underlying Trilinos data
      */
-//@{
+    //@{
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_CrsGraph
      * data that stores the sparsity pattern.
      */
-    const Epetra_FECrsGraph &trilinos_sparsity_pattern () const;
+    const Epetra_FECrsGraph &
+    trilinos_sparsity_pattern() const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -964,7 +988,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_domain_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &domain_partitioner () const;
+    const Epetra_Map &
+    domain_partitioner() const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -975,7 +1000,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_range_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &range_partitioner () const;
+    const Epetra_Map &
+    range_partitioner() const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -985,7 +1011,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_range_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &row_partitioner () const;
+    const Epetra_Map &
+    row_partitioner() const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -997,7 +1024,8 @@ namespace TrilinosWrappers
      * Epetra_FECrsGraph.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &col_partitioner () const;
+    const Epetra_Map &
+    col_partitioner() const;
 
     /**
      * Return a const reference to the communicator used for this object.
@@ -1005,49 +1033,55 @@ namespace TrilinosWrappers
      * @deprecated Use get_mpi_communicator instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Comm &trilinos_communicator () const;
+    const Epetra_Comm &
+    trilinos_communicator() const;
 
     /**
      * Return the MPI communicator object in use with this matrix.
      */
-    MPI_Comm get_mpi_communicator () const;
-//@}
+    MPI_Comm
+    get_mpi_communicator() const;
+    //@}
 
     /**
      * @name Partitioners
      */
-//@{
+    //@{
 
     /**
      * Return the partitioning of the domain space of this pattern, i.e., the
      * partitioning of the vectors a matrix based on this sparsity pattern has
      * to be multiplied with.
      */
-    IndexSet locally_owned_domain_indices() const;
+    IndexSet
+    locally_owned_domain_indices() const;
 
     /**
      * Return the partitioning of the range space of this pattern, i.e., the
      * partitioning of the vectors that are the result from matrix-vector
      * products from a matrix based on this pattern.
      */
-    IndexSet locally_owned_range_indices() const;
+    IndexSet
+    locally_owned_range_indices() const;
 
-//@}
+    //@}
 
     /**
      * @name Iterators
      */
-//@{
+    //@{
 
     /**
      * Iterator starting at the first entry.
      */
-    const_iterator begin () const;
+    const_iterator
+    begin() const;
 
     /**
      * Final iterator.
      */
-    const_iterator end () const;
+    const_iterator
+    end() const;
 
     /**
      * Iterator starting at the first entry of row @p r.
@@ -1057,7 +1091,8 @@ namespace TrilinosWrappers
      * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable
      * in that case.
      */
-    const_iterator begin (const size_type r) const;
+    const_iterator
+    begin(const size_type r) const;
 
     /**
      * Final iterator of row <tt>r</tt>. It points to the first element past
@@ -1067,20 +1102,22 @@ namespace TrilinosWrappers
      * in particular the case if it is the end iterator for the last row of a
      * matrix.
      */
-    const_iterator end (const size_type r) const;
+    const_iterator
+    end(const size_type r) const;
 
-//@}
+    //@}
     /**
      * @name Input/Output
      */
-//@{
+    //@{
 
     /**
      * Abstract Trilinos object that helps view in ASCII other Trilinos
      * objects. Currently this function is not implemented.  TODO: Not
      * implemented.
      */
-    void write_ascii ();
+    void
+    write_ascii();
 
     /**
      * Print (the locally owned part of) the sparsity pattern to the given
@@ -1089,8 +1126,9 @@ namespace TrilinosWrappers
      * processor number is printed to the stream, as well as a summary before
      * actually writing the entries.
      */
-    void print (std::ostream &out,
-                const bool    write_extended_trilinos_info = false) const;
+    void
+    print(std::ostream &out,
+          const bool    write_extended_trilinos_info = false) const;
 
     /**
      * Print the sparsity of the matrix in a format that <tt>gnuplot</tt>
@@ -1106,9 +1144,10 @@ namespace TrilinosWrappers
      * Print the sparsity pattern in gnuplot by setting the data style to dots
      * or points and use the <tt>plot</tt> command.
      */
-    void print_gnuplot (std::ostream &out) const;
+    void
+    print_gnuplot(std::ostream &out) const;
 
-//@}
+    //@}
     /**
      * @addtogroup Exceptions
      * @{
@@ -1116,50 +1155,55 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException1 (ExcTrilinosError,
-                    int,
-                    << "An error with error number " << arg1
-                    << " occurred while calling a Trilinos function");
+    DeclException1(ExcTrilinosError,
+                   int,
+                   << "An error with error number " << arg1
+                   << " occurred while calling a Trilinos function");
 
     /**
      * Exception
      */
-    DeclException2 (ExcInvalidIndex,
-                    size_type, size_type,
-                    << "The entry with index <" << arg1 << ',' << arg2
-                    << "> does not exist.");
+    DeclException2(ExcInvalidIndex,
+                   size_type,
+                   size_type,
+                   << "The entry with index <" << arg1 << ',' << arg2
+                   << "> does not exist.");
 
     /**
      * Exception
      */
-    DeclExceptionMsg (ExcSourceEqualsDestination,
-                      "You are attempting an operation on two sparsity patterns that "
-                      "are the same object, but the operation requires that the "
-                      "two objects are in fact different.");
+    DeclExceptionMsg(
+      ExcSourceEqualsDestination,
+      "You are attempting an operation on two sparsity patterns that "
+      "are the same object, but the operation requires that the "
+      "two objects are in fact different.");
 
     /**
      * Exception
      */
-    DeclException4 (ExcAccessToNonLocalElement,
-                    size_type, size_type, size_type, size_type,
-                    << "You tried to access element (" << arg1
-                    << "/" << arg2 << ")"
-                    << " of a distributed matrix, but only rows "
-                    << arg3 << " through " << arg4
-                    << " are stored locally and can be accessed.");
+    DeclException4(ExcAccessToNonLocalElement,
+                   size_type,
+                   size_type,
+                   size_type,
+                   size_type,
+                   << "You tried to access element (" << arg1 << "/" << arg2
+                   << ")"
+                   << " of a distributed matrix, but only rows " << arg3
+                   << " through " << arg4
+                   << " are stored locally and can be accessed.");
 
     /**
      * Exception
      */
-    DeclException2 (ExcAccessToNonPresentElement,
-                    size_type, size_type,
-                    << "You tried to access element (" << arg1
-                    << "/" << arg2 << ")"
-                    << " of a sparse matrix, but it appears to not"
-                    << " exist in the Trilinos sparsity pattern.");
+    DeclException2(ExcAccessToNonPresentElement,
+                   size_type,
+                   size_type,
+                   << "You tried to access element (" << arg1 << "/" << arg2
+                   << ")"
+                   << " of a sparse matrix, but it appears to not"
+                   << " exist in the Trilinos sparsity pattern.");
     //@}
   private:
-
     /**
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
@@ -1188,78 +1232,72 @@ namespace TrilinosWrappers
 
 
 
-// -------------------------- inline and template functions ----------------------
+  // -------------------------- inline and template functions
+  // ----------------------
 
 
-#ifndef DOXYGEN
+#    ifndef DOXYGEN
 
   namespace SparsityPatternIterators
   {
-
-    inline
-    Accessor::Accessor (const SparsityPattern *sp,
-                        const size_type        row,
-                        const size_type        index)
-      :
+    inline Accessor::Accessor(const SparsityPattern *sp,
+                              const size_type        row,
+                              const size_type        index) :
       sparsity_pattern(const_cast<SparsityPattern *>(sp)),
       a_row(row),
       a_index(index)
     {
-      visit_present_row ();
+      visit_present_row();
     }
 
 
 
-    inline
-    Accessor::size_type
+    inline Accessor::size_type
     Accessor::row() const
     {
-      Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
+      Assert(a_row < sparsity_pattern->n_rows(),
+             ExcBeyondEndOfSparsityPattern());
       return a_row;
     }
 
 
 
-    inline
-    Accessor::size_type
+    inline Accessor::size_type
     Accessor::column() const
     {
-      Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
+      Assert(a_row < sparsity_pattern->n_rows(),
+             ExcBeyondEndOfSparsityPattern());
       return (*colnum_cache)[a_index];
     }
 
 
 
-    inline
-    Accessor::size_type
+    inline Accessor::size_type
     Accessor::index() const
     {
-      Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
+      Assert(a_row < sparsity_pattern->n_rows(),
+             ExcBeyondEndOfSparsityPattern());
       return a_index;
     }
 
 
 
-    inline
-    Iterator::Iterator(const SparsityPattern *sp,
-                       const size_type        row,
-                       const size_type        index)
-      :
+    inline Iterator::Iterator(const SparsityPattern *sp,
+                              const size_type        row,
+                              const size_type        index) :
       accessor(sp, row, index)
     {}
 
 
-    inline
-    Iterator::Iterator(const Iterator &) = default;
+    inline Iterator::Iterator(const Iterator &) = default;
 
 
 
-    inline
-    Iterator &
-    Iterator::operator++ ()
+    inline Iterator &
+    Iterator::operator++()
     {
-      Assert (accessor.a_row < accessor.sparsity_pattern->n_rows(),
-              ExcIteratorPastEnd());
+      Assert(accessor.a_row < accessor.sparsity_pattern->n_rows(),
+             ExcIteratorPastEnd());
 
       ++accessor.a_index;
 
@@ -1272,8 +1310,7 @@ namespace TrilinosWrappers
           accessor.a_index = 0;
           ++accessor.a_row;
 
-          while ((accessor.a_row < accessor.sparsity_pattern->n_rows())
-                 &&
+          while ((accessor.a_row < accessor.sparsity_pattern->n_rows()) &&
                  (accessor.sparsity_pattern->row_length(accessor.a_row) == 0))
             ++accessor.a_row;
 
@@ -1284,9 +1321,8 @@ namespace TrilinosWrappers
 
 
 
-    inline
-    Iterator
-    Iterator::operator++ (int)
+    inline Iterator
+    Iterator::operator++(int)
     {
       const Iterator old_state = *this;
       ++(*this);
@@ -1295,27 +1331,22 @@ namespace TrilinosWrappers
 
 
 
-    inline
-    const Accessor &
-    Iterator::operator* () const
+    inline const Accessor &Iterator::operator*() const
     {
       return accessor;
     }
 
 
 
-    inline
-    const Accessor *
-    Iterator::operator-> () const
+    inline const Accessor *Iterator::operator->() const
     {
       return &accessor;
     }
 
 
 
-    inline
-    bool
-    Iterator::operator == (const Iterator &other) const
+    inline bool
+    Iterator::operator==(const Iterator &other) const
     {
       return (accessor.a_row == other.accessor.a_row &&
               accessor.a_index == other.accessor.a_index);
@@ -1323,30 +1354,27 @@ namespace TrilinosWrappers
 
 
 
-    inline
-    bool
-    Iterator::operator != (const Iterator &other) const
+    inline bool
+    Iterator::operator!=(const Iterator &other) const
     {
-      return ! (*this == other);
+      return !(*this == other);
     }
 
 
 
-    inline
-    bool
-    Iterator::operator < (const Iterator &other) const
+    inline bool
+    Iterator::operator<(const Iterator &other) const
     {
       return (accessor.row() < other.accessor.row() ||
               (accessor.row() == other.accessor.row() &&
                accessor.index() < other.accessor.index()));
     }
 
-  }
+  } // namespace SparsityPatternIterators
 
 
 
-  inline
-  SparsityPattern::const_iterator
+  inline SparsityPattern::const_iterator
   SparsityPattern::begin() const
   {
     return const_iterator(this, 0, 0);
@@ -1354,8 +1382,7 @@ namespace TrilinosWrappers
 
 
 
-  inline
-  SparsityPattern::const_iterator
+  inline SparsityPattern::const_iterator
   SparsityPattern::end() const
   {
     return const_iterator(this, n_rows(), 0);
@@ -1363,29 +1390,27 @@ namespace TrilinosWrappers
 
 
 
-  inline
-  SparsityPattern::const_iterator
+  inline SparsityPattern::const_iterator
   SparsityPattern::begin(const size_type r) const
   {
-    Assert (r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+    Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
     if (row_length(r) > 0)
       return const_iterator(this, r, 0);
     else
-      return end (r);
+      return end(r);
   }
 
 
 
-  inline
-  SparsityPattern::const_iterator
+  inline SparsityPattern::const_iterator
   SparsityPattern::end(const size_type r) const
   {
-    Assert (r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+    Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
     // place the iterator on the first entry
     // past this line, or at the end of the
     // matrix
-    for (size_type i=r+1; i<n_rows(); ++i)
+    for (size_type i = r + 1; i < n_rows(); ++i)
       if (row_length(i) > 0)
         return const_iterator(this, i, 0);
 
@@ -1396,18 +1421,17 @@ namespace TrilinosWrappers
 
 
 
-  inline
-  bool
-  SparsityPattern::in_local_range (const size_type index) const
+  inline bool
+  SparsityPattern::in_local_range(const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#ifndef DEAL_II_WITH_64BIT_INDICES
+#      ifndef DEAL_II_WITH_64BIT_INDICES
     begin = graph->RowMap().MinMyGID();
-    end = graph->RowMap().MaxMyGID()+1;
-#else
+    end   = graph->RowMap().MaxMyGID() + 1;
+#      else
     begin = graph->RowMap().MinMyGID64();
-    end = graph->RowMap().MaxMyGID64()+1;
-#endif
+    end   = graph->RowMap().MaxMyGID64() + 1;
+#      endif
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -1415,41 +1439,36 @@ namespace TrilinosWrappers
 
 
 
-  inline
-  bool
-  SparsityPattern::is_compressed () const
+  inline bool
+  SparsityPattern::is_compressed() const
   {
     return graph->Filled();
   }
 
 
 
-  inline
-  bool
-  SparsityPattern::empty () const
+  inline bool
+  SparsityPattern::empty() const
   {
     return ((n_rows() == 0) && (n_cols() == 0));
   }
 
 
 
-  inline
-  void
-  SparsityPattern::add (const size_type i,
-                        const size_type j)
+  inline void
+  SparsityPattern::add(const size_type i, const size_type j)
   {
-    add_entries (i, &j, &j+1);
+    add_entries(i, &j, &j + 1);
   }
 
 
 
   template <typename ForwardIterator>
-  inline
-  void
-  SparsityPattern::add_entries (const size_type row,
-                                ForwardIterator begin,
-                                ForwardIterator end,
-                                const bool      /*indices_are_sorted*/)
+  inline void
+  SparsityPattern::add_entries(const size_type row,
+                               ForwardIterator begin,
+                               ForwardIterator end,
+                               const bool /*indices_are_sorted*/)
   {
     if (begin == end)
       return;
@@ -1462,70 +1481,68 @@ namespace TrilinosWrappers
     // accessor class. consequently, we need to somehow get an actual value
     // from it which we can by evaluating an expression such as when
     // multiplying the value produced by 2
-    Assert (sizeof(TrilinosWrappers::types::int_type) ==
-            sizeof((*begin)*2),
-            ExcNotImplemented());
+    Assert(sizeof(TrilinosWrappers::types::int_type) == sizeof((*begin) * 2),
+           ExcNotImplemented());
 
     TrilinosWrappers::types::int_type *col_index_ptr =
       (TrilinosWrappers::types::int_type *)(&*begin);
     const int n_cols = static_cast<int>(end - begin);
 
     int ierr;
-    if ( graph->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row)) != -1)
-      ierr = graph->InsertGlobalIndices (row, n_cols, col_index_ptr);
+    if (graph->RowMap().LID(
+          static_cast<TrilinosWrappers::types::int_type>(row)) != -1)
+      ierr = graph->InsertGlobalIndices(row, n_cols, col_index_ptr);
     else if (nonlocal_graph.get() != nullptr)
       {
         // this is the case when we have explicitly set the off-processor rows
         // and want to create a separate matrix object for them (to retain
         // thread-safety)
-        Assert (nonlocal_graph->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
-                ExcMessage("Attempted to write into off-processor matrix row "
-                           "that has not be specified as being writable upon "
-                           "initialization"));
-        ierr = nonlocal_graph->InsertGlobalIndices (row, n_cols, col_index_ptr);
+        Assert(nonlocal_graph->RowMap().LID(
+                 static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
+               ExcMessage("Attempted to write into off-processor matrix row "
+                          "that has not be specified as being writable upon "
+                          "initialization"));
+        ierr = nonlocal_graph->InsertGlobalIndices(row, n_cols, col_index_ptr);
       }
     else
-      ierr = graph->InsertGlobalIndices
-             (1, (TrilinosWrappers::types::int_type *)&row, n_cols, col_index_ptr);
+      ierr = graph->InsertGlobalIndices(
+        1, (TrilinosWrappers::types::int_type *)&row, n_cols, col_index_ptr);
 
-    AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
+    AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
   }
 
 
 
-  inline
-  const Epetra_FECrsGraph &
-  SparsityPattern::trilinos_sparsity_pattern () const
+  inline const Epetra_FECrsGraph &
+  SparsityPattern::trilinos_sparsity_pattern() const
   {
     return *graph;
   }
 
 
 
-  inline
-  IndexSet
-  SparsityPattern::locally_owned_domain_indices () const
+  inline IndexSet
+  SparsityPattern::locally_owned_domain_indices() const
   {
     return IndexSet(static_cast<const Epetra_Map &>(graph->DomainMap()));
   }
 
 
 
-  inline
-  IndexSet
-  SparsityPattern::locally_owned_range_indices () const
+  inline IndexSet
+  SparsityPattern::locally_owned_range_indices() const
   {
     return IndexSet(static_cast<const Epetra_Map &>(graph->RangeMap()));
   }
 
-#endif // DOXYGEN
-}
+#    endif // DOXYGEN
+} // namespace TrilinosWrappers
 
 
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // DEAL_II_WITH_TRILINOS
+#  endif // DEAL_II_WITH_TRILINOS
 
 
 /*--------------------   trilinos_sparsity_pattern.h     --------------------*/

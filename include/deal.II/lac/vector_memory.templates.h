@@ -17,8 +17,8 @@
 #define dealii_vector_memory_templates_h
 
 
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/vector_memory.h>
 
@@ -26,23 +26,20 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename VectorType>
-typename GrowingVectorMemory<VectorType>::Pool GrowingVectorMemory<VectorType>::pool;
+typename GrowingVectorMemory<VectorType>::Pool
+  GrowingVectorMemory<VectorType>::pool;
 
 template <typename VectorType>
 Threads::Mutex GrowingVectorMemory<VectorType>::mutex;
 
 template <typename VectorType>
-inline
-GrowingVectorMemory<VectorType>::Pool::Pool()
-  :
-  data(nullptr)
+inline GrowingVectorMemory<VectorType>::Pool::Pool() : data(nullptr)
 {}
 
 
 
 template <typename VectorType>
-inline
-GrowingVectorMemory<VectorType>::Pool::~Pool()
+inline GrowingVectorMemory<VectorType>::Pool::~Pool()
 {
   // Nothing to do if memory was unused.
   if (data == nullptr)
@@ -56,19 +53,18 @@ GrowingVectorMemory<VectorType>::Pool::~Pool()
 
 
 template <typename VectorType>
-inline
-void
+inline void
 GrowingVectorMemory<VectorType>::Pool::initialize(const size_type size)
 {
   if (data == nullptr)
     {
       data = new std::vector<entry_type>(size);
 
-      for (typename std::vector<entry_type>::iterator i= data->begin();
+      for (typename std::vector<entry_type>::iterator i = data->begin();
            i != data->end();
            ++i)
         {
-          i->first = false;
+          i->first  = false;
           i->second = std_cxx14::make_unique<VectorType>();
         }
     }
@@ -76,9 +72,9 @@ GrowingVectorMemory<VectorType>::Pool::initialize(const size_type size)
 
 
 template <typename VectorType>
-inline
-GrowingVectorMemory<VectorType>::GrowingVectorMemory (const size_type initial_size,
-                                                      const bool log_statistics)
+inline GrowingVectorMemory<VectorType>::GrowingVectorMemory(
+  const size_type initial_size,
+  const bool      log_statistics)
 
   :
   total_alloc(0),
@@ -91,8 +87,7 @@ GrowingVectorMemory<VectorType>::GrowingVectorMemory (const size_type initial_si
 
 
 template <typename VectorType>
-inline
-GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
+inline GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
 {
   AssertNothrow(current_alloc == 0,
                 StandardExceptions::ExcMemoryLeak(current_alloc));
@@ -108,9 +103,8 @@ GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
 
 
 template <typename VectorType>
-inline
-VectorType *
-GrowingVectorMemory<VectorType>::alloc ()
+inline VectorType *
+GrowingVectorMemory<VectorType>::alloc()
 {
   Threads::Mutex::ScopedLock lock(mutex);
 
@@ -118,8 +112,9 @@ GrowingVectorMemory<VectorType>::alloc ()
   ++current_alloc;
   // see if there is a free vector
   // available in our list
-  for (typename std::vector<entry_type>::iterator i=pool.data->begin();
-       i != pool.data->end(); ++i)
+  for (typename std::vector<entry_type>::iterator i = pool.data->begin();
+       i != pool.data->end();
+       ++i)
     {
       if (i->first == false)
         {
@@ -129,7 +124,8 @@ GrowingVectorMemory<VectorType>::alloc ()
     }
 
   // no free vector found, so let's just allocate a new one
-  pool.data->emplace_back(entry_type (true, std_cxx14::make_unique<VectorType>()));
+  pool.data->emplace_back(
+    entry_type(true, std_cxx14::make_unique<VectorType>()));
 
   return pool.data->back().second.get();
 }
@@ -137,14 +133,14 @@ GrowingVectorMemory<VectorType>::alloc ()
 
 
 template <typename VectorType>
-inline
-void
+inline void
 GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 {
   Threads::Mutex::ScopedLock lock(mutex);
 
-  for (typename std::vector<entry_type>::iterator i=pool.data->begin();
-       i != pool.data->end(); ++i)
+  for (typename std::vector<entry_type>::iterator i = pool.data->begin();
+       i != pool.data->end();
+       ++i)
     {
       if (v == i->second.get())
         {
@@ -159,9 +155,8 @@ GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 
 
 template <typename VectorType>
-inline
-void
-GrowingVectorMemory<VectorType>::release_unused_memory ()
+inline void
+GrowingVectorMemory<VectorType>::release_unused_memory()
 {
   Threads::Mutex::ScopedLock lock(mutex);
 
@@ -172,18 +167,17 @@ GrowingVectorMemory<VectorType>::release_unused_memory ()
 
 
 template <typename VectorType>
-inline
-std::size_t
-GrowingVectorMemory<VectorType>::memory_consumption () const
+inline std::size_t
+GrowingVectorMemory<VectorType>::memory_consumption() const
 {
   Threads::Mutex::ScopedLock lock(mutex);
 
-  std::size_t result = sizeof (*this);
-  const typename std::vector<entry_type>::const_iterator
-  end = pool.data->end();
-  for (typename std::vector<entry_type>::const_iterator
-       i = pool.data->begin(); i != end ; ++i)
-    result += sizeof (*i) + MemoryConsumption::memory_consumption(i->second);
+  std::size_t                                            result = sizeof(*this);
+  const typename std::vector<entry_type>::const_iterator end = pool.data->end();
+  for (typename std::vector<entry_type>::const_iterator i = pool.data->begin();
+       i != end;
+       ++i)
+    result += sizeof(*i) + MemoryConsumption::memory_consumption(i->second);
 
   return result;
 }

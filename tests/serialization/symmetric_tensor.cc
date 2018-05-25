@@ -16,37 +16,34 @@
 
 // check serialization for SymmetricTensor<2,dim>
 
-#include "serialization.h"
 #include <deal.II/base/symmetric_tensor.h>
 
+#include "serialization.h"
 
-void test ()
+
+void
+test()
 {
-  const unsigned int dim=3;
-  const unsigned int rank=2;
+  const unsigned int dim  = 3;
+  const unsigned int rank = 2;
 
-  double a1[3][3] = {{1., 2., 3.},
-    {2., 5., 6.},
-    {3., 6., 9.}
-  };
-  SymmetricTensor<rank,dim> t1((Tensor<rank,dim>(a1)));
+  double a1[3][3] = {{1., 2., 3.}, {2., 5., 6.}, {3., 6., 9.}};
+  SymmetricTensor<rank, dim> t1((Tensor<rank, dim>(a1)));
 
 
-  double a2[3][3] = {{10., 11., 12.},
-    {11., 14., 15.},
-    {12., 15., 18.}
-  };
-  SymmetricTensor<rank,dim> t2((Tensor<rank,dim>(a2)));
+  double a2[3][3] = {{10., 11., 12.}, {11., 14., 15.}, {12., 15., 18.}};
+  SymmetricTensor<rank, dim> t2((Tensor<rank, dim>(a2)));
 
-  verify (t1, t2);
+  verify(t1, t2);
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

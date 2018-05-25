@@ -19,69 +19,73 @@
 // for a finite element that consists of only a single set of vector
 // components (i.e. it has dim components)
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/lac/constraint_matrix.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+void
+test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
-  Functions::ConstantFunction<dim> constant_function(1.,dim);
-  typename FunctionMap<dim>::type function_map;
-  for (unsigned int j=0; j<GeometryInfo<dim>::faces_per_cell; ++j)
+  Functions::ConstantFunction<dim> constant_function(1., dim);
+  typename FunctionMap<dim>::type  function_map;
+  for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell; ++j)
     function_map[j] = &constant_function;
 
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
-      deallog << "FE=" << fe.get_name()
-              << ", case=" << i
-              << std::endl;
+      deallog << "FE=" << fe.get_name() << ", case=" << i << std::endl;
 
       std::set<types::boundary_id> boundary_ids;
-      for (unsigned int j=0; j<=i; ++j)
-        boundary_ids.insert (j);
+      for (unsigned int j = 0; j <= i; ++j)
+        boundary_ids.insert(j);
 
       ConstraintMatrix cm;
-      VectorTools::compute_nonzero_normal_flux_constraints
-      (dof, 0, boundary_ids, function_map,  cm);
+      VectorTools::compute_nonzero_normal_flux_constraints(
+        dof, 0, boundary_ids, function_map, cm);
 
-      cm.print (deallog.get_file_stream ());
+      cm.print(deallog.get_file_stream());
     }
-  //Get the location of all boundary dofs
+  // Get the location of all boundary dofs
   std::vector<types::global_dof_index> face_dofs;
-  const std::vector<Point<dim-1> > &
-  unit_support_points = fe.get_unit_face_support_points();
-  Quadrature<dim-1> quadrature(unit_support_points);
-  FEFaceValues<dim, dim> fe_face_values(fe, quadrature, update_quadrature_points);
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof.begin_active(),
-  endc = dof.end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell;
+  const std::vector<Point<dim - 1>> &  unit_support_points =
+    fe.get_unit_face_support_points();
+  Quadrature<dim - 1>    quadrature(unit_support_points);
+  FEFaceValues<dim, dim> fe_face_values(
+    fe, quadrature, update_quadrature_points);
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+                                                 endc = dof.end();
+  for (; cell != endc; ++cell)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
          ++face_no)
       if (cell->face(face_no)->at_boundary())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
-          face_dofs.resize (fe.dofs_per_face);
-          face->get_dof_indices (face_dofs);
+          face_dofs.resize(fe.dofs_per_face);
+          face->get_dof_indices(face_dofs);
 
           fe_face_values.reinit(cell, face_no);
-          for (unsigned int i=0; i<face_dofs.size(); ++i)
+          for (unsigned int i = 0; i < face_dofs.size(); ++i)
             {
               std::cout << face_dofs[i] << "\t"
                         << fe_face_values.quadrature_point(i) << "\t"
@@ -89,34 +93,34 @@ void test (const Triangulation<dim> &tr,
                         << std::endl;
             }
         }
-
-
 }
 
 
 template <int dim>
-void test_hyper_cube()
+void
+test_hyper_cube()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
 
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    tr.begin_active()->face(i)->set_boundary_id (i);
+  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    tr.begin_active()->face(i)->set_boundary_id(i);
 
   tr.refine_global(2);
 
-  for (unsigned int degree=1; degree<4; ++degree)
+  for (unsigned int degree = 1; degree < 4; ++degree)
     {
-      FESystem<dim> fe (FE_Q<dim>(degree), dim);
+      FESystem<dim> fe(FE_Q<dim>(degree), dim);
       test(tr, fe);
     }
 }
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
 

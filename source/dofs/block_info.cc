@@ -16,20 +16,24 @@
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_tools.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>
+
+#include <deal.II/multigrid/mg_tools.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
 void
-BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof, bool levels_only, bool active_only)
+BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
+                      bool                             levels_only,
+                      bool                             active_only)
 {
   if (!levels_only && dof.has_active_dofs())
     {
-      const FiniteElement<dim, spacedim> &fe = dof.get_fe();
+      const FiniteElement<dim, spacedim> & fe = dof.get_fe();
       std::vector<types::global_dof_index> sizes(fe.n_blocks());
       DoFTools::count_dofs_per_block(dof, sizes);
       bi_global.reinit(sizes);
@@ -37,16 +41,17 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof, bool levels_only, bo
 
   if (!active_only && dof.has_level_dofs())
     {
-      std::vector<std::vector<types::global_dof_index> > sizes (dof.get_triangulation().n_levels ());
+      std::vector<std::vector<types::global_dof_index>> sizes(
+        dof.get_triangulation().n_levels());
 
-      for (unsigned int i = 0; i < sizes.size (); ++i)
-        sizes[i].resize (dof.get_fe ().n_blocks ());
+      for (unsigned int i = 0; i < sizes.size(); ++i)
+        sizes[i].resize(dof.get_fe().n_blocks());
 
-      MGTools::count_dofs_per_block (dof, sizes);
-      levels.resize (sizes.size ());
+      MGTools::count_dofs_per_block(dof, sizes);
+      levels.resize(sizes.size());
 
-      for (unsigned int i = 0; i < sizes.size (); ++i)
-        levels[i].reinit (sizes[i]);
+      for (unsigned int i = 0; i < sizes.size(); ++i)
+        levels[i].reinit(sizes[i]);
     }
 }
 
@@ -55,18 +60,16 @@ template <int dim, int spacedim>
 void
 BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
 {
-  const FiniteElement<dim, spacedim> &fe = dof.get_fe();
+  const FiniteElement<dim, spacedim> & fe = dof.get_fe();
   std::vector<types::global_dof_index> sizes(fe.n_blocks());
 
   base_elements.resize(fe.n_blocks());
 
-  for (unsigned int i=0; i<base_elements.size(); ++i)
+  for (unsigned int i = 0; i < base_elements.size(); ++i)
     base_elements[i] = fe.block_to_base_index(i).first;
 
   local_renumbering.resize(fe.n_dofs_per_cell());
-  FETools::compute_block_renumbering(fe,
-                                     local_renumbering,
-                                     sizes, false);
+  FETools::compute_block_renumbering(fe, local_renumbering, sizes, false);
   bi_local.reinit(sizes);
 }
 

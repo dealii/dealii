@@ -25,13 +25,11 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_matrix (m);
-  m.print (deallog.get_file_stream());
+  FullMatrix<std::complex<number>> m;
+  make_matrix(m);
+  m.print(deallog.get_file_stream());
 }
-

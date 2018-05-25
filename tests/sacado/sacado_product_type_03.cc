@@ -16,45 +16,48 @@
 
 // test ProductType with sacado
 
-#include <typeinfo>
-
 #include <deal.II/base/tensor.h>
+
 #include <deal.II/differentiation/ad/sacado_product_types.h>
+
+#include <typeinfo>
 
 #include "../tests.h"
 
 template <typename T, typename U, typename CompareType>
-void check()
+void
+check()
 {
-  AssertThrow (typeid(typename ProductType<T,U>::type) == typeid(CompareType),
-               ExcInternalError());
+  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType),
+              ExcInternalError());
 }
 
 
-int main()
+int
+main()
 {
-  typedef Sacado::Fad::DFad<double> Sdouble;
+  typedef Sacado::Fad::DFad<double>  Sdouble;
   typedef Sacado::Fad::DFad<Sdouble> SSdouble;
   initlog();
 
 
   // check product of scalars
-  check<Sdouble,SSdouble,SSdouble>();
-  check<SSdouble,Sdouble,SSdouble>();
+  check<Sdouble, SSdouble, SSdouble>();
+  check<SSdouble, Sdouble, SSdouble>();
 
   // check product with Tensor<1,dim>
-  check<Tensor<1,2,Sdouble>,SSdouble,Tensor<1,2,SSdouble> >();
-  check<Tensor<1,2,SSdouble>,Sdouble,Tensor<1,2,SSdouble> >();
+  check<Tensor<1, 2, Sdouble>, SSdouble, Tensor<1, 2, SSdouble>>();
+  check<Tensor<1, 2, SSdouble>, Sdouble, Tensor<1, 2, SSdouble>>();
 
-  check<SSdouble,Tensor<1,2,Sdouble>,Tensor<1,2,SSdouble> >();
-  check<Sdouble,Tensor<1,2,SSdouble>,Tensor<1,2,SSdouble> >();
+  check<SSdouble, Tensor<1, 2, Sdouble>, Tensor<1, 2, SSdouble>>();
+  check<Sdouble, Tensor<1, 2, SSdouble>, Tensor<1, 2, SSdouble>>();
 
   // check product with Tensor<2,dim> (which is a different class)
-  check<Tensor<2,2,Sdouble>,SSdouble,Tensor<2,2,SSdouble> >();
-  check<Tensor<2,2,SSdouble>,Sdouble,Tensor<2,2,SSdouble> >();
+  check<Tensor<2, 2, Sdouble>, SSdouble, Tensor<2, 2, SSdouble>>();
+  check<Tensor<2, 2, SSdouble>, Sdouble, Tensor<2, 2, SSdouble>>();
 
-  check<SSdouble,Tensor<2,2,Sdouble>,Tensor<2,2,SSdouble> >();
-  check<Sdouble,Tensor<2,2,SSdouble>,Tensor<2,2,SSdouble> >();
+  check<SSdouble, Tensor<2, 2, Sdouble>, Tensor<2, 2, SSdouble>>();
+  check<Sdouble, Tensor<2, 2, SSdouble>, Tensor<2, 2, SSdouble>>();
 
   deallog << "OK" << std::endl;
 }

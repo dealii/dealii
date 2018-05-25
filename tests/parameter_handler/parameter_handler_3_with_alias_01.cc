@@ -20,11 +20,13 @@
 // declare it, but the input file still references the original name) whereas
 // the _with_alias_02 does it the other way around
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   try
     {
@@ -32,29 +34,24 @@ int main ()
       deallog.attach(logfile);
 
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
-      prm.declare_entry ("string list",
-                         "a",
-                         Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-                         "docs 1");
-      prm.declare_entry ("int",
-                         "1",
-                         Patterns::Integer());
-      prm.declare_entry ("double",
-                         "3.1415926",
-                         Patterns::Double(),
-                         "docs 3");
-      prm.declare_alias ("int",
-                         "int_alias");
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.declare_entry("string list",
+                        "a",
+                        Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+                        "docs 1");
+      prm.declare_entry("int", "1", Patterns::Integer());
+      prm.declare_entry("double", "3.1415926", Patterns::Double(), "docs 3");
+      prm.declare_alias("int", "int_alias");
+      prm.leave_subsection();
 
       // read and then write parameters
       prm.parse_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
-      prm.print_parameters (logfile, ParameterHandler::Text);
+      prm.print_parameters(logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -67,7 +64,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

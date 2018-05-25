@@ -19,29 +19,31 @@
 // the STL.
 
 
-#include "../tests.h"
 #include <deal.II/base/std_cxx14/algorithm.h>
 
-constexpr bool comp (const int &a, const int &b)
+#include "../tests.h"
+
+constexpr bool
+comp(const int &a, const int &b)
 {
-  return b<a;
+  return b < a;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  constexpr int max_1 = std_cxx14::max(0,1);
+  constexpr int max_1 = std_cxx14::max(0, 1);
   deallog << max_1 << std::endl;
-  constexpr int max_2 = std_cxx14::max(3,2,comp);
+  constexpr int max_2 = std_cxx14::max(3, 2, comp);
   deallog << max_2 << std::endl;
 
-  constexpr int min_1 = std_cxx14::min(1,2);
+  constexpr int min_1 = std_cxx14::min(1, 2);
   deallog << min_1 << std::endl;
-  constexpr int min_2 = std_cxx14::min(1,2,comp);
+  constexpr int min_2 = std_cxx14::min(1, 2, comp);
   deallog << min_2 << std::endl;
 
   deallog << "OK" << std::endl;
 }
-

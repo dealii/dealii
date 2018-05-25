@@ -18,34 +18,38 @@
 // Test constructor/reinit of BlockVector with IndexSets and the conversion
 // to a Vector
 
-#include "../tests.h"
-#include "../distributed_grids/coarse_grid_common.h"
+#include <deal.II/base/index_set.h>
+
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/base/index_set.h>
+
 #include <iostream>
 #include <vector>
 
-void test ()
+#include "../distributed_grids/coarse_grid_common.h"
+#include "../tests.h"
+
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   std::vector<IndexSet> local_active(2);
 
   // block 0:
   local_active[0].set_size(numproc);
-  local_active[0].add_range(myid,myid+1);
+  local_active[0].add_range(myid, myid + 1);
 
-  local_active[1].set_size(2*numproc);
-  local_active[1].add_range(myid*2,myid*2+2);
+  local_active[1].set_size(2 * numproc);
+  local_active[1].add_range(myid * 2, myid * 2 + 2);
 
   TrilinosWrappers::MPI::BlockVector v_block(local_active, MPI_COMM_WORLD);
 
   v_block(myid) = 100.0 + myid;
 
-  v_block.block(1)(myid*2)=myid*2.0;
-  v_block.block(1)(myid*2+1)=myid*2.0+1.0;
+  v_block.block(1)(myid * 2)     = myid * 2.0;
+  v_block.block(1)(myid * 2 + 1) = myid * 2.0 + 1.0;
 
   v_block.compress(VectorOperation::insert);
 
@@ -55,7 +59,7 @@ void test ()
   v_block.locally_owned_elements().print(deallog.get_file_stream());
 
   TrilinosWrappers::MPI::Vector v;
-  v.reinit (v_block);
+  v.reinit(v_block);
 
   deallog << "size: " << v.size() << std::endl;
   v.locally_owned_elements().print(deallog.get_file_stream());
@@ -63,9 +67,10 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
   test();
 }

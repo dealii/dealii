@@ -17,10 +17,11 @@
 #define dealii_signaling_nan_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/symmetric_tensor.h>
+
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/tensor.h>
 
 #include <limits>
 
@@ -29,7 +30,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace numbers
 {
-
   namespace internal
   {
     /**
@@ -58,7 +58,8 @@ namespace numbers
       template <>
       struct NaNInitializer<float>
       {
-        static float invalid_element ()
+        static float
+        invalid_element()
         {
           return std::numeric_limits<float>::signaling_NaN();
         }
@@ -73,7 +74,8 @@ namespace numbers
       template <>
       struct NaNInitializer<double>
       {
-        static double invalid_element ()
+        static double
+        invalid_element()
         {
           return std::numeric_limits<double>::signaling_NaN();
         }
@@ -86,13 +88,14 @@ namespace numbers
        * invalid signaling NaN values.
        */
       template <int dim, typename T>
-      struct NaNInitializer<Tensor<1,dim,T> >
+      struct NaNInitializer<Tensor<1, dim, T>>
       {
-        static Tensor<1,dim,T> invalid_element ()
+        static Tensor<1, dim, T>
+        invalid_element()
         {
-          Tensor<1,dim,T> nan_tensor;
+          Tensor<1, dim, T> nan_tensor;
 
-          for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int i = 0; i < dim; ++i)
             nan_tensor[i] = NaNInitializer<T>::invalid_element();
 
           return nan_tensor;
@@ -107,15 +110,17 @@ namespace numbers
        * invalid signaling NaN values.
        */
       template <int rank, int dim, typename T>
-      struct NaNInitializer<Tensor<rank,dim,T> >
+      struct NaNInitializer<Tensor<rank, dim, T>>
       {
-        static Tensor<rank,dim,T> invalid_element ()
+        static Tensor<rank, dim, T>
+        invalid_element()
         {
-          Tensor<rank,dim,T> nan_tensor;
+          Tensor<rank, dim, T> nan_tensor;
 
           // recursively initialize sub-tensors with invalid elements
-          for (unsigned int i=0; i<dim; ++i)
-            nan_tensor[i] = NaNInitializer<Tensor<rank-1,dim,T> >::invalid_element();
+          for (unsigned int i = 0; i < dim; ++i)
+            nan_tensor[i] =
+              NaNInitializer<Tensor<rank - 1, dim, T>>::invalid_element();
 
           return nan_tensor;
         }
@@ -129,13 +134,14 @@ namespace numbers
        * invalid signaling NaN values.
        */
       template <int dim, typename T>
-      struct NaNInitializer<Point<dim,T> >
+      struct NaNInitializer<Point<dim, T>>
       {
-        static Point<dim,T> invalid_element ()
+        static Point<dim, T>
+        invalid_element()
         {
-          Point<dim,T> nan_point;
+          Point<dim, T> nan_point;
 
-          for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int i = 0; i < dim; ++i)
             nan_point[i] = NaNInitializer<T>::invalid_element();
 
           return nan_point;
@@ -150,16 +156,20 @@ namespace numbers
        * components are invalid signaling NaN values.
        */
       template <int rank, int dim, typename T>
-      struct NaNInitializer<SymmetricTensor<rank,dim,T> >
+      struct NaNInitializer<SymmetricTensor<rank, dim, T>>
       {
-        static SymmetricTensor<rank,dim,T> invalid_element ()
+        static SymmetricTensor<rank, dim, T>
+        invalid_element()
         {
           // initialize symmetric tensors via the unrolled list of elements
-          T initializers[SymmetricTensor<rank,dim,T>::n_independent_components];
-          for (unsigned int i=0; i<SymmetricTensor<rank,dim,T>::n_independent_components; ++i)
+          T initializers
+            [SymmetricTensor<rank, dim, T>::n_independent_components];
+          for (unsigned int i = 0;
+               i < SymmetricTensor<rank, dim, T>::n_independent_components;
+               ++i)
             initializers[i] = NaNInitializer<T>::invalid_element();
 
-          return SymmetricTensor<rank,dim,T>(initializers);
+          return SymmetricTensor<rank, dim, T>(initializers);
         }
       };
 
@@ -171,22 +181,22 @@ namespace numbers
        * whose components are invalid signaling NaN values.
        */
       template <int order, int dim, int spacedim, typename T>
-      struct NaNInitializer<DerivativeForm<order,dim,spacedim,T> >
+      struct NaNInitializer<DerivativeForm<order, dim, spacedim, T>>
       {
-        static DerivativeForm<order,dim,spacedim,T> invalid_element ()
+        static DerivativeForm<order, dim, spacedim, T>
+        invalid_element()
         {
-          DerivativeForm<order,dim,spacedim,T> form;
+          DerivativeForm<order, dim, spacedim, T> form;
 
           // recursively initialize sub-tensors with invalid elements
-          for (unsigned int i=0; i<spacedim; ++i)
-            form[i] = NaNInitializer<Tensor<order,dim,T> >::invalid_element();
+          for (unsigned int i = 0; i < spacedim; ++i)
+            form[i] = NaNInitializer<Tensor<order, dim, T>>::invalid_element();
 
           return form;
         }
       };
-    }
-  }
-
+    } // namespace SignalingNaN
+  }   // namespace internal
 
 
 
@@ -221,9 +231,9 @@ namespace numbers
     // dispatch to the classes in the internal namespace because there
     // we can do partial specializations, which is not possible for
     // template functions such as the current one
-    return internal::SignalingNaN::NaNInitializer<T>::invalid_element ();
+    return internal::SignalingNaN::NaNInitializer<T>::invalid_element();
   }
-}
+} // namespace numbers
 
 
 DEAL_II_NAMESPACE_CLOSE

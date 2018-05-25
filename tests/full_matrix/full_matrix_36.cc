@@ -23,13 +23,12 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_square_matrix (m);
-  m.diagadd (3.141);
-  print_matrix (m);
+  make_square_matrix(m);
+  m.diagadd(3.141);
+  print_matrix(m);
 }

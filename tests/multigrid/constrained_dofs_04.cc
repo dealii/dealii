@@ -17,23 +17,27 @@
 // check that we get a reasonable error message when trying to call
 // MGConstrainedDofs::initialize() with distributing level dofs.
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
 #include <algorithm>
 
-int main(int argc, char *argv[])
+#include "../tests.h"
+
+int
+main(int argc, char *argv[])
 {
   initlog();
   deal_II_exceptions::disable_abort_on_exception();
 
-  constexpr int dim=2;
+  constexpr int      dim = 2;
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
-  DoFHandler<dim> dh (tria);
+  DoFHandler<dim> dh(tria);
   dh.distribute_dofs(FE_Q<dim>(1));
   MGConstrainedDoFs mg_dofs;
   try

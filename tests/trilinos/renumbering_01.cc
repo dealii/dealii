@@ -15,30 +15,36 @@
 
 // Test that dof renumbering is also reflected in TrilinosWrappers::SparseMatrix
 
-#include "../tests.h"
-
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/shared_tria.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/utilities.h>
+
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <mpi.h>
 
-#include <vector>
 #include <iostream>
+#include <vector>
+
+#include "../tests.h"
 
 using namespace dealii;
 
@@ -87,7 +93,8 @@ public:
     constraints.clear();
     constraints.close();
 
-    if (do_renumber) renumber();
+    if (do_renumber)
+      renumber();
 
     init_structures();
 
@@ -99,39 +106,41 @@ public:
       deallog << " without renumbering" << std::endl;
   }
 
-  ~Test ()
+  ~Test()
   {
     dof_handler.clear();
   }
 
 private:
-
-  void init_structures()
+  void
+  init_structures()
   {
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     locally_owned_dofs.print(deallog);
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
     locally_relevant_dofs.print(deallog);
 
-    DynamicSparsityPattern sparsity_pattern (locally_relevant_dofs);
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
-                                     constraints, /*keep constrained dofs*/ false);
-    SparsityTools::distribute_sparsity_pattern (sparsity_pattern,
-                                                dof_handler.n_locally_owned_dofs_per_processor(),
-                                                MPI_COMM_WORLD,
-                                                locally_relevant_dofs);
+    DynamicSparsityPattern sparsity_pattern(locally_relevant_dofs);
+    DoFTools::make_sparsity_pattern(dof_handler,
+                                    sparsity_pattern,
+                                    constraints,
+                                    /*keep constrained dofs*/ false);
+    SparsityTools::distribute_sparsity_pattern(
+      sparsity_pattern,
+      dof_handler.n_locally_owned_dofs_per_processor(),
+      MPI_COMM_WORLD,
+      locally_relevant_dofs);
 
-    system_matrix.reinit (locally_owned_dofs,
-                          locally_owned_dofs,
-                          sparsity_pattern,
-                          MPI_COMM_WORLD);
+    system_matrix.reinit(
+      locally_owned_dofs, locally_owned_dofs, sparsity_pattern, MPI_COMM_WORLD);
     deallog << "local_range: " << system_matrix.local_range().first << " - "
             << system_matrix.local_range().second << std::endl;
   }
 
-  void renumber()
+  void
+  renumber()
   {
-    //DoFRenumbering::Cuthill_McKee(dof_handler);
+    // DoFRenumbering::Cuthill_McKee(dof_handler);
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
 
@@ -141,7 +150,8 @@ private:
 
     std::vector<types::global_dof_index> local_new_number;
     for (IndexSet::ElementIterator dof = locally_owned_dofs.begin();
-         dof != locally_owned_dofs.end(); ++dof)
+         dof != locally_owned_dofs.end();
+         ++dof)
       local_new_number.push_back(new_number[*dof]);
 
     deallog << "n_dofs = " << dof_handler.n_dofs() << std::endl;
@@ -155,10 +165,11 @@ private:
   }
 };
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
-  MPILogInitAll log;
+  MPILogInitAll                    log;
 
   Test test1(false);
   MPI_Barrier(MPI_COMM_WORLD);

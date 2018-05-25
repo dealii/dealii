@@ -13,26 +13,29 @@
 //
 //---------------------------------------------------------------------
 
-// Create a list of points, and the ones within a specified radius of the target points
+// Create a list of points, and the ones within a specified radius of the target
+// points
 
-#include "../tests.h"
 #include <deal.II/numerics/kdtree.h>
 
-int main ()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
   KDTree<2> kdtree;
 
-  std::vector<Point<2> > points;
+  std::vector<Point<2>> points;
 
   // Add four points
-  points.push_back(Point<2>(0,0));
-  points.push_back(Point<2>(0,1));
-  points.push_back(Point<2>(1,0));
-  points.push_back(Point<2>(1,1));
+  points.push_back(Point<2>(0, 0));
+  points.push_back(Point<2>(0, 1));
+  points.push_back(Point<2>(1, 0));
+  points.push_back(Point<2>(1, 1));
 
-  std::vector<Point<2> > test_points;
+  std::vector<Point<2>> test_points;
   test_points.push_back(Point<2>(2, 0));
   test_points.push_back(Point<2>(2, 2));
 
@@ -45,21 +48,22 @@ int main ()
 
   kdtree.set_points(points);
 
-  std::vector<std::pair<unsigned int, double> > matches;
+  std::vector<std::pair<unsigned int, double>> matches;
 
   // Get points within ball
   for (auto &p : test_points)
     {
       for (auto &r : radii)
         {
-
           auto matches = kdtree.get_points_within_ball(p, r, true);
 
-          deallog << std::endl << "At distance less than " << r << " from " << p << " we have:" << std::endl;
+          deallog << std::endl
+                  << "At distance less than " << r << " from " << p
+                  << " we have:" << std::endl;
           for (auto &m : matches)
             {
-              deallog << "points[" << m.first << "] = " << points[m.first] << ", distance: "
-                      << m.second << std::endl;
+              deallog << "points[" << m.first << "] = " << points[m.first]
+                      << ", distance: " << m.second << std::endl;
             }
         }
     }

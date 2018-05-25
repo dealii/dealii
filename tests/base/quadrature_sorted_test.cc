@@ -20,194 +20,201 @@
 // Verify that weights are actually sorted
 
 
-#include "../tests.h"
-
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature_lib.h>
+
+#include "../tests.h"
 
 template <int dim>
 void
-fill_vector (std::vector<Quadrature<dim> *> &quadratures)
+fill_vector(std::vector<Quadrature<dim> *> &quadratures)
 {
-  quadratures.push_back (new QSorted<dim>(QMidpoint<dim>()));
-  quadratures.push_back (new QSorted<dim>(QTrapez<dim>()));
-  quadratures.push_back (new QSorted<dim>(QSimpson<dim>()));
-  quadratures.push_back (new QSorted<dim>(QMilne<dim>()));
-  quadratures.push_back (new QSorted<dim>(QWeddle<dim>()));
-  for (unsigned int i=0; i<9; ++i)
+  quadratures.push_back(new QSorted<dim>(QMidpoint<dim>()));
+  quadratures.push_back(new QSorted<dim>(QTrapez<dim>()));
+  quadratures.push_back(new QSorted<dim>(QSimpson<dim>()));
+  quadratures.push_back(new QSorted<dim>(QMilne<dim>()));
+  quadratures.push_back(new QSorted<dim>(QWeddle<dim>()));
+  for (unsigned int i = 0; i < 9; ++i)
     {
-      quadratures.push_back (new QSorted<dim>(QGauss<dim>(i)));
+      quadratures.push_back(new QSorted<dim>(QGauss<dim>(i)));
     }
   QMilne<1> q1d;
-  quadratures.push_back (new QSorted<dim>(Quadrature<dim>(q1d)));
-  for (unsigned int i=2; i<8; ++i)
+  quadratures.push_back(new QSorted<dim>(Quadrature<dim>(q1d)));
+  for (unsigned int i = 2; i < 8; ++i)
     {
-      quadratures.push_back (new QSorted<dim>(QGaussLobatto<dim>(i)));
+      quadratures.push_back(new QSorted<dim>(QGaussLobatto<dim>(i)));
     }
 }
 
 template <int dim>
 void
-check_cells (std::vector<Quadrature<dim>*> &quadratures)
+check_cells(std::vector<Quadrature<dim> *> &quadratures)
 {
   Quadrature<dim> quadrature;
-  for (unsigned int n=0; n<quadratures.size(); ++n)
+  for (unsigned int n = 0; n < quadratures.size(); ++n)
     {
-      quadrature = *quadratures[n];
-      const std::vector<Point<dim> > &points=quadrature.get_points();
-      const std::vector<double> &weights=quadrature.get_weights();
+      quadrature                             = *quadratures[n];
+      const std::vector<Point<dim>> &points  = quadrature.get_points();
+      const std::vector<double> &    weights = quadrature.get_weights();
 
       deallog << "Quadrature no." << n;
 
-      unsigned int i=0;
-      double quadrature_int=0;
-      double exact_int=0;
-      double err = 0;
+      unsigned int i              = 0;
+      double       quadrature_int = 0;
+      double       exact_int      = 0;
+      double       err            = 0;
 
       do
         {
           ++i;
 
-          quadrature_int=0;
+          quadrature_int = 0;
           // Check the polynomial x^i*y^i
 
-          for (unsigned int x=0; x<quadrature.size(); ++x)
+          for (unsigned int x = 0; x < quadrature.size(); ++x)
             {
-              double f=1.;
+              double f = 1.;
               switch (dim)
                 {
-                case 3:
-                  f *= std::pow(static_cast<double>(points[x](2)), i*1.0);
-                case 2:
-                  f *= std::pow(static_cast<double>(points[x](1)), i*1.0);
-                case 1:
-                  f *= std::pow(static_cast<double>(points[x](0)), i*1.0);
+                  case 3:
+                    f *= std::pow(static_cast<double>(points[x](2)), i * 1.0);
+                  case 2:
+                    f *= std::pow(static_cast<double>(points[x](1)), i * 1.0);
+                  case 1:
+                    f *= std::pow(static_cast<double>(points[x](0)), i * 1.0);
                 }
-              quadrature_int+=f*weights[x];
+              quadrature_int += f * weights[x];
             }
 
           // the exact integral is 1/(i+1)
-          exact_int=1./std::pow(static_cast<double>(i+1),dim);
-          err = std::fabs(quadrature_int-exact_int);
+          exact_int = 1. / std::pow(static_cast<double>(i + 1), dim);
+          err       = std::fabs(quadrature_int - exact_int);
         }
-      while (err<1e-14);
+      while (err < 1e-14);
       // Uncomment here for testing
-//      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
-      deallog << " is exact for polynomials of degree " << i-1 << std::endl;
+      //      deallog << " (Int " << quadrature_int << ',' << exact_int << ")";
+      deallog << " is exact for polynomials of degree " << i - 1 << std::endl;
     }
 }
 
 
 template <int dim>
 void
-check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
+check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
+            const bool                                sub)
 {
   if (sub)
     deallog.push("subfaces");
   else
     deallog.push("faces");
 
-  for (unsigned int n=0; n<quadratures.size(); ++n)
+  for (unsigned int n = 0; n < quadratures.size(); ++n)
     {
-      Quadrature<dim> quadrature (sub == false?
-                                  QProjector<dim>::project_to_all_faces(*quadratures[n]) :
-                                  QProjector<dim>::project_to_all_subfaces(*quadratures[n]));
-      const std::vector<Point<dim> > &points=quadrature.get_points();
-      const std::vector<double> &weights=quadrature.get_weights();
+      Quadrature<dim> quadrature(
+        sub == false ?
+          QProjector<dim>::project_to_all_faces(*quadratures[n]) :
+          QProjector<dim>::project_to_all_subfaces(*quadratures[n]));
+      const std::vector<Point<dim>> &points  = quadrature.get_points();
+      const std::vector<double> &    weights = quadrature.get_weights();
 
       deallog << "Quadrature no." << n;
 
-      unsigned int i=0;
-      long double quadrature_int=0;
-      double exact_int=0;
-      double err = 0;
+      unsigned int i              = 0;
+      long double  quadrature_int = 0;
+      double       exact_int      = 0;
+      double       err            = 0;
 
       do
         {
           ++i;
 
-          quadrature_int=0;
+          quadrature_int = 0;
           // Check the polynomial
           // x^i*y^i*z^i
 
-          for (unsigned int x=0; x<quadrature.size(); ++x)
+          for (unsigned int x = 0; x < quadrature.size(); ++x)
             {
-              long double f=1.;
+              long double f = 1.;
               switch (dim)
                 {
-                case 3:
-                  f *= std::pow((long double) points[x](2), i*1.0L);
-                case 2:
-                  f *= std::pow((long double) points[x](1), i*1.0L);
-                case 1:
-                  f *= std::pow((long double) points[x](0), i*1.0L);
+                  case 3:
+                    f *= std::pow((long double)points[x](2), i * 1.0L);
+                  case 2:
+                    f *= std::pow((long double)points[x](1), i * 1.0L);
+                  case 1:
+                    f *= std::pow((long double)points[x](0), i * 1.0L);
                 }
-              quadrature_int+=f*weights[x];
+              quadrature_int += f * weights[x];
             }
 
           // the exact integral is
           // 1/(i+1)^(dim-1)
           switch (dim)
             {
-            case 2:
-              exact_int = 2 * (sub ? 2:1) / (double) (i+1);
-              break;
-            case 3:
-              exact_int = 3 * (sub ? (4+2+2):1)*8 / (double) (i+1)/(i+1);
-              break;
+              case 2:
+                exact_int = 2 * (sub ? 2 : 1) / (double)(i + 1);
+                break;
+              case 3:
+                exact_int =
+                  3 * (sub ? (4 + 2 + 2) : 1) * 8 / (double)(i + 1) / (i + 1);
+                break;
             }
 
-          err = std::fabs(quadrature_int-exact_int);
+          err = std::fabs(quadrature_int - exact_int);
         }
       // for comparison: use factor 8 in case
       // of dim==3, as we integrate 8 times
       // over the whole surface (all
       // combinations of face_orientation,
       // face_flip and face_rotation)
-      while (err < (dim==3 ? 8 : 1) * 2e-14);
+      while (err < (dim == 3 ? 8 : 1) * 2e-14);
       // Uncomment here for testing
-      //      deallog << " (Int " << quadrature_int << '-' << exact_int << '=' << err << ")";
-      deallog << " is exact for polynomials of degree " << i-1 << std::endl;
+      //      deallog << " (Int " << quadrature_int << '-' << exact_int << '='
+      //      << err << ")";
+      deallog << " is exact for polynomials of degree " << i - 1 << std::endl;
     }
   deallog.pop();
 }
 
 template <int dim>
 void
-check_quadratures (const std::vector<Quadrature<dim>*> &quadratures)
+check_quadratures(const std::vector<Quadrature<dim> *> &quadratures)
 {
-  for (unsigned int i=0; i<quadratures.size(); ++i)
+  for (unsigned int i = 0; i < quadratures.size(); ++i)
     {
-      Quadrature<dim> &quad = *quadratures[i];
-      bool check = true;
-      for (unsigned int q=1; q<quad.size(); ++q)
-        if (quad.weight(q) < quad.weight(q-1))
+      Quadrature<dim> &quad  = *quadratures[i];
+      bool             check = true;
+      for (unsigned int q = 1; q < quad.size(); ++q)
+        if (quad.weight(q) < quad.weight(q - 1))
           {
             check = false;
             break;
           }
       if (check == false)
         {
-          deallog << "Something went wrong. The qudrature is not properly sorted." << std::endl;
-          for (unsigned int q=1; q<quad.size(); ++q)
+          deallog
+            << "Something went wrong. The qudrature is not properly sorted."
+            << std::endl;
+          for (unsigned int q = 1; q < quad.size(); ++q)
             {
-              deallog << "q(" << q << "): " << quad.point(q)
-                      << ", w(" << q << "): " << quad.weight(q) << std::endl;
+              deallog << "q(" << q << "): " << quad.point(q) << ", w(" << q
+                      << "): " << quad.weight(q) << std::endl;
             }
         }
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 
   std::vector<Quadrature<1> *> q1;
   std::vector<Quadrature<2> *> q2;
   std::vector<Quadrature<3> *> q3;
-  fill_vector (q1);
-  fill_vector (q2);
-  fill_vector (q3);
+  fill_vector(q1);
+  fill_vector(q2);
+  fill_vector(q3);
 
   deallog.push("1d");
   check_cells(q1);
@@ -216,15 +223,15 @@ int main()
 
   deallog.push("2d");
   check_cells(q2);
-  check_faces<2>(q1,false);
-  check_faces<2>(q1,true);
+  check_faces<2>(q1, false);
+  check_faces<2>(q1, true);
   check_quadratures(q2);
   deallog.pop();
 
   deallog.push("3d");
   check_cells(q3);
-  check_faces<3>(q2,false);
-  check_faces<3>(q2,true);
+  check_faces<3>(q2, false);
+  check_faces<3>(q2, true);
   check_quadratures(q3);
   deallog.pop();
 
@@ -232,12 +239,10 @@ int main()
   // messages about memory leaks when
   // using purify or other memory
   // checkers
-  for (unsigned int i=0; i<q1.size(); ++i)
+  for (unsigned int i = 0; i < q1.size(); ++i)
     delete q1[i];
-  for (unsigned int i=0; i<q2.size(); ++i)
+  for (unsigned int i = 0; i < q2.size(); ++i)
     delete q2[i];
-  for (unsigned int i=0; i<q3.size(); ++i)
+  for (unsigned int i = 0; i < q3.size(); ++i)
     delete q3[i];
 }
-
-

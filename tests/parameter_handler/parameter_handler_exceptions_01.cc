@@ -17,32 +17,32 @@
 
 // ensure that we end up in a defined state after a pattern is not matched
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
+#include "../tests.h"
 
 
 std::string input = "set test_1 = 1\n"
                     "subsection subsec\n"
-                    "  set test_2 = 42\n"    // forbidden
+                    "  set test_2 = 42\n" // forbidden
                     "end\n";
 
 
 
-void check (const char *p)
+void
+check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "0",
-                     Patterns::Integer(-1,1));
-  prm.enter_subsection ("subsec");
-  prm.declare_entry ("test_2", "0",
-                     Patterns::Integer(-1,1));
-  prm.leave_subsection ();
+  prm.declare_entry("test_1", "0", Patterns::Integer(-1, 1));
+  prm.enter_subsection("subsec");
+  prm.declare_entry("test_2", "0", Patterns::Integer(-1, 1));
+  prm.leave_subsection();
 
   std::istringstream in(input);
   try
     {
       deallog << "Trying to read parameters..." << std::endl;
-      prm.parse_input (in);
+      prm.parse_input(in);
       deallog << "Done reading parameters..." << std::endl;
     }
   catch (...)
@@ -55,21 +55,23 @@ void check (const char *p)
   // subsection we were in before attempting the `parse_input` call
   // (namely, in the top-level section of the prm tree)
   deallog << "test_1="
-          << prm.get ("test_1")  // should =1, because we read that value
+          << prm.get("test_1") // should =1, because we read that value
           << std::endl;
-  prm.enter_subsection ("subsec");
+  prm.enter_subsection("subsec");
   deallog << "test_2="
-          << prm.get ("test_2")  // should =default, because reading the value failed
+          << prm.get(
+               "test_2") // should =default, because reading the value failed
           << std::endl;
-  prm.leave_subsection ();
+  prm.leave_subsection();
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_1.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_1.prm");
 
   return 0;
 }

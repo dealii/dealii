@@ -18,35 +18,38 @@
 // This test is adapted from tests/trilinos/solver_03.cc
 
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include "../testmatrix.h"
-#include <iostream>
+
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_relaxation.h>
+#include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/solver_control.h>
-#include <deal.II/lac/solver_richardson.h>
-#include <deal.II/lac/solver_relaxation.h>
-#include <deal.II/lac/precondition.h>
+
+#include <iostream>
+
+#include "../testmatrix.h"
+#include "../tests.h"
 
 template <typename MatrixType, typename VectorType, class PRECONDITION>
 void
-check_solve (SolverControl       &solver_control,
-             const MatrixType    &A,
-             VectorType          &u,
-             VectorType          &f,
-             const PRECONDITION  &P,
-             const bool           expected_result)
+check_solve(SolverControl &     solver_control,
+            const MatrixType &  A,
+            VectorType &        u,
+            VectorType &        f,
+            const PRECONDITION &P,
+            const bool          expected_result)
 {
   SolverCG<VectorType> solver(solver_control);
 
-  u = 0.;
-  f = 1.;
+  u            = 0.;
+  f            = 1.;
   bool success = false;
   try
     {
-      solver.solve(A,u,f,P);
+      solver.solve(A, u, f, P);
       deallog << "Success. ";
       success = true;
     }
@@ -61,7 +64,8 @@ check_solve (SolverControl       &solver_control,
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   std::ofstream logfile("output");
   logfile.precision(4);
@@ -70,20 +74,20 @@ int main(int argc, char **argv)
 
   {
     const unsigned int size = 32;
-    unsigned int dim = (size-1)*(size-1);
+    unsigned int       dim  = (size - 1) * (size - 1);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
     // Make matrix
-    FDMatrix testproblem(size, size);
+    FDMatrix        testproblem(size, size);
     SparsityPattern structure(dim, dim, 5);
     testproblem.five_point_structure(structure);
     structure.compress();
-    SparseMatrix<double>  A(structure);
+    SparseMatrix<double> A(structure);
     testproblem.five_point(A);
 
-    Vector<double>  f(dim);
-    Vector<double>  u(dim);
+    Vector<double> f(dim);
+    Vector<double> u(dim);
     f = 1.;
 
     PreconditionJacobi<> preconditioner;
@@ -93,14 +97,14 @@ int main(int argc, char **argv)
     {
       // Expects success
       IterationNumberControl solver_control(2000, 1.e-3);
-      check_solve (solver_control, A,u,f, preconditioner, true);
+      check_solve(solver_control, A, u, f, preconditioner, true);
     }
     deallog.pop();
     deallog.push("Iterations");
     {
       // Expects success
       IterationNumberControl solver_control(20, 1.e-3);
-      check_solve (solver_control, A,u,f, preconditioner, true);
+      check_solve(solver_control, A, u, f, preconditioner, true);
     }
     deallog.pop();
   }

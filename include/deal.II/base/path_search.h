@@ -18,13 +18,14 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
-#include <string>
 #include <fstream>
 #include <map>
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -102,8 +103,7 @@ public:
    *
    * The debug argument determines the verbosity of this class.
    */
-  PathSearch (const std::string &cls,
-              const unsigned int debug=0);
+  PathSearch(const std::string &cls, const unsigned int debug = 0);
 
   /**
    * Find a file in the class specified by the constructor and return its
@@ -121,8 +121,8 @@ public:
    * components and suffix.
    * @param open_mode The mode handed over to the @p fopen function.
    */
-  std::string find (const std::string &filename,
-                    const char *open_mode = "r");
+  std::string
+  find(const std::string &filename, const char *open_mode = "r");
 
   /**
    * Find a file in the class specified by the constructor and return its
@@ -142,32 +142,37 @@ public:
    * @param suffix The suffix to be used for opening.
    * @param open_mode The mode handed over to the @p fopen function.
    */
-  std::string find (const std::string &filename,
-                    const std::string &suffix,
-                    const char *open_mode = "r");
+  std::string
+  find(const std::string &filename,
+       const std::string &suffix,
+       const char *       open_mode = "r");
 
   /**
    * Show the paths and suffixes used for this object.
    */
   template <class StreamType>
-  void show(StreamType &stream) const;
+  void
+  show(StreamType &stream) const;
 
   /**
    * Add a new class.
    */
-  static void add_class (const std::string &cls);
+  static void
+  add_class(const std::string &cls);
 
   /**
    * Add a path to the current class. See PathSearch::Position for possible
    * position arguments.
    */
-  void add_path (const std::string &path, Position pos = back);
+  void
+  add_path(const std::string &path, Position pos = back);
 
   /**
    * Add a path to the current class. See PathSearch::Position for possible
    * position arguments.
    */
-  void add_suffix (const std::string &suffix, Position pos = back);
+  void
+  add_suffix(const std::string &suffix, Position pos = back);
 
   /**
    * This class was not registered in the path search mechanism.
@@ -175,8 +180,7 @@ public:
    */
   DeclException1(ExcNoClass,
                  std::string,
-                 << "The class "
-                 << arg1
+                 << "The class " << arg1
                  << " must be registered before referring it in PathSearch.");
   /**
    * The PathSearch class could not find a file with this name in its path
@@ -184,7 +188,8 @@ public:
    * @ingroup Exceptions
    */
   DeclException2(ExcFileNotFound,
-                 std::string, std::string,
+                 std::string,
+                 std::string,
                  << "The file \"" << arg1 << "\" was not found in the path for "
                  << "files of class " << arg2 << ".");
 
@@ -192,24 +197,27 @@ private:
   /**
    * Type of values in the class maps.
    */
-  typedef std::map<std::string, std::vector<std::string> >::value_type map_type;
+  typedef std::map<std::string, std::vector<std::string>>::value_type map_type;
 
   /**
    * Initialize the static list objects for further use.
    */
-  static void initialize_classes();
+  static void
+  initialize_classes();
 
   /**
    * Get path list for a certain class. Used to set up #my_path_list in
    * constructor.
    */
-  static std::vector<std::string> &get_path_list(const std::string &cls);
+  static std::vector<std::string> &
+  get_path_list(const std::string &cls);
 
   /**
    * Get suffix list for a certain class. Used to set up #my_suffix_list in
    * constructor.
    */
-  static std::vector<std::string> &get_suffix_list(const std::string &cls);
+  static std::vector<std::string> &
+  get_suffix_list(const std::string &cls);
 
   /**
    * The file class handled by this object.
@@ -219,12 +227,12 @@ private:
   /**
    * All path lists for all classes, such that we can build them only once.
    */
-  static std::map<std::string, std::vector<std::string> > path_lists;
+  static std::map<std::string, std::vector<std::string>> path_lists;
 
   /**
    * List of suffixes for each class.
    */
-  static std::map<std::string, std::vector<std::string> > suffix_lists;
+  static std::map<std::string, std::vector<std::string>> suffix_lists;
 
   /**
    * Path list for the class this object belongs to.
@@ -252,14 +260,14 @@ private:
 
 
 template <class StreamType>
-inline
-void
+inline void
 PathSearch::show(StreamType &out) const
 {
   out << "DEAL_II_" << cls << "PATH=\"";
   bool first = true;
   for (std::vector<std::string>::iterator p = my_path_list.begin();
-       p != my_path_list.end(); ++p)
+       p != my_path_list.end();
+       ++p)
     {
       if (!first)
         out << ':';
@@ -268,7 +276,8 @@ PathSearch::show(StreamType &out) const
     }
   out << '"' << std::endl << " Suffixes";
   for (std::vector<std::string>::iterator s = my_suffix_list.begin();
-       s != my_suffix_list.end(); ++s)
+       s != my_suffix_list.end();
+       ++s)
     out << " \"" << *s << '"';
   out << std::endl;
 }
@@ -276,4 +285,3 @@ PathSearch::show(StreamType &out) const
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

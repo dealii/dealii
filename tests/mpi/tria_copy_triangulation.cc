@@ -33,54 +33,65 @@
 // so this is what we also give as argument to the mesh with which we
 // compare
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
-  GridGenerator::subdivided_hyper_cube(tr, 6-dim);
+  GridGenerator::subdivided_hyper_cube(tr, 6 - dim);
 
   parallel::distributed::Triangulation<dim> new_tr(MPI_COMM_WORLD);
 
-  new_tr.copy_triangulation (tr);
+  new_tr.copy_triangulation(tr);
 
-  Assert (tr.n_active_cells() == new_tr.n_active_cells(), ExcInternalError());
-  Assert (tr.n_levels() == new_tr.n_levels(), ExcInternalError());
+  Assert(tr.n_active_cells() == new_tr.n_active_cells(), ExcInternalError());
+  Assert(tr.n_levels() == new_tr.n_levels(), ExcInternalError());
 
-  typename Triangulation<dim,dim>::active_cell_iterator cell1, cell2;
+  typename Triangulation<dim, dim>::active_cell_iterator cell1, cell2;
 
   for (cell1 = tr.begin_active(), cell2 = new_tr.begin_active();
        cell1 != tr.end();
        ++cell1, ++cell2)
     {
-      if (cell1->is_locally_owned ())
+      if (cell1->is_locally_owned())
         {
           if (myid == 0)
             {
-              deallog << "triangulation::cell     " << cell1 << ": locally owned, subdomain_id = " << cell1->subdomain_id () << std::endl;
-              deallog << "new_triangulation::cell " << cell2 << ": locally owned, subdomain_id = " << cell2->subdomain_id () << std::endl;
+              deallog << "triangulation::cell     " << cell1
+                      << ": locally owned, subdomain_id = "
+                      << cell1->subdomain_id() << std::endl;
+              deallog << "new_triangulation::cell " << cell2
+                      << ": locally owned, subdomain_id = "
+                      << cell2->subdomain_id() << std::endl;
             };
 
-          Assert (cell2->is_locally_owned (), ExcInternalError());
-          Assert (cell1->subdomain_id () == cell2->subdomain_id (), ExcInternalError());
+          Assert(cell2->is_locally_owned(), ExcInternalError());
+          Assert(cell1->subdomain_id() == cell2->subdomain_id(),
+                 ExcInternalError());
 
-          for (unsigned int vertex=0;
-               vertex<GeometryInfo<dim>::vertices_per_cell;
+          for (unsigned int vertex = 0;
+               vertex < GeometryInfo<dim>::vertices_per_cell;
                ++vertex)
             {
-              Assert (cell1->vertex(vertex).distance (cell2->vertex(vertex)) < 1.e-14, ExcInternalError());
+              Assert(cell1->vertex(vertex).distance(cell2->vertex(vertex)) <
+                       1.e-14,
+                     ExcInternalError());
 
               if (myid == 0)
                 deallog << "  vertices " << vertex << " coincide" << std::endl;
@@ -90,33 +101,40 @@ void test()
         {
           if (myid == 0)
             {
-              deallog << "triangulation::cell     " << cell1 << ": ghost, subdomain_id = " << cell1->subdomain_id () << std::endl;
-              deallog << "new_triangulation::cell " << cell2 << ": ghost, subdomain_id = " << cell2->subdomain_id () << std::endl;
+              deallog << "triangulation::cell     " << cell1
+                      << ": ghost, subdomain_id = " << cell1->subdomain_id()
+                      << std::endl;
+              deallog << "new_triangulation::cell " << cell2
+                      << ": ghost, subdomain_id = " << cell2->subdomain_id()
+                      << std::endl;
             };
 
-          Assert (cell2->is_ghost (), ExcInternalError());
+          Assert(cell2->is_ghost(), ExcInternalError());
         }
       else if (cell1->is_artificial())
         {
           if (myid == 0)
             {
-              deallog << "triangulation::cell     " << cell1 << ": artificial" << std::endl;
-              deallog << "new_triangulation::cell " << cell2 << ": artificial" << std::endl;
+              deallog << "triangulation::cell     " << cell1 << ": artificial"
+                      << std::endl;
+              deallog << "new_triangulation::cell " << cell2 << ": artificial"
+                      << std::endl;
             };
 
-          Assert (cell2->is_artificial (), ExcInternalError());
+          Assert(cell2->is_artificial(), ExcInternalError());
         }
       else
-        Assert (false, ExcInternalError());
+        Assert(false, ExcInternalError());
     };
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 
@@ -130,5 +148,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

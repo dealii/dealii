@@ -16,30 +16,30 @@
 
 // test IndexSet::index_within_set () for an empty index set
 
-#include "../tests.h"
-
 #include <deal.II/base/index_set.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  IndexSet index_set (20);
+  IndexSet index_set(20);
 
-  index_set.compress ();
+  index_set.compress();
 
-  AssertThrow (index_set.index_within_set(2) == numbers::invalid_dof_index,
-               ExcInternalError());
+  AssertThrow(index_set.index_within_set(2) == numbers::invalid_dof_index,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
-
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

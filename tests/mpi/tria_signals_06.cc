@@ -14,13 +14,15 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 
 #include <functional>
 #include <ostream>
+
+#include "../tests.h"
 
 // This is a test for test driver itself. Signals on refinement is disabled,
 // so non-positive n_active_cell_gap is expected. Thus we can make sure the
@@ -36,8 +38,7 @@ template <int dim, int spacedim>
 class SignalListener
 {
 public:
-  SignalListener(Triangulation<dim, spacedim> &tria_in)
-    :
+  SignalListener(Triangulation<dim, spacedim> &tria_in) :
     n_active_cells(tria_in.n_active_cells()),
     tria(tria_in)
   {
@@ -46,20 +47,22 @@ public:
     //                   this,
     //                   std::placeholders::_1));
 
-    tria_in.signals.pre_coarsening_on_cell.connect
-    (std::bind (&SignalListener<dim, spacedim>::count_on_coarsen,
+    tria_in.signals.pre_coarsening_on_cell.connect(
+      std::bind(&SignalListener<dim, spacedim>::count_on_coarsen,
                 this,
                 std::placeholders::_1));
   }
 
-  int n_active_cell_gap()
+  int
+  n_active_cell_gap()
   {
-    return (n_active_cells -
-            static_cast<int> (tria.n_active_cells()));
+    return (n_active_cells - static_cast<int>(tria.n_active_cells()));
   }
 
 private:
-  void count_on_refine(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  void
+  count_on_refine(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     n_active_cells += cell->n_children();
     --n_active_cells;
@@ -67,7 +70,9 @@ private:
     return;
   }
 
-  void count_on_coarsen(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  void
+  count_on_coarsen(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     ++n_active_cells;
     n_active_cells -= cell->n_children();
@@ -75,30 +80,30 @@ private:
     return;
   }
 
-  int n_active_cells;
+  int                                 n_active_cells;
   const Triangulation<dim, spacedim> &tria;
 };
 
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;
 
   {
-    const std::string prefix = Utilities::int_to_string (dim, 1) +
-                               "d-" +
-                               Utilities::int_to_string (spacedim, 1)
-                               + "d";
+    const std::string prefix = Utilities::int_to_string(dim, 1) + "d-" +
+                               Utilities::int_to_string(spacedim, 1) + "d";
     deallog.push(prefix.c_str());
   }
 
   // Option dealii::Triangulation<dim, spacedim>::maximum_smoothing can't
   // run in parallel at the time that this test is created.
-  TriaType tria(MPI_COMM_WORLD,
-                typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
-                (dealii::Triangulation<dim, spacedim>::smoothing_on_refinement |
-                 dealii::Triangulation<dim, spacedim>::smoothing_on_coarsening));
+  TriaType tria(
+    MPI_COMM_WORLD,
+    typename dealii::Triangulation<dim, spacedim>::MeshSmoothing(
+      dealii::Triangulation<dim, spacedim>::smoothing_on_refinement |
+      dealii::Triangulation<dim, spacedim>::smoothing_on_coarsening));
 
 
   GridGenerator::hyper_cube(tria);
@@ -107,32 +112,34 @@ void test()
   tria.refine_global(1);
 
 
-  // The following loop is borrowed from p4est_3d_refine_01 with some modifications.
-  for  (int n_loop = 0;
-        // Terminate loop on global information to prevent premature termination
-        // on only part of processors. (n_loop < 20) is just a passive safety to
-        // avoid infinite loop.
-        (tria.n_global_active_cells() < 20000) && (n_loop < 20);
-        ++n_loop)
+  // The following loop is borrowed from p4est_3d_refine_01 with some
+  // modifications.
+  for (int n_loop = 0;
+       // Terminate loop on global information to prevent premature termination
+       // on only part of processors. (n_loop < 20) is just a passive safety to
+       // avoid infinite loop.
+       (tria.n_global_active_cells() < 20000) && (n_loop < 20);
+       ++n_loop)
     {
-      std::vector<bool> flags (tria.n_active_cells(), false);
+      std::vector<bool> flags(tria.n_active_cells(), false);
 
       // Refine one fifth of all cells each time (but at least one).
       // Note that only the own marked cells will be refined.
       // But refine flags on own cells could be effected by flags on ghost cells
       // through mesh smoothing.
-      for (unsigned int i=0; i<tria.n_active_cells() / 3 + 1; ++i)
+      for (unsigned int i = 0; i < tria.n_active_cells() / 3 + 1; ++i)
         {
           const unsigned int x = Testing::rand() % flags.size();
-          flags[x] = true;
+          flags[x]             = true;
         }
 
-      unsigned int index=0;
-      unsigned int locals=0;
+      unsigned int index  = 0;
+      unsigned int locals = 0;
 
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator
-           cell = tria.begin_active();
-           cell != tria.end(); ++cell, ++index)
+      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
+             tria.begin_active();
+           cell != tria.end();
+           ++cell, ++index)
         if (flags[index])
           {
             if (cell->is_locally_owned())
@@ -145,57 +152,59 @@ void test()
           // Coarsen some cells randomly only if we have enough local cells
           // marked to be refined
           std::fill(flags.begin(), flags.end(), false);
-          for (unsigned int i=0; i<tria.n_active_cells() / 3; ++i)
+          for (unsigned int i = 0; i < tria.n_active_cells() / 3; ++i)
             {
               const unsigned int x = Testing::rand() % flags.size();
-              flags[x] = true;
+              flags[x]             = true;
             }
 
-          index=0;
+          index = 0;
           for (typename Triangulation<dim, spacedim>::active_cell_iterator
-               cell = tria.begin_active();
-               cell != tria.end(); ++cell, ++index)
-            if (flags[index] && ! cell->refine_flag_set())
+                 cell = tria.begin_active();
+               cell != tria.end();
+               ++cell, ++index)
+            if (flags[index] && !cell->refine_flag_set())
               {
                 cell->set_coarsen_flag();
               }
         }
 
-      tria.execute_coarsening_and_refinement ();
+      tria.execute_coarsening_and_refinement();
 
       deallog << "n_loop: " << n_loop
-              << ", n_cell_gap: "
-              << count_cell_via_signal.n_active_cell_gap() << std::endl;
+              << ", n_cell_gap: " << count_cell_via_signal.n_active_cell_gap()
+              << std::endl;
     }
 
   deallog.pop();
   return;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, /* int max_num_threads */ 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, /* int max_num_threads */ 1);
   MPILogInitAll log;
 
   // parallel::distributed::Triangulation<1, spacedim> is not valid.
   {
-    const int dim = 2;
+    const int dim      = 2;
     const int spacedim = 2;
-    test<dim,spacedim> ();
+    test<dim, spacedim>();
   }
 
   {
-    const int dim = 2;
+    const int dim      = 2;
     const int spacedim = 3;
-    test<dim,spacedim> ();
+    test<dim, spacedim>();
   }
 
   {
-    const int dim = 3;
+    const int dim      = 3;
     const int spacedim = 3;
-    test<dim,spacedim> ();
+    test<dim, spacedim>();
   }
 
   return (0);
 }
-

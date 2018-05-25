@@ -17,31 +17,33 @@
 
 // check Utilities::MPI::min for vectors, but with input=output
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
 
-void test()
+#include "../tests.h"
+
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  unsigned int values_[2] = { myid, numprocs+myid };
+  unsigned int              values_[2] = {myid, numprocs + myid};
   std::vector<unsigned int> inout(&values_[0], &values_[2]);
-  Utilities::MPI::min (inout,
-                       MPI_COMM_WORLD,
-                       inout);
-  Assert (inout[0] == 0, ExcInternalError());
-  Assert (inout[1] == numprocs, ExcInternalError());
+  Utilities::MPI::min(inout, MPI_COMM_WORLD, inout);
+  Assert(inout[0] == 0, ExcInternalError());
+  Assert(inout[1] == numprocs, ExcInternalError());
 
-  if (myid==0)
+  if (myid == 0)
     deallog << inout[0] << ' ' << inout[1] << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;
@@ -49,7 +51,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
 

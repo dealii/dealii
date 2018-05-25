@@ -18,11 +18,8 @@
  * @file Test whether
  */
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -32,15 +29,20 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/integrators/laplace.h>
 
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
 #include <deal.II/meshworker/local_integrator.h>
-#include <deal.II/meshworker/simple.h>
 #include <deal.II/meshworker/loop.h>
+#include <deal.II/meshworker/simple.h>
 
 #include <deal.II/multigrid/sparse_matrix_collection.h>
+
+#include "../tests.h"
 
 using namespace dealii;
 using namespace LocalIntegrators;
@@ -51,10 +53,17 @@ class LaplaceMatrix : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   LaplaceMatrix();
-  virtual void cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
-  virtual void boundary(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
-  virtual void face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
-                    MeshWorker::IntegrationInfo<dim> &info1, MeshWorker::IntegrationInfo<dim> &info2) const;
+  virtual void
+  cell(MeshWorker::DoFInfo<dim> &        dinfo,
+       MeshWorker::IntegrationInfo<dim> &info) const;
+  virtual void
+  boundary(MeshWorker::DoFInfo<dim> &        dinfo,
+           MeshWorker::IntegrationInfo<dim> &info) const;
+  virtual void
+  face(MeshWorker::DoFInfo<dim> &        dinfo1,
+       MeshWorker::DoFInfo<dim> &        dinfo2,
+       MeshWorker::IntegrationInfo<dim> &info1,
+       MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 
@@ -64,26 +73,33 @@ LaplaceMatrix<dim>::LaplaceMatrix()
 
 
 template <int dim>
-void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
+void
+LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
+                         MeshWorker::IntegrationInfo<dim> &info) const
 {
-  Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0));
+  Laplace::cell_matrix(dinfo.matrix(0, false).matrix, info.fe_values(0));
 }
 
 
 template <int dim>
-void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo,
-                                  typename MeshWorker::IntegrationInfo<dim> &info) const
+void
+LaplaceMatrix<dim>::boundary(
+  MeshWorker::DoFInfo<dim> &                 dinfo,
+  typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
-  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
+  Laplace::nitsche_matrix(dinfo.matrix(0, false).matrix,
+                          info.fe_values(0),
                           Laplace::compute_penalty(dinfo, dinfo, deg, deg));
 }
 
 
 template <int dim>
-void LaplaceMatrix<dim>::face(
-  MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
-  MeshWorker::IntegrationInfo<dim> &info1, MeshWorker::IntegrationInfo<dim> &info2) const
+void
+LaplaceMatrix<dim>::face(MeshWorker::DoFInfo<dim> &        dinfo1,
+                         MeshWorker::DoFInfo<dim> &        dinfo2,
+                         MeshWorker::IntegrationInfo<dim> &info1,
+                         MeshWorker::IntegrationInfo<dim> &info2) const
 {
   if (info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::H1))
     return;
@@ -92,21 +108,30 @@ void LaplaceMatrix<dim>::face(
 
   if (info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
       !info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::Hcurl))
-    Laplace::ip_tangential_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
-                                  dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-                                  info1.fe_values(0), info2.fe_values(0),
-                                  Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
+    Laplace::ip_tangential_matrix(
+      dinfo1.matrix(0, false).matrix,
+      dinfo1.matrix(0, true).matrix,
+      dinfo2.matrix(0, true).matrix,
+      dinfo2.matrix(0, false).matrix,
+      info1.fe_values(0),
+      info2.fe_values(0),
+      Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
   else
-    Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
-                       dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-                       info1.fe_values(0), info2.fe_values(0),
+    Laplace::ip_matrix(dinfo1.matrix(0, false).matrix,
+                       dinfo1.matrix(0, true).matrix,
+                       dinfo2.matrix(0, true).matrix,
+                       dinfo2.matrix(0, false).matrix,
+                       info1.fe_values(0),
+                       info2.fe_values(0),
                        Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
 }
 
 
 template <int dim>
-void assemble_mg_matrix(DoFHandler<dim> &dof_handler,
-                        MeshWorker::LocalIntegrator<dim> &matrix_integrator, mg::SparseMatrixCollection<double> &mg)
+void
+assemble_mg_matrix(DoFHandler<dim> &                   dof_handler,
+                   MeshWorker::LocalIntegrator<dim> &  matrix_integrator,
+                   mg::SparseMatrixCollection<double> &mg)
 {
   MGConstrainedDoFs mg_constraints;
   mg_constraints.clear();
@@ -123,36 +148,44 @@ void assemble_mg_matrix(DoFHandler<dim> &dof_handler,
 
   MeshWorker::DoFInfo<dim> dof_info(dof_handler.block_info());
 
-  MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
+  MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double>> assembler;
   assembler.initialize(mg_constraints);
   assembler.initialize(mg.matrix);
   assembler.initialize_interfaces(mg.matrix_in, mg.matrix_out);
   assembler.initialize_fluxes(mg.matrix_up, mg.matrix_down);
 
-  MeshWorker::integration_loop<dim, dim> (
-    dof_handler.begin_mg(), dof_handler.end_mg(),
-    dof_info, info_box, matrix_integrator, assembler);
+  MeshWorker::integration_loop<dim, dim>(dof_handler.begin_mg(),
+                                         dof_handler.end_mg(),
+                                         dof_info,
+                                         info_box,
+                                         matrix_integrator,
+                                         assembler);
 
   const unsigned int nlevels = dof_handler.get_triangulation().n_levels();
-  for (unsigned int level=0; level<nlevels; ++level)
+  for (unsigned int level = 0; level < nlevels; ++level)
     {
-      for (unsigned int i=0; i<dof_handler.n_dofs(level); ++i)
-        if (mg.matrix[level].diag_element(i)==0)
-          mg.matrix[level].set(i,i,1.);
+      for (unsigned int i = 0; i < dof_handler.n_dofs(level); ++i)
+        if (mg.matrix[level].diag_element(i) == 0)
+          mg.matrix[level].set(i, i, 1.);
     }
 }
 
 
 template <int dim>
-void test(FiniteElement<dim> &fe)
+void
+test(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  Triangulation<dim> tr(Triangulation<dim>:: limit_level_difference_at_vertices);
-  std::vector<unsigned int> repititions (dim, 1);
+  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
+  std::vector<unsigned int> repititions(dim, 1);
   repititions[0] = 2;
-  const Point<dim> p1 = (dim == 1 ? Point<dim> (-1.) : (dim == 2 ? Point<dim>(-1.,-1.) : Point<dim> (-1.,-1.,-1.)));
-  const Point<dim> p2 = (dim == 1 ? Point<dim> (1.) : (dim == 2 ? Point<dim>(1.,1.) : Point<dim> (1.,1.,1.)));
+  const Point<dim> p1 =
+    (dim == 1 ? Point<dim>(-1.) :
+                (dim == 2 ? Point<dim>(-1., -1.) : Point<dim>(-1., -1., -1.)));
+  const Point<dim> p2 =
+    (dim == 1 ? Point<dim>(1.) :
+                (dim == 2 ? Point<dim>(1., 1.) : Point<dim>(1., 1., 1.)));
   GridGenerator::subdivided_hyper_rectangle(tr, repititions, p1, p2);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
@@ -164,43 +197,49 @@ void test(FiniteElement<dim> &fe)
   dof.distribute_mg_dofs(fe);
   dof.initialize_local_block_info();
   mg::SparseMatrixCollection<double> mg;
-  mg.resize(0,tr.n_levels()-1);
+  mg.resize(0, tr.n_levels() - 1);
   mg.reinit(dof);
   assemble_mg_matrix(dof, matrix_integrator, mg);
 
-  for (unsigned int level=0; level<tr.n_levels(); ++level)
+  for (unsigned int level = 0; level < tr.n_levels(); ++level)
     {
       const unsigned int prec = 3;
-      const unsigned int wd = 2;
+      const unsigned int wd   = 2;
 
       deallog << "Level " << level << std::endl << "mg" << std::endl;
-      mg.matrix[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
-      if (level>0)
+      mg.matrix[level].print_formatted(
+        deallog.get_file_stream(), prec, false, wd, "0.");
+      if (level > 0)
         {
           deallog << "in" << std::endl;
-          mg.matrix_in[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_in[level].print_formatted(
+            deallog.get_file_stream(), prec, false, wd, "0.");
           deallog << "out" << std::endl;
-          mg.matrix_out[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_out[level].print_formatted(
+            deallog.get_file_stream(), prec, false, wd, "0.");
           deallog << "up" << std::endl;
-          mg.matrix_up[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_up[level].print_formatted(
+            deallog.get_file_stream(), prec, false, wd, "0.");
           deallog << "down" << std::endl;
-          mg.matrix_down[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_down[level].print_formatted(
+            deallog.get_file_stream(), prec, false, wd, "0.");
         }
     }
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname("output");
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   deallog.attach(logfile);
 
-  FE_DGP<2> p0(0);
-  FE_DGP<2> p1(1);
+  FE_DGP<2>           p0(0);
+  FE_DGP<2>           p1(1);
   FE_RaviartThomas<2> rt0(0);
   FE_RaviartThomas<2> rt1(1);
-  FE_Q<2> q2(2);
+  FE_Q<2>             q2(2);
 
   FESystem<2> sys1(p0, 2, p0, 1);
   FESystem<2> sys2(rt0, 1, p0, 1);

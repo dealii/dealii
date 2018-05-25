@@ -19,16 +19,18 @@
 // value of an entry doesn't match the pattern; but it should still
 // yield a properly declared entry
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+#include "../tests.h"
+
+void
+check(const char *p)
 {
   ParameterHandler prm;
   try
     {
-      prm.declare_entry ("test_1", "abc",
-                         Patterns::List(Patterns::Integer(-1,1),2,3));
+      prm.declare_entry(
+        "test_1", "abc", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
     }
   catch (const ParameterHandler::ExcValueDoesNotMatchPattern &)
     {
@@ -36,17 +38,18 @@ void check (const char *p)
     }
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_1_exception.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_1_exception.prm");
 
   return 0;
 }

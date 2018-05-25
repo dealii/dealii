@@ -18,47 +18,52 @@
 // check Vector<double>::operator = (Vector), except that we don't
 // resize the vector to be copied to beforehand
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
   // set some entries of the vector
-  for (unsigned int i=0; i<v.size(); ++i)
-    if (i%3 == 0)
-      v(i) = i+1.;
-  v.compress ();
+  for (unsigned int i = 0; i < v.size(); ++i)
+    if (i % 3 == 0)
+      v(i) = i + 1.;
+  v.compress();
 
   // then copy it to a vector of different
   // size
-  Vector<double> w (1);
+  Vector<double> w(1);
   w = v;
 
   // make sure they're equal
-  deallog << v *w << ' ' << v.l2_norm() * w.l2_norm()
-          << ' ' << v *w - v.l2_norm() * w.l2_norm() << std::endl;
-  Assert (std::fabs(v*w - v.l2_norm() * w.l2_norm()) < 1e-14*(v*w),
-          ExcInternalError());
+  deallog << v * w << ' ' << v.l2_norm() * w.l2_norm() << ' '
+          << v * w - v.l2_norm() * w.l2_norm() << std::endl;
+  Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < 1e-14 * (v * w),
+         ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -71,7 +76,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

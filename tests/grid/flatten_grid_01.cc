@@ -15,18 +15,18 @@
 
 // Generate a grid, refine it once, flatten it and output the result.
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_generator.h>
-
 template <int dim, int spacedim1, int spacedim2>
-void test()
+void
+test()
 {
-  deallog << "Testing <" << dim << "," << spacedim1
-          << "> VS <" << dim << "," << spacedim2
-          << ">" << std::endl;
+  deallog << "Testing <" << dim << "," << spacedim1 << "> VS <" << dim << ","
+          << spacedim2 << ">" << std::endl;
 
   Triangulation<dim, spacedim1> tria1;
   GridGenerator::hyper_cube(tria1);
@@ -38,26 +38,27 @@ void test()
   go.write_msh(tria2, deallog.get_file_stream());
 }
 
-int main()
+int
+main()
 {
   initlog();
-  test<1,1,1>();
-  test<1,1,2>();
-  test<1,1,3>();
+  test<1, 1, 1>();
+  test<1, 1, 2>();
+  test<1, 1, 3>();
   //
-  test<1,2,1>();
-  test<1,2,2>();
-  test<1,2,3>();
+  test<1, 2, 1>();
+  test<1, 2, 2>();
+  test<1, 2, 3>();
   //
-  test<1,3,1>();
-  test<1,3,2>();
-  test<1,3,3>();
+  test<1, 3, 1>();
+  test<1, 3, 2>();
+  test<1, 3, 3>();
   //
-  test<2,2,2>();
-  test<2,2,3>();
+  test<2, 2, 2>();
+  test<2, 2, 3>();
   //
-  test<2,3,2>();
-  test<2,3,3>();
+  test<2, 3, 2>();
+  test<2, 3, 3>();
   //
-  test<3,3,3>();
+  test<3, 3, 3>();
 }

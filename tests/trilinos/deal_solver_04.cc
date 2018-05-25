@@ -17,65 +17,70 @@
 // test the MINRES solver using the Trilinos matrix and vector classes
 
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include "../testmatrix.h"
-#include <iostream>
+
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_minres.h>
+#include <deal.II/lac/solver_qmrs.h>
+#include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/solver_control.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/solver_gmres.h>
-#include <deal.II/lac/solver_bicgstab.h>
-#include <deal.II/lac/solver_richardson.h>
-#include <deal.II/lac/solver_qmrs.h>
-#include <deal.II/lac/solver_minres.h>
-#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/vector_memory.h>
+
+#include <iostream>
 #include <typeinfo>
 
+#include "../testmatrix.h"
+#include "../tests.h"
 
-int main(int argc, char **argv)
+
+int
+main(int argc, char **argv)
 {
   std::ofstream logfile("output");
   logfile.precision(4);
   deallog.attach(logfile);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   {
     SolverControl control(100, 1.e-3);
 
     const unsigned int size = 32;
-    unsigned int dim = (size-1)*(size-1);
+    unsigned int       dim  = (size - 1) * (size - 1);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
     // Make matrix
-    FDMatrix testproblem(size, size);
-    DynamicSparsityPattern csp (dim, dim);
+    FDMatrix               testproblem(size, size);
+    DynamicSparsityPattern csp(dim, dim);
     testproblem.five_point_structure(csp);
-    TrilinosWrappers::SparseMatrix  A;
+    TrilinosWrappers::SparseMatrix A;
     A.reinit(csp);
     testproblem.five_point(A);
 
     TrilinosWrappers::MPI::Vector f;
-    f.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    f.reinit(complete_index_set(dim), MPI_COMM_WORLD);
     TrilinosWrappers::MPI::Vector u;
-    u.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    u.reinit(complete_index_set(dim), MPI_COMM_WORLD);
     f = 1.;
-    A.compress (VectorOperation::insert);
-    f.compress (VectorOperation::insert);
-    u.compress (VectorOperation::insert);
+    A.compress(VectorOperation::insert);
+    f.compress(VectorOperation::insert);
+    u.compress(VectorOperation::insert);
 
     GrowingVectorMemory<TrilinosWrappers::MPI::Vector> mem;
-    SolverMinRes<TrilinosWrappers::MPI::Vector> solver(control,mem);
-    PreconditionIdentity preconditioner;
+    SolverMinRes<TrilinosWrappers::MPI::Vector>        solver(control, mem);
+    PreconditionIdentity                               preconditioner;
 
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
-    check_solver_within_range(solver.solve(A,u,f,preconditioner),
-                              control.last_step(), 0, 42);
+    check_solver_within_range(
+      solver.solve(A, u, f, preconditioner), control.last_step(), 0, 42);
   }
 }

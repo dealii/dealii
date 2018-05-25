@@ -16,39 +16,41 @@
 
 // test FESeries::linear_regression()
 
-#include "../tests.h"
+#include <deal.II/fe/fe_series.h>
+
 #include <iostream>
 
-#include <deal.II/fe/fe_series.h>
+#include "../tests.h"
 
 using namespace dealii;
 
 
-void test ()
+void
+test()
 {
-  const double k_in = numbers::PI;
-  const double b_in = std::sqrt(2.);
-  const unsigned int N = 10;
+  const double        k_in = numbers::PI;
+  const double        b_in = std::sqrt(2.);
+  const unsigned int  N    = 10;
   std::vector<double> x(N), y(N);
 
   // fill the data
   for (unsigned int i = 0; i < N; i++)
     {
-      x[i] = 0.1*i;
-      y[i] = k_in * x[i]  + b_in;
+      x[i] = 0.1 * i;
+      y[i] = k_in * x[i] + b_in;
     }
 
 
-  std::pair<double,double> fit = FESeries::linear_regression(x,y);
+  std::pair<double, double> fit = FESeries::linear_regression(x, y);
 
   deallog << "exact:      " << k_in << " " << b_in << std::endl;
   deallog << "calculated: " << fit.first << " " << fit.second << std::endl;
-
 }
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

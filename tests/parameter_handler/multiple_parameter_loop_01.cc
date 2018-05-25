@@ -17,8 +17,9 @@
 
 // check the MultipleParameterLoop class
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
+#include "../tests.h"
 
 
 // Take the example from the
@@ -28,59 +29,61 @@
 class HelperClass : public MultipleParameterLoop::UserClass
 {
 public:
-  virtual void create_new (unsigned int run_no)
+  virtual void
+  create_new(unsigned int run_no)
   {
     this->run_no = run_no;
   }
-  virtual void declare_parameters (ParameterHandler &prm);
-  virtual void run (ParameterHandler &prm);
+  virtual void
+  declare_parameters(ParameterHandler &prm);
+  virtual void
+               run(ParameterHandler &prm);
   unsigned int run_no;
 };
 
 
-void HelperClass::declare_parameters (ParameterHandler &prm)
+void
+HelperClass::declare_parameters(ParameterHandler &prm)
 {
-  prm.enter_subsection ("Testing");
-  prm.declare_entry ("string list",
-                     "a",
-                     Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-                     "docs 1");
-  prm.declare_entry ("int",
-                     "1",
-                     Patterns::Integer());
-  prm.declare_entry ("double",
-                     "3.1415926",
-                     Patterns::Double(),
-                     "docs 3");
-  prm.leave_subsection ();
+  prm.enter_subsection("Testing");
+  prm.declare_entry("string list",
+                    "a",
+                    Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+                    "docs 1");
+  prm.declare_entry("int", "1", Patterns::Integer());
+  prm.declare_entry("double", "3.1415926", Patterns::Double(), "docs 3");
+  prm.leave_subsection();
 }
 
 
-void HelperClass::run (ParameterHandler &prm)
+void
+HelperClass::run(ParameterHandler &prm)
 {
   deallog << "Number of run: " << run_no << std::endl;
 
-  prm.print_parameters (deallog.get_file_stream(), ParameterHandler::Text);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
 }
 
 
 
-void check ()
+void
+check()
 {
   class MultipleParameterLoop prm;
-  HelperClass h;
+  HelperClass                 h;
 
-  h.declare_parameters (prm);
-  prm.parse_input (SOURCE_DIR "/prm/multiple_parameter_loop_01.prm");
-  prm.loop (h);
+  h.declare_parameters(prm);
+  prm.parse_input(SOURCE_DIR "/prm/multiple_parameter_loop_01.prm");
+  prm.loop(h);
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check ();
+  check();
 
   return 0;
 }

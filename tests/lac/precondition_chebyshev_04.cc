@@ -19,38 +19,44 @@
 // vector
 
 
-#include "../tests.h"
-#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 
 class DiagonalMatrixManual
 {
 public:
-  DiagonalMatrixManual() {}
+  DiagonalMatrixManual()
+  {}
 
-  void set_vector_one (const unsigned int size)
+  void
+  set_vector_one(const unsigned int size)
   {
     diagonal.reinit(size);
     diagonal = 1;
   }
 
-  void reinit (const FullMatrix<double> f)
+  void
+  reinit(const FullMatrix<double> f)
   {
     diagonal.reinit(f.m());
-    for (unsigned int i=0; i<f.m(); ++i)
-      diagonal(i) = 1./f(i,i);
+    for (unsigned int i = 0; i < f.m(); ++i)
+      diagonal(i) = 1. / f(i, i);
     diagonal.print(deallog);
   }
 
-  typename Vector<double>::size_type m() const
+  typename Vector<double>::size_type
+  m() const
   {
     return diagonal.size();
   }
 
-  void vmult(Vector<double> &dst, const Vector<double> &src) const
+  void
+  vmult(Vector<double> &dst, const Vector<double> &src) const
   {
     dst = src;
     dst.scale(diagonal);
@@ -65,31 +71,35 @@ void
 check()
 {
   const unsigned int size = 10;
-  FullMatrix<double> m(size,size);
-  for (unsigned int i=0; i<size; ++i)
-    m(i,i) = i+1;
+  FullMatrix<double> m(size, size);
+  for (unsigned int i = 0; i < size; ++i)
+    m(i, i) = i + 1;
 
-  Vector<double> in (size), out(size), ref(size), zero(size);
-  for (unsigned int i=0; i<size; ++i)
+  Vector<double> in(size), out(size), ref(size), zero(size);
+  for (unsigned int i = 0; i < size; ++i)
     in(i) = random_value<double>();
 
-  PreconditionChebyshev<FullMatrix<double>,Vector<double>,DiagonalMatrixManual> prec;
-  PreconditionChebyshev<FullMatrix<double>,Vector<double>,DiagonalMatrixManual>::AdditionalData
-  data;
+  PreconditionChebyshev<FullMatrix<double>,
+                        Vector<double>,
+                        DiagonalMatrixManual>
+                                                              prec;
+  PreconditionChebyshev<FullMatrix<double>,
+                        Vector<double>,
+                        DiagonalMatrixManual>::AdditionalData data;
   data.smoothing_range = 2 * size;
-  data.degree = 3;
+  data.degree          = 3;
   data.preconditioner.reset(new DiagonalMatrixManual());
   data.preconditioner->set_vector_one(size);
   prec.initialize(m, data);
 
   deallog << "Exact inverse:     ";
-  for (unsigned int i=0; i<size; ++i)
-    deallog << in(i)/m(i,i) << " ";
+  for (unsigned int i = 0; i < size; ++i)
+    deallog << in(i) / m(i, i) << " ";
   deallog << std::endl;
 
   deallog << "Check  vmult usual init: ";
   prec.vmult(ref, in);
-  for (unsigned int i=0; i<size; ++i)
+  for (unsigned int i = 0; i < size; ++i)
     deallog << ref(i) << " ";
   deallog << std::endl;
 
@@ -98,25 +108,28 @@ check()
   prec.vmult(out, zero);
   prec.vmult(out, in);
   deallog << "Check  vmult zero init:  ";
-  for (unsigned int i=0; i<size; ++i)
+  for (unsigned int i = 0; i < size; ++i)
     deallog << out(i) << " ";
   out -= ref;
   deallog << " difference norm = " << out.linfty_norm() << std::endl;
 
-  PreconditionChebyshev<FullMatrix<double>,Vector<double>,DiagonalMatrixManual> prec2;
+  PreconditionChebyshev<FullMatrix<double>,
+                        Vector<double>,
+                        DiagonalMatrixManual>
+    prec2;
   prec2.initialize(m, data);
   prec2.vmult(out, zero);
   prec2.vmult(out, in);
   deallog << "Check  vmult zero init:  ";
-  for (unsigned int i=0; i<size; ++i)
+  for (unsigned int i = 0; i < size; ++i)
     deallog << out(i) << " ";
   out -= ref;
   deallog << " difference norm = " << out.linfty_norm() << std::endl;
-
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

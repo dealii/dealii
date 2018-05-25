@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#  include <thread>
+#include <thread>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {

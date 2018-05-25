@@ -18,18 +18,20 @@
 // check querying the number of nonzero elements in
 // ChunkSparseMatrix
 
-#include "../tests.h"
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
+#include "../tests.h"
 
-void test (const unsigned int chunk_size)
+
+void
+test(const unsigned int chunk_size)
 {
-  ChunkSparsityPattern sp (5,5,3,chunk_size);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
-  sp.compress ();
+  ChunkSparsityPattern sp(5, 5, 3, chunk_size);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 5; ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
+  sp.compress();
 
   ChunkSparseMatrix<double> m(sp);
 
@@ -40,13 +42,13 @@ void test (const unsigned int chunk_size)
   // but don't count it when traversing the
   // row
   unsigned int counter = 0;
-  for (unsigned int i=0; i<m.m(); ++i)
+  for (unsigned int i = 0; i < m.m(); ++i)
     {
-      for (unsigned int j=0; j<m.n(); ++j)
-        if ((i+2*j+1) % 3 == 0)
+      for (unsigned int j = 0; j < m.n(); ++j)
+        if ((i + 2 * j + 1) % 3 == 0)
           {
-            m.set (i,j, i*j*.5+.5);
-            if (i!=j)
+            m.set(i, j, i * j * .5 + .5);
+            if (i != j)
               ++counter;
           }
       ++counter;
@@ -55,13 +57,11 @@ void test (const unsigned int chunk_size)
   deallog << m.n_nonzero_elements() << std::endl;
   if (chunk_size == 1)
     {
-      Assert (m.n_nonzero_elements() == counter,
-              ExcInternalError());
+      Assert(m.n_nonzero_elements() == counter, ExcInternalError());
     }
   else
     {
-      Assert (m.n_nonzero_elements() >= counter,
-              ExcInternalError());
+      Assert(m.n_nonzero_elements() >= counter, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -69,21 +69,22 @@ void test (const unsigned int chunk_size)
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
-      for (unsigned int i=0;
-           i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
+      const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
+      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
            ++i)
-        test (chunk_sizes[i]);
+        test(chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -96,7 +97,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -17,36 +17,42 @@
 // check serialization for Lagrange polynomial based on Gauss-Lobatto support
 // points
 
-#include "serialization.h"
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
+
 #include <boost/serialization/vector.hpp>
 
-void test ()
+#include "serialization.h"
+
+void
+test()
 {
-  unsigned int n1 = 3;
-  unsigned int support_point1 = 1;
-  QGaussLobatto<1> quad1 (n1+1);
-  Polynomials::Polynomial<double> p1 = Polynomials::
-                                       generate_complete_Lagrange_basis (quad1.get_points())[support_point1];
+  unsigned int                    n1             = 3;
+  unsigned int                    support_point1 = 1;
+  QGaussLobatto<1>                quad1(n1 + 1);
+  Polynomials::Polynomial<double> p1 =
+    Polynomials::generate_complete_Lagrange_basis(
+      quad1.get_points())[support_point1];
 
-  unsigned int n2 = 4;
-  unsigned int support_point2 = 2;
-  QGaussLobatto<1> quad2 (n2+1);
-  Polynomials::Polynomial<double> p2 = Polynomials::
-                                       generate_complete_Lagrange_basis (quad2.get_points())[support_point2];
+  unsigned int                    n2             = 4;
+  unsigned int                    support_point2 = 2;
+  QGaussLobatto<1>                quad2(n2 + 1);
+  Polynomials::Polynomial<double> p2 =
+    Polynomials::generate_complete_Lagrange_basis(
+      quad2.get_points())[support_point2];
 
-  verify (p1, p2);
+  verify(p1, p2);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

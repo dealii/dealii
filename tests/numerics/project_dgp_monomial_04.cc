@@ -26,8 +26,9 @@
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=0; p<6-dim; ++p)
-    test_with_2d_deformed_mesh (FE_DGPMonomial<dim>(p), p, (p+1)/2);
+  for (unsigned int p = 0; p < 6 - dim; ++p)
+    test_with_2d_deformed_mesh(FE_DGPMonomial<dim>(p), p, (p + 1) / 2);
 }

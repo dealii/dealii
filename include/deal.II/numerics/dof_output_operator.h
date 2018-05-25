@@ -18,11 +18,15 @@
 #define dealii_dof_output_operator_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/parameter_handler.h>
+
 #include <deal.II/algorithms/any_data.h>
-#include <deal.II/base/event.h>
 #include <deal.II/algorithms/operator.h>
+
+#include <deal.II/base/event.h>
+#include <deal.II/base/parameter_handler.h>
+
 #include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>
@@ -35,7 +39,7 @@ namespace Algorithms
    * An output operator writing a separate file in each step and writing the
    * vectors as finite element functions with respect to a given DoFHandler.
    */
-  template <typename VectorType, int dim, int spacedim=dim>
+  template <typename VectorType, int dim, int spacedim = dim>
   class DoFOutputOperator : public OutputOperator<VectorType>
   {
   public:
@@ -47,20 +51,23 @@ namespace Algorithms
      * last step command. Numbers with less digits are filled with
      * zeros from the left.
      */
-    DoFOutputOperator (const std::string &filename_base = std::string("output"),
-                       const unsigned int digits = 3);
+    DoFOutputOperator(const std::string &filename_base = std::string("output"),
+                      const unsigned int digits        = 3);
 
-    void parse_parameters(ParameterHandler &param);
-    void initialize (const DoFHandler<dim, spacedim> &dof_handler);
+    void
+    parse_parameters(ParameterHandler &param);
+    void
+    initialize(const DoFHandler<dim, spacedim> &dof_handler);
 
     virtual OutputOperator<VectorType> &
-    operator << (const AnyData &vectors) override;
+    operator<<(const AnyData &vectors) override;
 
   private:
     SmartPointer<const DoFHandler<dim, spacedim>,
-                 DoFOutputOperator<VectorType, dim, spacedim> > dof;
+                 DoFOutputOperator<VectorType, dim, spacedim>>
+      dof;
 
-    const std::string filename_base;
+    const std::string  filename_base;
     const unsigned int digits;
 
     DataOut<dim> out;
@@ -68,11 +75,12 @@ namespace Algorithms
 
   template <typename VectorType, int dim, int spacedim>
   inline void
-  DoFOutputOperator<VectorType, dim, spacedim>::initialize(const DoFHandler<dim, spacedim> &dof_handler)
+  DoFOutputOperator<VectorType, dim, spacedim>::initialize(
+    const DoFHandler<dim, spacedim> &dof_handler)
   {
     dof = &dof_handler;
   }
-}
+} // namespace Algorithms
 
 
 DEAL_II_NAMESPACE_CLOSE

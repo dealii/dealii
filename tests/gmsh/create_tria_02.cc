@@ -17,21 +17,24 @@
 // Create a hyper ball, refine it, extract an iges of the boundary,
 // and create a new mesh using gmsh from that iges file.
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
+#include <deal.II/gmsh/utilities.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 
-#include <deal.II/gmsh/utilities.h>
-#include <deal.II/opencascade/utilities.h>
 #include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/utilities.h>
 
-int main ()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
-  Triangulation<2> tria (Triangulation<2>::MeshSmoothing::none,
-                         /*check_for_distorted_cells*/ true);
+  Triangulation<2> tria(Triangulation<2>::MeshSmoothing::none,
+                        /*check_for_distorted_cells*/ true);
   GridGenerator::hyper_ball(tria);
 
   tria.refine_global(4);
@@ -44,9 +47,9 @@ int main ()
   // The grid created depends on the OpenCASCADE and Gmsh version used.
   // Hence, only check that the resulting mesh is non-empty and the cells
   // are not distorted.
-  AssertThrow(tria.n_cells()>0, ExcInternalError());
+  AssertThrow(tria.n_cells() > 0, ExcInternalError());
 
-  deallog << "OK"  << std::endl;
+  deallog << "OK" << std::endl;
 
   return 0;
 }

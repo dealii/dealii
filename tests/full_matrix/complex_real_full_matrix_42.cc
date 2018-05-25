@@ -25,23 +25,18 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  for (unsigned int n=1; n<=5; ++n)
+  for (unsigned int n = 1; n <= 5; ++n)
     {
-      const std::complex<number> array[] = { 50, 2, 3, 4, 5,
-                                             6, 50, 8, 9, 0,
-                                             1, 2, 50, 4, 5,
-                                             6, 7, 8, 50, 0,
-                                             1, 2, 3, 4, 50
-                                           };
+      const std::complex<number> array[] = {50, 2, 3, 4,  5, 6, 50, 8, 9,
+                                            0,  1, 2, 50, 4, 5, 6,  7, 8,
+                                            50, 0, 1, 2,  3, 4, 50};
 
-      FullMatrix<std::complex<number> > m (n,n,array), p(n,n);
-      p.invert (m);
-      print_matrix (p);
+      FullMatrix<std::complex<number>> m(n, n, array), p(n, n);
+      p.invert(m);
+      print_matrix(p);
     }
 }
-

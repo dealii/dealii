@@ -21,6 +21,7 @@
 
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/signaling_nan.h>
+
 #include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -28,9 +29,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  ThetaTimestepping<VectorType>::ThetaTimestepping (OperatorBase &e,
-                                                    OperatorBase &i)
-    :
+  ThetaTimestepping<VectorType>::ThetaTimestepping(OperatorBase &e,
+                                                   OperatorBase &i) :
     vtheta(0.5),
     adaptive(false),
     op_explicit(&e),
@@ -57,7 +57,7 @@ namespace Algorithms
   ThetaTimestepping<VectorType>::declare_parameters(ParameterHandler &param)
   {
     param.enter_subsection("ThetaTimestepping");
-    TimestepControl::declare_parameters (param);
+    TimestepControl::declare_parameters(param);
     param.declare_entry("Theta", ".5", Patterns::Double());
     param.declare_entry("Adaptive", "false", Patterns::Bool());
     param.leave_subsection();
@@ -65,25 +65,25 @@ namespace Algorithms
 
   template <typename VectorType>
   void
-  ThetaTimestepping<VectorType>::parse_parameters (ParameterHandler &param)
+  ThetaTimestepping<VectorType>::parse_parameters(ParameterHandler &param)
   {
     param.enter_subsection("ThetaTimestepping");
-    control.parse_parameters (param);
-    vtheta = param.get_double("Theta");
+    control.parse_parameters(param);
+    vtheta   = param.get_double("Theta");
     adaptive = param.get_bool("Adaptive");
-    param.leave_subsection ();
+    param.leave_subsection();
   }
 
 
   template <typename VectorType>
   void
-  ThetaTimestepping<VectorType>::operator() (AnyData &out, const AnyData &in)
+  ThetaTimestepping<VectorType>::operator()(AnyData &out, const AnyData &in)
   {
     Assert(!adaptive, ExcNotImplemented());
 
     LogStream::Prefix prefix("Theta");
 
-    VectorType &solution = *out.entry<VectorType *>(0);
+    VectorType &                    solution = *out.entry<VectorType *>(0);
     GrowingVectorMemory<VectorType> mem;
     typename VectorMemory<VectorType>::Pointer aux(mem);
     aux->reinit(solution);
@@ -120,9 +120,9 @@ namespace Algorithms
     for (unsigned int count = 1; d_explicit.time < control.final(); ++count)
       {
         const bool step_change = control.advance();
-        d_implicit.time = control.now();
-        d_explicit.step = (1.-vtheta)*control.step();
-        d_implicit.step = vtheta*control.step();
+        d_implicit.time        = control.now();
+        d_explicit.step        = (1. - vtheta) * control.step();
+        d_implicit.step        = vtheta * control.step();
         deallog << "Time step:" << d_implicit.time << std::endl;
 
         op_explicit->notify(Events::new_time);
@@ -144,7 +144,7 @@ namespace Algorithms
         d_explicit.time = control.now();
       }
   }
-}
+} // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE
 

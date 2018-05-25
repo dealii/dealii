@@ -16,35 +16,39 @@
 
 // see if we can detach from threads
 
-#include "../tests.h"
-#include <atomic>
-#include <unistd.h>
-
 #include <deal.II/base/thread_management.h>
 
+#include <unistd.h>
 
-Threads::Mutex mutex;
+#include <atomic>
+
+#include "../tests.h"
+
+
+Threads::Mutex          mutex;
 static std::atomic<int> spin_lock(0);
 
 
-void worker ()
+void
+worker()
 {
   // wait for the mutex to make sure the main
   // thread has already moved on. we can immediately
   // release the mutex again.
-  mutex.acquire ();
-  mutex.release ();
+  mutex.acquire();
+  mutex.release();
   deallog << "OK." << std::endl;
   spin_lock = 1;
 }
 
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  mutex.acquire ();
+  mutex.acquire();
   // start and abandon the
   // thread. because we hold the
   // lock, the started task can not
@@ -59,12 +63,12 @@ int main()
   // won't be able to acquire the
   // mutex
   {
-    Threads::new_thread (worker);
+    Threads::new_thread(worker);
   }
-  sleep (1);
+  sleep(1);
 
   // let abandoned thread continue
-  mutex.release ();
+  mutex.release();
 
   // wait for thread to finish
   while (spin_lock == 0)

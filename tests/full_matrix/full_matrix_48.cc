@@ -23,18 +23,17 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_matrix(m);
   Vector<number> v, w;
-  make_domain_vector (v);
-  make_range_vector (w);
+  make_domain_vector(v);
+  make_range_vector(w);
 
-  m.Tvmult_add (v, w);
-  print_vector (v);
-  print_vector (w);
+  m.Tvmult_add(v, w);
+  print_vector(v);
+  print_vector(w);
 }

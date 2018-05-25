@@ -23,21 +23,23 @@
 // leading to more external faces than one originally wanted
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
-  deallog << std::setprecision (2);
+  deallog << std::setprecision(2);
 
   // generate a hyperball in 3d
   Triangulation<3> tria;
-  GridGenerator::hyper_ball (tria, Point<3>(), std::sqrt(3.));
+  GridGenerator::hyper_ball(tria, Point<3>(), std::sqrt(3.));
 
   // output all faces. there should
   // be 6 external ones, but there
@@ -47,30 +49,26 @@ int main ()
   // some of them internal to the
   // ball
   unsigned int external_faces = 0;
-  for (Triangulation<3>::face_iterator face=tria.begin_face();
-       face!=tria.end_face(); ++face)
+  for (Triangulation<3>::face_iterator face = tria.begin_face();
+       face != tria.end_face();
+       ++face)
     {
-      deallog << face << "   "
-              << face->boundary_id() << "  "
-              << face->vertex_index(0)
-              << " <" << face->vertex(0) << '>'
+      deallog << face << "   " << face->boundary_id() << "  "
+              << face->vertex_index(0) << " <" << face->vertex(0) << '>'
               << std::endl
-              << "           " << face->vertex_index(1)
-              << "  <" << face->vertex(1) << '>'
-              << std::endl
-              << "           " << face->vertex_index(2)
-              << "  <" << face->vertex(2) << '>'
-              << std::endl
-              << "           " << face->vertex_index(3)
-              << "  <" << face->vertex(3) << '>'
-              << std::endl;
+              << "           " << face->vertex_index(1) << "  <"
+              << face->vertex(1) << '>' << std::endl
+              << "           " << face->vertex_index(2) << "  <"
+              << face->vertex(2) << '>' << std::endl
+              << "           " << face->vertex_index(3) << "  <"
+              << face->vertex(3) << '>' << std::endl;
       if (face->at_boundary())
         ++external_faces;
     }
 
   deallog << "External faces: " << external_faces << std::endl;
 
-  Assert (external_faces == 6, ExcInternalError());
+  Assert(external_faces == 6, ExcInternalError());
 
   return 0;
 }

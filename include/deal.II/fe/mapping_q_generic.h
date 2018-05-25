@@ -18,13 +18,17 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/derivative_form.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/fe/mapping.h>
+
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping.h>
+
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <array>
@@ -32,7 +36,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int,int> class MappingQ;
+template <int, int>
+class MappingQ;
 
 
 /*!@addtogroup mapping */
@@ -124,8 +129,8 @@ template <int,int> class MappingQ;
  *
  * @author Wolfgang Bangerth, 2015, Martin Kronbichler, 2017
  */
-template <int dim, int spacedim=dim>
-class MappingQGeneric : public Mapping<dim,spacedim>
+template <int dim, int spacedim = dim>
+class MappingQGeneric : public Mapping<dim, spacedim>
 {
 public:
   /**
@@ -133,29 +138,30 @@ public:
    * polynomials that are used to map cells from the reference to the real
    * cell.
    */
-  MappingQGeneric (const unsigned int polynomial_degree);
+  MappingQGeneric(const unsigned int polynomial_degree);
 
   /**
    * Copy constructor.
    */
-  MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping);
+  MappingQGeneric(const MappingQGeneric<dim, spacedim> &mapping);
 
   // for documentation, see the Mapping base class
-  virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  virtual std::unique_ptr<Mapping<dim, spacedim>>
+  clone() const override;
 
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the
    * constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree() const;
 
   /**
    * Always returns @p true because the default implementation of functions in
    * this class preserves vertex locations.
    */
-  virtual
-  bool preserves_vertex_locations () const override;
+  virtual bool
+  preserves_vertex_locations() const override;
 
   /**
    * @name Mapping points between reference and real cells
@@ -163,16 +169,16 @@ public:
    */
 
   // for documentation, see the Mapping base class
-  virtual
-  Point<spacedim>
-  transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               const Point<dim>                                 &p) const override;
+  virtual Point<spacedim>
+  transform_unit_to_real_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const Point<dim> &p) const override;
 
   // for documentation, see the Mapping base class
-  virtual
-  Point<dim>
-  transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               const Point<spacedim>                            &p) const override;
+  virtual Point<dim>
+  transform_real_to_unit_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const Point<spacedim> &p) const override;
 
   /**
    * @}
@@ -184,44 +190,39 @@ public:
    */
 
   // for documentation, see the Mapping base class
-  virtual
-  void
-  transform (const ArrayView<const Tensor<1,dim> >                  &input,
-             const MappingType                                       type,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const ArrayView<Tensor<1,spacedim> >                   &output) const override;
+  virtual void
+  transform(const ArrayView<const Tensor<1, dim>> &                  input,
+            const MappingType                                        type,
+            const typename Mapping<dim, spacedim>::InternalDataBase &internal,
+            const ArrayView<Tensor<1, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
-  virtual
-  void
-  transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
-             const MappingType                                         type,
-             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
-             const ArrayView<Tensor<2,spacedim> >                     &output) const override;
+  virtual void
+  transform(const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
+            const MappingType                                        type,
+            const typename Mapping<dim, spacedim>::InternalDataBase &internal,
+            const ArrayView<Tensor<2, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
-  virtual
-  void
-  transform (const ArrayView<const Tensor<2, dim> >                 &input,
-             const MappingType                                       type,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const ArrayView<Tensor<2,spacedim> >                   &output) const override;
+  virtual void
+  transform(const ArrayView<const Tensor<2, dim>> &                  input,
+            const MappingType                                        type,
+            const typename Mapping<dim, spacedim>::InternalDataBase &internal,
+            const ArrayView<Tensor<2, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
-  virtual
-  void
-  transform (const ArrayView<const DerivativeForm<2, dim, spacedim> > &input,
-             const MappingType                                         type,
-             const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
-             const ArrayView<Tensor<3,spacedim> >                     &output) const override;
+  virtual void
+  transform(const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
+            const MappingType                                        type,
+            const typename Mapping<dim, spacedim>::InternalDataBase &internal,
+            const ArrayView<Tensor<3, spacedim>> &output) const override;
 
   // for documentation, see the Mapping base class
-  virtual
-  void
-  transform (const ArrayView<const Tensor<3, dim> >                 &input,
-             const MappingType                                       type,
-             const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const ArrayView<Tensor<3,spacedim> >                   &output) const override;
+  virtual void
+  transform(const ArrayView<const Tensor<3, dim>> &                  input,
+            const MappingType                                        type,
+            const typename Mapping<dim, spacedim>::InternalDataBase &internal,
+            const ArrayView<Tensor<3, spacedim>> &output) const override;
 
   /**
    * @}
@@ -244,7 +245,7 @@ public:
    * calls from the finite element to functions such as transform(). The
    * latter class of member variables are marked as 'mutable'.
    */
-  class InternalData : public Mapping<dim,spacedim>::InternalDataBase
+  class InternalData : public Mapping<dim, spacedim>::InternalDataBase
   {
   public:
     /**
@@ -262,9 +263,9 @@ public:
      * mapping shape functions.
      */
     void
-    initialize (const UpdateFlags      update_flags,
-                const Quadrature<dim> &quadrature,
-                const unsigned int     n_original_q_points);
+    initialize(const UpdateFlags      update_flags,
+               const Quadrature<dim> &quadrature,
+               const unsigned int     n_original_q_points);
 
     /**
      * Initialize the object's member variables related to cell and face data
@@ -272,9 +273,9 @@ public:
      * function calls initialize().
      */
     void
-    initialize_face (const UpdateFlags      update_flags,
-                     const Quadrature<dim> &quadrature,
-                     const unsigned int     n_original_q_points);
+    initialize_face(const UpdateFlags      update_flags,
+                    const Quadrature<dim> &quadrature,
+                    const unsigned int     n_original_q_points);
 
     /**
      * Compute the values and/or derivatives of the shape functions used for
@@ -291,75 +292,79 @@ public:
      * compute the mapping and its derivatives at this location, but have
      * already sized all internal arrays correctly.
      */
-    void compute_shape_function_values (const std::vector<Point<dim> > &unit_points);
+    void
+    compute_shape_function_values(const std::vector<Point<dim>> &unit_points);
 
 
     /**
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
      */
-    const double &shape (const unsigned int qpoint,
-                         const unsigned int shape_nr) const;
+    const double &
+    shape(const unsigned int qpoint, const unsigned int shape_nr) const;
 
     /**
      * Shape function at quadrature point. See above.
      */
-    double &shape (const unsigned int qpoint,
-                   const unsigned int shape_nr);
+    double &
+    shape(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
      * Gradient of shape function in quadrature point. See above.
      */
-    const Tensor<1,dim> &derivative (const unsigned int qpoint,
-                                     const unsigned int shape_nr) const;
+    const Tensor<1, dim> &
+    derivative(const unsigned int qpoint, const unsigned int shape_nr) const;
 
     /**
      * Gradient of shape function in quadrature point. See above.
      */
-    Tensor<1,dim> &derivative (const unsigned int qpoint,
-                               const unsigned int shape_nr);
+    Tensor<1, dim> &
+    derivative(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
      * Second derivative of shape function in quadrature point. See above.
      */
-    const Tensor<2,dim> &second_derivative (const unsigned int qpoint,
-                                            const unsigned int shape_nr) const;
+    const Tensor<2, dim> &
+    second_derivative(const unsigned int qpoint,
+                      const unsigned int shape_nr) const;
 
     /**
      * Second derivative of shape function in quadrature point. See above.
      */
-    Tensor<2,dim> &second_derivative (const unsigned int qpoint,
-                                      const unsigned int shape_nr);
+    Tensor<2, dim> &
+    second_derivative(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
      * third derivative of shape function in quadrature point. See above.
      */
-    const Tensor<3,dim> &third_derivative (const unsigned int qpoint,
-                                           const unsigned int shape_nr) const;
+    const Tensor<3, dim> &
+    third_derivative(const unsigned int qpoint,
+                     const unsigned int shape_nr) const;
 
     /**
      * third derivative of shape function in quadrature point. See above.
      */
-    Tensor<3,dim> &third_derivative (const unsigned int qpoint,
-                                     const unsigned int shape_nr);
+    Tensor<3, dim> &
+    third_derivative(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
      * fourth derivative of shape function in quadrature point. See above.
      */
-    const Tensor<4,dim> &fourth_derivative (const unsigned int qpoint,
-                                            const unsigned int shape_nr) const;
+    const Tensor<4, dim> &
+    fourth_derivative(const unsigned int qpoint,
+                      const unsigned int shape_nr) const;
 
     /**
      * fourth derivative of shape function in quadrature point. See above.
      */
-    Tensor<4,dim> &fourth_derivative (const unsigned int qpoint,
-                                      const unsigned int shape_nr);
+    Tensor<4, dim> &
+    fourth_derivative(const unsigned int qpoint, const unsigned int shape_nr);
 
     /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
-    virtual
-    std::size_t memory_consumption () const override;
+    virtual std::size_t
+    memory_consumption() const override;
 
     /**
      * Values of shape functions. Access by function @p shape.
@@ -373,7 +378,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<Tensor<1,dim> > shape_derivatives;
+    std::vector<Tensor<1, dim>> shape_derivatives;
 
     /**
      * Values of shape function second derivatives. Access by function @p
@@ -381,7 +386,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<Tensor<2,dim> > shape_second_derivatives;
+    std::vector<Tensor<2, dim>> shape_second_derivatives;
 
     /**
      * Values of shape function third derivatives. Access by function @p
@@ -389,7 +394,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<Tensor<3,dim> > shape_third_derivatives;
+    std::vector<Tensor<3, dim>> shape_third_derivatives;
 
     /**
      * Values of shape function fourth derivatives. Access by function @p
@@ -397,7 +402,7 @@ public:
      *
      * Computed once.
      */
-    std::vector<Tensor<4,dim> > shape_fourth_derivatives;
+    std::vector<Tensor<4, dim>> shape_fourth_derivatives;
 
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and
@@ -412,7 +417,9 @@ public:
      *
      * Filled once.
      */
-    std::array<std::vector<Tensor<1,dim> >, GeometryInfo<dim>::faces_per_cell *(dim-1)> unit_tangentials;
+    std::array<std::vector<Tensor<1, dim>>,
+               GeometryInfo<dim>::faces_per_cell *(dim - 1)>
+      unit_tangentials;
 
     /**
      * The polynomial degree of the mapping. Since the objects here are also
@@ -442,41 +449,42 @@ public:
     QGaussLobatto<1> line_support_points;
 
     /**
-      * In case the quadrature rule given represents a tensor product
-      * we need to store the evaluations of the 1d polynomials at the
-      * the 1d quadrature points. That is what this variable is for.
-      */
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double>> shape_info;
+     * In case the quadrature rule given represents a tensor product
+     * we need to store the evaluations of the 1d polynomials at the
+     * the 1d quadrature points. That is what this variable is for.
+     */
+    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double>>
+      shape_info;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * we need to store temporary data in this object.
      */
-    mutable AlignedVector<VectorizedArray<double> > scratch;
+    mutable AlignedVector<VectorizedArray<double>> scratch;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the values at the mapped support points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double> > values_dofs;
+    mutable AlignedVector<VectorizedArray<double>> values_dofs;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the values at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double> > values_quad;
+    mutable AlignedVector<VectorizedArray<double>> values_quad;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the gradients at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double> > gradients_quad;
+    mutable AlignedVector<VectorizedArray<double>> gradients_quad;
 
     /**
      * In case the quadrature rule given represents a tensor product
      * the hessians at the quadrature points are stored in this object.
      */
-    mutable AlignedVector<VectorizedArray<double> > hessians_quad;
+    mutable AlignedVector<VectorizedArray<double>> hessians_quad;
 
     /**
      * Indicates whether the given Quadrature object is a tensor product.
@@ -492,7 +500,7 @@ public:
      *
      * Computed on each cell.
      */
-    mutable std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
+    mutable std::vector<DerivativeForm<1, dim, spacedim>> covariant;
 
     /**
      * Tensors of contravariant transformation at each of the quadrature
@@ -501,23 +509,24 @@ public:
      *
      * Computed on each cell.
      */
-    mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
+    mutable std::vector<DerivativeForm<1, dim, spacedim>> contravariant;
 
     /**
      * Auxiliary vectors for internal use.
      */
-    mutable std::vector<std::vector<Tensor<1,spacedim> > > aux;
+    mutable std::vector<std::vector<Tensor<1, spacedim>>> aux;
 
     /**
      * Stores the support points of the mapping shape functions on the @p
      * cell_of_current_support_points.
      */
-    mutable std::vector<Point<spacedim> > mapping_support_points;
+    mutable std::vector<Point<spacedim>> mapping_support_points;
 
     /**
      * Stores the cell of which the @p mapping_support_points are stored.
      */
-    mutable typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
+    mutable typename Triangulation<dim, spacedim>::cell_iterator
+      cell_of_current_support_points;
 
     /**
      * The determinant of the Jacobian in each quadrature point. Filled if
@@ -528,62 +537,59 @@ public:
 
 
   // documentation can be found in Mapping::requires_update_flags()
-  virtual
-  UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const override;
+  virtual UpdateFlags
+  requires_update_flags(const UpdateFlags update_flags) const override;
 
   // documentation can be found in Mapping::get_data()
-  virtual
-  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
-  get_data (const UpdateFlags,
-            const Quadrature<dim> &quadrature) const override;
+  virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+  get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
 
   // documentation can be found in Mapping::get_face_data()
-  virtual
-  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
-  get_face_data (const UpdateFlags flags,
-                 const Quadrature<dim-1>& quadrature) const override;
+  virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+  get_face_data(const UpdateFlags          flags,
+                const Quadrature<dim - 1> &quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
-  virtual
-  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
-  get_subface_data (const UpdateFlags flags,
-                    const Quadrature<dim-1>& quadrature) const override;
+  virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+  get_subface_data(const UpdateFlags          flags,
+                   const Quadrature<dim - 1> &quadrature) const override;
 
   // documentation can be found in Mapping::fill_fe_values()
-  virtual
-  CellSimilarity::Similarity
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
-                  const CellSimilarity::Similarity                               cell_similarity,
-                  const Quadrature<dim>                                         &quadrature,
-                  const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
-                  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &output_data) const override;
+  virtual CellSimilarity::Similarity
+  fill_fe_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const CellSimilarity::Similarity                            cell_similarity,
+    const Quadrature<dim> &                                     quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const override;
 
   // documentation can be found in Mapping::fill_fe_face_values()
-  virtual
-  void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
-                       const unsigned int                                             face_no,
-                       const Quadrature<dim-1>                                       &quadrature,
-                       const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
-                       dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const override;
 
   // documentation can be found in Mapping::fill_fe_subface_values()
-  virtual
-  void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
-                          const unsigned int                                             face_no,
-                          const unsigned int                                             subface_no,
-                          const Quadrature<dim-1>                                       &quadrature,
-                          const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
-                          dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_subface_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const unsigned int                                          subface_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const override;
 
   /**
    * @}
    */
 
 protected:
-
   /**
    * The degree of the polynomials used as shape functions for the mapping of
    * cells.
@@ -606,7 +612,7 @@ protected:
    * shape functions/DoFs on non-standard faces. This is used to reorder
    * support points in the same way.
    */
-  const std::unique_ptr<FE_Q<dim> > fe_q;
+  const std::unique_ptr<FE_Q<dim>> fe_q;
 
   /**
    * A vector of tables of weights by which we multiply the locations of the
@@ -627,7 +633,7 @@ protected:
    * For the definition of this table see equation (8) of the `mapping'
    * report.
    */
-  std::vector<Table<2,double> > support_point_weights_perimeter_to_interior;
+  std::vector<Table<2, double>> support_point_weights_perimeter_to_interior;
 
   /**
    * A table of weights by which we multiply the locations of the vertex
@@ -641,7 +647,7 @@ protected:
    * in 2D, 8 in 3D), and as many rows as there are additional support points
    * in the mapping, i.e., <code>(degree+1)^dim - 2^dim</code>.
    */
-  Table<2,double> support_point_weights_cell;
+  Table<2, double> support_point_weights_cell;
 
   /**
    * Return the locations of support points for the mapping. For example, for
@@ -672,18 +678,19 @@ protected:
    * interpolation, or if dim<spacedim, it asks the underlying manifold for
    * the locations of interior points.
    */
-  virtual
-  std::vector<Point<spacedim> >
-  compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  virtual std::vector<Point<spacedim>>
+  compute_mapping_support_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
   /**
    * Transform the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
    */
   Point<dim>
-  transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                        const Point<spacedim> &p,
-                                        const Point<dim> &initial_p_unit) const;
+  transform_real_to_unit_cell_internal(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const Point<spacedim> &                                     p,
+    const Point<dim> &initial_p_unit) const;
 
   /**
    * Append the support points of all shape functions located on bounding
@@ -698,10 +705,10 @@ protected:
    * shape function support points differently than the present class, which
    * chooses the points as interpolation points on the boundary.
    */
-  virtual
-  void
-  add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                           std::vector<Point<spacedim> > &a) const;
+  virtual void
+  add_line_support_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim>> &                              a) const;
 
   /**
    * Append the support points of all shape functions located on bounding
@@ -717,16 +724,17 @@ protected:
    * shape function support points differently than the present class, which
    * chooses the points as interpolation points on the boundary.
    */
-  virtual
-  void
-  add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          std::vector<Point<spacedim> > &a) const;
+  virtual void
+  add_quad_support_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim>> &                              a) const;
 
   /**
    * Make MappingQ a friend since it needs to call the fill_fe_values()
    * functions on its MappingQGeneric(1) sub-object.
    */
-  template <int, int> friend class MappingQ;
+  template <int, int>
+  friend class MappingQ;
 };
 
 
@@ -738,141 +746,149 @@ protected:
 #ifndef DOXYGEN
 
 template <int dim, int spacedim>
-inline
-const double &
-MappingQGeneric<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
-                                                    const unsigned int shape_nr) const
+inline const double &
+MappingQGeneric<dim, spacedim>::InternalData::shape(
+  const unsigned int qpoint,
+  const unsigned int shape_nr) const
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_values.size()));
-  return shape_values [qpoint*n_shape_functions + shape_nr];
+  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
+         ExcIndexRange(
+           qpoint * n_shape_functions + shape_nr, 0, shape_values.size()));
+  return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
 
 
 template <int dim, int spacedim>
-inline
-double &
-MappingQGeneric<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
+inline double &
+MappingQGeneric<dim, spacedim>::InternalData::shape(const unsigned int qpoint,
                                                     const unsigned int shape_nr)
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_values.size()));
-  return shape_values [qpoint*n_shape_functions + shape_nr];
+  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
+         ExcIndexRange(
+           qpoint * n_shape_functions + shape_nr, 0, shape_values.size()));
+  return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
 
 template <int dim, int spacedim>
-inline
-const Tensor<1,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
-                                                         const unsigned int shape_nr) const
+inline const Tensor<1, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr) const
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_derivatives.size()));
-  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
+  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
+         ExcIndexRange(
+           qpoint * n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+  return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 
 
 template <int dim, int spacedim>
-inline
-Tensor<1,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
-                                                         const unsigned int shape_nr)
+inline Tensor<1, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr)
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
-                       shape_derivatives.size()));
-  return shape_derivatives [qpoint*n_shape_functions + shape_nr];
+  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
+         ExcIndexRange(
+           qpoint * n_shape_functions + shape_nr, 0, shape_derivatives.size()));
+  return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 
 template <int dim, int spacedim>
-inline
-const Tensor<2,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::second_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr) const
+inline const Tensor<2, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::second_derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr) const
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+  Assert(qpoint * n_shape_functions + shape_nr <
+           shape_second_derivatives.size(),
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
                        shape_second_derivatives.size()));
-  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
+  return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 
 template <int dim, int spacedim>
-inline
-Tensor<2,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::second_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr)
+inline Tensor<2, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::second_derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr)
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+  Assert(qpoint * n_shape_functions + shape_nr <
+           shape_second_derivatives.size(),
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
                        shape_second_derivatives.size()));
-  return shape_second_derivatives [qpoint*n_shape_functions + shape_nr];
+  return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 template <int dim, int spacedim>
-inline
-const Tensor<3,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::third_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr) const
+inline const Tensor<3, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::third_derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr) const
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
                        shape_third_derivatives.size()));
-  return shape_third_derivatives [qpoint*n_shape_functions + shape_nr];
+  return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 
 template <int dim, int spacedim>
-inline
-Tensor<3,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::third_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr)
+inline Tensor<3, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::third_derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr)
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
                        shape_third_derivatives.size()));
-  return shape_third_derivatives [qpoint*n_shape_functions + shape_nr];
+  return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 
 template <int dim, int spacedim>
-inline
-const Tensor<4,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::fourth_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr) const
+inline const Tensor<4, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::fourth_derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr) const
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+  Assert(qpoint * n_shape_functions + shape_nr <
+           shape_fourth_derivatives.size(),
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
                        shape_fourth_derivatives.size()));
-  return shape_fourth_derivatives [qpoint*n_shape_functions + shape_nr];
+  return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 
 template <int dim, int spacedim>
-inline
-Tensor<4,dim> &
-MappingQGeneric<dim,spacedim>::InternalData::fourth_derivative (const unsigned int qpoint,
-    const unsigned int shape_nr)
+inline Tensor<4, dim> &
+MappingQGeneric<dim, spacedim>::InternalData::fourth_derivative(
+  const unsigned int qpoint,
+  const unsigned int shape_nr)
 {
-  Assert(qpoint*n_shape_functions + shape_nr < shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
+  Assert(qpoint * n_shape_functions + shape_nr <
+           shape_fourth_derivatives.size(),
+         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                       0,
                        shape_fourth_derivatives.size()));
-  return shape_fourth_derivatives [qpoint*n_shape_functions + shape_nr];
+  return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
 
 
 template <int dim, int spacedim>
-inline
-bool
-MappingQGeneric<dim,spacedim>::preserves_vertex_locations () const
+inline bool
+MappingQGeneric<dim, spacedim>::preserves_vertex_locations() const
 {
   return true;
 }

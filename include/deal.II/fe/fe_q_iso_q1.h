@@ -17,8 +17,10 @@
 #define dealii_fe_q_iso_q1_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/fe/fe_q_base.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -69,8 +71,8 @@ DEAL_II_NAMESPACE_OPEN
  * solution and stabilization techniques are used that work for linears but
  * not higher order elements. </li>
  *
- * <li> Stokes/Navier Stokes systems such as the one discussed in step-22 could be
- * solved with Q2-iso-Q1 elements for velocities instead of Q2 elements.
+ * <li> Stokes/Navier Stokes systems such as the one discussed in step-22 could
+ * be solved with Q2-iso-Q1 elements for velocities instead of Q2 elements.
  * Combined with Q1 pressures they give a stable mixed element pair. However,
  * they perform worse than the standard (Taylor-Hood $Q_2\times Q_1$)
  * approach in most situations.  </li>
@@ -107,8 +109,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Martin Kronbichler, 2013
  */
-template <int dim, int spacedim=dim>
-class FE_Q_iso_Q1 : public FE_Q_Base<TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double> >,dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_Q_iso_Q1
+  : public FE_Q_Base<
+      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
+      dim,
+      spacedim>
 {
 public:
   /**
@@ -123,10 +129,10 @@ public:
    * returns <tt>FE_Q_iso_q1<dim>(equivalent_degree)</tt>, with @p dim and @p
    * equivalent_degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
   /**
@@ -136,10 +142,10 @@ public:
    * the current element is scalar, the support point values need to
    * be vectors of length 1.
    */
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
   /**
    * @name Functions to support hp
@@ -155,9 +161,9 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
   //@}
 };
 

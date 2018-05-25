@@ -16,41 +16,43 @@
 
 // Test vmult and Tvmult of PointerMatrix
 
-#include "../tests.h"
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   initlog();
 
-  FullMatrix<double> A(5,5);
-  unsigned int k=0;
-  for (unsigned int i=0; i<A.m(); ++i)
-    for (unsigned int j=0; j<A.n(); ++j)
-      A(i,j) = ++k;
+  FullMatrix<double> A(5, 5);
+  unsigned int       k = 0;
+  for (unsigned int i = 0; i < A.m(); ++i)
+    for (unsigned int j = 0; j < A.n(); ++j)
+      A(i, j) = ++k;
 
-  PointerMatrix<FullMatrix<double>, Vector<double> > P(&A, "P");
+  PointerMatrix<FullMatrix<double>, Vector<double>> P(&A, "P");
 
   Vector<double> x(5);
   Vector<double> y(5);
   Vector<double> y2(5);
   Vector<double> diff(5);
 
-  for (unsigned int i=0; i<x.size(); ++i)
+  for (unsigned int i = 0; i < x.size(); ++i)
     {
-      x = 0.;
+      x    = 0.;
       x(i) = 1.;
-      A.vmult(y,x);
-      P.vmult(y2,x);
+      A.vmult(y, x);
+      P.vmult(y2, x);
       diff = y;
       diff.add(-1., y2);
       deallog << "P.vmult:  diff " << diff.l2_norm() << std::endl;
 
-      A.Tvmult(y,x);
-      P.Tvmult(y2,x);
+      A.Tvmult(y, x);
+      P.Tvmult(y2, x);
       diff = y;
       diff.add(-1., y2);
       deallog << "P.Tvmult: diff " << diff.l2_norm() << std::endl;

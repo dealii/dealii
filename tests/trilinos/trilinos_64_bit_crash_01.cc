@@ -21,36 +21,36 @@
 //   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5884
 
 
-#include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
+#include "../tests.h"
+
 
 template <typename int_type>
-void test ()
+void
+test()
 {
-  const Epetra_Map map (int_type(1),
-                        0,
-                        Epetra_MpiComm(MPI_COMM_SELF));
+  const Epetra_Map map(int_type(1), 0, Epetra_MpiComm(MPI_COMM_SELF));
 
-  int n_entries_per_row[1] = {1};
-  Epetra_CrsGraph graph (Copy, map, map,
-                         &n_entries_per_row[0], true);
+  int             n_entries_per_row[1] = {1};
+  Epetra_CrsGraph graph(Copy, map, map, &n_entries_per_row[0], true);
 
   int_type row_indices[1] = {0};
-  graph.InsertGlobalIndices (int_type(0),
-                             1, &row_indices[0]);
+  graph.InsertGlobalIndices(int_type(0), 1, &row_indices[0]);
 
   graph.FillComplete(map, map);
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(4);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   deallog << "32bit" << std::endl;
   test<int>();

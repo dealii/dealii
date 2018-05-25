@@ -15,11 +15,12 @@
 
 // Check that the move constructor for `IndexSet` works properly
 
-#include "../tests.h"
-
 #include <deal.II/base/index_set.h>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 

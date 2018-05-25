@@ -18,36 +18,39 @@
 // Try to merge two empty ConstraintMatrix objects initialized with IndexSets
 // that don't match.
 
-#include "../tests.h"
 #include <deal.II/lac/constraint_matrix.h>
 
+#include "../tests.h"
 
 
-void merge_check ()
+
+void
+merge_check()
 {
-  deallog << "Checking ConstraintMatrix::merge with localized lines" << std::endl;
+  deallog << "Checking ConstraintMatrix::merge with localized lines"
+          << std::endl;
 
   // set local lines to a very large range that
   // surely triggers an error if the
   // implementation is wrong
-  IndexSet local_lines1 (100000000);
-  local_lines1.add_range (99999890, 99999900);
-  local_lines1.add_range (99999990, 99999992);
+  IndexSet local_lines1(100000000);
+  local_lines1.add_range(99999890, 99999900);
+  local_lines1.add_range(99999990, 99999992);
   local_lines1.compress();
   local_lines1.print(deallog.get_file_stream());
 
-  IndexSet local_lines2 (100000000);
-  local_lines2.add_range (99999893, 99999900);
-  local_lines2.add_range (99999990, 100000000);
+  IndexSet local_lines2(100000000);
+  local_lines2.add_range(99999893, 99999900);
+  local_lines2.add_range(99999990, 100000000);
   local_lines2.compress();
   local_lines2.print(deallog.get_file_stream());
 
   // works correctly
-  ConstraintMatrix c1 (local_lines1), c2 (local_lines2);
+  ConstraintMatrix c1(local_lines1), c2(local_lines2);
 
   // now merge the two and print the
   // results
-  c1.merge (c2, ConstraintMatrix::no_conflicts_allowed, true);
+  c1.merge(c2, ConstraintMatrix::no_conflicts_allowed, true);
   c1.print(deallog.get_file_stream());
 
   deallog << "OK" << std::endl;
@@ -55,10 +58,10 @@ void merge_check ()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  merge_check ();
+  merge_check();
 }
-

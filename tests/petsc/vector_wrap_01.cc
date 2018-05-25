@@ -18,57 +18,61 @@
 // Test the constructor PETScWrappers::VectorBase(const Vec &) that takes an
 // existing PETSc vector.
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (PETScWrappers::VectorBase &v,
-           PETScWrappers::MPI::Vector &w)
+
+void
+test(PETScWrappers::VectorBase &v, PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     v(i) = i;
 
   // copy elements by reference
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     w(i) = v(i);
 
   // check that they're equal
-  Assert (v==w, ExcInternalError());
+  Assert(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-      Vec vpetsc;
-      int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Vec                              vpetsc;
+      int ierr = VecCreateSeq(PETSC_COMM_SELF, 100, &vpetsc);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
       {
-        PETScWrappers::VectorBase v (vpetsc);
-        PETScWrappers::MPI::Vector w (PETSC_COMM_SELF, 100, 100);
-        test (v,w);
+        PETScWrappers::VectorBase  v(vpetsc);
+        PETScWrappers::MPI::Vector w(PETSC_COMM_SELF, 100, 100);
+        test(v, w);
       }
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      ierr = VecDestroy (vpetsc);
+#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
+      ierr = VecDestroy(vpetsc);
 #else
-      ierr = VecDestroy (&vpetsc);
+      ierr = VecDestroy(&vpetsc);
 #endif
 
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -81,7 +85,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

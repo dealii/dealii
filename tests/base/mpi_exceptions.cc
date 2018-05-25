@@ -17,14 +17,16 @@
 // Check that we can catch all MPI-1 error codes and print appropriate
 // exception messages to the screen.
 
-#include "../tests.h"
 #include <deal.II/base/exceptions.h>
 
 #include <mpi.h>
 
 #include <vector>
 
-int main (int argc, char **argv)
+#include "../tests.h"
+
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 

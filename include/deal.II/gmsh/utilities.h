@@ -21,17 +21,18 @@
 
 #ifdef DEAL_II_WITH_GMSH
 
-#ifdef DEAL_II_WITH_OPENCASCADE
-#include <TopoDS_Shape.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopoDS_Edge.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS_Compound.hxx>
-#include <TopoDS_CompSolid.hxx>
-#endif
+#  ifdef DEAL_II_WITH_OPENCASCADE
+#    include <TopoDS_CompSolid.hxx>
+#    include <TopoDS_Compound.hxx>
+#    include <TopoDS_Edge.hxx>
+#    include <TopoDS_Face.hxx>
+#    include <TopoDS_Shape.hxx>
+#    include <TopoDS_Vertex.hxx>
+#  endif
 
-#include <deal.II/base/parameter_handler.h>
-#include <deal.II/grid/tria.h>
+#  include <deal.II/base/parameter_handler.h>
+
+#  include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace Gmsh
 {
-
   /**
    * A parameter class used to pass options to the Gmsh executable.
    *
@@ -54,13 +54,14 @@ namespace Gmsh
     /**
      * Set all additional parameters to their default values.
      */
-    AdditionalParameters(const double characteristic_length=1.0,
-                         const std::string &output_base_name="");
+    AdditionalParameters(const double       characteristic_length = 1.0,
+                         const std::string &output_base_name      = "");
 
     /**
      * Call prm.add_parameter for each member of the AdditionalParameters class.
      */
-    void add_parameters(ParameterHandler &prm);
+    void
+    add_parameters(ParameterHandler &prm);
 
     /**
      * The characteristic length used for the definition of the Gmsh grid.
@@ -79,7 +80,7 @@ namespace Gmsh
     std::string output_base_name = "";
   };
 
-#ifdef DEAL_II_WITH_OPENCASCADE
+#  ifdef DEAL_II_WITH_OPENCASCADE
   /**
    * Given a smooth closed curve creates a triangulation from it using
    * Gmsh.
@@ -90,11 +91,12 @@ namespace Gmsh
    */
   template <int spacedim>
   void
-  create_triangulation_from_boundary_curve(const TopoDS_Edge &boundary,
-                                           Triangulation<2,spacedim> &tria,
-                                           const AdditionalParameters &prm=AdditionalParameters());
-#endif
-}
+  create_triangulation_from_boundary_curve(
+    const TopoDS_Edge &         boundary,
+    Triangulation<2, spacedim> &tria,
+    const AdditionalParameters &prm = AdditionalParameters());
+#  endif
+} // namespace Gmsh
 
 DEAL_II_NAMESPACE_CLOSE
 

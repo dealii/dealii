@@ -15,23 +15,27 @@
 
 // Check import function
 
-#include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>
+
 #include <iostream>
 #include <vector>
 
-void test()
-{
-  unsigned int my_id = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int n_procs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+#include "../tests.h"
 
-  IndexSet locally_owned(n_procs*2);
-  locally_owned.add_range(my_id*2, my_id*2+2);
+void
+test()
+{
+  unsigned int my_id   = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+
+  IndexSet locally_owned(n_procs * 2);
+  locally_owned.add_range(my_id * 2, my_id * 2 + 2);
   IndexSet read_write_owned(4);
-  read_write_owned.add_range(my_id*2, my_id*2+2);
+  read_write_owned.add_range(my_id * 2, my_id * 2 + 2);
 
   LinearAlgebra::distributed::Vector<double> v(locally_owned, MPI_COMM_WORLD);
   LinearAlgebra::ReadWriteVector<double> read_write_vector(read_write_owned);
@@ -52,8 +56,8 @@ void test()
 
   v.import(read_write_vector, VectorOperation::insert);
 
-  AssertThrow(v.local_element(0) == my_id+1, ExcInternalError());
-  AssertThrow(v.local_element(1) == my_id+1, ExcInternalError());
+  AssertThrow(v.local_element(0) == my_id + 1, ExcInternalError());
+  AssertThrow(v.local_element(1) == my_id + 1, ExcInternalError());
 
   if (my_id == 0)
     deallog << "OK" << std::endl;
@@ -61,11 +65,13 @@ void test()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)
@@ -77,5 +83,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

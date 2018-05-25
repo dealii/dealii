@@ -19,49 +19,52 @@
 // so that one can attach a boundary or manifold object to these parts
 // of the boundary
 
-#include "../tests.h"
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 std::ofstream logfile("output");
 
 
 template <int dim>
-void check (double r1, double r2, unsigned int n)
+void
+check(double r1, double r2, unsigned int n)
 {
-  Point<dim> center;
-  Triangulation<dim> tria (Triangulation<dim>::none);
-  GridGenerator::hyper_shell (tria, center, r1, r2, n, true);
+  Point<dim>         center;
+  Triangulation<dim> tria(Triangulation<dim>::none);
+  GridGenerator::hyper_shell(tria, center, r1, r2, n, true);
   static const SphericalManifold<dim> boundary(center);
   tria.set_manifold(0, boundary);
 
-  for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
-       cell != tria.end(); ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
+       cell != tria.end();
+       ++cell)
+    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->at_boundary())
-        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
-          AssertThrow (cell->face(f)->line(l)->boundary_id()
-                       ==
-                       cell->face(f)->boundary_id(),
-                       ExcInternalError());
+        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_face; ++l)
+          AssertThrow(cell->face(f)->line(l)->boundary_id() ==
+                        cell->face(f)->boundary_id(),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  check<3> (.5, 1, 6);
-  check<3> (.5, 1, 12);
-  check<3> (.5, 1, 96);
+  check<3>(.5, 1, 6);
+  check<3>(.5, 1, 12);
+  check<3>(.5, 1, 96);
 }

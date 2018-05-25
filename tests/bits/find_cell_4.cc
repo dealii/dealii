@@ -19,56 +19,50 @@
 // in it. this presently fails since the point sits right on the edge
 // of the domain, but for different reasons that find_cell_5
 
-#include "../tests.h"
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 
+#include "../tests.h"
 
-#include <deal.II/fe/mapping_q1.h>
-
-void check (Triangulation<3> &tria)
+void check(Triangulation<3> &tria)
 {
-  Point<3> p (0.75,0,0);
+  Point<3> p(0.75, 0, 0);
 
-  Triangulation<3>::active_cell_iterator cell
-    = GridTools::find_active_cell_around_point (tria, p);
+  Triangulation<3>::active_cell_iterator cell =
+    GridTools::find_active_cell_around_point(tria, p);
 
   deallog << cell << std::endl;
-  for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
+  for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell; ++v)
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
 
   // Transform back and forth
-  Point<3> pp =
-    StaticMappingQ1<3>::mapping.transform_unit_to_real_cell
-    ( cell,
-      GeometryInfo<3>::project_to_unit_cell
-      (
-        StaticMappingQ1<3>::mapping.transform_real_to_unit_cell
-        ( cell,
-          p
-        )
-      )
-    );
+  Point<3> pp = StaticMappingQ1<3>::mapping.transform_unit_to_real_cell(
+    cell,
+    GeometryInfo<3>::project_to_unit_cell(
+      StaticMappingQ1<3>::mapping.transform_real_to_unit_cell(cell, p)));
 
-  AssertThrow (p.distance (pp) < 1e-15,  ExcInternalError());
+  AssertThrow(p.distance(pp) < 1e-15, ExcInternalError());
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       Triangulation<3> coarse_grid;
-      GridGenerator::hyper_cube (coarse_grid);
-      coarse_grid.refine_global (3);
-      check (coarse_grid);
+      GridGenerator::hyper_cube(coarse_grid);
+      coarse_grid.refine_global(3);
+      check(coarse_grid);
     }
   catch (const std::exception &exc)
     {
@@ -77,6 +71,3 @@ int main ()
       deallog << exc.what() << std::endl;
     }
 }
-
-
-

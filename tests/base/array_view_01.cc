@@ -16,36 +16,37 @@
 
 // test for class ArrayView
 
-#include "../tests.h"
-
 #include <deal.II/base/array_view.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   std::vector<int> v(10);
 
-  ArrayView<int> a (&v[4], 3);  // writable view
+  ArrayView<int> a(&v[4], 3); // writable view
   a[2] = 42;
 
-  Assert (a[2] == 42, ExcInternalError());
-  Assert (v[6] == 42, ExcInternalError());
+  Assert(a[2] == 42, ExcInternalError());
+  Assert(v[6] == 42, ExcInternalError());
 
-  ArrayView<const int> a2 (&v[4], 3);  // readable view
-  Assert (a2[2] == 42, ExcInternalError());
+  ArrayView<const int> a2(&v[4], 3); // readable view
+  Assert(a2[2] == 42, ExcInternalError());
 
-  ArrayView<const int> a3 (a);  // readable view, converted from 'a'
-  Assert (a3[2] == 42, ExcInternalError());
+  ArrayView<const int> a3(a); // readable view, converted from 'a'
+  Assert(a3[2] == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

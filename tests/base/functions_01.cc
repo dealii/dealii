@@ -16,38 +16,44 @@
 
 // Check consistency of function implementations
 
-#include "../tests.h"
+#include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/data_out_base.h>
+#include <deal.II/base/flow_function.h>
+#include <deal.II/base/function_lib.h>
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/function_lib.h>
-#include <deal.II/base/auto_derivative_function.h>
-#include <deal.II/base/flow_function.h>
+
 #include <deal.II/lac/vector.h>
 
+#include <string>
+#include <vector>
+
+#include "../tests.h"
 #include "functions.h"
 
-#include <vector>
-#include <string>
-
-#define CHECK(F) { deallog << #F << std::endl;  \
-    F f;                \
-    check_function_value_consistency(f, 5);       \
-    check_function_gradient_consistency(f, 5);      \
-    check_gradient(f, 5); \
+#define CHECK(F)                               \
+  {                                            \
+    deallog << #F << std::endl;                \
+    F f;                                       \
+    check_function_value_consistency(f, 5);    \
+    check_function_gradient_consistency(f, 5); \
+    check_gradient(f, 5);                      \
   }
 
 
-#define CHECKN(F,arg) { deallog << #F << '(' << arg << ')' << std::endl;  \
-    F f(arg);               \
-    check_function_value_consistency(f, arg+1);       \
-    check_function_gradient_consistency(f, arg+1);      \
+#define CHECKN(F, arg)                               \
+  {                                                  \
+    deallog << #F << '(' << arg << ')' << std::endl; \
+    F f(arg);                                        \
+    check_function_value_consistency(f, arg + 1);    \
+    check_function_gradient_consistency(f, arg + 1); \
   }
 
 
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 

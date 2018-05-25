@@ -21,10 +21,10 @@
 #include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   deallog << "FAIL!" << std::endl;
 }
-

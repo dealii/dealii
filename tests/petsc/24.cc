@@ -19,50 +19,54 @@
 // this function has since been removed, so we test for v=0 instead, although
 // that may be covered by one of the other tests
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (PETScWrappers::MPI::Vector &v)
+
+void
+test(PETScWrappers::MPI::Vector &v)
 {
   // set some entries of the vector
-  for (unsigned int i=0; i<v.size(); ++i)
-    if (i%3 == 0)
-      v(i) = i+1.;
-  v.compress (VectorOperation::insert);
+  for (unsigned int i = 0; i < v.size(); ++i)
+    if (i % 3 == 0)
+      v(i) = i + 1.;
+  v.compress(VectorOperation::insert);
 
   // then clear it again and make sure the
   // vector is really empty
   const unsigned int sz = v.size();
-  v = 0;
-  AssertThrow (v.size() == sz, ExcInternalError());
-  AssertThrow (v.l2_norm() == 0, ExcInternalError());
+  v                     = 0;
+  AssertThrow(v.size() == sz, ExcInternalError());
+  AssertThrow(v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         IndexSet indices(100);
         indices.add_range(0, 100);
         PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
         test(v);
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -75,7 +79,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -17,22 +17,24 @@
 // test output of supercolumns
 
 
-#include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   TableHandler table;
-  table.set_auto_fill_mode (true);
+  table.set_auto_fill_mode(true);
 
-  std::string keys[] = { "key1", "key2", "key3", "key4", "key5" };
+  std::string keys[] = {"key1", "key2", "key3", "key4", "key5"};
 
   table.add_value(keys[0], 0.0);
   table.add_value(keys[0], 1.0);
@@ -41,16 +43,15 @@ int main ()
   table.add_value(keys[3], std::string("A"));
   table.add_value(keys[4], 123456789.0);
 
-  table.add_column_to_supercolumn("key1","short");
-  table.add_column_to_supercolumn("key2","short");
-  table.add_column_to_supercolumn("key3","very_long_supercolumn");
-  table.add_column_to_supercolumn("key4","very_long_supercolumn");
+  table.add_column_to_supercolumn("key1", "short");
+  table.add_column_to_supercolumn("key2", "short");
+  table.add_column_to_supercolumn("key3", "very_long_supercolumn");
+  table.add_column_to_supercolumn("key4", "very_long_supercolumn");
 
   table.write_text(deallog.get_file_stream(),
                    TableHandler::table_with_separate_column_description);
 
   deallog << std::endl;
 
-  table.write_text(deallog.get_file_stream(),
-                   TableHandler::table_with_headers);
+  table.write_text(deallog.get_file_stream(), TableHandler::table_with_headers);
 }

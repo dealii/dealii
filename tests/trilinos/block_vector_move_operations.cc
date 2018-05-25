@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+
+#include "../tests.h"
 
 #define PRINTBLOCK(name, var)                                \
   deallog << "Block vector: " name << ":" << std::endl;      \
@@ -29,18 +30,20 @@
     }
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   {
     std::vector<IndexSet> local_owned(5);
     for (auto &index : local_owned)
       {
         index.set_size(2);
-        index.add_range(0,2);
+        index.add_range(0, 2);
       }
 
     TrilinosWrappers::MPI::BlockVector temp(local_owned, MPI_COMM_WORLD);
@@ -64,5 +67,3 @@ int main (int argc, char **argv)
     deallog << "old object size: " << u.n_blocks() << std::endl;
   }
 }
-
-

@@ -18,22 +18,24 @@
 // testing reading a parameter that doesn't conform to its specs. this
 // incidentally also uncovered a bug in Patterns::Integer::match
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+#include "../tests.h"
+
+void
+check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "3", Patterns::Integer());
+  prm.declare_entry("test_1", "3", Patterns::Integer());
 
   std::ifstream in(p);
   try
     {
-      prm.parse_input (in);
+      prm.parse_input(in);
 
       // The first line in the parameter file should not match the given
       // pattern, so we should not get here
-      deallog << "test_1=" << prm.get ("test_1") << std::endl;
+      deallog << "test_1=" << prm.get("test_1") << std::endl;
     }
   catch (ParameterHandler::ExcInvalidEntryForPattern &exc)
     {
@@ -43,11 +45,12 @@ void check (const char *p)
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_10.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_10.prm");
 
   return 0;
 }

@@ -16,35 +16,34 @@
 
 // check points and weights for Gauss-Lobatto quadrature formula
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   initlog();
 
-  for (unsigned int n=2; n<20; ++n)
+  for (unsigned int n = 2; n < 20; ++n)
     {
       deallog << "QGaussLobatto(" << n << ")" << std::endl;
 
       QGaussLobatto<1> q(n);
-      for (unsigned int i=0; i<q.size(); ++i)
+      for (unsigned int i = 0; i < q.size(); ++i)
         deallog << q.point(i) << ' ' << q.weight(i) << std::endl;
 
       // the points must be symmetrically located around 0.5
       double p = 0;
-      for (unsigned int i=0; i<q.size(); ++i)
+      for (unsigned int i = 0; i < q.size(); ++i)
         p += (q.point(i)[0] - 0.5);
-      AssertThrow (std::fabs(p) < 1e-12, ExcInternalError());
+      AssertThrow(std::fabs(p) < 1e-12, ExcInternalError());
 
       // the sum of weights must be one
       double w = 0;
-      for (unsigned int i=0; i<q.size(); ++i)
+      for (unsigned int i = 0; i < q.size(); ++i)
         w += q.weight(i);
-      AssertThrow (std::fabs(w-1) < 1e-12, ExcInternalError());
+      AssertThrow(std::fabs(w - 1) < 1e-12, ExcInternalError());
     }
 }
-
-

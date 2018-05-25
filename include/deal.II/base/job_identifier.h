@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN
@@ -46,7 +47,8 @@ public:
    * avoid linking the library version. Unfortunately, this mechanism does not
    * work with shared libraries.
    */
-  static const char *program_id();
+  static const char *
+  program_id();
 
   /**
    * Obtain the base name of the filename passed as argument. That is,
@@ -55,12 +57,14 @@ public:
    * user program with argument <tt>__FILE__</tt> to create an
    * identifier for the program being run.
    */
-  static std::string base_name(const char *filename);
+  static std::string
+  base_name(const char *filename);
 
   /**
    * Return the value of <tt>id</tt>.
    */
-  const std::string operator () () const;
+  const std::string
+  operator()() const;
 
 private:
   /**
@@ -70,7 +74,8 @@ private:
 };
 
 
-/*------------------------------ Inline functions ------------------------------*/
+/*------------------------------ Inline functions
+ * ------------------------------*/
 
 
 /**

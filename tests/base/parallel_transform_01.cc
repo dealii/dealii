@@ -16,34 +16,36 @@
 
 // test parallel::transform
 
-#include "../tests.h"
-
 #include <deal.II/base/parallel.h>
+
 #include <deal.II/lac/vector.h>
+
 #include <boost/lambda/lambda.hpp>
 
+#include "../tests.h"
 
 
-int main()
+
+int
+main()
 {
   initlog();
 
-  const unsigned int N=10000;
-  Vector<double> x(N), y(N);
+  const unsigned int N = 10000;
+  Vector<double>     x(N), y(N);
 
-  for (unsigned int i=0; i<N; ++i)
+  for (unsigned int i = 0; i < N; ++i)
     x(i) = i;
 
   // set y=2*x
-  parallel::transform (x.begin(), x.end(), y.begin(),
-                       (2*boost::lambda::_1),
-                       10);
+  parallel::transform(
+    x.begin(), x.end(), y.begin(), (2 * boost::lambda::_1), 10);
 
   // compute y=0 from the previous result
   y -= x;
   y -= x;
 
-  AssertThrow (y.l2_norm() == 0, ExcInternalError());
+  AssertThrow(y.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

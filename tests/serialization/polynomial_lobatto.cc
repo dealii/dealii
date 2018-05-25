@@ -16,30 +16,34 @@
 
 // check serialization for Polynomial
 
-#include "serialization.h"
 #include <deal.II/base/polynomial.h>
+
 #include <boost/serialization/vector.hpp>
 
+#include "serialization.h"
 
-void test ()
+
+void
+test()
 {
-  unsigned int degree1 = 3;
+  unsigned int         degree1 = 3;
   Polynomials::Lobatto p1(degree1);
 
-  unsigned int degree2 = 6;
+  unsigned int         degree2 = 6;
   Polynomials::Lobatto p2(degree2);
 
-  verify (p1, p2);
+  verify(p1, p2);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

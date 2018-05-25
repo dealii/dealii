@@ -16,29 +16,32 @@
 
 // check serialization for Tensor<1,dim>
 
-#include "serialization.h"
 #include <deal.II/base/point.h>
 
+#include "serialization.h"
 
-void test ()
+
+void
+test()
 {
-  const unsigned int dim=3;
+  const unsigned int dim = 3;
 
-  Point<dim> p1(1.,2.,3.);
+  Point<dim> p1(1., 2., 3.);
 
-  Point<dim> p2(4.,5.,6.);
+  Point<dim> p2(4., 5., 6.);
 
-  verify (p1, p2);
+  verify(p1, p2);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

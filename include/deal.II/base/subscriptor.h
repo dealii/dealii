@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
 #include <atomic>
@@ -92,20 +93,23 @@ public:
    * This has to be handled with care, too, because the counter has to remain
    * the same. It therefore does nothing more than returning <tt>*this</tt>.
    */
-  Subscriptor &operator = (const Subscriptor &);
+  Subscriptor &
+  operator=(const Subscriptor &);
 
   /**
    * Move assignment operator.
    *
    * Asserts that the counter for the moved object is zero.
    */
-  Subscriptor &operator = (Subscriptor &&) noexcept;
+  Subscriptor &
+  operator=(Subscriptor &&) noexcept;
 
   /**
    * Subscribes a user of the object. The subscriber may be identified by text
    * supplied as <tt>identifier</tt>.
    */
-  void subscribe (const char *identifier = nullptr) const;
+  void
+  subscribe(const char *identifier = nullptr) const;
 
   /**
    * Unsubscribes a user from the object.
@@ -113,19 +117,22 @@ public:
    * @note The <tt>identifier</tt> must be the <b>same pointer</b> as the one
    * supplied to subscribe(), not just the same text.
    */
-  void unsubscribe (const char *identifier = nullptr) const;
+  void
+  unsubscribe(const char *identifier = nullptr) const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to
    * use this class for reference counted lifetime determination where the
    * last one to unsubscribe also deletes the object.
    */
-  unsigned int n_subscriptions () const;
+  unsigned int
+  n_subscriptions() const;
 
   /**
    * List the subscribers to @p deallog.
    */
-  void list_subscribers () const;
+  void
+  list_subscribers() const;
 
   /**
    * @addtogroup Exceptions
@@ -136,9 +143,11 @@ public:
    * Exception: Object may not be deleted, since it is used.
    */
   DeclException3(ExcInUse,
-                 int, std::string, std::string,
-                 << "Object of class " << arg2
-                 << " is still used by " << arg1 << " other objects."
+                 int,
+                 std::string,
+                 std::string,
+                 << "Object of class " << arg2 << " is still used by " << arg1
+                 << " other objects."
                  << "\n\n"
                  << "(Additional information: " << arg3 << ")\n\n"
                  << "See the entry in the Frequently Asked Questions of "
@@ -150,7 +159,9 @@ public:
    * A subscriber with the identification string given to
    * Subscriptor::unsubscribe() did not subscribe to the object.
    */
-  DeclException2(ExcNoSubscriber, std::string, std::string,
+  DeclException2(ExcNoSubscriber,
+                 std::string,
+                 std::string,
                  << "No subscriber with identifier <" << arg2
                  << "> subscribes to this object of class " << arg1
                  << ". Consequently, it cannot be unsubscribed.");
@@ -169,20 +180,19 @@ public:
    * there is no reason to write the subscribers out in the first place.
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 
 private:
   /**
    * The data type used in #counter_map.
    */
-  typedef std::map<const char *, unsigned int>::value_type
-  map_value_type;
+  typedef std::map<const char *, unsigned int>::value_type map_value_type;
 
   /**
    * The iterator type used in #counter_map.
    */
-  typedef std::map<const char *, unsigned int>::iterator
-  map_iterator;
+  typedef std::map<const char *, unsigned int>::iterator map_iterator;
 
   /**
    * Store the number of objects which subscribed to this object. Initially,
@@ -229,16 +239,15 @@ private:
    * then, rather than aborting, this function prints an error message to the
    * standard error stream and returns.
    */
-  void check_no_subscribers () const noexcept;
+  void
+  check_no_subscribers() const noexcept;
 };
 
 //---------------------------------------------------------------------------
 
 template <class Archive>
-inline
-void
-Subscriptor::serialize(Archive &,
-                       const unsigned int)
+inline void
+Subscriptor::serialize(Archive &, const unsigned int)
 {
   // do nothing, as explained in the
   // documentation of this function

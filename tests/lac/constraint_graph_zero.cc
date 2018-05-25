@@ -24,35 +24,37 @@
 // node).
 
 
-#include "../tests.h"
 #include <deal.II/lac/constraint_matrix.h>
 
+#include "../tests.h"
 
 
-void test ()
+
+void
+test()
 {
-
   ConstraintMatrix cm;
 
   // a "regular" constraint
-  cm.add_line (1);
-  cm.add_entry (1, 2, 42.);
+  cm.add_line(1);
+  cm.add_entry(1, 2, 42.);
 
   // a "singular" constraint
-  cm.add_line (4);
+  cm.add_line(4);
 
-  cm.write_dot (deallog.get_file_stream());
+  cm.write_dot(deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

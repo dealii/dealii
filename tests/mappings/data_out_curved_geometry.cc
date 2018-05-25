@@ -22,46 +22,49 @@
 //
 // based on a testcase by Sebastian Gonzalez-Pintor
 
-#include "../tests.h"
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
-
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/numerics/data_out.h>
 
+#include "../tests.h"
 
 
-int main ()
+
+int
+main()
 {
   initlog();
 
-  const Point<2> center (0,0);
-  const SphericalManifold<2> boundary_description (center);
+  const Point<2>             center(0, 0);
+  const SphericalManifold<2> boundary_description(center);
 
-  for (unsigned int degree=1; degree <= 4; ++degree)
+  for (unsigned int degree = 1; degree <= 4; ++degree)
     {
       deallog << "===== Mapping degree " << degree << std::endl;
 
       Triangulation<2> triangulation;
-      GridGenerator::hyper_ball (triangulation, Point< 2 >(0.0,0.0), 1.0 );
+      GridGenerator::hyper_ball(triangulation, Point<2>(0.0, 0.0), 1.0);
 
-      const MappingQ<2> mapping (degree, true);
-      const FE_Q<2>     dummy_fe (1);
-      DoFHandler<2> dof_handler (triangulation);
+      const MappingQ<2> mapping(degree, true);
+      const FE_Q<2>     dummy_fe(1);
+      DoFHandler<2>     dof_handler(triangulation);
 
-      for (Triangulation<2>::active_cell_iterator
-           cell = triangulation.begin_active(); cell!=triangulation.end(); ++cell)
+      for (Triangulation<2>::active_cell_iterator cell =
+             triangulation.begin_active();
+           cell != triangulation.end();
+           ++cell)
         {
           if (cell->center().square() < 1.e-5)
             cell->set_material_id(1);
@@ -69,26 +72,24 @@ int main ()
             cell->set_material_id(0);
         }
 
-      Triangulation<2>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
+      Triangulation<2>::active_cell_iterator cell =
+                                               triangulation.begin_active(),
+                                             endc = triangulation.end();
 
-      for (; cell!=endc; ++cell)
+      for (; cell != endc; ++cell)
         if (cell->material_id() != 1)
-          cell->set_all_manifold_ids (100);
+          cell->set_all_manifold_ids(100);
 
-      triangulation.set_manifold (100, boundary_description);
+      triangulation.set_manifold(100, boundary_description);
 
-      dof_handler.distribute_dofs (dummy_fe);
+      dof_handler.distribute_dofs(dummy_fe);
 
-      Vector<double> dummy (triangulation.n_active_cells());
+      Vector<double> dummy(triangulation.n_active_cells());
 
       DataOut<2> data_out;
-      data_out.attach_dof_handler (dof_handler);
-      data_out.add_data_vector (dummy, "dummy");
-      data_out.build_patches (mapping, 5, DataOut<2>::curved_inner_cells );
-      data_out.write_vtk (deallog.get_file_stream());
+      data_out.attach_dof_handler(dof_handler);
+      data_out.add_data_vector(dummy, "dummy");
+      data_out.build_patches(mapping, 5, DataOut<2>::curved_inner_cells);
+      data_out.write_vtk(deallog.get_file_stream());
     }
 }
-
-

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// This file compiles the last quarter of the instantiations from solution_transfer.cc
-// to reduce the compilation unit (and memory consumption)
+// This file compiles the last quarter of the instantiations from
+// solution_transfer.cc to reduce the compilation unit (and memory consumption)
 
 #define SPLIT_INSTANTIATIONS_INDEX 3
 #include "solution_transfer.cc"

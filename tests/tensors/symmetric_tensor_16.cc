@@ -16,36 +16,38 @@
 
 // compute the deviator tensor as stated in the documentation of outer_product
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "dim=" << dim << std::endl;
 
-  const SymmetricTensor<4,dim>
-  T = (identity_tensor<dim>()
-       - 1./dim * outer_product(unit_symmetric_tensor<dim>(),
-                                unit_symmetric_tensor<dim>()));
+  const SymmetricTensor<4, dim> T =
+    (identity_tensor<dim>() - 1. / dim *
+                                outer_product(unit_symmetric_tensor<dim>(),
+                                              unit_symmetric_tensor<dim>()));
 
-  AssertThrow ((T-deviator_tensor<dim>()).norm()
-               <= 1e-15*T.norm(), ExcInternalError());
+  AssertThrow((T - deviator_tensor<dim>()).norm() <= 1e-15 * T.norm(),
+              ExcInternalError());
 }
 
 
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

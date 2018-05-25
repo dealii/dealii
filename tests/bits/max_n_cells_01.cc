@@ -14,51 +14,54 @@
 // ---------------------------------------------------------------------
 
 
-// test the max_n_cells argument to GridRefinement::refine_and_coarsen_fixed_number
+// test the max_n_cells argument to
+// GridRefinement::refine_and_coarsen_fixed_number
 
 
-#include "../tests.h"
-#include <deal.II/lac/vector.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/grid_out.h>
 
+#include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
-  for (unsigned int cycle=0; cycle<7*(4-dim)*(4-dim); ++cycle)
+  for (unsigned int cycle = 0; cycle < 7 * (4 - dim) * (4 - dim); ++cycle)
     {
-      deallog << "cycle=" << cycle << ", n_cells=" << tria.n_active_cells() << std::endl;
+      deallog << "cycle=" << cycle << ", n_cells=" << tria.n_active_cells()
+              << std::endl;
 
-      Vector<float> criteria (tria.n_active_cells());
-      for (unsigned int i=0; i<tria.n_active_cells(); ++i)
+      Vector<float> criteria(tria.n_active_cells());
+      for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
         criteria(i) = i;
 
-      GridRefinement::refine_and_coarsen_fixed_number (tria,
-                                                       criteria,
-                                                       1./4, 1./64,
-                                                       10000);
+      GridRefinement::refine_and_coarsen_fixed_number(
+        tria, criteria, 1. / 4, 1. / 64, 10000);
       tria.execute_coarsening_and_refinement();
     }
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 }

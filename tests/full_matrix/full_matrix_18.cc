@@ -23,12 +23,11 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_square_matrix (m);
+  make_square_matrix(m);
   deallog << m.relative_symmetry_norm2() << std::endl;
 }

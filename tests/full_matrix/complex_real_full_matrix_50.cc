@@ -25,20 +25,19 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_matrix (m);
-  Vector<std::complex<number> > v, w, x;
-  make_range_vector (v);
-  make_domain_vector (w);
-  make_range_vector (x);
+  FullMatrix<std::complex<number>> m;
+  make_matrix(m);
+  Vector<std::complex<number>> v, w, x;
+  make_range_vector(v);
+  make_domain_vector(w);
+  make_range_vector(x);
 
-  m.residual (v, w, x);
-  print_vector (v);
-  print_vector (w);
-  print_vector (x);
+  m.residual(v, w, x);
+  print_vector(v);
+  print_vector(w);
+  print_vector(x);
 }

@@ -18,7 +18,9 @@
 #define dealii_fe_q_dg0_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/tensor_product_polynomials_const.h>
+
 #include <deal.II/fe/fe_q_base.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -233,15 +235,16 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  *
  */
-template <int dim, int spacedim=dim>
-class FE_Q_DG0 : public FE_Q_Base<TensorProductPolynomialsConst<dim>,dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_Q_DG0
+  : public FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>
 {
 public:
   /**
    * Constructor for tensor product polynomials of degree @p p plus locally
    * constant functions.
    */
-  FE_Q_DG0 (const unsigned int p);
+  FE_Q_DG0(const unsigned int p);
 
   /**
    * Constructor for tensor product polynomials with support points @p points
@@ -249,20 +252,21 @@ public:
    * formula. The degree of the finite element is <tt>points.size()-1</tt>.
    * Note that the first point has to be 0 and the last one 1.
    */
-  FE_Q_DG0 (const Quadrature<1> &points);
+  FE_Q_DG0(const Quadrature<1> &points);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_Q_DG0<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
   // documentation inherited from the base class
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
@@ -274,16 +278,17 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
-  get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                            FullMatrix<double>       &matrix) const override;
+  get_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                           FullMatrix<double> &matrix) const override;
 
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, there
@@ -291,20 +296,19 @@ public:
    * mode is all ones for the usual FE_Q basis and the second one only using
    * the discontinuous part.
    */
-  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const override;
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
 private:
-
   /**
    * Return the restriction_is_additive flags. Only the last component is
    * true.
    */
-  static std::vector<bool> get_riaf_vector(const unsigned int degree);
+  static std::vector<bool>
+  get_riaf_vector(const unsigned int degree);
 
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector
@@ -312,7 +316,8 @@ private:
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 };
 
 

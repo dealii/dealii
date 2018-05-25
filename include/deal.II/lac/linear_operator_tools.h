@@ -20,13 +20,11 @@
 // PackagedOperation. To ease the pain of reading compilation errors, just
 // include all headers we ever need to use LO and friends in one place:
 
-#include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/block_linear_operator.h>
-#include <deal.II/lac/trilinos_linear_operator.h>
-
-#include <deal.II/lac/packaged_operation.h>
-
 #include <deal.II/lac/constrained_linear_operator.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/schur_complement.h>
+#include <deal.II/lac/trilinos_linear_operator.h>
 
 #endif

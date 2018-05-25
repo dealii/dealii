@@ -16,33 +16,34 @@
 
 // Tests grow_or_shrink() of square and rectangle LAPACKFullMatrix
 
-#include "../tests.h"
 #include <deal.II/lac/lapack_full_matrix.h>
 
 #include <iostream>
 
+#include "../tests.h"
 
-void test (const unsigned int size)
+
+void
+test(const unsigned int size)
 {
-  AssertThrow (size>2, ExcInternalError());
+  AssertThrow(size > 2, ExcInternalError());
   const unsigned int smaller = size - 2;
   const unsigned int larger  = size + 3;
 
   // initialise a first matrix with the standard constructor and fill
   // it with some numbers
-  LAPACKFullMatrix<double> M (size, size);
+  LAPACKFullMatrix<double> M(size, size);
 
-  for (unsigned int i=0; i<size; ++i)
-    for (unsigned int j=0; j<size; ++j)
-      M(i,j) = i+2.*j;
+  for (unsigned int i = 0; i < size; ++i)
+    for (unsigned int j = 0; j < size; ++j)
+      M(i, j) = i + 2. * j;
 
   LAPACKFullMatrix<double> M1(M), M2(M);
 
   M1.grow_or_shrink(smaller);
   for (unsigned int i = 0; i < smaller; ++i)
     for (unsigned int j = 0; j < smaller; ++j)
-      AssertThrow(M1(i,j) == M(i,j),
-                  ExcInternalError());
+      AssertThrow(M1(i, j) == M(i, j), ExcInternalError());
 
   M2.grow_or_shrink(larger);
   for (unsigned int i = 0; i < larger; ++i)
@@ -50,13 +51,11 @@ void test (const unsigned int size)
       {
         if (i < size && j < size)
           {
-            AssertThrow(M2(i,j) == M(i,j),
-                        ExcInternalError());
+            AssertThrow(M2(i, j) == M(i, j), ExcInternalError());
           }
         else
           {
-            AssertThrow(M2(i,j) == 0.,
-                        ExcInternalError());
+            AssertThrow(M2(i, j) == 0., ExcInternalError());
           }
       }
 
@@ -64,16 +63,17 @@ void test (const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
 
   logfile.precision(3);
   deallog.attach(logfile);
 
-  test (4);
-  test (7);
-  test (11);
-  test (31);
+  test(4);
+  test(7);
+  test(11);
+  test(31);
 }

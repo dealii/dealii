@@ -20,17 +20,18 @@
 // they didn't throw an error when the string wasn't actually convertible to a
 // number
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+#include "../tests.h"
+
+void
+check()
 {
   ParameterHandler prm;
-  prm.declare_entry ("a", "this that and the other", Patterns::Anything(),
-                     "");
+  prm.declare_entry("a", "this that and the other", Patterns::Anything(), "");
   try
     {
-      prm.get_double ("a");
+      prm.get_double("a");
     }
   catch (...)
     {
@@ -39,7 +40,7 @@ void check ()
 
   try
     {
-      prm.get_integer ("a");
+      prm.get_integer("a");
     }
   catch (...)
     {
@@ -48,21 +49,21 @@ void check ()
 
   try
     {
-      prm.get_bool ("a");
+      prm.get_bool("a");
     }
   catch (...)
     {
       deallog << "get_bool() detected the mistake" << std::endl;
     }
-
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check ();
+  check();
 
   return 0;
 }

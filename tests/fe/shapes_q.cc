@@ -14,17 +14,20 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-#include "shapes.h"
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
+
 #include <string>
+
+#include "../tests.h"
+#include "shapes.h"
 
 #define PRECISION 8
 
 
 template <int dim>
-void plot_FE_Q_shape_functions()
+void
+plot_FE_Q_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 
@@ -42,36 +45,36 @@ void plot_FE_Q_shape_functions()
   // reduce run-time
   if (dim < 3)
     {
-      FE_Q<dim> q3(QIterated<1>(QTrapez<1>(),3));
+      FE_Q<dim> q3(QIterated<1>(QTrapez<1>(), 3));
       plot_shape_functions(m, q3, "Q3");
       plot_face_shape_functions(m, q3, "Q3");
       test_compute_functions(m, q3, "Q3");
 
-      FE_Q<dim> q4(QIterated<1>(QTrapez<1>(),4));
+      FE_Q<dim> q4(QIterated<1>(QTrapez<1>(), 4));
       plot_shape_functions(m, q4, "Q4");
       plot_face_shape_functions(m, q4, "Q4");
       test_compute_functions(m, q4, "Q4");
     };
 
-//    FE_Q<dim> q5(5);
-//    plot_shape_functions(m, q5, "Q5");
-//    FE_Q<dim> q6(6);
-//    plot_shape_functions(m, q6, "Q6");
-//    FE_Q<dim> q7(7);
-//    plot_shape_functions(m, q7, "Q7");
-//    FE_Q<dim> q8(8);
-//    plot_shape_functions(m, q8, "Q8");
-//    FE_Q<dim> q9(9);
-//    plot_shape_functions(m, q9, "Q9");
-//    FE_Q<dim> q10(10);
-//    plot_shape_functions(m, q10, "Q10");
+  //    FE_Q<dim> q5(5);
+  //    plot_shape_functions(m, q5, "Q5");
+  //    FE_Q<dim> q6(6);
+  //    plot_shape_functions(m, q6, "Q6");
+  //    FE_Q<dim> q7(7);
+  //    plot_shape_functions(m, q7, "Q7");
+  //    FE_Q<dim> q8(8);
+  //    plot_shape_functions(m, q8, "Q8");
+  //    FE_Q<dim> q9(9);
+  //    plot_shape_functions(m, q9, "Q9");
+  //    FE_Q<dim> q10(10);
+  //    plot_shape_functions(m, q10, "Q10");
 }
 
 
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
 

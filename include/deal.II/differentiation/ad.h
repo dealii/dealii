@@ -18,13 +18,11 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/differentiation/ad/ad_number_types.h>
 #include <deal.II/differentiation/ad/ad_number_traits.h>
-
+#include <deal.II/differentiation/ad/ad_number_types.h>
 #include <deal.II/differentiation/ad/adolc_math.h>
 #include <deal.II/differentiation/ad/adolc_number_types.h>
 #include <deal.II/differentiation/ad/adolc_product_types.h>
-
 #include <deal.II/differentiation/ad/sacado_math.h>
 #include <deal.II/differentiation/ad/sacado_number_types.h>
 #include <deal.II/differentiation/ad/sacado_product_types.h>
@@ -40,18 +38,16 @@ DEAL_II_NAMESPACE_OPEN
 namespace Differentiation
 {
   /**
-   * Wrappers for automatic differentiation libraries. Currently there is support
-   * for the following libraries:
+   * Wrappers for automatic differentiation libraries. Currently there is
+   * support for the following libraries:
    *   - Adol-C
    *   - Sacado (a component of Trilinos)
    *
    * @ingroup auto_symb_diff
    */
   namespace AD
-  {
-
-  }
-}
+  {}
+} // namespace Differentiation
 
 DEAL_II_NAMESPACE_CLOSE
 

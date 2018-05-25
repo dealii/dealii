@@ -21,13 +21,16 @@
 class B
 {
 public:
-  virtual ~B() {}
+  virtual ~B()
+  {}
 };
 
-class D : public B {};
+class D : public B
+{};
 
 
-void test ()
+void
+test()
 {
   // Create a pointer to D
   std::unique_ptr<D> d = std_cxx14::make_unique<D>();
@@ -36,22 +39,23 @@ void test ()
   std::unique_ptr<B> b = Utilities::dynamic_unique_cast<B>(std::move(d));
 
   // Ownership now rests with b, but it's still a D. Verify this:
-  Assert (d.get() == nullptr, ExcInternalError());
-  Assert (b.get() != nullptr, ExcInternalError());
-  Assert (dynamic_cast<D *>(b.get()) != nullptr, ExcInternalError());
+  Assert(d.get() == nullptr, ExcInternalError());
+  Assert(b.get() != nullptr, ExcInternalError());
+  Assert(dynamic_cast<D *>(b.get()) != nullptr, ExcInternalError());
 
   // Check that we can again upcast to D:
   std::unique_ptr<D> dd = Utilities::dynamic_unique_cast<D>(std::move(b));
 
   // Ownership now rests with b, but it's still a D. Verify this:
-  Assert (b.get() == nullptr, ExcInternalError());
-  Assert (dd.get() != nullptr, ExcInternalError());
+  Assert(b.get() == nullptr, ExcInternalError());
+  Assert(dd.get() != nullptr, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-void invalid_test ()
+void
+invalid_test()
 {
   // Create a pointer to B
   std::unique_ptr<B> b = std_cxx14::make_unique<B>();
@@ -69,11 +73,11 @@ void invalid_test ()
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
-  invalid_test ();
+  test();
+  invalid_test();
 }

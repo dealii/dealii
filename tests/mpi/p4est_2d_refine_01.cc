@@ -17,27 +17,30 @@
 
 // one global refinement of a 2d square with p4est
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   if (true)
     {
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+      if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -48,9 +51,9 @@ void test()
       std::vector<types::subdomain_id> cell_subd(tr.n_active_cells());
 
       GridTools::get_subdomain_association(tr, cell_subd);
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+      if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         {
-          for (unsigned int i=0; i<tr.n_active_cells(); ++i)
+          for (unsigned int i = 0; i < tr.n_active_cells(); ++i)
             deallog << cell_subd[i] << " ";
           deallog << std::endl;
         }
@@ -60,24 +63,23 @@ void test()
           deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
         }
 
-      const unsigned int checksum = tr.get_checksum ();
+      const unsigned int checksum = tr.get_checksum();
       if (myid == 0)
-        deallog << "Checksum: "
-                << checksum
-                << std::endl;
+        deallog << "Checksum: " << checksum << std::endl;
     }
 
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));
@@ -92,5 +94,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

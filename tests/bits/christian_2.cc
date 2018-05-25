@@ -16,15 +16,21 @@
 
 // check one aspect of DataOutStack in 2+1d
 
-#include "../tests.h"
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/data_out_stack.h>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -37,13 +43,13 @@ int main()
   dof.distribute_dofs(fe);
 
   Vector<double> sol(dof.n_dofs());
-  for (unsigned int i=0; i<dof.n_dofs(); ++i)
+  for (unsigned int i = 0; i < dof.n_dofs(); ++i)
     sol(i) = i;
 
   // test output using DataOutStack
   DataOutStack<2> data_out_stack;
   data_out_stack.declare_data_vector("dof", DataOutStack<2>::dof_vector);
-  data_out_stack.new_parameter_value(2.5,1.);
+  data_out_stack.new_parameter_value(2.5, 1.);
   data_out_stack.attach_dof_handler(dof);
   data_out_stack.add_data_vector(sol, "dof");
   data_out_stack.build_patches();

@@ -18,31 +18,31 @@
 // functions at equidistant points. (I needed this output at one point
 // in time, so why not make it a testcase -- WB)
 
-#include "../tests.h"
-
 #include <deal.II/base/polynomial.h>
+
+#include "../tests.h"
 
 
 using namespace Polynomials;
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  const std::vector<Polynomial<double> >
-  p = Hierarchical::generate_complete_basis (10);
+  const std::vector<Polynomial<double>> p =
+    Hierarchical::generate_complete_basis(10);
 
-  const unsigned int div=30;
-  for (unsigned int i=0; i<=div; ++i)
+  const unsigned int div = 30;
+  for (unsigned int i = 0; i <= div; ++i)
     {
-      const double x = 1.*i/div;
+      const double x = 1. * i / div;
       deallog << x << " ";
-      for (unsigned int j=0; j<p.size(); ++j)
+      for (unsigned int j = 0; j < p.size(); ++j)
         deallog << p[j].value(x) << " ";
       deallog << std::endl;
     }
 }
-

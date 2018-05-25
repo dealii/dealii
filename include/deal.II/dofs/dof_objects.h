@@ -18,19 +18,24 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int> class DoFHandler;
+template <int, int>
+class DoFHandler;
 
 namespace internal
 {
   namespace DoFHandlerImplementation
   {
-    template <int> class DoFLevel;
-    template <int> class DoFFaces;
+    template <int>
+    class DoFLevel;
+    template <int>
+    class DoFFaces;
 
 
     /**
@@ -82,11 +87,11 @@ namespace internal
        */
       template <int dh_dim, int spacedim>
       void
-      set_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-                     const unsigned int       obj_index,
-                     const unsigned int       fe_index,
-                     const unsigned int       local_index,
-                     const types::global_dof_index       global_index);
+      set_dof_index(const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
+                    const unsigned int                          obj_index,
+                    const unsigned int                          fe_index,
+                    const unsigned int                          local_index,
+                    const types::global_dof_index               global_index);
 
       /**
        * Return the global index of the @p local_index-th degree of freedom
@@ -102,10 +107,10 @@ namespace internal
        */
       template <int dh_dim, int spacedim>
       types::global_dof_index
-      get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-                     const unsigned int       obj_index,
-                     const unsigned int       fe_index,
-                     const unsigned int       local_index) const;
+      get_dof_index(const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
+                    const unsigned int                          obj_index,
+                    const unsigned int                          fe_index,
+                    const unsigned int local_index) const;
 
       /**
        * Return the value 1. The meaning of this function becomes clear by
@@ -114,8 +119,9 @@ namespace internal
        */
       template <int dh_dim, int spacedim>
       unsigned int
-      n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-                           const types::global_dof_index       index) const;
+      n_active_fe_indices(
+        const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
+        const types::global_dof_index               index) const;
 
       /**
        * Similar to the function above. Assert that the given index is zero,
@@ -123,41 +129,45 @@ namespace internal
        */
       template <int dh_dim, int spacedim>
       bool
-      fe_index_is_active (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-                          const types::global_dof_index       index,
-                          const unsigned int       fe_index) const;
+      fe_index_is_active(
+        const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
+        const types::global_dof_index               index,
+        const unsigned int                          fe_index) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar, const unsigned int version);
 
       /**
        * Declare the classes that store levels and faces of DoFs friends so
        * that they can resize arrays.
        */
-      template <int> friend class DoFLevel;
-      template <int> friend class DoFFaces;
+      template <int>
+      friend class DoFLevel;
+      template <int>
+      friend class DoFFaces;
     };
 
 
-// --------------------- template and inline functions ------------------
+    // --------------------- template and inline functions ------------------
 
     template <int dim>
     template <int dh_dim, int spacedim>
-    inline
-    unsigned int
-    DoFObjects<dim>::n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &,
-                                          const types::global_dof_index) const
+    inline unsigned int
+    DoFObjects<dim>::n_active_fe_indices(
+      const dealii::DoFHandler<dh_dim, spacedim> &,
+      const types::global_dof_index) const
     {
       return 1;
     }
@@ -166,16 +176,16 @@ namespace internal
 
     template <int dim>
     template <int dh_dim, int spacedim>
-    inline
-    bool
-    DoFObjects<dim>::fe_index_is_active (const dealii::DoFHandler<dh_dim,spacedim> &,
-                                         const types::global_dof_index,
-                                         const unsigned int fe_index) const
+    inline bool
+    DoFObjects<dim>::fe_index_is_active(
+      const dealii::DoFHandler<dh_dim, spacedim> &,
+      const types::global_dof_index,
+      const unsigned int fe_index) const
     {
       (void)fe_index;
-      Assert (fe_index == 0,
-              ExcMessage ("Only zero fe_index values are allowed for "
-                          "non-hp DoFHandlers."));
+      Assert(fe_index == 0,
+             ExcMessage("Only zero fe_index values are allowed for "
+                        "non-hp DoFHandlers."));
       return true;
     }
 
@@ -183,39 +193,45 @@ namespace internal
 
     template <int dim>
     template <int dh_dim, int spacedim>
-    inline
-    types::global_dof_index
-    DoFObjects<dim>::
-    get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-                   const unsigned int       obj_index,
-                   const unsigned int       fe_index,
-                   const unsigned int       local_index) const
+    inline types::global_dof_index
+    DoFObjects<dim>::get_dof_index(
+      const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
+      const unsigned int                          obj_index,
+      const unsigned int                          fe_index,
+      const unsigned int                          local_index) const
     {
       (void)fe_index;
-      Assert ((fe_index == dealii::DoFHandler<dh_dim,spacedim>::default_fe_index),
-              ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-      Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
-              ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
-      Assert (obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>()+local_index
-              <
-              dofs.size(),
-              ExcInternalError());
+      Assert(
+        (fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
+        ExcMessage(
+          "Only the default FE index is allowed for non-hp DoFHandler objects"));
+      Assert(
+        local_index < dof_handler.get_fe().template n_dofs_per_object<dim>(),
+        ExcIndexRange(local_index,
+                      0,
+                      dof_handler.get_fe().template n_dofs_per_object<dim>()));
+      Assert(obj_index *
+                   dof_handler.get_fe().template n_dofs_per_object<dim>() +
+                 local_index <
+               dofs.size(),
+             ExcInternalError());
 
-      return dofs[obj_index * dof_handler.get_fe()
-                  .template n_dofs_per_object<dim>() + local_index];
+      return dofs[obj_index *
+                    dof_handler.get_fe().template n_dofs_per_object<dim>() +
+                  local_index];
     }
 
 
     template <int dim>
     template <class Archive>
-    void DoFObjects<dim>::serialize(Archive &ar,
-                                    const unsigned int)
+    void
+    DoFObjects<dim>::serialize(Archive &ar, const unsigned int)
     {
       ar &dofs;
     }
 
-  }
-}
+  } // namespace DoFHandlerImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

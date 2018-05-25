@@ -22,40 +22,40 @@
 
 
 // all include files you need here
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1)
+void
+test(unsigned int ref = 1)
 {
-  deallog << "Testing dim=" << dim
-          << ", spacedim="<< spacedim << std::endl;
+  deallog << "Testing dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
   Point<spacedim> center;
-  for (unsigned int i=0; i<dim; ++i)
+  for (unsigned int i = 0; i < dim; ++i)
     center[i] = .5;
 
-  Triangulation<dim,spacedim> tria;
-  SphericalManifold<dim,spacedim> boundary(center);
-  GridGenerator::hyper_cube (tria);
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell;
+  Triangulation<dim, spacedim>     tria;
+  SphericalManifold<dim, spacedim> boundary(center);
+  GridGenerator::hyper_cube(tria);
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell;
 
   tria.begin_active()->face(0)->set_manifold_id(1);
-  tria.set_manifold(1,boundary);
+  tria.set_manifold(1, boundary);
 
   tria.refine_global(2);
 
-  for (cell=tria.begin_active(); cell!=tria.end(); ++cell)
+  for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
       deallog << "C: " << cell << std::endl;
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-        deallog << "F: " << cell->face(f) << ", mid: "
-                << (int) cell->face(f)->manifold_id() << std::endl;
+      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        deallog << "F: " << cell->face(f)
+                << ", mid: " << (int)cell->face(f)->manifold_id() << std::endl;
     }
 
 
@@ -64,15 +64,16 @@ void test(unsigned int ref=1)
   tria.reset_manifold(1);
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1,1>();
-  test<1,2>();
-  test<2,2>();
-  test<2,3>();
-  test<3,3>();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 
   return 0;
 }

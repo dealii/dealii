@@ -18,8 +18,10 @@
 #define dealii_fe_rannacher_turek_h
 
 #include <deal.II/base/polynomials_rannacher_turek.h>
-#include <deal.II/fe/fe_poly.h>
+
 #include <deal.II/fe/fe_base.h>
+#include <deal.II/fe/fe_poly.h>
+
 #include <string>
 #include <vector>
 
@@ -61,20 +63,20 @@ public:
    *
    * The element is currently only implemented for order 0 in 2D.
    */
-  FE_RannacherTurek(const unsigned int order = 0,
+  FE_RannacherTurek(const unsigned int order                 = 0,
                     const unsigned int n_face_support_points = 2);
 
-  virtual std::string get_name() const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,dim> >
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
 
   // documentation inherited from the base class
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
 private:
   /**
@@ -96,12 +98,14 @@ private:
   /**
    * Compute generalized support points and their weights.
    */
-  void initialize_support_points();
+  void
+  initialize_support_points();
   /**
    * Return information about degrees of freedom per object as needed during
    * construction.
    */
-  std::vector<unsigned int> get_dpo_vector();
+  std::vector<unsigned int>
+  get_dpo_vector();
 };
 
 

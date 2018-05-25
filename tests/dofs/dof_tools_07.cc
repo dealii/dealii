@@ -22,15 +22,14 @@
 
 
 
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
-  std::vector<types::global_dof_index> n_dofs(dof_handler.get_fe().n_components());
-  DoFTools::count_dofs_per_component (dof_handler,
-                                      n_dofs);
-  for (unsigned int i=0; i<n_dofs.size(); ++i)
+  std::vector<types::global_dof_index> n_dofs(
+    dof_handler.get_fe().n_components());
+  DoFTools::count_dofs_per_component(dof_handler, n_dofs);
+  for (unsigned int i = 0; i < n_dofs.size(); ++i)
     deallog << n_dofs[i] << " ";
   deallog << std::endl;
 }

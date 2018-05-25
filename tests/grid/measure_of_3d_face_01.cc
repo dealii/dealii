@@ -16,13 +16,14 @@
 
 // Test by Kevin Drzycimski: compute the measure of the faces of a 3d cell
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 // move backward two adjacent vertices of the top face up by one
@@ -50,10 +51,11 @@ Point<3> distort_twisted(Point<3> p)
 
 
 
-void test ()
+void
+test()
 {
   Triangulation<3> tria;
-  GridOut gridout;
+  GridOut          gridout;
 
   deallog << "Planar\n";
   GridGenerator::hyper_cube(tria);
@@ -75,7 +77,7 @@ void test ()
   GridTools::transform(&distort_twisted, tria);
   gridout.write_eps(tria, deallog.get_file_stream());
 
-  double measure_twisted[] = {1.5, 1.5, 1.5, 1.5, 1, 5./3};
+  double measure_twisted[] = {1.5, 1.5, 1.5, 1.5, 1, 5. / 3};
   deallog << "Face\tExact\tMeasure" << std::endl;
   cell = tria.begin_active();
   for (int i = 0; i < 6; ++i)
@@ -97,10 +99,11 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (5);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(5);
   deallog.attach(logfile);
 
   // run the tests but continue when finding an exception: we will try
@@ -109,6 +112,5 @@ int main()
   // remaining faces
   deal_II_exceptions::disable_abort_on_exception();
 
-  test ();
+  test();
 }
-

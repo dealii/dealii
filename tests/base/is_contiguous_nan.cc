@@ -26,26 +26,26 @@
 // The failure of the function to recognize that the array elements
 // are contiguous led to downstream failures of make_array_view().
 
-#include "../tests.h"
-
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/signaling_nan.h>
 
-void test ()
+#include "../tests.h"
+
+void
+test()
 {
-  std::vector<double> tmp (2);
+  std::vector<double> tmp(2);
   tmp[0] = numbers::signaling_nan<double>();
   tmp[1] = numbers::signaling_nan<double>();
-  deallog << (internal::ArrayViewHelper::is_contiguous (tmp.begin(), tmp.end())
-              ?
-              "true"
-              :
-              "false")
+  deallog << (internal::ArrayViewHelper::is_contiguous(tmp.begin(), tmp.end()) ?
+                "true" :
+                "false")
           << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

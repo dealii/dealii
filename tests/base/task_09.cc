@@ -21,22 +21,24 @@
 //
 // this test verifies that we no longer deadlock
 
-#include "../tests.h"
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
+
 #include <chrono>
 #include <thread>
 
-
-#include <deal.II/base/thread_management.h>
-#include <deal.II/base/multithread_info.h>
+#include "../tests.h"
 
 
-void test ()
+void
+test()
 {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 
-void outer ()
+void
+outer()
 {
   // wait for some time to make sure that really all outer tasks have been
   // started, then start a bunch of new tasks and wait for them to finish. it
@@ -46,17 +48,18 @@ void outer ()
   // never release the mutex that we try to acquire in join()
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  Threads::new_task (test).join();
+  Threads::new_task(test).join();
 }
 
 
 
-int main()
+int
+main()
 {
   initlog();
 
   {
-    const std::size_t n_tasks = MultithreadInfo::n_cores()*2;
+    const std::size_t n_tasks = MultithreadInfo::n_cores() * 2;
 #ifdef _POSIX_C_SOURCE
     // get rid of the environment variable if it exists (this may not be
     // possible under MSVC, but the test will still pass; it just won't test
@@ -67,7 +70,7 @@ int main()
     // reset the concurrency limit that exists in tests.h:
     MultithreadInfo::set_thread_limit(n_tasks);
     std::vector<Threads::Task<void>> tasks(n_tasks);
-    for (std::size_t task_n=0; task_n<n_tasks; ++task_n)
+    for (std::size_t task_n = 0; task_n < n_tasks; ++task_n)
       {
         // We must save each task, otherwise it will join before the next loop
         // iteration

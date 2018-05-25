@@ -16,13 +16,15 @@
 // Verify that SymmetricTensor::operator() and SymmetricTensor::operator[] do
 // what we think they should do.
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/table_indices.h>
 
+#include "../tests.h"
+
 
 template <int dim>
-void check_2 ()
+void
+check_2()
 {
   using namespace dealii;
   Testing::rand(true, 42);
@@ -33,11 +35,11 @@ void check_2 ()
     {
       for (unsigned int l = 0; l < dim; ++l)
         {
-          const double entry = double(Testing::rand());
+          const double    entry = double(Testing::rand());
           TableIndices<2> indices(k, l);
 
           // check assignment
-          change_with_brackets[indices] = entry;
+          change_with_brackets[indices]    = entry;
           change_with_parentheses(indices) = entry;
           AssertThrow(change_with_brackets[k][l] == entry,
                       ExcMessage("Entries should match"));
@@ -45,7 +47,7 @@ void check_2 ()
                       ExcMessage("Entries should match"));
 
           // and access
-          const double brackets_entry = change_with_brackets[indices];
+          const double brackets_entry    = change_with_brackets[indices];
           const double parentheses_entry = change_with_parentheses(indices);
           AssertThrow(brackets_entry == entry,
                       ExcMessage("Entries should match"));
@@ -56,7 +58,8 @@ void check_2 ()
 }
 
 template <int dim>
-void check_4 ()
+void
+check_4()
 {
   using namespace dealii;
   Testing::rand(true, 42);
@@ -71,11 +74,11 @@ void check_4 ()
             {
               for (unsigned int l = 0; l < dim; ++l)
                 {
-                  const double entry = double(Testing::rand());
+                  const double    entry = double(Testing::rand());
                   TableIndices<4> indices(i, j, k, l);
 
                   // check assignment
-                  change_with_brackets[indices] = entry;
+                  change_with_brackets[indices]    = entry;
                   change_with_parentheses(indices) = entry;
                   AssertThrow(change_with_brackets[i][j][k][l] == entry,
                               ExcMessage("Entries should match"));
@@ -84,7 +87,8 @@ void check_4 ()
 
                   // and access
                   const double brackets_entry = change_with_brackets[indices];
-                  const double parentheses_entry = change_with_parentheses(indices);
+                  const double parentheses_entry =
+                    change_with_parentheses(indices);
                   AssertThrow(brackets_entry == entry,
                               ExcMessage("Entries should match"));
                   AssertThrow(parentheses_entry == entry,
@@ -96,7 +100,8 @@ void check_4 ()
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -17,32 +17,38 @@
 // compute some convergence results from computing pi on a mesh that
 // is deformed to represent a quarter of a ring
 
-#include "../tests.h"
-#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/base/convergence_table.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/fe/mapping_q_eulerian.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
+
 #include <iostream>
 
-#include <deal.II/fe/mapping_q_eulerian.h>
+#include "../tests.h"
 
 
 // .... IMPOSED DISPLACEMENT
@@ -51,19 +57,21 @@ template <int dim>
 class ImposedDisplacement : public Function<dim>
 {
 public:
-  ImposedDisplacement() : Function<dim> (dim) { }
-  virtual void vector_value(const Point<dim> &p,
-                            Vector<double> &value) const;
+  ImposedDisplacement() : Function<dim>(dim)
+  {}
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &value) const;
 };
 
 template <>
-void ImposedDisplacement<2>::vector_value(const Point<2> &p,
-                                          Vector<double> &value) const
+void
+ImposedDisplacement<2>::vector_value(const Point<2> &p,
+                                     Vector<double> &value) const
 {
-  double radius = 1 + (sqrt(5)-1)*p(0);
-  double angle  = 0.5*numbers::PI*(1-p(1));
-  value(0) = radius*sin(angle)-p(0);
-  value(1) = radius*cos(angle)-p(1);
+  double radius = 1 + (sqrt(5) - 1) * p(0);
+  double angle  = 0.5 * numbers::PI * (1 - p(1));
+  value(0)      = radius * sin(angle) - p(0);
+  value(1)      = radius * cos(angle) - p(1);
 }
 
 
@@ -73,22 +81,27 @@ template <int dim>
 class MappingTest
 {
 public:
-  MappingTest (unsigned int degree);
-  ~MappingTest ();
+  MappingTest(unsigned int degree);
+  ~MappingTest();
 
-  void run_test();
-  void graphical_output();
+  void
+  run_test();
+  void
+  graphical_output();
 
 private:
-  double compute_area();
-  void explicitly_move_mesh();
-  void write_tria_to_eps(std::string id);
+  double
+  compute_area();
+  void
+  explicitly_move_mesh();
+  void
+  write_tria_to_eps(std::string id);
 
-  Triangulation<dim>     triangulation;
-  DoFHandler<dim>        dof_handler;
-  FESystem<dim>          fe;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler;
+  FESystem<dim>      fe;
 
-  unsigned int           degree;
+  unsigned int degree;
 
   ImposedDisplacement<dim> imposed_displacement;
   Vector<double>           displacements;
@@ -98,47 +111,47 @@ private:
 // .... CONSTRUCTOR
 
 template <int dim>
-MappingTest<dim>::MappingTest (unsigned int degree)
-  :
-  dof_handler (triangulation),
-  fe (FE_Q<dim>(degree),dim),
+MappingTest<dim>::MappingTest(unsigned int degree) :
+  dof_handler(triangulation),
+  fe(FE_Q<dim>(degree), dim),
   degree(degree)
-{ }
+{}
 
 
 // .... DESTRUCTOR
 
 template <int dim>
-MappingTest<dim>::~MappingTest ()
+MappingTest<dim>::~MappingTest()
 {
-  dof_handler.clear ();
+  dof_handler.clear();
 }
 
 
 // .... COMPUTE AREA
 
 template <int dim>
-double MappingTest<dim>::compute_area ()
+double
+MappingTest<dim>::compute_area()
 {
-  QGauss<dim>  quadrature_formula(degree+1);
+  QGauss<dim> quadrature_formula(degree + 1);
 
   MappingQEulerian<dim> mapping(degree, dof_handler, displacements);
 
-  FEValues<dim> fe_values (mapping, fe, quadrature_formula,
-                           update_JxW_values);
+  FEValues<dim> fe_values(mapping, fe, quadrature_formula, update_JxW_values);
 
-  const unsigned int   n_q_points = quadrature_formula.size();
+  const unsigned int n_q_points = quadrature_formula.size();
 
   long double area = 0.;
 
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
 
-  for (; cell!=endc; ++cell)
+  for (; cell != endc; ++cell)
     {
-      fe_values.reinit (cell);
-      for (unsigned int q=0; q<n_q_points; ++q) area += fe_values.JxW(q);
+      fe_values.reinit(cell);
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        area += fe_values.JxW(q);
     }
 
   return area;
@@ -148,32 +161,33 @@ double MappingTest<dim>::compute_area ()
 // .... RUN TEST
 
 template <int dim>
-void MappingTest<dim>::run_test ()
+void
+MappingTest<dim>::run_test()
 {
-  GridGenerator::hyper_cube (triangulation,0, 1);
+  GridGenerator::hyper_cube(triangulation, 0, 1);
 
   ConvergenceTable table;
 
-  for (unsigned int ref_level = 0;
-       ref_level < (degree<4 ? 5 : 3);
+  for (unsigned int ref_level = 0; ref_level < (degree < 4 ? 5 : 3);
        ++ref_level, triangulation.refine_global(1))
     {
+      dof_handler.distribute_dofs(fe);
+      displacements.reinit(dof_handler.n_dofs());
 
-      dof_handler.distribute_dofs (fe);
-      displacements.reinit (dof_handler.n_dofs());
+      VectorTools::interpolate(MappingQGeneric<dim>(1),
+                               dof_handler,
+                               imposed_displacement,
+                               displacements);
 
-      VectorTools::interpolate(MappingQGeneric<dim>(1),dof_handler,
-                               imposed_displacement,displacements);
 
-
-      table.add_value("cells",triangulation.n_active_cells());
-      table.add_value("dofs",dof_handler.n_dofs());
+      table.add_value("cells", triangulation.n_active_cells());
+      table.add_value("dofs", dof_handler.n_dofs());
 
       long double area  = compute_area();
-      long double error = std::fabs(numbers::PI-area)/numbers::PI;
+      long double error = std::fabs(numbers::PI - area) / numbers::PI;
 
-      table.add_value("area",  static_cast<double> (area));
-      table.add_value("error", static_cast<double> (error));
+      table.add_value("area", static_cast<double>(area));
+      table.add_value("error", static_cast<double>(error));
     }
 
   table.set_precision("area", 8);
@@ -183,33 +197,33 @@ void MappingTest<dim>::run_test ()
                                    ConvergenceTable::reduction_rate_log2);
   table.write_text(deallog.get_file_stream());
   deallog << std::endl;
-
 }
 
 
 // .... EXPLICITLY MOVE MESH
 
 template <int dim>
-void MappingTest<dim>::explicitly_move_mesh ()
+void
+MappingTest<dim>::explicitly_move_mesh()
 {
-  std::vector<bool> moved (triangulation.n_vertices(),false);
-  unsigned int vpc = GeometryInfo<dim>::vertices_per_cell;
+  std::vector<bool> moved(triangulation.n_vertices(), false);
+  unsigned int      vpc = GeometryInfo<dim>::vertices_per_cell;
 
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active (),
-  endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
 
   for (; cell != endc; cell++)
     {
-      for (unsigned int v=0; v < vpc; v++)
+      for (unsigned int v = 0; v < vpc; v++)
         {
           if (moved[cell->vertex_index(v)] == false)
             {
-              moved[cell->vertex_index(v)] =  true;
+              moved[cell->vertex_index(v)] = true;
               Point<dim> vertex_disp;
-              for (unsigned int d=0; d<dim; d++)
+              for (unsigned int d = 0; d < dim; d++)
                 {
-                  vertex_disp[d] = displacements(cell->vertex_dof_index(v,d));
+                  vertex_disp[d] = displacements(cell->vertex_dof_index(v, d));
                 }
               cell->vertex(v) += vertex_disp;
             }
@@ -222,16 +236,17 @@ void MappingTest<dim>::explicitly_move_mesh ()
 // .... GRAPHICAL OUTPUT
 
 template <int dim>
-void MappingTest<dim>::graphical_output ()
+void
+MappingTest<dim>::graphical_output()
 {
-  GridGenerator::hyper_cube (triangulation,0, 1);
+  GridGenerator::hyper_cube(triangulation, 0, 1);
   triangulation.refine_global(4);
 
-  dof_handler.distribute_dofs (fe);
-  displacements.reinit (dof_handler.n_dofs());
+  dof_handler.distribute_dofs(fe);
+  displacements.reinit(dof_handler.n_dofs());
 
-  VectorTools::interpolate(MappingQGeneric<dim>(1),dof_handler,
-                           imposed_displacement,displacements);
+  VectorTools::interpolate(
+    MappingQGeneric<dim>(1), dof_handler, imposed_displacement, displacements);
 
   explicitly_move_mesh();
 }
@@ -239,16 +254,17 @@ void MappingTest<dim>::graphical_output ()
 
 // .... MAIN
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
 
   // convergence studies
 
-  for (unsigned int degree = 1; degree <=4; ++degree)
+  for (unsigned int degree = 1; degree <= 4; ++degree)
     {
       deallog << ".... Q" << degree << " Mapping ...." << std::endl;
       MappingTest<2> test_one(degree);
@@ -262,4 +278,3 @@ int main ()
 
   return 0;
 }
-

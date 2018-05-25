@@ -17,18 +17,19 @@
 //   dealii::Vector<std::complex<double>>
 //   dealii::SparseMatrix<std::complex<double>>
 
-#include "../tests.h"
+#include <deal.II/lac/packaged_operation.h>
+#include <deal.II/lac/vector.h>
 
 #include <complex>
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/packaged_operation.h>
+#include "../tests.h"
 
 using namespace dealii;
 
 
-void test_applies(std::string description,
-                  const PackagedOperation<Vector<std::complex<double>>> &expr)
+void
+test_applies(std::string                                            description,
+             const PackagedOperation<Vector<std::complex<double>>> &expr)
 {
   // test apply
   Vector<std::complex<double>> tmp = expr;
@@ -42,7 +43,8 @@ void test_applies(std::string description,
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
@@ -54,7 +56,7 @@ int main()
   Vector<std::complex<double>> u(25);
   for (unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double)(i + 1);
     }
 
   deallog << "u: " << u << std::endl;

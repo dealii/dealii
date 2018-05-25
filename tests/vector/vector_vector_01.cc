@@ -20,35 +20,39 @@
 // that did not honor the 'explicit' keyword on template constructors. this is
 // now autoconf'ed.
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
-    v(i) = i+1.;
+  for (unsigned int i = 0; i < v.size(); ++i)
+    v(i) = i + 1.;
   Vector<float> w(v);
 
-  AssertThrow (w==v, ExcInternalError());
+  AssertThrow(w == v, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -61,7 +65,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

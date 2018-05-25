@@ -16,16 +16,19 @@
 
 // check serialization for Table<4, int>
 
-#include "serialization.h"
 #include <deal.II/base/table.h>
+
 #include <boost/serialization/vector.hpp>
 
+#include "serialization.h"
 
-void test ()
+
+void
+test()
 {
-  unsigned int index1 = 3, index2 = 4, index3 = 2, index4 = 5;
+  unsigned int    index1 = 3, index2 = 4, index3 = 2, index4 = 5;
   TableIndices<4> indices1(index1, index2, index3, index4);
-  unsigned int sum_of_indices = index1 + index2 + index3 + index4;
+  unsigned int    sum_of_indices = index1 + index2 + index3 + index4;
 
   Table<4, int> t1(index1, index2, index3, index4);
   Table<4, int> t2(index1, index2, index3, index4);
@@ -45,26 +48,27 @@ void test ()
             {
               for (unsigned int i4 = 0; i4 < indices1[3]; ++i4)
                 {
-                  t1[i1][i2][i3][i4] = counter ++;
+                  t1[i1][i2][i3][i4] = counter++;
                   t2[i1][i2][i3][i4] = counter + sum_of_indices;
                 }
             }
         }
     }
 
-  verify (t1, t2);
+  verify(t1, t2);
 
-  verify (t1, t3);
+  verify(t1, t3);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

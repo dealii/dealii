@@ -16,22 +16,21 @@
 
 // test ThreadLocalStorage::operator T&
 
-#include "../tests.h"
-
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/thread_local_storage.h>
+#include <deal.II/base/thread_management.h>
+
+#include "../tests.h"
 
 
 struct X
 {
   Threads::ThreadLocalStorage<int> tls_data;
 
-  X ()
-    :
-    tls_data (42)
+  X() : tls_data(42)
   {}
 
-  int f ()
+  int
+  f()
   {
     // access TLS data and have it
     // converted to the right data type
@@ -42,23 +41,23 @@ struct X
 };
 
 
-void test ()
+void
+test()
 {
-  X x;
+  X                    x;
   Threads::Thread<int> t;
-  t = Threads::new_thread (&X::f, x);
+  t = Threads::new_thread(&X::f, x);
 
-  AssertThrow (t.return_value() == 42,
-               ExcInternalError());
+  AssertThrow(t.return_value() == 42, ExcInternalError());
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
   deallog << "OK" << std::endl;
 }

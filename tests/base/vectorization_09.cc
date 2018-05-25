@@ -16,54 +16,55 @@
 
 // test VectorizedArray::streaming_store
 
+#include <deal.II/base/aligned_vector.h>
+#include <deal.II/base/vectorization.h>
+
 #include "../tests.h"
 
-#include <deal.II/base/vectorization.h>
-#include <deal.II/base/aligned_vector.h>
-
 template <typename Number>
-void test ()
+void
+test()
 {
-  const unsigned int n_chunks = 50000;
-  const unsigned int n_vectors = VectorizedArray<Number>::n_array_elements;
-  std::vector<Number> values(n_vectors*n_chunks);
-  for (unsigned int i=0; i<values.size(); ++i)
+  const unsigned int  n_chunks  = 50000;
+  const unsigned int  n_vectors = VectorizedArray<Number>::n_array_elements;
+  std::vector<Number> values(n_vectors * n_chunks);
+  for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = i;
 
   // test store operation
-  AlignedVector<Number> stored(n_vectors*n_chunks);
-  for (unsigned int i=0; i<n_chunks; ++i)
+  AlignedVector<Number> stored(n_vectors * n_chunks);
+  for (unsigned int i = 0; i < n_chunks; ++i)
     {
       VectorizedArray<Number> tmp;
-      tmp.load(&values[i*n_vectors]);
-      tmp.streaming_store(&stored[i*n_vectors]);
+      tmp.load(&values[i * n_vectors]);
+      tmp.streaming_store(&stored[i * n_vectors]);
     }
-  for (unsigned int i=0; i<n_chunks*n_vectors; ++i)
+  for (unsigned int i = 0; i < n_chunks * n_vectors; ++i)
     AssertThrow(stored[i] == i, ExcInternalError());
   deallog << "streaming store OK" << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
   deallog.push("double");
-  test<double> ();
+  test<double>();
   deallog.pop();
   deallog.push("float");
-  test<float> ();
+  test<float>();
   deallog.pop();
 
   // test long double and unsigned int: in these cases, the default path of
   // VectorizedArray is taken no matter what was done for double or float
   deallog.push("long double");
-  test<long double> ();
+  test<long double>();
   deallog.pop();
 
   deallog.push("unsigned int");
-  test<unsigned int> ();
+  test<unsigned int>();
   deallog.pop();
 }

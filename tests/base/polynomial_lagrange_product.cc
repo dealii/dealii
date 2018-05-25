@@ -17,17 +17,18 @@
 // Tests correctness of values and derivatives for polynomials derived from
 // Lagrange product form
 
-#include "../tests.h"
-
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
+
+#include "../tests.h"
 
 
 using namespace Polynomials;
 
 
-void check_derivatives (const std::vector<Polynomial<double> > &p,
-                        const unsigned int                      n_deriv)
+void
+check_derivatives(const std::vector<Polynomial<double>> &p,
+                  const unsigned int                     n_deriv)
 {
   // check whether the values and derivatives
   // are evaluated correctly some randomly
@@ -36,39 +37,40 @@ void check_derivatives (const std::vector<Polynomial<double> > &p,
   // expanded form by adding a dummy polynomial;
   // addition of polynomials destroys the
   // product form in the current implementation)
-  deallog << "Representation of derivatives up to order " << n_deriv-1 << std::endl;
+  deallog << "Representation of derivatives up to order " << n_deriv - 1
+          << std::endl;
   std::vector<double> values(n_deriv), values_ref(n_deriv);
-  Monomial<double> zero (0,0);
-  for (unsigned int j=0; j<p.size(); ++j)
+  Monomial<double>    zero(0, 0);
+  for (unsigned int j = 0; j < p.size(); ++j)
     {
       double x = random_value<double>();
-      p[j].value (x, values);
+      p[j].value(x, values);
       Polynomial<double> q = p[j];
       q += zero;
-      q.value (x, values_ref);
-      for (unsigned int i=0; i<n_deriv; ++i)
+      q.value(x, values_ref);
+      for (unsigned int i = 0; i < n_deriv; ++i)
         {
           deallog << ".";
-          if (std::fabs (values[i]-values_ref[i]) >
-              std::max(1e-11,1e-11*std::fabs(values[i])))
+          if (std::fabs(values[i] - values_ref[i]) >
+              std::max(1e-11, 1e-11 * std::fabs(values[i])))
             deallog << "Error deriv" << i << "  lg y="
-                    << std::log10(std::fabs(values[i]-values_ref[i]))
+                    << std::log10(std::fabs(values[i] - values_ref[i]))
                     << ", is: " << values[i] << ", should be: " << values_ref[i]
                     << std::endl;
         }
     }
   deallog << std::endl;
-
 }
 
 
 
 void
-check_poly (const Quadrature<1> &q)
+check_poly(const Quadrature<1> &q)
 {
   deallog << "Points: " << q.size() << std::endl;
-  std::vector<Polynomial<double> > p = generate_complete_Lagrange_basis(q.get_points());
-  for (unsigned int i=1; i<6; ++i)
+  std::vector<Polynomial<double>> p =
+    generate_complete_Lagrange_basis(q.get_points());
+  for (unsigned int i = 1; i < 6; ++i)
     check_derivatives(p, i);
   deallog << std::endl;
 }
@@ -76,26 +78,28 @@ check_poly (const Quadrature<1> &q)
 
 
 void
-check_lge (unsigned int n)
+check_lge(unsigned int n)
 {
-  deallog << "Points: " << n+1 << std::endl;
-  std::vector<Polynomial<double> > p = LagrangeEquidistant::generate_complete_basis(n);
-  for (unsigned int i=1; i<6; ++i)
+  deallog << "Points: " << n + 1 << std::endl;
+  std::vector<Polynomial<double>> p =
+    LagrangeEquidistant::generate_complete_basis(n);
+  for (unsigned int i = 1; i < 6; ++i)
     check_derivatives(p, i);
   deallog << std::endl;
 }
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
   deallog.push("LagrangeEquidistant");
-  for (unsigned i=1; i<8; i+=2)
-    check_lge (i);
+  for (unsigned i = 1; i < 8; i += 2)
+    check_lge(i);
   deallog.pop();
   deallog << std::endl;
 
@@ -103,7 +107,7 @@ int main()
   // conditioning, so test to some very high
   // orders
   deallog.push("GaussLobatto");
-  for (unsigned i=1; i<8; i+=2)
-    check_poly (QGaussLobatto<1>(i+1));
+  for (unsigned i = 1; i < 8; i += 2)
+    check_poly(QGaussLobatto<1>(i + 1));
   deallog.pop();
 }

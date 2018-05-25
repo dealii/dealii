@@ -17,9 +17,10 @@
 #define dealii_polynomials_integrated_legendre_sz_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/point.h>
+
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/thread_management.h>
 
 
@@ -51,19 +52,21 @@ public:
   /**
    * Constructor generating the coefficients of the polynomials at degree p.
    */
-  IntegratedLegendreSZ (const unsigned int p);
+  IntegratedLegendreSZ(const unsigned int p);
 
   /**
    * Return the complete set of Integrated Legendre polynomials up to the
    * given degree.
    */
-  static std::vector<Polynomials::Polynomial<double>> generate_complete_basis (const unsigned int degree);
+  static std::vector<Polynomials::Polynomial<double>>
+  generate_complete_basis(const unsigned int degree);
 
 private:
   /**
    * Main function to compute the co-efficients of the polynomial at degree p.
    */
-  static const std::vector<double> get_coefficients (const unsigned int k);
+  static const std::vector<double>
+  get_coefficients(const unsigned int k);
 };
 
 DEAL_II_NAMESPACE_CLOSE

@@ -18,43 +18,49 @@
 // setting where one ghost is zero and should not have an effect on vector
 // entries
 
-#include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/la_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0) deallog << "numproc=" << numproc << std::endl;
+  if (myid == 0)
+    deallog << "numproc=" << numproc << std::endl;
 
 
   // each processor owns 2 indices and all
   // are ghosting element 1 (the second)
-  IndexSet local_owned(numproc*2);
-  local_owned.add_range(myid*2,myid*2+2);
-  IndexSet local_relevant(numproc*2);
+  IndexSet local_owned(numproc * 2);
+  local_owned.add_range(myid * 2, myid * 2 + 2);
+  IndexSet local_relevant(numproc * 2);
   local_relevant = local_owned;
-  local_relevant.add_range(1,2);
-  local_relevant.add_range(4,5);
+  local_relevant.add_range(1, 2);
+  local_relevant.add_range(4, 5);
 
-  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(
+    local_owned, local_relevant, MPI_COMM_WORLD);
 
   // set local values and check them
-  v(myid*2)=myid*2.0;
-  v(myid*2+1)=myid*2.0+1.0;
+  v(myid * 2)     = myid * 2.0;
+  v(myid * 2 + 1) = myid * 2.0 + 1.0;
 
   v.compress(VectorOperation::insert);
-  v*=2.0;
+  v *= 2.0;
   v.add(1.0);
 
-  AssertThrow(v(myid*2) == myid*4.0+1, ExcInternalError());
-  AssertThrow(v(myid*2+1) == myid*4.0+3.0, ExcInternalError());
+  AssertThrow(v(myid * 2) == myid * 4.0 + 1, ExcInternalError());
+  AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 3.0, ExcInternalError());
 
   // set ghost dof on all processors, compress
   // (insert mode)
@@ -63,8 +69,8 @@ void test ()
 
   if (myid == 0)
     {
-      deallog << myid*2 << ":" << v(myid*2) << std::endl;
-      deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
+      deallog << myid * 2 << ":" << v(myid * 2) << std::endl;
+      deallog << myid * 2 + 1 << ":" << v(myid * 2 + 1) << std::endl;
     }
 
   v(1) = -7;
@@ -72,13 +78,13 @@ void test ()
 
   if (myid == 0)
     {
-      deallog << myid*2 << ":" << v(myid*2) << std::endl;
-      deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
+      deallog << myid * 2 << ":" << v(myid * 2) << std::endl;
+      deallog << myid * 2 + 1 << ":" << v(myid * 2 + 1) << std::endl;
     }
 
   // import ghosts onto all procs
   v.update_ghost_values();
-  AssertThrow (v(1) == -7.0, ExcInternalError());
+  AssertThrow(v(1) == -7.0, ExcInternalError());
 
   // check l2 norm
   const double l2_norm = v.l2_norm();
@@ -91,11 +97,13 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)
@@ -107,5 +115,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

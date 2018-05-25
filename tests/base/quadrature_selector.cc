@@ -19,38 +19,38 @@
 // arguments
 
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/quadrature_selector.h>
+
 #include <string>
+
+#include "../tests.h"
 
 
 template <int dim>
-void check (const std::string     &name,
-            const unsigned int     order,
-            const Quadrature<dim> &q)
+void
+check(const std::string &    name,
+      const unsigned int     order,
+      const Quadrature<dim> &q)
 {
-  Assert (QuadratureSelector<dim>(name, order).get_points() ==
-          q.get_points(),
-          ExcInternalError());
+  Assert(QuadratureSelector<dim>(name, order).get_points() == q.get_points(),
+         ExcInternalError());
   deallog << name << ' ' << order << " ok" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  check ("gauss", 2, QGauss<1>(2));
-  check ("gauss", 2, QGauss<2>(2));
-  check ("gauss", 2, QGauss<3>(2));
+  check("gauss", 2, QGauss<1>(2));
+  check("gauss", 2, QGauss<2>(2));
+  check("gauss", 2, QGauss<3>(2));
 
-  check ("gauss", 2, QGauss<3>(2));
-  check ("gauss", 6, QGauss<3>(6));
-  check ("gauss", 10, QGauss<3>(10));
+  check("gauss", 2, QGauss<3>(2));
+  check("gauss", 6, QGauss<3>(6));
+  check("gauss", 10, QGauss<3>(10));
 
-  check ("weddle", 0, QWeddle<2>());
+  check("weddle", 0, QWeddle<2>());
 }
-
-

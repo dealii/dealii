@@ -35,30 +35,31 @@ ans =
   -27
 */
 
-#include "../tests.h"
-#include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+
+#include "../tests.h"
+#include "create_matrix.h"
 
 
 template <typename NumberType>
 void
 test()
 {
-  const unsigned int size = 3;
+  const unsigned int           size = 3;
   LAPACKFullMatrix<NumberType> M(size);
   M.set_property(LAPACKSupport::upper_triangular);
 
-  M = 0.;
+  M                    = 0.;
   unsigned int counter = 1;
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j)
       {
         if (j >= i)
-          M(i,j) = counter;
+          M(i, j) = counter;
 
         counter++;
       }
@@ -68,22 +69,21 @@ test()
   x[1] = -7;
   x[2] = 1;
 
-  M.vmult(y,x);
+  M.vmult(y, x);
   y.print(deallog.get_file_stream(), 6, false);
 
-  M.Tvmult(y,x);
+  M.Tvmult(y, x);
   y.print(deallog.get_file_stream(), 6, false);
-
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 
   test<double>();
-
 }

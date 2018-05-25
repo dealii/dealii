@@ -18,18 +18,19 @@
 // PETScWrappers: document bug when using GrowingVectorMemory
 // at the end of a run.
 
-#include "../tests.h"
+#include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/base/utilities.h>
+
+#include "../tests.h"
 
 //#include <mpi.h>
 
 template <class v>
-void testit()
+void
+testit()
 {
   GrowingVectorMemory<v> m;
   m.free(m.alloc());
@@ -37,27 +38,29 @@ void testit()
 
 
 
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0)
+  if (myid == 0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
 
   testit<PETScWrappers::MPI::Vector>();
   testit<PETScWrappers::MPI::BlockVector>();
 
-  if (myid==0)
+  if (myid == 0)
     deallog << "done" << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
 

@@ -17,10 +17,11 @@
 
 // Just output the restriction matrices of the RT element
 
-#include "../tests.h"
 #include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <string>
+
+#include "../tests.h"
 
 #define PRECISION 8
 
@@ -30,19 +31,18 @@ template <int dim>
 void
 test(const unsigned int degree)
 {
-  deallog << "FE_RaviartThomas<" << dim << "> (" << degree << ")"
-          << std::endl;
+  deallog << "FE_RaviartThomas<" << dim << "> (" << degree << ")" << std::endl;
 
   FE_RaviartThomas<dim> fe_rt(degree);
 
-  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
     {
       const FullMatrix<double> &m = fe_rt.get_restriction_matrix(c);
 
-      for (unsigned int i=0; i<m.m(); ++i)
+      for (unsigned int i = 0; i < m.m(); ++i)
         {
-          for (unsigned int j=0; j<m.n(); ++j)
-            deallog << m(i,j) << ' ';
+          for (unsigned int j = 0; j < m.n(); ++j)
+            deallog << m(i, j) << ' ';
           deallog << std::endl;
         }
 
@@ -54,12 +54,12 @@ test(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  for (unsigned int degree=0; degree<3; ++degree)
+  for (unsigned int degree = 0; degree < 3; ++degree)
     {
       test<2>(degree);
       test<3>(degree);

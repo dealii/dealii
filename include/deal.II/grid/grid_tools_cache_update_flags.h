@@ -23,7 +23,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace GridTools
 {
-
   /**
    * The enum type given to the Cache class to select what
    * information to update.
@@ -41,7 +40,8 @@ namespace GridTools
     update_nothing = 0x00,
 
     /**
-     * Update vertex_to_cell_map, as returned by GridTools::vertex_to_cell_map().
+     * Update vertex_to_cell_map, as returned by
+     * GridTools::vertex_to_cell_map().
      */
     update_vertex_to_cell_map = 0x01,
 
@@ -49,10 +49,12 @@ namespace GridTools
      * Update vertex_to_cell_centers_directions, as returned by
      * GridTools::vertex_to_cell_centers_directions()
      */
-    update_vertex_to_cell_centers_directions = update_vertex_to_cell_map | 0x0002,
+    update_vertex_to_cell_centers_directions =
+      update_vertex_to_cell_map | 0x0002,
 
     /**
-     * Update a KDTree object, initialized with the vertices of the Triangulation.
+     * Update a KDTree object, initialized with the vertices of the
+     * Triangulation.
      */
     update_vertex_kdtree = 0x04,
 
@@ -74,15 +76,17 @@ namespace GridTools
    * @ref CacheUpdateFlags
    */
   template <class StreamType>
-  inline
-  StreamType &operator << (StreamType &s,
-                           const CacheUpdateFlags u)
+  inline StreamType &
+  operator<<(StreamType &s, const CacheUpdateFlags u)
   {
     s << " CacheUpdateFlags";
-    if (u & update_vertex_to_cell_map)                 s << "|vertex_to_cell_map";
-    if (u & update_vertex_to_cell_centers_directions)  s << "|vertex_to_cells_centers_directions";
+    if (u & update_vertex_to_cell_map)
+      s << "|vertex_to_cell_map";
+    if (u & update_vertex_to_cell_centers_directions)
+      s << "|vertex_to_cells_centers_directions";
 #ifdef DEAL_II_WITH_NANOFLANN
-    if (u & update_vertex_kdtree)                      s << "|vertex_kdtree";
+    if (u & update_vertex_kdtree)
+      s << "|vertex_kdtree";
 #endif
     return s;
   }
@@ -97,32 +101,27 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  inline
-  CacheUpdateFlags
-  operator | (const CacheUpdateFlags f1,
-              const CacheUpdateFlags f2)
+  inline CacheUpdateFlags
+  operator|(const CacheUpdateFlags f1, const CacheUpdateFlags f2)
   {
-    return static_cast<CacheUpdateFlags> (
-             static_cast<unsigned int> (f1) |
-             static_cast<unsigned int> (f2));
+    return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) |
+                                         static_cast<unsigned int>(f2));
   }
 
   /**
    * Global operator which returns an object in which all bits are set which are
    * not set in the argument. This operator exists since
-   * if it did not then the result of the bit-negation <tt>operator ~</tt> would be an
-   * integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type CacheUpdateFlags.
+   * if it did not then the result of the bit-negation <tt>operator ~</tt> would
+   * be an integer which would in turn trigger a compiler warning when we tried
+   * to assign it to an object of type CacheUpdateFlags.
    *
    * @ref CacheUpdateFlags
    */
-  inline
-  CacheUpdateFlags
-  operator ~ (const CacheUpdateFlags f1)
+  inline CacheUpdateFlags
+  operator~(const CacheUpdateFlags f1)
   {
-    return static_cast<CacheUpdateFlags> (
-             static_cast<unsigned int> (f1) ^
-             static_cast<unsigned int> (update_all));
+    return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) ^
+                                         static_cast<unsigned int>(update_all));
   }
 
 
@@ -133,10 +132,8 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  inline
-  CacheUpdateFlags &
-  operator |= (CacheUpdateFlags &f1,
-               const CacheUpdateFlags f2)
+  inline CacheUpdateFlags &
+  operator|=(CacheUpdateFlags &f1, const CacheUpdateFlags f2)
   {
     f1 = f1 | f2;
     return f1;
@@ -152,14 +149,11 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  inline
-  CacheUpdateFlags
-  operator & (const CacheUpdateFlags f1,
-              const CacheUpdateFlags f2)
+  inline CacheUpdateFlags operator&(const CacheUpdateFlags f1,
+                                    const CacheUpdateFlags f2)
   {
-    return static_cast<CacheUpdateFlags> (
-             static_cast<unsigned int> (f1) &
-             static_cast<unsigned int> (f2));
+    return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) &
+                                         static_cast<unsigned int>(f2));
   }
 
 
@@ -169,16 +163,14 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  inline
-  CacheUpdateFlags &
-  operator &= (CacheUpdateFlags &f1,
-               const CacheUpdateFlags f2)
+  inline CacheUpdateFlags &
+  operator&=(CacheUpdateFlags &f1, const CacheUpdateFlags f2)
   {
     f1 = f1 & f2;
     return f1;
   }
 
-}
+} // namespace GridTools
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

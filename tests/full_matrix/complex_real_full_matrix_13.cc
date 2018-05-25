@@ -25,15 +25,14 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_square_matrix (m);
-  Vector<std::complex<number> > v;
-  make_range_vector (v);
+  FullMatrix<std::complex<number>> m;
+  make_square_matrix(m);
+  Vector<std::complex<number>> v;
+  make_range_vector(v);
 
-  deallog << m.matrix_norm_square (v) << std::endl;
+  deallog << m.matrix_norm_square(v) << std::endl;
 }

@@ -16,13 +16,14 @@
 
 // test LAPACKFullMatrix::rank1_update() for rank1 update of a matrix
 
-#include "../tests.h"
-#include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+
+#include "../tests.h"
+#include "create_matrix.h"
 
 
 template <typename NumberType>
@@ -39,8 +40,8 @@ test(const unsigned int size)
       for (unsigned int j = i; j < size; ++j)
         {
           const NumberType val = random_value<NumberType>();
-          A(i,j) = val;
-          A(j,i) = val;
+          A(i, j)              = val;
+          A(j, i)              = val;
         }
     }
 
@@ -55,23 +56,24 @@ test(const unsigned int size)
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j)
       {
-        const NumberType diff = A(i,j) + a * v(i) * v(j) - B(i,j);
-        AssertThrow(std::abs(diff) < 1e-10 * std::abs(B(i,j)),
-                    ExcMessage("diff="+ std::to_string(diff)));
+        const NumberType diff = A(i, j) + a * v(i) * v(j) - B(i, j);
+        AssertThrow(std::abs(diff) < 1e-10 * std::abs(B(i, j)),
+                    ExcMessage("diff=" + std::to_string(diff)));
       }
 
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 
-  const std::vector<unsigned int> sizes = {{17,35,391}};
+  const std::vector<unsigned int> sizes = {{17, 35, 391}};
   for (const auto &s : sizes)
     {
       deallog << "size=" << s << std::endl;

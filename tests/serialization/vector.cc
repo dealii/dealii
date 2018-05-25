@@ -16,11 +16,14 @@
 
 // check serialization for Vector
 
-#include "serialization.h"
 #include <deal.II/lac/vector.h>
+
 #include <boost/serialization/vector.hpp>
 
-void test ()
+#include "serialization.h"
+
+void
+test()
 {
   unsigned int n = 5;
 
@@ -29,26 +32,27 @@ void test ()
 
   Vector<double> v3;
 
-  for (unsigned int i = 0; i<n; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      v1(i) = i*1.;
-      v2(i) = i*1. + n*1.;
+      v1(i) = i * 1.;
+      v2(i) = i * 1. + n * 1.;
     }
 
 
-  verify (v1, v2);
+  verify(v1, v2);
 
-  verify (v1, v3);
+  verify(v1, v3);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

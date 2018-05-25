@@ -16,8 +16,9 @@
 
 #include <deal.II/base/polynomials_abf.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <iostream>
+
 #include <iomanip>
+#include <iostream>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -27,26 +28,25 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   template <int dim>
-  std::vector<std::vector< Polynomials::Polynomial< double > > >
-  get_abf_polynomials (const unsigned int k)
+  std::vector<std::vector<Polynomials::Polynomial<double>>>
+  get_abf_polynomials(const unsigned int k)
   {
-    std::vector<std::vector< Polynomials::Polynomial< double > > > pols(dim);
-    pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k+2);
+    std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
+    pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k + 2);
 
     if (k == 0)
-      for (unsigned int d=1; d<dim; ++d)
+      for (unsigned int d = 1; d < dim; ++d)
         pols[d] = Polynomials::Legendre::generate_complete_basis(0);
     else
-      for (unsigned int d=1; d<dim; ++d)
+      for (unsigned int d = 1; d < dim; ++d)
         pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
 
     return pols;
   }
-}
+} // namespace
 
 template <int dim>
-PolynomialsABF<dim>::PolynomialsABF (const unsigned int k)
-  :
+PolynomialsABF<dim>::PolynomialsABF(const unsigned int k) :
   my_degree(k),
   polynomial_space(get_abf_polynomials<dim>(k)),
   n_pols(compute_n_pols(k))
@@ -54,30 +54,30 @@ PolynomialsABF<dim>::PolynomialsABF (const unsigned int k)
   // check that the dimensions match. we only store one of the 'dim'
   // anisotropic polynomials that make up the vector-valued space, so
   // multiply by 'dim'
-  Assert (dim * polynomial_space.n() == compute_n_pols(k),
-          ExcInternalError());
+  Assert(dim * polynomial_space.n() == compute_n_pols(k), ExcInternalError());
 }
 
 
 
 template <int dim>
 void
-PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
-                              std::vector<Tensor<1,dim> > &values,
-                              std::vector<Tensor<2,dim> > &grads,
-                              std::vector<Tensor<3,dim> > &grad_grads,
-                              std::vector<Tensor<4,dim> > &third_derivatives,
-                              std::vector<Tensor<5,dim> > &fourth_derivatives) const
+PolynomialsABF<dim>::compute(
+  const Point<dim> &           unit_point,
+  std::vector<Tensor<1, dim>> &values,
+  std::vector<Tensor<2, dim>> &grads,
+  std::vector<Tensor<3, dim>> &grad_grads,
+  std::vector<Tensor<4, dim>> &third_derivatives,
+  std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size()==n_pols || values.size()==0,
+  Assert(values.size() == n_pols || values.size() == 0,
          ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size()==n_pols|| grads.size()==0,
+  Assert(grads.size() == n_pols || grads.size() == 0,
          ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size()==n_pols|| grad_grads.size()==0,
+  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
          ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size()==n_pols|| third_derivatives.size()==0,
+  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
          ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size()==n_pols|| fourth_derivatives.size()==0,
+  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
          ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
   const unsigned int n_sub = polynomial_space.n();
@@ -94,7 +94,7 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
   p_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_sub);
   p_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 : n_sub);
 
-  for (unsigned int d=0; d<dim; ++d)
+  for (unsigned int d = 0; d < dim; ++d)
     {
       // First we copy the point. The
       // polynomial space for
@@ -108,39 +108,46 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
       // coordinates through all
       // directions.
       Point<dim> p;
-      for (unsigned int c=0; c<dim; ++c)
-        p(c) = unit_point((c+d)%dim);
+      for (unsigned int c = 0; c < dim; ++c)
+        p(c) = unit_point((c + d) % dim);
 
-      polynomial_space.compute (p, p_values, p_grads, p_grad_grads,
-                                p_third_derivatives, p_fourth_derivatives);
+      polynomial_space.compute(p,
+                               p_values,
+                               p_grads,
+                               p_grad_grads,
+                               p_third_derivatives,
+                               p_fourth_derivatives);
 
-      for (unsigned int i=0; i<p_values.size(); ++i)
-        values[i+d*n_sub][d] = p_values[i];
+      for (unsigned int i = 0; i < p_values.size(); ++i)
+        values[i + d * n_sub][d] = p_values[i];
 
-      for (unsigned int i=0; i<p_grads.size(); ++i)
-        for (unsigned int d1=0; d1<dim; ++d1)
-          grads[i+d*n_sub][d][(d1+d)%dim] = p_grads[i][d1];
+      for (unsigned int i = 0; i < p_grads.size(); ++i)
+        for (unsigned int d1 = 0; d1 < dim; ++d1)
+          grads[i + d * n_sub][d][(d1 + d) % dim] = p_grads[i][d1];
 
-      for (unsigned int i=0; i<p_grad_grads.size(); ++i)
-        for (unsigned int d1=0; d1<dim; ++d1)
-          for (unsigned int d2=0; d2<dim; ++d2)
-            grad_grads[i+d*n_sub][d][(d1+d)%dim][(d2+d)%dim]
-              = p_grad_grads[i][d1][d2];
+      for (unsigned int i = 0; i < p_grad_grads.size(); ++i)
+        for (unsigned int d1 = 0; d1 < dim; ++d1)
+          for (unsigned int d2 = 0; d2 < dim; ++d2)
+            grad_grads[i + d * n_sub][d][(d1 + d) % dim][(d2 + d) % dim] =
+              p_grad_grads[i][d1][d2];
 
-      for (unsigned int i=0; i<p_third_derivatives.size(); ++i)
-        for (unsigned int d1=0; d1<dim; ++d1)
-          for (unsigned int d2=0; d2<dim; ++d2)
-            for (unsigned int d3=0; d3<dim; ++d3)
-              third_derivatives[i+d*n_sub][d][(d1+d)%dim][(d2+d)%dim][(d3+d)%dim]
-                = p_third_derivatives[i][d1][d2][d3];
+      for (unsigned int i = 0; i < p_third_derivatives.size(); ++i)
+        for (unsigned int d1 = 0; d1 < dim; ++d1)
+          for (unsigned int d2 = 0; d2 < dim; ++d2)
+            for (unsigned int d3 = 0; d3 < dim; ++d3)
+              third_derivatives[i + d * n_sub][d][(d1 + d) % dim]
+                               [(d2 + d) % dim][(d3 + d) % dim] =
+                                 p_third_derivatives[i][d1][d2][d3];
 
-      for (unsigned int i=0; i<p_fourth_derivatives.size(); ++i)
-        for (unsigned int d1=0; d1<dim; ++d1)
-          for (unsigned int d2=0; d2<dim; ++d2)
-            for (unsigned int d3=0; d3<dim; ++d3)
-              for (unsigned int d4=0; d4<dim; ++d4)
-                fourth_derivatives[i+d*n_sub][d][(d1+d)%dim][(d2+d)%dim][(d3+d)%dim][(d4+d)%dim]
-                  = p_fourth_derivatives[i][d1][d2][d3][d4];
+      for (unsigned int i = 0; i < p_fourth_derivatives.size(); ++i)
+        for (unsigned int d1 = 0; d1 < dim; ++d1)
+          for (unsigned int d2 = 0; d2 < dim; ++d2)
+            for (unsigned int d3 = 0; d3 < dim; ++d3)
+              for (unsigned int d4 = 0; d4 < dim; ++d4)
+                fourth_derivatives[i + d * n_sub][d][(d1 + d) % dim]
+                                  [(d2 + d) % dim][(d3 + d) % dim]
+                                  [(d4 + d) % dim] =
+                                    p_fourth_derivatives[i][d1][d2][d3][d4];
     }
 }
 
@@ -151,22 +158,22 @@ PolynomialsABF<dim>::compute_n_pols(const unsigned int k)
 {
   switch (dim)
     {
-    case 1:
-      // in 1d, we simply have Q_{k+2}, which has dimension k+3
-      return k+3;
+      case 1:
+        // in 1d, we simply have Q_{k+2}, which has dimension k+3
+        return k + 3;
 
-    case 2:
-      // the polynomial space is Q_{k+2,k} \times Q_{k,k+2}, which has
-      // 2(k+3)(k+1) DoFs
-      return 2*(k+3)*(k+1);
+      case 2:
+        // the polynomial space is Q_{k+2,k} \times Q_{k,k+2}, which has
+        // 2(k+3)(k+1) DoFs
+        return 2 * (k + 3) * (k + 1);
 
-    case 3:
-      // the polynomial space is Q_{k+2,k,k} \times Q_{k,k+2,k} \times Q_{k,k,k+2},
-      // which has 3(k+3)(k+1)(k+1) DoFs
-      return 3*(k+3)*(k+1)*(k+1);
+      case 3:
+        // the polynomial space is Q_{k+2,k,k} \times Q_{k,k+2,k} \times
+        // Q_{k,k,k+2}, which has 3(k+3)(k+1)(k+1) DoFs
+        return 3 * (k + 3) * (k + 1) * (k + 1);
 
-    default:
-      Assert(false, ExcNotImplemented());
+      default:
+        Assert(false, ExcNotImplemented());
     }
 
   return 0;

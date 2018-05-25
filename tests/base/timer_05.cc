@@ -15,19 +15,21 @@
 
 // the same as timer_04.cc but this time with MPI.
 
-#include "../tests.h"
 #include <deal.II/base/timer.h>
+
+#include "../tests.h"
 
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn(unsigned int n)
 {
-  for (unsigned int i=0 ; i<n ; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j=1 ; j<100000 ; ++j)
+      for (unsigned int j = 1; j < 100000; ++j)
         {
-          s += 1./j * i;
+          s += 1. / j * i;
         }
     }
 }
@@ -45,8 +47,10 @@ assert_min_max_avg_invalid(const Utilities::MPI::MinMaxAvg &data)
   AssertThrow(std::isnan(data.min), ExcInternalError());
   AssertThrow(std::isnan(data.max), ExcInternalError());
   AssertThrow(std::isnan(data.avg), ExcInternalError());
-  AssertThrow(data.min_index == numbers::invalid_unsigned_int, ExcInternalError());
-  AssertThrow(data.max_index == numbers::invalid_unsigned_int, ExcInternalError());
+  AssertThrow(data.min_index == numbers::invalid_unsigned_int,
+              ExcInternalError());
+  AssertThrow(data.max_index == numbers::invalid_unsigned_int,
+              ExcInternalError());
 }
 
 // check that the MinMaxAvg values are reasonable.
@@ -56,8 +60,10 @@ assert_min_max_avg_valid(const Utilities::MPI::MinMaxAvg &data)
   AssertThrow(data.min > 0., ExcInternalError());
   AssertThrow(data.max >= data.min, ExcInternalError());
   AssertThrow(data.avg >= data.min, ExcInternalError());
-  AssertThrow(data.min_index != numbers::invalid_unsigned_int, ExcInternalError());
-  AssertThrow(data.max_index != numbers::invalid_unsigned_int, ExcInternalError());
+  AssertThrow(data.min_index != numbers::invalid_unsigned_int,
+              ExcInternalError());
+  AssertThrow(data.max_index != numbers::invalid_unsigned_int,
+              ExcInternalError());
 }
 
 
@@ -89,7 +95,7 @@ test_timer(Timer &t)
 
   t.reset();
   AssertThrow(t.wall_time() == 0., ExcInternalError());
-  AssertThrow(t.cpu_time()== 0., ExcInternalError());
+  AssertThrow(t.cpu_time() == 0., ExcInternalError());
   assert_min_max_avg_invalid(t.get_data());
   assert_min_max_avg_invalid(t.get_total_data());
   assert_min_max_avg_invalid(t.get_last_lap_wall_time_data());
@@ -100,7 +106,8 @@ test_timer(Timer &t)
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();

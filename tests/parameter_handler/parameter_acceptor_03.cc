@@ -14,27 +14,29 @@
 //-----------------------------------------------------------
 
 
-#include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/parameter_acceptor.h>
-
 #include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
 
-template<int dim>
+#include "../tests.h"
+
+template <int dim>
 class Test : public ParameterAcceptor
 {
 public:
   Test()
   {
     std::string def = "0.";
-    for (int i=1; i<dim; ++i)
+    for (int i = 1; i < dim; ++i)
       def += ",0.";
     add_parameter("A point", p);
   };
 
-  void log_info()
+  void
+  log_info()
   {
-    deallog << "My type: " << boost::core::demangle(typeid(*this).name()) << std::endl
+    deallog << "My type: " << boost::core::demangle(typeid(*this).name())
+            << std::endl
             << "p: " << p << std::endl;
   }
 
@@ -43,7 +45,8 @@ private:
 };
 
 
-int main ()
+int
+main()
 {
   initlog();
   Test<1> a;

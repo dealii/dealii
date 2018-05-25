@@ -16,11 +16,14 @@
 
 // check Tensor::operator= (double)
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+
 #include <deal.II/lac/vector.h>
 
-int main ()
+#include "../tests.h"
+
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
@@ -28,14 +31,14 @@ int main ()
 
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
 
-  const unsigned int dim=3;
-  Tensor<2,dim> t(a);
+  const unsigned int dim = 3;
+  Tensor<2, dim>     t(a);
 
   deallog << t.norm() << std::endl;
   t = 0;
   deallog << t.norm() << std::endl;
 
-  Assert (t.norm() == 0, ExcInternalError());
+  Assert(t.norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

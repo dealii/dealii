@@ -15,11 +15,12 @@
 
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
@@ -28,7 +29,8 @@ std::ofstream logfile("output");
 
 
 template <int dim>
-void test1 ()
+void
+test1()
 {
   // test 1: hypercube
   if (true)
@@ -36,17 +38,15 @@ void test1 ()
       Triangulation<dim> tria;
       GridGenerator::hyper_cube(tria);
 
-      for (unsigned int i=0; i<2; ++i)
+      for (unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: "
-                  << GridTools::maximal_cell_diameter (tria)
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
                   << std::endl;
-          Assert (GridTools::maximal_cell_diameter (tria)
-                  >=
-                  GridTools::minimal_cell_diameter (tria),
-                  ExcInternalError());
+          Assert(GridTools::maximal_cell_diameter(tria) >=
+                   GridTools::minimal_cell_diameter(tria),
+                 ExcInternalError());
         };
     };
 
@@ -57,31 +57,29 @@ void test1 ()
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
       tria.reset_manifold(0);
 
-      for (unsigned int i=0; i<2; ++i)
+      for (unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: "
-                  << GridTools::maximal_cell_diameter (tria)
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
                   << std::endl;
-          Assert (GridTools::maximal_cell_diameter (tria)
-                  >=
-                  GridTools::minimal_cell_diameter (tria),
-                  ExcInternalError());
+          Assert(GridTools::maximal_cell_diameter(tria) >=
+                   GridTools::minimal_cell_diameter(tria),
+                 ExcInternalError());
         };
     };
 }
 
 
-int main ()
+int
+main()
 {
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  test1<1> ();
-  test1<2> ();
-  test1<3> ();
+  test1<1>();
+  test1<2>();
+  test1<3>();
 
   return 0;
 }
-

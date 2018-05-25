@@ -17,18 +17,21 @@
 #define dealii_hp_fe_values_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/fe/fe.h>
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/hp/q_collection.h>
-#include <deal.II/hp/mapping_collection.h>
 #include <deal.II/fe/fe_values.h>
+
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/q_collection.h>
 
 #include <map>
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class FiniteElement;
+template <int dim, int spacedim>
+class FiniteElement;
 
 
 
@@ -64,42 +67,48 @@ namespace internal
        * Constructor. Set the fields of this class to the values indicated by
        * the parameters to the constructor.
        */
-      FEValuesBase (const dealii::hp::MappingCollection<dim,FEValuesType::space_dimension> &mapping_collection,
-                    const dealii::hp::FECollection<dim,FEValuesType::space_dimension>      &fe_collection,
-                    const dealii::hp::QCollection<q_dim>     &q_collection,
-                    const dealii::UpdateFlags             update_flags);
+      FEValuesBase(
+        const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>
+          &mapping_collection,
+        const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
+          &                                   fe_collection,
+        const dealii::hp::QCollection<q_dim> &q_collection,
+        const dealii::UpdateFlags             update_flags);
       /**
        * Constructor. This constructor is equivalent to the other one except
        * that it makes the object use a $Q_1$ mapping (i.e., an object of type
        * MappingQGeneric(1)) implicitly.
        */
-      FEValuesBase (const dealii::hp::FECollection<dim,FEValuesType::space_dimension> &fe_collection,
-                    const dealii::hp::QCollection<q_dim> &q_collection,
-                    const UpdateFlags         update_flags);
+      FEValuesBase(
+        const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
+          &                                   fe_collection,
+        const dealii::hp::QCollection<q_dim> &q_collection,
+        const UpdateFlags                     update_flags);
 
       /**
        * Get a reference to the collection of finite element objects used
        * here.
        */
-      const dealii::hp::FECollection<dim,FEValuesType::space_dimension> &
-      get_fe_collection () const;
+      const dealii::hp::FECollection<dim, FEValuesType::space_dimension> &
+      get_fe_collection() const;
 
       /**
        * Get a reference to the collection of mapping objects used here.
        */
-      const dealii::hp::MappingCollection<dim,FEValuesType::space_dimension> &
-      get_mapping_collection () const;
+      const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension> &
+      get_mapping_collection() const;
 
       /**
        * Get a reference to the collection of quadrature objects used here.
        */
       const dealii::hp::QCollection<q_dim> &
-      get_quadrature_collection () const;
+      get_quadrature_collection() const;
 
       /**
        * Get the underlying update flags.
        */
-      UpdateFlags get_update_flags() const;
+      UpdateFlags
+      get_update_flags() const;
 
       /**
        * Return a reference to the @p FEValues object selected by the last
@@ -107,10 +116,10 @@ namespace internal
        * you called the @p reinit function of the <tt>hp::FE*Values</tt> class
        * the last time.
        */
-      const FEValuesType &get_present_fe_values () const;
+      const FEValuesType &
+      get_present_fe_values() const;
 
     protected:
-
       /**
        * Select a FEValues object suitable for the given FE, quadrature, and
        * mapping indices. If such an object doesn't yet exist, create one.
@@ -119,22 +128,26 @@ namespace internal
        * also reinit() the selected FEValues object.
        */
       FEValuesType &
-      select_fe_values (const unsigned int fe_index,
-                        const unsigned int mapping_index,
-                        const unsigned int q_index);
+      select_fe_values(const unsigned int fe_index,
+                       const unsigned int mapping_index,
+                       const unsigned int q_index);
 
     protected:
       /**
        * A pointer to the collection of finite elements to be used.
        */
-      const SmartPointer<const dealii::hp::FECollection<dim,FEValuesType::space_dimension>,
-            FEValuesBase<dim,q_dim,FEValuesType> > fe_collection;
+      const SmartPointer<
+        const dealii::hp::FECollection<dim, FEValuesType::space_dimension>,
+        FEValuesBase<dim, q_dim, FEValuesType>>
+        fe_collection;
 
       /**
        * A pointer to the collection of mappings to be used.
        */
-      const SmartPointer<const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>,
-            FEValuesBase<dim,q_dim,FEValuesType> > mapping_collection;
+      const SmartPointer<
+        const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>,
+        FEValuesBase<dim, q_dim, FEValuesType>>
+        mapping_collection;
 
       /**
        * Copy of the quadrature collection object provided to the constructor.
@@ -153,7 +166,7 @@ namespace internal
        * Initially, all entries have zero pointers, and we will allocate them
        * lazily as needed in select_fe_values().
        */
-      dealii::Table<3,std::shared_ptr<FEValuesType> > fe_values_table;
+      dealii::Table<3, std::shared_ptr<FEValuesType>> fe_values_table;
 
       /**
        * Set of indices pointing at the fe_values object selected last time
@@ -167,14 +180,13 @@ namespace internal
       const UpdateFlags update_flags;
     };
 
-  }
+  } // namespace hp
 
-}
+} // namespace internal
 
 
 namespace hp
 {
-
   /**
    * An hp equivalent of the ::FEValues class. See the step-27 tutorial
    * program for examples of use.
@@ -223,11 +235,11 @@ namespace hp
    * @ingroup hp hpcollection
    * @author Wolfgang Bangerth, 2003
    */
-  template <int dim, int spacedim=dim>
-  class FEValues : public dealii::internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> >
+  template <int dim, int spacedim = dim>
+  class FEValues : public dealii::internal::hp::
+                     FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>
   {
   public:
-
     static const unsigned int dimension = dim;
 
     static const unsigned int space_dimension = spacedim;
@@ -241,10 +253,11 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the DoFHandler::get_fe() function.
      */
-    FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
-              const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
-              const dealii::hp::QCollection<dim>       &q_collection,
-              const UpdateFlags             update_flags);
+    FEValues(
+      const dealii::hp::MappingCollection<dim, spacedim> &mapping_collection,
+      const dealii::hp::FECollection<dim, spacedim> &     fe_collection,
+      const dealii::hp::QCollection<dim> &                q_collection,
+      const UpdateFlags                                   update_flags);
 
 
     /**
@@ -258,9 +271,9 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the DoFHandler::get_fe() function.
      */
-    FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
-              const hp::QCollection<dim>      &q_collection,
-              const UpdateFlags            update_flags);
+    FEValues(const hp::FECollection<dim, spacedim> &fe_collection,
+             const hp::QCollection<dim> &           q_collection,
+             const UpdateFlags                      update_flags);
 
 
     /**
@@ -310,10 +323,10 @@ namespace hp
      */
     template <typename DoFHandlerType, bool lda>
     void
-    reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > cell,
-            const unsigned int q_index       = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index      = numbers::invalid_unsigned_int);
+    reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
      * Like the previous function, but for non-hp iterators. The reason this
@@ -330,12 +343,10 @@ namespace hp
      * three arguments.
      */
     void
-    reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-            const unsigned int q_index       = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index      = numbers::invalid_unsigned_int);
-
-
+    reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
   };
 
 
@@ -364,8 +375,10 @@ namespace hp
    * @ingroup hp hpcollection
    * @author Wolfgang Bangerth, 2003
    */
-  template <int dim, int spacedim=dim>
-  class FEFaceValues : public dealii::internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> >
+  template <int dim, int spacedim = dim>
+  class FEFaceValues
+    : public dealii::internal::hp::
+        FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>
   {
   public:
     /**
@@ -377,10 +390,10 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the <tt>DoFHandler::get_fe()</tt> function.
      */
-    FEFaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
-                  const hp::FECollection<dim,spacedim>  &fe_collection,
-                  const hp::QCollection<dim-1>     &q_collection,
-                  const UpdateFlags             update_flags);
+    FEFaceValues(const hp::MappingCollection<dim, spacedim> &mapping_collection,
+                 const hp::FECollection<dim, spacedim> &     fe_collection,
+                 const hp::QCollection<dim - 1> &            q_collection,
+                 const UpdateFlags                           update_flags);
 
 
     /**
@@ -394,9 +407,9 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the <tt>DoFHandler::get_fe()</tt> function.
      */
-    FEFaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
-                  const hp::QCollection<dim-1> &q_collection,
-                  const UpdateFlags             update_flags);
+    FEFaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
+                 const hp::QCollection<dim - 1> &       q_collection,
+                 const UpdateFlags                      update_flags);
 
     /**
      * Reinitialize the object for the given cell and face.
@@ -445,11 +458,11 @@ namespace hp
      */
     template <typename DoFHandlerType, bool lda>
     void
-    reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > cell,
-            const unsigned int face_no,
-            const unsigned int q_index       = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index      = numbers::invalid_unsigned_int);
+    reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
+           const unsigned int                                       face_no,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
      * Like the previous function, but for non-hp iterators. The reason this
@@ -466,11 +479,11 @@ namespace hp
      * three arguments.
      */
     void
-    reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int q_index       = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index      = numbers::invalid_unsigned_int);
+    reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+           const unsigned int                                          face_no,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
   };
 
 
@@ -482,8 +495,10 @@ namespace hp
    * @ingroup hp hpcollection
    * @author Wolfgang Bangerth, 2003
    */
-  template <int dim, int spacedim=dim>
-  class FESubfaceValues : public dealii::internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> >
+  template <int dim, int spacedim = dim>
+  class FESubfaceValues
+    : public dealii::internal::hp::
+        FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>
   {
   public:
     /**
@@ -495,10 +510,11 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the <tt>DoFHandler::get_fe()</tt> function.
      */
-    FESubfaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
-                     const hp::FECollection<dim,spacedim>  &fe_collection,
-                     const hp::QCollection<dim-1>     &q_collection,
-                     const UpdateFlags             update_flags);
+    FESubfaceValues(
+      const hp::MappingCollection<dim, spacedim> &mapping_collection,
+      const hp::FECollection<dim, spacedim> &     fe_collection,
+      const hp::QCollection<dim - 1> &            q_collection,
+      const UpdateFlags                           update_flags);
 
 
     /**
@@ -512,9 +528,9 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the <tt>DoFHandler::get_fe()</tt> function.
      */
-    FESubfaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
-                     const hp::QCollection<dim-1>    &q_collection,
-                     const UpdateFlags            update_flags);
+    FESubfaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
+                    const hp::QCollection<dim - 1> &       q_collection,
+                    const UpdateFlags                      update_flags);
 
     /**
      * Reinitialize the object for the given cell, face, and subface.
@@ -553,12 +569,12 @@ namespace hp
      */
     template <typename DoFHandlerType, bool lda>
     void
-    reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,lda> > cell,
-            const unsigned int face_no,
-            const unsigned int subface_no,
-            const unsigned int q_index       = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index      = numbers::invalid_unsigned_int);
+    reinit(const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
+           const unsigned int                                       face_no,
+           const unsigned int                                       subface_no,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
      * Like the previous function, but for non-hp iterators. The reason this
@@ -575,15 +591,15 @@ namespace hp
      * three arguments.
      */
     void
-    reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int subface_no,
-            const unsigned int q_index       = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index      = numbers::invalid_unsigned_int);
+    reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+           const unsigned int                                          face_no,
+           const unsigned int subface_no,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
   };
 
-}
+} // namespace hp
 
 
 // -------------- inline and template functions --------------
@@ -593,9 +609,8 @@ namespace internal
   namespace hp
   {
     template <int dim, int q_dim, class FEValuesType>
-    inline
-    const FEValuesType &
-    FEValuesBase<dim,q_dim,FEValuesType>::get_present_fe_values () const
+    inline const FEValuesType &
+    FEValuesBase<dim, q_dim, FEValuesType>::get_present_fe_values() const
     {
       return *fe_values_table(present_fe_values_index);
     }
@@ -603,9 +618,8 @@ namespace internal
 
 
     template <int dim, int q_dim, class FEValuesType>
-    inline
-    const dealii::hp::FECollection<dim,FEValuesType::space_dimension> &
-    FEValuesBase<dim,q_dim,FEValuesType>::get_fe_collection () const
+    inline const dealii::hp::FECollection<dim, FEValuesType::space_dimension> &
+    FEValuesBase<dim, q_dim, FEValuesType>::get_fe_collection() const
     {
       return *fe_collection;
     }
@@ -613,9 +627,9 @@ namespace internal
 
 
     template <int dim, int q_dim, class FEValuesType>
-    inline
-    const dealii::hp::MappingCollection<dim,FEValuesType::space_dimension> &
-    FEValuesBase<dim,q_dim,FEValuesType>::get_mapping_collection () const
+    inline const dealii::hp::MappingCollection<dim,
+                                               FEValuesType::space_dimension> &
+    FEValuesBase<dim, q_dim, FEValuesType>::get_mapping_collection() const
     {
       return *mapping_collection;
     }
@@ -623,9 +637,8 @@ namespace internal
 
 
     template <int dim, int q_dim, class FEValuesType>
-    inline
-    const dealii::hp::QCollection<q_dim> &
-    FEValuesBase<dim,q_dim,FEValuesType>::get_quadrature_collection () const
+    inline const dealii::hp::QCollection<q_dim> &
+    FEValuesBase<dim, q_dim, FEValuesType>::get_quadrature_collection() const
     {
       return q_collection;
     }
@@ -633,15 +646,14 @@ namespace internal
 
 
     template <int dim, int q_dim, class FEValuesType>
-    inline
-    dealii::UpdateFlags
-    FEValuesBase<dim,q_dim,FEValuesType>::get_update_flags () const
+    inline dealii::UpdateFlags
+    FEValuesBase<dim, q_dim, FEValuesType>::get_update_flags() const
     {
       return update_flags;
     }
-  }
+  } // namespace hp
 
-}
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

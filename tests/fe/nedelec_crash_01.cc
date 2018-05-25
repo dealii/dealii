@@ -17,20 +17,20 @@
 // A test extracted from integrators/cochain_01 that crashed with the
 // FE_Nedelec at the time
 
-#include "../tests.h"
-#include "../test_grids.h"
-
-
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nedelec.h>
 
+#include "../test_grids.h"
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   deallog.attach(logfile);
 
   // generate a version of the
@@ -38,8 +38,9 @@ int main()
   // use the old-style constraints
   struct MyFE : FE_Nedelec<3>
   {
-    MyFE () : FE_Nedelec<3>(0) {};
-    virtual bool hp_constraints_are_implemented () const
+    MyFE() : FE_Nedelec<3>(0){};
+    virtual bool
+    hp_constraints_are_implemented() const
     {
       return false;
     }
@@ -52,8 +53,8 @@ int main()
   dof.distribute_dofs(fe);
 
   ConstraintMatrix constraints;
-  DoFTools::make_hanging_node_constraints (dof, constraints);
+  DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
-  constraints.print (deallog.get_file_stream ());
+  constraints.print(deallog.get_file_stream());
 }

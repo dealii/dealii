@@ -17,7 +17,9 @@
 #define dealii_fe_q_hierarchical_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/fe/fe_poly.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -105,22 +107,26 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In 2d, these shape functions look as follows: <table> <tr> <td
  * align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_1^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_1^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0003.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_1^H$ element, shape function 2
  * </td>
  *
@@ -206,51 +212,60 @@ DEAL_II_NAMESPACE_OPEN
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0003.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 2
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0004.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0005.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0005.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 4
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0006.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0007.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0007.png
  * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 6
  * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0008.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0008.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $Q_2^H$ element,
@@ -281,88 +296,104 @@ DEAL_II_NAMESPACE_OPEN
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0003.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 2
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0004.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0005.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0005.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 4
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0006.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0007.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0007.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 6
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0008.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0009.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0009.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 8
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0010.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0011.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0011.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 10
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0012.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0013.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0013.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 12
  * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0014.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0014.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0015.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0015.png
  * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 14
  * </td>
  *
@@ -393,139 +424,164 @@ DEAL_II_NAMESPACE_OPEN
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0001.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 0
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0003.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0003.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 2
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0004.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0005.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0005.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 4
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0006.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0007.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0007.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 6
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0008.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0009.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0009.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 8
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0010.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0011.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0011.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 10
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0012.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0013.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0013.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 12
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0014.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0014.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0015.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0015.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 14
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 15 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0016.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0016.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0017.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0017.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 16
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 17 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0018.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0018.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0019.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0019.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 18
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 19 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0020.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0020.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0021.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0021.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 20
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 21 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0022.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0022.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0023.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0023.png
  * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 22
  * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 23 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0024.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0024.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $Q_4^H$ element,
@@ -538,31 +594,32 @@ DEAL_II_NAMESPACE_OPEN
  * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005, Denis Davydov, 2015
  */
 template <int dim>
-class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
+class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>, dim>
 {
 public:
   /**
    * Constructor for tensor product polynomials of degree @p p.
    */
-  FE_Q_Hierarchical (const unsigned int p);
+  FE_Q_Hierarchical(const unsigned int p);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_Q_Hierarchical<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,dim> >
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
 
   /**
    * @name Functions to support hp
@@ -577,21 +634,25 @@ public:
    * the degree of the element), as it implements the complete set of
    * functions necessary for hp capability.
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented() const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one. Interpolation only between FE_Q_Hierarchical is supported.
    */
-  virtual void get_interpolation_matrix(const FiniteElement< dim> &source,
-                                        FullMatrix< double > &matrix) const override;
+  virtual void
+  get_interpolation_matrix(const FiniteElement<dim> &source,
+                           FullMatrix<double> &      matrix) const override;
 
   /**
    * Embedding matrix between grids. Only isotropic refinement is supported.
    */
-  virtual const
-  FullMatrix<double> &get_prolongation_matrix  (const unsigned int child,
-                                                const RefinementCase<dim> &refinement_case = RefinementCase< dim >::isotropic_refinement) const override;
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -608,23 +669,20 @@ public:
    * the vertex dofs of the present element, whereas the second is the
    * corresponding index of the other finite element.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Same as above but for lines.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Same as above but for faces.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   /*@}*/
 
@@ -639,7 +697,9 @@ public:
    * from a given element, then they must throw an exception of type
    * <tt>FiniteElement<dim>::ExcInterpolationNotImplemented</tt>.
    */
-  virtual void get_face_interpolation_matrix (const FiniteElement<dim> &source, FullMatrix<double> &matrix) const override;
+  virtual void
+  get_face_interpolation_matrix(const FiniteElement<dim> &source,
+                                FullMatrix<double> &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -652,7 +712,10 @@ public:
    * from a given element, then they must throw an exception of type
    * <tt>ExcInterpolationNotImplemented</tt>.
    */
-  virtual void get_subface_interpolation_matrix (const FiniteElement<dim> &source, const unsigned int subface, FullMatrix<double> &matrix) const override;
+  virtual void
+  get_subface_interpolation_matrix(const FiniteElement<dim> &source,
+                                   const unsigned int        subface,
+                                   FullMatrix<double> &matrix) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -663,9 +726,9 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim> &fe_other) const override;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -675,32 +738,34 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption() const override;
 
   /**
    * For a finite element of degree @p sub_degree < @p degree, we return a
    * vector which maps the numbering on an FE of degree @p sub_degree into the
    * numbering on this element.
    */
-  std::vector<unsigned int> get_embedding_dofs (const unsigned int sub_degree) const;
+  std::vector<unsigned int>
+  get_embedding_dofs(const unsigned int sub_degree) const;
 
   /**
    * Return a list of constant modes of the element. For this element, the
    * list consists of true arguments for the first vertex shape functions and
    * false for the remaining ones.
    */
-  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const override;
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const override;
 
 private:
-
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector
    * function and it creates the @p dofs_per_object vector that is needed
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * The numbering of the degrees of freedom in continuous finite elements is
@@ -729,47 +794,51 @@ private:
    * correct size, which is equal to the number of degrees of freedom in the
    * finite element.
    */
-  static
-  std::vector<unsigned int> hierarchic_to_fe_q_hierarchical_numbering (
-    const FiniteElementData<dim> &fe);
+  static std::vector<unsigned int>
+  hierarchic_to_fe_q_hierarchical_numbering(const FiniteElementData<dim> &fe);
 
   /**
    * This is an analogon to the previous function, but working on faces.
    */
-  static
-  std::vector<unsigned int>
-  face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int degree);
+  static std::vector<unsigned int>
+  face_fe_q_hierarchical_to_hierarchic_numbering(const unsigned int degree);
 
   /**
    * Initialize two auxiliary fields that will be used in setting up the
    * various matrices in the constructor.
    */
-  void build_dofs_cell (std::vector<FullMatrix<double> > &dofs_cell,
-                        std::vector<FullMatrix<double> > &dofs_subcell) const;
+  void
+  build_dofs_cell(std::vector<FullMatrix<double>> &dofs_cell,
+                  std::vector<FullMatrix<double>> &dofs_subcell) const;
 
   /**
    * Initialize the hanging node constraints matrices. Called from the
    * constructor.
    */
-  void initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell);
+  void
+  initialize_constraints(const std::vector<FullMatrix<double>> &dofs_subcell);
 
   /**
    * Initialize the embedding matrices. Called from the constructor.
    */
-  void initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &dofs_cell,
-                                             const std::vector<FullMatrix<double> > &dofs_subcell);
+  void
+  initialize_embedding_and_restriction(
+    const std::vector<FullMatrix<double>> &dofs_cell,
+    const std::vector<FullMatrix<double>> &dofs_subcell);
 
   /**
    * Initialize the @p generalized_support_points field of the FiniteElement class.
    * Called from the constructor.
    */
-  void initialize_generalized_support_points ();
+  void
+  initialize_generalized_support_points();
 
   /**
    * Initialize the @p generalized_face_support_points field of the FiniteElement
    * class. Called from the constructor.
    */
-  void initialize_generalized_face_support_points ();
+  void
+  initialize_generalized_face_support_points();
 
   /**
    * Mapping from lexicographic to shape function numbering on first face.
@@ -782,7 +851,8 @@ private:
    * lexicographic_to_hierarchic_numbering for the faces of the finite element
    * of dimension dim+1.
    */
-  template <int dim1> friend class FE_Q_Hierarchical;
+  template <int dim1>
+  friend class FE_Q_Hierarchical;
 };
 
 /*@}*/
@@ -790,16 +860,18 @@ private:
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
-void FE_Q_Hierarchical<1>::initialize_generalized_face_support_points ();
+void
+FE_Q_Hierarchical<1>::initialize_generalized_face_support_points();
 
 template <>
 bool
-FE_Q_Hierarchical<1>::has_support_on_face (const unsigned int,
-                                           const unsigned int) const;
+FE_Q_Hierarchical<1>::has_support_on_face(const unsigned int,
+                                          const unsigned int) const;
 
 template <>
 std::vector<unsigned int>
-FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int);
+FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering(
+  const unsigned int);
 
 DEAL_II_NAMESPACE_CLOSE
 

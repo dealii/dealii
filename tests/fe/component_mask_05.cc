@@ -20,34 +20,35 @@
 // here: ComponentMask::represents_n_components
 
 
-#include "../tests.h"
 #include <deal.II/fe/component_mask.h>
 
+#include "../tests.h"
 
 
 
-
-void test ()
+void
+test()
 {
   // test for an initialized mask
-  AssertThrow (ComponentMask(12,false).represents_n_components(12) == true,
-               ExcInternalError());
-  AssertThrow (ComponentMask(12,false).represents_n_components(13) == false,
-               ExcInternalError());
+  AssertThrow(ComponentMask(12, false).represents_n_components(12) == true,
+              ExcInternalError());
+  AssertThrow(ComponentMask(12, false).represents_n_components(13) == false,
+              ExcInternalError());
   // test for an empty mask
-  AssertThrow (ComponentMask().represents_n_components(12) == true,
-               ExcInternalError());
-  AssertThrow (ComponentMask().represents_n_components(13) == true,
-               ExcInternalError());
+  AssertThrow(ComponentMask().represents_n_components(12) == true,
+              ExcInternalError());
+  AssertThrow(ComponentMask().represents_n_components(13) == true,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

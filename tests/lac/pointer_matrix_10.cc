@@ -15,10 +15,11 @@
 
 // check PointerMatrix:checkAssign
 
-#include "../tests.h"
-#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 template <typename number>
 void
@@ -27,7 +28,7 @@ checkAssign(FullMatrix<number> &A, FullMatrix<number> &B)
   deallog << "=" << std::endl;
   deallog << "Init with matrix 1" << std::endl;
 
-  PointerMatrix<FullMatrix<number>, Vector<number> > P(&A);
+  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A);
 
   deallog << "Multiplying with all ones vector" << std::endl;
   Vector<number> V(A.n());
@@ -88,17 +89,14 @@ checkAssign(FullMatrix<number> &A, FullMatrix<number> &B)
 int
 main()
 {
-
   std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  const double Adata[] =
-  { 2, 3, 4, 5 };
+  const double Adata[] = {2, 3, 4, 5};
 
-  const double Bdata[] =
-  { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  const double Bdata[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
   FullMatrix<double> A(2, 2);
   A.fill(Adata);

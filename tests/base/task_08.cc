@@ -18,33 +18,35 @@
 // task to finish then the destructor of Task will wait for the task
 // to finish
 
-#include "../tests.h"
-#include <unistd.h>
-
 #include <deal.II/base/thread_management.h>
 
+#include <unistd.h>
 
-void test (int i)
+#include "../tests.h"
+
+
+void
+test(int i)
 {
-  sleep (1);
+  sleep(1);
   deallog << "Task " << i << " finished!" << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   {
-    Threads::new_task (test, 1);
+    Threads::new_task(test, 1);
 
     deallog << "OK" << std::endl;
   }
 
-  deallog.detach ();
-  logfile.close ();
-  sort_file_contents ("output");
+  deallog.detach();
+  logfile.close();
+  sort_file_contents("output");
 }

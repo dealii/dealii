@@ -13,15 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/point.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q_generic.h>
@@ -32,8 +32,8 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/mapping_collection.h>
 
 #include <deal.II/lac/full_matrix.h>
 
@@ -53,9 +53,9 @@ namespace GridTools
 {
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
-  find_closest_vertex (const MeshType<dim,spacedim> &mesh,
-                       const Point<spacedim>        &p,
-                       const std::vector<bool>      &marked_vertices)
+  find_closest_vertex(const MeshType<dim, spacedim> &mesh,
+                      const Point<spacedim> &        p,
+                      const std::vector<bool> &      marked_vertices)
   {
     // first get the underlying
     // triangulation from the
@@ -63,10 +63,12 @@ namespace GridTools
     // and used vertices
     const Triangulation<dim, spacedim> &tria = mesh.get_triangulation();
 
-    const std::vector< Point<spacedim> > &vertices = tria.get_vertices();
+    const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
 
-    Assert ( tria.get_vertices().size() == marked_vertices.size() || marked_vertices.size() ==0,
-             ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+    Assert(
+      tria.get_vertices().size() == marked_vertices.size() ||
+        marked_vertices.size() == 0,
+      ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -75,17 +77,15 @@ namespace GridTools
     // I.e., if p is true q must be true
     // (if p is false, q could be false or true).
     // p implies q logic is encapsulated in ~p|q.
-    Assert( marked_vertices.size()==0
-            ||
-            std::equal( marked_vertices.begin(),
-                        marked_vertices.end(),
-                        tria.get_used_vertices().begin(),
-                        [](bool p, bool q)
-    {
-      return !p || q;
-    }),
-    ExcMessage("marked_vertices should be a subset of used vertices in the triangulation "
-               "but marked_vertices contains one or more vertices that are not used vertices!") );
+    Assert(
+      marked_vertices.size() == 0 ||
+        std::equal(marked_vertices.begin(),
+                   marked_vertices.end(),
+                   tria.get_used_vertices().begin(),
+                   [](bool p, bool q) { return !p || q; }),
+      ExcMessage(
+        "marked_vertices should be a subset of used vertices in the triangulation "
+        "but marked_vertices contains one or more vertices that are not used vertices!"));
 
     // In addition, if a vector bools
     // is specified (marked_vertices)
@@ -93,8 +93,9 @@ namespace GridTools
     // could be the potentially closest
     // vertex to the point, use it instead
     // of used vertices
-    const std::vector<bool> &used     =
-      (marked_vertices.size()==0) ? tria.get_used_vertices() : marked_vertices;
+    const std::vector<bool> &used = (marked_vertices.size() == 0) ?
+                                      tria.get_used_vertices() :
+                                      marked_vertices;
 
     // At the beginning, the first
     // used vertex is the closest one
@@ -110,7 +111,7 @@ namespace GridTools
 
     // For all remaining vertices, test
     // whether they are any closer
-    for (unsigned int j = best_vertex+1; j < vertices.size(); j++)
+    for (unsigned int j = best_vertex + 1; j < vertices.size(); j++)
       if (used[j])
         {
           double dist = (p - vertices[j]).norm_square();
@@ -128,10 +129,10 @@ namespace GridTools
 
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
-  find_closest_vertex (const Mapping<dim,spacedim>  &mapping,
-                       const MeshType<dim,spacedim> &mesh,
-                       const Point<spacedim>        &p,
-                       const std::vector<bool>      &marked_vertices)
+  find_closest_vertex(const Mapping<dim, spacedim> & mapping,
+                      const MeshType<dim, spacedim> &mesh,
+                      const Point<spacedim> &        p,
+                      const std::vector<bool> &      marked_vertices)
   {
     // Take a shortcut in the simple case.
     if (mapping.preserves_vertex_locations() == true)
@@ -145,8 +146,10 @@ namespace GridTools
 
     auto vertices = extract_used_vertices(tria, mapping);
 
-    Assert ( tria.get_vertices().size() == marked_vertices.size() || marked_vertices.size() ==0,
-             ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+    Assert(
+      tria.get_vertices().size() == marked_vertices.size() ||
+        marked_vertices.size() == 0,
+      ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -155,21 +158,19 @@ namespace GridTools
     // I.e., if p is true q must be true
     // (if p is false, q could be false or true).
     // p implies q logic is encapsulated in ~p|q.
-    Assert( marked_vertices.size()==0
-            ||
-            std::equal( marked_vertices.begin(),
-                        marked_vertices.end(),
-                        tria.get_used_vertices().begin(),
-                        [](bool p, bool q)
-    {
-      return !p || q;
-    }),
-    ExcMessage("marked_vertices should be a subset of used vertices in the triangulation "
-               "but marked_vertices contains one or more vertices that are not used vertices!") );
+    Assert(
+      marked_vertices.size() == 0 ||
+        std::equal(marked_vertices.begin(),
+                   marked_vertices.end(),
+                   tria.get_used_vertices().begin(),
+                   [](bool p, bool q) { return !p || q; }),
+      ExcMessage(
+        "marked_vertices should be a subset of used vertices in the triangulation "
+        "but marked_vertices contains one or more vertices that are not used vertices!"));
 
     // Remove from the map unwanted elements.
     if (marked_vertices.size())
-      for (auto it = vertices.begin(); it != vertices.end(); )
+      for (auto it = vertices.begin(); it != vertices.end();)
         {
           if (marked_vertices[it->first] == false)
             {
@@ -190,27 +191,32 @@ namespace GridTools
 #ifndef _MSC_VER
   std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
 #else
-  std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type>
+  std::vector<
+    typename dealii::internal::
+      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
 #endif
-  find_cells_adjacent_to_vertex(const MeshType<dim,spacedim> &mesh,
-                                const unsigned int            vertex)
+  find_cells_adjacent_to_vertex(const MeshType<dim, spacedim> &mesh,
+                                const unsigned int             vertex)
   {
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
     Assert(vertex < mesh.get_triangulation().n_vertices(),
-           ExcIndexRange(0,mesh.get_triangulation().n_vertices(),vertex));
+           ExcIndexRange(0, mesh.get_triangulation().n_vertices(), vertex));
     Assert(mesh.get_triangulation().get_used_vertices()[vertex],
            ExcVertexNotUsed(vertex));
 
     // use a set instead of a vector
     // to ensure that cells are inserted only
     // once
-    std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type> adjacent_cells;
+    std::set<typename dealii::internal::
+               ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
+      adjacent_cells;
 
-    typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type
-    cell = mesh.begin_active(),
-    endc = mesh.end();
+    typename dealii::internal::
+      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
+        cell = mesh.begin_active(),
+        endc = mesh.end();
 
     // go through all active cells and look if the vertex is part of that cell
     //
@@ -265,8 +271,7 @@ namespace GridTools
                     const unsigned int face =
                       GeometryInfo<dim>::vertex_to_face[v][vface];
 
-                    if (!cell->at_boundary(face)
-                        &&
+                    if (!cell->at_boundary(face) &&
                         cell->neighbor(face)->active())
                       {
                         // there is a (possibly) coarser cell behind a
@@ -279,7 +284,7 @@ namespace GridTools
                         // the cell was already in the list then the
                         // std::set makes sure that we get it only
                         // once)
-                        adjacent_cells.insert (cell->neighbor(face));
+                        adjacent_cells.insert(cell->neighbor(face));
                       }
                   }
 
@@ -290,7 +295,7 @@ namespace GridTools
         // in 3d also loop over the edges
         if (dim >= 3)
           {
-            for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+            for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
               if (cell->line(e)->has_children())
                 // the only place where this vertex could have been
                 // hiding is on the mid-edge point of the edge we
@@ -306,22 +311,22 @@ namespace GridTools
 
         // in more than 3d we would probably have to do the same as
         // above also for even lower-dimensional objects
-        Assert (dim <= 3, ExcNotImplemented());
+        Assert(dim <= 3, ExcNotImplemented());
 
         // move on to the next cell if we have found the
         // vertex on the current one
-next_cell:
-        ;
+      next_cell:;
       }
 
     // if this was an active vertex then there needs to have been
     // at least one cell to which it is adjacent!
-    Assert (adjacent_cells.size() > 0, ExcInternalError());
+    Assert(adjacent_cells.size() > 0, ExcInternalError());
 
     // return the result as a vector, rather than the set we built above
-    return
-      std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type>
-      (adjacent_cells.begin(), adjacent_cells.end());
+    return std::vector<
+      typename dealii::internal::
+        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>(
+      adjacent_cells.begin(), adjacent_cells.end());
   }
 
 
@@ -329,20 +334,32 @@ next_cell:
   namespace
   {
     template <int dim, template <int, int> class MeshType, int spacedim>
-    void find_active_cell_around_point_internal
-    (const MeshType<dim,spacedim> &mesh,
+    void
+    find_active_cell_around_point_internal(
+      const MeshType<dim, spacedim> &mesh,
 #ifndef _MSC_VER
-     std::set<typename MeshType<dim, spacedim>::active_cell_iterator> &searched_cells,
-     std::set<typename MeshType<dim, spacedim>::active_cell_iterator> &adjacent_cells)
+      std::set<typename MeshType<dim, spacedim>::active_cell_iterator>
+        &searched_cells,
+      std::set<typename MeshType<dim, spacedim>::active_cell_iterator>
+        &adjacent_cells)
 #else
-     std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type> &searched_cells,
-     std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type> &adjacent_cells)
+      std::set<
+        typename dealii::internal::
+          ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
+        &searched_cells,
+      std::set<
+        typename dealii::internal::
+          ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
+        &adjacent_cells)
 #endif
     {
 #ifndef _MSC_VER
-      typedef typename MeshType<dim, spacedim>::active_cell_iterator cell_iterator;
+      typedef
+        typename MeshType<dim, spacedim>::active_cell_iterator cell_iterator;
 #else
-      typedef typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type cell_iterator;
+      typedef typename dealii::internal::
+        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
+          cell_iterator;
 #endif
 
       // update the searched cells
@@ -352,19 +369,23 @@ next_cell:
       // have not yet searched.
       std::set<cell_iterator> adjacent_cells_new;
 
-      typename std::set<cell_iterator>::const_iterator
-      cell = adjacent_cells.begin(),
-      endc = adjacent_cells.end();
+      typename std::set<cell_iterator>::const_iterator cell =
+                                                         adjacent_cells.begin(),
+                                                       endc =
+                                                         adjacent_cells.end();
       for (; cell != endc; ++cell)
         {
           std::vector<cell_iterator> active_neighbors;
-          get_active_neighbors<MeshType<dim, spacedim> >(*cell, active_neighbors);
-          for (unsigned int i=0; i<active_neighbors.size(); ++i)
-            if (searched_cells.find(active_neighbors[i]) == searched_cells.end())
+          get_active_neighbors<MeshType<dim, spacedim>>(*cell,
+                                                        active_neighbors);
+          for (unsigned int i = 0; i < active_neighbors.size(); ++i)
+            if (searched_cells.find(active_neighbors[i]) ==
+                searched_cells.end())
               adjacent_cells_new.insert(active_neighbors[i]);
         }
       adjacent_cells.clear();
-      adjacent_cells.insert(adjacent_cells_new.begin(), adjacent_cells_new.end());
+      adjacent_cells.insert(adjacent_cells_new.begin(),
+                            adjacent_cells_new.end());
       if (adjacent_cells.size() == 0)
         {
           // we haven't found any other cell that would be a
@@ -374,7 +395,7 @@ next_cell:
           // choose the first previously untouched cell we
           // can find
           cell_iterator it = mesh.begin_active();
-          for ( ; it!=mesh.end(); ++it)
+          for (; it != mesh.end(); ++it)
             if (searched_cells.find(it) == searched_cells.end())
               {
                 adjacent_cells.insert(it);
@@ -382,59 +403,63 @@ next_cell:
               }
         }
     }
-  }
+  } // namespace
 
   template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
   typename MeshType<dim, spacedim>::active_cell_iterator
 #else
-  typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type
+  typename dealii::internal::
+    ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
 #endif
-  find_active_cell_around_point (const MeshType<dim,spacedim> &mesh,
-                                 const Point<spacedim>        &p,
-                                 const std::vector<bool>      &marked_vertices)
+  find_active_cell_around_point(const MeshType<dim, spacedim> &mesh,
+                                const Point<spacedim> &        p,
+                                const std::vector<bool> &      marked_vertices)
   {
-    return
-      find_active_cell_around_point<dim,MeshType,spacedim>
-      (StaticMappingQ1<dim,spacedim>::mapping,
-       mesh, p, marked_vertices).first;
+    return find_active_cell_around_point<dim, MeshType, spacedim>(
+             StaticMappingQ1<dim, spacedim>::mapping, mesh, p, marked_vertices)
+      .first;
   }
 
 
   template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
-  std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> >
+  std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim>>
 #else
-  std::pair<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type, Point<dim> >
+  std::pair<typename dealii::internal::
+              ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
+            Point<dim>>
 #endif
-  find_active_cell_around_point (const Mapping<dim,spacedim>  &mapping,
-                                 const MeshType<dim,spacedim> &mesh,
-                                 const Point<spacedim>        &p,
-                                 const std::vector<bool>      &marked_vertices)
+  find_active_cell_around_point(const Mapping<dim, spacedim> & mapping,
+                                const MeshType<dim, spacedim> &mesh,
+                                const Point<spacedim> &        p,
+                                const std::vector<bool> &      marked_vertices)
   {
-    typedef typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type active_cell_iterator;
+    typedef typename dealii::internal::
+      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
+        active_cell_iterator;
 
     // The best distance is set to the
     // maximum allowable distance from
     // the unit cell; we assume a
     // max. deviation of 1e-10
-    double best_distance = 1e-10;
-    int    best_level = -1;
-    std::pair<active_cell_iterator, Point<dim> > best_cell;
+    double                                      best_distance = 1e-10;
+    int                                         best_level    = -1;
+    std::pair<active_cell_iterator, Point<dim>> best_cell;
 
     // Find closest vertex and determine
     // all adjacent cells
-    std::vector<active_cell_iterator> adjacent_cells_tmp
-      = find_cells_adjacent_to_vertex(mesh,
-                                      find_closest_vertex(mapping, mesh, p, marked_vertices));
+    std::vector<active_cell_iterator> adjacent_cells_tmp =
+      find_cells_adjacent_to_vertex(
+        mesh, find_closest_vertex(mapping, mesh, p, marked_vertices));
 
     // Make sure that we have found
     // at least one cell adjacent to vertex.
-    Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
+    Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
 
     // Copy all the cells into a std::set
-    std::set<active_cell_iterator> adjacent_cells (adjacent_cells_tmp.begin(),
-                                                   adjacent_cells_tmp.end());
+    std::set<active_cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
+                                                  adjacent_cells_tmp.end());
     std::set<active_cell_iterator> searched_cells;
 
     // Determine the maximal number of cells
@@ -443,33 +468,33 @@ next_cell:
     // the cell and have not searched
     // every cell in the triangulation,
     // we keep on looking.
-    const unsigned int n_active_cells = mesh.get_triangulation().n_active_cells();
-    bool found = false;
+    const unsigned int n_active_cells =
+      mesh.get_triangulation().n_active_cells();
+    bool         found          = false;
     unsigned int cells_searched = 0;
     while (!found && cells_searched < n_active_cells)
       {
         typename std::set<active_cell_iterator>::const_iterator
-        cell = adjacent_cells.begin(),
-        endc = adjacent_cells.end();
+          cell = adjacent_cells.begin(),
+          endc = adjacent_cells.end();
         for (; cell != endc; ++cell)
           {
             try
               {
-                const Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
+                const Point<dim> p_cell =
+                  mapping.transform_real_to_unit_cell(*cell, p);
 
                 // calculate the infinity norm of
                 // the distance vector to the unit cell.
-                const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+                const double dist =
+                  GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
                 // We compare if the point is inside the
                 // unit cell (or at least not too far
                 // outside). If it is, it is also checked
                 // that the cell has a more refined state
-                if ((dist < best_distance)
-                    ||
-                    ((dist == best_distance)
-                     &&
-                     ((*cell)->level() > best_level)))
+                if ((dist < best_distance) || ((dist == best_distance) &&
+                                               ((*cell)->level() > best_level)))
                   {
                     found         = true;
                     best_distance = dist;
@@ -477,7 +502,9 @@ next_cell:
                     best_cell     = std::make_pair(*cell, p_cell);
                   }
               }
-            catch (typename MappingQGeneric<dim,spacedim>::ExcTransformationFailed &)
+            catch (
+              typename MappingQGeneric<dim, spacedim>::ExcTransformationFailed
+                &)
               {
                 // ok, the transformation
                 // failed presumably
@@ -511,13 +538,13 @@ next_cell:
         // is for.
         if (!found && cells_searched < n_active_cells)
           {
-            find_active_cell_around_point_internal<dim,MeshType,spacedim>
-            (mesh, searched_cells, adjacent_cells);
+            find_active_cell_around_point_internal<dim, MeshType, spacedim>(
+              mesh, searched_cells, adjacent_cells);
           }
       }
 
-    AssertThrow (best_cell.first.state() == IteratorState::valid,
-                 ExcPointNotFound<spacedim>(p));
+    AssertThrow(best_cell.first.state() == IteratorState::valid,
+                ExcPointNotFound<spacedim>(p));
 
     return best_cell;
   }
@@ -526,33 +553,39 @@ next_cell:
 
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
-  compute_active_cell_halo_layer
-  (const MeshType                                                                    &mesh,
-   const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate)
+  compute_active_cell_halo_layer(
+    const MeshType &mesh,
+    const std::function<bool(const typename MeshType::active_cell_iterator &)>
+      &predicate)
   {
     std::vector<typename MeshType::active_cell_iterator> active_halo_layer;
-    std::vector<bool> locally_active_vertices_on_subdomain (mesh.get_triangulation().n_vertices(),
-                                                            false);
+    std::vector<bool> locally_active_vertices_on_subdomain(
+      mesh.get_triangulation().n_vertices(), false);
 
     // Find the cells for which the predicate is true
     // These are the cells around which we wish to construct
     // the halo layer
-    for (typename MeshType::active_cell_iterator
-         cell = mesh.begin_active();
-         cell != mesh.end(); ++cell)
+    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
+         cell != mesh.end();
+         ++cell)
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+        for (unsigned int v = 0;
+             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
+             ++v)
           locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
 
     // Find the cells that do not conform to the predicate
     // but share a vertex with the selected subdomain
     // These comprise the halo layer
-    for (typename MeshType::active_cell_iterator
-         cell = mesh.begin_active();
-         cell != mesh.end(); ++cell)
+    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
+         cell != mesh.end();
+         ++cell)
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
-          if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] == true)
+        for (unsigned int v = 0;
+             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
+             ++v)
+          if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
+              true)
             {
               active_halo_layer.push_back(cell);
               break;
@@ -565,34 +598,41 @@ next_cell:
 
   template <class MeshType>
   std::vector<typename MeshType::cell_iterator>
-  compute_cell_halo_layer_on_level
-  (const MeshType                                                       &mesh,
-   const std::function<bool (const typename MeshType::cell_iterator &)> &predicate,
-   const unsigned int                                                    level)
+  compute_cell_halo_layer_on_level(
+    const MeshType &mesh,
+    const std::function<bool(const typename MeshType::cell_iterator &)>
+      &                predicate,
+    const unsigned int level)
   {
     std::vector<typename MeshType::cell_iterator> level_halo_layer;
-    std::vector<bool> locally_active_vertices_on_level_subdomain (mesh.get_triangulation().n_vertices(),
-        false);
+    std::vector<bool> locally_active_vertices_on_level_subdomain(
+      mesh.get_triangulation().n_vertices(), false);
 
     // Find the cells for which the predicate is true
     // These are the cells around which we wish to construct
     // the halo layer
-    for (typename MeshType::cell_iterator
-         cell = mesh.begin(level);
-         cell != mesh.end(level); ++cell)
+    for (typename MeshType::cell_iterator cell = mesh.begin(level);
+         cell != mesh.end(level);
+         ++cell)
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
-          locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] = true;
+        for (unsigned int v = 0;
+             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
+             ++v)
+          locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] =
+            true;
 
     // Find the cells that do not conform to the predicate
     // but share a vertex with the selected subdomain on that level
     // These comprise the halo layer
-    for (typename MeshType::cell_iterator
-         cell = mesh.begin(level);
-         cell != mesh.end(level); ++cell)
+    for (typename MeshType::cell_iterator cell = mesh.begin(level);
+         cell != mesh.end(level);
+         ++cell)
       if (!predicate(cell)) // False predicate --> Potential halo cell
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
-          if (locally_active_vertices_on_level_subdomain[cell->vertex_index(v)] == true)
+        for (unsigned int v = 0;
+             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
+             ++v)
+          if (locally_active_vertices_on_level_subdomain[cell->vertex_index(
+                v)] == true)
             {
               level_halo_layer.push_back(cell);
               break;
@@ -606,10 +646,14 @@ next_cell:
   {
     template <class MeshType>
     bool
-    contains_locally_owned_cells (const std::vector<typename MeshType::active_cell_iterator> &cells)
+    contains_locally_owned_cells(
+      const std::vector<typename MeshType::active_cell_iterator> &cells)
     {
-      for (typename std::vector<typename MeshType::active_cell_iterator>::const_iterator
-           it = cells.begin(); it != cells.end(); ++it)
+      for (typename std::vector<
+             typename MeshType::active_cell_iterator>::const_iterator it =
+             cells.begin();
+           it != cells.end();
+           ++it)
         {
           if ((*it)->is_locally_owned())
             return true;
@@ -619,30 +663,33 @@ next_cell:
 
     template <class MeshType>
     bool
-    contains_artificial_cells (const std::vector<typename MeshType::active_cell_iterator> &cells)
+    contains_artificial_cells(
+      const std::vector<typename MeshType::active_cell_iterator> &cells)
     {
-      for (typename std::vector<typename MeshType::active_cell_iterator>::const_iterator
-           it = cells.begin(); it != cells.end(); ++it)
+      for (typename std::vector<
+             typename MeshType::active_cell_iterator>::const_iterator it =
+             cells.begin();
+           it != cells.end();
+           ++it)
         {
           if ((*it)->is_artificial())
             return true;
         }
       return false;
     }
-  }
-
+  } // namespace
 
 
 
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
-  compute_ghost_cell_halo_layer (const MeshType &mesh)
+  compute_ghost_cell_halo_layer(const MeshType &mesh)
   {
-    std::function<bool (const typename MeshType::active_cell_iterator &)> predicate
-      = IteratorFilters::LocallyOwnedCell();
+    std::function<bool(const typename MeshType::active_cell_iterator &)>
+      predicate = IteratorFilters::LocallyOwnedCell();
 
     const std::vector<typename MeshType::active_cell_iterator>
-    active_halo_layer = compute_active_cell_halo_layer (mesh, predicate);
+      active_halo_layer = compute_active_cell_halo_layer(mesh, predicate);
 
     // Check that we never return locally owned or artificial cells
     // What is left should only be the ghost cells
@@ -658,14 +705,16 @@ next_cell:
 
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
-  compute_active_cell_layer_within_distance
-  (const MeshType                                                                    &mesh,
-   const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate,
-   const double                                                                       layer_thickness)
+  compute_active_cell_layer_within_distance(
+    const MeshType &mesh,
+    const std::function<bool(const typename MeshType::active_cell_iterator &)>
+      &          predicate,
+    const double layer_thickness)
   {
-    std::vector<typename MeshType::active_cell_iterator> subdomain_boundary_cells, active_cell_layer_within_distance;
-    std::vector<bool> vertices_outside_subdomain ( mesh.get_triangulation().n_vertices(),
-                                                   false);
+    std::vector<typename MeshType::active_cell_iterator>
+                      subdomain_boundary_cells, active_cell_layer_within_distance;
+    std::vector<bool> vertices_outside_subdomain(
+      mesh.get_triangulation().n_vertices(), false);
 
     const unsigned int spacedim = MeshType::space_dimension;
 
@@ -677,12 +726,14 @@ next_cell:
 
     // Find the cells for which the predicate is false
     // These are the cells which are around the predicate subdomain
-    for ( typename MeshType::active_cell_iterator
-          cell = mesh.begin_active();
-          cell != mesh.end(); ++cell)
-      if ( !predicate(cell)) // Negation of predicate --> Not Part of subdomain
+    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
+         cell != mesh.end();
+         ++cell)
+      if (!predicate(cell)) // Negation of predicate --> Not Part of subdomain
         {
-          for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+          for (unsigned int v = 0;
+               v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
+               ++v)
             vertices_outside_subdomain[cell->vertex_index(v)] = true;
           n_non_predicate_cells++;
         }
@@ -691,94 +742,116 @@ next_cell:
     // or if none of the active cells conform to the predicate
     // there is no active cell layer around the predicate
     // subdomain (within any distance)
-    if ( n_non_predicate_cells == 0  || n_non_predicate_cells == mesh.get_triangulation().n_active_cells() )
+    if (n_non_predicate_cells == 0 ||
+        n_non_predicate_cells == mesh.get_triangulation().n_active_cells())
       return std::vector<typename MeshType::active_cell_iterator>();
 
     // Find the cells that conform to the predicate
     // but share a vertex with the cell not in the predicate subdomain
-    for ( typename MeshType::active_cell_iterator
-          cell = mesh.begin_active();
-          cell != mesh.end(); ++cell)
-      if ( predicate(cell)) // True predicate --> Potential boundary cell of the subdomain
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
+    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
+         cell != mesh.end();
+         ++cell)
+      if (predicate(cell)) // True predicate --> Potential boundary cell of the
+                           // subdomain
+        for (unsigned int v = 0;
+             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
+             ++v)
           if (vertices_outside_subdomain[cell->vertex_index(v)] == true)
             {
               subdomain_boundary_cells.push_back(cell);
               break; // No need to go through remaining vertices
             }
 
-    // To cheaply filter out some cells located far away from the predicate subdomain,
-    // get the bounding box of the predicate subdomain.
-    std::pair< Point<spacedim>, Point<spacedim> > bounding_box = compute_bounding_box( mesh,
-        predicate );
+    // To cheaply filter out some cells located far away from the predicate
+    // subdomain, get the bounding box of the predicate subdomain.
+    std::pair<Point<spacedim>, Point<spacedim>> bounding_box =
+      compute_bounding_box(mesh, predicate);
 
     // DOUBLE_EPSILON to compare really close double values
-    const double &DOUBLE_EPSILON = 100.*std::numeric_limits<double>::epsilon();
+    const double &DOUBLE_EPSILON =
+      100. * std::numeric_limits<double>::epsilon();
 
     // Add layer_thickness to the bounding box
-    for ( unsigned int d=0; d<spacedim; ++d)
+    for (unsigned int d = 0; d < spacedim; ++d)
       {
-        bounding_box.first[d]  -= (layer_thickness+DOUBLE_EPSILON); // minp
-        bounding_box.second[d] += (layer_thickness+DOUBLE_EPSILON); // maxp
+        bounding_box.first[d] -= (layer_thickness + DOUBLE_EPSILON);  // minp
+        bounding_box.second[d] += (layer_thickness + DOUBLE_EPSILON); // maxp
       }
 
-    std::vector<Point<spacedim> > subdomain_boundary_cells_centers; // cache all the subdomain boundary cells centers here
-    std::vector<double> subdomain_boundary_cells_radii; // cache all the subdomain boundary cells radii
-    subdomain_boundary_cells_centers.reserve (subdomain_boundary_cells.size());
-    subdomain_boundary_cells_radii.reserve (subdomain_boundary_cells.size());
+    std::vector<Point<spacedim>>
+      subdomain_boundary_cells_centers; // cache all the subdomain boundary
+                                        // cells centers here
+    std::vector<double>
+      subdomain_boundary_cells_radii; // cache all the subdomain boundary cells
+                                      // radii
+    subdomain_boundary_cells_centers.reserve(subdomain_boundary_cells.size());
+    subdomain_boundary_cells_radii.reserve(subdomain_boundary_cells.size());
     // compute cell radius for each boundary cell of the predicate subdomain
-    for ( typename std::vector<typename MeshType::active_cell_iterator>::const_iterator
-          subdomain_boundary_cell_iterator  = subdomain_boundary_cells.begin();
-          subdomain_boundary_cell_iterator != subdomain_boundary_cells.end(); ++subdomain_boundary_cell_iterator )
+    for (typename std::vector<typename MeshType::active_cell_iterator>::
+           const_iterator subdomain_boundary_cell_iterator =
+             subdomain_boundary_cells.begin();
+         subdomain_boundary_cell_iterator != subdomain_boundary_cells.end();
+         ++subdomain_boundary_cell_iterator)
       {
-        const std::pair<Point<spacedim>, double> &
-        subdomain_boundary_cell_enclosing_ball = (*subdomain_boundary_cell_iterator)->enclosing_ball();
+        const std::pair<Point<spacedim>, double>
+          &subdomain_boundary_cell_enclosing_ball =
+            (*subdomain_boundary_cell_iterator)->enclosing_ball();
 
-        subdomain_boundary_cells_centers.push_back( subdomain_boundary_cell_enclosing_ball.first);
-        subdomain_boundary_cells_radii.push_back( subdomain_boundary_cell_enclosing_ball.second);
+        subdomain_boundary_cells_centers.push_back(
+          subdomain_boundary_cell_enclosing_ball.first);
+        subdomain_boundary_cells_radii.push_back(
+          subdomain_boundary_cell_enclosing_ball.second);
       }
-    AssertThrow( subdomain_boundary_cells_radii.size() == subdomain_boundary_cells_centers.size(),
-                 ExcInternalError());
+    AssertThrow(subdomain_boundary_cells_radii.size() ==
+                  subdomain_boundary_cells_centers.size(),
+                ExcInternalError());
 
-    // Find the cells that are within layer_thickness of predicate subdomain boundary
-    // distance but are inside the extended bounding box.
-    // Most cells might be outside the extended bounding box, so we could skip them.
-    // Those cells that are inside the extended bounding box but are not part of the
-    // predicate subdomain are possible candidates to be within the distance to the
-    // boundary cells of the predicate subdomain.
-    for ( typename MeshType::active_cell_iterator
-          cell = mesh.begin_active();
-          cell != mesh.end(); ++cell)
+    // Find the cells that are within layer_thickness of predicate subdomain
+    // boundary distance but are inside the extended bounding box. Most cells
+    // might be outside the extended bounding box, so we could skip them. Those
+    // cells that are inside the extended bounding box but are not part of the
+    // predicate subdomain are possible candidates to be within the distance to
+    // the boundary cells of the predicate subdomain.
+    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
+         cell != mesh.end();
+         ++cell)
       {
         // Ignore all the cells that are in the predicate subdomain
-        if ( predicate(cell))
+        if (predicate(cell))
           continue;
 
-        const std::pair<Point<spacedim>, double> &cell_enclosing_ball
-          = cell->enclosing_ball();
+        const std::pair<Point<spacedim>, double> &cell_enclosing_ball =
+          cell->enclosing_ball();
 
-        const Point<spacedim> &cell_enclosing_ball_center = cell_enclosing_ball.first;
+        const Point<spacedim> &cell_enclosing_ball_center =
+          cell_enclosing_ball.first;
         const double &cell_enclosing_ball_radius = cell_enclosing_ball.second;
 
         bool cell_inside = true; // reset for each cell
 
         for (unsigned int d = 0; d < spacedim; ++d)
-          cell_inside &= (cell_enclosing_ball_center[d] + cell_enclosing_ball_radius > bounding_box.first[d])
-                         && (cell_enclosing_ball_center[d] - cell_enclosing_ball_radius < bounding_box.second[d]);
-        // cell_inside is true if its enclosing ball intersects the extended bounding box
+          cell_inside &=
+            (cell_enclosing_ball_center[d] + cell_enclosing_ball_radius >
+             bounding_box.first[d]) &&
+            (cell_enclosing_ball_center[d] - cell_enclosing_ball_radius <
+             bounding_box.second[d]);
+        // cell_inside is true if its enclosing ball intersects the extended
+        // bounding box
 
         // Ignore all the cells that are outside the extended bounding box
         if (cell_inside)
-          for (unsigned int i =0; i< subdomain_boundary_cells_radii.size(); ++i)
-            if ( cell_enclosing_ball_center.distance_square(subdomain_boundary_cells_centers[i])
-                 <  Utilities::fixed_power<2>( cell_enclosing_ball_radius +
-                                               subdomain_boundary_cells_radii[i] +
-                                               layer_thickness + DOUBLE_EPSILON ))
+          for (unsigned int i = 0; i < subdomain_boundary_cells_radii.size();
+               ++i)
+            if (cell_enclosing_ball_center.distance_square(
+                  subdomain_boundary_cells_centers[i]) <
+                Utilities::fixed_power<2>(cell_enclosing_ball_radius +
+                                          subdomain_boundary_cells_radii[i] +
+                                          layer_thickness + DOUBLE_EPSILON))
               {
                 active_cell_layer_within_distance.push_back(cell);
-                break; // Exit the loop checking all the remaining subdomain boundary cells
+                break; // Exit the loop checking all the remaining subdomain
+                       // boundary cells
               }
-
       }
     return active_cell_layer_within_distance;
   }
@@ -787,37 +860,48 @@ next_cell:
 
   template <class MeshType>
   std::vector<typename MeshType::active_cell_iterator>
-  compute_ghost_cell_layer_within_distance ( const MeshType &mesh, const double layer_thickness)
+  compute_ghost_cell_layer_within_distance(const MeshType &mesh,
+                                           const double    layer_thickness)
   {
     IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
-    std::function<bool (const typename MeshType::active_cell_iterator &)> predicate (locally_owned_cell_predicate);
+    std::function<bool(const typename MeshType::active_cell_iterator &)>
+      predicate(locally_owned_cell_predicate);
 
     const std::vector<typename MeshType::active_cell_iterator>
-    ghost_cell_layer_within_distance = compute_active_cell_layer_within_distance (mesh, predicate, layer_thickness);
+      ghost_cell_layer_within_distance =
+        compute_active_cell_layer_within_distance(
+          mesh, predicate, layer_thickness);
 
     // Check that we never return locally owned or artificial cells
     // What is left should only be the ghost cells
-    Assert(contains_locally_owned_cells<MeshType>(ghost_cell_layer_within_distance) == false,
-           ExcMessage("Ghost cells within layer_thickness contains locally owned cells."));
-    Assert(contains_artificial_cells<MeshType>(ghost_cell_layer_within_distance) == false,
-           ExcMessage("Ghost cells within layer_thickness contains artificial cells."
-                      "The function compute_ghost_cell_layer_within_distance "
-                      "is probably called while using parallel::distributed::Triangulation. "
-                      "In such case please refer to the description of this function."));
+    Assert(
+      contains_locally_owned_cells<MeshType>(
+        ghost_cell_layer_within_distance) == false,
+      ExcMessage(
+        "Ghost cells within layer_thickness contains locally owned cells."));
+    Assert(
+      contains_artificial_cells<MeshType>(ghost_cell_layer_within_distance) ==
+        false,
+      ExcMessage(
+        "Ghost cells within layer_thickness contains artificial cells."
+        "The function compute_ghost_cell_layer_within_distance "
+        "is probably called while using parallel::distributed::Triangulation. "
+        "In such case please refer to the description of this function."));
 
     return ghost_cell_layer_within_distance;
   }
 
 
 
-  template < class MeshType>
-  std::pair< Point<MeshType::space_dimension>, Point<MeshType::space_dimension> >
-  compute_bounding_box
-  ( const MeshType                                                                    &mesh,
-    const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate )
+  template <class MeshType>
+  std::pair<Point<MeshType::space_dimension>, Point<MeshType::space_dimension>>
+  compute_bounding_box(
+    const MeshType &mesh,
+    const std::function<bool(const typename MeshType::active_cell_iterator &)>
+      &predicate)
   {
-    std::vector<bool> locally_active_vertices_on_subdomain (mesh.get_triangulation().n_vertices(),
-                                                            false);
+    std::vector<bool> locally_active_vertices_on_subdomain(
+      mesh.get_triangulation().n_vertices(), false);
 
     const unsigned int spacedim = MeshType::space_dimension;
 
@@ -826,10 +910,10 @@ next_cell:
     Point<MeshType::space_dimension> maxp, minp;
 
     // initialize minp and maxp with the first predicate cell center
-    for ( typename MeshType::active_cell_iterator
-          cell = mesh.begin_active();
-          cell != mesh.end(); ++cell)
-      if ( predicate(cell))
+    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
+         cell != mesh.end();
+         ++cell)
+      if (predicate(cell))
         {
           minp = cell->center();
           maxp = cell->center();
@@ -838,35 +922,38 @@ next_cell:
 
     // Run through all the cells to check if it belongs to predicate domain,
     // if it belongs to the predicate domain, extend the bounding box.
-    for ( typename MeshType::active_cell_iterator
-          cell = mesh.begin_active();
-          cell != mesh.end(); ++cell)
+    for (typename MeshType::active_cell_iterator cell = mesh.begin_active();
+         cell != mesh.end();
+         ++cell)
       if (predicate(cell)) // True predicate --> Part of subdomain
-        for (unsigned int v=0; v<GeometryInfo<MeshType::dimension>::vertices_per_cell; ++v)
-          if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] == false)
+        for (unsigned int v = 0;
+             v < GeometryInfo<MeshType::dimension>::vertices_per_cell;
+             ++v)
+          if (locally_active_vertices_on_subdomain[cell->vertex_index(v)] ==
+              false)
             {
-              locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
-              for ( unsigned int d=0; d<spacedim; ++d)
+              locally_active_vertices_on_subdomain[cell->vertex_index(v)] =
+                true;
+              for (unsigned int d = 0; d < spacedim; ++d)
                 {
-                  minp[d] = std::min( minp[d], cell->vertex(v)[d]);
-                  maxp[d] = std::max( maxp[d], cell->vertex(v)[d]);
+                  minp[d] = std::min(minp[d], cell->vertex(v)[d]);
+                  maxp[d] = std::max(maxp[d], cell->vertex(v)[d]);
                 }
             }
 
-    return std::make_pair( minp, maxp );
+    return std::make_pair(minp, maxp);
   }
 
 
 
   template <typename MeshType>
   std::list<std::pair<typename MeshType::cell_iterator,
-      typename MeshType::cell_iterator> >
-      get_finest_common_cells (const MeshType &mesh_1,
-                               const MeshType &mesh_2)
+                      typename MeshType::cell_iterator>>
+  get_finest_common_cells(const MeshType &mesh_1, const MeshType &mesh_2)
   {
-    Assert (have_same_coarse_mesh (mesh_1, mesh_2),
-            ExcMessage ("The two meshes must be represent triangulations that "
-                        "have the same coarse meshes"));
+    Assert(have_same_coarse_mesh(mesh_1, mesh_2),
+           ExcMessage("The two meshes must be represent triangulations that "
+                      "have the same coarse meshes"));
 
     // the algorithm goes as follows:
     // first, we fill a list with pairs
@@ -883,19 +970,17 @@ next_cell:
     // non-active cells, we will get to
     // the later on for further
     // consideration
-    typedef
-    std::list<std::pair<typename MeshType::cell_iterator,
-        typename MeshType::cell_iterator> >
-        CellList;
+    typedef std::list<std::pair<typename MeshType::cell_iterator,
+                                typename MeshType::cell_iterator>>
+      CellList;
 
     CellList cell_list;
 
     // first push the coarse level cells
-    typename MeshType::cell_iterator
-    cell_1 = mesh_1.begin(0),
-    cell_2 = mesh_2.begin(0);
+    typename MeshType::cell_iterator cell_1 = mesh_1.begin(0),
+                                     cell_2 = mesh_2.begin(0);
     for (; cell_1 != mesh_1.end(0); ++cell_1, ++cell_2)
-      cell_list.emplace_back (cell_1, cell_2);
+      cell_list.emplace_back(cell_1, cell_2);
 
     // then traverse list as described
     // above
@@ -906,15 +991,15 @@ next_cell:
         // have children, then erase
         // this element and push their
         // children instead
-        if (cell_pair->first->has_children()
-            &&
+        if (cell_pair->first->has_children() &&
             cell_pair->second->has_children())
           {
-            Assert(cell_pair->first->refinement_case()==
-                   cell_pair->second->refinement_case(), ExcNotImplemented());
-            for (unsigned int c=0; c<cell_pair->first->n_children(); ++c)
-              cell_list.emplace_back (cell_pair->first->child(c),
-                                      cell_pair->second->child(c));
+            Assert(cell_pair->first->refinement_case() ==
+                     cell_pair->second->refinement_case(),
+                   ExcNotImplemented());
+            for (unsigned int c = 0; c < cell_pair->first->n_children(); ++c)
+              cell_list.emplace_back(cell_pair->first->child(c),
+                                     cell_pair->second->child(c));
 
             // erasing an iterator
             // keeps other iterators
@@ -926,7 +1011,7 @@ next_cell:
             const typename CellList::iterator previous_cell_pair = cell_pair;
             ++cell_pair;
 
-            cell_list.erase (previous_cell_pair);
+            cell_list.erase(previous_cell_pair);
           }
         else
           // both cells are active, do
@@ -938,14 +1023,12 @@ next_cell:
     // validate that all pairs have at least one
     // active iterator or have different
     // refinement_cases
-    for (cell_pair = cell_list.begin(); cell_pair != cell_list.end(); ++cell_pair)
-      Assert (cell_pair->first->active()
-              ||
-              cell_pair->second->active()
-              ||
-              (cell_pair->first->refinement_case()
-               != cell_pair->second->refinement_case()),
-              ExcInternalError());
+    for (cell_pair = cell_list.begin(); cell_pair != cell_list.end();
+         ++cell_pair)
+      Assert(cell_pair->first->active() || cell_pair->second->active() ||
+               (cell_pair->first->refinement_case() !=
+                cell_pair->second->refinement_case()),
+             ExcInternalError());
 
     return cell_list;
   }
@@ -954,23 +1037,24 @@ next_cell:
 
   template <int dim, int spacedim>
   bool
-  have_same_coarse_mesh (const Triangulation<dim, spacedim> &mesh_1,
-                         const Triangulation<dim, spacedim> &mesh_2)
+  have_same_coarse_mesh(const Triangulation<dim, spacedim> &mesh_1,
+                        const Triangulation<dim, spacedim> &mesh_2)
   {
     // make sure the two meshes have
     // the same number of coarse cells
-    if (mesh_1.n_cells (0) != mesh_2.n_cells (0))
+    if (mesh_1.n_cells(0) != mesh_2.n_cells(0))
       return false;
 
     // if so, also make sure they have
     // the same vertices on the cells
     // of the coarse mesh
-    typename Triangulation<dim, spacedim>::cell_iterator
-    cell_1 = mesh_1.begin(0),
-    cell_2 = mesh_2.begin(0),
-    endc   = mesh_1.end(0);
-    for (; cell_1!=endc; ++cell_1, ++cell_2)
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+    typename Triangulation<dim, spacedim>::cell_iterator cell_1 =
+                                                           mesh_1.begin(0),
+                                                         cell_2 =
+                                                           mesh_2.begin(0),
+                                                         endc = mesh_1.end(0);
+    for (; cell_1 != endc; ++cell_1, ++cell_2)
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         if (cell_1->vertex(v) != cell_2->vertex(v))
           return false;
 
@@ -985,45 +1069,45 @@ next_cell:
 
   template <typename MeshType>
   bool
-  have_same_coarse_mesh (const MeshType &mesh_1,
-                         const MeshType &mesh_2)
+  have_same_coarse_mesh(const MeshType &mesh_1, const MeshType &mesh_2)
   {
-    return have_same_coarse_mesh (mesh_1.get_triangulation(),
-                                  mesh_2.get_triangulation());
+    return have_same_coarse_mesh(mesh_1.get_triangulation(),
+                                 mesh_2.get_triangulation());
   }
 
 
 
   template <int dim, int spacedim>
-  std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
-  find_active_cell_around_point (const hp::MappingCollection<dim,spacedim>   &mapping,
-                                 const hp::DoFHandler<dim,spacedim> &mesh,
-                                 const Point<spacedim>     &p)
+  std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator,
+            Point<dim>>
+  find_active_cell_around_point(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const hp::DoFHandler<dim, spacedim> &       mesh,
+    const Point<spacedim> &                     p)
   {
-    Assert ((mapping.size() == 1) ||
-            (mapping.size() == mesh.get_fe_collection().size()),
-            ExcMessage ("Mapping collection needs to have either size 1 "
-                        "or size equal to the number of elements in "
-                        "the FECollection."));
+    Assert((mapping.size() == 1) ||
+             (mapping.size() == mesh.get_fe_collection().size()),
+           ExcMessage("Mapping collection needs to have either size 1 "
+                      "or size equal to the number of elements in "
+                      "the FECollection."));
 
-    typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell_iterator;
+    typedef typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
+      cell_iterator;
 
-    std::pair<cell_iterator, Point<dim> > best_cell;
-    //If we have only one element in the MappingCollection,
-    //we use find_active_cell_around_point using only one
-    //mapping.
+    std::pair<cell_iterator, Point<dim>> best_cell;
+    // If we have only one element in the MappingCollection,
+    // we use find_active_cell_around_point using only one
+    // mapping.
     if (mapping.size() == 1)
       best_cell = find_active_cell_around_point(mapping[0], mesh, p);
     else
       {
-
-
         // The best distance is set to the
         // maximum allowable distance from
         // the unit cell; we assume a
         // max. deviation of 1e-10
         double best_distance = 1e-10;
-        int    best_level = -1;
+        int    best_level    = -1;
 
 
         // Find closest vertex and determine
@@ -1035,10 +1119,11 @@ next_cell:
 
         // Make sure that we have found
         // at least one cell adjacent to vertex.
-        Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
+        Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
 
         // Copy all the cells into a std::set
-        std::set<cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(), adjacent_cells_tmp.end());
+        std::set<cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
+                                               adjacent_cells_tmp.end());
         std::set<cell_iterator> searched_cells;
 
         // Determine the maximal number of cells
@@ -1047,39 +1132,44 @@ next_cell:
         // the cell and have not searched
         // every cell in the triangulation,
         // we keep on looking.
-        const unsigned int n_cells = mesh.get_triangulation().n_cells();
-        bool found = false;
-        unsigned int cells_searched = 0;
+        const unsigned int n_cells        = mesh.get_triangulation().n_cells();
+        bool               found          = false;
+        unsigned int       cells_searched = 0;
         while (!found && cells_searched < n_cells)
           {
             typename std::set<cell_iterator>::const_iterator
-            cell = adjacent_cells.begin(),
-            endc = adjacent_cells.end();
+              cell = adjacent_cells.begin(),
+              endc = adjacent_cells.end();
             for (; cell != endc; ++cell)
               {
                 try
                   {
-                    const Point<dim> p_cell = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
+                    const Point<dim> p_cell =
+                      mapping[(*cell)->active_fe_index()]
+                        .transform_real_to_unit_cell(*cell, p);
 
 
                     // calculate the infinity norm of
                     // the distance vector to the unit cell.
-                    const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+                    const double dist =
+                      GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
                     // We compare if the point is inside the
                     // unit cell (or at least not too far
                     // outside). If it is, it is also checked
                     // that the cell has a more refined state
-                    if (dist < best_distance ||
-                        (dist == best_distance && (*cell)->level() > best_level))
+                    if (dist < best_distance || (dist == best_distance &&
+                                                 (*cell)->level() > best_level))
                       {
-                        found       = true;
+                        found         = true;
                         best_distance = dist;
                         best_level    = (*cell)->level();
                         best_cell     = std::make_pair(*cell, p_cell);
                       }
                   }
-                catch (typename MappingQGeneric<dim,spacedim>::ExcTransformationFailed &)
+                catch (
+                  typename MappingQGeneric<dim,
+                                           spacedim>::ExcTransformationFailed &)
                   {
                     // ok, the transformation
                     // failed presumably
@@ -1094,7 +1184,7 @@ next_cell:
                     // to the next
                   }
               }
-            //update the number of cells searched
+            // update the number of cells searched
             cells_searched += adjacent_cells.size();
             // if we have not found the cell in
             // question and have not yet searched every
@@ -1103,15 +1193,16 @@ next_cell:
             // the cells in adjacent_cells.
             if (!found && cells_searched < n_cells)
               {
-                find_active_cell_around_point_internal<dim,hp::DoFHandler,spacedim>
-                (mesh, searched_cells, adjacent_cells);
+                find_active_cell_around_point_internal<dim,
+                                                       hp::DoFHandler,
+                                                       spacedim>(
+                  mesh, searched_cells, adjacent_cells);
               }
-
           }
       }
 
-    AssertThrow (best_cell.first.state() == IteratorState::valid,
-                 ExcPointNotFound<spacedim>(p));
+    AssertThrow(best_cell.first.state() == IteratorState::valid,
+                ExcPointNotFound<spacedim>(p));
 
     return best_cell;
   }
@@ -1121,39 +1212,45 @@ next_cell:
   std::vector<typename MeshType::active_cell_iterator>
   get_patch_around_cell(const typename MeshType::active_cell_iterator &cell)
   {
-    Assert (cell->is_locally_owned(),
-            ExcMessage ("This function only makes sense if the cell for "
-                        "which you are asking for a patch, is locally "
-                        "owned."));
+    Assert(cell->is_locally_owned(),
+           ExcMessage("This function only makes sense if the cell for "
+                      "which you are asking for a patch, is locally "
+                      "owned."));
 
     std::vector<typename MeshType::active_cell_iterator> patch;
-    patch.push_back (cell);
-    for (unsigned int face_number=0; face_number<GeometryInfo<MeshType::dimension>::faces_per_cell; ++face_number)
-      if (cell->face(face_number)->at_boundary()==false)
+    patch.push_back(cell);
+    for (unsigned int face_number = 0;
+         face_number < GeometryInfo<MeshType::dimension>::faces_per_cell;
+         ++face_number)
+      if (cell->face(face_number)->at_boundary() == false)
         {
           if (cell->neighbor(face_number)->has_children() == false)
-            patch.push_back (cell->neighbor(face_number));
+            patch.push_back(cell->neighbor(face_number));
           else
-            // the neighbor is refined. in 2d/3d, we can simply ask for the children
-            // of the neighbor because they can not be further refined and,
-            // consequently, the children is active
+            // the neighbor is refined. in 2d/3d, we can simply ask for the
+            // children of the neighbor because they can not be further refined
+            // and, consequently, the children is active
             if (MeshType::dimension > 1)
-              {
-                for (unsigned int subface=0; subface<cell->face(face_number)->n_children(); ++subface)
-                  patch.push_back (cell->neighbor_child_on_subface (face_number, subface));
-              }
-            else
-              {
-                // in 1d, we need to work a bit harder: iterate until we find
-                // the child by going from cell to child to child etc
-                typename MeshType::cell_iterator neighbor
-                  = cell->neighbor (face_number);
-                while (neighbor->has_children())
-                  neighbor = neighbor->child(1-face_number);
+            {
+              for (unsigned int subface = 0;
+                   subface < cell->face(face_number)->n_children();
+                   ++subface)
+                patch.push_back(
+                  cell->neighbor_child_on_subface(face_number, subface));
+            }
+          else
+            {
+              // in 1d, we need to work a bit harder: iterate until we find
+              // the child by going from cell to child to child etc
+              typename MeshType::cell_iterator neighbor =
+                cell->neighbor(face_number);
+              while (neighbor->has_children())
+                neighbor = neighbor->child(1 - face_number);
 
-                Assert (neighbor->neighbor(1-face_number) == cell, ExcInternalError());
-                patch.push_back (neighbor);
-              }
+              Assert(neighbor->neighbor(1 - face_number) == cell,
+                     ExcInternalError());
+              patch.push_back(neighbor);
+            }
         }
     return patch;
   }
@@ -1162,132 +1259,169 @@ next_cell:
 
   template <class Container>
   std::vector<typename Container::cell_iterator>
-  get_cells_at_coarsest_common_level (
+  get_cells_at_coarsest_common_level(
     const std::vector<typename Container::active_cell_iterator> &patch)
   {
-    Assert (patch.size() > 0, ExcMessage("Vector containing patch cells should not be an empty vector!"));
-    // In order to extract the set of cells with the coarsest common level from the give vector of cells:
-    // First it finds the number associated with the minimum level of refinmenet, namely "min_level"
+    Assert(patch.size() > 0,
+           ExcMessage(
+             "Vector containing patch cells should not be an empty vector!"));
+    // In order to extract the set of cells with the coarsest common level from
+    // the give vector of cells: First it finds the number associated with the
+    // minimum level of refinmenet, namely "min_level"
     int min_level = patch[0]->level();
 
-    for (unsigned int i=0; i<patch.size(); ++i)
-      min_level = std::min (min_level, patch[i]->level() );
-    std::set<typename Container::cell_iterator>  uniform_cells;
-    typename std::vector<typename Container::active_cell_iterator>::const_iterator  patch_cell;
+    for (unsigned int i = 0; i < patch.size(); ++i)
+      min_level = std::min(min_level, patch[i]->level());
+    std::set<typename Container::cell_iterator> uniform_cells;
+    typename std::vector<
+      typename Container::active_cell_iterator>::const_iterator patch_cell;
     // it loops through all cells of the input vector
-    for (patch_cell=patch.begin(); patch_cell!=patch.end () ; ++patch_cell)
+    for (patch_cell = patch.begin(); patch_cell != patch.end(); ++patch_cell)
       {
-        // If the refinement level of each cell i the loop be equal to the min_level, so that
-        // that cell inserted into the set of uniform_cells, as the set of cells with the coarsest common refinement level
+        // If the refinement level of each cell i the loop be equal to the
+        // min_level, so that that cell inserted into the set of uniform_cells,
+        // as the set of cells with the coarsest common refinement level
         if ((*patch_cell)->level() == min_level)
-          uniform_cells.insert (*patch_cell);
+          uniform_cells.insert(*patch_cell);
         else
-          // If not, it asks for the parent of the cell, until it finds the parent cell
-          // with the refinement level equal to the min_level and inserts that parent cell into the
-          // the set of uniform_cells, as the set of cells with the coarsest common refinement level.
+          // If not, it asks for the parent of the cell, until it finds the
+          // parent cell with the refinement level equal to the min_level and
+          // inserts that parent cell into the the set of uniform_cells, as the
+          // set of cells with the coarsest common refinement level.
           {
             typename Container::cell_iterator parent = *patch_cell;
 
             while (parent->level() > min_level)
-              parent = parent-> parent();
-            uniform_cells.insert (parent);
+              parent = parent->parent();
+            uniform_cells.insert(parent);
           }
       }
 
-    return std::vector<typename Container::cell_iterator> (uniform_cells.begin(),
-                                                           uniform_cells.end());
+    return std::vector<typename Container::cell_iterator>(uniform_cells.begin(),
+                                                          uniform_cells.end());
   }
 
 
 
   template <class Container>
-  void build_triangulation_from_patch(const std::vector<typename Container::active_cell_iterator> &patch,
-                                      Triangulation<Container::dimension,Container::space_dimension> &local_triangulation,
-                                      std::map<typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator,
-                                      typename Container::active_cell_iterator> &patch_to_global_tria_map)
+  void
+  build_triangulation_from_patch(
+    const std::vector<typename Container::active_cell_iterator> &patch,
+    Triangulation<Container::dimension, Container::space_dimension>
+      &local_triangulation,
+    std::map<
+      typename Triangulation<Container::dimension,
+                             Container::space_dimension>::active_cell_iterator,
+      typename Container::active_cell_iterator> &patch_to_global_tria_map)
 
   {
     const std::vector<typename Container::cell_iterator> uniform_cells =
-      get_cells_at_coarsest_common_level <Container> (patch);
+      get_cells_at_coarsest_common_level<Container>(patch);
     // First it creates triangulation from the vector of "uniform_cells"
     local_triangulation.clear();
-    std::vector<Point<Container::space_dimension> > vertices;
-    const unsigned int n_uniform_cells=uniform_cells.size();
-    std::vector<CellData<Container::dimension> > cells(n_uniform_cells);
-    unsigned int k=0;// for enumerating cells
-    unsigned int i=0;// for enumerating vertices
-    typename std::vector<typename Container::cell_iterator>::const_iterator uniform_cell;
-    for (uniform_cell=uniform_cells.begin(); uniform_cell!=uniform_cells.end(); ++uniform_cell)
+    std::vector<Point<Container::space_dimension>> vertices;
+    const unsigned int n_uniform_cells = uniform_cells.size();
+    std::vector<CellData<Container::dimension>> cells(n_uniform_cells);
+    unsigned int                                k = 0; // for enumerating cells
+    unsigned int i = 0; // for enumerating vertices
+    typename std::vector<typename Container::cell_iterator>::const_iterator
+      uniform_cell;
+    for (uniform_cell = uniform_cells.begin();
+         uniform_cell != uniform_cells.end();
+         ++uniform_cell)
       {
-        for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
+        for (unsigned int v = 0;
+             v < GeometryInfo<Container::dimension>::vertices_per_cell;
+             ++v)
           {
-            Point<Container::space_dimension> position=(*uniform_cell)->vertex (v);
-            bool repeat_vertex=false;
+            Point<Container::space_dimension> position =
+              (*uniform_cell)->vertex(v);
+            bool repeat_vertex = false;
 
-            for (unsigned int m=0; m<i; ++m)
+            for (unsigned int m = 0; m < i; ++m)
               {
                 if (position == vertices[m])
                   {
-                    repeat_vertex=true;
-                    cells[k].vertices[v]=m;
+                    repeat_vertex        = true;
+                    cells[k].vertices[v] = m;
                     break;
                   }
               }
-            if (repeat_vertex==false)
+            if (repeat_vertex == false)
               {
                 vertices.push_back(position);
-                cells[k].vertices[v]=i;
-                i=i+1;
+                cells[k].vertices[v] = i;
+                i                    = i + 1;
               }
 
-          }//for vertices_per_cell
-        k=k+1;
+          } // for vertices_per_cell
+        k = k + 1;
       }
-    local_triangulation.create_triangulation(vertices,cells,SubCellData());
-    Assert (local_triangulation.n_active_cells() == uniform_cells.size(), ExcInternalError());
-    local_triangulation.clear_user_flags ();
-    unsigned int index=0;
+    local_triangulation.create_triangulation(vertices, cells, SubCellData());
+    Assert(local_triangulation.n_active_cells() == uniform_cells.size(),
+           ExcInternalError());
+    local_triangulation.clear_user_flags();
+    unsigned int index = 0;
     // Create a map between cells of class DoFHandler into class Triangulation
-    std::map<typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator,
-        typename Container::cell_iterator> patch_to_global_tria_map_tmp;
-    for (typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator coarse_cell = local_triangulation.begin();
-         coarse_cell != local_triangulation.end(); ++coarse_cell, ++index)
+    std::map<typename Triangulation<Container::dimension,
+                                    Container::space_dimension>::cell_iterator,
+             typename Container::cell_iterator>
+      patch_to_global_tria_map_tmp;
+    for (typename Triangulation<Container::dimension,
+                                Container::space_dimension>::cell_iterator
+           coarse_cell = local_triangulation.begin();
+         coarse_cell != local_triangulation.end();
+         ++coarse_cell, ++index)
       {
-        patch_to_global_tria_map_tmp.insert (std::make_pair(coarse_cell, uniform_cells[index]));
-        // To ensure that the cells with the same coordinates (here, we compare their centers) are mapped into each other.
+        patch_to_global_tria_map_tmp.insert(
+          std::make_pair(coarse_cell, uniform_cells[index]));
+        // To ensure that the cells with the same coordinates (here, we compare
+        // their centers) are mapped into each other.
 
-        Assert(coarse_cell->center().distance( uniform_cells[index]->center())<=1e-15*coarse_cell->diameter(),
+        Assert(coarse_cell->center().distance(uniform_cells[index]->center()) <=
+                 1e-15 * coarse_cell->diameter(),
                ExcInternalError());
       }
     bool refinement_necessary;
-    // In this loop we start to do refinement on the above coarse triangulation to reach
-    // to the same level of refinement as the patch cells are really on
+    // In this loop we start to do refinement on the above coarse triangulation
+    // to reach to the same level of refinement as the patch cells are really on
     do
       {
         refinement_necessary = false;
-        for (typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator
-             active_tria_cell = local_triangulation.begin_active();
-             active_tria_cell != local_triangulation.end(); ++active_tria_cell)
+        for (typename Triangulation<Container::dimension,
+                                    Container::space_dimension>::
+               active_cell_iterator active_tria_cell =
+                 local_triangulation.begin_active();
+             active_tria_cell != local_triangulation.end();
+             ++active_tria_cell)
           {
             if (patch_to_global_tria_map_tmp[active_tria_cell]->has_children())
               {
-                active_tria_cell -> set_refine_flag();
+                active_tria_cell->set_refine_flag();
                 refinement_necessary = true;
               }
-            else for (unsigned int i=0; i<patch.size(); ++i)
+            else
+              for (unsigned int i = 0; i < patch.size(); ++i)
                 {
                   // Even though vertices may not be exactly the same, the
                   // appropriate cells will match since == for TriAccessors
                   // checks only cell level and index.
-                  if (patch_to_global_tria_map_tmp[active_tria_cell]==patch[i])
+                  if (patch_to_global_tria_map_tmp[active_tria_cell] ==
+                      patch[i])
                     {
                       // adjust the cell vertices of the local_triangulation to
                       // match cell vertices of the global triangulation
-                      for (unsigned int v=0; v<GeometryInfo<Container::dimension>::vertices_per_cell; ++v)
+                      for (unsigned int v = 0;
+                           v < GeometryInfo<
+                                 Container::dimension>::vertices_per_cell;
+                           ++v)
                         active_tria_cell->vertex(v) = patch[i]->vertex(v);
 
-                      Assert(active_tria_cell->center().distance(patch_to_global_tria_map_tmp[active_tria_cell]->center())
-                             <=1e-15*active_tria_cell->diameter(), ExcInternalError());
+                      Assert(active_tria_cell->center().distance(
+                               patch_to_global_tria_map_tmp[active_tria_cell]
+                                 ->center()) <=
+                               1e-15 * active_tria_cell->diameter(),
+                             ExcInternalError());
 
                       active_tria_cell->set_user_flag();
                       break;
@@ -1297,45 +1431,51 @@ next_cell:
 
         if (refinement_necessary)
           {
-            local_triangulation.execute_coarsening_and_refinement ();
+            local_triangulation.execute_coarsening_and_refinement();
 
-            for (typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator
-                 cell = local_triangulation.begin();
-                 cell != local_triangulation.end(); ++cell)
+            for (typename Triangulation<
+                   Container::dimension,
+                   Container::space_dimension>::cell_iterator cell =
+                   local_triangulation.begin();
+                 cell != local_triangulation.end();
+                 ++cell)
               {
-
-                if (patch_to_global_tria_map_tmp.find(cell)!=patch_to_global_tria_map_tmp.end())
+                if (patch_to_global_tria_map_tmp.find(cell) !=
+                    patch_to_global_tria_map_tmp.end())
                   {
-                    if (cell-> has_children())
+                    if (cell->has_children())
                       {
-                        // Note: Since the cell got children, then it should not be in the map anymore
-                        // children may be added into the map, instead
+                        // Note: Since the cell got children, then it should not
+                        // be in the map anymore children may be added into the
+                        // map, instead
 
                         // these children may not yet be in the map
-                        for (unsigned int c=0; c<cell->n_children(); ++c)
+                        for (unsigned int c = 0; c < cell->n_children(); ++c)
                           {
-                            if (patch_to_global_tria_map_tmp.find(cell->child(c)) ==
-                                patch_to_global_tria_map_tmp.end())
+                            if (patch_to_global_tria_map_tmp.find(cell->child(
+                                  c)) == patch_to_global_tria_map_tmp.end())
                               {
-                                patch_to_global_tria_map_tmp.insert (std::make_pair(cell->child(c),
-                                                                                    patch_to_global_tria_map_tmp[cell]->child(c)));
+                                patch_to_global_tria_map_tmp.insert(
+                                  std::make_pair(
+                                    cell->child(c),
+                                    patch_to_global_tria_map_tmp[cell]->child(
+                                      c)));
 
                                 // One might be tempted to assert that the cell
                                 // being added here has the same center as the
                                 // equivalent cell in the global triangulation,
-                                // but it may not be the case.  For triangulations
-                                // that have been perturbed or smoothed, the cell
-                                // indices and levels may be the same, but the
-                                // vertex locations may not.  We adjust
-                                // the vertices of the cells that have no
-                                // children (ie the active cells) to be
+                                // but it may not be the case.  For
+                                // triangulations that have been perturbed or
+                                // smoothed, the cell indices and levels may be
+                                // the same, but the vertex locations may not.
+                                // We adjust the vertices of the cells that have
+                                // no children (ie the active cells) to be
                                 // consistent with the global triangulation
                                 // later on and add assertions at that time
                                 // to guarantee the cells in the
-                                // local_triangulation are physically at the same
-                                // locations of the cells in the patch of the
-                                // global triangulation.
-
+                                // local_triangulation are physically at the
+                                // same locations of the cells in the patch of
+                                // the global triangulation.
                               }
                           }
                         // The parent cell whose children were added
@@ -1345,45 +1485,52 @@ next_cell:
                   }
               }
           }
-
       }
     while (refinement_necessary);
 
 
     // Last assertion check to make sure we have the right cells and centers
     // in the map, and hence the correct vertices of the triangulation
-    for (typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator
-         cell = local_triangulation.begin();
-         cell != local_triangulation.end(); ++cell)
+    for (typename Triangulation<Container::dimension,
+                                Container::space_dimension>::cell_iterator
+           cell = local_triangulation.begin();
+         cell != local_triangulation.end();
+         ++cell)
       {
-        if (cell->user_flag_set() )
+        if (cell->user_flag_set())
           {
-            Assert(patch_to_global_tria_map_tmp.find(cell) != patch_to_global_tria_map_tmp.end(),
-                   ExcInternalError() );
+            Assert(patch_to_global_tria_map_tmp.find(cell) !=
+                     patch_to_global_tria_map_tmp.end(),
+                   ExcInternalError());
 
-            Assert(cell->center().distance( patch_to_global_tria_map_tmp[cell]->center())<=1e-15*cell->diameter(),
+            Assert(cell->center().distance(
+                     patch_to_global_tria_map_tmp[cell]->center()) <=
+                     1e-15 * cell->diameter(),
                    ExcInternalError());
           }
       }
 
 
-    typename std::map<typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator,
-             typename Container::cell_iterator>::iterator map_tmp_it =
-               patch_to_global_tria_map_tmp.begin(),map_tmp_end = patch_to_global_tria_map_tmp.end();
-    // Now we just need to take the temporary map of pairs of type cell_iterator "patch_to_global_tria_map_tmp"
-    // making pair of active_cell_iterators so that filling out the final map "patch_to_global_tria_map"
-    for (; map_tmp_it!=map_tmp_end; ++map_tmp_it)
+    typename std::map<
+      typename Triangulation<Container::dimension,
+                             Container::space_dimension>::cell_iterator,
+      typename Container::cell_iterator>::iterator
+      map_tmp_it  = patch_to_global_tria_map_tmp.begin(),
+      map_tmp_end = patch_to_global_tria_map_tmp.end();
+    // Now we just need to take the temporary map of pairs of type cell_iterator
+    // "patch_to_global_tria_map_tmp" making pair of active_cell_iterators so
+    // that filling out the final map "patch_to_global_tria_map"
+    for (; map_tmp_it != map_tmp_end; ++map_tmp_it)
       patch_to_global_tria_map[map_tmp_it->first] = map_tmp_it->second;
   }
 
 
 
-
   template <class DoFHandlerType>
-  std::map< types::global_dof_index,std::vector<typename DoFHandlerType::active_cell_iterator> >
+  std::map<types::global_dof_index,
+           std::vector<typename DoFHandlerType::active_cell_iterator>>
   get_dof_to_support_patch_map(DoFHandlerType &dof_handler)
   {
-
     // This is the map from global_dof_index to
     // a set of cells on patch.  We first map into
     // a set because it is very likely that we
@@ -1394,7 +1541,9 @@ next_cell:
     // constructed, we will copy to a map of vectors
     // since that is the preferred output for other
     // functions.
-    std::map< types::global_dof_index,std::set<typename DoFHandlerType::active_cell_iterator> > dof_to_set_of_cells_map;
+    std::map<types::global_dof_index,
+             std::set<typename DoFHandlerType::active_cell_iterator>>
+      dof_to_set_of_cells_map;
 
     std::vector<types::global_dof_index> local_dof_indices;
     std::vector<types::global_dof_index> local_face_dof_indices;
@@ -1407,18 +1556,23 @@ next_cell:
 
     // in 3d, we need pointers from active lines to the
     // active parent lines, so we construct it as needed.
-    std::map<typename DoFHandlerType::active_line_iterator, typename DoFHandlerType::line_iterator > lines_to_parent_lines_map;
+    std::map<typename DoFHandlerType::active_line_iterator,
+             typename DoFHandlerType::line_iterator>
+      lines_to_parent_lines_map;
     if (DoFHandlerType::dimension == 3)
       {
-
         // save user flags as they will be modified and then later restored
         dof_handler.get_triangulation().save_user_flags(user_flags);
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>(dof_handler.get_triangulation()).clear_user_flags ();
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
+                                         DoFHandlerType::space_dimension> &>(
+          dof_handler.get_triangulation())
+          .clear_user_flags();
 
 
-        typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
+        typename DoFHandlerType::active_cell_iterator cell = dof_handler
+                                                               .begin_active(),
                                                       endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
+        for (; cell != endc; ++cell)
           {
             // We only want lines that are locally_relevant
             // although it doesn't hurt to have lines that
@@ -1426,11 +1580,16 @@ next_cell:
             // few and we don't have to use them.
             if (cell->is_artificial() == false)
               {
-                for (unsigned int l=0; l<GeometryInfo<DoFHandlerType::dimension>::lines_per_cell; ++l)
+                for (unsigned int l = 0;
+                     l <
+                     GeometryInfo<DoFHandlerType::dimension>::lines_per_cell;
+                     ++l)
                   if (cell->line(l)->has_children())
-                    for (unsigned int c=0; c<cell->line(l)->n_children(); ++c)
+                    for (unsigned int c = 0; c < cell->line(l)->n_children();
+                         ++c)
                       {
-                        lines_to_parent_lines_map[cell->line(l)->child(c)] = cell->line(l);
+                        lines_to_parent_lines_map[cell->line(l)->child(c)] =
+                          cell->line(l);
                         // set flags to know that child
                         // line has an active parent.
                         cell->line(l)->child(c)->set_user_flag();
@@ -1446,9 +1605,10 @@ next_cell:
     // which it is a part, mainly the ones that must
     // be added on account of adaptivity hanging node
     // constraints.
-    typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
+    typename DoFHandlerType::active_cell_iterator cell =
+                                                    dof_handler.begin_active(),
                                                   endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         // Need to loop through all cells that could
         // be in the patch of dofs on locally_owned
@@ -1461,7 +1621,7 @@ next_cell:
             // Take care of adding cell pointer to each
             // dofs that exists on cell.
             cell->get_dof_indices(local_dof_indices);
-            for (unsigned int i=0; i< n_dofs_per_cell; ++i )
+            for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
               dof_to_set_of_cells_map[local_dof_indices[i]].insert(cell);
 
             // In the case of the adjacent cell (over
@@ -1472,11 +1632,14 @@ next_cell:
             // face (or line).
 
             // Take care of dofs on neighbor faces
-            for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
+            for (unsigned int f = 0;
+                 f < GeometryInfo<DoFHandlerType::dimension>::faces_per_cell;
+                 ++f)
               {
                 if (cell->face(f)->has_children())
                   {
-                    for (unsigned int c=0; c<cell->face(f)->n_children(); ++c)
+                    for (unsigned int c = 0; c < cell->face(f)->n_children();
+                         ++c)
                       {
                         //  Add cell to dofs of all subfaces
                         //
@@ -1490,19 +1653,23 @@ next_cell:
                         //   |                   |of subface|         |
                         //   *-------------------*----------*---------*
                         //
-                        Assert (cell->face(f)->child(c)->has_children() == false, ExcInternalError());
+                        Assert(cell->face(f)->child(c)->has_children() == false,
+                               ExcInternalError());
 
-                        const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
+                        const unsigned int n_dofs_per_face =
+                          cell->get_fe().dofs_per_face;
                         local_face_dof_indices.resize(n_dofs_per_face);
 
-                        cell->face(f)->child(c)->get_dof_indices(local_face_dof_indices);
-                        for (unsigned int i=0; i< n_dofs_per_face; ++i )
-                          dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
+                        cell->face(f)->child(c)->get_dof_indices(
+                          local_face_dof_indices);
+                        for (unsigned int i = 0; i < n_dofs_per_face; ++i)
+                          dof_to_set_of_cells_map[local_face_dof_indices[i]]
+                            .insert(cell);
                       }
                   }
-                else if ((cell->face(f)->at_boundary() == false) && (cell->neighbor_is_coarser(f)))
+                else if ((cell->face(f)->at_boundary() == false) &&
+                         (cell->neighbor_is_coarser(f)))
                   {
-
                     // Add cell to dofs of parent face and all
                     // child faces of parent face
                     //
@@ -1518,30 +1685,47 @@ next_cell:
                     //
 
                     // Add cell to all dofs of parent face
-                    std::pair<unsigned int, unsigned int> neighbor_face_no_subface_no = cell->neighbor_of_coarser_neighbor(f);
+                    std::pair<unsigned int, unsigned int>
+                      neighbor_face_no_subface_no =
+                        cell->neighbor_of_coarser_neighbor(f);
                     unsigned int face_no = neighbor_face_no_subface_no.first;
                     unsigned int subface = neighbor_face_no_subface_no.second;
 
-                    const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
+                    const unsigned int n_dofs_per_face =
+                      cell->get_fe().dofs_per_face;
                     local_face_dof_indices.resize(n_dofs_per_face);
 
-                    cell->neighbor(f)->face(face_no)->get_dof_indices(local_face_dof_indices);
-                    for (unsigned int i=0; i< n_dofs_per_face; ++i )
-                      dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
+                    cell->neighbor(f)->face(face_no)->get_dof_indices(
+                      local_face_dof_indices);
+                    for (unsigned int i = 0; i < n_dofs_per_face; ++i)
+                      dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(
+                        cell);
 
                     // Add cell to all dofs of children of
                     // parent face
-                    for (unsigned int c=0; c<cell->neighbor(f)->face(face_no)->n_children(); ++c)
+                    for (unsigned int c = 0;
+                         c < cell->neighbor(f)->face(face_no)->n_children();
+                         ++c)
                       {
-                        if (c != subface) // don't repeat work on dofs of original cell
+                        if (c != subface) // don't repeat work on dofs of
+                                          // original cell
                           {
-                            const unsigned int n_dofs_per_face = cell->get_fe().dofs_per_face;
+                            const unsigned int n_dofs_per_face =
+                              cell->get_fe().dofs_per_face;
                             local_face_dof_indices.resize(n_dofs_per_face);
 
-                            Assert (cell->neighbor(f)->face(face_no)->child(c)->has_children() == false, ExcInternalError());
-                            cell->neighbor(f)->face(face_no)->child(c)->get_dof_indices(local_face_dof_indices);
-                            for (unsigned int i=0; i<n_dofs_per_face; ++i )
-                              dof_to_set_of_cells_map[local_face_dof_indices[i]].insert(cell);
+                            Assert(cell->neighbor(f)
+                                       ->face(face_no)
+                                       ->child(c)
+                                       ->has_children() == false,
+                                   ExcInternalError());
+                            cell->neighbor(f)
+                              ->face(face_no)
+                              ->child(c)
+                              ->get_dof_indices(local_face_dof_indices);
+                            for (unsigned int i = 0; i < n_dofs_per_face; ++i)
+                              dof_to_set_of_cells_map[local_face_dof_indices[i]]
+                                .insert(cell);
                           }
                       }
                   }
@@ -1557,23 +1741,33 @@ next_cell:
             // and dofs on all children of parent line.
             if (DoFHandlerType::dimension == 3)
               {
-                for (unsigned int l=0; l<GeometryInfo<DoFHandlerType::dimension>::lines_per_cell; ++l)
+                for (unsigned int l = 0;
+                     l <
+                     GeometryInfo<DoFHandlerType::dimension>::lines_per_cell;
+                     ++l)
                   {
                     if (cell->line(l)->has_children())
                       {
-                        for (unsigned int c=0; c<cell->line(l)->n_children(); ++c)
+                        for (unsigned int c = 0;
+                             c < cell->line(l)->n_children();
+                             ++c)
                           {
-                            Assert (cell->line(l)->child(c)->has_children() == false, ExcInternalError());
+                            Assert(cell->line(l)->child(c)->has_children() ==
+                                     false,
+                                   ExcInternalError());
 
                             // dofs_per_line returns number of dofs
                             // on line not including the vertices of the line.
-                            const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
-                                                                 + cell->get_fe().dofs_per_line;
+                            const unsigned int n_dofs_per_line =
+                              2 * cell->get_fe().dofs_per_vertex +
+                              cell->get_fe().dofs_per_line;
                             local_line_dof_indices.resize(n_dofs_per_line);
 
-                            cell->line(l)->child(c)->get_dof_indices(local_line_dof_indices);
-                            for (unsigned int i=0; i<n_dofs_per_line; ++i )
-                              dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
+                            cell->line(l)->child(c)->get_dof_indices(
+                              local_line_dof_indices);
+                            for (unsigned int i = 0; i < n_dofs_per_line; ++i)
+                              dof_to_set_of_cells_map[local_line_dof_indices[i]]
+                                .insert(cell);
                           }
                       }
                     // user flag was set above to denote that
@@ -1582,38 +1776,45 @@ next_cell:
                     // children
                     else if (cell->line(l)->user_flag_set() == true)
                       {
-                        typename DoFHandlerType::line_iterator parent_line = lines_to_parent_lines_map[cell->line(l)];
-                        Assert (parent_line->has_children(), ExcInternalError() );
+                        typename DoFHandlerType::line_iterator parent_line =
+                          lines_to_parent_lines_map[cell->line(l)];
+                        Assert(parent_line->has_children(), ExcInternalError());
 
                         // dofs_per_line returns number of dofs
                         // on line not including the vertices of the line.
-                        const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
-                                                             + cell->get_fe().dofs_per_line;
+                        const unsigned int n_dofs_per_line =
+                          2 * cell->get_fe().dofs_per_vertex +
+                          cell->get_fe().dofs_per_line;
                         local_line_dof_indices.resize(n_dofs_per_line);
 
                         parent_line->get_dof_indices(local_line_dof_indices);
-                        for (unsigned int i=0; i<n_dofs_per_line; ++i )
-                          dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
+                        for (unsigned int i = 0; i < n_dofs_per_line; ++i)
+                          dof_to_set_of_cells_map[local_line_dof_indices[i]]
+                            .insert(cell);
 
-                        for (unsigned int c=0; c<parent_line->n_children(); ++c)
+                        for (unsigned int c = 0; c < parent_line->n_children();
+                             ++c)
                           {
-                            Assert (parent_line->child(c)->has_children() == false, ExcInternalError());
+                            Assert(parent_line->child(c)->has_children() ==
+                                     false,
+                                   ExcInternalError());
 
-                            const unsigned int n_dofs_per_line = 2*cell->get_fe().dofs_per_vertex
-                                                                 + cell->get_fe().dofs_per_line;
+                            const unsigned int n_dofs_per_line =
+                              2 * cell->get_fe().dofs_per_vertex +
+                              cell->get_fe().dofs_per_line;
                             local_line_dof_indices.resize(n_dofs_per_line);
 
-                            parent_line->child(c)->get_dof_indices(local_line_dof_indices);
-                            for (unsigned int i=0; i<n_dofs_per_line; ++i )
-                              dof_to_set_of_cells_map[local_line_dof_indices[i]].insert(cell);
+                            parent_line->child(c)->get_dof_indices(
+                              local_line_dof_indices);
+                            for (unsigned int i = 0; i < n_dofs_per_line; ++i)
+                              dof_to_set_of_cells_map[local_line_dof_indices[i]]
+                                .insert(cell);
                           }
-
-
                       }
                   } // for lines l
-              }// if DoFHandlerType::dimension == 3
-          }// if cell->is_locally_owned()
-      }// for cells
+              }     // if DoFHandlerType::dimension == 3
+          }         // if cell->is_locally_owned()
+      }             // for cells
 
 
     if (DoFHandlerType::dimension == 3)
@@ -1621,18 +1822,25 @@ next_cell:
         // finally, restore user flags that were changed above
         // to when we constructed the pointers to parent of lines
         // Since dof_handler is const, we must leave it unchanged.
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &>(dof_handler.get_triangulation()).load_user_flags (user_flags);
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
+                                         DoFHandlerType::space_dimension> &>(
+          dof_handler.get_triangulation())
+          .load_user_flags(user_flags);
       }
 
     // Finally, we copy map of sets to
     // map of vectors using the std::vector::assign() function
-    std::map< types::global_dof_index, std::vector<typename DoFHandlerType::active_cell_iterator> > dof_to_cell_patches;
+    std::map<types::global_dof_index,
+             std::vector<typename DoFHandlerType::active_cell_iterator>>
+      dof_to_cell_patches;
 
-    typename std::map<types::global_dof_index, std::set< typename DoFHandlerType::active_cell_iterator> >::iterator
-    it = dof_to_set_of_cells_map.begin(),
-    it_end = dof_to_set_of_cells_map.end();
-    for ( ; it!=it_end; ++it)
-      dof_to_cell_patches[it->first].assign( it->second.begin(), it->second.end() );
+    typename std::map<types::global_dof_index,
+                      std::set<typename DoFHandlerType::active_cell_iterator>>::
+      iterator it     = dof_to_set_of_cells_map.begin(),
+               it_end = dof_to_set_of_cells_map.end();
+    for (; it != it_end; ++it)
+      dof_to_cell_patches[it->first].assign(it->second.begin(),
+                                            it->second.end());
 
     return dof_to_cell_patches;
   }
@@ -1642,52 +1850,51 @@ next_cell:
    */
   template <typename CellIterator>
   void
-  match_periodic_face_pairs
-  (std::set<std::pair<CellIterator, unsigned int> > &pairs1,
-   std::set<std::pair<typename identity<CellIterator>::type, unsigned int> > &pairs2,
-   const int                                        direction,
-   std::vector<PeriodicFacePair<CellIterator> >     &matched_pairs,
-   const dealii::Tensor<1,CellIterator::AccessorType::space_dimension> &offset,
-   const FullMatrix<double>                         &matrix)
+  match_periodic_face_pairs(
+    std::set<std::pair<CellIterator, unsigned int>> &pairs1,
+    std::set<std::pair<typename identity<CellIterator>::type, unsigned int>>
+      &                                          pairs2,
+    const int                                    direction,
+    std::vector<PeriodicFacePair<CellIterator>> &matched_pairs,
+    const dealii::Tensor<1, CellIterator::AccessorType::space_dimension>
+      &                       offset,
+    const FullMatrix<double> &matrix)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     (void)space_dim;
-    Assert (0<=direction && direction<space_dim,
-            ExcIndexRange (direction, 0, space_dim));
+    Assert(0 <= direction && direction < space_dim,
+           ExcIndexRange(direction, 0, space_dim));
 
-    Assert (pairs1.size() == pairs2.size(),
-            ExcMessage ("Unmatched faces on periodic boundaries"));
+    Assert(pairs1.size() == pairs2.size(),
+           ExcMessage("Unmatched faces on periodic boundaries"));
 
     unsigned int n_matches = 0;
 
     // Match with a complexity of O(n^2). This could be improved...
     std::bitset<3> orientation;
-    typedef typename std::set
-    <std::pair<CellIterator, unsigned int> >::const_iterator PairIterator;
+    typedef
+      typename std::set<std::pair<CellIterator, unsigned int>>::const_iterator
+        PairIterator;
     for (PairIterator it1 = pairs1.begin(); it1 != pairs1.end(); ++it1)
       {
         for (PairIterator it2 = pairs2.begin(); it2 != pairs2.end(); ++it2)
           {
-            const CellIterator cell1 = it1->first;
-            const CellIterator cell2 = it2->first;
+            const CellIterator cell1     = it1->first;
+            const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
             if (GridTools::orthogonal_equality(orientation,
                                                cell1->face(face_idx1),
                                                cell2->face(face_idx2),
-                                               direction, offset,
+                                               direction,
+                                               offset,
                                                matrix))
               {
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
-                const PeriodicFacePair<CellIterator> matched_face =
-                {
-                  {cell1, cell2},
-                  {face_idx1, face_idx2},
-                  orientation,
-                  matrix
-                };
+                const PeriodicFacePair<CellIterator> matched_face = {
+                  {cell1, cell2}, {face_idx1, face_idx2}, orientation, matrix};
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
@@ -1696,85 +1903,89 @@ next_cell:
           }
       }
 
-    //Assure that all faces are matched
-    AssertThrow (n_matches == pairs1.size() && pairs2.size() == 0,
-                 ExcMessage ("Unmatched faces on periodic boundaries"));
+    // Assure that all faces are matched
+    AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
+                ExcMessage("Unmatched faces on periodic boundaries"));
   }
 
 
 
   template <typename MeshType>
   void
-  collect_periodic_faces
-  (const MeshType                        &mesh,
-   const types::boundary_id               b_id,
-   const int                              direction,
-   std::vector<PeriodicFacePair<typename MeshType::cell_iterator> > &matched_pairs,
-   const Tensor<1,MeshType::space_dimension> &offset,
-   const FullMatrix<double>              &matrix)
+  collect_periodic_faces(
+    const MeshType &         mesh,
+    const types::boundary_id b_id,
+    const int                direction,
+    std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
+      &                                         matched_pairs,
+    const Tensor<1, MeshType::space_dimension> &offset,
+    const FullMatrix<double> &                  matrix)
   {
-    static const int dim = MeshType::dimension;
+    static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert (0<=direction && direction<space_dim,
-            ExcIndexRange (direction, 0, space_dim));
+    Assert(0 <= direction && direction < space_dim,
+           ExcIndexRange(direction, 0, space_dim));
 
-    Assert(dim == space_dim,
-           ExcNotImplemented());
+    Assert(dim == space_dim, ExcNotImplemented());
 
     // Loop over all cells on the highest level and collect all boundary
     // faces 2*direction and 2*direction*1:
 
-    std::set<std::pair<typename MeshType::cell_iterator, unsigned int> > pairs1;
-    std::set<std::pair<typename MeshType::cell_iterator, unsigned int> > pairs2;
+    std::set<std::pair<typename MeshType::cell_iterator, unsigned int>> pairs1;
+    std::set<std::pair<typename MeshType::cell_iterator, unsigned int>> pairs2;
 
     for (typename MeshType::cell_iterator cell = mesh.begin(0);
-         cell != mesh.end(0); ++cell)
+         cell != mesh.end(0);
+         ++cell)
       {
-        const typename MeshType::face_iterator face_1 = cell->face(2*direction);
-        const typename MeshType::face_iterator face_2 = cell->face(2*direction+1);
+        const typename MeshType::face_iterator face_1 =
+          cell->face(2 * direction);
+        const typename MeshType::face_iterator face_2 =
+          cell->face(2 * direction + 1);
 
         if (face_1->at_boundary() && face_1->boundary_id() == b_id)
           {
-            const std::pair<typename MeshType::cell_iterator, unsigned int> pair1
-              = std::make_pair(cell, 2*direction);
+            const std::pair<typename MeshType::cell_iterator, unsigned int>
+              pair1 = std::make_pair(cell, 2 * direction);
             pairs1.insert(pair1);
           }
 
         if (face_2->at_boundary() && face_2->boundary_id() == b_id)
           {
-            const std::pair<typename MeshType::cell_iterator, unsigned int> pair2
-              = std::make_pair(cell, 2*direction+1);
+            const std::pair<typename MeshType::cell_iterator, unsigned int>
+              pair2 = std::make_pair(cell, 2 * direction + 1);
             pairs2.insert(pair2);
           }
       }
 
-    Assert (pairs1.size() == pairs2.size(),
-            ExcMessage ("Unmatched faces on periodic boundaries"));
+    Assert(pairs1.size() == pairs2.size(),
+           ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert (pairs1.size() > 0,
-            ExcMessage("No new periodic face pairs have been found. "
-                       "Are you sure that you've selected the correct boundary "
-                       "id's and that the coarsest level mesh is colorized?"));
+    Assert(pairs1.size() > 0,
+           ExcMessage("No new periodic face pairs have been found. "
+                      "Are you sure that you've selected the correct boundary "
+                      "id's and that the coarsest level mesh is colorized?"));
 
 #ifdef DEBUG
     const unsigned int size_old = matched_pairs.size();
 #endif
 
     // and call match_periodic_face_pairs that does the actual matching:
-    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset,
-                              matrix);
+    match_periodic_face_pairs(
+      pairs1, pairs2, direction, matched_pairs, offset, matrix);
 
 #ifdef DEBUG
-    //check for standard orientation
+    // check for standard orientation
     const unsigned int size_new = matched_pairs.size();
     for (unsigned int i = size_old; i < size_new; ++i)
       {
-        Assert(matched_pairs[i].orientation == 1,
-               ExcMessage("Found a face match with non standard orientation. "
-                          "This function is only suitable for meshes with cells "
-                          "in default orientation"));
+        Assert(
+          matched_pairs[i].orientation == 1,
+          ExcMessage("Found a face match with non standard orientation. "
+                     "This function is only suitable for meshes with cells "
+                     "in default orientation"));
       }
 #endif
   }
@@ -1783,61 +1994,63 @@ next_cell:
 
   template <typename MeshType>
   void
-  collect_periodic_faces
-  (const MeshType                        &mesh,
-   const types::boundary_id               b_id1,
-   const types::boundary_id               b_id2,
-   const int                              direction,
-   std::vector<PeriodicFacePair<typename MeshType::cell_iterator> > &matched_pairs,
-   const Tensor<1,MeshType::space_dimension> &offset,
-   const FullMatrix<double>              &matrix)
+  collect_periodic_faces(
+    const MeshType &         mesh,
+    const types::boundary_id b_id1,
+    const types::boundary_id b_id2,
+    const int                direction,
+    std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
+      &                                         matched_pairs,
+    const Tensor<1, MeshType::space_dimension> &offset,
+    const FullMatrix<double> &                  matrix)
   {
-    static const int dim = MeshType::dimension;
+    static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert (0<=direction && direction<space_dim,
-            ExcIndexRange (direction, 0, space_dim));
+    Assert(0 <= direction && direction < space_dim,
+           ExcIndexRange(direction, 0, space_dim));
 
     // Loop over all cells on the highest level and collect all boundary
     // faces belonging to b_id1 and b_id2:
 
-    std::set<std::pair<typename MeshType::cell_iterator, unsigned int> > pairs1;
-    std::set<std::pair<typename MeshType::cell_iterator, unsigned int> > pairs2;
+    std::set<std::pair<typename MeshType::cell_iterator, unsigned int>> pairs1;
+    std::set<std::pair<typename MeshType::cell_iterator, unsigned int>> pairs2;
 
     for (typename MeshType::cell_iterator cell = mesh.begin(0);
-         cell != mesh.end(0); ++cell)
+         cell != mesh.end(0);
+         ++cell)
       {
         for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
           {
             const typename MeshType::face_iterator face = cell->face(i);
             if (face->at_boundary() && face->boundary_id() == b_id1)
               {
-                const std::pair<typename MeshType::cell_iterator, unsigned int> pair1
-                  = std::make_pair(cell, i);
+                const std::pair<typename MeshType::cell_iterator, unsigned int>
+                  pair1 = std::make_pair(cell, i);
                 pairs1.insert(pair1);
               }
 
             if (face->at_boundary() && face->boundary_id() == b_id2)
               {
-                const std::pair<typename MeshType::cell_iterator, unsigned int> pair2
-                  = std::make_pair(cell, i);
+                const std::pair<typename MeshType::cell_iterator, unsigned int>
+                  pair2 = std::make_pair(cell, i);
                 pairs2.insert(pair2);
               }
           }
       }
 
-    Assert (pairs1.size() == pairs2.size(),
-            ExcMessage ("Unmatched faces on periodic boundaries"));
+    Assert(pairs1.size() == pairs2.size(),
+           ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert (pairs1.size() > 0,
-            ExcMessage("No new periodic face pairs have been found. "
-                       "Are you sure that you've selected the correct boundary "
-                       "id's and that the coarsest level mesh is colorized?"));
+    Assert(pairs1.size() > 0,
+           ExcMessage("No new periodic face pairs have been found. "
+                      "Are you sure that you've selected the correct boundary "
+                      "id's and that the coarsest level mesh is colorized?"));
 
     // and call match_periodic_face_pairs that does the actual matching:
-    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset,
-                              matrix);
+    match_periodic_face_pairs(
+      pairs1, pairs2, direction, matched_pairs, offset, matrix);
   }
 
 
@@ -1852,14 +2065,15 @@ next_cell:
    * is parallel to the unit vector in <direction>
    */
   template <int spacedim>
-  inline bool orthogonal_equality (const Point<spacedim>    &point1,
-                                   const Point<spacedim>    &point2,
-                                   const int                 direction,
-                                   const Tensor<1,spacedim> &offset,
-                                   const FullMatrix<double> &matrix)
+  inline bool
+  orthogonal_equality(const Point<spacedim> &    point1,
+                      const Point<spacedim> &    point2,
+                      const int                  direction,
+                      const Tensor<1, spacedim> &offset,
+                      const FullMatrix<double> & matrix)
   {
-    Assert (0<=direction && direction<spacedim,
-            ExcIndexRange (direction, 0, spacedim));
+    Assert(0 <= direction && direction < spacedim,
+           ExcIndexRange(direction, 0, spacedim));
 
     Assert(matrix.m() == matrix.n(), ExcInternalError());
 
@@ -1868,7 +2082,7 @@ next_cell:
     if (matrix.m() == spacedim)
       for (int i = 0; i < spacedim; ++i)
         for (int j = 0; j < spacedim; ++j)
-          distance(i) += matrix(i,j) * point1(j);
+          distance(i) += matrix(i, j) * point1(j);
     else
       distance = point1;
 
@@ -1898,32 +2112,42 @@ next_cell:
    * documentation of make_periodicity_constraints and
    * collect_periodic_faces for details
    */
-  template <int dim> struct OrientationLookupTable {};
+  template <int dim>
+  struct OrientationLookupTable
+  {};
 
-  template <> struct OrientationLookupTable<1>
+  template <>
+  struct OrientationLookupTable<1>
   {
-    typedef std::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
-    static inline std::bitset<3> lookup (const MATCH_T &)
+    typedef std::array<unsigned int, GeometryInfo<1>::vertices_per_face>
+      MATCH_T;
+    static inline std::bitset<3>
+    lookup(const MATCH_T &)
     {
       // The 1D case is trivial
       return 1; // [true ,false,false]
     }
   };
 
-  template <> struct OrientationLookupTable<2>
+  template <>
+  struct OrientationLookupTable<2>
   {
-    typedef std::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
-    static inline std::bitset<3> lookup (const MATCH_T &matching)
+    typedef std::array<unsigned int, GeometryInfo<2>::vertices_per_face>
+      MATCH_T;
+    static inline std::bitset<3>
+    lookup(const MATCH_T &matching)
     {
       // In 2D matching faces (=lines) results in two cases: Either
       // they are aligned or flipped. We store this "line_flip"
       // property somewhat sloppy as "face_flip"
       // (always: face_orientation = true, face_rotation = false)
 
-      static const MATCH_T m_tff = {{ 0, 1 }};
-      if (matching == m_tff) return 1;           // [true ,false,false]
-      static const MATCH_T m_ttf = {{ 1, 0 }};
-      if (matching == m_ttf) return 3;           // [true ,true ,false]
+      static const MATCH_T m_tff = {{0, 1}};
+      if (matching == m_tff)
+        return 1; // [true ,false,false]
+      static const MATCH_T m_ttf = {{1, 0}};
+      if (matching == m_ttf)
+        return 3; // [true ,true ,false]
       Assert(false, ExcInternalError());
       // what follows is dead code, but it avoids warnings about the lack
       // of a return value
@@ -1931,32 +2155,43 @@ next_cell:
     }
   };
 
-  template <> struct OrientationLookupTable<3>
+  template <>
+  struct OrientationLookupTable<3>
   {
-    typedef std::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
-    static inline std::bitset<3> lookup (const MATCH_T &matching)
+    typedef std::array<unsigned int, GeometryInfo<3>::vertices_per_face>
+      MATCH_T;
+    static inline std::bitset<3>
+    lookup(const MATCH_T &matching)
     {
       // The full fledged 3D case. *Yay*
       // See the documentation in include/deal.II/base/geometry_info.h
       // as well as the actual implementation in source/grid/tria.cc
       // for more details...
 
-      static const MATCH_T m_tff = {{ 0, 1, 2, 3 }};
-      if (matching == m_tff) return 1;                   // [true ,false,false]
-      static const MATCH_T m_tft = {{ 1, 3, 0, 2 }};
-      if (matching == m_tft) return 5;                   // [true ,false,true ]
-      static const MATCH_T m_ttf = {{ 3, 2, 1, 0 }};
-      if (matching == m_ttf) return 3;                   // [true ,true ,false]
-      static const MATCH_T m_ttt = {{ 2, 0, 3, 1 }};
-      if (matching == m_ttt) return 7;                   // [true ,true ,true ]
-      static const MATCH_T m_fff = {{ 0, 2, 1, 3 }};
-      if (matching == m_fff) return 0;                   // [false,false,false]
-      static const MATCH_T m_fft = {{ 2, 3, 0, 1 }};
-      if (matching == m_fft) return 4;                   // [false,false,true ]
-      static const MATCH_T m_ftf = {{ 3, 1, 2, 0 }};
-      if (matching == m_ftf) return 2;                   // [false,true ,false]
-      static const MATCH_T m_ftt = {{ 1, 0, 3, 2 }};
-      if (matching == m_ftt) return 6;                   // [false,true ,true ]
+      static const MATCH_T m_tff = {{0, 1, 2, 3}};
+      if (matching == m_tff)
+        return 1; // [true ,false,false]
+      static const MATCH_T m_tft = {{1, 3, 0, 2}};
+      if (matching == m_tft)
+        return 5; // [true ,false,true ]
+      static const MATCH_T m_ttf = {{3, 2, 1, 0}};
+      if (matching == m_ttf)
+        return 3; // [true ,true ,false]
+      static const MATCH_T m_ttt = {{2, 0, 3, 1}};
+      if (matching == m_ttt)
+        return 7; // [true ,true ,true ]
+      static const MATCH_T m_fff = {{0, 2, 1, 3}};
+      if (matching == m_fff)
+        return 0; // [false,false,false]
+      static const MATCH_T m_fft = {{2, 3, 0, 1}};
+      if (matching == m_fft)
+        return 4; // [false,false,true ]
+      static const MATCH_T m_ftf = {{3, 1, 2, 0}};
+      if (matching == m_ftf)
+        return 2; // [false,true ,false]
+      static const MATCH_T m_ftt = {{1, 0, 3, 2}};
+      if (matching == m_ftt)
+        return 6; // [false,true ,true ]
       Assert(false, ExcInternalError());
       // what follows is dead code, but it avoids warnings about the lack
       // of a return value
@@ -1967,13 +2202,13 @@ next_cell:
 
 
   template <typename FaceIterator>
-  inline bool
-  orthogonal_equality (std::bitset<3>     &orientation,
-                       const FaceIterator &face1,
-                       const FaceIterator &face2,
-                       const int          direction,
-                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
-                       const FullMatrix<double> &matrix)
+  inline bool orthogonal_equality(
+    std::bitset<3> &                                              orientation,
+    const FaceIterator &                                          face1,
+    const FaceIterator &                                          face2,
+    const int                                                     direction,
+    const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
+    const FullMatrix<double> &                                    matrix)
   {
     Assert(matrix.m() == matrix.n(),
            ExcMessage("The supplied matrix must be a square matrix"));
@@ -1982,8 +2217,7 @@ next_cell:
 
     // Do a full matching of the face vertices:
 
-    std::
-    array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
+    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
 
     std::set<unsigned int> face2_vertices;
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
@@ -1995,8 +2229,11 @@ next_cell:
              it != face2_vertices.end();
              ++it)
           {
-            if (orthogonal_equality(face1->vertex(i),face2->vertex(*it),
-                                    direction, offset, matrix))
+            if (orthogonal_equality(face1->vertex(i),
+                                    face2->vertex(*it),
+                                    direction,
+                                    offset,
+                                    matrix))
               {
                 matching[i] = *it;
                 face2_vertices.erase(it);
@@ -2016,20 +2253,21 @@ next_cell:
 
   template <typename FaceIterator>
   inline bool
-  orthogonal_equality (const FaceIterator &face1,
-                       const FaceIterator &face2,
-                       const int          direction,
-                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
-                       const FullMatrix<double> &matrix)
+  orthogonal_equality(
+    const FaceIterator &                                          face1,
+    const FaceIterator &                                          face2,
+    const int                                                     direction,
+    const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
+    const FullMatrix<double> &                                    matrix)
   {
     // Call the function above with a dummy orientation array
     std::bitset<3> dummy;
-    return orthogonal_equality (dummy, face1, face2, direction, offset, matrix);
+    return orthogonal_equality(dummy, face1, face2, direction, offset, matrix);
   }
 
 
 
-}
+} // namespace GridTools
 
 
 #include "grid_tools_dof_handlers.inst"

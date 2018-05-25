@@ -18,33 +18,32 @@
 // this test failed with an internal error somewhere in the coarsening
 // functions
 
-#include "../tests.h"
-#include "../grid/mesh_3d.h"
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_reordering.h>
-#include <deal.II/grid/grid_generator.h>
+
+#include "../grid/mesh_3d.h"
+#include "../tests.h"
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   Triangulation<3> coarse_grid;
-  create_L_shape (coarse_grid);
+  create_L_shape(coarse_grid);
 
   // refine once, then unrefine again
-  coarse_grid.refine_global (1);
-  for (Triangulation<3>::active_cell_iterator c=coarse_grid.begin_active();
-       c != coarse_grid.end(); ++c)
-    c->set_coarsen_flag ();
-  coarse_grid.execute_coarsening_and_refinement ();
+  coarse_grid.refine_global(1);
+  for (Triangulation<3>::active_cell_iterator c = coarse_grid.begin_active();
+       c != coarse_grid.end();
+       ++c)
+    c->set_coarsen_flag();
+  coarse_grid.execute_coarsening_and_refinement();
 
   deallog << "ok." << std::endl;
 }
-
-
-

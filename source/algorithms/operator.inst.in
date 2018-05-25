@@ -15,8 +15,8 @@
 
 
 for (VEC : VECTOR_TYPES)
-{
+  {
     template class OutputOperator<VEC>;
     template class Newton<VEC>;
     template class ThetaTimestepping<VEC>;
-}
+  }

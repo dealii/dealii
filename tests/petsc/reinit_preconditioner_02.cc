@@ -17,33 +17,37 @@
 
 // check re-initializing a preconditioner (serial version)
 
-#include "../tests.h"
+#include <deal.II/base/index_set.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_precondition.h>
-#include <deal.II/base/index_set.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
+
 template <class PRE>
-void test ()
+void
+test()
 {
-  DynamicSparsityPattern csp (5, 5);
+  DynamicSparsityPattern csp(5, 5);
 
-  for (unsigned int i=0; i<5; ++i)
-    csp.add(i,i);
+  for (unsigned int i = 0; i < 5; ++i)
+    csp.add(i, i);
 
-  csp.add(0,1);
-  csp.add(1,0);
+  csp.add(0, 1);
+  csp.add(1, 0);
 
   PETScWrappers::SparseMatrix mat;
-  mat.reinit (csp);
+  mat.reinit(csp);
 
-  for (unsigned int i=0; i<5; ++i)
-    mat.set(i,i, 1.0+i*2.0);
-  mat.set(0,1, 0.1);
-  mat.set(1,0, 0.1);
+  for (unsigned int i = 0; i < 5; ++i)
+    mat.set(i, i, 1.0 + i * 2.0);
+  mat.set(0, 1, 0.1);
+  mat.set(1, 0, 0.1);
 
   mat.compress(VectorOperation::insert);
 
@@ -62,7 +66,7 @@ void test ()
     pre.vmult(dst, src);
     dst.print(deallog.get_file_stream());
 
-    mat.add(0,0,1.0);
+    mat.add(0, 0, 1.0);
     mat.compress(VectorOperation::add);
 
     pre.initialize(mat);
@@ -75,20 +79,21 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
-  test<PETScWrappers::PreconditionJacobi> ();
-  test<PETScWrappers::PreconditionBlockJacobi> ();
-  test<PETScWrappers::PreconditionSOR> ();
-  test<PETScWrappers::PreconditionSSOR> ();
+  test<PETScWrappers::PreconditionJacobi>();
+  test<PETScWrappers::PreconditionBlockJacobi>();
+  test<PETScWrappers::PreconditionSOR>();
+  test<PETScWrappers::PreconditionSSOR>();
   // todo: this crashes test<PETScWrappers::PreconditionEisenstat> ();
-  test<PETScWrappers::PreconditionICC> ();
-  test<PETScWrappers::PreconditionILU> ();
-  test<PETScWrappers::PreconditionLU> ();
-  test<PETScWrappers::PreconditionBoomerAMG> ();
-  test<PETScWrappers::PreconditionParaSails> ();
-  test<PETScWrappers::PreconditionNone> ();
+  test<PETScWrappers::PreconditionICC>();
+  test<PETScWrappers::PreconditionILU>();
+  test<PETScWrappers::PreconditionLU>();
+  test<PETScWrappers::PreconditionBoomerAMG>();
+  test<PETScWrappers::PreconditionParaSails>();
+  test<PETScWrappers::PreconditionNone>();
 }

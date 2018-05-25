@@ -16,14 +16,16 @@
 // test MPI::Partitioner update_ghosts() and compress() in case we have
 // empty owned DoFs
 
-#include "../tests.h"
-#include <deal.II/base/mpi.h>
-#include <deal.II/base/index_set.h>
-#include <deal.II/base/partitioner.h>
 #include <deal.II/base/aligned_vector.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/partitioner.h>
 
-template <typename Number=double>
-void test()
+#include "../tests.h"
+
+template <typename Number = double>
+void
+test()
 {
   const unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
@@ -51,36 +53,36 @@ void test()
 
   IndexSet is1(16), is2(16), is3(16);
 
-  if (rank==0)
+  if (rank == 0)
     {
-      is1.add_range(0,8);
+      is1.add_range(0, 8);
       // note: empty is2
-      is3.add_range(8,12);
+      is3.add_range(8, 12);
     }
-  else if (rank==1)
+  else if (rank == 1)
     {
-      is1.add_range(8,16);
+      is1.add_range(8, 16);
       is2.add_index(1);
       is2.add_index(2);
-      is3.add_range(0,4);
+      is3.add_range(0, 4);
     }
 
   // create partitioner
-  std::shared_ptr<Utilities::MPI::Partitioner> partitioner
-  (new Utilities::MPI::Partitioner(is1, MPI_COMM_WORLD));
+  std::shared_ptr<Utilities::MPI::Partitioner> partitioner(
+    new Utilities::MPI::Partitioner(is1, MPI_COMM_WORLD));
   partitioner->set_ghost_indices(is3);
-  std::shared_ptr<Utilities::MPI::Partitioner> tight_partitioner
-  (new Utilities::MPI::Partitioner(is1, MPI_COMM_WORLD));
-  tight_partitioner->set_ghost_indices(is2,is3);
+  std::shared_ptr<Utilities::MPI::Partitioner> tight_partitioner(
+    new Utilities::MPI::Partitioner(is1, MPI_COMM_WORLD));
+  tight_partitioner->set_ghost_indices(is2, is3);
 
   // create vector
-  AlignedVector<Number> owned(rank==0?8:0);
+  AlignedVector<Number> owned(rank == 0 ? 8 : 0);
   AlignedVector<Number> ghost(4);
 
   for (unsigned int i = 0; i < 4; ++i)
     ghost[i] = 0.;
 
-  if (rank==0)
+  if (rank == 0)
     for (int i = 0; i < 8; i++)
       owned[i] = i;
 
@@ -103,62 +105,61 @@ void test()
 
   // ... finish exchange
   tight_partitioner->export_to_ghosted_array_finish(
-    ArrayView<Number>(ghost.begin(), ghost.size()),
-    requests);
+    ArrayView<Number>(ghost.begin(), ghost.size()), requests);
 
-  auto print = [&] ()
-  {
+  auto print = [&]() {
     deallog << "owned:" << std::endl;
     for (auto el : owned)
       deallog << el << " ";
-    deallog << std::endl
-            << "ghost:" << std::endl;
+    deallog << std::endl << "ghost:" << std::endl;
     for (auto el : ghost)
       deallog << el << " ";
     deallog << std::endl;
   };
 
-  deallog << "update ghosts()"<<std::endl;
+  deallog << "update ghosts()" << std::endl;
   print();
 
   AlignedVector<Number> import_data;
   import_data.resize_fast(tight_partitioner->n_import_indices());
 
   // now do insert:
-  auto compress = [&] (VectorOperation::values operation)
-  {
+  auto compress = [&](VectorOperation::values operation) {
     const unsigned int counter = 0;
-    tight_partitioner->import_from_ghosted_array_start
-    (operation, counter,
-     ArrayView<Number>(ghost.begin(), ghost.size()),
-     ArrayView<Number>(import_data.begin(), tight_partitioner->n_import_indices()),
-     compress_requests);
+    tight_partitioner->import_from_ghosted_array_start(
+      operation,
+      counter,
+      ArrayView<Number>(ghost.begin(), ghost.size()),
+      ArrayView<Number>(import_data.begin(),
+                        tight_partitioner->n_import_indices()),
+      compress_requests);
 
-    tight_partitioner->import_from_ghosted_array_finish
-    (operation,
-     ArrayView<const Number>(import_data.begin(), tight_partitioner->n_import_indices()),
-     ArrayView<Number>(owned.begin(), owned.size()),
-     ArrayView<Number>(ghost.begin(), ghost.size()),
-     compress_requests);
+    tight_partitioner->import_from_ghosted_array_finish(
+      operation,
+      ArrayView<const Number>(import_data.begin(),
+                              tight_partitioner->n_import_indices()),
+      ArrayView<Number>(owned.begin(), owned.size()),
+      ArrayView<Number>(ghost.begin(), ghost.size()),
+      compress_requests);
   };
 
-  deallog << "compress(insert)"<<std::endl;
+  deallog << "compress(insert)" << std::endl;
   compress(VectorOperation::insert);
   print();
 
-  if (rank==1)
+  if (rank == 1)
     {
-      ghost[1]=10;
-      ghost[2]=20;
+      ghost[1] = 10;
+      ghost[2] = 20;
     }
 
-  deallog << "compress(add)"<<std::endl;
+  deallog << "compress(add)" << std::endl;
   compress(VectorOperation::add);
   print();
-
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   using namespace dealii;
 

@@ -15,12 +15,14 @@
 
 // Check the function all_zero
 
-#include "../tests.h"
 #include <deal.II/lac/la_vector.h>
+
+#include "../tests.h"
 
 
 template <typename Number>
-void check_all_zero()
+void
+check_all_zero()
 {
   LinearAlgebra::Vector<Number> v(10);
 
@@ -30,7 +32,8 @@ void check_all_zero()
   AssertThrow(v.all_zero() == false, ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   initlog();
 

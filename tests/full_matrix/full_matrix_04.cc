@@ -14,15 +14,16 @@
 // ---------------------------------------------------------------------
 
 
-//check method FullMatrix::triple_product
+// check method FullMatrix::triple_product
+
+#include <deal.II/lac/eigen.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include "../tests.h"
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/eigen.h>
-
-void diff(FullMatrix<double> &M)
+void
+diff(FullMatrix<double> &M)
 {
   const double err = M.frobenius_norm();
   if (err < 1.e-14)
@@ -32,51 +33,52 @@ void diff(FullMatrix<double> &M)
 }
 
 
-void test (const unsigned int n, const unsigned int m)
+void
+test(const unsigned int n, const unsigned int m)
 {
   // Create some random matrices
-  FullMatrix<double> A(n,n);
-  FullMatrix<double> C(m,m);
-  FullMatrix<double> B(n,m);
-  FullMatrix<double> D(m,n);
-  FullMatrix<double> Bt(m,n);
-  FullMatrix<double> Dt(n,m);
+  FullMatrix<double> A(n, n);
+  FullMatrix<double> C(m, m);
+  FullMatrix<double> B(n, m);
+  FullMatrix<double> D(m, n);
+  FullMatrix<double> Bt(m, n);
+  FullMatrix<double> Dt(n, m);
 
-  for (unsigned int i=0; i<n; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j=0; j<n; ++j)
-        A(i,j) = random_value<double>();
-      for (unsigned int j=0; j<m; ++j)
+      for (unsigned int j = 0; j < n; ++j)
+        A(i, j) = random_value<double>();
+      for (unsigned int j = 0; j < m; ++j)
         {
-          B(i,j) = Bt(j,i) = random_value<double>();
-          D(j,i) = Dt(i,j) = random_value<double>();
+          B(i, j) = Bt(j, i) = random_value<double>();
+          D(j, i) = Dt(i, j) = random_value<double>();
         }
     }
-  for (unsigned int i=0; i<m; ++i)
-    for (unsigned int j=0; j<m; ++j)
-      C(i,j) = random_value<double>();
+  for (unsigned int i = 0; i < m; ++i)
+    for (unsigned int j = 0; j < m; ++j)
+      C(i, j) = random_value<double>();
 
   // Compare first Schur complement
   // with mmult.
-  FullMatrix<double> S1(m,m);
+  FullMatrix<double> S1(m, m);
   S1.triple_product(A, D, B, false, false);
 
-  FullMatrix<double> aux1(n,m);
-  A.mmult(aux1,B);
-  FullMatrix<double> aux2(m,m);
-  D.mmult(aux2,aux1);
+  FullMatrix<double> aux1(n, m);
+  A.mmult(aux1, B);
+  FullMatrix<double> aux2(m, m);
+  D.mmult(aux2, aux1);
   aux2.add(-1., S1);
   diff(aux2);
 
   // Compare second Schur complement
   // with mmult
-  FullMatrix<double> S2(n,n);
+  FullMatrix<double> S2(n, n);
   S2.triple_product(C, B, D, false, false);
 
-  FullMatrix<double> aux3(m,n);
-  C.mmult(aux3,D);
-  FullMatrix<double> aux4(n,n);
-  B.mmult(aux4,aux3);
+  FullMatrix<double> aux3(m, n);
+  C.mmult(aux3, D);
+  FullMatrix<double> aux4(n, n);
+  B.mmult(aux4, aux3);
   aux4.add(-1., S2);
   diff(aux4);
 
@@ -110,10 +112,10 @@ void test (const unsigned int n, const unsigned int m)
 
 
 int
-main ()
+main()
 {
   initlog();
 
-  test(3,4);
-  test(4,7);
+  test(3, 4);
+  test(4, 7);
 }

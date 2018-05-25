@@ -20,53 +20,57 @@
 // setting the same elements on an element-by-element level. Use the entries
 // as they would result from a Laplace operator in 1D.
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
+
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::SparseMatrix &m)
+
+void
+test(TrilinosWrappers::SparseMatrix &m)
 {
   TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), 3U);
 
   // first set a few entries one-by-one and
   // initialize the sparsity pattern for m2
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      if (std::fabs((double)i-j) < 2)
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.n(); ++j)
+      if (std::fabs((double)i - j) < 2)
         {
           double value;
           if (i == j)
-            if (i>0 && i<m.m()-1)
+            if (i > 0 && i < m.m() - 1)
               value = 2.;
             else
               value = 1.;
           else
             value = -1.;
 
-          m.set (i,j, value);
-          m2.set (i,j, 0.);
+          m.set(i, j, value);
+          m2.set(i, j, 0.);
         }
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
   m2.compress(VectorOperation::insert);
 
   // now add the same elements from a full
   // matrix
   {
-    FullMatrix<double> full_matrix(2,2);
-    full_matrix(0,0) = full_matrix(1,1) = 1.;
-    full_matrix(0,1) = full_matrix(1,0) = -1.;
-    std::vector<types::global_dof_index> local_indices (2);
+    FullMatrix<double> full_matrix(2, 2);
+    full_matrix(0, 0) = full_matrix(1, 1) = 1.;
+    full_matrix(0, 1) = full_matrix(1, 0) = -1.;
+    std::vector<types::global_dof_index> local_indices(2);
 
-    for (unsigned int i=0; i<m.m()-1; ++i)
+    for (unsigned int i = 0; i < m.m() - 1; ++i)
       {
         local_indices[0] = i;
-        local_indices[1] = i+1;
+        local_indices[1] = i + 1;
 
-        m2.add (local_indices, local_indices, full_matrix);
+        m2.add(local_indices, local_indices, full_matrix);
       }
   }
 
@@ -79,29 +83,32 @@ void test (TrilinosWrappers::SparseMatrix &m)
   // matrix in order to check whether all
   // elements really are zero
   double norm = m2.frobenius_norm();
-  AssertThrow (norm == 0, ExcInternalError());
+  AssertThrow(norm == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
       {
-        TrilinosWrappers::SparseMatrix m (16U,16U,3U);
-        test (m);
+        TrilinosWrappers::SparseMatrix m(16U, 16U, 3U);
+        test(m);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -114,7 +121,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

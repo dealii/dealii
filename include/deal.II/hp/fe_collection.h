@@ -17,9 +17,10 @@
 #define dealii_fe_collection_h
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values_extractors.h>
-#include <deal.II/fe/component_mask.h>
 
 #include <memory>
 
@@ -27,7 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
-
   /**
    * This class acts as a collection of finite element objects used in the
    * hp::DoFHandler. It is thus to a hp::DoFHandler what a FiniteElement is to
@@ -50,7 +50,7 @@ namespace hp
    *
    * @author Wolfgang Bangerth, 2003
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim = dim>
   class FECollection : public Subscriptor
   {
   public:
@@ -58,7 +58,7 @@ namespace hp
      * Default constructor. Leads to an empty collection that can later be
      * filled using push_back().
      */
-    FECollection () = default;
+    FECollection() = default;
 
     /**
      * Conversion constructor. This constructor creates a FECollection from a
@@ -66,14 +66,14 @@ namespace hp
      * push_back(), if desired, though it would probably be clearer to add all
      * mappings the same way.
      */
-    explicit FECollection (const FiniteElement<dim,spacedim> &fe);
+    explicit FECollection(const FiniteElement<dim, spacedim> &fe);
 
     /**
      * Constructor. This constructor creates a FECollection from more than
      * one finite element.
      */
     template <class... FETypes>
-    explicit FECollection (const FETypes &... fes);
+    explicit FECollection(const FETypes &... fes);
 
     /**
      * Constructor. Same as above but for any number of elements. Pointers to
@@ -82,35 +82,37 @@ namespace hp
      * other than to create copies internally. Consequently, you can delete
      * these pointers immediately again after calling this constructor.
      */
-    FECollection (const std::vector<const FiniteElement<dim,spacedim>*> &fes);
+    FECollection(const std::vector<const FiniteElement<dim, spacedim> *> &fes);
 
     /**
      * Copy constructor.
      */
-    FECollection (const FECollection<dim,spacedim> &) = default;
+    FECollection(const FECollection<dim, spacedim> &) = default;
 
     /**
      * Move constructor.
      */
-    FECollection (FECollection<dim,spacedim> &&) noexcept = default;
+    FECollection(FECollection<dim, spacedim> &&) noexcept = default;
 
     /**
      * Move assignment operator.
      */
     FECollection<dim, spacedim> &
-    operator= (FECollection<dim,spacedim> &&) = default; // NOLINT
+    operator=(FECollection<dim, spacedim> &&) = default; // NOLINT
 
     /**
-     * Equality comparison operator. All stored FiniteElement objects are compared in order.
+     * Equality comparison operator. All stored FiniteElement objects are
+     * compared in order.
      */
     bool
-    operator== (const FECollection<dim,spacedim> &fe_collection) const;
+    operator==(const FECollection<dim, spacedim> &fe_collection) const;
 
     /**
-     * Non-equality comparison operator. All stored FiniteElement objects are compared in order.
+     * Non-equality comparison operator. All stored FiniteElement objects are
+     * compared in order.
      */
     bool
-    operator!= (const FECollection<dim,spacedim> &fe_collection) const;
+    operator!=(const FECollection<dim, spacedim> &fe_collection) const;
 
     /**
      * Add a finite element. This function generates a copy of the given
@@ -121,7 +123,8 @@ namespace hp
      * When a new element is added, it needs to have the same number of vector
      * components as all other elements already in the collection.
      */
-    void push_back (const FiniteElement<dim,spacedim> &new_fe);
+    void
+    push_back(const FiniteElement<dim, spacedim> &new_fe);
 
     /**
      * Get a reference to the given element in this collection.
@@ -129,13 +132,14 @@ namespace hp
      * @pre @p index must be between zero and the number of elements of the
      * collection.
      */
-    const FiniteElement<dim,spacedim> &
-    operator[] (const unsigned int index) const;
+    const FiniteElement<dim, spacedim> &
+    operator[](const unsigned int index) const;
 
     /**
      * Return the number of finite element objects stored in this collection.
      */
-    unsigned int size () const;
+    unsigned int
+    size() const;
 
     /**
      * Return the number of vector components of the finite elements in this
@@ -146,7 +150,8 @@ namespace hp
      * @ref GlossComponent "the glossary"
      * for more information.
      */
-    unsigned int n_components () const;
+    unsigned int
+    n_components() const;
 
     /**
      * Return the number of vector blocks of the finite elements in this
@@ -164,48 +169,56 @@ namespace hp
      * they are the same, this function returns the result of
      * FiniteElement::n_blocks().
      */
-    unsigned int n_blocks () const;
+    unsigned int
+    n_blocks() const;
 
     /**
      * Return the maximal number of degrees of freedom per vertex over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_vertex () const;
+    unsigned int
+    max_dofs_per_vertex() const;
 
     /**
      * Return the maximal number of degrees of freedom per line over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_line () const;
+    unsigned int
+    max_dofs_per_line() const;
 
     /**
      * Return the maximal number of degrees of freedom per quad over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_quad () const;
+    unsigned int
+    max_dofs_per_quad() const;
 
     /**
      * Return the maximal number of degrees of freedom per hex over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_hex () const;
+    unsigned int
+    max_dofs_per_hex() const;
 
     /**
      * Return the maximal number of degrees of freedom per face over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_face () const;
+    unsigned int
+    max_dofs_per_face() const;
 
     /**
      * Return the maximal number of degrees of freedom per cell over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_cell () const;
+    unsigned int
+    max_dofs_per_cell() const;
 
     /**
      * Return an estimate for the memory allocated for this object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
 
     /**
@@ -225,7 +238,8 @@ namespace hp
      * But the get_face_interpolation_matrix might still fail to find an
      * interpolation matrix between these two elements.
      */
-    bool hp_constraints_are_implemented () const;
+    bool
+    hp_constraints_are_implemented() const;
 
     /**
      * Try to find a least dominant finite element inside this FECollection
@@ -251,7 +265,7 @@ namespace hp
      * dominating element in the sense described above .
      */
     unsigned int
-    find_least_face_dominating_fe (const std::set<unsigned int> &fes) const;
+    find_least_face_dominating_fe(const std::set<unsigned int> &fes) const;
 
     /**
      * Return a component mask with as many elements as this object has vector
@@ -270,7 +284,7 @@ namespace hp
      * one that corresponds to the argument.
      */
     ComponentMask
-    component_mask (const FEValuesExtractors::Scalar &scalar) const;
+    component_mask(const FEValuesExtractors::Scalar &scalar) const;
 
     /**
      * Return a component mask with as many elements as this object has vector
@@ -289,7 +303,7 @@ namespace hp
      * ones that corresponds to the argument.
      */
     ComponentMask
-    component_mask (const FEValuesExtractors::Vector &vector) const;
+    component_mask(const FEValuesExtractors::Vector &vector) const;
 
     /**
      * Return a component mask with as many elements as this object has vector
@@ -309,7 +323,8 @@ namespace hp
      * ones that corresponds to the argument.
      */
     ComponentMask
-    component_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+    component_mask(
+      const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
     /**
      * Given a block mask (see
@@ -332,7 +347,7 @@ namespace hp
      * selected blocks of the input argument.
      */
     ComponentMask
-    component_mask (const BlockMask &block_mask) const;
+    component_mask(const BlockMask &block_mask) const;
 
     /**
      * Return a block mask with as many elements as this object has blocks and
@@ -361,7 +376,7 @@ namespace hp
      * one that corresponds to the argument.
      */
     BlockMask
-    block_mask (const FEValuesExtractors::Scalar &scalar) const;
+    block_mask(const FEValuesExtractors::Scalar &scalar) const;
 
     /**
      * Return a component mask with as many elements as this object has vector
@@ -386,7 +401,7 @@ namespace hp
      * ones that corresponds to the argument.
      */
     BlockMask
-    block_mask (const FEValuesExtractors::Vector &vector) const;
+    block_mask(const FEValuesExtractors::Vector &vector) const;
 
     /**
      * Return a component mask with as many elements as this object has vector
@@ -412,7 +427,7 @@ namespace hp
      * ones that corresponds to the argument.
      */
     BlockMask
-    block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+    block_mask(const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
     /**
      * Given a component mask (see
@@ -443,19 +458,20 @@ namespace hp
      * blocks of the input argument.
      */
     BlockMask
-    block_mask (const ComponentMask &component_mask) const;
+    block_mask(const ComponentMask &component_mask) const;
 
 
     /**
      * Exception
      */
-    DeclException0 (ExcNoFiniteElements);
+    DeclException0(ExcNoFiniteElements);
 
   private:
     /**
      * Array of pointers to the finite elements stored by this collection.
      */
-    std::vector<std::shared_ptr<const FiniteElement<dim,spacedim> > > finite_elements;
+    std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>
+      finite_elements;
   };
 
 
@@ -464,36 +480,35 @@ namespace hp
 
   template <int dim, int spacedim>
   template <class... FETypes>
-  FECollection<dim,spacedim>::FECollection (const FETypes &... fes)
+  FECollection<dim, spacedim>::FECollection(const FETypes &... fes)
   {
-    static_assert(is_base_of_all<FiniteElement<dim, spacedim>, FETypes...>::value,
-                  "Not all of the input arguments of this function "
-                  "are derived from FiniteElement<dim,spacedim>!");
+    static_assert(
+      is_base_of_all<FiniteElement<dim, spacedim>, FETypes...>::value,
+      "Not all of the input arguments of this function "
+      "are derived from FiniteElement<dim,spacedim>!");
 
     // loop over all of the given arguments and add the finite elements to
     // this collection. Inlining the definition of fe_pointers causes internal
     // compiler errors on GCC 7.1.1 so we define it separately:
-    const auto fe_pointers = { &fes... };
+    const auto fe_pointers = {&fes...};
     for (auto p : fe_pointers)
-      push_back (*p);
+      push_back(*p);
   }
 
 
   template <int dim, int spacedim>
-  inline
-  unsigned int
-  FECollection<dim,spacedim>::size () const
+  inline unsigned int
+  FECollection<dim, spacedim>::size() const
   {
     return finite_elements.size();
   }
 
 
   template <int dim, int spacedim>
-  inline
-  unsigned int
-  FECollection<dim,spacedim>::n_components () const
+  inline unsigned int
+  FECollection<dim, spacedim>::n_components() const
   {
-    Assert (finite_elements.size () > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     // note that there is no need
     // here to enforce that indeed
@@ -503,21 +518,21 @@ namespace hp
     // adding a new element to the
     // collection.
 
-    return finite_elements[0]->n_components ();
+    return finite_elements[0]->n_components();
   }
 
 
 
   template <int dim, int spacedim>
-  inline
-  bool
-  FECollection<dim,spacedim>::operator== (const FECollection<dim,spacedim> &fe_collection) const
+  inline bool
+  FECollection<dim, spacedim>::
+  operator==(const FECollection<dim, spacedim> &fe_collection) const
   {
     const unsigned int n_elements = size();
     if (n_elements != fe_collection.size())
       return false;
 
-    for (unsigned int i=0; i<n_elements; ++i)
+    for (unsigned int i = 0; i < n_elements; ++i)
       if (!(*finite_elements[i] == fe_collection[i]))
         return false;
 
@@ -527,9 +542,9 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  inline
-  bool
-  FECollection<dim,spacedim>::operator != (const FECollection<dim,spacedim> &fe_collection) const
+  inline bool
+  FECollection<dim, spacedim>::
+  operator!=(const FECollection<dim, spacedim> &fe_collection) const
   {
     return !(*this == fe_collection);
   }
@@ -537,12 +552,11 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  inline
-  const FiniteElement<dim,spacedim> &
-  FECollection<dim,spacedim>::operator[] (const unsigned int index) const
+  inline const FiniteElement<dim, spacedim> &FECollection<dim, spacedim>::
+                                             operator[](const unsigned int index) const
   {
-    Assert (index < finite_elements.size(),
-            ExcIndexRange (index, 0, finite_elements.size()));
+    Assert(index < finite_elements.size(),
+           ExcIndexRange(index, 0, finite_elements.size()));
     return *finite_elements[index];
   }
 
@@ -550,12 +564,12 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_vertex () const
+  FECollection<dim, spacedim>::max_dofs_per_vertex() const
   {
-    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i=0; i<finite_elements.size(); ++i)
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_vertex > max)
         max = finite_elements[i]->dofs_per_vertex;
 
@@ -566,12 +580,12 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_line () const
+  FECollection<dim, spacedim>::max_dofs_per_line() const
   {
-    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i=0; i<finite_elements.size(); ++i)
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_line > max)
         max = finite_elements[i]->dofs_per_line;
 
@@ -582,12 +596,12 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_quad () const
+  FECollection<dim, spacedim>::max_dofs_per_quad() const
   {
-    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i=0; i<finite_elements.size(); ++i)
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_quad > max)
         max = finite_elements[i]->dofs_per_quad;
 
@@ -598,12 +612,12 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_hex () const
+  FECollection<dim, spacedim>::max_dofs_per_hex() const
   {
-    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i=0; i<finite_elements.size(); ++i)
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_hex > max)
         max = finite_elements[i]->dofs_per_hex;
 
@@ -614,12 +628,12 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_face () const
+  FECollection<dim, spacedim>::max_dofs_per_face() const
   {
-    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i=0; i<finite_elements.size(); ++i)
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_face > max)
         max = finite_elements[i]->dofs_per_face;
 
@@ -630,12 +644,12 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim,spacedim>::max_dofs_per_cell () const
+  FECollection<dim, spacedim>::max_dofs_per_cell() const
   {
-    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     unsigned int max = 0;
-    for (unsigned int i=0; i<finite_elements.size(); ++i)
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
       if (finite_elements[i]->dofs_per_cell > max)
         max = finite_elements[i]->dofs_per_cell;
 
@@ -645,14 +659,14 @@ namespace hp
 
   template <int dim, int spacedim>
   bool
-  FECollection<dim,spacedim>::hp_constraints_are_implemented () const
+  FECollection<dim, spacedim>::hp_constraints_are_implemented() const
   {
-    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     bool hp_constraints = true;
-    for (unsigned int i=0; i<finite_elements.size(); ++i)
-      hp_constraints = hp_constraints &&
-                       finite_elements[i]->hp_constraints_are_implemented();
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
+      hp_constraints =
+        hp_constraints && finite_elements[i]->hp_constraints_are_implemented();
 
     return hp_constraints;
   }

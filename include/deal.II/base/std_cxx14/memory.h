@@ -43,28 +43,29 @@ namespace std_cxx14
     {
       static constexpr bool value = true;
     };
-  }
+  } // namespace internal
 
   template <typename T, typename... Args>
   inline
-  typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T> >::type
-  make_unique(Args &&... constructor_arguments)
+    typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T>>::type
+    make_unique(Args &&... constructor_arguments)
   {
-    return std::unique_ptr<T>(new T(std::forward<Args>(constructor_arguments)...));
+    return std::unique_ptr<T>(
+      new T(std::forward<Args>(constructor_arguments)...));
   }
 
   template <typename T>
   inline
-  typename std::enable_if<std::is_array<T>::value, std::unique_ptr<T> >::type
-  make_unique(std::size_t n)
+    typename std::enable_if<std::is_array<T>::value, std::unique_ptr<T>>::type
+    make_unique(std::size_t n)
   {
     static_assert(!internal::is_bounded_array<T>::value,
                   "This function is not implemented for bounded array types.");
-    return std::unique_ptr<T>(new typename std::remove_extent<T>::type [n]);
+    return std::unique_ptr<T>(new typename std::remove_extent<T>::type[n]);
   }
 
 #endif
-}
+} // namespace std_cxx14
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_cxx14_memory_h

@@ -14,17 +14,18 @@
 // ---------------------------------------------------------------------
 
 
-#include "interpolate_common.h"
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_nedelec.h>
+
+#include "interpolate_common.h"
 
 
 // FE_Nedelec<dim>::interpolate(...)
 
 template <int dim>
-void check1(const Function<dim> &f,
-            const unsigned int degree)
+void
+check1(const Function<dim> &f, const unsigned int degree)
 {
   FE_Nedelec<dim> fe(degree);
   deallog << fe.get_name() << ' ';
@@ -32,16 +33,17 @@ void check1(const Function<dim> &f,
 
   std::vector<double> dofs(fe.dofs_per_cell);
 
-  std::vector<Vector<double> > values (fe.get_generalized_support_points().size(),
-                                       Vector<double>(dim));
+  std::vector<Vector<double>> values(fe.get_generalized_support_points().size(),
+                                     Vector<double>(dim));
   f.vector_value_list(fe.get_generalized_support_points(), values);
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
-  deallog << " vector " << vector_difference(fe,dofs,f,0) << std::endl;
+  deallog << " vector " << vector_difference(fe, dofs, f, 0) << std::endl;
 }
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
   {

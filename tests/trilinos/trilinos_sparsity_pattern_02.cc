@@ -18,17 +18,21 @@
 // tests setup of Trilinos sparsity patterns when some processors do not have
 // any cells.
 
-#include "../tests.h"
-
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/distributed/tria.h>
+
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
+
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/constraint_matrix.h>
+
+#include "../tests.h"
 
 namespace Step22
 {
@@ -38,27 +42,27 @@ namespace Step22
   class StokesProblem
   {
   public:
-    StokesProblem (const unsigned int degree);
-    void run ();
+    StokesProblem(const unsigned int degree);
+    void
+    run();
 
   private:
-    void setup_dofs ();
+    void
+    setup_dofs();
 
-    const unsigned int   degree;
+    const unsigned int degree;
 
-    MPI_Comm                                    mpi_communicator;
+    MPI_Comm mpi_communicator;
 
-    SphericalManifold<dim>                      boundary;
-    parallel::distributed::Triangulation<dim>   triangulation;
-    FESystem<dim>                               fe;
-    DoFHandler<dim>                             dof_handler;
+    SphericalManifold<dim>                    boundary;
+    parallel::distributed::Triangulation<dim> triangulation;
+    FESystem<dim>                             fe;
+    DoFHandler<dim>                           dof_handler;
 
-    ConstraintMatrix                            constraints;
-    std::vector<IndexSet>                       owned_partitioning;
-    std::vector<IndexSet>                       relevant_partitioning;
+    ConstraintMatrix      constraints;
+    std::vector<IndexSet> owned_partitioning;
+    std::vector<IndexSet> relevant_partitioning;
   };
-
-
 
 
 
@@ -76,43 +80,49 @@ namespace Step22
 
 
 
-
   template <int dim>
-  void StokesProblem<dim>::setup_dofs ()
+  void
+  StokesProblem<dim>::setup_dofs()
   {
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
-    std::vector<unsigned int> block_component (dim+1,0);
+    std::vector<unsigned int> block_component(dim + 1, 0);
     block_component[dim] = 1;
-    DoFRenumbering::component_wise (dof_handler, block_component);
+    DoFRenumbering::component_wise(dof_handler, block_component);
 
-    std::vector<types::global_dof_index> dofs_per_block (2);
-    DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);
-    const unsigned int n_u = dofs_per_block[0],
-                       n_p = dofs_per_block[1];
+    std::vector<types::global_dof_index> dofs_per_block(2);
+    DoFTools::count_dofs_per_block(
+      dof_handler, dofs_per_block, block_component);
+    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
       owned_partitioning.clear();
       IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
       owned_partitioning.push_back(locally_owned_dofs.get_view(0, n_u));
-      owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u+n_p));
+      owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u + n_p));
 
       relevant_partitioning.clear();
       IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
+      DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                              locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
-      relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u+n_p));
+      relevant_partitioning.push_back(
+        locally_relevant_dofs.get_view(n_u, n_u + n_p));
     }
 
     ConstraintMatrix new_constraints;
     new_constraints.close();
     {
-      TrilinosWrappers::BlockSparsityPattern bsp
-      (owned_partitioning, owned_partitioning,
-       relevant_partitioning, mpi_communicator);
-      DoFTools::make_sparsity_pattern (dof_handler, bsp,
-                                       new_constraints,
-                                       false, Utilities::MPI::this_mpi_process(mpi_communicator));
+      TrilinosWrappers::BlockSparsityPattern bsp(owned_partitioning,
+                                                 owned_partitioning,
+                                                 relevant_partitioning,
+                                                 mpi_communicator);
+      DoFTools::make_sparsity_pattern(
+        dof_handler,
+        bsp,
+        new_constraints,
+        false,
+        Utilities::MPI::this_mpi_process(mpi_communicator));
 
       bsp.compress();
     }
@@ -120,59 +130,57 @@ namespace Step22
 
 
 
-
   template <int dim>
-  void StokesProblem<dim>::run ()
+  void
+  StokesProblem<dim>::run()
   {
-    Point<dim> center;
+    Point<dim>   center;
     const double inner_radius = .5;
     const double outer_radius = 1.;
 
-    GridGenerator::quarter_hyper_shell (triangulation,
-                                        center,
-                                        inner_radius,
-                                        outer_radius,
-                                        0,
-                                        true);
+    GridGenerator::quarter_hyper_shell(
+      triangulation, center, inner_radius, outer_radius, 0, true);
 
     triangulation.set_manifold(0, boundary);
     triangulation.set_manifold(1, boundary);
-    setup_dofs ();
+    setup_dofs();
 
 
     deallog << "OK" << std::endl;
   }
-}
+} // namespace Step22
 
 
 
-int main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   try
     {
       using namespace dealii;
       using namespace Step22;
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)==0)
+      if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         {
           std::ofstream logfile("output");
           deallog.attach(logfile, false);
           {
             StokesProblem<3> flow_problem(1);
-            flow_problem.run ();
+            flow_problem.run();
           }
         }
       else
         {
           StokesProblem<3> flow_problem(1);
-          flow_problem.run ();
+          flow_problem.run();
         }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -185,7 +193,8 @@ int main (int argc, char *argv[])
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

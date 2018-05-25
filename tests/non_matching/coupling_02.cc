@@ -15,16 +15,20 @@
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/non_matching/coupling.h>
 
-#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+
+#include <deal.II/non_matching/coupling.h>
 
 #include <deal.II/numerics/matrix_tools.h>
 
@@ -36,31 +40,32 @@ using namespace dealii;
 // immersed dimension, with a non trivial component selection in the space_dh,
 // and check that constants are projected correctly.
 
-template<int dim, int spacedim>
-void test()
+template <int dim, int spacedim>
+void
+test()
 {
-  deallog << "dim: " << dim << ", spacedim: "
-          << spacedim << std::endl;
+  deallog << "dim: " << dim << ", spacedim: " << spacedim << std::endl;
 
-  Triangulation<dim,spacedim> tria;
-  Triangulation<spacedim,spacedim> space_tria;
+  Triangulation<dim, spacedim>      tria;
+  Triangulation<spacedim, spacedim> space_tria;
 
-  GridGenerator::hyper_cube(tria,-.4,.3);
-  GridGenerator::hyper_cube(space_tria,-1,1);
+  GridGenerator::hyper_cube(tria, -.4, .3);
+  GridGenerator::hyper_cube(space_tria, -1, 1);
 
   tria.refine_global(1);
   space_tria.refine_global(2);
 
-  FE_Q<dim,spacedim> fe(1);
-  FESystem<spacedim,spacedim> space_fe(FE_Q<spacedim,spacedim>(1), spacedim+1);
-  ComponentMask space_mask(spacedim+1, false);
+  FE_Q<dim, spacedim>          fe(1);
+  FESystem<spacedim, spacedim> space_fe(FE_Q<spacedim, spacedim>(1),
+                                        spacedim + 1);
+  ComponentMask                space_mask(spacedim + 1, false);
   space_mask.set(spacedim, true);
 
   deallog << "FE      : " << fe.get_name() << std::endl
           << "Space FE: " << space_fe.get_name() << std::endl;
 
-  DoFHandler<dim,spacedim> dh(tria);
-  DoFHandler<spacedim,spacedim> space_dh(space_tria);
+  DoFHandler<dim, spacedim>      dh(tria);
+  DoFHandler<spacedim, spacedim> space_dh(space_tria);
 
   dh.distribute_dofs(fe);
   space_dh.distribute_dofs(space_fe);
@@ -75,18 +80,18 @@ void test()
   SparsityPattern sparsity;
   {
     DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
-    NonMatching::create_coupling_sparsity_pattern(space_dh, dh,
-                                                  quad, dsp, constraints, space_mask);
+    NonMatching::create_coupling_sparsity_pattern(
+      space_dh, dh, quad, dsp, constraints, space_mask);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
-  NonMatching::create_coupling_mass_matrix(space_dh, dh, quad, coupling,
-                                           constraints, space_mask);
+  NonMatching::create_coupling_mass_matrix(
+    space_dh, dh, quad, coupling, constraints, space_mask);
 
   SparsityPattern mass_sparsity;
   {
     DynamicSparsityPattern dsp(dh.n_dofs(), dh.n_dofs());
-    DoFTools::make_sparsity_pattern(dh,dsp);
+    DoFTools::make_sparsity_pattern(dh, dsp);
     mass_sparsity.copy_from(dsp);
   }
   SparseMatrix<double> mass_matrix(mass_sparsity);
@@ -113,12 +118,13 @@ void test()
 
 
 
-int main()
+int
+main()
 {
   initlog();
-  test<1,1>();
-  test<1,2>();
-  test<2,2>();
-  test<2,3>();
-  test<3,3>();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 }

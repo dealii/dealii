@@ -16,31 +16,34 @@
 
 // check TableIndices in various ways
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+
 #include <deal.II/lac/vector.h>
 
-int main ()
+#include "../tests.h"
+
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  const TableIndices<2> t1(84,42);
-  TableIndices<2> t2;
+  const TableIndices<2> t1(84, 42);
+  TableIndices<2>       t2;
   t2[0] = 84;
   t2[1] = 42;
 
-  AssertThrow (t1 == t2, ExcInternalError());
-  AssertThrow (t1[0] == t2[0], ExcInternalError());
-  AssertThrow (t1[1] == t2[1], ExcInternalError());
+  AssertThrow(t1 == t2, ExcInternalError());
+  AssertThrow(t1[0] == t2[0], ExcInternalError());
+  AssertThrow(t1[1] == t2[1], ExcInternalError());
 
-  AssertThrow (! (t1 != t2), ExcInternalError());
+  AssertThrow(!(t1 != t2), ExcInternalError());
 
   t2.sort();
-  AssertThrow (t1 != t2, ExcInternalError());
-  AssertThrow (t1[0] == t2[1], ExcInternalError());
-  AssertThrow (t1[1] == t2[0], ExcInternalError());
+  AssertThrow(t1 != t2, ExcInternalError());
+  AssertThrow(t1[0] == t2[1], ExcInternalError());
+  AssertThrow(t1[1] == t2[0], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

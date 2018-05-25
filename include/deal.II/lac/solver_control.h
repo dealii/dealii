@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/subscriptor.h>
 
 #include <vector>
@@ -64,7 +65,6 @@ class ParameterHandler;
 class SolverControl : public Subscriptor
 {
 public:
-
   /**
    * Enum denoting the different states a solver can be in. See the general
    * documentation of this class for more information.
@@ -94,32 +94,33 @@ public:
   class NoConvergence : public dealii::ExceptionBase
   {
   public:
-    NoConvergence (const unsigned int last_step,
-                   const double       last_residual)
-      : last_step (last_step), last_residual(last_residual)
+    NoConvergence(const unsigned int last_step, const double last_residual) :
+      last_step(last_step),
+      last_residual(last_residual)
     {}
 
-    virtual ~NoConvergence () noexcept override = default;
+    virtual ~NoConvergence() noexcept override = default;
 
-    virtual void print_info (std::ostream &out) const override
+    virtual void
+    print_info(std::ostream &out) const override
     {
-      out << "Iterative method reported convergence failure in step "
-          << last_step << ". The residual in the last step was " << last_residual
-          << ".\n\n"
-          << "This error message can indicate that you have simply not allowed "
-          << "a sufficiently large number of iterations for your iterative solver "
-          << "to converge. This often happens when you increase the size of your "
-          << "problem. In such cases, the last residual will likely still be very "
-          << "small, and you can make the error go away by increasing the allowed "
-          << "number of iterations when setting up the SolverControl object that "
-          << "determines the maximal number of iterations you allow."
-          << "\n\n"
-          << "The other situation where this error may occur is when your matrix "
-          << "is not invertible (e.g., your matrix has a null-space), or if you "
-          << "try to apply the wrong solver to a matrix (e.g., using CG for a "
-          << "matrix that is not symmetric or not positive definite). In these "
-          << "cases, the residual in the last iteration is likely going to be large."
-          << std::endl;
+      out
+        << "Iterative method reported convergence failure in step " << last_step
+        << ". The residual in the last step was " << last_residual << ".\n\n"
+        << "This error message can indicate that you have simply not allowed "
+        << "a sufficiently large number of iterations for your iterative solver "
+        << "to converge. This often happens when you increase the size of your "
+        << "problem. In such cases, the last residual will likely still be very "
+        << "small, and you can make the error go away by increasing the allowed "
+        << "number of iterations when setting up the SolverControl object that "
+        << "determines the maximal number of iterations you allow."
+        << "\n\n"
+        << "The other situation where this error may occur is when your matrix "
+        << "is not invertible (e.g., your matrix has a null-space), or if you "
+        << "try to apply the wrong solver to a matrix (e.g., using CG for a "
+        << "matrix that is not symmetric or not positive definite). In these "
+        << "cases, the residual in the last iteration is likely going to be large."
+        << std::endl;
     }
 
     /**
@@ -130,7 +131,7 @@ public:
     /**
      * Residual in the last step.
      */
-    const double       last_residual;
+    const double last_residual;
   };
 
 
@@ -146,10 +147,10 @@ public:
    * specifies the whether the final result is logged to @p deallog. Default
    * is yes.
    */
-  SolverControl (const unsigned int n           = 100,
-                 const double       tol         = 1.e-10,
-                 const bool         log_history = false,
-                 const bool         log_result  = true);
+  SolverControl(const unsigned int n           = 100,
+                const double       tol         = 1.e-10,
+                const bool         log_history = false,
+                const bool         log_result  = true);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -160,12 +161,14 @@ public:
   /**
    * Interface to parameter file.
    */
-  static void declare_parameters (ParameterHandler &param);
+  static void
+  declare_parameters(ParameterHandler &param);
 
   /**
    * Read parameters from file.
    */
-  void parse_parameters (ParameterHandler &param);
+  void
+  parse_parameters(ParameterHandler &param);
 
   /**
    * Decide about success or failure of an iteration.  This function gets the
@@ -184,118 +187,138 @@ public:
    * Derived classes may overload this function, e.g. to log the convergence
    * indicators (@p check_value) or to do other computations.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value);
+  virtual State
+  check(const unsigned int step, const double check_value);
 
   /**
    * Return the result of the last check operation.
    */
-  State last_check() const;
+  State
+  last_check() const;
 
   /**
    * Return the initial convergence criterion.
    */
-  double initial_value() const;
+  double
+  initial_value() const;
 
   /**
    * Return the convergence value of last iteration step for which @p check
    * was called by the solver.
    */
-  double last_value() const;
+  double
+  last_value() const;
 
   /**
    * Number of last iteration step.
    */
-  unsigned int last_step() const;
+  unsigned int
+  last_step() const;
 
   /**
    * Maximum number of steps.
    */
-  unsigned int max_steps () const;
+  unsigned int
+  max_steps() const;
 
   /**
    * Change maximum number of steps.
    */
-  unsigned int set_max_steps (const unsigned int);
+  unsigned int
+  set_max_steps(const unsigned int);
 
   /**
    * Enables the failure check. Solving is stopped with @p ReturnState @p
    * failure if <tt>residual>failure_residual</tt> with
    * <tt>failure_residual:=rel_failure_residual*first_residual</tt>.
    */
-  void set_failure_criterion (const double rel_failure_residual);
+  void
+  set_failure_criterion(const double rel_failure_residual);
 
   /**
    * Disables failure check and resets @p relative_failure_residual and @p
    * failure_residual to zero.
    */
-  void clear_failure_criterion ();
+  void
+  clear_failure_criterion();
 
   /**
    * Tolerance.
    */
-  double tolerance () const;
+  double
+  tolerance() const;
 
   /**
    * Change tolerance.
    */
-  double set_tolerance (const double);
+  double
+  set_tolerance(const double);
 
   /**
    * Enables writing residuals of each step into a vector for later analysis.
    */
-  void enable_history_data();
+  void
+  enable_history_data();
 
   /**
    * Provide read access to the collected residual data.
    */
-  const std::vector<double> &get_history_data() const;
+  const std::vector<double> &
+  get_history_data() const;
 
   /**
    * Average error reduction over all steps.
    *
    * Requires enable_history_data()
    */
-  double average_reduction() const;
+  double
+  average_reduction() const;
   /**
    * Error reduction of the last step; for stationary iterations, this
    * approximates the norm of the iteration matrix.
    *
    * Requires enable_history_data()
    */
-  double final_reduction() const;
+  double
+  final_reduction() const;
 
   /**
    * Error reduction of any iteration step.
    *
    * Requires enable_history_data()
    */
-  double step_reduction(unsigned int step) const;
+  double
+  step_reduction(unsigned int step) const;
 
   /**
    * Log each iteration step. Use @p log_frequency for skipping steps.
    */
-  void log_history (const bool);
+  void
+  log_history(const bool);
 
   /**
    * Return the @p log_history flag.
    */
-  bool log_history () const;
+  bool
+  log_history() const;
 
   /**
    * Set logging frequency.
    */
-  unsigned int log_frequency (unsigned int);
+  unsigned int
+  log_frequency(unsigned int);
 
   /**
    * Log start and end step.
    */
-  void log_result (const bool);
+  void
+  log_result(const bool);
 
   /**
    * Return the @p log_result flag.
    */
-  bool log_result () const;
+  bool
+  log_result() const;
 
   /**
    * This exception is thrown if a function operating on the vector of history
@@ -313,22 +336,22 @@ protected:
   /**
    * Prescribed tolerance to be achieved.
    */
-  double       tol;
+  double tol;
 
   /**
    * Result of last check operation.
    */
-  State        lcheck;
+  State lcheck;
 
   /**
    * Initial value.
    */
-  double       initial_val;
+  double initial_val;
 
   /**
    * Last value of the convergence criterion.
    */
-  double       lvalue;
+  double lvalue;
 
   /**
    * Last step.
@@ -339,12 +362,12 @@ protected:
    * Is set to @p true by @p set_failure_criterion and enables failure
    * checking.
    */
-  bool         check_failure;
+  bool check_failure;
 
   /**
    * Stores the @p rel_failure_residual set by @p set_failure_criterion
    */
-  double       relative_failure_residual;
+  double relative_failure_residual;
 
   /**
    * @p failure_residual equals the first residual multiplied by @p
@@ -352,12 +375,12 @@ protected:
    *
    * Until the first residual is known it is 0.
    */
-  double       failure_residual;
+  double failure_residual;
 
   /**
    * Log convergence history to @p deallog.
    */
-  bool         m_log_history;
+  bool m_log_history;
 
   /**
    * Log only every nth step.
@@ -369,12 +392,12 @@ protected:
    * iteration, a statement about failure or success together with @p lstep
    * and @p lvalue are logged.
    */
-  bool         m_log_result;
+  bool m_log_result;
 
   /**
    * Control over the storage of history data. Set by enable_history_data().
    */
-  bool         history_data_enabled;
+  bool history_data_enabled;
 
   /**
    * Vector storing the result after each iteration step for later statistical
@@ -407,23 +430,24 @@ public:
    * have the same meaning as those of the constructor of the SolverControl
    * constructor.
    */
-  ReductionControl (const unsigned int maxiter = 100,
-                    const double   tolerance   = 1.e-10,
-                    const double   reduce      = 1.e-2,
-                    const bool     log_history = false,
-                    const bool     log_result  = true);
+  ReductionControl(const unsigned int maxiter     = 100,
+                   const double       tolerance   = 1.e-10,
+                   const double       reduce      = 1.e-2,
+                   const bool         log_history = false,
+                   const bool         log_result  = true);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
    * SolverControl by setting @p reduce to zero.
    */
-  ReductionControl (const SolverControl &c);
+  ReductionControl(const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
    * assignment will emulate SolverControl by setting @p reduce to zero.
    */
-  ReductionControl &operator= (const SolverControl &c);
+  ReductionControl &
+  operator=(const SolverControl &c);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -434,30 +458,34 @@ public:
   /**
    * Interface to parameter file.
    */
-  static void declare_parameters (ParameterHandler &param);
+  static void
+  declare_parameters(ParameterHandler &param);
 
   /**
    * Read parameters from file.
    */
-  void parse_parameters (ParameterHandler &param);
+  void
+  parse_parameters(ParameterHandler &param);
 
   /**
    * Decide about success or failure of an iteration.  This function calls the
    * one in the base class, but sets the tolerance to <tt>reduction * initial
    * value</tt> upon the first iteration.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value) override;
+  virtual State
+  check(const unsigned int step, const double check_value) override;
 
   /**
    * Reduction factor.
    */
-  double reduction () const;
+  double
+  reduction() const;
 
   /**
    * Change reduction factor.
    */
-  double set_reduction (const double);
+  double
+  set_reduction(const double);
 
 protected:
   /**
@@ -491,23 +519,24 @@ public:
    * Constructor.  Provide exactly the same arguments as the constructor of
    * the SolverControl class.
    */
-  IterationNumberControl (const unsigned int maxiter = 100,
-                          const double       tolerance = 1e-12,
-                          const bool     log_history = false,
-                          const bool     log_result  = true);
+  IterationNumberControl(const unsigned int maxiter     = 100,
+                         const double       tolerance   = 1e-12,
+                         const bool         log_history = false,
+                         const bool         log_result  = true);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
    * SolverControl by setting the reduction target to zero.
    */
-  IterationNumberControl (const SolverControl &c);
+  IterationNumberControl(const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
    * assignment will emulate SolverControl by setting the reduction target to
    * zero.
    */
-  IterationNumberControl &operator= (const SolverControl &c);
+  IterationNumberControl &
+  operator=(const SolverControl &c);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -520,8 +549,8 @@ public:
    * success solely on the fact if a given number of iterations was reached or
    * the check value reached exactly zero.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value) override;
+  virtual State
+  check(const unsigned int step, const double check_value) override;
 };
 
 
@@ -532,8 +561,9 @@ public:
  * using inexact Hessian.
  *
  * For example: The requested number of consecutively converged iterations is 2,
- * the tolerance is 0.2. The ConsecutiveControl will return SolverControl::State::success
- * only at the last step in the sequence 0.5, 0.0005, 1.0, 0.05, 0.01.
+ * the tolerance is 0.2. The ConsecutiveControl will return
+ * SolverControl::State::success only at the last step in the sequence 0.5,
+ * 0.0005, 1.0, 0.05, 0.01.
  *
  * @author Denis Davydov, 2017
  */
@@ -546,24 +576,25 @@ public:
    * convergence. Other arguments have the same meaning as those of the
    * constructor of the SolverControl.
    */
-  ConsecutiveControl (const unsigned int maxiter = 100,
-                      const double   tolerance   = 1.e-10,
-                      const unsigned int n_consecutive_iterations = 2,
-                      const bool     log_history = false,
-                      const bool     log_result  = false);
+  ConsecutiveControl(const unsigned int maxiter                  = 100,
+                     const double       tolerance                = 1.e-10,
+                     const unsigned int n_consecutive_iterations = 2,
+                     const bool         log_history              = false,
+                     const bool         log_result               = false);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
    * SolverControl by setting @p n_consecutive_iterations to one.
    */
-  ConsecutiveControl (const SolverControl &c);
+  ConsecutiveControl(const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ConsecutiveControl. The result of the
    * assignment will emulate SolverControl by setting @p n_consecutive_iterations
    * to one.
    */
-  ConsecutiveControl &operator= (const SolverControl &c);
+  ConsecutiveControl &
+  operator=(const SolverControl &c);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -575,8 +606,8 @@ public:
    * Decide about success or failure of an iteration, see the class description
    * above.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value) override;
+  virtual State
+  check(const unsigned int step, const double check_value) override;
 
 protected:
   /**
@@ -589,7 +620,6 @@ protected:
    * Counter for the number of consecutively converged iterations.
    */
   unsigned int n_converged_iterations;
-
 };
 
 /*@}*/
@@ -598,7 +628,7 @@ protected:
 #ifndef DOXYGEN
 
 inline unsigned int
-SolverControl::max_steps () const
+SolverControl::max_steps() const
 {
   return maxsteps;
 }
@@ -606,36 +636,36 @@ SolverControl::max_steps () const
 
 
 inline unsigned int
-SolverControl::set_max_steps (const unsigned int newval)
+SolverControl::set_max_steps(const unsigned int newval)
 {
   unsigned int old = maxsteps;
-  maxsteps = newval;
+  maxsteps         = newval;
   return old;
 }
 
 
 
 inline void
-SolverControl::set_failure_criterion (const double rel_failure_residual)
+SolverControl::set_failure_criterion(const double rel_failure_residual)
 {
-  relative_failure_residual=rel_failure_residual;
-  check_failure=true;
+  relative_failure_residual = rel_failure_residual;
+  check_failure             = true;
 }
 
 
 
 inline void
-SolverControl::clear_failure_criterion ()
+SolverControl::clear_failure_criterion()
 {
-  relative_failure_residual=0;
-  failure_residual=0;
-  check_failure=false;
+  relative_failure_residual = 0;
+  failure_residual          = 0;
+  check_failure             = false;
 }
 
 
 
 inline double
-SolverControl::tolerance () const
+SolverControl::tolerance() const
 {
   return tol;
 }
@@ -643,16 +673,16 @@ SolverControl::tolerance () const
 
 
 inline double
-SolverControl::set_tolerance (const double t)
+SolverControl::set_tolerance(const double t)
 {
   double old = tol;
-  tol = t;
+  tol        = t;
   return old;
 }
 
 
 inline void
-SolverControl::log_history (const bool newval)
+SolverControl::log_history(const bool newval)
 {
   m_log_history = newval;
 }
@@ -660,38 +690,38 @@ SolverControl::log_history (const bool newval)
 
 
 inline bool
-SolverControl::log_history () const
+SolverControl::log_history() const
 {
   return m_log_history;
 }
 
 
 inline void
-SolverControl::log_result (const bool newval)
+SolverControl::log_result(const bool newval)
 {
   m_log_result = newval;
 }
 
 
 inline bool
-SolverControl::log_result () const
+SolverControl::log_result() const
 {
   return m_log_result;
 }
 
 
 inline double
-ReductionControl::reduction () const
+ReductionControl::reduction() const
 {
   return reduce;
 }
 
 
 inline double
-ReductionControl::set_reduction (const double t)
+ReductionControl::set_reduction(const double t)
 {
   double old = reduce;
-  reduce = t;
+  reduce     = t;
   return old;
 }
 

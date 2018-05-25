@@ -20,40 +20,44 @@
 //         ::operator = (dealii::BlockVector<TrilinosScalar>)
 // with block vectors instead of plain vectors
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
+
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::MPI::BlockVector &v)
+
+void
+test(TrilinosWrappers::MPI::BlockVector &v)
 {
-  std::vector<types::global_dof_index> sizes (2, 3);
-  dealii::BlockVector<TrilinosScalar> w;
+  std::vector<types::global_dof_index> sizes(2, 3);
+  dealii::BlockVector<TrilinosScalar>  w;
   w.reinit(sizes);
 
-  for (unsigned int i=0; i<w.size(); ++i)
+  for (unsigned int i = 0; i < w.size(); ++i)
     w(i) = i;
 
   v = w;
 
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w(i) == i, ExcInternalError());
-      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow(w(i) == i, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
     }
 
   // now also check the reverse assignment
   w = 0;
   w = v;
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w(i) == i, ExcInternalError());
-      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow(w(i) == i, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
     }
 
 
@@ -62,25 +66,28 @@ void test (TrilinosWrappers::MPI::BlockVector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
     {
       {
-        std::vector<IndexSet> sizes (2, complete_index_set(3));
+        std::vector<IndexSet>              sizes(2, complete_index_set(3));
         TrilinosWrappers::MPI::BlockVector v;
         v.reinit(sizes);
-        test (v);
+        test(v);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -93,7 +100,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

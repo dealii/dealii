@@ -22,64 +22,70 @@
 // can actually count DoFs and decide who owns what
 
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
+
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   std::vector<unsigned int> sub(2);
-  sub[0] = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  sub[0] = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   sub[1] = 1;
-  GridGenerator::subdivided_hyper_rectangle(static_cast<Triangulation<dim>&>(tr),
-                                            sub, Point<2>(0,0), Point<2>(1,1));
+  GridGenerator::subdivided_hyper_rectangle(
+    static_cast<Triangulation<dim> &>(tr), sub, Point<2>(0, 0), Point<2>(1, 1));
 
   const FE_Q<dim> fe_q(1);
-  FESystem<dim> fe(fe_q,2);
+  FESystem<dim>   fe(fe_q, 2);
   DoFHandler<dim> dofh(tr);
-  dofh.distribute_dofs (fe);
+  dofh.distribute_dofs(fe);
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "Total dofs=" << dofh.n_dofs() << std::endl;
 
   {
     IndexSet dof_set;
-    DoFTools::extract_locally_active_dofs (dofh, dof_set);
-    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    DoFTools::extract_locally_active_dofs(dofh, dof_set);
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       dof_set.print(deallog);
   }
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "****" << std::endl;
 
   DoFRenumbering::component_wise(dofh);
   {
     IndexSet dof_set;
-    DoFTools::extract_locally_active_dofs (dofh, dof_set);
+    DoFTools::extract_locally_active_dofs(dofh, dof_set);
 
-    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         dof_set.print(deallog);
-        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
+        for (unsigned int i = 0;
+             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+             ++i)
           {
             deallog << "Dofs owned by processor " << i << ": ";
             dofh.locally_owned_dofs_per_processor()[i].print(deallog);
@@ -87,20 +93,18 @@ void test()
           }
       }
 
-    if (myid==0)
+    if (myid == 0)
       {
+        std::vector<types::global_dof_index>           local_dof_indices;
+        typename DoFHandler<dim>::active_cell_iterator cell, endc = dofh.end();
 
-        std::vector<types::global_dof_index> local_dof_indices;
-        typename DoFHandler<dim>::active_cell_iterator
-        cell, endc = dofh.end();
-
-        if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+        if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
           for (cell = dofh.begin_active(); cell != endc; ++cell)
             if (!cell->is_artificial() && !cell->is_ghost())
               {
-                local_dof_indices.resize (cell->get_fe().dofs_per_cell);
-                cell->get_dof_indices (local_dof_indices);
-                for (unsigned int i=0; i< cell->get_fe().dofs_per_cell; ++i)
+                local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+                cell->get_dof_indices(local_dof_indices);
+                for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
                   deallog << local_dof_indices[i] << " ";
                 deallog << std::endl;
               }
@@ -109,11 +113,12 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));
@@ -132,5 +137,4 @@ int main(int argc, char *argv[])
       test<2>();
       deallog.pop();
     }
-
 }

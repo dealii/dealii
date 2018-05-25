@@ -16,41 +16,42 @@
 
 // test Tensor<1,dim> * SymmetricTensor<2,dim>
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "dim=" << dim << std::endl;
 
-  SymmetricTensor<2,dim> s;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      s[i][j] = (i+1) * (j+1);
+  SymmetricTensor<2, dim> s;
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = i; j < dim; ++j)
+      s[i][j] = (i + 1) * (j + 1);
 
-  Tensor<1,dim> t;
-  for (unsigned int i=0; i<dim; ++i)
-    t[i] = (i==0 ? 1 : 2);
+  Tensor<1, dim> t;
+  for (unsigned int i = 0; i < dim; ++i)
+    t[i] = (i == 0 ? 1 : 2);
 
-  deallog << s *t << std::endl
-          << t *s << std::endl;
+  deallog << s * t << std::endl << t * s << std::endl;
 
-  Assert (s*t == t*s, ExcInternalError());
+  Assert(s * t == t * s, ExcInternalError());
 }
 
 
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test<3> ();
-  test<5> ();
+  test<3>();
+  test<5>();
 
   deallog << "OK" << std::endl;
 }

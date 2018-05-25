@@ -17,36 +17,36 @@
 // Read goteborg.iges and dump its topological structure to the
 // logfile.
 
-#include "../tests.h"
-
 #include <deal.II/opencascade/utilities.h>
+
+#include <Standard_Stream.hxx>
 #include <TopTools.hxx>
 #include <TopoDS_Shape.hxx>
-#include <Standard_Stream.hxx>
+
+#include "../tests.h"
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   TopoDS_Shape sh = read_STEP(SOURCE_DIR "/step_files/goteborg.step");
-  std::vector<TopoDS_Face> faces;
-  std::vector<TopoDS_Edge> edges;
+  std::vector<TopoDS_Face>   faces;
+  std::vector<TopoDS_Edge>   edges;
   std::vector<TopoDS_Vertex> vertices;
 
   extract_geometrical_shapes(sh, faces, edges, vertices);
 
-  std::tuple<unsigned int, unsigned int, unsigned int>
-  n = count_elements(sh);
-  unsigned int nf=std::get<0>(n);
-  unsigned int ne=std::get<1>(n);
-  unsigned int nv=std::get<2>(n);
+  std::tuple<unsigned int, unsigned int, unsigned int> n  = count_elements(sh);
+  unsigned int                                         nf = std::get<0>(n);
+  unsigned int                                         ne = std::get<1>(n);
+  unsigned int                                         nv = std::get<2>(n);
 
-  deallog << "Shape contains " << std::get<0>(n) << " faces, "
-          << std::get<1>(n) << " edges, and "
-          << std::get<2>(n) << " vertices." << std::endl;
+  deallog << "Shape contains " << std::get<0>(n) << " faces, " << std::get<1>(n)
+          << " edges, and " << std::get<2>(n) << " vertices." << std::endl;
 
   if (nf != faces.size())
     deallog << "Error!" << std::endl;

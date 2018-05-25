@@ -23,15 +23,14 @@ namespace Particles
   const PropertyPool::Handle PropertyPool::invalid_handle = nullptr;
 
 
-  PropertyPool::PropertyPool (const unsigned int n_properties_per_slot)
-    :
-    n_properties (n_properties_per_slot)
+  PropertyPool::PropertyPool(const unsigned int n_properties_per_slot) :
+    n_properties(n_properties_per_slot)
   {}
 
 
 
   PropertyPool::Handle
-  PropertyPool::allocate_properties_array ()
+  PropertyPool::allocate_properties_array()
   {
     PropertyPool::Handle handle = PropertyPool::invalid_handle;
     if (n_properties > 0)
@@ -43,7 +42,7 @@ namespace Particles
 
 
   void
-  PropertyPool::deallocate_properties_array (Handle handle)
+  PropertyPool::deallocate_properties_array(Handle handle)
   {
     delete[] handle;
   }
@@ -51,7 +50,7 @@ namespace Particles
 
 
   ArrayView<double>
-  PropertyPool::get_properties (const Handle handle)
+  PropertyPool::get_properties(const Handle handle)
   {
     return ArrayView<double>(handle, n_properties);
   }
@@ -71,5 +70,5 @@ namespace Particles
   {
     return n_properties;
   }
-}
+} // namespace Particles
 DEAL_II_NAMESPACE_CLOSE

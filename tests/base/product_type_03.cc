@@ -17,46 +17,63 @@
 // test that the product between a tensor of rank 2 and a scalar
 // results a result type as expected
 
-#include "../tests.h"
-#include <typeinfo>
-#include <complex>
-
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor.h>
 
+#include <complex>
+#include <typeinfo>
+
+#include "../tests.h"
+
 
 template <typename T, typename U, typename CompareType>
-void check()
+void
+check()
 {
-  AssertThrow (typeid(T() * U()) == typeid(CompareType),
-               ExcInternalError());
-  AssertThrow (typeid(T() * U()) == typeid(CompareType),
-               ExcInternalError());
+  AssertThrow(typeid(T() * U()) == typeid(CompareType), ExcInternalError());
+  AssertThrow(typeid(T() * U()) == typeid(CompareType), ExcInternalError());
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
   // check product of scalars
-  check<Tensor<2,1,double>,double,Tensor<2,1,double> >();
-  check<double,Tensor<2,1,double>,Tensor<2,1,double> >();
+  check<Tensor<2, 1, double>, double, Tensor<2, 1, double>>();
+  check<double, Tensor<2, 1, double>, Tensor<2, 1, double>>();
 
-  check<Tensor<2,1,double>,float,Tensor<2,1,double> >();
-  check<float,Tensor<2,1,double>,Tensor<2,1,double> >();
+  check<Tensor<2, 1, double>, float, Tensor<2, 1, double>>();
+  check<float, Tensor<2, 1, double>, Tensor<2, 1, double>>();
 
-  check<Tensor<2,1,double>,std::complex<double>,Tensor<2,1,std::complex<double> > >();
-  check<std::complex<double>,Tensor<2,1,double>,Tensor<2,1,std::complex<double> > >();
+  check<Tensor<2, 1, double>,
+        std::complex<double>,
+        Tensor<2, 1, std::complex<double>>>();
+  check<std::complex<double>,
+        Tensor<2, 1, double>,
+        Tensor<2, 1, std::complex<double>>>();
 
-  check<Tensor<2,1,double>,std::complex<float>,Tensor<2,1,std::complex<double> > >();
-  check<std::complex<float>,Tensor<2,1,double>,Tensor<2,1,std::complex<double> > >();
+  check<Tensor<2, 1, double>,
+        std::complex<float>,
+        Tensor<2, 1, std::complex<double>>>();
+  check<std::complex<float>,
+        Tensor<2, 1, double>,
+        Tensor<2, 1, std::complex<double>>>();
 
-  check<Tensor<2,1,float>,std::complex<double>,Tensor<2,1,std::complex<double> > >();
-  check<std::complex<double>,Tensor<2,1,float>,Tensor<2,1,std::complex<double> > >();
+  check<Tensor<2, 1, float>,
+        std::complex<double>,
+        Tensor<2, 1, std::complex<double>>>();
+  check<std::complex<double>,
+        Tensor<2, 1, float>,
+        Tensor<2, 1, std::complex<double>>>();
 
-  check<Tensor<2,1,float>,std::complex<float>,Tensor<2,1,std::complex<float> > >();
-  check<std::complex<float>,Tensor<2,1,float>,Tensor<2,1,std::complex<float> > >();
+  check<Tensor<2, 1, float>,
+        std::complex<float>,
+        Tensor<2, 1, std::complex<float>>>();
+  check<std::complex<float>,
+        Tensor<2, 1, float>,
+        Tensor<2, 1, std::complex<float>>>();
 
   deallog << "OK" << std::endl;
 }

@@ -17,35 +17,36 @@
 
 // check Vector<double>::ratio
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v,
-           Vector<double> &w,
-           Vector<double> &x)
+
+void
+test(Vector<double> &v, Vector<double> &w, Vector<double> &x)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
-      w(i) = i+1.;
-      x(i) = i+2.;
+      w(i) = i + 1.;
+      x(i) = i + 2.;
     }
 
-  v.compress ();
-  w.compress ();
-  x.compress ();
+  v.compress();
+  w.compress();
+  x.compress();
 
-  v.ratio (w, x);
+  v.ratio(w, x);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      Assert (w(i) == i+1., ExcInternalError());
-      Assert (x(i) == i+2., ExcInternalError());
-      Assert (std::fabs(v(i) - (i+1.)/(i+2.)) < 1e-14*v(i),
-              ExcInternalError());
+      Assert(w(i) == i + 1., ExcInternalError());
+      Assert(x(i) == i + 2., ExcInternalError());
+      Assert(std::fabs(v(i) - (i + 1.) / (i + 2.)) < 1e-14 * v(i),
+             ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -53,20 +54,22 @@ void test (Vector<double> &v,
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      Vector<double> w (100);
-      Vector<double> x (100);
-      test (v,w,x);
+      Vector<double> v(100);
+      Vector<double> w(100);
+      Vector<double> x(100);
+      test(v, w, x);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -79,7 +82,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

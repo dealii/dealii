@@ -16,17 +16,18 @@
 
 // Test the SolverSelector class.
 
-#include "../tests.h"
-#include "../testmatrix.h"
+#include <deal.II/lac/solver_selector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/solver_selector.h>
+
+#include "../testmatrix.h"
+#include "../tests.h"
 
 
 template <typename MatrixType, typename VectorType>
 void
-check (const MatrixType &A, const VectorType &f)
+check(const MatrixType &A, const VectorType &f)
 {
   std::vector<std::string> names;
   names.push_back("cg");
@@ -34,10 +35,10 @@ check (const MatrixType &A, const VectorType &f)
   names.push_back("gmres");
   names.push_back("fgmres");
 
-  ReductionControl cont1(100, 0., 1.e-4);
-  SolverControl cont2(100, 1.e-7);
-  SolverSelector<VectorType> solver;
-  PreconditionSSOR<SparseMatrix<double> > pre;
+  ReductionControl                       cont1(100, 0., 1.e-4);
+  SolverControl                          cont2(100, 1.e-7);
+  SolverSelector<VectorType>             solver;
+  PreconditionSSOR<SparseMatrix<double>> pre;
   pre.initialize(A);
 
   VectorType u;
@@ -60,30 +61,30 @@ check (const MatrixType &A, const VectorType &f)
       u = 0.;
       solver.solve(A, u, f, pre);
     }
-
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
-//  logfile.setf(std::ios::fixed);
+  //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  unsigned int size=37;
-  unsigned int dim = (size-1)*(size-1);
+  unsigned int size = 37;
+  unsigned int dim  = (size - 1) * (size - 1);
 
   deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
   // Make matrix
-  FDMatrix testproblem(size, size);
+  FDMatrix        testproblem(size, size);
   SparsityPattern structure(dim, dim, 5);
   testproblem.five_point_structure(structure);
   structure.compress();
-  SparseMatrix<double>  A(structure);
+  SparseMatrix<double> A(structure);
   testproblem.five_point(A);
-  Vector<double>  f(dim);
+  Vector<double> f(dim);
   f = 1.;
 
   check(A, f);

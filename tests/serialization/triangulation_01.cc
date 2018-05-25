@@ -16,17 +16,19 @@
 
 // check serialization for Triangulation<1,dim>
 
-#include "serialization.h"
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
+
+#include "serialization.h"
 
 namespace dealii
 {
   template <int dim, int spacedim>
-  bool operator == (const Triangulation<dim,spacedim> &t1,
-                    const Triangulation<dim,spacedim> &t2)
+  bool
+  operator==(const Triangulation<dim, spacedim> &t1,
+             const Triangulation<dim, spacedim> &t2)
   {
     // test a few attributes, though we can't
     // test everything unfortunately...
@@ -39,12 +41,11 @@ namespace dealii
     if (t1.n_faces() != t2.n_faces())
       return false;
 
-    typename Triangulation<dim,spacedim>::cell_iterator
-    c1 = t1.begin(),
-    c2 = t2.begin();
+    typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin(),
+                                                         c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           {
             if (c1->vertex(v) != c2->vertex(v))
               return false;
@@ -52,7 +53,7 @@ namespace dealii
               return false;
           }
 
-        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
@@ -62,8 +63,7 @@ namespace dealii
 
             if (c1->face(f)->at_boundary())
               {
-                if (c1->face(f)->boundary_id() !=
-                    c2->face(f)->boundary_id())
+                if (c1->face(f)->boundary_id() != c2->face(f)->boundary_id())
                   return false;
               }
             else
@@ -75,8 +75,8 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active()
-            && (c1->subdomain_id() != c2->subdomain_id()))
+        if (c1->active() && c2->active() &&
+            (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
         if (c1->level_subdomain_id() != c2->level_subdomain_id())
@@ -98,16 +98,15 @@ namespace dealii
           if (c1->active_cell_index() != c2->active_cell_index())
             return false;
 
-        if (c1->level()>0)
+        if (c1->level() > 0)
           if (c1->parent_index() != c2->parent_index())
             return false;
       }
 
     // also check the order of raw iterators as they contain
     // something about the history of the triangulation
-    typename Triangulation<dim,spacedim>::cell_iterator
-    r1 = t1.begin(),
-    r2 = t2.begin();
+    typename Triangulation<dim, spacedim>::cell_iterator r1 = t1.begin(),
+                                                         r2 = t2.begin();
     for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
       {
         if (r1->level() != r2->level())
@@ -118,60 +117,62 @@ namespace dealii
 
     return true;
   }
-}
+} // namespace dealii
 
 
 template <int dim, int spacedim>
-void do_boundary (Triangulation<dim,spacedim> &t1)
+void
+do_boundary(Triangulation<dim, spacedim> &t1)
 {
-  typename Triangulation<dim,spacedim>::cell_iterator
-  c1 = t1.begin();
+  typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (c1->at_boundary(f))
         {
-          c1->face(f)->set_boundary_id (42);
+          c1->face(f)->set_boundary_id(42);
           //        c1->face(f)->set_manifold_id (43);
         }
 }
 
 
 template <int spacedim>
-void do_boundary (Triangulation<1,spacedim> &)
+void do_boundary(Triangulation<1, spacedim> &)
 {}
 
 
 template <int dim, int spacedim>
-void test ()
+void
+test()
 {
-  Triangulation<dim,spacedim> tria_1, tria_2;
+  Triangulation<dim, spacedim> tria_1, tria_2;
 
-  GridGenerator::hyper_cube (tria_1);
-  tria_1.refine_global (2);
-  tria_1.begin_active()->set_subdomain_id (1);
-  tria_1.begin_active()->set_level_subdomain_id (4);
-  tria_1.begin_active()->set_material_id (2);
-  tria_1.begin_active()->set_user_index (3);
-  tria_1.begin_active()->set_user_flag ();
-  tria_1.begin_active()->set_refine_flag (RefinementCase<dim>::cut_x);
+  GridGenerator::hyper_cube(tria_1);
+  tria_1.refine_global(2);
+  tria_1.begin_active()->set_subdomain_id(1);
+  tria_1.begin_active()->set_level_subdomain_id(4);
+  tria_1.begin_active()->set_material_id(2);
+  tria_1.begin_active()->set_user_index(3);
+  tria_1.begin_active()->set_user_flag();
+  tria_1.begin_active()->set_refine_flag(RefinementCase<dim>::cut_x);
 
-  do_boundary (tria_1);
+  do_boundary(tria_1);
 
-  verify (tria_1, tria_2);
+  verify(tria_1, tria_2);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test<1,1> ();
-  test<1,2> ();
-  test<2,2> ();
-  test<2,3> ();
-  test<3,3> ();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 
   deallog << "OK" << std::endl;
 }

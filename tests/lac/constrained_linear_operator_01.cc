@@ -23,31 +23,35 @@
 // with the help of constrainted_linear_operator and
 // constrained_right_hand_side
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/constrained_linear_operator.h>
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/linear_operator.h>
-#include <deal.II/lac/packaged_operation.h>
-#include <deal.II/lac/constrained_linear_operator.h>
-
 #include <iostream>
+
+#include "../tests.h"
 
 using namespace dealii;
 
@@ -55,118 +59,116 @@ template <int dim>
 class Step6
 {
 public:
-  Step6 ();
+  Step6();
 
-  void run ();
+  void
+  run();
 
 private:
-  void setup_system ();
+  void
+  setup_system();
 
-  void assemble_system ();
+  void
+  assemble_system();
 
-  void solve ();
+  void
+  solve();
 
-  void refine_grid ();
+  void
+  refine_grid();
 
-  Triangulation<dim>   triangulation;
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
-  ConstraintMatrix     constraints;
+  Triangulation<dim> triangulation;
+  FE_Q<dim>          fe;
+  DoFHandler<dim>    dof_handler;
+  ConstraintMatrix   constraints;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
   SparseMatrix<double> system_matrix_lo;
 
-  Vector<double>       solution;
-  Vector<double>       solution_lo;
-  Vector<double>       system_rhs;
-  Vector<double>       system_rhs_lo;
+  Vector<double> solution;
+  Vector<double> solution_lo;
+  Vector<double> system_rhs;
+  Vector<double> system_rhs_lo;
 };
 
 
 template <int dim>
-Step6<dim>::Step6 ()
-  :
-  fe (2),
-  dof_handler (triangulation)
+Step6<dim>::Step6() : fe(2), dof_handler(triangulation)
 {}
 
 
 template <int dim>
-void Step6<dim>::setup_system ()
+void
+Step6<dim>::setup_system()
 {
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
-  solution.reinit (dof_handler.n_dofs());
-  solution_lo.reinit (dof_handler.n_dofs());
+  solution.reinit(dof_handler.n_dofs());
+  solution_lo.reinit(dof_handler.n_dofs());
 
-  system_rhs.reinit (dof_handler.n_dofs());
-  system_rhs_lo.reinit (dof_handler.n_dofs());
+  system_rhs.reinit(dof_handler.n_dofs());
+  system_rhs_lo.reinit(dof_handler.n_dofs());
 
-  constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dof_handler,
-                                           constraints);
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            Functions::ConstantFunction<dim>(1.),
-                                            constraints);
-  constraints.close ();
+  constraints.clear();
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, Functions::ConstantFunction<dim>(1.), constraints);
+  constraints.close();
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
   sparsity_pattern.copy_from(dsp);
 
-  system_matrix.reinit (sparsity_pattern);
-  system_matrix_lo.reinit (sparsity_pattern);
+  system_matrix.reinit(sparsity_pattern);
+  system_matrix_lo.reinit(sparsity_pattern);
 }
 
 
 template <int dim>
-void Step6<dim>::assemble_system ()
+void
+Step6<dim>::assemble_system()
 {
   const QGauss<dim> quadrature_formula(3);
 
-  FEValues<dim> fe_values (fe, quadrature_formula,
-                           update_values |  update_gradients |
-                           update_quadrature_points  |  update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double> cell_rhs (dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
-  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
+  for (; cell != endc; ++cell)
     {
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
-      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              cell_matrix(i,j) += (fe_values.shape_grad(i,q_index) *
-                                   fe_values.shape_grad(j,q_index) *
-                                   fe_values.JxW(q_index));
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+              cell_matrix(i, j) +=
+                (fe_values.shape_grad(i, q_index) *
+                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
-            cell_rhs(i) += (fe_values.shape_value(i,q_index) *
-                            1.0 *
+            cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
                             fe_values.JxW(q_index));
           }
 
-      cell->get_dof_indices (local_dof_indices);
-      constraints.distribute_local_to_global (cell_matrix,
-                                              cell_rhs,
-                                              local_dof_indices,
-                                              system_matrix,
-                                              system_rhs);
+      cell->get_dof_indices(local_dof_indices);
+      constraints.distribute_local_to_global(
+        cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       cell->distribute_local_to_global(cell_matrix, system_matrix_lo);
       cell->distribute_local_to_global(cell_rhs, system_rhs_lo);
     }
@@ -174,10 +176,11 @@ void Step6<dim>::assemble_system ()
 
 
 template <int dim>
-void Step6<dim>::solve ()
+void
+Step6<dim>::solve()
 {
-  SolverControl      solver_control (1000, 1e-8);
-  SolverCG<>         solver (solver_control);
+  SolverControl solver_control(1000, 1e-8);
+  SolverCG<>    solver(solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
@@ -187,45 +190,44 @@ void Step6<dim>::solve ()
     solver_control.last_step(),
     10,
     60);
-  constraints.distribute (solution);
+  constraints.distribute(solution);
 
-  const auto A = linear_operator(system_matrix_lo);
-  const auto M = constrained_linear_operator(constraints, A);
-  const auto rhs = constrained_right_hand_side(constraints, A,
-                                               system_rhs_lo);
+  const auto A   = linear_operator(system_matrix_lo);
+  const auto M   = constrained_linear_operator(constraints, A);
+  const auto rhs = constrained_right_hand_side(constraints, A, system_rhs_lo);
 
-  check_solver_within_range(
-    solver.solve(M, solution_lo, rhs, preconditioner),
-    solver_control.last_step(),
-    10,
-    60);
+  check_solver_within_range(solver.solve(M, solution_lo, rhs, preconditioner),
+                            solver_control.last_step(),
+                            10,
+                            60);
   constraints.distribute(solution_lo);
 }
 
 
 template <int dim>
-void Step6<dim>::refine_grid ()
+void
+Step6<dim>::refine_grid()
 {
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-                                      QGauss<dim-1>(3),
-                                      typename FunctionMap<dim>::type(),
-                                      solution,
-                                      estimated_error_per_cell);
+  KellyErrorEstimator<dim>::estimate(dof_handler,
+                                     QGauss<dim - 1>(3),
+                                     typename FunctionMap<dim>::type(),
+                                     solution,
+                                     estimated_error_per_cell);
 
-  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                   estimated_error_per_cell,
-                                                   0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(
+    triangulation, estimated_error_per_cell, 0.3, 0.03);
 
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 }
 
 
 template <int dim>
-void Step6<dim>::run ()
+void
+Step6<dim>::run()
 {
-  for (unsigned int cycle=0; cycle<3; ++cycle)
+  for (unsigned int cycle = 0; cycle < 3; ++cycle)
     {
       if (cycle == 0)
         {
@@ -248,13 +250,14 @@ void Step6<dim>::run ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
 
   Step6<2> laplace_problem_2d;
-  laplace_problem_2d.run ();
+  laplace_problem_2d.run();
 
   return 0;
 }

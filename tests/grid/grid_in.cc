@@ -15,38 +15,42 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/grid_generator.h>
 
 #include <string>
+
+#include "../tests.h"
 
 std::ofstream logfile("output");
 
 
 template <int dim>
-void test1 ()
+void
+test1()
 {
   Triangulation<dim> tria;
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
-  std::ifstream in (SOURCE_DIR "/grid_in/2d.inp");
-  gi.read_ucd (in);
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
+  std::ifstream in(SOURCE_DIR "/grid_in/2d.inp");
+  gi.read_ucd(in);
 
   GridOut grid_out;
-  grid_out.set_flags (GridOutFlags::Ucd(true));
-  grid_out.write_ucd (tria, logfile);
+  grid_out.set_flags(GridOutFlags::Ucd(true));
+  grid_out.write_ucd(tria, logfile);
 }
 
 
 template <int dim>
-void test2 ()
+void
+test2()
 {
   // read a much larger grid (30k
   // cells). with the old grid
@@ -64,13 +68,13 @@ void test2 ()
   // grid_in_02 testcase fail when using this
   // input file, but grid_in_02/2d.xda is a
   // corrected input file.
-  Triangulation<dim> tria (Triangulation<dim>::none, true);
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
-  std::ifstream in (SOURCE_DIR "/grid_in/2d.xda");
+  Triangulation<dim> tria(Triangulation<dim>::none, true);
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
+  std::ifstream in(SOURCE_DIR "/grid_in/2d.xda");
   try
     {
-      gi.read_xda (in);
+      gi.read_xda(in);
     }
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
@@ -82,37 +86,40 @@ void test2 ()
     }
 
 
-  int hash = 0;
+  int hash  = 0;
   int index = 0;
-  for (typename Triangulation<dim>::active_cell_iterator c=tria.begin_active();
-       c!=tria.end(); ++c, ++index)
-    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-      hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells()+1);
+  for (typename Triangulation<dim>::active_cell_iterator c =
+         tria.begin_active();
+       c != tria.end();
+       ++c, ++index)
+    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells() + 1);
   deallog << hash << std::endl;
 }
 
 
 template <int dim>
-void test3 ()
+void
+test3()
 {
   Triangulation<dim> tria;
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
-  gi.read (SOURCE_DIR "/grid_in/2d.nc");
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
+  gi.read(SOURCE_DIR "/grid_in/2d.nc");
 
-  GridOut grid_out;
+  GridOut       grid_out;
   std::ofstream gnufile("grid_in_2d.gnuplot");
-  grid_out.write_gnuplot (tria, gnufile);
+  grid_out.write_gnuplot(tria, gnufile);
 }
 
 
 template <int dim>
-void check_file (const std::string name,
-                 typename GridIn<dim>::Format format)
+void
+check_file(const std::string name, typename GridIn<dim>::Format format)
 {
-  Triangulation<dim> tria (Triangulation<dim>::none, true);
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
+  Triangulation<dim> tria(Triangulation<dim>::none, true);
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
   try
     {
       gi.read(name, format);
@@ -124,29 +131,28 @@ void check_file (const std::string name,
               << std::endl;
     }
 
-  deallog << '\t' << tria.n_vertices()
-          << '\t' << tria.n_cells()
-          << std::endl;
+  deallog << '\t' << tria.n_vertices() << '\t' << tria.n_cells() << std::endl;
 }
 
-void filename_resolution()
+void
+filename_resolution()
 {
-  check_file<2> (std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::ucd);
-  check_file<2> (std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::xda);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::ucd);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::xda);
 }
 
 
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
+  deallog << std::setprecision(2);
+  logfile << std::setprecision(2);
   deallog.attach(logfile);
 
-  test1<2> ();
-  test2<2> ();
+  test1<2>();
+  test2<2>();
   // test3 needs NetCDF
-//    test3<2> ();
+  //    test3<2> ();
 
   filename_resolution();
 }
-

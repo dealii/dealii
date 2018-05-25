@@ -25,13 +25,13 @@ main()
   initlog();
   deallog << std::setprecision(9);
 
-  CHECK_ALL(DGQ,0,2);
-  CHECK_ALL(DGQ,1,2);
-  CHECK_ALL(DGQ,2,2);
-  CHECK_ALL(DGQ,3,2);
-  CHECK_ALL(DGQ,4,2);
+  CHECK_ALL(DGQ, 0, 2);
+  CHECK_ALL(DGQ, 1, 2);
+  CHECK_ALL(DGQ, 2, 2);
+  CHECK_ALL(DGQ, 3, 2);
+  CHECK_ALL(DGQ, 4, 2);
 
-  CHECK_ALL(DGQ,0,3);
-  CHECK_ALL(DGQ,1,3);
-  CHECK_ALL(DGQ,2,3);
+  CHECK_ALL(DGQ, 0, 3);
+  CHECK_ALL(DGQ, 1, 3);
+  CHECK_ALL(DGQ, 2, 3);
 }

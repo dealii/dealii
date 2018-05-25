@@ -18,21 +18,28 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
+
 #include <deal.II/dofs/function_map.h>
+
 #include <deal.II/fe/component_mask.h>
+
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int, int> class Mapping;
-template <int> class Quadrature;
+template <int, int>
+class Mapping;
+template <int>
+class Quadrature;
 
 namespace hp
 {
-  template <int> class QCollection;
+  template <int>
+  class QCollection;
 }
 
 
@@ -75,10 +82,9 @@ namespace hp
  * is as follows:
  * @code{.bib}
  * @Article{KGZB83,
- *   author =       {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
- *                   and Babu\v{s}ka, I.},
- *   title =        {A posteriori error analysis and adaptive processes
- *                   in the finite element method: Part {I}--Error Analysis},
+ *   author =       {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O.
+ * C. and Babu\v{s}ka, I.}, title =        {A posteriori error analysis and
+ * adaptive processes in the finite element method: Part {I}--Error Analysis},
  *   journal =      {Int. J. Num. Meth. Engrg.},
  *   year =         {1983},
  *   volume =       {19},
@@ -93,13 +99,14 @@ namespace hp
  * \eta_K^2 = \sum_{F\in\partial K} c_F \int_{\partial K_F} \left[a
  * \frac{\partial u_h}{\partial n}\right]^2 do \f] be the error estimator for
  * cell $K$. $[\cdot]$ denotes the jump of the argument at the face. In the
- * paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit esoteric,
- * stemming from interpolation estimates and stability constants which may
- * hold for the Poisson problem, but may not hold for more general situations.
- * Alternatively, we consider the case when $ c_F=\frac {h_F}{2p_F} $, where $
- * h_F $ is face diagonal and $ p_F=max(p^+,p^-) $ is the maximum polynomial
- * degree of adjacent elements; or $c_F=h_K$. The choice between these factors is done by means of
- * the enumerator, provided as the last argument in all functions.
+ * paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit
+ * esoteric, stemming from interpolation estimates and stability constants which
+ * may hold for the Poisson problem, but may not hold for more general
+ * situations. Alternatively, we consider the case when $ c_F=\frac {h_F}{2p_F}
+ * $, where $ h_F $ is face diagonal and $ p_F=max(p^+,p^-) $ is the maximum
+ * polynomial degree of adjacent elements; or $c_F=h_K$. The choice between
+ * these factors is done by means of the enumerator, provided as the last
+ * argument in all functions.
  *
  * To perform the integration, use is made of the FEFaceValues and
  * FESubfaceValues classes. The integration is performed by looping over all
@@ -247,7 +254,7 @@ namespace hp
  * @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006, Denis Davydov,
  * 2015; parallelization by Thomas Richter, 2000
  */
-template <int dim, int spacedim=dim>
+template <int dim, int spacedim = dim>
 class KellyErrorEstimator
 {
 public:
@@ -259,7 +266,8 @@ public:
   {
     //! Kelly error estimator with the factor $\frac {h_K}{24}$.
     cell_diameter_over_24 = 0,
-    //! the boundary residual estimator with the factor $\frac {h_F}{2 max(p^+,p^-)}$.
+    //! the boundary residual estimator with the factor $\frac {h_F}{2
+    //! max(p^+,p^-)}$.
     face_diameter_over_twice_max_degree,
     //! Kelly error estimator with the factor $h_K$.
     cell_diameter
@@ -326,37 +334,41 @@ public:
    * parallel::distributed::Triangulation::n_locally_owned_active_cells().
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<dim, spacedim>               &mapping,
-   const DoFHandlerType                       &dof,
-   const Quadrature<dim-1>                    &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = nullptr,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<dim, spacedim> &mapping,
+    const DoFHandlerType &        dof,
+    const Quadrature<dim - 1> &   quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficients   = nullptr,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
   /**
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const Quadrature<dim-1>                    &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = nullptr,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &     dof,
+    const Quadrature<dim - 1> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficients   = nullptr,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
   /**
    * Same function as above, but accepts more than one solution vector and
@@ -372,37 +384,41 @@ public:
    * pointers.)
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<dim, spacedim>               &mapping,
-   const DoFHandlerType                       &dof,
-   const Quadrature<dim-1>                    &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<dim, spacedim> &mapping,
+    const DoFHandlerType &        dof,
+    const Quadrature<dim - 1> &   quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = 0,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
   /**
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const Quadrature<dim-1>                    &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &     dof,
+    const Quadrature<dim - 1> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = 0,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
   /**
@@ -410,19 +426,21 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<dim, spacedim>               &mapping,
-   const DoFHandlerType                       &dof,
-   const hp::QCollection<dim-1>               &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<dim, spacedim> &  mapping,
+    const DoFHandlerType &          dof,
+    const hp::QCollection<dim - 1> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficients   = 0,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
 
   /**
@@ -430,18 +448,20 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const hp::QCollection<dim-1>               &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = nullptr,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &          dof,
+    const hp::QCollection<dim - 1> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficients   = nullptr,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
 
   /**
@@ -449,19 +469,21 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<dim, spacedim>               &mapping,
-   const DoFHandlerType                       &dof,
-   const hp::QCollection<dim-1>               &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<dim, spacedim> &  mapping,
+    const DoFHandlerType &          dof,
+    const hp::QCollection<dim - 1> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = 0,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
   /**
@@ -469,67 +491,72 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const hp::QCollection<dim-1>               &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = nullptr,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &          dof,
+    const hp::QCollection<dim - 1> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcInvalidComponentMask,
-                    "You provided a ComponentMask argument that is invalid. "
-                    "Component masks need to be either default constructed "
-                    "(in which case they indicate that every component is "
-                    "selected) or need to have a length equal to the number "
-                    "of vector components of the finite element in use "
-                    "by the DoFHandler object. In the latter case, at "
-                    "least one component needs to be selected.");
+  DeclExceptionMsg(ExcInvalidComponentMask,
+                   "You provided a ComponentMask argument that is invalid. "
+                   "Component masks need to be either default constructed "
+                   "(in which case they indicate that every component is "
+                   "selected) or need to have a length equal to the number "
+                   "of vector components of the finite element in use "
+                   "by the DoFHandler object. In the latter case, at "
+                   "least one component needs to be selected.");
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcInvalidCoefficient,
-                    "If you do specify the argument for a (possibly "
-                    "spatially variable) coefficient function for this function, "
-                    "then it needs to refer to a coefficient that is either "
-                    "scalar (has one vector component) or has as many vector "
-                    "components as there are in the finite element used by "
-                    "the DoFHandler argument.");
+  DeclExceptionMsg(
+    ExcInvalidCoefficient,
+    "If you do specify the argument for a (possibly "
+    "spatially variable) coefficient function for this function, "
+    "then it needs to refer to a coefficient that is either "
+    "scalar (has one vector component) or has as many vector "
+    "components as there are in the finite element used by "
+    "the DoFHandler argument.");
   /**
    * Exception
    */
-  DeclException3 (ExcInvalidBoundaryFunction,
-                  types::boundary_id,
-                  int,
-                  int,
-                  << "You provided a function map that for boundary indicator "
-                  << arg1 << " specifies a function with "
-                  << arg2 << " vector components. However, the finite "
-                  "element in use has "
-                  << arg2 << " components, and these two numbers need to match.");
+  DeclException3(ExcInvalidBoundaryFunction,
+                 types::boundary_id,
+                 int,
+                 int,
+                 << "You provided a function map that for boundary indicator "
+                 << arg1 << " specifies a function with " << arg2
+                 << " vector components. However, the finite "
+                    "element in use has "
+                 << arg2
+                 << " components, and these two numbers need to match.");
   /**
    * Exception
    */
-  DeclException2 (ExcIncompatibleNumberOfElements,
-                  int, int,
-                  << "The number of input vectors, " << arg1
-                  << " needs to be equal to the number of output vectors, "
-                  << arg2
-                  << ". This is not the case in your call of this function.");
+  DeclException2(ExcIncompatibleNumberOfElements,
+                 int,
+                 int,
+                 << "The number of input vectors, " << arg1
+                 << " needs to be equal to the number of output vectors, "
+                 << arg2
+                 << ". This is not the case in your call of this function.");
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcNoSolutions,
-                    "You need to specify at least one solution vector as "
-                    "input.");
+  DeclExceptionMsg(ExcNoSolutions,
+                   "You need to specify at least one solution vector as "
+                   "input.");
 };
 
 
@@ -546,7 +573,7 @@ public:
  * @author Wolfgang Bangerth, 1998, 2004.
  */
 template <int spacedim>
-class KellyErrorEstimator<1,spacedim>
+class KellyErrorEstimator<1, spacedim>
 {
 public:
   /**
@@ -557,7 +584,8 @@ public:
   {
     //! Kelly error estimator with the factor $\frac {h_K}{24}$.
     cell_diameter_over_24 = 0,
-    //! the boundary residual estimator with the factor $\frac {h_F}{2 max(p^+,p^-)}$.
+    //! the boundary residual estimator with the factor $\frac {h_F}{2
+    //! max(p^+,p^-)}$.
     face_diameter_over_twice_max_degree,
     //! Kelly error estimator with the factor $h_K$.
     cell_diameter
@@ -586,37 +614,41 @@ public:
    * general case.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<1,spacedim>                  &mapping,
-   const DoFHandlerType                       &dof,
-   const Quadrature<0>                        &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficient    = nullptr,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<1, spacedim> &mapping,
+    const DoFHandlerType &      dof,
+    const Quadrature<0> &       quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficient    = nullptr,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
   /**
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const Quadrature<0>                        &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = nullptr,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &dof,
+    const Quadrature<0> & quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficients   = nullptr,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
   /**
    * Same function as above, but accepts more than one solution vectors and
@@ -632,37 +664,41 @@ public:
    * pointers.)
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<1,spacedim>                  &mapping,
-   const DoFHandlerType                       &dof,
-   const Quadrature<0>                        &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<1, spacedim> &mapping,
+    const DoFHandlerType &      dof,
+    const Quadrature<0> &       quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = 0,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
   /**
    * Call the @p estimate function, see above, with
    * <tt>mapping=MappingQGeneric1<1>()</tt>.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const Quadrature<0>                        &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &dof,
+    const Quadrature<0> & quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = 0,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
   /**
@@ -670,19 +706,21 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<1,spacedim>                  &mapping,
-   const DoFHandlerType                       &dof,
-   const hp::QCollection<0>                   &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<1, spacedim> &mapping,
+    const DoFHandlerType &      dof,
+    const hp::QCollection<0> &  quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficients   = 0,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
 
   /**
@@ -690,18 +728,20 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const hp::QCollection<0>                   &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const InputVector                          &solution,
-   Vector<float>                              &error,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &    dof,
+    const hp::QCollection<0> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                       neumann_bc,
+    const InputVector &       solution,
+    Vector<float> &           error,
+    const ComponentMask &     component_mask = ComponentMask(),
+    const Function<spacedim> *coefficients   = 0,
+    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
+    const types::material_id  material_id    = numbers::invalid_material_id,
+    const Strategy            strategy       = cell_diameter_over_24);
 
 
   /**
@@ -709,19 +749,21 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const Mapping<1,spacedim>                  &mapping,
-   const DoFHandlerType                       &dof,
-   const hp::QCollection<0>                   &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const Mapping<1, spacedim> &mapping,
+    const DoFHandlerType &      dof,
+    const hp::QCollection<0> &  quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = 0,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
   /**
@@ -729,67 +771,72 @@ public:
    * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, typename DoFHandlerType>
-  static void estimate
-  (const DoFHandlerType                       &dof,
-   const hp::QCollection<0>                   &quadrature,
-   const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
-   const std::vector<const InputVector *>     &solutions,
-   std::vector<Vector<float>*>                &errors,
-   const ComponentMask                        &component_mask = ComponentMask(),
-   const Function<spacedim>                   *coefficients   = 0,
-   const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
-   const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id,
-   const Strategy                              strategy       = cell_diameter_over_24);
+  static void
+  estimate(
+    const DoFHandlerType &    dof,
+    const hp::QCollection<0> &quadrature,
+    const typename FunctionMap<spacedim, typename InputVector::value_type>::type
+      &                                     neumann_bc,
+    const std::vector<const InputVector *> &solutions,
+    std::vector<Vector<float> *> &          errors,
+    const ComponentMask &                   component_mask = ComponentMask(),
+    const Function<spacedim> *              coefficients   = 0,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcInvalidComponentMask,
-                    "You provided a ComponentMask argument that is invalid. "
-                    "Component masks need to be either default constructed "
-                    "(in which case they indicate that every component is "
-                    "selected) or need to have a length equal to the number "
-                    "of vector components of the finite element in use "
-                    "by the DoFHandler object. In the latter case, at "
-                    "least one component needs to be selected.");
+  DeclExceptionMsg(ExcInvalidComponentMask,
+                   "You provided a ComponentMask argument that is invalid. "
+                   "Component masks need to be either default constructed "
+                   "(in which case they indicate that every component is "
+                   "selected) or need to have a length equal to the number "
+                   "of vector components of the finite element in use "
+                   "by the DoFHandler object. In the latter case, at "
+                   "least one component needs to be selected.");
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcInvalidCoefficient,
-                    "If you do specify the argument for a (possibly "
-                    "spatially variable) coefficient function for this function, "
-                    "then it needs to refer to a coefficient that is either "
-                    "scalar (has one vector component) or has as many vector "
-                    "components as there are in the finite element used by "
-                    "the DoFHandler argument.");
+  DeclExceptionMsg(
+    ExcInvalidCoefficient,
+    "If you do specify the argument for a (possibly "
+    "spatially variable) coefficient function for this function, "
+    "then it needs to refer to a coefficient that is either "
+    "scalar (has one vector component) or has as many vector "
+    "components as there are in the finite element used by "
+    "the DoFHandler argument.");
   /**
    * Exception
    */
-  DeclException3 (ExcInvalidBoundaryFunction,
-                  types::boundary_id,
-                  int,
-                  int,
-                  << "You provided a function map that for boundary indicator "
-                  << arg1 << " specifies a function with "
-                  << arg2 << " vector components. However, the finite "
-                  "element in use has "
-                  << arg3 << " components, and these two numbers need to match.");
+  DeclException3(ExcInvalidBoundaryFunction,
+                 types::boundary_id,
+                 int,
+                 int,
+                 << "You provided a function map that for boundary indicator "
+                 << arg1 << " specifies a function with " << arg2
+                 << " vector components. However, the finite "
+                    "element in use has "
+                 << arg3
+                 << " components, and these two numbers need to match.");
   /**
    * Exception
    */
-  DeclException2 (ExcIncompatibleNumberOfElements,
-                  int, int,
-                  << "The number of input vectors, " << arg1
-                  << " needs to be equal to the number of output vectors, "
-                  << arg2
-                  << ". This is not the case in your call of this function.");
+  DeclException2(ExcIncompatibleNumberOfElements,
+                 int,
+                 int,
+                 << "The number of input vectors, " << arg1
+                 << " needs to be equal to the number of output vectors, "
+                 << arg2
+                 << ". This is not the case in your call of this function.");
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcNoSolutions,
-                    "You need to specify at least one solution vector as "
-                    "input.");
+  DeclExceptionMsg(ExcNoSolutions,
+                   "You need to specify at least one solution vector as "
+                   "input.");
 };
 
 
