@@ -101,7 +101,7 @@ that a cell can be only refined once more than its neighbors), but that we end
 up with these &ldquo;hanging nodes&rdquo; if we do this.
 
 
-<h3> How to deal with hanging nodes </h3>
+<h3> How to deal with hanging nodes in theory </h3>
 
 The methods using triangular meshes mentioned above go to great
 lengths to make sure that each vertex is a vertex of all adjacent
@@ -153,7 +153,15 @@ discrete finite element space is a proper subset of the $H^1$ function
 space in which we seek the solution of the Laplace equation.
 To guarantee that the global solution is continuous at these nodes as well, we
 have to state some additional constraints on the values of the solution at
-these nodes. How these constraints have to look is relatively easy to
+these nodes. The trick is to realize that while the shape functions shown
+above are discontinuous (and consequently an <i>arbitrary</i> linear combination
+of them is also discontinuous), that linear combinations in which the shape
+functions are added up as $u_h(\mathbf x)=\sum_j U_j \varphi_j(\mathbf x)$
+can be continuous <i>if the coefficients $U_j$ satisfy certain relationships</i>.
+In other words, the coefficients $U_j$ can not be chosen arbitrarily
+but have to satisfy certain constraints so that the function $u_h$ is in fact
+continuous.
+How these constraints have to look is relatively easy to
 understand conceptually, but the implementation in software is
 complicated and takes several thousand lines of code. On the other
 hand, in user code, it is only about half a dozen lines you have to
@@ -165,6 +173,49 @@ linear system of equations. Before going over the details of the program
 below, you may want to take a look at the @ref constraints documentation
 module that explains how these constraints can be computed and what classes in
 deal.II work on them.
+
+
+<h3> How to deal with hanging nodes in practice </h3>
+
+The practice of hanging node constraints is rather simpler than the
+theory we have outlined above. In reality, you will really only have to
+add about half a dozen lines of additional code to a program like step-4
+to make it work with adaptive meshes that have hanging nodes. The
+interesting part about this is that it is entirely independent of the
+equation you are solving: How the constraints look like has nothing
+to do with the equation and only with the finite element in use.
+As a consequence, the code to deal with these constraints is entirely
+contained in the deal.II library itself, and you do not need to worry
+about the details.
+
+The steps you have to do to make this work are essentially like this:
+- You have to have a ConstraintMatrix object that stores the
+  constraints due our desire to keep the solution space continuous
+  even in the presence of hanging nodes.
+- You have to fill this object using the function
+  DoFTools::make_hanging_node_constraints().
+- You have to use this object when you copy the local contributions to
+  the matrix and right hand side into the global objects, by using
+  ConstraintMatrix::distribute_local_to_global(). Up until
+  now, we have done this ourselves, but now with constraints, this
+  is where the magic happens and we apply the constraints to the
+  linear system. What this function does is make sure that the
+  degrees of freedom located at hanging nodes are not, in fact,
+  really free. Rather, they are factually eliminated from the
+  linear system by setting their rows and columns to zero and putting
+  something on the diagonal to ensure the matrix remains invertible.
+- You then solve the linear system as usual, but at the end of this
+  step, you need to make sure that the degrees of "freedom" located
+  on hanging nodes get their correct (constrained) value so that the
+  solution you then visualize or evaluate in other ways in in
+  fact continuous. This is done by calling
+  ConstraintMatrix::distribute() immediately after solving.
+
+These four steps are really all that is necessary -- it's that simple
+from a user perspective. The fact that, in the function calls mentioned
+above, you will run through several thousand lines of not-so-trivial
+code is entirely immaterial to this: In user code, there are really
+only four additional steps.
 
 
 <h3> Indicators for mesh refinement and coarsening </h3>
@@ -206,17 +257,21 @@ The only other new thing is a method to catch exceptions in the
 program crashes for some reason.
 
 
-<h3>The ConstraintMatrix</h3>
+<h3> Boundary conditions </h3>
 
-As explained above, we are going to use an object called ConstraintMatrix
-that will store the constraints at the hanging nodes to insure the solution
-is continuous at these nodes. We could first assemble the system as normal
-and then condense out the degrees of freedom that need to be constrained.
-This is also explained  @ref constraints documentation
-module. Instead we will go the more efficient route and eliminate the
-constrained entries while we are copying from the local to the global system.
-Because boundary conditions can be treated in the same way, we will
-incorporate the them as constraints in the same ConstraintMatrix object.
+It turns out that one can see Dirichlet boundary conditions as just another
+constraint on the degrees of freedom. It's a particularly simple one,
+indeed: If $j$ is a degree of freedom on the boundary, with position
+$\mathbf x_j$, then imposing the boundary condition $u=g$ on $\partial\Omega$
+simply yields the constraint $U_j=g({\mathbf x}_j)$.
+
+The ConstraintMatrix can handle such constraints as well, which makes it
+convenient to let the same object we use for hanging node constraints
+also deal with these Dirichlet boundary conditions.
 This way, we don't need to apply the boundary conditions after assembly 
 (like we did in the earlier steps).
+All that is necessary is that we call the variant of
+VectorTools::interpolate_boundary_values() that returns its information
+in a ConstraintMatrix object, rather than the `std::map` we have used
+in previous tutorial programs.
  
