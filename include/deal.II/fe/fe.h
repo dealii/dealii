@@ -412,7 +412,7 @@ class FESystem;
  * with some weights, then the weights have to be exactly the same as those
  * for constrained nodes on the three other edges with respect to the
  * corresponding nodes on these edges. If this isn't the case, you will get
- * into trouble with the ConstraintMatrix class that is the primary consumer
+ * into trouble with the AffineConstraints class that is the primary consumer
  * of the constraint information: while that class is able to handle
  * constraints that are entered more than once (as is necessary for the case
  * above), it insists that the weights are exactly the same.
@@ -421,9 +421,9 @@ class FESystem;
  * parent face degrees of freedom that contain those on the edges of the
  * parent face; it is possible that some of them are in turn constrained
  * themselves, leading to longer chains of constraints that the
- * ConstraintMatrix class will eventually have to sort out. (The constraints
+ * AffineConstraints class will eventually have to sort out. (The constraints
  * described above are used by the DoFTools::make_hanging_node_constraints()
- * function that constructs a ConstraintMatrix object.) However, this is of no
+ * function that constructs an AffineConstraints object.) However, this is of no
  * concern for the FiniteElement and derived classes since they only act
  * locally on one cell and its immediate neighbor, and do not see the bigger
  * picture. The

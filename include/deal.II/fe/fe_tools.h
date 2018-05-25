@@ -49,7 +49,8 @@ template <int dim, int spacedim>
 class DoFHandler;
 template <int dim>
 class FiniteElementData;
-class ConstraintMatrix;
+template <typename number>
+class AffineConstraints;
 
 
 
@@ -643,9 +644,10 @@ namespace FETools
    * course Q1 on each cell.
    *
    * For this case (continuous elements on grids with hanging nodes), please
-   * use the @p interpolate() function with an additional ConstraintMatrix
-   * argument, see below, or make the field conforming yourself by calling the
-   * @p distribute function of your hanging node constraints object.
+   * use the @p interpolate() function with an additional AffineConstraints
+   * object as argument, see below, or make the field conforming yourself
+   * by calling the @p distribute function of your hanging node constraints
+   * object.
    */
   template <int dim,
             int spacedim,
@@ -682,11 +684,12 @@ namespace FETools
             class InVector,
             class OutVector>
   void
-  interpolate(const DoFHandlerType1<dim, spacedim> &dof1,
-              const InVector &                      u1,
-              const DoFHandlerType2<dim, spacedim> &dof2,
-              const ConstraintMatrix &              constraints,
-              OutVector &                           u2);
+  interpolate(
+    const DoFHandlerType1<dim, spacedim> &                   dof1,
+    const InVector &                                         u1,
+    const DoFHandlerType2<dim, spacedim> &                   dof2,
+    const AffineConstraints<typename OutVector::value_type> &constraints,
+    OutVector &                                              u2);
 
   /**
    * Compute the interpolation of the @p fe1-function @p u1 to a @p
@@ -695,7 +698,7 @@ namespace FETools
    *
    * Note, that this function does not work on continuous elements at hanging
    * nodes. For that case use the @p back_interpolate function, below, that
-   * takes an additional @p ConstraintMatrix object.
+   * takes an additional @p AffineConstraints object.
    *
    * @p dof1 might be a DoFHandler or a hp::DoFHandler onject.
    *
@@ -728,12 +731,13 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DoFHandler<dim, spacedim> &dof1,
-                   const ConstraintMatrix &         constraints1,
-                   const InVector &                 u1,
-                   const DoFHandler<dim, spacedim> &dof2,
-                   const ConstraintMatrix &         constraints2,
-                   OutVector &                      u1_interpolated);
+  back_interpolate(
+    const DoFHandler<dim, spacedim> &                        dof1,
+    const AffineConstraints<typename OutVector::value_type> &constraints1,
+    const InVector &                                         u1,
+    const DoFHandler<dim, spacedim> &                        dof2,
+    const AffineConstraints<typename OutVector::value_type> &constraints2,
+    OutVector &                                              u1_interpolated);
 
   /**
    * Compute $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
@@ -742,7 +746,7 @@ namespace FETools
    *
    * Note, that this function does not work for continuous elements at hanging
    * nodes. For that case use the @p interpolation_difference function, below,
-   * that takes an additional @p ConstraintMatrix object.
+   * that takes an additional @p AffineConstraints object.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void
@@ -765,12 +769,13 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  interpolation_difference(const DoFHandler<dim, spacedim> &dof1,
-                           const ConstraintMatrix &         constraints1,
-                           const InVector &                 z1,
-                           const DoFHandler<dim, spacedim> &dof2,
-                           const ConstraintMatrix &         constraints2,
-                           OutVector &                      z1_difference);
+  interpolation_difference(
+    const DoFHandler<dim, spacedim> &                        dof1,
+    const AffineConstraints<typename OutVector::value_type> &constraints1,
+    const InVector &                                         z1,
+    const DoFHandler<dim, spacedim> &                        dof2,
+    const AffineConstraints<typename OutVector::value_type> &constraints2,
+    OutVector &                                              z1_difference);
 
 
 
@@ -842,7 +847,7 @@ namespace FETools
    * @note The resulting field does not satisfy continuity requirements of the
    * given finite elements if the algorithm outlined above is used. When you
    * use continuous elements on grids with hanging nodes, please use the @p
-   * extrapolate function with an additional ConstraintMatrix argument, see
+   * extrapolate function with an additional AffineConstraints argument, see
    * below.
    *
    * @note Since this function operates on patches of cells, it requires that
@@ -870,11 +875,12 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  extrapolate(const DoFHandler<dim, spacedim> &dof1,
-              const InVector &                 z1,
-              const DoFHandler<dim, spacedim> &dof2,
-              const ConstraintMatrix &         constraints,
-              OutVector &                      z2);
+  extrapolate(
+    const DoFHandler<dim, spacedim> &                        dof1,
+    const InVector &                                         z1,
+    const DoFHandler<dim, spacedim> &                        dof2,
+    const AffineConstraints<typename OutVector::value_type> &constraints,
+    OutVector &                                              z2);
 
   //@}
   /**
@@ -1405,7 +1411,7 @@ namespace FETools
                  << "You are using continuous elements on a grid with "
                  << "hanging nodes but without providing hanging node "
                  << "constraints. Use the respective function with "
-                 << "additional ConstraintMatrix argument(s), instead."
+                 << "additional AffineConstraints argument(s), instead."
                  << (arg1 ? "" : ""));
   /**
    * You need at least two grid levels.

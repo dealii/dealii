@@ -31,7 +31,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       extrapolate<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
                                      const VEC &,
                                      const DoFHandler<deal_II_dimension> &,
-                                     const ConstraintMatrix &,
+                                     const AffineConstraints<VEC::value_type> &,
                                      VEC &);
 #endif
     \}
