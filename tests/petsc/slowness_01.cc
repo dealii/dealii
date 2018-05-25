@@ -22,105 +22,109 @@
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
 
-#include "../tests.h"
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/petsc_sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   const unsigned int N = 200;
 
   // first build the sparsity pattern
-  SparsityPattern sparsity (N*N, N*N, 5);
-  for (unsigned int i=0; i<N; i++)
-    for (unsigned int j=0; j<N; j++)
+  SparsityPattern sparsity(N * N, N * N, 5);
+  for (unsigned int i = 0; i < N; i++)
+    for (unsigned int j = 0; j < N; j++)
       {
-        const unsigned int global = i*N+j;
+        const unsigned int global = i * N + j;
         sparsity.add(global, global);
-        if (j>0)
+        if (j > 0)
           {
-            sparsity.add(global-1, global);
-            sparsity.add(global, global-1);
+            sparsity.add(global - 1, global);
+            sparsity.add(global, global - 1);
           }
-        if (j<N-1)
+        if (j < N - 1)
           {
-            sparsity.add(global+1, global);
-            sparsity.add(global, global+1);
+            sparsity.add(global + 1, global);
+            sparsity.add(global, global + 1);
           }
-        if (i>0)
+        if (i > 0)
           {
-            sparsity.add(global-N, global);
-            sparsity.add(global, global-N);
+            sparsity.add(global - N, global);
+            sparsity.add(global, global - N);
           }
-        if (i<N-1)
+        if (i < N - 1)
           {
-            sparsity.add(global+N, global);
-            sparsity.add(global, global+N);
+            sparsity.add(global + N, global);
+            sparsity.add(global, global + N);
           }
       }
-  sparsity.compress ();
+  sparsity.compress();
 
 
   // next build the sparse matrix itself
-  SparseMatrix<double> matrix (sparsity);
-  for (unsigned int i=0; i<N; i++)
-    for (unsigned int j=0; j<N; j++)
+  SparseMatrix<double> matrix(sparsity);
+  for (unsigned int i = 0; i < N; i++)
+    for (unsigned int j = 0; j < N; j++)
       {
-        const unsigned int global = i*N+j;
+        const unsigned int global = i * N + j;
         matrix.add(global, global, 4);
-        if (j>0)
+        if (j > 0)
           {
-            matrix.add(global-1, global, -1);
-            matrix.add(global, global-1, -1);
+            matrix.add(global - 1, global, -1);
+            matrix.add(global, global - 1, -1);
           }
-        if (j<N-1)
+        if (j < N - 1)
           {
-            matrix.add(global+1, global, -1);
-            matrix.add(global, global+1, -1);
+            matrix.add(global + 1, global, -1);
+            matrix.add(global, global + 1, -1);
           }
-        if (i>0)
+        if (i > 0)
           {
-            matrix.add(global-N, global, -1);
-            matrix.add(global, global-N, -1);
+            matrix.add(global - N, global, -1);
+            matrix.add(global, global - N, -1);
           }
-        if (i<N-1)
+        if (i < N - 1)
           {
-            matrix.add(global+N, global, -1);
-            matrix.add(global, global+N, -1);
+            matrix.add(global + N, global, -1);
+            matrix.add(global, global + N, -1);
           }
       }
 
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  Vector<double> v1(N*N), v2(N*N);
-  for (unsigned int i=0; i<N*N; ++i)
+  Vector<double> v1(N * N), v2(N * N);
+  for (unsigned int i = 0; i < N * N; ++i)
     v1(i) = i;
-  matrix.vmult (v2, v1);
+  matrix.vmult(v2, v1);
 
-  deallog << v1 *v2 << std::endl;
+  deallog << v1 * v2 << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        test ();
+        test();
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -133,7 +137,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

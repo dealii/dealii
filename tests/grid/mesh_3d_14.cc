@@ -19,129 +19,131 @@
 // correct. it is thus also similar to mesh_3d_7, but checks for faces
 // and subfaces
 
-#include "../tests.h"
-#include "mesh_3d.h"
-
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_reordering.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/vector.h>
+
+#include "../tests.h"
+#include "mesh_3d.h"
 
 
-void check_this (Triangulation<3> &tria)
+
+void check_this(Triangulation<3> &tria)
 {
-  QTrapez<2> quadrature;
-  FE_Q<3> fe(1);
-  FEFaceValues<3> fe_face_values1 (fe, quadrature,
-                                   update_quadrature_points | update_JxW_values |
-                                   update_normal_vectors);
-  FESubfaceValues<3> fe_face_values2 (fe, quadrature,
-                                      update_quadrature_points | update_JxW_values |
-                                      update_normal_vectors);
+  QTrapez<2>         quadrature;
+  FE_Q<3>            fe(1);
+  FEFaceValues<3>    fe_face_values1(fe,
+                                  quadrature,
+                                  update_quadrature_points | update_JxW_values |
+                                    update_normal_vectors);
+  FESubfaceValues<3> fe_face_values2(
+    fe,
+    quadrature,
+    update_quadrature_points | update_JxW_values | update_normal_vectors);
 
-  DoFHandler<3> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  DoFHandler<3> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
   DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
-  for (; cell!=dof_handler.end(); ++cell)
-    for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell;
+  for (; cell != dof_handler.end(); ++cell)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell;
          ++face_no)
-      if (!cell->at_boundary(face_no)
-          &&
+      if (!cell->at_boundary(face_no) &&
           cell->neighbor(face_no)->has_children())
-        for (unsigned int subface_no=0;
-             subface_no<GeometryInfo<3>::max_children_per_face;
+        for (unsigned int subface_no = 0;
+             subface_no < GeometryInfo<3>::max_children_per_face;
              ++subface_no)
           {
-            const unsigned int neighbor_neighbor
-              = cell->neighbor_of_neighbor (face_no);
+            const unsigned int neighbor_neighbor =
+              cell->neighbor_of_neighbor(face_no);
             // get an iterator
             // pointing to the cell
             // behind the present
             // subface
-            const DoFHandler<3>::active_cell_iterator neighbor_child
-              = cell->neighbor_child_on_subface(face_no,subface_no);
+            const DoFHandler<3>::active_cell_iterator neighbor_child =
+              cell->neighbor_child_on_subface(face_no, subface_no);
 
-            fe_face_values1.reinit (neighbor_child, neighbor_neighbor);
-            fe_face_values2.reinit (cell, face_no, subface_no);
+            fe_face_values1.reinit(neighbor_child, neighbor_neighbor);
+            fe_face_values2.reinit(cell, face_no, subface_no);
 
-            for (unsigned int q=0; q<quadrature.size(); ++q)
+            for (unsigned int q = 0; q < quadrature.size(); ++q)
               {
-                AssertThrow ((fe_face_values1.quadrature_point(q)-
-                              fe_face_values2.quadrature_point(q)).norm_square()
-                             < 1e-20,
-                             ExcInternalError());
+                AssertThrow((fe_face_values1.quadrature_point(q) -
+                             fe_face_values2.quadrature_point(q))
+                                .norm_square() < 1e-20,
+                            ExcInternalError());
 
-                AssertThrow (std::fabs(fe_face_values1.JxW(q)-
-                                       fe_face_values2.JxW(q)) < 1e-15,
-                             ExcInternalError());
-                AssertThrow ((fe_face_values1.normal_vector(q) +
-                              fe_face_values2.normal_vector(q)).norm_square()
-                             < 1e-20,
-                             ExcInternalError());
+                AssertThrow(std::fabs(fe_face_values1.JxW(q) -
+                                      fe_face_values2.JxW(q)) < 1e-15,
+                            ExcInternalError());
+                AssertThrow((fe_face_values1.normal_vector(q) +
+                             fe_face_values2.normal_vector(q))
+                                .norm_square() < 1e-20,
+                            ExcInternalError());
               }
           }
 }
 
 
 
-void check (Triangulation<3> &tria)
+void check(Triangulation<3> &tria)
 {
-  (++tria.begin_active())->set_refine_flag ();
-  tria.execute_coarsening_and_refinement ();
+  (++tria.begin_active())->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
 
   deallog << "Initial check" << std::endl;
-  check_this (tria);
+  check_this(tria);
 
-  for (unsigned int r=0; r<3; ++r)
+  for (unsigned int r = 0; r < 3; ++r)
     {
-      tria.refine_global (1);
+      tria.refine_global(1);
       deallog << "Check " << r << std::endl;
-      check_this (tria);
+      check_this(tria);
     }
 
-  coarsen_global (tria);
+  coarsen_global(tria);
   deallog << "Check " << 1 << std::endl;
-  check_this (tria);
+  check_this(tria);
 
-  tria.refine_global (1);
+  tria.refine_global(1);
   deallog << "Check " << 2 << std::endl;
-  check_this (tria);
+  check_this(tria);
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   {
     Triangulation<3> coarse_grid;
-    create_two_cubes (coarse_grid);
-    check (coarse_grid);
+    create_two_cubes(coarse_grid);
+    check(coarse_grid);
   }
 
   {
     Triangulation<3> coarse_grid;
-    create_L_shape (coarse_grid);
-    check (coarse_grid);
+    create_L_shape(coarse_grid);
+    check(coarse_grid);
   }
 
   {
     Triangulation<3> coarse_grid;
-    GridGenerator::hyper_ball (coarse_grid);
+    GridGenerator::hyper_ball(coarse_grid);
     coarse_grid.reset_manifold(0);
-    check (coarse_grid);
+    check(coarse_grid);
   }
-
 }
-
-
-

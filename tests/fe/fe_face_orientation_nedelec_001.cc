@@ -22,5 +22,5 @@ int
 main()
 {
   initlog();
-  run (false, false, true);
+  run(false, false, true);
 }

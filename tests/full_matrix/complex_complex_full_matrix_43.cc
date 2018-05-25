@@ -16,8 +16,8 @@
 
 
 // check FullMatrix::mmult. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// complex-valued matrices and vectors; this time we actually store complex
+// values in them
 
 
 #include "../tests.h"
@@ -25,23 +25,22 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m, n, o;
-  make_complex_square_matrix (m);
-  make_complex_square_matrix (n);
-  make_complex_square_matrix (o);
+  FullMatrix<std::complex<number>> m, n, o;
+  make_complex_square_matrix(m);
+  make_complex_square_matrix(n);
+  make_complex_square_matrix(o);
 
-  m.mmult (n, o, true);
-  print_matrix (m);
-  print_matrix (n);
-  print_matrix (o);
+  m.mmult(n, o, true);
+  print_matrix(m);
+  print_matrix(n);
+  print_matrix(o);
 
-  m.mmult (n, o, false);
-  print_matrix (m);
-  print_matrix (n);
-  print_matrix (o);
+  m.mmult(n, o, false);
+  print_matrix(m);
+  print_matrix(n);
+  print_matrix(o);
 }

@@ -16,23 +16,24 @@
 // check that operations on tensors of vectorized arrays are properly
 // supported
 
-#include "../tests.h"
-
 #include <deal.II/base/point.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
-  Tensor<1,2,VectorizedArray<double> > t;
+  Tensor<1, 2, VectorizedArray<double>> t;
   deallog << "Tensor norm: " << t.norm()[0] << std::endl;
-  Point<3,VectorizedArray<float> > p;
+  Point<3, VectorizedArray<float>> p;
   deallog << "Point norm: " << p.norm()[0] << std::endl;
-  SymmetricTensor<2,3,VectorizedArray<double> > st2;
-  SymmetricTensor<4,2,VectorizedArray<double> > st4;
-  deallog << "Symmetric tensor norm: " << st2.norm()[0]
-          << " " << st4.norm()[0] << std::endl;
+  SymmetricTensor<2, 3, VectorizedArray<double>> st2;
+  SymmetricTensor<4, 2, VectorizedArray<double>> st4;
+  deallog << "Symmetric tensor norm: " << st2.norm()[0] << " " << st4.norm()[0]
+          << std::endl;
 }

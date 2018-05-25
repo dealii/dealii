@@ -17,17 +17,17 @@
 #define dealii_non_matching_immersed_surface_quadrature
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/tensor.h>
 
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {
-
   /**
    * Defines a quadrature formula for integration over an oriented surface,
    * $\hat{S}$, immersed in the unit cell. By immersed it is meant that the
@@ -43,7 +43,8 @@ namespace NonMatching
    * @f[
    * \int_{S\cap K} f(x) dS =
    * \int_{S\cap K} f(x) |d\bar{S}| =
-   * \int_{\hat{S}\cap\hat{K}} f(F_{K}(\hat{x})) \det(J) |\left( J^{-1} \right )^T d\hat{S}|,
+   * \int_{\hat{S}\cap\hat{K}} f(F_{K}(\hat{x})) \det(J) |\left( J^{-1} \right
+   * )^T d\hat{S}|,
    * @f]
    * where $F_K$ is the mapping from reference to real space and $J$ is its
    * Jacobian. This transformation is possible since the continuous surface
@@ -74,22 +75,20 @@ namespace NonMatching
   class ImmersedSurfaceQuadrature : public Quadrature<dim>
   {
   public:
-
     /**
      * Default constructor to initialize the quadrature with no quadrature
      * points.
      */
-    ImmersedSurfaceQuadrature()=default;
+    ImmersedSurfaceQuadrature() = default;
 
     /**
      * Construct a quadrature formula from vectors of points, weights and
      * surface normals. The points, weights and normals should be with respect
      * to reference space, and the normals should be normalized.
      */
-    ImmersedSurfaceQuadrature(
-      const std::vector<Point<dim>> &points,
-      const std::vector<double> &weights,
-      const std::vector<Tensor<1,dim>> &normals);
+    ImmersedSurfaceQuadrature(const std::vector<Point<dim>> &    points,
+                              const std::vector<double> &        weights,
+                              const std::vector<Tensor<1, dim>> &normals);
 
     /**
      * Extend the given formula by an additional quadrature point.
@@ -106,29 +105,31 @@ namespace NonMatching
      * @note This function should only be used during construction of the
      * quadrature formula.
      */
-    void push_back(const Point<dim> &point,
-                   const double weight,
-                   const Tensor<1, dim> &normal);
+    void
+    push_back(const Point<dim> &    point,
+              const double          weight,
+              const Tensor<1, dim> &normal);
 
     /**
      * Return a reference to the <tt>i</tt>th surface normal.
      */
-    const Tensor<1,dim> &normal_vector(const unsigned int i) const;
+    const Tensor<1, dim> &
+    normal_vector(const unsigned int i) const;
 
     /**
      * Return a reference to the whole %vector of normals.
      */
-    const std::vector<Tensor<1,dim>> &get_normal_vectors() const;
+    const std::vector<Tensor<1, dim>> &
+    get_normal_vectors() const;
 
   protected:
-
     /**
      * %Vector of surface normals at each quadrature point.
      */
-    std::vector<Tensor<1,dim>> normals;
+    std::vector<Tensor<1, dim>> normals;
   };
 
-}
+} // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -18,87 +18,101 @@
 // test Tria::ghost_owners() like tria_ghost_owners_01 but with one coarse
 // cell
 
-#include "../tests.h"
-
-
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/distributed/tria.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/distributed/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
+#include <deal.II/lac/vector.h>
 
-
+#include "../tests.h"
 
 
 
 // make sure if i is in s on proc j, j is in s on proc i
-void mpi_check(const std::set<types::subdomain_id> &s)
+void
+mpi_check(const std::set<types::subdomain_id> &s)
 {
   MPI_Barrier(MPI_COMM_WORLD);
   unsigned int tag = 1234;
-  for (std::set<types::subdomain_id>::iterator it = s.begin();
-       it != s.end(); ++it)
+  for (std::set<types::subdomain_id>::iterator it = s.begin(); it != s.end();
+       ++it)
     MPI_Send(nullptr, 0, MPI_INT, *it, tag, MPI_COMM_WORLD);
 
-  for (unsigned int i=0; i<s.size(); ++i)
+  for (unsigned int i = 0; i < s.size(); ++i)
     {
       MPI_Status status;
-      MPI_Recv(nullptr, 0, MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
+      MPI_Recv(
+        nullptr, 0, MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
       if ((s.end() == s.find(status.MPI_SOURCE)))
-        deallog << status.MPI_SOURCE <<  " NOTOKAY" << std::endl;
+        deallog << status.MPI_SOURCE << " NOTOKAY" << std::endl;
       Assert(s.end() != s.find(status.MPI_SOURCE), ExcInternalError());
     }
   MPI_Barrier(MPI_COMM_WORLD);
 }
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD, Triangulation<dim>::
-                                               limit_level_difference_at_vertices,
-                                               parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  parallel::distributed::Triangulation<dim> tr(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
 
   GridGenerator::hyper_cube(tr);
-  tr.refine_global (5-dim);
+  tr.refine_global(5 - dim);
 
 
-  for (unsigned int ref=0; ref<=3; ++ref)
+  for (unsigned int ref = 0; ref <= 3; ++ref)
     {
       deallog << "* cycle " << ref << std::endl;
 
       deallog << "ghost owners: ";
       std::set<types::subdomain_id> ghost_owners = tr.ghost_owners();
-      for (std::set<types::subdomain_id>::iterator it = ghost_owners.begin(); it!=ghost_owners.end(); ++it)
+      for (std::set<types::subdomain_id>::iterator it = ghost_owners.begin();
+           it != ghost_owners.end();
+           ++it)
         deallog << *it << " ";
       deallog << std::endl;
 
       mpi_check(ghost_owners);
 
       deallog << "level ghost owners: ";
-      std::set<types::subdomain_id> level_ghost_owners = tr.level_ghost_owners();
-      for (std::set<types::subdomain_id>::iterator it = level_ghost_owners.begin(); it!=level_ghost_owners.end(); ++it)
+      std::set<types::subdomain_id> level_ghost_owners =
+        tr.level_ghost_owners();
+      for (std::set<types::subdomain_id>::iterator it =
+             level_ghost_owners.begin();
+           it != level_ghost_owners.end();
+           ++it)
         deallog << *it << " ";
       deallog << std::endl;
 
       mpi_check(level_ghost_owners);
 
       // owners need to be a subset of level owners:
-      bool is_subset = std::includes(level_ghost_owners.begin(), level_ghost_owners.end(), ghost_owners.begin(), ghost_owners.end());
+      bool is_subset = std::includes(level_ghost_owners.begin(),
+                                     level_ghost_owners.end(),
+                                     ghost_owners.begin(),
+                                     ghost_owners.end());
       Assert(is_subset, ExcInternalError());
 
-      Vector<float> indicators (tr.n_active_cells());
+      Vector<float>                 indicators(tr.n_active_cells());
       std::set<types::subdomain_id> neighbors;
       {
-        for (typename Triangulation<dim>::active_cell_iterator
-             cell = tr.begin_active(); cell != tr.end(); ++cell)
+        for (typename Triangulation<dim>::active_cell_iterator cell =
+               tr.begin_active();
+             cell != tr.end();
+             ++cell)
           if (!cell->is_artificial())
             {
               if (cell->is_ghost())
@@ -109,22 +123,22 @@ void test()
 
       Assert(neighbors == ghost_owners, ExcInternalError());
 
-      parallel::distributed::GridRefinement
-      ::refine_and_coarsen_fixed_number (tr, indicators,
-                                         0.3, 0.0);
-      tr.execute_coarsening_and_refinement ();
+      parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
+        tr, indicators, 0.3, 0.0);
+      tr.execute_coarsening_and_refinement();
       if (myid == 0)
-        deallog << "total active cells = "
-                << tr.n_global_active_cells() << std::endl;
+        deallog << "total active cells = " << tr.n_global_active_cells()
+                << std::endl;
     }
 
   deallog << "OK" << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   MPILogInitAll all;
   deallog.push("2d");

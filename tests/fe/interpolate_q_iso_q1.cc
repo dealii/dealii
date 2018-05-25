@@ -14,45 +14,47 @@
 // ---------------------------------------------------------------------
 
 
-#include "interpolate_common.h"
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_q_iso_q1.h>
+
+#include "interpolate_common.h"
 
 
 // FE_Q_iso_Q1<dim>::interpolate(...)
 
 template <int dim>
-void check(const Function<dim> &f,
-           const unsigned int degree)
+void
+check(const Function<dim> &f, const unsigned int degree)
 {
   FE_Q_iso_Q1<dim> fe(degree);
   deallog << fe.get_name() << ' ';
 
   std::vector<double> dofs(fe.dofs_per_cell);
 
-  std::vector<Vector<double> > values (fe.get_unit_support_points().size(),
-                                       Vector<double>(1));
+  std::vector<Vector<double>> values(fe.get_unit_support_points().size(),
+                                     Vector<double>(1));
   f.vector_value_list(fe.get_unit_support_points(), values);
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
-  deallog << " vector " << difference(fe,dofs,f) << std::endl;
+  deallog << " vector " << difference(fe, dofs, f) << std::endl;
 }
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  Q1WedgeFunction<1,1> w1;
-  check(w1,1);
-  check(w1,2);
-  check(w1,3);
-  Q1WedgeFunction<2,1> w2;
-  check(w2,1);
-  check(w2,2);
-  check(w2,3);
-  Q1WedgeFunction<3,1> w3;
-  check(w3,1);
-  check(w3,2);
-  check(w3,3);
+  Q1WedgeFunction<1, 1> w1;
+  check(w1, 1);
+  check(w1, 2);
+  check(w1, 3);
+  Q1WedgeFunction<2, 1> w2;
+  check(w2, 1);
+  check(w2, 2);
+  check(w2, 3);
+  Q1WedgeFunction<3, 1> w3;
+  check(w3, 1);
+  check(w3, 2);
+  check(w3, 3);
 }

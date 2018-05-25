@@ -16,35 +16,39 @@
 // Test that it is possible to create a block diagonal linear operator
 // from other linear operators involving Trilinos matrices.
 
-#include "../tests.h"
-
-#include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/block_linear_operator.h>
+#include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
+
+#include "../tests.h"
 
 using namespace dealii;
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
   deallog << std::setprecision(10);
 
   TrilinosWrappers::SparseMatrix a;
 
-  auto op_a  = linear_operator<TrilinosWrappers::MPI::Vector>(a);
+  auto op_a = linear_operator<TrilinosWrappers::MPI::Vector>(a);
 
   TrilinosWrappers::BlockSparseMatrix b;
 
   auto op_b = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
 
-  typedef LinearOperator<TrilinosWrappers::MPI::Vector,TrilinosWrappers::MPI::Vector> Op_MPI;
+  typedef LinearOperator<TrilinosWrappers::MPI::Vector,
+                         TrilinosWrappers::MPI::Vector>
+    Op_MPI;
 
-  auto op_c = block_diagonal_operator<2, TrilinosWrappers::MPI::BlockVector >(std::array<Op_MPI,2> ({{ op_a, op_a}}));
+  auto op_c = block_diagonal_operator<2, TrilinosWrappers::MPI::BlockVector>(
+    std::array<Op_MPI, 2>({{op_a, op_a}}));
 
   deallog << "OK" << std::endl;
 

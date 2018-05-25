@@ -19,14 +19,15 @@
 // since boost/math/special_functions/erf.hpp uses it. this test is a
 // reminder that we can't do this again in the future
 
-#include "../tests.h"
-
 #include <boost/math/special_functions/erf.hpp>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   initlog();
 
-  deallog << boost::math::erf (0.5) << std::endl;
+  deallog << boost::math::erf(0.5) << std::endl;
 }

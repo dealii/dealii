@@ -20,62 +20,65 @@
 // of two or more non-connected parts, and the reordering algorithm
 // trips over that
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
 
-
-
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/manifold_lib.h>
+#include "../tests.h"
 
 
 template <int dim>
 class LaplaceProblem
 {
 public:
-  void run ();
+  void
+  run();
+
 private:
-  Triangulation<dim>   triangulation;
+  Triangulation<dim> triangulation;
 };
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run()
 {
   GridIn<dim> grid_in;
-  grid_in.attach_triangulation (triangulation);
+  grid_in.attach_triangulation(triangulation);
 
   std::ifstream input_file(SOURCE_DIR "/gerold_1.inp");
   grid_in.read_ucd(input_file);
 
   DynamicSparsityPattern cell_connectivity;
-  GridTools::get_face_connectivity_of_cells (triangulation,
-                                             cell_connectivity);
-  std::vector<types::global_dof_index> permutation(triangulation.n_active_cells());
-  SparsityTools::reorder_Cuthill_McKee (cell_connectivity, permutation);
+  GridTools::get_face_connectivity_of_cells(triangulation, cell_connectivity);
+  std::vector<types::global_dof_index> permutation(
+    triangulation.n_active_cells());
+  SparsityTools::reorder_Cuthill_McKee(cell_connectivity, permutation);
 
-  for (unsigned int i=0; i<permutation.size(); ++i)
+  for (unsigned int i = 0; i < permutation.size(); ++i)
     deallog << permutation[i] << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       LaplaceProblem<3> laplace_problem_3d;
-      laplace_problem_3d.run ();
+      laplace_problem_3d.run();
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -87,7 +90,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

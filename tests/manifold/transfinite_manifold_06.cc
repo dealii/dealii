@@ -20,33 +20,36 @@
 // the transfinite interpolation would eagerly search too far outside the
 // valid chart domain, leading to failures in the spherical manifold.
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  const int dim = 3;
+  const int          dim = 3;
   Triangulation<dim> tria1, tria2, tria;
   GridGenerator::hyper_shell(tria1, Point<dim>(), 0.4, std::sqrt(dim), 6);
   GridGenerator::hyper_ball(tria2, Point<dim>(), 0.4);
   GridGenerator::merge_triangulations(tria1, tria2, tria);
   tria.set_all_manifold_ids(0);
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end(); ++cell)
+       cell != tria.end();
+       ++cell)
     {
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         {
           bool face_at_sphere_boundary = true;
-          for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
-            if (std::abs(cell->face(f)->vertex(v).norm()-0.4) > 1e-12)
+          for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell;
+               ++v)
+            if (std::abs(cell->face(f)->vertex(v).norm() - 0.4) > 1e-12)
               face_at_sphere_boundary = false;
           if (face_at_sphere_boundary)
             cell->face(f)->set_all_manifold_ids(1);
@@ -63,7 +66,8 @@ int main ()
   deallog.precision(10);
   deallog << "Cell centers" << std::endl;
   for (auto cell : tria.cell_iterators())
-    deallog << cell->id() << " has center " << cell->center(/*respect_manifold*/true) << std::endl;
+    deallog << cell->id() << " has center "
+            << cell->center(/*respect_manifold*/ true) << std::endl;
 
   return 0;
 }

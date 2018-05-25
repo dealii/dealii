@@ -18,18 +18,19 @@
 // TriaAccessor::recursively_set_material_id had a bug in that it only
 // set the material_id for two of its children, not all
 
-#include "../tests.h"
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  for (unsigned int t=0; t<2; ++t)
+  for (unsigned int t = 0; t < 2; ++t)
     {
       deallog << "dim=" << dim << ", test=" << t << std::endl;
 
@@ -47,13 +48,15 @@ void test()
       // for test 1, refine a second
       // time isotropically. for test
       // 2, cut in only one direction
-      if (t==0)
+      if (t == 0)
         tr.refine_global(1);
       else
         {
-          for (typename Triangulation<dim>::active_cell_iterator
-               cell = tr.begin_active(); cell != tr.end(); ++cell)
-            cell->set_refine_flag (RefinementCase<dim>::cut_x);
+          for (typename Triangulation<dim>::active_cell_iterator cell =
+                 tr.begin_active();
+               cell != tr.end();
+               ++cell)
+            cell->set_refine_flag(RefinementCase<dim>::cut_x);
           tr.execute_coarsening_and_refinement();
         }
 
@@ -62,37 +65,39 @@ void test()
       // now call the function once
       // for one of the cells on
       // level 1
-      tr.begin(1)->recursively_set_material_id (1);
+      tr.begin(1)->recursively_set_material_id(1);
 
       // and then count how many
       // active cells inherited this
       // flag
-      unsigned int n=0;
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = tr.begin_active(); cell != tr.end(); ++cell)
+      unsigned int n = 0;
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             tr.begin_active();
+           cell != tr.end();
+           ++cell)
         if (cell->material_id() == 1)
           ++n;
 
       deallog << n << std::endl;
 
-      if (t==0)
+      if (t == 0)
         {
-          AssertThrow (n == GeometryInfo<dim>::max_children_per_cell,
-                       ExcInternalError());
+          AssertThrow(n == GeometryInfo<dim>::max_children_per_cell,
+                      ExcInternalError());
         }
       else
         {
-          AssertThrow (n == 2,
-                       ExcInternalError());
+          AssertThrow(n == 2, ExcInternalError());
         }
     }
 }
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
 
   deallog.attach(logfile);
 

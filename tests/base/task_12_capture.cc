@@ -20,18 +20,20 @@
 // like the _12 test, but using lambda captures
 
 
-#include "../tests.h"
+#include <deal.II/base/thread_management.h>
+
 #include <unistd.h>
 
-#include <deal.II/base/thread_management.h>
+#include "../tests.h"
 
 
 // return a double, to make sure we correctly identify the return type
 // of the expressions used in new_task(...)
-double test (int i)
+double
+test(int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
-  sleep (1);
+  sleep(1);
   deallog << "Task " << i << " finished!" << std::endl;
 
   return 3.141;
@@ -39,30 +41,26 @@ double test (int i)
 
 
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  int arg1=1;
-  int arg2=2;
+  int arg1 = 1;
+  int arg2 = 2;
 
   Threads::TaskGroup<double> tg;
-  tg += Threads::new_task ([arg1]()   // capture arg1 by value
-  {
-    return test(arg1);
-  });
-  tg += Threads::new_task ([&arg2]()  // capture arg2 by reference
-  {
-    return test(arg2);
-  });
+  tg += Threads::new_task([arg1]() // capture arg1 by value
+                          { return test(arg1); });
+  tg += Threads::new_task([&arg2]() // capture arg2 by reference
+                          { return test(arg2); });
 
-  tg.join_all ();
+  tg.join_all();
 
   deallog << "OK" << std::endl;
 
-  deallog.detach ();
-  logfile.close ();
-  sort_file_contents ("output");
+  deallog.detach();
+  logfile.close();
+  sort_file_contents("output");
 }

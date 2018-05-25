@@ -19,43 +19,49 @@
 // just wanted to check that the nedelec element that has much of the same
 // code also works. turns out, all was fine
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
+
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation, -1, 1);
+  GridGenerator::hyper_cube(triangulation, -1, 1);
 
-  FE_Nedelec<dim> fe (0);
-  DoFHandler<dim> dof_handler (triangulation);
-  dof_handler.distribute_dofs (fe);
+  FE_Nedelec<dim> fe(0);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(fe);
 
-  QGauss<dim-1> q(2);
-  FEFaceValues<dim> fe_values (fe, q, update_values|update_gradients);
-  fe_values.reinit (dof_handler.begin_active(), 0);
+  QGauss<dim - 1>   q(2);
+  FEFaceValues<dim> fe_values(fe, q, update_values | update_gradients);
+  fe_values.reinit(dof_handler.begin_active(), 0);
 
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 
   return 0;
 }

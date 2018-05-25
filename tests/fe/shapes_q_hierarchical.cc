@@ -14,17 +14,20 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-#include "shapes.h"
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/mapping_q1.h>
+
 #include <string>
+
+#include "../tests.h"
+#include "shapes.h"
 
 #define PRECISION 8
 
 
 template <int dim>
-void plot_FE_Q_Hierarchical_shape_functions()
+void
+plot_FE_Q_Hierarchical_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 
@@ -58,7 +61,7 @@ void plot_FE_Q_Hierarchical_shape_functions()
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
 

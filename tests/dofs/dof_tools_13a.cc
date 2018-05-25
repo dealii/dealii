@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/lac/vector.h>
+
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <deal.II/lac/vector.h>
 
 // check
 //   DoFTools::distribute_cell_to_dof_vector
@@ -29,57 +30,53 @@
 
 
 
-
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // this doesn't make much sense if
   // the element is not primitive
   if (dof_handler.get_fe().is_primitive() == false)
     return;
 
-  Vector<double> cell_data (dof_handler.get_triangulation().n_active_cells());
-  for (unsigned int i=0; i<cell_data.size(); ++i)
+  Vector<double> cell_data(dof_handler.get_triangulation().n_active_cells());
+  for (unsigned int i = 0; i < cell_data.size(); ++i)
     cell_data(i) = i;
 
   // distribute to first component
-  Vector<double> dof_data (dof_handler.n_dofs());
+  Vector<double> dof_data(dof_handler.n_dofs());
 
   // preset the vector to make sure
   // that the function zeroes out
   // previous content. however, only
   // touch those elements that we
   // will actually use
-  std::vector<bool> component_dofs (dof_handler.n_dofs());
+  std::vector<bool> component_dofs(dof_handler.n_dofs());
   {
-    std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
-                                      false);
+    std::vector<bool> component_mask(dof_handler.get_fe().n_components(),
+                                     false);
     component_mask[0] = true;
-    DoFTools::extract_dofs (dof_handler, ComponentMask(component_mask), component_dofs);
+    DoFTools::extract_dofs(
+      dof_handler, ComponentMask(component_mask), component_dofs);
 
-    for (unsigned int i=0; i<dof_data.size(); ++i)
+    for (unsigned int i = 0; i < dof_data.size(); ++i)
       if (component_dofs[i] == true)
-        dof_data(i) = i+1;
+        dof_data(i) = i + 1;
       else
         dof_data(i) = 0;
   }
 
-  DoFTools::distribute_cell_to_dof_vector (dof_handler,
-                                           cell_data,
-                                           dof_data);
+  DoFTools::distribute_cell_to_dof_vector(dof_handler, cell_data, dof_data);
   // output every third element
-  for (unsigned int i=0; i<dof_data.size(); i+=3)
+  for (unsigned int i = 0; i < dof_data.size(); i += 3)
     deallog << dof_data(i) << " ";
   deallog << std::endl;
 
   // check that no other values were
   // set
-  for (unsigned int i=0; i<dof_data.size(); ++i)
+  for (unsigned int i = 0; i < dof_data.size(); ++i)
     if (component_dofs[i] == false)
-      AssertThrow (dof_data(i) == 0,
-                   ExcInternalError());
+      AssertThrow(dof_data(i) == 0, ExcInternalError());
 
 
   // distribute to last component. by
@@ -90,28 +87,26 @@ check_this (const DoFHandler<dim> &dof_handler)
   // sure that the function zeroes out
   // previous content.
   {
-    std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
-                                      false);
+    std::vector<bool> component_mask(dof_handler.get_fe().n_components(),
+                                     false);
     component_mask.back() = true;
-    DoFTools::extract_dofs (dof_handler, ComponentMask(component_mask), component_dofs);
-    for (unsigned int i=0; i<dof_data.size(); ++i)
+    DoFTools::extract_dofs(
+      dof_handler, ComponentMask(component_mask), component_dofs);
+    for (unsigned int i = 0; i < dof_data.size(); ++i)
       if (component_dofs[i] == true)
-        dof_data(i) = i+1;
+        dof_data(i) = i + 1;
       else
         dof_data(i) = 0;
   }
-  DoFTools::distribute_cell_to_dof_vector (dof_handler,
-                                           cell_data,
-                                           dof_data,
-                                           dof_handler.get_fe().n_components()-1);
-  for (unsigned int i=0; i<dof_data.size(); i+=3)
+  DoFTools::distribute_cell_to_dof_vector(
+    dof_handler, cell_data, dof_data, dof_handler.get_fe().n_components() - 1);
+  for (unsigned int i = 0; i < dof_data.size(); i += 3)
     deallog << dof_data(i) << " ";
   deallog << std::endl;
 
   // check that no other values were
   // set
-  for (unsigned int i=0; i<dof_data.size(); ++i)
+  for (unsigned int i = 0; i < dof_data.size(); ++i)
     if (component_dofs[i] == false)
-      AssertThrow (dof_data(i) == 0,
-                   ExcInternalError());
+      AssertThrow(dof_data(i) == 0, ExcInternalError());
 }

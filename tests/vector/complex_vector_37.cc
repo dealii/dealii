@@ -17,42 +17,47 @@
 
 // check Vector<std::complex<double> >::add (scalar)
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<std::complex<double> > &v)
+
+void
+test(Vector<std::complex<double>> &v)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
-    v(i) = std::complex<double> (i+1., i+2.);
+  for (unsigned int i = 0; i < v.size(); ++i)
+    v(i) = std::complex<double>(i + 1., i + 2.);
 
-  v.compress ();
+  v.compress();
 
-  v.add (1.);
+  v.add(1.);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow (v(i) == std::complex<double> (i+2., i+2.),
-                 ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow(v(i) == std::complex<double>(i + 2., i + 2.),
+                ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<std::complex<double> > v (100);
-      test (v);
+      Vector<std::complex<double>> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -65,7 +70,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

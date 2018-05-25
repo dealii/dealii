@@ -16,22 +16,24 @@
 
 // test IndexSet::subtract_set further
 
-#include "../tests.h"
-#include <stdlib.h>
-
 #include <deal.II/base/index_set.h>
 
+#include <stdlib.h>
 
-void test ()
+#include "../tests.h"
+
+
+void
+test()
 {
-  IndexSet is1 (100);
-  IndexSet is2 (100);
+  IndexSet is1(100);
+  IndexSet is2(100);
 
-  is1.add_range(0,10);
-  is1.add_range(20,100);
+  is1.add_range(0, 10);
+  is1.add_range(20, 100);
 
-  is2.add_range(0,50);
-//  is2.add_range(10,15);
+  is2.add_range(0, 50);
+  //  is2.add_range(10,15);
 
   IndexSet is3 = is1;
   is3.subtract_set(is2);
@@ -40,26 +42,25 @@ void test ()
   is2.print(deallog);
   is3.print(deallog);
 
-  for (unsigned int i=0; i<is3.size(); ++i)
+  for (unsigned int i = 0; i < is3.size(); ++i)
     {
-      AssertThrow ((is1.is_element(i) && !is2.is_element(i))
-                   ==
-                   is3.is_element(i),
-                   ExcInternalError());
+      AssertThrow((is1.is_element(i) && !is2.is_element(i)) ==
+                    is3.is_element(i),
+                  ExcInternalError());
     }
 
   deallog << is3.index_within_set(51) << std::endl;
-  AssertThrow(is3.index_within_set(51)==1, ExcInternalError());
+  AssertThrow(is3.index_within_set(51) == 1, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

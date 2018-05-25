@@ -19,18 +19,24 @@
 // the components selected for the Hdiv seminorm computations are not
 // the first dim components in the Finite Element.
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/base/signaling_nan.h>
+
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
+
+#include <deal.II/fe/fe_system.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/base/signaling_nan.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 
 using namespace dealii;
@@ -45,101 +51,102 @@ template <int dim>
 class Ref : public Function<dim>
 {
 public:
-  Ref() : Function<dim>(2*dim) {}
+  Ref() : Function<dim>(2 * dim)
+  {}
 
-  void vector_value (const Point<dim> &p, Vector<double> &values) const
+  void
+  vector_value(const Point<dim> &p, Vector<double> &values) const
   {
     switch (dim)
       {
-      case 2:
-        values[0] = p[0]*p[0]+p[1];
-        values[1] = p[0]*p[0]+p[1]*p[1];
-        values[2] = 2*(p[0]*p[0]+p[1]);
-        values[3] = 2*(p[0]*p[0]+p[1]*p[1]);
-        break;
-      case 3:
-        values[0] = p[0]*p[0]+p[1]+p[2];
-        values[1] = p[0]*p[0]+p[1]*p[1];
-        values[2] = p[2]+p[0]*p[1];
-        values[3] = 2*(p[0]*p[0]+p[1]+p[2]);
-        values[4] = 2*(p[0]*p[0]+p[1]*p[1]);
-        values[5] = 2*(p[2]+p[0]*p[1]);
-        break;
-      default:
-        Assert(false, ExcNotImplemented());
+        case 2:
+          values[0] = p[0] * p[0] + p[1];
+          values[1] = p[0] * p[0] + p[1] * p[1];
+          values[2] = 2 * (p[0] * p[0] + p[1]);
+          values[3] = 2 * (p[0] * p[0] + p[1] * p[1]);
+          break;
+        case 3:
+          values[0] = p[0] * p[0] + p[1] + p[2];
+          values[1] = p[0] * p[0] + p[1] * p[1];
+          values[2] = p[2] + p[0] * p[1];
+          values[3] = 2 * (p[0] * p[0] + p[1] + p[2]);
+          values[4] = 2 * (p[0] * p[0] + p[1] * p[1]);
+          values[5] = 2 * (p[2] + p[0] * p[1]);
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
       }
   }
 };
 
 
 template <int dim>
-void test(VectorTools::NormType norm, double value)
+void
+test(VectorTools::NormType norm, double value)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
-  FESystem<dim> fe(FE_Q<dim>(3),dim,
-                   FE_Q<dim>(3),dim);
+  FESystem<dim>   fe(FE_Q<dim>(3), dim, FE_Q<dim>(3), dim);
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
 
-  Vector<double> solution (dofh.n_dofs ());
+  Vector<double> solution(dofh.n_dofs());
   VectorTools::interpolate(dofh, Ref<dim>(), solution);
 
-  Vector<double> cellwise_errors (tria.n_active_cells());
+  Vector<double> cellwise_errors(tria.n_active_cells());
 
-  const ComponentSelectFunction<dim> mask_2 (std::make_pair(dim,2*dim), 2*dim);
-  VectorTools::integrate_difference (dofh,
-                                     solution,
-                                     ZeroFunction<dim>(2*dim),
-                                     cellwise_errors,
-                                     QGauss<dim>(5),
-                                     norm);
+  const ComponentSelectFunction<dim> mask_2(std::make_pair(dim, 2 * dim),
+                                            2 * dim);
+  VectorTools::integrate_difference(dofh,
+                                    solution,
+                                    ZeroFunction<dim>(2 * dim),
+                                    cellwise_errors,
+                                    QGauss<dim>(5),
+                                    norm);
 
   double error = cellwise_errors.l2_norm();
 
-  const double difference_1 = std::abs(error-value);
-  deallog  << "computed: " << error
-           << " expected: " << value
-           << " difference: " << difference_1
-           << std::endl;
-  Assert(difference_1<1e-10, ExcMessage("Error in integrate_difference, first components"));
+  const double difference_1 = std::abs(error - value);
+  deallog << "computed: " << error << " expected: " << value
+          << " difference: " << difference_1 << std::endl;
+  Assert(difference_1 < 1e-10,
+         ExcMessage("Error in integrate_difference, first components"));
 
-  VectorTools::integrate_difference (dofh,
-                                     solution,
-                                     ZeroFunction<dim>(2*dim),
-                                     cellwise_errors,
-                                     QGauss<dim>(5),
-                                     norm,
-                                     &mask_2);
+  VectorTools::integrate_difference(dofh,
+                                    solution,
+                                    ZeroFunction<dim>(2 * dim),
+                                    cellwise_errors,
+                                    QGauss<dim>(5),
+                                    norm,
+                                    &mask_2);
 
-  error = cellwise_errors.l2_norm();
-  const double difference_2 = std::abs(error-2.0*value);
-  deallog  << "computed: " << error
-           << " expected: " << 2.0*value
-           << " difference: " << difference_2
-           << std::endl;
-  Assert(difference_2<1e-10, ExcMessage("Error in integrate_difference, second components"));
-
+  error                     = cellwise_errors.l2_norm();
+  const double difference_2 = std::abs(error - 2.0 * value);
+  deallog << "computed: " << error << " expected: " << 2.0 * value
+          << " difference: " << difference_2 << std::endl;
+  Assert(difference_2 < 1e-10,
+         ExcMessage("Error in integrate_difference, second components"));
 }
 
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << dim << " dimensions, Hdiv_seminorm:" << std::endl;
   double true_value = 0;
   switch (dim)
     {
-    case 2:
-      true_value = std::sqrt(14.0/3.0);
-      break;
-    case 3:
-      true_value = std::sqrt(29.0/3.0);
-      break;
-    default:
-      Assert(false, ExcNotImplemented());
+      case 2:
+        true_value = std::sqrt(14.0 / 3.0);
+        break;
+      case 3:
+        true_value = std::sqrt(29.0 / 3.0);
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
     }
 
   test<dim>(VectorTools::Hdiv_seminorm, true_value);
@@ -147,7 +154,8 @@ void test()
 }
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   test<2>();

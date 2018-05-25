@@ -22,9 +22,10 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int i=1; i<4; ++i)
-    for (unsigned int j=i; j<4; ++j)
-      do_check (FE_DGPMonomial<dim>(i), FE_DGPMonomial<dim>(j));
+  for (unsigned int i = 1; i < 4; ++i)
+    for (unsigned int j = i; j < 4; ++j)
+      do_check(FE_DGPMonomial<dim>(i), FE_DGPMonomial<dim>(j));
 }

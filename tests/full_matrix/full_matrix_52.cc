@@ -23,18 +23,17 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_square_matrix (m);
+  make_square_matrix(m);
   Vector<number> x, y;
-  make_range_vector (x);
-  make_range_vector (y);
+  make_range_vector(x);
+  make_range_vector(y);
 
-  m.backward (x, y);
-  print_vector (x);
-  print_vector (y);
+  m.backward(x, y);
+  print_vector(x);
+  print_vector(y);
 }

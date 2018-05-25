@@ -17,8 +17,11 @@
 #define dealii_intergrid_map_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/smartpointer.h>
+
 #include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
@@ -112,7 +115,6 @@ template <class MeshType>
 class InterGridMap : public Subscriptor
 {
 public:
-
   /**
    * Typedef to the iterator type of the grid class under consideration.
    */
@@ -126,8 +128,8 @@ public:
   /**
    * Create the mapping between the two grids.
    */
-  void make_mapping (const MeshType &source_grid,
-                     const MeshType &destination_grid);
+  void
+  make_mapping(const MeshType &source_grid, const MeshType &destination_grid);
 
   /**
    * Access operator: give a cell on the source grid and receive the
@@ -135,63 +137,67 @@ public:
    * refined cell of which the source cell would be created if it were further
    * refined.
    */
-  cell_iterator operator [] (const cell_iterator &source_cell) const;
+  cell_iterator operator[](const cell_iterator &source_cell) const;
 
   /**
    * Delete all data of this class.
    */
-  void clear ();
+  void
+  clear();
 
   /**
    * Return a reference to the source grid.
    */
-  const MeshType &get_source_grid () const;
+  const MeshType &
+  get_source_grid() const;
 
   /**
    * Return a reference to the destination grid.
    */
-  const MeshType &get_destination_grid () const;
+  const MeshType &
+  get_destination_grid() const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidKey,
-                  cell_iterator,
-                  << "The iterator " << arg1 << " is not valid as key for "
-                  << "this map.");
+  DeclException1(ExcInvalidKey,
+                 cell_iterator,
+                 << "The iterator " << arg1 << " is not valid as key for "
+                 << "this map.");
   /**
    * Exception
    */
-  DeclException0 (ExcIncompatibleGrids);
+  DeclException0(ExcIncompatibleGrids);
 
 private:
   /**
    * The actual data. Hold one iterator for each cell on each level.
    */
-  std::vector<std::vector<cell_iterator> > mapping;
+  std::vector<std::vector<cell_iterator>> mapping;
 
   /**
    * Store a pointer to the source grid.
    */
-  SmartPointer<const MeshType,InterGridMap<MeshType> > source_grid;
+  SmartPointer<const MeshType, InterGridMap<MeshType>> source_grid;
 
   /**
    * Likewise for the destination grid.
    */
-  SmartPointer<const MeshType,InterGridMap<MeshType> > destination_grid;
+  SmartPointer<const MeshType, InterGridMap<MeshType>> destination_grid;
 
   /**
    * Set the mapping for the pair of cells given. These shall match in level
    * of refinement and all other properties.
    */
-  void set_mapping (const cell_iterator &src_cell,
-                    const cell_iterator &dst_cell);
+  void
+  set_mapping(const cell_iterator &src_cell, const cell_iterator &dst_cell);
 
   /**
    * Set the value of the key @p src_cell to @p dst_cell. Do so as well for
@@ -200,8 +206,9 @@ private:
    * all values of the hierarchy of cells and their children point to one cell
    * on the @p dst_grid.
    */
-  void set_entries_to_cell (const cell_iterator &src_cell,
-                            const cell_iterator &dst_cell);
+  void
+  set_entries_to_cell(const cell_iterator &src_cell,
+                      const cell_iterator &dst_cell);
 };
 
 

@@ -16,33 +16,33 @@
 // A test by Krzysztof Bzowski that verifies something in SolutionTransfer
 // that didn't work for a few days
 
-#include "../tests.h"
+#include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/grid/tria.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_nothing.h>
-#include <deal.II/dofs/dof_tools.h>
-
+#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/solution_transfer.h>
 
 #include <iostream>
 
+#include "../tests.h"
+
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
 
   Triangulation<2> triangulation(Triangulation<2>::none);
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(1);
 
   hp::FECollection<2> fe_collection;
@@ -73,7 +73,7 @@ int main()
   cell++;
   cell->set_active_fe_index(0);
 
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
   // Init solution
   Vector<double> solution(dof_handler.n_dofs());
@@ -99,10 +99,11 @@ int main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2> > solultion_trans(dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(
+    dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 
   dof_handler.distribute_dofs(fe_collection);
 
@@ -111,4 +112,3 @@ int main()
 
   deallog << "OK" << std::endl;
 }
-

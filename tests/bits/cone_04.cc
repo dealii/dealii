@@ -17,57 +17,61 @@
 
 // check CylindricalManifold<3>::normal_vector()
 
-#include "../tests.h"
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+
+#include "../tests.h"
 
 
-void check ()
+void
+check()
 {
   constexpr int dim = 3;
 
   Triangulation<dim> triangulation;
-  GridGenerator::truncated_cone (triangulation);
-  GridTools::transform ([](const Point<3> &p)
-  {
-    return Point<3> (-p[1], p[0], p[2]);
-  },
-  triangulation);
+  GridGenerator::truncated_cone(triangulation);
+  GridTools::transform(
+    [](const Point<3> &p) { return Point<3>(-p[1], p[0], p[2]); },
+    triangulation);
   static const CylindricalManifold<dim> boundary(1);
-  triangulation.set_manifold (0, boundary);
+  triangulation.set_manifold(0, boundary);
 
-  triangulation.refine_global (2);
+  triangulation.refine_global(2);
 
-  for (const auto cell: triangulation.active_cell_iterators())
-    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+  for (const auto cell : triangulation.active_cell_iterators())
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+         ++face_no)
       {
-        const auto face=cell->face(face_no);
+        const auto face = cell->face(face_no);
         if (face->boundary_id() == 0)
-          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
+               ++v)
             {
-              const Point<dim> vertex = face->vertex(v);
-              const Tensor<1,dim> tangent_1 ({-vertex(2), 0., vertex(0)});
-              const Tensor<1,dim> tangent_2 = vertex-Point<dim>(0,3,0);
+              const Point<dim>     vertex = face->vertex(v);
+              const Tensor<1, dim> tangent_1({-vertex(2), 0., vertex(0)});
+              const Tensor<1, dim> tangent_2 = vertex - Point<dim>(0, 3, 0);
 
               // get the normal vector and test it
-              const Tensor<1,3> normal_vector = boundary.normal_vector(face, vertex);
+              const Tensor<1, 3> normal_vector =
+                boundary.normal_vector(face, vertex);
 
-              Assert (std::fabs(normal_vector.norm()-1) < 1e-12,
-                      ExcInternalError());
-              Assert (std::fabs(normal_vector * tangent_1) < 1e-12,
-                      ExcInternalError());
-              Assert (std::fabs(normal_vector * tangent_2) < 1e-12,
-                      ExcInternalError());
+              Assert(std::fabs(normal_vector.norm() - 1) < 1e-12,
+                     ExcInternalError());
+              Assert(std::fabs(normal_vector * tangent_1) < 1e-12,
+                     ExcInternalError());
+              Assert(std::fabs(normal_vector * tangent_2) < 1e-12,
+                     ExcInternalError());
             }
       }
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check ();
+  check();
 }

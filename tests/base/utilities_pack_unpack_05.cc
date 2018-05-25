@@ -19,38 +19,37 @@
 // (based upon "utilities_pack_unpack_04")
 
 
-#include "../tests.h"
-
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
+
+#include "../tests.h"
 
 
 using namespace dealii;
 
 
 template <int N, int dim>
-void check (const double (&array)[N], const Point<dim> (&point))
+void
+check(const double (&array)[N], const Point<dim>(&point))
 {
   std::vector<char> buffer;
 
   // PACK BUFFER
   // add first object to buffer and store buffer size for later separation
-  const size_t buffer_separator = Utilities::pack (array, buffer);
+  const size_t buffer_separator = Utilities::pack(array, buffer);
   // add second object to buffer
-  Utilities::pack (point, buffer);
+  Utilities::pack(point, buffer);
 
   // UNPACK BUFFER
   double unpacked_array[N];
-  Utilities::unpack (buffer.cbegin(),
-                     buffer.cbegin()+buffer_separator,
-                     unpacked_array);
-  Point<dim> unpacked_point =
-    Utilities::unpack<Point<dim>> (buffer.cbegin()+buffer_separator,
-                                   buffer.cend());
+  Utilities::unpack(
+    buffer.cbegin(), buffer.cbegin() + buffer_separator, unpacked_array);
+  Point<dim> unpacked_point = Utilities::unpack<Point<dim>>(
+    buffer.cbegin() + buffer_separator, buffer.cend());
 
   // TEST RESULTS
   bool equal_array = true;
-  for (unsigned int i=0; i<N; ++i)
+  for (unsigned int i = 0; i < N; ++i)
     if (array[i] != unpacked_array[i])
       {
         equal_array = false;
@@ -58,30 +57,34 @@ void check (const double (&array)[N], const Point<dim> (&point))
       }
   deallog << "compare array: " << (equal_array ? "OK" : "Failed") << std::endl;
 
-  deallog << "compare point: " << (point.distance(unpacked_point) < 1e-12 ? "OK" : "Failed") << std::endl;
+  deallog << "compare point: "
+          << (point.distance(unpacked_point) < 1e-12 ? "OK" : "Failed")
+          << std::endl;
 }
 
 
-void test()
+void
+test()
 {
   // try small arrays that are packed by just using memcpy
-  Point<3> p1 = random_point<3>();
-  double x1[3] = { 1, 2, 3 };
-  check (x1, p1);
+  Point<3> p1    = random_point<3>();
+  double   x1[3] = {1, 2, 3};
+  check(x1, p1);
 
   // now try much larger arrays that will actually be serialized
   // using BOOST
-  const unsigned int N=10000;
-  Point<N> p2 = random_point<N>();
-  double x2[N];
-  for (unsigned int i=0; i<N; ++i)
+  const unsigned int N  = 10000;
+  Point<N>           p2 = random_point<N>();
+  double             x2[N];
+  for (unsigned int i = 0; i < N; ++i)
     x2[i] = i;
-  check (x2, p2);
+  check(x2, p2);
 
   deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

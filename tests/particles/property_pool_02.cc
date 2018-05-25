@@ -17,19 +17,23 @@
 
 // test a property pool that allocates more than one property per chunk
 
-#include "../tests.h"
 #include <deal.II/particles/property_pool.h>
+
 #include <fstream>
 #include <iomanip>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   {
-    const unsigned int n_properties = 3;
+    const unsigned int      n_properties = 3;
     Particles::PropertyPool pool(n_properties);
 
-    typename Particles::PropertyPool::Handle handle = pool.allocate_properties_array();
+    typename Particles::PropertyPool::Handle handle =
+      pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 1.2;
     pool.get_properties(handle)[1] = 2.5;
@@ -38,7 +42,7 @@ void test ()
 
     deallog << "Pool properties:";
 
-    for (unsigned int i=0; i<pool.get_properties(handle).size(); ++i)
+    for (unsigned int i = 0; i < pool.get_properties(handle).size(); ++i)
       deallog << " " << pool.get_properties(handle)[i];
 
     deallog << std::endl;
@@ -51,7 +55,8 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
   test();

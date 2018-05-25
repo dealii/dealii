@@ -15,9 +15,9 @@
 
 
 
-// check running over const iterators starting at the second line. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// check running over const iterators starting at the second line. like the
+// full_matrix_* tests, but use complex-valued matrices and vectors; this time
+// we actually store complex values in them
 
 
 #include "../tests.h"
@@ -25,19 +25,16 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
+  FullMatrix<std::complex<number>> m;
+  make_complex_matrix(m);
 
 
-  for (typename FullMatrix<std::complex<number> >::const_iterator
-       p = m.begin(1); p!=m.end(1); ++p)
-    deallog << p->row() << ' ' << p->column() << ' '
-            << p->value()
-            << std::endl;
+  for (typename FullMatrix<std::complex<number>>::const_iterator p = m.begin(1);
+       p != m.end(1);
+       ++p)
+    deallog << p->row() << ' ' << p->column() << ' ' << p->value() << std::endl;
 }
-

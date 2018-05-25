@@ -17,11 +17,13 @@
 #define dealii_fe_abf_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/table.h>
-#include <deal.II/base/polynomials_abf.h>
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomials_abf.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
 
@@ -104,14 +106,15 @@ public:
   /**
    * Constructor for the ABF element of degree @p p.
    */
-  FE_ABF (const unsigned int p);
+  FE_ABF(const unsigned int p);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_ABF<dim>(degree)</tt>, with @p dim and @p degree replaced
    * by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
@@ -120,19 +123,20 @@ public:
    * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
    * always @p true.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
 
   // documentation inherited from the base class
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,dim> >
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
 
 private:
@@ -150,7 +154,7 @@ private:
    * FiniteElementData.
    */
   static std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree);
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * Initialize the @p generalized_support_points field of the FiniteElement
@@ -161,7 +165,8 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void
+  initialize_support_points(const unsigned int rt_degree);
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
@@ -169,7 +174,8 @@ private:
    * element, this restriction operator preserves the divergence of a function
    * weakly.
    */
-  void initialize_restriction ();
+  void
+  initialize_restriction();
 
   /**
    * Fields of cell-independent data.
@@ -191,7 +197,7 @@ private:
      * space cell is then simply done by multiplication with the Jacobian of
      * the mapping.
      */
-    std::vector<std::vector<Tensor<1,dim> > > shape_values;
+    std::vector<std::vector<Tensor<1, dim>>> shape_values;
 
     /**
      * Array with shape function gradients in quadrature points. There is one
@@ -202,7 +208,7 @@ private:
      * then only have to apply the transformation (which is a matrix-vector
      * multiplication) when visiting an actual cell.
      */
-    std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
+    std::vector<std::vector<Tensor<2, dim>>> shape_gradients;
   };
 
   /**
@@ -241,7 +247,8 @@ private:
   /**
    * Allow access from other dimensions.
    */
-  template <int dim1> friend class FE_ABF;
+  template <int dim1>
+  friend class FE_ABF;
 };
 
 

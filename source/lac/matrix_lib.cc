@@ -18,31 +18,36 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-MeanValueFilter::MeanValueFilter(size_type component)
-  :
-  component(component)
+MeanValueFilter::MeanValueFilter(size_type component) : component(component)
 {}
 
-template void MeanValueFilter::filter(Vector<float> &) const;
-template void MeanValueFilter::filter(Vector<double> &) const;
-template void MeanValueFilter::filter(BlockVector<float> &) const;
-template void MeanValueFilter::filter(BlockVector<double> &) const;
-template void MeanValueFilter::vmult(Vector<float> &,
-                                     const Vector<float> &) const;
-template void MeanValueFilter::vmult(Vector<double> &,
-                                     const Vector<double> &) const;
-template void MeanValueFilter::vmult(BlockVector<float> &,
-                                     const BlockVector<float> &) const;
-template void MeanValueFilter::vmult(BlockVector<double> &,
-                                     const BlockVector<double> &) const;
+template void
+MeanValueFilter::filter(Vector<float> &) const;
+template void
+MeanValueFilter::filter(Vector<double> &) const;
+template void
+MeanValueFilter::filter(BlockVector<float> &) const;
+template void
+MeanValueFilter::filter(BlockVector<double> &) const;
+template void
+MeanValueFilter::vmult(Vector<float> &, const Vector<float> &) const;
+template void
+MeanValueFilter::vmult(Vector<double> &, const Vector<double> &) const;
+template void
+MeanValueFilter::vmult(BlockVector<float> &, const BlockVector<float> &) const;
+template void
+MeanValueFilter::vmult(BlockVector<double> &,
+                       const BlockVector<double> &) const;
 
-template void MeanValueFilter::vmult_add(Vector<float> &,
-                                         const Vector<float> &) const;
-template void MeanValueFilter::vmult_add(Vector<double> &,
-                                         const Vector<double> &) const;
-template void MeanValueFilter::vmult_add(BlockVector<float> &,
-                                         const BlockVector<float> &) const;
-template void MeanValueFilter::vmult_add(BlockVector<double> &,
-                                         const BlockVector<double> &) const;
+template void
+MeanValueFilter::vmult_add(Vector<float> &, const Vector<float> &) const;
+template void
+MeanValueFilter::vmult_add(Vector<double> &, const Vector<double> &) const;
+template void
+MeanValueFilter::vmult_add(BlockVector<float> &,
+                           const BlockVector<float> &) const;
+template void
+MeanValueFilter::vmult_add(BlockVector<double> &,
+                           const BlockVector<double> &) const;
 
 DEAL_II_NAMESPACE_CLOSE

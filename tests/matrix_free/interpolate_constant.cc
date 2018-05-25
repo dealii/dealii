@@ -21,11 +21,10 @@
 // cartesian meshes are treated correctly. The test case is without any
 // constraints
 
-#include "../tests.h"
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 
-
+#include "../tests.h"
 #include "interpolate_functions_common.h"
 
 
@@ -33,56 +32,59 @@ template <int dim>
 class CompareFunction : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p, const unsigned int ) const
+  virtual double
+  value(const Point<dim> &p, const unsigned int) const
   {
     return 1;
   }
-  virtual Tensor<1,dim> gradient (const Point<dim> &p, const unsigned int ) const
+  virtual Tensor<1, dim>
+  gradient(const Point<dim> &p, const unsigned int) const
   {
-    return Tensor<1,dim>();
+    return Tensor<1, dim>();
   }
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p, const unsigned int ) const
+  virtual SymmetricTensor<2, dim>
+  hessian(const Point<dim> &p, const unsigned int) const
   {
-    return SymmetricTensor<2,dim>();
+    return SymmetricTensor<2, dim>();
   }
-
 };
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
   if (fe_degree > 0)
     {
-      FE_Q<dim> fe (fe_degree);
-      DoFHandler<dim> dof (tria);
+      FE_Q<dim>       fe(fe_degree);
+      DoFHandler<dim> dof(tria);
       dof.distribute_dofs(fe);
 
       ConstraintMatrix constraints;
       constraints.close();
-      do_test<dim, fe_degree, double> (dof, constraints);
+      do_test<dim, fe_degree, double>(dof, constraints);
     }
   {
-    FE_DGQ<dim> fe (fe_degree);
-    DoFHandler<dim> dof (tria);
+    FE_DGQ<dim>     fe(fe_degree);
+    DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
     ConstraintMatrix constraints;
     constraints.close();
-    do_test<dim, fe_degree, double> (dof, constraints);
+    do_test<dim, fe_degree, double>(dof, constraints);
   }
   deallog << "Test without templates on FEEvaluation" << std::endl;
   {
-    FE_DGQ<dim> fe (fe_degree);
-    DoFHandler<dim> dof (tria);
+    FE_DGQ<dim>     fe(fe_degree);
+    DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
     ConstraintMatrix constraints;
     constraints.close();
-    do_test<dim, -1, double> (dof, constraints);
+    do_test<dim, -1, double>(dof, constraints);
   }
 }

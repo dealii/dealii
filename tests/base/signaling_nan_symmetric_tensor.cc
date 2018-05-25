@@ -22,31 +22,33 @@
 // correctly filled), but outputting a sNaN triggers a floating point
 // exception as well
 
-#include "../tests.h"
 #include <deal.II/base/signaling_nan.h>
+
 #include <limits>
+
+#include "../tests.h"
 
 
 template <typename T>
-void check ()
+void
+check()
 {
-  numbers::signaling_nan<SymmetricTensor<2,2,T> >();
-  numbers::signaling_nan<SymmetricTensor<4,2,T> >();
+  numbers::signaling_nan<SymmetricTensor<2, 2, T>>();
+  numbers::signaling_nan<SymmetricTensor<4, 2, T>>();
 
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  check<float> ();
-  check<double> ();
+  check<float>();
+  check<double>();
 
   return 0;
 }
-
-

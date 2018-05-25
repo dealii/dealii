@@ -18,42 +18,44 @@
 // The matrix is the same as in slepc/solve_04 test which has eingenvalues:
 // 3.98974 > 3.95906 > 3.90828 > 3.83792
 
-#include "../tests.h"
-#include "../testmatrix.h"
-#include "../slepc/testmatrix.h"
-#include <iostream>
 #include <deal.II/lac/petsc_compatibility.h>
-#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/utilities.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/utilities.h>
+#include <deal.II/lac/vector_memory.h>
+
+#include <iostream>
 #include <typeinfo>
 
-int main(int argc, char **argv)
+#include "../slepc/testmatrix.h"
+#include "../testmatrix.h"
+#include "../tests.h"
+
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(6);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
-
     const unsigned int size = 31;
-    unsigned int dim = (size-1);
+    unsigned int       dim  = (size - 1);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl << std::endl;
 
     // Make matrix
-    FD1DLaplaceMatrix testproblem(size);
-    PETScWrappers::SparseMatrix  A(dim, dim, 3);
+    FD1DLaplaceMatrix           testproblem(size);
+    PETScWrappers::SparseMatrix A(dim, dim, 3);
     testproblem.three_point(A);
-    A.compress (VectorOperation::insert);
+    A.compress(VectorOperation::insert);
 
     PETScWrappers::MPI::Vector v0(MPI_COMM_WORLD, dim, dim);
     PETScWrappers::MPI::Vector y(MPI_COMM_WORLD, dim, dim);
     PETScWrappers::MPI::Vector x(MPI_COMM_WORLD, dim, dim);
-    for (unsigned int j=0; j<v0.size(); ++j)
+    for (unsigned int j = 0; j < v0.size(); ++j)
       v0[j] = random_value<double>();
 
     v0.compress(VectorOperation::insert);
@@ -61,19 +63,25 @@ int main(int argc, char **argv)
 
     for (unsigned int k = 4; k < 10; ++k)
       {
-        const double est = Utilities::LinearAlgebra::lanczos_largest_eigenvalue(A,v0,k,vector_memory);
-        Assert (est > 3.98974, ExcInternalError());
-        deallog << k << std::endl
-                << "Lanczos " << est << std::endl;
+        const double est = Utilities::LinearAlgebra::lanczos_largest_eigenvalue(
+          A, v0, k, vector_memory);
+        Assert(est > 3.98974, ExcInternalError());
+        deallog << k << std::endl << "Lanczos " << est << std::endl;
 
         // estimate from CG
         {
-          ReductionControl control (k,
-                                    std::sqrt(std::numeric_limits<double>::epsilon()),
-                                    1e-10, false, false);
-          std::vector<double> estimated_eigenvalues;
-          SolverCG<PETScWrappers::MPI::Vector> solver (control);
-          solver.connect_eigenvalues_slot([&estimated_eigenvalues] (const std::vector<double> &ev) -> void {estimated_eigenvalues = ev;});
+          ReductionControl control(
+            k,
+            std::sqrt(std::numeric_limits<double>::epsilon()),
+            1e-10,
+            false,
+            false);
+          std::vector<double>                  estimated_eigenvalues;
+          SolverCG<PETScWrappers::MPI::Vector> solver(control);
+          solver.connect_eigenvalues_slot(
+            [&estimated_eigenvalues](const std::vector<double> &ev) -> void {
+              estimated_eigenvalues = ev;
+            });
           y = v0;
           PreconditionIdentity preconditioner;
           try
@@ -81,12 +89,10 @@ int main(int argc, char **argv)
               solver.solve(A, x, y, preconditioner);
             }
           catch (SolverControl::NoConvergence &)
-            {
-            }
+            {}
 
-          deallog << "CG " <<  estimated_eigenvalues.back() << std::endl;
+          deallog << "CG " << estimated_eigenvalues.back() << std::endl;
         }
       }
   }
-
 }

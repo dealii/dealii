@@ -17,10 +17,12 @@
 #define dealii_schur_complement_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
-#include <deal.II/lac/vector_memory.h>
+
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
+#include <deal.II/lac/vector_memory.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -149,13 +151,14 @@ DEAL_II_NAMESPACE_OPEN
  *    const auto prec_A = PreconditionSelector<...>(A);
  *    const auto A_inv = inverse_operator<...>(A,prec_A);
  *    const auto S = schur_complement(A_inv,B,C,D);
- *    const auto S_prec = PreconditionSelector<...>(D); // D and S operate on same space
- *    const auto S_inv = inverse_operator<...>(S,...,prec_S);
+ *    const auto S_prec = PreconditionSelector<...>(D); // D and S operate on
+ * same space const auto S_inv = inverse_operator<...>(S,...,prec_S);
  *
  *    // Solve reduced block system
- *    auto rhs = condense_schur_rhs (A_inv,C,f,g); // PackagedOperation that represents the condensed form of g
- *    y = S_inv * rhs; // Solve for y
- *    x = postprocess_schur_solution (A_inv,B,y,f); // Compute x using resolved solution y
+ *    auto rhs = condense_schur_rhs (A_inv,C,f,g); // PackagedOperation that
+ * represents the condensed form of g y = S_inv * rhs; // Solve for y x =
+ * postprocess_schur_solution (A_inv,B,y,f); // Compute x using resolved
+ * solution y
  * @endcode
  *
  * In the above example, the preconditioner for $ S $ was defined as the
@@ -178,8 +181,10 @@ DEAL_II_NAMESPACE_OPEN
  *    // Construction of approximate inverse of Schur complement
  *    const auto A_inv_approx = linear_operator(preconditioner_A);
  *    const auto S_approx = schur_complement(A_inv_approx,B,C,D);
- *    const auto S_approx_prec = PreconditionSelector<...>(D); // D and S_approx operate on same space
- *    const auto S_inv_approx = inverse_operator(S_approx,...,S_approx_prec); // Inner solver: Typically limited to few iterations using IterationNumberControl
+ *    const auto S_approx_prec = PreconditionSelector<...>(D); // D and S_approx
+ * operate on same space const auto S_inv_approx =
+ * inverse_operator(S_approx,...,S_approx_prec); // Inner solver: Typically
+ * limited to few iterations using IterationNumberControl
  *
  *    // Construction of exact inverse of Schur complement
  *    const auto S = schur_complement(A_inv,B,C,D);
@@ -222,8 +227,10 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup LAOperators
  */
-template <typename Range_1, typename Domain_1,
-          typename Range_2, typename Domain_2,
+template <typename Range_1,
+          typename Domain_1,
+          typename Range_2,
+          typename Domain_2,
           typename Payload>
 LinearOperator<Range_2, Domain_2, Payload>
 schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
@@ -237,9 +244,9 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
   // All of the memory allocations etc. are taken care of
   // internally.
   if (D.is_null_operator == false)
-    return D - C*A_inv*B;
+    return D - C * A_inv * B;
   else
-    return -1.0*C*A_inv*B;
+    return -1.0 * C * A_inv * B;
 }
 
 //@}
@@ -272,20 +279,22 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
  *
  * @ingroup LAOperators
  */
-template <typename Range_1, typename Domain_1,
-          typename Range_2, typename Payload>
+template <typename Range_1,
+          typename Domain_1,
+          typename Range_2,
+          typename Payload>
 PackagedOperation<Range_2>
-condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
-                    const LinearOperator<Range_2, Domain_1, Payload> &C,
-                    const Range_1                                    &f,
-                    const Range_2                                    &g)
+condense_schur_rhs(const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
+                   const LinearOperator<Range_2, Domain_1, Payload> &C,
+                   const Range_1 &                                   f,
+                   const Range_2 &                                   g)
 {
   // We return the result of the compound PackagedOperation
   // directly, so as to ensure that the underlying Payload
   // definition aligns with the operations expressed here.
   // All of the memory allocations etc. are taken care of
   // internally.
-  return g - C*A_inv*f;
+  return g - C * A_inv * f;
 }
 
 /**
@@ -309,20 +318,23 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
  *
  * @ingroup LAOperators
  */
-template <typename Range_1, typename Domain_1,
-          typename Domain_2, typename Payload>
+template <typename Range_1,
+          typename Domain_1,
+          typename Domain_2,
+          typename Payload>
 PackagedOperation<Domain_1>
-postprocess_schur_solution (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
-                            const LinearOperator<Range_1, Domain_2, Payload> &B,
-                            const Domain_2                                   &y,
-                            const Range_1                                    &f)
+postprocess_schur_solution(
+  const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
+  const LinearOperator<Range_1, Domain_2, Payload> &B,
+  const Domain_2 &                                  y,
+  const Range_1 &                                   f)
 {
   // We return the result of the compound PackagedOperation
   // directly, so as to ensure that the underlying Payload
   // definition aligns with the operations expressed here.
   // All of the memory allocations etc. are taken care of
   // internally.
-  return A_inv*(f - B*y);
+  return A_inv * (f - B * y);
 }
 
 //@}

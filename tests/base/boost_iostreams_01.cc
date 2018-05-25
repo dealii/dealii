@@ -16,40 +16,42 @@
 
 // test that we can use BOOST iostreams
 
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+
 #include "../tests.h"
 
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/device/file.hpp>
 
-
-void test ()
+void
+test()
 {
   // create a stream where we read from gzipped data
   boost::iostreams::filtering_istream in;
   in.push(boost::iostreams::basic_gzip_decompressor<>());
-  in.push(boost::iostreams::file_source(SOURCE_DIR "/boost_iostreams_01.data.gz"));
-  AssertThrow (in, ExcIO());
+  in.push(
+    boost::iostreams::file_source(SOURCE_DIR "/boost_iostreams_01.data.gz"));
+  AssertThrow(in, ExcIO());
 
   // read the two numbers that are in this file
-  int i;
+  int    i;
   double d;
   in >> i >> d;
 
   deallog << i << ' ' << d << std::endl;
 
   // make sure that we got here just fine but that there is nothing else
-  AssertThrow (in, ExcIO());
+  AssertThrow(in, ExcIO());
   in >> i;
-  AssertThrow (!in, ExcIO());
+  AssertThrow(!in, ExcIO());
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

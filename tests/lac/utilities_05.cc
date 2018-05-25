@@ -17,29 +17,31 @@
 // Test hyperbolic rotations.
 
 
-#include "../tests.h"
-#include <deal.II/lac/utilities.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/utilities.h>
 #include <deal.II/lac/vector.h>
 
-template <typename NumberType>
-void test (const NumberType a, const NumberType b)
-{
+#include "../tests.h"
 
+template <typename NumberType>
+void
+test(const NumberType a, const NumberType b)
+{
   FullMatrix<NumberType> rotation(2);
-  Vector<NumberType> x(2), y(2), res(2);
+  Vector<NumberType>     x(2), y(2), res(2);
 
   x[0] = a;
   x[1] = b;
   y[1] = NumberType();
 
-  const std::array<NumberType,3> csr = Utilities::LinearAlgebra::hyperbolic_rotation(a,b);
+  const std::array<NumberType, 3> csr =
+    Utilities::LinearAlgebra::hyperbolic_rotation(a, b);
 
-  rotation(0,0) =  csr[0]; //  c
-  rotation(1,1) =  csr[0]; //  c
-  rotation(0,1) = -csr[1]; // -s
-  rotation(1,0) = -csr[1]; // -s
-  y[0]          =  csr[2]; //  r
+  rotation(0, 0) = csr[0];  //  c
+  rotation(1, 1) = csr[0];  //  c
+  rotation(0, 1) = -csr[1]; // -s
+  rotation(1, 0) = -csr[1]; // -s
+  y[0]           = csr[2];  //  r
 
   rotation.residual(res, x, y);
 
@@ -58,20 +60,20 @@ void test (const NumberType a, const NumberType b)
       res.print(deallog.get_file_stream());
       AssertThrow(false, ExcInternalError());
     }
-
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(6);
   deallog.attach(logfile);
 
-  deallog << "Residuals:"<< std::endl;
+  deallog << "Residuals:" << std::endl;
   // check all combinations with real solutions: |f| > |g|
-  test<double>( 3.,  0.);  // g == 0
-  test<double>( 2.,  1.5); // both positive
-  test<double>( 3., -0.5); // g negative
+  test<double>(3., 0.);    // g == 0
+  test<double>(2., 1.5);   // both positive
+  test<double>(3., -0.5);  // g negative
   test<double>(-4., -2.4); // both negative
-  test<double>(-5.,  2);   // f negative
+  test<double>(-5., 2);    // f negative
 }

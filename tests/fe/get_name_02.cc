@@ -17,19 +17,22 @@
 
 // test get_name()
 
-#include "../tests.h"
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
-#include <deal.II/base/quadrature_lib.h>
 
 #include <string>
 
+#include "../tests.h"
+
 
 template <int dim, int spacedim>
-void test(const FiniteElement<dim,spacedim> &fe)
+void
+test(const FiniteElement<dim, spacedim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 }
@@ -41,31 +44,31 @@ main()
   initlog();
 
   {
-    FE_Q<2,3> fe(1);
+    FE_Q<2, 3> fe(1);
     test(fe);
   }
   {
-    FE_Q<2,3> fe(QGaussLobatto<1>(4));
+    FE_Q<2, 3> fe(QGaussLobatto<1>(4));
     test(fe);
   }
   {
-    QGauss<1> quadrature_g(5);
-    FE_DGQArbitraryNodes<2,3> fe(quadrature_g);
+    QGauss<1>                  quadrature_g(5);
+    FE_DGQArbitraryNodes<2, 3> fe(quadrature_g);
     test(fe);
   }
   {
-    QGaussLobatto<1> quadrature_gl(5);
-    FE_DGQArbitraryNodes<2,3> fe(quadrature_gl);
+    QGaussLobatto<1>           quadrature_gl(5);
+    FE_DGQArbitraryNodes<2, 3> fe(quadrature_gl);
     test(fe);
   }
   {
-    QGaussLog<1> quadrature(3);
-    FE_DGQArbitraryNodes<2,3> fe(quadrature);
+    QGaussLog<1>               quadrature(3);
+    FE_DGQArbitraryNodes<2, 3> fe(quadrature);
     test(fe);
   }
   {
-    QIterated<1> quadrature(QTrapez<1>(), 3);
-    FE_DGQArbitraryNodes<2,3> fe(quadrature);
+    QIterated<1>               quadrature(QTrapez<1>(), 3);
+    FE_DGQArbitraryNodes<2, 3> fe(quadrature);
     test(fe);
   }
 

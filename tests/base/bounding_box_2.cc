@@ -17,23 +17,24 @@
 // test for BoundingBox<unsigned int spacedim> which tests the functions
 // volume and merge_with of the class
 
+#include <deal.II/base/bounding_box.h>
+#include <deal.II/base/point.h>
+
 #include "../tests.h"
 
-#include <deal.II/base/point.h>
-#include <deal.II/base/bounding_box.h>
-
 template <int spacedim>
-void test_bounding_box()
+void
+test_bounding_box()
 {
   BoundingBox<spacedim> a;
   deallog << "Empty BoundingBox: " << std::endl;
   deallog << a.volume() << std::endl;
 
 
-  std::pair<Point<spacedim>,Point<spacedim>> unit;
-  for (int i=0; i<spacedim; i++)
+  std::pair<Point<spacedim>, Point<spacedim>> unit;
+  for (int i = 0; i < spacedim; i++)
     {
-      unit.first[i] = 0.0;
+      unit.first[i]  = 0.0;
       unit.second[i] = 1.0;
     }
 
@@ -43,16 +44,16 @@ void test_bounding_box()
   deallog << b.get_boundary_points().second << std::endl;
   deallog << " Boundary Box volume: " << b.volume() << std::endl;
   b.merge_with(a);
-  deallog << "Merging it with 0: volume "  << b.volume() << std::endl;
+  deallog << "Merging it with 0: volume " << b.volume() << std::endl;
   deallog << "Boundary points:" << std::endl;
   deallog << b.get_boundary_points().first << std::endl;
   deallog << b.get_boundary_points().second << std::endl;
 
-  std::pair<Point<spacedim>,Point<spacedim>> boundaries;
-  for (int i=0; i<spacedim; i++)
+  std::pair<Point<spacedim>, Point<spacedim>> boundaries;
+  for (int i = 0; i < spacedim; i++)
     {
-      unit.first[i] = 1.0;
-      unit.second[i] = 2.0 + i ;
+      unit.first[i]  = 1.0;
+      unit.second[i] = 2.0 + i;
     }
 
   BoundingBox<spacedim> c(unit);
@@ -68,7 +69,8 @@ void test_bounding_box()
   deallog << "End test for dimension " << spacedim << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

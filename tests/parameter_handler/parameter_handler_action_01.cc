@@ -18,20 +18,20 @@
 // check the ParameterHandler::add_action() function
 
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
+#include "../tests.h"
 
-void check (const char *p)
+
+void
+check(const char *p)
 {
   std::string parameter_set_by_action;
 
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "-1,0",
-                     Patterns::List(Patterns::Integer(-1,1),2,3));
-  prm.add_action ("test_1",
-                  [&](const std::string &s)
-  {
+  prm.declare_entry(
+    "test_1", "-1,0", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
+  prm.add_action("test_1", [&](const std::string &s) {
     deallog << "In action:" << s << std::endl;
     parameter_set_by_action = s;
     return true;
@@ -41,19 +41,20 @@ void check (const char *p)
   std::ifstream in(p);
 
   deallog << "Reading parameters" << std::endl;
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
   deallog << "Saved parameter: " << parameter_set_by_action << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_1.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_1.prm");
 
   return 0;
 }

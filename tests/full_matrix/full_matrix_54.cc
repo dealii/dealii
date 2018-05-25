@@ -24,17 +24,16 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<number> A(8,9);
+  FullMatrix<number> A(8, 9);
   fill_matrix(A);
-  deallog<<"Given matrix"<<std::endl;
+  deallog << "Given matrix" << std::endl;
   display_matrix(A);
-  FullMatrix<number> A_t(A.n(),A.m());
-  A_t.Tadd(A,1);
-  deallog<<"Transposed matrix"<<std::endl;
+  FullMatrix<number> A_t(A.n(), A.m());
+  A_t.Tadd(A, 1);
+  deallog << "Transposed matrix" << std::endl;
   display_matrix(A_t);
 }

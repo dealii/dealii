@@ -17,28 +17,30 @@
 
 // Tests basic stuff of Trilinos sparsity patterns
 
-#include "../tests.h"
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   TrilinosWrappers::SparsityPattern sp;
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
 
   deallog << "Creating entries..." << std::endl;
 
-  sp.reinit(5,7,3);
+  sp.reinit(5, 7, 3);
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
 
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<7; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 7; ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
 
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
 
-  sp.compress ();
+  sp.compress();
 
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
   deallog << "Number of entries: " << sp.n_nonzero_elements() << std::endl;
@@ -50,7 +52,7 @@ void test ()
   deallog << "Bandwidth: " << sp.bandwidth() << std::endl;
   deallog << "SP::empty(): " << sp.empty() << std::endl;
 
-  sp.compress ();
+  sp.compress();
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
 
   deallog << "Clearing..." << std::endl;
@@ -67,19 +69,22 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -92,7 +97,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

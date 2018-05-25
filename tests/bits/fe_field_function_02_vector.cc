@@ -23,48 +23,55 @@
 #include "../tests.h"
 
 // all include files you need here
-#include <deal.II/numerics/fe_field_function.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/numerics/vector_tools.h>
+
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/vector_tools.h>
 
 
 template <int dim>
 class F : public Function<dim>
 {
 public:
-  F() : Function<dim>(2) {}
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double> &v) const
+  F() : Function<dim>(2)
+  {}
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &v) const
   {
-    v = 0;
+    v    = 0;
     v[0] = p.square();
   }
 };
 
 
-double abs_zero(double a)
+double
+abs_zero(double a)
 {
-  if ( std::abs(a) < 1e-10)
+  if (std::abs(a) < 1e-10)
     return 0;
   else
     return a;
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(8/dim);
+  tria.refine_global(8 / dim);
 
-  FESystem<dim> fe(FE_Q<dim> (2),2);
+  FESystem<dim>   fe(FE_Q<dim>(2), 2);
   DoFHandler<dim> dh(tria);
 
   dh.distribute_dofs(fe);
@@ -77,8 +84,7 @@ void test()
   VectorTools::interpolate(dh, ff, v1);
   deallog << "V norm: " << v1.l2_norm() << std::endl;
 
-  Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double> >
-  fef(dh, v1);
+  Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double>> fef(dh, v1);
 
   // project the discrete function fef back
   // onto the finite element space. this
@@ -92,12 +98,12 @@ void test()
   }
   v2.add(-1, v1);
 
-  deallog << "Projection error: " << abs_zero(v2.l2_norm())
-          << std::endl;
-  Assert (v2.l2_norm() < 1e-10, ExcInternalError());
+  deallog << "Projection error: " << abs_zero(v2.l2_norm()) << std::endl;
+  Assert(v2.l2_norm() < 1e-10, ExcInternalError());
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -107,4 +113,3 @@ int main ()
 
   return 0;
 }
-

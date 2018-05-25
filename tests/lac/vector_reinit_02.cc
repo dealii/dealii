@@ -19,32 +19,36 @@
 // communicator is deleted.
 
 
-#include "../tests.h"
 #include <deal.II/base/mpi.h>
+
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector_memory.h>
 
+#include "../tests.h"
+
 template <typename VectorType>
-void do_test()
+void
+do_test()
 {
   IndexSet set(5);
-  set.add_range(0,5);
+  set.add_range(0, 5);
 
   VectorType v1, v2;
 
   {
-    MPI_Comm communicator = Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
+    MPI_Comm communicator =
+      Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     v1.reinit(set, communicator);
     deallog << "reinit: " << v1.size() << " ";
 
 #ifdef DEAL_II_WITH_MPI
-    MPI_Comm_free (&communicator);
+    MPI_Comm_free(&communicator);
 #endif
-
   }
 
   {
-    MPI_Comm communicator = Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
+    MPI_Comm communicator =
+      Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     v2.reinit(set, communicator);
     v1.reinit(v2);
     deallog << v1.size() << " ";
@@ -52,12 +56,13 @@ void do_test()
     deallog << v1.size() << std::endl;
 
 #ifdef DEAL_II_WITH_MPI
-    MPI_Comm_free (&communicator);
+    MPI_Comm_free(&communicator);
 #endif
   }
 
   {
-    MPI_Comm communicator = Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
+    MPI_Comm communicator =
+      Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     v2.reinit(set, communicator);
     v1 = v2;
     deallog << "assign " << v1.size() << " ";
@@ -65,41 +70,44 @@ void do_test()
     deallog << v1.size() << std::endl;
 
 #ifdef DEAL_II_WITH_MPI
-    MPI_Comm_free (&communicator);
+    MPI_Comm_free(&communicator);
 #endif
   }
 
   {
-    MPI_Comm communicator = Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
-    GrowingVectorMemory<VectorType> memory;
+    MPI_Comm communicator =
+      Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
+    GrowingVectorMemory<VectorType>            memory;
     typename VectorMemory<VectorType>::Pointer v3(memory);
     v1.reinit(set, communicator);
     v3->reinit(v1);
     deallog << "reinit pool " << v1.size() << " " << v3->size() << " ";
 
 #ifdef DEAL_II_WITH_MPI
-    MPI_Comm_free (&communicator);
+    MPI_Comm_free(&communicator);
 #endif
   }
 
   {
-    MPI_Comm communicator = Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
-    GrowingVectorMemory<VectorType> memory;
+    MPI_Comm communicator =
+      Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
+    GrowingVectorMemory<VectorType>            memory;
     typename VectorMemory<VectorType>::Pointer v3(memory);
     v1.reinit(set, communicator);
     v3->reinit(v1);
     deallog << "reinit pool " << v3->size() << std::endl;
 
 #ifdef DEAL_II_WITH_MPI
-    MPI_Comm_free (&communicator);
+    MPI_Comm_free(&communicator);
 #endif
   }
-
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   initlog();
 

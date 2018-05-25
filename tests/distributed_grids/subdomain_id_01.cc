@@ -17,28 +17,30 @@
 
 // check (level)subdomain_id(). Should be =0.
 
-#include "../tests.h"
-
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
+
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
+#include "../tests.h"
 
 
 
 template <class TRIA>
-void check (TRIA &tr)
+void
+check(TRIA &tr)
 {
-  typename TRIA::cell_iterator cell = tr.begin(),
-                               endc = tr.end();
+  typename TRIA::cell_iterator cell = tr.begin(), endc = tr.end();
 
-  for (; cell!=endc; ++cell)
+  for (; cell != endc; ++cell)
     {
       deallog << cell->level_subdomain_id() << " ";
       try
@@ -48,7 +50,6 @@ void check (TRIA &tr)
       catch (...)
         {
           deallog << ".";
-
         }
       deallog << std::endl;
     }
@@ -57,22 +58,20 @@ void check (TRIA &tr)
 }
 
 
-int main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   initlog();
 
-  Triangulation<2> tria;
+  Triangulation<2>                        tria;
   parallel::distributed::Triangulation<2> tria2(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global (2);
-  GridGenerator::hyper_cube (tria2);
-  tria2.refine_global (2);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(2);
+  GridGenerator::hyper_cube(tria2);
+  tria2.refine_global(2);
   check(tria);
   check(tria2);
 }
-
-
-

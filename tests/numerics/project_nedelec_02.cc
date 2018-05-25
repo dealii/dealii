@@ -21,10 +21,11 @@
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   if (dim > 1)
     // only p=1 implemented at present
-    for (unsigned int p=0; p<2; ++p)
-      test_with_hanging_nodes (FE_Nedelec<dim>(p), p, 1);
+    for (unsigned int p = 0; p < 2; ++p)
+      test_with_hanging_nodes(FE_Nedelec<dim>(p), p, 1);
 }

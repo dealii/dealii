@@ -16,30 +16,31 @@
 // Test that it is possible to use a PackagedOperation created by
 // operator*() of a LinearOperator object for Trilinos matrices and vectors
 
-#include "../tests.h"
-
 #include <deal.II/lac/linear_operator_tools.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include "../tests.h"
+
 using namespace dealii;
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
   deallog << std::setprecision(10);
 
-  typedef TrilinosWrappers::MPI::Vector vector_t;
+  typedef TrilinosWrappers::MPI::Vector  vector_t;
   typedef TrilinosWrappers::SparseMatrix matrix_t;
 
   matrix_t a(5U, 5U, 3U);
-  a.compress (VectorOperation::add);
+  a.compress(VectorOperation::add);
 
-  auto op_a  = linear_operator<vector_t>(a);
-  vector_t u,res;
+  auto     op_a = linear_operator<vector_t>(a);
+  vector_t u, res;
   op_a.reinit_domain_vector(u, false);
   res = op_a * u;
   // ^^ this was not working, whereas op_a.vmult(res,u) did.

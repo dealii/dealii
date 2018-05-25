@@ -17,29 +17,33 @@
 
 // check the Patterns::Map pattern with a separator other than the default ','
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+#include "../tests.h"
+
+void
+check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_13", "-1:a xyz 0:b xyz 1:c",
-                     Patterns::Map(Patterns::Integer(-1,1),
-                                   Patterns::Selection("a|b|c"),
-                                   2,3, "xyz"));
+  prm.declare_entry(
+    "test_13",
+    "-1:a xyz 0:b xyz 1:c",
+    Patterns::Map(
+      Patterns::Integer(-1, 1), Patterns::Selection("a|b|c"), 2, 3, "xyz"));
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_13=" << prm.get ("test_13") << std::endl;
+  deallog << "test_13=" << prm.get("test_13") << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_13a.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_13a.prm");
 
   return 0;
 }

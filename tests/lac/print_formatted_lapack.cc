@@ -16,19 +16,20 @@
 
 // Check LAPACKFullMatrix::print_formatted on NaN entry
 
-#include "../tests.h"
-
 #include <deal.II/lac/lapack_full_matrix.h>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   initlog();
 
-  LAPACKFullMatrix<double> matrix(2,2);
-  matrix(0,0) = std::numeric_limits<double>::quiet_NaN();
-  matrix(0,1) = std::numeric_limits<double>::infinity();
-  matrix(1,1) = -std::numeric_limits<double>::infinity();
+  LAPACKFullMatrix<double> matrix(2, 2);
+  matrix(0, 0) = std::numeric_limits<double>::quiet_NaN();
+  matrix(0, 1) = std::numeric_limits<double>::infinity();
+  matrix(1, 1) = -std::numeric_limits<double>::infinity();
 
   deallog << "Using print_formatted" << std::endl;
   matrix.print_formatted(deallog.get_file_stream(), 3, true, 0, "0");

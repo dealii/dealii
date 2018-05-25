@@ -15,52 +15,52 @@
 
 // Check get_tangent_vector for spherical manifold, on simple points.
 
-#include "../tests.h"
-
 #include <deal.II/base/utilities.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/mapping_q_generic.h>
+
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q_generic.h>
+
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
 #include <numeric>
 
+#include "../tests.h"
+
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
-  Point<spacedim> center;
-  static  const PolarManifold<dim,spacedim> manifold(center);
+  Point<spacedim>                           center;
+  static const PolarManifold<dim, spacedim> manifold(center);
 
   // Go from 0,1 to 1,0
-  Point<spacedim> p0,p1;
+  Point<spacedim> p0, p1;
   p0[1] = 1.0;
   p1[0] = 1.0;
 
-  Tensor<1,spacedim> T = manifold.get_tangent_vector(p0, p1);
+  Tensor<1, spacedim> T = manifold.get_tangent_vector(p0, p1);
 
   deallog << "P0      : " << p0 << std::endl;
   deallog << "P1      : " << p1 << std::endl;
   deallog << "T(P0-P1): " << T << std::endl;
-  deallog << "Error   : " << T.norm() - numbers::PI/2 << std::endl;
+  deallog << "Error   : " << T.norm() - numbers::PI / 2 << std::endl;
 }
 
 
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  test<2,2>();
-  test<2,3>();
+  test<2, 2>();
+  test<2, 3>();
 
-  test<3,3>();
+  test<3, 3>();
 
   return 0;
 }
-
-
-

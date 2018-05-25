@@ -17,14 +17,16 @@
 
 // test assemble_flags.h
 
-#include "../tests.h"
 #include <deal.II/meshworker/assemble_flags.h>
 
 #include <fstream>
 
+#include "../tests.h"
+
 using namespace MeshWorker;
 
-int main()
+int
+main()
 {
   initlog();
   AssembleFlags flag = assemble_own_cells | assemble_boundary_faces;

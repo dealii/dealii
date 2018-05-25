@@ -19,6 +19,7 @@
 
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/std_cxx14/memory.h>
+
 #include <deal.II/fe/fe.h>
 
 
@@ -52,87 +53,99 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2009
  */
-template <class PolynomialType, int dim=PolynomialType::dimension+1, int spacedim=dim>
-class FE_PolyFace : public FiniteElement<dim,spacedim>
+template <class PolynomialType,
+          int dim      = PolynomialType::dimension + 1,
+          int spacedim = dim>
+class FE_PolyFace : public FiniteElement<dim, spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_PolyFace (const PolynomialType &poly_space,
-               const FiniteElementData<dim> &fe_data,
-               const std::vector<bool> &restriction_is_additive_flags);
+  FE_PolyFace(const PolynomialType &        poly_space,
+              const FiniteElementData<dim> &fe_data,
+              const std::vector<bool> &     restriction_is_additive_flags);
 
   /**
    * Return the polynomial degree of this finite element, i.e. the value
    * passed to the constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree() const;
 
   // for documentation, see the FiniteElement base class
-  virtual
-  UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const override;
+  virtual UpdateFlags
+  requires_update_flags(const UpdateFlags update_flags) const override;
 
 protected:
   /*
-   * NOTE: The following functions have their definitions inlined into the class declaration
-   * because we otherwise run into a compiler error with MS Visual Studio.
+   * NOTE: The following functions have their definitions inlined into the class
+   * declaration because we otherwise run into a compiler error with MS Visual
+   * Studio.
    */
 
 
-  virtual
-  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
-  get_data (const UpdateFlags                                                    /*update_flags*/,
-            const Mapping<dim,spacedim>                                         &/*mapping*/,
-            const Quadrature<dim>                                               &/*quadrature*/,
-            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const override
+  virtual std::unique_ptr<
+    typename FiniteElement<dim, spacedim>::InternalDataBase>
+  get_data(
+    const UpdateFlags /*update_flags*/,
+    const Mapping<dim, spacedim> & /*mapping*/,
+    const Quadrature<dim> & /*quadrature*/,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      & /*output_data*/) const override
   {
     return std_cxx14::make_unique<InternalData>();
   }
 
-  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
-  get_face_data(const UpdateFlags                                                    update_flags,
-                const Mapping<dim,spacedim>                                         &/*mapping*/,
-                const Quadrature<dim-1>                                             &quadrature,
-                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const override
+  std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+  get_face_data(
+    const UpdateFlags update_flags,
+    const Mapping<dim, spacedim> & /*mapping*/,
+    const Quadrature<dim - 1> &quadrature,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      & /*output_data*/) const override
   {
     // generate a new data object and
     // initialize some fields
-    auto data = std_cxx14::make_unique<InternalData>();
+    auto data         = std_cxx14::make_unique<InternalData>();
     data->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
 
     // some scratch arrays
-    std::vector<double> values(0);
-    std::vector<Tensor<1,dim-1> > grads(0);
-    std::vector<Tensor<2,dim-1> > grad_grads(0);
-    std::vector<Tensor<3,dim-1> > empty_vector_of_3rd_order_tensors;
-    std::vector<Tensor<4,dim-1> > empty_vector_of_4th_order_tensors;
+    std::vector<double>             values(0);
+    std::vector<Tensor<1, dim - 1>> grads(0);
+    std::vector<Tensor<2, dim - 1>> grad_grads(0);
+    std::vector<Tensor<3, dim - 1>> empty_vector_of_3rd_order_tensors;
+    std::vector<Tensor<4, dim - 1>> empty_vector_of_4th_order_tensors;
 
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
     if (data->update_each & update_values)
       {
-        values.resize (poly_space.n());
-        data->shape_values.resize (poly_space.n(),
-                                   std::vector<double> (n_q_points));
-        for (unsigned int i=0; i<n_q_points; ++i)
+        values.resize(poly_space.n());
+        data->shape_values.resize(poly_space.n(),
+                                  std::vector<double>(n_q_points));
+        for (unsigned int i = 0; i < n_q_points; ++i)
           {
             poly_space.compute(quadrature.point(i),
-                               values, grads, grad_grads,
+                               values,
+                               grads,
+                               grad_grads,
                                empty_vector_of_3rd_order_tensors,
                                empty_vector_of_4th_order_tensors);
 
-            for (unsigned int k=0; k<poly_space.n(); ++k)
+            for (unsigned int k = 0; k < poly_space.n(); ++k)
               data->shape_values[k][i] = values[k];
           }
       }
     // No derivatives of this element
     // are implemented.
-    if (data->update_each & update_gradients || data->update_each & update_hessians)
+    if (data->update_each & update_gradients ||
+        data->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }
@@ -140,50 +153,67 @@ protected:
     return std::move(data);
   }
 
-  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
-  get_subface_data(const UpdateFlags                                                    update_flags,
-                   const Mapping<dim,spacedim>                                         &mapping,
-                   const Quadrature<dim-1>                                             &quadrature,
-                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override
+  std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+  get_subface_data(
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim - 1> &   quadrature,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const override
   {
-    return get_face_data(update_flags, mapping,
-                         QProjector<dim - 1>::project_to_all_children(quadrature),
-                         output_data);
+    return get_face_data(
+      update_flags,
+      mapping,
+      QProjector<dim - 1>::project_to_all_children(quadrature),
+      output_data);
   }
 
-  virtual
-  void
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                  const CellSimilarity::Similarity                                     cell_similarity,
-                  const Quadrature<dim>                                               &quadrature,
-                  const Mapping<dim,spacedim>                                         &mapping,
-                  const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
-                  const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const CellSimilarity::Similarity                            cell_similarity,
+    const Quadrature<dim> &                                     quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+      &                                                            mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const override;
 
-  virtual
-  void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                       const unsigned int                                                   face_no,
-                       const Quadrature<dim-1>                                             &quadrature,
-                       const Mapping<dim,spacedim>                                         &mapping,
-                       const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
-                       const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+      &                                                            mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const override;
 
-  virtual
-  void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                          const unsigned int                                                   face_no,
-                          const unsigned int                                                   sub_no,
-                          const Quadrature<dim-1>                                             &quadrature,
-                          const Mapping<dim,spacedim>                                         &mapping,
-                          const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
-                          const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_subface_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const unsigned int                                          sub_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+      &                                                            mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const override;
 
   /**
    * Fields of cell-independent data.
@@ -191,7 +221,7 @@ protected:
    * For information about the general purpose of this class, see the
    * documentation of the base class.
    */
-  class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
+  class InternalData : public FiniteElement<dim, spacedim>::InternalDataBase
   {
   public:
     /**
@@ -207,7 +237,7 @@ protected:
      * In particular, we can simply copy the same set of values to each of the
      * faces.
      */
-    std::vector<std::vector<double> > shape_values;
+    std::vector<std::vector<double>> shape_values;
   };
 
   /**

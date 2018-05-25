@@ -14,20 +14,21 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_petsc_parallel_vector_h
-#define dealii_petsc_parallel_vector_h
+#  define dealii_petsc_parallel_vector_h
 
 
-#include <deal.II/base/config.h>
+#  include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/base/subscriptor.h>
-#  include <deal.II/lac/exceptions.h>
-#  include <deal.II/lac/vector.h>
-#  include <deal.II/lac/vector_operation.h>
-#  include <deal.II/lac/petsc_vector_base.h>
-#  include <deal.II/base/index_set.h>
-#  include <deal.II/lac/vector_type_traits.h>
+#    include <deal.II/base/index_set.h>
+#    include <deal.II/base/subscriptor.h>
+
+#    include <deal.II/lac/exceptions.h>
+#    include <deal.II/lac/petsc_vector_base.h>
+#    include <deal.II/lac/vector.h>
+#    include <deal.II/lac/vector_operation.h>
+#    include <deal.II/lac/vector_type_traits.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,7 +47,6 @@ namespace PETScWrappers
    */
   namespace MPI
   {
-
     /**
      * Implementation of a parallel vector class based on PETSC and using MPI
      * communication to synchronize distributed operations. All the
@@ -166,7 +166,7 @@ namespace PETScWrappers
       /**
        * Default constructor. Initialize the vector as empty.
        */
-      Vector ();
+      Vector();
 
       /**
        * Constructor. Set dimension to @p n and initialize all elements with
@@ -184,9 +184,9 @@ namespace PETScWrappers
        * <tt>v=Vector@<number@>(0);</tt>, i.e. the vector is replaced by one
        * of length zero.
        */
-      explicit Vector (const MPI_Comm  &communicator,
-                       const size_type  n,
-                       const size_type  local_size);
+      explicit Vector(const MPI_Comm &communicator,
+                      const size_type n,
+                      const size_type local_size);
 
 
       /**
@@ -200,9 +200,9 @@ namespace PETScWrappers
        * different parts of the vector shall communicate
        */
       template <typename Number>
-      explicit Vector (const MPI_Comm               &communicator,
-                       const dealii::Vector<Number> &v,
-                       const size_type               local_size);
+      explicit Vector(const MPI_Comm &              communicator,
+                      const dealii::Vector<Number> &v,
+                      const size_type               local_size);
 
 
       /**
@@ -218,9 +218,9 @@ namespace PETScWrappers
        * is deprecated: use PETScWrappers::MPI::Vector instead.
        */
       DEAL_II_DEPRECATED
-      explicit Vector (const MPI_Comm     &communicator,
-                       const VectorBase   &v,
-                       const size_type     local_size);
+      explicit Vector(const MPI_Comm &  communicator,
+                      const VectorBase &v,
+                      const size_type   local_size);
 
       /**
        * Construct a new parallel ghosted PETSc vector from IndexSets.
@@ -239,15 +239,15 @@ namespace PETScWrappers
        * way, the ghost parameter can equal the set of locally relevant
        * degrees of freedom, see step-32.
        *
-       * @note This operation always creates a ghosted vector, which is considered
-       * read-only.
+       * @note This operation always creates a ghosted vector, which is
+       * considered read-only.
        *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      Vector (const IndexSet &local,
-              const IndexSet &ghost,
-              const MPI_Comm &communicator);
+      Vector(const IndexSet &local,
+             const IndexSet &ghost,
+             const MPI_Comm &communicator);
 
       /**
        * Construct a new parallel PETSc vector without ghost elements from an
@@ -260,20 +260,21 @@ namespace PETScWrappers
        * not reordered by component (use a PETScWrappers::BlockVector
        * otherwise).
        */
-      explicit Vector (const IndexSet &local,
-                       const MPI_Comm &communicator);
+      explicit Vector(const IndexSet &local, const MPI_Comm &communicator);
 
       /**
        * Release all memory and return to a state just like after having
        * called the default constructor.
        */
-      virtual void clear () override;
+      virtual void
+      clear() override;
 
       /**
        * Copy the given vector. Resize the present vector if necessary. Also
        * take over the MPI communicator of @p v.
        */
-      Vector &operator= (const Vector &v);
+      Vector &
+      operator=(const Vector &v);
 
       /**
        * Set all components of the vector to the given number @p s. Simply
@@ -281,7 +282,8 @@ namespace PETScWrappers
        * function to make the example given in the discussion about making the
        * constructor explicit work.
        */
-      Vector &operator= (const PetscScalar s);
+      Vector &
+      operator=(const PetscScalar s);
 
       /**
        * Copy the values of a deal.II vector (as opposed to those of the PETSc
@@ -293,7 +295,8 @@ namespace PETScWrappers
        * can't get from the source vector.
        */
       template <typename number>
-      Vector &operator= (const dealii::Vector<number> &v);
+      Vector &
+      operator=(const dealii::Vector<number> &v);
 
       /**
        * Change the dimension of the vector to @p N. It is unspecified how
@@ -311,10 +314,11 @@ namespace PETScWrappers
        * If @p omit_zeroing_entries is false, the vector is filled by zeros.
        * Otherwise, the elements are left an unspecified state.
        */
-      void reinit (const MPI_Comm  &communicator,
-                   const size_type  N,
-                   const size_type  local_size,
-                   const bool       omit_zeroing_entries = false);
+      void
+      reinit(const MPI_Comm &communicator,
+             const size_type N,
+             const size_type local_size,
+             const bool      omit_zeroing_entries = false);
 
       /**
        * Change the dimension to that of the vector @p v, and also take over
@@ -325,8 +329,8 @@ namespace PETScWrappers
        * as calling <tt>reinit(v.size(), v.local_size(),
        * omit_zeroing_entries)</tt>.
        */
-      void reinit (const Vector &v,
-                   const bool    omit_zeroing_entries = false);
+      void
+      reinit(const Vector &v, const bool omit_zeroing_entries = false);
 
       /**
        * Reinit as a vector with ghost elements. See the constructor with
@@ -335,9 +339,10 @@ namespace PETScWrappers
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      void reinit (const IndexSet &local,
-                   const IndexSet &ghost,
-                   const MPI_Comm &communicator);
+      void
+      reinit(const IndexSet &local,
+             const IndexSet &ghost,
+             const MPI_Comm &communicator);
 
       /**
        * Reinit as a vector without ghost elements. See constructor with same
@@ -346,14 +351,15 @@ namespace PETScWrappers
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      void reinit (const IndexSet &local,
-                   const MPI_Comm &communicator);
+      void
+      reinit(const IndexSet &local, const MPI_Comm &communicator);
 
       /**
        * Return a reference to the MPI communicator object in use with this
        * vector.
        */
-      const MPI_Comm &get_mpi_communicator () const override;
+      const MPI_Comm &
+      get_mpi_communicator() const override;
 
       /**
        * Print to a stream. @p precision denotes the desired precision with
@@ -366,10 +372,11 @@ namespace PETScWrappers
        * that the right thing happens for parallel vectors that are
        * distributed across processors.
        */
-      void print (std::ostream       &out,
-                  const unsigned int  precision  = 3,
-                  const bool          scientific = true,
-                  const bool          across     = true) const;
+      void
+      print(std::ostream &     out,
+            const unsigned int precision  = 3,
+            const bool         scientific = true,
+            const bool         across     = true) const;
 
       /**
        * @copydoc PETScWrappers::VectorBase::all_zero()
@@ -377,7 +384,8 @@ namespace PETScWrappers
        * @note This function overloads the one in the base class to make this
        * a collective operation.
        */
-      bool all_zero () const;
+      bool
+      all_zero() const;
 
     protected:
       /**
@@ -386,8 +394,8 @@ namespace PETScWrappers
        * local_size denotes how many of these elements shall be stored
        * locally.
        */
-      virtual void create_vector (const size_type n,
-                                  const size_type local_size);
+      virtual void
+      create_vector(const size_type n, const size_type local_size);
 
 
 
@@ -396,9 +404,10 @@ namespace PETScWrappers
        * with the specified ghost indices. Note that you need to call
        * update_ghost_values() before accessing those.
        */
-      virtual void create_vector (const size_type n,
-                                  const size_type local_size,
-                                  const IndexSet &ghostnodes);
+      virtual void
+      create_vector(const size_type n,
+                    const size_type local_size,
+                    const IndexSet &ghostnodes);
 
 
     private:
@@ -409,7 +418,7 @@ namespace PETScWrappers
     };
 
 
-// ------------------ template and inline functions -------------
+    // ------------------ template and inline functions -------------
 
 
     /**
@@ -420,34 +429,32 @@ namespace PETScWrappers
      * @relatesalso PETScWrappers::MPI::Vector
      * @author Wolfgang Bangerth, 2004
      */
-    inline
-    void swap (Vector &u, Vector &v)
+    inline void
+    swap(Vector &u, Vector &v)
     {
-      u.swap (v);
+      u.swap(v);
     }
 
 
-#ifndef DOXYGEN
+#    ifndef DOXYGEN
 
     template <typename number>
-    Vector::Vector (const MPI_Comm         &communicator,
-                    const dealii::Vector<number> &v,
-                    const size_type         local_size)
-      :
-      communicator (communicator)
+    Vector::Vector(const MPI_Comm &              communicator,
+                   const dealii::Vector<number> &v,
+                   const size_type               local_size) :
+      communicator(communicator)
     {
-      Vector::create_vector (v.size(), local_size);
+      Vector::create_vector(v.size(), local_size);
 
       *this = v;
     }
 
 
 
-    inline
-    Vector &
-    Vector::operator= (const PetscScalar s)
+    inline Vector &
+    Vector::operator=(const PetscScalar s)
     {
-      VectorBase::operator= (s);
+      VectorBase::operator=(s);
 
       return *this;
     }
@@ -455,12 +462,10 @@ namespace PETScWrappers
 
 
     template <typename number>
-    inline
-    Vector &
-    Vector::operator= (const dealii::Vector<number> &v)
+    inline Vector &
+    Vector::operator=(const dealii::Vector<number> &v)
     {
-      Assert (size() == v.size(),
-              ExcDimensionMismatch (size(), v.size()));
+      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
       // FIXME: the following isn't necessarily fast, but this is due to
       // the fact that PETSc doesn't offer an inlined access operator.
@@ -488,32 +493,32 @@ namespace PETScWrappers
       // function in Petsc that would take a pointer to an array of
       // PetscScalar values and simply copy n elements verbatim into the
       // vector...
-      for (size_type i=0; i<v.size(); ++i)
+      for (size_type i = 0; i < v.size(); ++i)
         (*this)(i) = v(i);
 
-      compress (::dealii::VectorOperation::insert);
+      compress(::dealii::VectorOperation::insert);
 
       return *this;
     }
 
 
 
-    inline
-    const MPI_Comm &
-    Vector::get_mpi_communicator () const
+    inline const MPI_Comm &
+    Vector::get_mpi_communicator() const
     {
       return communicator;
     }
 
-#endif // DOXYGEN
-  }
-}
+#    endif // DOXYGEN
+  }        // namespace MPI
+} // namespace PETScWrappers
 
 namespace internal
 {
   namespace LinearOperatorImplementation
   {
-    template <typename> class ReinitHelper;
+    template <typename>
+    class ReinitHelper;
 
     /**
      * A helper class used internally in linear_operator.h. Specialization for
@@ -524,25 +529,27 @@ namespace internal
     {
     public:
       template <typename Matrix>
-      static
-      void reinit_range_vector (const Matrix &matrix,
-                                PETScWrappers::MPI::Vector &v,
-                                bool /*omit_zeroing_entries*/)
+      static void
+      reinit_range_vector(const Matrix &              matrix,
+                          PETScWrappers::MPI::Vector &v,
+                          bool /*omit_zeroing_entries*/)
       {
-        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator());
+        v.reinit(matrix.locally_owned_range_indices(),
+                 matrix.get_mpi_communicator());
       }
 
       template <typename Matrix>
-      static
-      void reinit_domain_vector(const Matrix &matrix,
-                                PETScWrappers::MPI::Vector &v,
-                                bool /*omit_zeroing_entries*/)
+      static void
+      reinit_domain_vector(const Matrix &              matrix,
+                           PETScWrappers::MPI::Vector &v,
+                           bool /*omit_zeroing_entries*/)
       {
-        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator());
+        v.reinit(matrix.locally_owned_domain_indices(),
+                 matrix.get_mpi_communicator());
       }
     };
 
-  } /* namespace LinearOperator */
+  } // namespace LinearOperatorImplementation
 } /* namespace internal */
 
 /**@}*/
@@ -554,16 +561,17 @@ namespace internal
  * @author Uwe Koecher, 2017
  */
 template <>
-struct is_serial_vector< PETScWrappers::MPI::Vector > : std::false_type
-{
-};
+struct is_serial_vector<PETScWrappers::MPI::Vector> : std::false_type
+{};
 
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_PETSC
+#  endif // DEAL_II_WITH_PETSC
 
-/*----------------------------   petsc_parallel_vector.h     ---------------------------*/
+/*----------------------------   petsc_parallel_vector.h
+ * ---------------------------*/
 
 #endif
-/*----------------------------   petsc_parallel_vector.h     ---------------------------*/
+/*----------------------------   petsc_parallel_vector.h
+ * ---------------------------*/

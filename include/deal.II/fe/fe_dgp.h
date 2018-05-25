@@ -17,7 +17,9 @@
 #define dealii_fe_dgp_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/polynomial_space.h>
+
 #include <deal.II/fe/fe_poly.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -108,7 +110,8 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_0$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_0$ element,
@@ -119,17 +122,20 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_1$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_1$ element, shape function 0 </td>
  *
  * <td align="center"> $P_1$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0002.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_1$ element,
@@ -141,31 +147,37 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_2$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 0 </td>
  *
  * <td align="center"> $P_2$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0003.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 2 </td>
  *
  * <td align="center"> $P_2$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0004.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0005.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 4 </td>
  *
  * <td align="center"> $P_2$ element, shape function 5 </td> </tr> </table>
@@ -174,128 +186,153 @@ DEAL_II_NAMESPACE_OPEN
  * <h4>$P_3$ element</h4>
  *
  * <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 0 </td>
  *
  * <td align="center"> $P_3$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0003.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 2 </td>
  *
  * <td align="center"> $P_3$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0004.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0005.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 4 </td>
  *
  * <td align="center"> $P_3$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0006.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0007.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 6 </td>
  *
  * <td align="center"> $P_3$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0008.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0009.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 8 </td>
  *
  * <td align="center"> $P_3$ element, shape function 9 </td> </tr> </table>
  *
  *
  * <h4>$P_4$ element</h4> <table> <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0000.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0000.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0001.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0001.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 0 </td>
  *
  * <td align="center"> $P_4$ element, shape function 1 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0002.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0002.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0003.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0003.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 2 </td>
  *
  * <td align="center"> $P_4$ element, shape function 3 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0004.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0004.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0005.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 4 </td>
  *
  * <td align="center"> $P_4$ element, shape function 5 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0006.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0006.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0007.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0007.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 6 </td>
  *
  * <td align="center"> $P_4$ element, shape function 7 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0008.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0008.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0009.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 8 </td>
  *
  * <td align="center"> $P_4$ element, shape function 9 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0010.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0010.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0011.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0011.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 10 </td>
  *
  * <td align="center"> $P_4$ element, shape function 11 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0012.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0012.png
  * </td>
  *
  * <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0013.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0013.png
  * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 12 </td>
  *
  * <td align="center"> $P_4$ element, shape function 13 </td> </tr>
  *
  * <tr> <td align="center">
- * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0014.png
+ * @image html
+ * http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0014.png
  * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $P_4$ element,
@@ -305,21 +342,22 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
-template <int dim, int spacedim=dim>
-class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_DGP : public FE_Poly<PolynomialSpace<dim>, dim, spacedim>
 {
 public:
   /**
    * Constructor for tensor product polynomials of degree @p p.
    */
-  FE_DGP (const unsigned int p);
+  FE_DGP(const unsigned int p);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_DGP<dim>(degree)</tt>, with @p dim and @p degree replaced
    * by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
   /**
    * @name Functions to support hp
@@ -344,9 +382,9 @@ public:
    * This being a discontinuous element, the set of such constraints is of
    * course empty.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -355,9 +393,9 @@ public:
    * This being a discontinuous element, the set of such constraints is of
    * course empty.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -366,9 +404,9 @@ public:
    * This being a discontinuous element, the set of such constraints is of
    * course empty.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -378,7 +416,8 @@ public:
    * of the element), as it has no hanging nodes (being a discontinuous
    * element).
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented() const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -389,9 +428,9 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * @}
@@ -409,8 +448,8 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
-  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const override;
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                FullMatrix<double> &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -424,16 +463,17 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
-  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                    const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const override;
+  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                   const unsigned int                  subface,
+                                   FullMatrix<double> &matrix) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -443,29 +483,29 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption() const override;
 
 
   /**
    * Return a list of constant modes of the element. For this element, the
    * first entry is true, all other are false.
    */
-  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const override;
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
 private:
-
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector
    * function and it creates the @p dofs_per_object vector that is needed
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 };
 
 /* @} */

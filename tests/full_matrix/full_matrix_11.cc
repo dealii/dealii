@@ -14,39 +14,42 @@
 // ---------------------------------------------------------------------
 
 
-//check method Tmmult of FullMatrix on larger size than full_matrix_02 where
-//we interface to the external BLAS
-
-#include "../tests.h"
+// check method Tmmult of FullMatrix on larger size than full_matrix_02 where
+// we interface to the external BLAS
 
 #include <deal.II/lac/full_matrix.h>
 
+#include "../tests.h"
+
 
 template <typename Number>
-void test()
+void
+test()
 {
   FullMatrix<Number> A(76, 2), B(76, 3), C(2, 3), D(2, 3);
-  for (unsigned int i=0; i<A.m(); ++i)
-    for (unsigned int j=0; j<A.n(); ++j)
-      A(i,j) = random_value<double>();
-  for (unsigned int i=0; i<B.m(); ++i)
-    for (unsigned int j=0; j<B.n(); ++j)
-      B(i,j) = random_value<double>();
+  for (unsigned int i = 0; i < A.m(); ++i)
+    for (unsigned int j = 0; j < A.n(); ++j)
+      A(i, j) = random_value<double>();
+  for (unsigned int i = 0; i < B.m(); ++i)
+    for (unsigned int j = 0; j < B.n(); ++j)
+      B(i, j) = random_value<double>();
 
   A.Tmmult(C, B); // C = A^T * B
 
-  for (unsigned int i=0; i<A.n(); ++i)
-    for (unsigned int j=0; j<B.n(); ++j)
-      for (unsigned int k=0; k<A.m(); ++k)
-        D(i,j) += A(k,i) * B(k,j);
+  for (unsigned int i = 0; i < A.n(); ++i)
+    for (unsigned int j = 0; j < B.n(); ++j)
+      for (unsigned int k = 0; k < A.m(); ++k)
+        D(i, j) += A(k, i) * B(k, j);
   C.add(-1., D);
 
-  deallog << "Difference: " << filter_out_small_numbers(C.l1_norm(),
-                                                        100.*std::numeric_limits<Number>::epsilon())
+  deallog << "Difference: "
+          << filter_out_small_numbers(
+               C.l1_norm(), 100. * std::numeric_limits<Number>::epsilon())
           << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

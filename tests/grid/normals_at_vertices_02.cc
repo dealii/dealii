@@ -15,42 +15,43 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
+
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 
-
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (3);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(3);
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  SphericalManifold<3> boundary (Point<3>(1,0,0));
+  SphericalManifold<3> boundary(Point<3>(1, 0, 0));
 
-  Triangulation<3> tria;
+  Triangulation<3>               tria;
   Manifold<3>::FaceVertexNormals normals;
 
-  GridGenerator::hyper_ball (tria, Point<3>(1,0,0), 3);
+  GridGenerator::hyper_ball(tria, Point<3>(1, 0, 0), 3);
 
-  Triangulation<3>::active_cell_iterator cell=tria.begin_active();
-  for (; cell!=tria.end(); ++cell)
-    for (unsigned int face_no=0;
-         face_no<GeometryInfo<3>::faces_per_cell; ++face_no)
+  Triangulation<3>::active_cell_iterator cell = tria.begin_active();
+  for (; cell != tria.end(); ++cell)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell;
+         ++face_no)
       if (cell->at_boundary(face_no))
         {
           deallog << " Face" << face_no << std::endl;
           Triangulation<3>::face_iterator face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
+          for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_face; ++v)
             {
               deallog << "  vertex=" << face->vertex(v)
                       << ",  normal=" << normals[v] << std::endl;

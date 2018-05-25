@@ -20,57 +20,65 @@
 // DoFHandler::renumbering function could not handle coarsened grids
 // (unused vertices, unused faces). Check that all this works now.
 
-#include "../tests.h"
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
+
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/dofs/dof_accessor.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/vector.h>
 
 #include <algorithm>
+
+#include "../tests.h"
 
 using namespace std;
 
 template <int dim>
-void check()
+void
+check()
 {
   FE_Q<dim> fe(3);
   deallog << fe.get_name() << std::endl;
 
-  Triangulation<dim> tria(Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> tria(
+    Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
-  typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
-  for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i, ++cell)
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
+       ++i, ++cell)
     cell->set_coarsen_flag();
-  tria.execute_coarsening_and_refinement ();
+  tria.execute_coarsening_and_refinement();
 
   DoFHandler<dim> mg_dof_handler(tria);
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs(fe);
-  for (unsigned int level=0; level<tria.n_levels(); ++level)
+  for (unsigned int level = 0; level < tria.n_levels(); ++level)
     {
-      const types::global_dof_index n_dofs=mg_dof_handler.n_dofs(level);
+      const types::global_dof_index   n_dofs = mg_dof_handler.n_dofs(level);
       vector<types::global_dof_index> new_numbers(n_dofs);
-      for (unsigned int i=0; i<n_dofs; ++i)
-        new_numbers[i]=n_dofs-1-i;
+      for (unsigned int i = 0; i < n_dofs; ++i)
+        new_numbers[i] = n_dofs - 1 - i;
 
       mg_dof_handler.renumber_dofs(level, new_numbers);
     }
 }
 
 
-int main()
+int
+main()
 {
   initlog(__FILE__);
-  check<1> ();
-  check<2> ();
-  check<3> ();
+  check<1>();
+  check<2>();
+  check<3>();
 
   deallog << "OK" << endl;
 }

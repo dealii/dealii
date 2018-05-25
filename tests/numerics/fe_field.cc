@@ -20,77 +20,83 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
+
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/fe_field_function.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
 void
-check ()
+check()
 {
   Triangulation<dim> triangulation;
 
-  GridGenerator::subdivided_hyper_cube (triangulation, 2);
+  GridGenerator::subdivided_hyper_cube(triangulation, 2);
   hp::FECollection<dim> fe_collection;
 
-  for (unsigned int i = 1; i <= triangulation.n_active_cells (); ++i)
-    fe_collection.push_back (FE_Q<dim> (i));
+  for (unsigned int i = 1; i <= triangulation.n_active_cells(); ++i)
+    fe_collection.push_back(FE_Q<dim>(i));
 
-  hp::DoFHandler<dim> dof_handler (triangulation);
+  hp::DoFHandler<dim> dof_handler(triangulation);
 
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
-  Vector<double> vector (dof_handler.n_dofs ());
+  Vector<double> vector(dof_handler.n_dofs());
 
-  for (unsigned int i = 0; i < dof_handler.n_dofs (); ++i)
-    vector (i) = i;
+  for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+    vector(i) = i;
 
-  Functions::FEFieldFunction<dim, hp::DoFHandler<dim> >
-  fe_field (dof_handler, vector);
-  QGauss<dim> quadrature (5);
+  Functions::FEFieldFunction<dim, hp::DoFHandler<dim>> fe_field(dof_handler,
+                                                                vector);
+  QGauss<dim>                                          quadrature(5);
 
-  deallog << "values:" <<std::endl;
+  deallog << "values:" << std::endl;
 
-  std::vector<double> values (quadrature.size ());
+  std::vector<double> values(quadrature.size());
 
-  fe_field.value_list (quadrature.get_points (), values);
+  fe_field.value_list(quadrature.get_points(), values);
 
-  for (unsigned int q_point = 0; q_point < quadrature.size (); ++q_point)
+  for (unsigned int q_point = 0; q_point < quadrature.size(); ++q_point)
     deallog << values[q_point] << std::endl;
 
-  deallog << "gradients:" <<std::endl;
+  deallog << "gradients:" << std::endl;
 
-  std::vector<Tensor<1, dim> > gradients (quadrature.size ());
+  std::vector<Tensor<1, dim>> gradients(quadrature.size());
 
-  fe_field.gradient_list (quadrature.get_points (), gradients);
+  fe_field.gradient_list(quadrature.get_points(), gradients);
 
-  for (unsigned int q_point = 0; q_point < quadrature.size (); ++q_point)
+  for (unsigned int q_point = 0; q_point < quadrature.size(); ++q_point)
     deallog << gradients[q_point] << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
-  deallog << std::setprecision (2);
+  deallog << std::setprecision(2);
   deallog << std::fixed;
 
-  deallog.push ("1d");
-  check<1> ();
-  deallog.pop ();
-  deallog.push ("2d");
-  check<2> ();
-  deallog.pop ();
-  deallog.push ("3d");
-  check<3> ();
-  deallog.pop ();
+  deallog.push("1d");
+  check<1>();
+  deallog.pop();
+  deallog.push("2d");
+  check<2>();
+  deallog.pop();
+  deallog.push("3d");
+  check<3>();
+  deallog.pop();
 }

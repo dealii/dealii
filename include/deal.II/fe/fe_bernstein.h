@@ -17,7 +17,9 @@
 #define dealii_fe_bernstein_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/fe/fe_q_base.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -61,14 +63,15 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2013, 2015
  */
 
-template <int dim, int spacedim=dim>
-class FE_Bernstein : public FE_Q_Base<TensorProductPolynomials<dim>,dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_Bernstein
+  : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
 {
 public:
   /**
    * Constructor for tensor product polynomials of degree @p p.
    */
-  FE_Bernstein (const unsigned int p);
+  FE_Bernstein(const unsigned int p);
 
   /**
    * FE_Bernstein is not interpolatory in the element interior, which prevents
@@ -78,8 +81,8 @@ public:
    * This function overrides the implementation from FE_Q_Base.
    */
   virtual void
-  get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                            FullMatrix<double>       &matrix) const override;
+  get_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                           FullMatrix<double> &matrix) const override;
 
   /**
    * FE_Bernstein is not interpolatory in the element interior, which prevents
@@ -89,8 +92,10 @@ public:
    * This function overrides the implementation from FE_Q_Base.
    */
   virtual const FullMatrix<double> &
-  get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const override;
+  get_restriction_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * FE_Bernstein is not interpolatory in the element interior, which prevents
@@ -100,8 +105,10 @@ public:
    * This function overrides the implementation from FE_Q_Base.
    */
   virtual const FullMatrix<double> &
-  get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const override;
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -113,8 +120,8 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
-  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const override;
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                FullMatrix<double> &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -126,15 +133,16 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
-  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                    const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const override;
+  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                   const unsigned int                  subface,
+                                   FullMatrix<double> &matrix) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented() const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -151,25 +159,25 @@ public:
    * the vertex dofs of the present element, whereas the second is the
    * corresponding index of the other finite element.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on lines.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on quads.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -180,9 +188,9 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
 
   /**
@@ -190,27 +198,28 @@ public:
    * returns <tt>FE_Bernstein<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
 protected:
-
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector
    * function and it creates the @p dofs_per_object vector that is needed
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * This function renumbers Bernstein basis functions from hierarchic to
    * lexicographic numbering.
    */
-  TensorProductPolynomials<dim> renumber_bases(const unsigned int degree);
+  TensorProductPolynomials<dim>
+  renumber_bases(const unsigned int degree);
 };
 
 

@@ -22,62 +22,69 @@
 // be copied at least once from the calling thread to the stack of the called
 // thread
 
-#include "../tests.h"
-
 #include <deal.II/base/thread_management.h>
+
+#include "../tests.h"
 
 struct X
 {
-  X() : i(0) {}
-  X(const X &x) : i(x.i+1) {}
-  X &operator= (const X &x)
+  X() : i(0)
+  {}
+  X(const X &x) : i(x.i + 1)
+  {}
+  X &
+  operator=(const X &x)
   {
-    i = x.i+1;
+    i = x.i + 1;
     return *this;
   }
   int i;
 };
 
 
-void execute_ref (const X &x)
+void
+execute_ref(const X &x)
 {
-  Assert (x.i == 0, ExcInternalError());
-  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << x.i << std::endl;
-  deallog << "OK" << std::endl;
-}
-
-void execute_value (X x)
-{
-  Assert (x.i > 0, ExcInternalError());
-  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << (x.i>0 ? "OK" : "not OK")
+  Assert(x.i == 0, ExcInternalError());
+  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << x.i
           << std::endl;
   deallog << "OK" << std::endl;
 }
 
+void
+execute_value(X x)
+{
+  Assert(x.i > 0, ExcInternalError());
+  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' '
+          << (x.i > 0 ? "OK" : "not OK") << std::endl;
+  deallog << "OK" << std::endl;
+}
 
-void test ()
+
+void
+test()
 {
   {
-    X x;
-    Threads::Thread<void> t = Threads::new_thread (&execute_ref,x);
-    t.join ();
+    X                     x;
+    Threads::Thread<void> t = Threads::new_thread(&execute_ref, x);
+    t.join();
   }
   {
-    X x;
-    Threads::Thread<void> t = Threads::new_thread (&execute_value,x);
-    t.join ();
+    X                     x;
+    Threads::Thread<void> t = Threads::new_thread(&execute_value, x);
+    t.join();
   }
 }
 
 
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog.detach();
   logfile.close();

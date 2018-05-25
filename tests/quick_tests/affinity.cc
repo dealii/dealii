@@ -19,34 +19,36 @@
  */
 
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/grid/tria.h>
+
 #if defined(__linux__)
-#include <sched.h>
-#include <sys/sysinfo.h>
+#  include <sched.h>
+#  include <sys/sysinfo.h>
 #endif
 
-bool getaffinity(unsigned int &bits_set,unsigned int &mask)
+bool
+getaffinity(unsigned int &bits_set, unsigned int &mask)
 {
   bits_set = 0;
-  mask = 0x00;
+  mask     = 0x00;
 
 #if defined(__linux__)
   cpu_set_t my_set;
   CPU_ZERO(&my_set);
 
   unsigned int len = sizeof(my_set);
-  int   ret = sched_getaffinity(0, len, &my_set);
+  int          ret = sched_getaffinity(0, len, &my_set);
 
-  if (ret!=0)
+  if (ret != 0)
     {
       printf("sched_getaffinity() failed, return value: %d\n", ret);
       return false;
     }
-  for (int i=0; i<CPU_SETSIZE; ++i)
-    bits_set += CPU_ISSET(i,&my_set);
+  for (int i = 0; i < CPU_SETSIZE; ++i)
+    bits_set += CPU_ISSET(i, &my_set);
 
   mask = *(int *)(&my_set);
 #else
@@ -56,10 +58,11 @@ bool getaffinity(unsigned int &bits_set,unsigned int &mask)
   return true;
 }
 
-int get_num_thread_env()
+int
+get_num_thread_env()
 {
-  const char *penv = getenv ("DEAL_II_NUM_THREADS");
-  if (penv!=nullptr)
+  const char *penv = getenv("DEAL_II_NUM_THREADS");
+  if (penv != nullptr)
     {
       int max_threads_env = -1;
       try
@@ -77,7 +80,8 @@ int get_num_thread_env()
 }
 
 
-int main ()
+int
+main()
 {
   // we need this, otherwise gcc will not link against deal.II
   dealii::Triangulation<2> test;
@@ -86,26 +90,38 @@ int main ()
   if (!getaffinity(bits_set, mask))
     return 1;
 
-  unsigned int nprocs = dealii::MultithreadInfo::n_cores();
+  unsigned int nprocs   = dealii::MultithreadInfo::n_cores();
   unsigned int tbbprocs = dealii::MultithreadInfo::n_threads();
-  int env = get_num_thread_env();
-  printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d, DEAL_II_NUM_THREADS=%d\n",
-         bits_set, mask, nprocs, tbbprocs, env );
+  int          env      = get_num_thread_env();
+  printf(
+    "aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d, DEAL_II_NUM_THREADS=%d\n",
+    bits_set,
+    mask,
+    nprocs,
+    tbbprocs,
+    env);
 
-  if (bits_set !=0  && bits_set!=nprocs)
+  if (bits_set != 0 && bits_set != nprocs)
     {
-      printf("Warning: sched_getaffinity() returns that we can only use %d out of %d CPUs.\n",bits_set, nprocs);
+      printf(
+        "Warning: sched_getaffinity() returns that we can only use %d out of %d CPUs.\n",
+        bits_set,
+        nprocs);
       return 2;
     }
   if (env != -1 && nprocs != tbbprocs)
     {
-      printf("Warning: number of threads is set to %d in environment using DEAL_II_NUM_THREADS.\n", env);
+      printf(
+        "Warning: number of threads is set to %d in environment using DEAL_II_NUM_THREADS.\n",
+        env);
       return 0; // do not return an error!
     }
   if (nprocs != tbbprocs)
     {
-      printf("Warning: for some reason TBB only wants to use %d out of %d CPUs.\n",
-             tbbprocs, nprocs);
+      printf(
+        "Warning: for some reason TBB only wants to use %d out of %d CPUs.\n",
+        tbbprocs,
+        nprocs);
       return 3;
     }
 

@@ -18,52 +18,63 @@
 // test TrilinosWrappers::SparseMatrix::reinit with a dealii::SparseMatrix
 // with a separate sparsity pattern that is partly subset and partly superset
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
-#include <deal.II/lac/sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-int main (int argc,char **argv)
+
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   initlog();
 
-  SparsityPattern sparsity (4,5,5);
-  sparsity.add (1,2);
-  sparsity.add (2,3);
-  sparsity.add (3,4);
-  sparsity.add (0,4);
+  SparsityPattern sparsity(4, 5, 5);
+  sparsity.add(1, 2);
+  sparsity.add(2, 3);
+  sparsity.add(3, 4);
+  sparsity.add(0, 4);
   sparsity.compress();
   SparseMatrix<double> matrix(sparsity);
   {
     double value = 1;
-    for (SparseMatrix<double>::iterator p=matrix.begin();
-         p != matrix.end(); ++p, ++value)
+    for (SparseMatrix<double>::iterator p = matrix.begin(); p != matrix.end();
+         ++p, ++value)
       p->value() = value;
   }
   deallog << "Original:" << std::endl;
-  matrix.print_formatted (deallog.get_file_stream());
+  matrix.print_formatted(deallog.get_file_stream());
 
   // create a separate sparsity pattern to use
-  SparsityPattern xsparsity (4,5,5);
-  xsparsity.add (1,2);
-  xsparsity.add (2,3);
-  xsparsity.add (2,4);
-  xsparsity.add (2,1);
+  SparsityPattern xsparsity(4, 5, 5);
+  xsparsity.add(1, 2);
+  xsparsity.add(2, 3);
+  xsparsity.add(2, 4);
+  xsparsity.add(2, 1);
   xsparsity.compress();
 
 
   // now copy everything into a Trilinos matrix
-  Epetra_Map rowmap(TrilinosWrappers::types::int_type(4),4,0,Utilities::Trilinos::comm_world());
-  Epetra_Map colmap(TrilinosWrappers::types::int_type(5),5,0,Utilities::Trilinos::comm_world());
+  Epetra_Map rowmap(TrilinosWrappers::types::int_type(4),
+                    4,
+                    0,
+                    Utilities::Trilinos::comm_world());
+  Epetra_Map colmap(TrilinosWrappers::types::int_type(5),
+                    5,
+                    0,
+                    Utilities::Trilinos::comm_world());
 
   TrilinosWrappers::SparseMatrix tmatrix;
-  tmatrix.reinit (rowmap, colmap, matrix, 0, true, &xsparsity);
+  tmatrix.reinit(rowmap, colmap, matrix, 0, true, &xsparsity);
 
   deallog << "Copy structure only:" << std::endl;
-  tmatrix.print (deallog.get_file_stream());
+  tmatrix.print(deallog.get_file_stream());
 }

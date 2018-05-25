@@ -16,28 +16,28 @@
 // Test the LinearOperator template on a trivial vector implementation
 // :: RightVector -> LeftVector
 
-#include "../tests.h"
-
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 using namespace dealii;
 
 
-int main()
+int
+main()
 {
   initlog();
 
   const std::function<void(Vector<double> &, bool)> reinit_vector =
-    [](Vector<double> &v, bool omit_zeroing_entries)
-  {
-    v.reinit(3, omit_zeroing_entries);
-  };
+    [](Vector<double> &v, bool omit_zeroing_entries) {
+      v.reinit(3, omit_zeroing_entries);
+    };
 
   const auto filter = mean_value_filter(reinit_vector);
 
-  Vector<double> vec (3);
+  Vector<double> vec(3);
   vec[0] = 1.;
   vec[1] = 2.;
   vec[2] = 3.;

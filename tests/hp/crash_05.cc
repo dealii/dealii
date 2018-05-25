@@ -18,72 +18,79 @@
 // a crash when using different fe's on different cells
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/hp/dof_handler.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
-  tria.refine_global (1);
+  tria.refine_global(1);
 
   // use the same element, but with
   // different indices
   hp::FECollection<dim> fe_collection;
-  for (unsigned int i=0; i<tria.n_active_cells(); ++i)
-    fe_collection.push_back(FE_Q<dim> (1));
+  for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
+    fe_collection.push_back(FE_Q<dim>(1));
 
   hp::DoFHandler<dim> dof_handler(tria);
 
   unsigned int fe_index = 0;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-       cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell, ++fe_index)
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+         dof_handler.begin_active();
+       cell != dof_handler.end();
+       ++cell, ++fe_index)
     {
       deallog << "Setting fe_index=" << fe_index << " on cell " << cell
               << std::endl;
-      cell->set_active_fe_index (fe_index);
+      cell->set_active_fe_index(fe_index);
     }
 
   dof_handler.distribute_dofs(fe_collection);
 
   std::vector<types::global_dof_index> local_dof_indices;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-       cell=dof_handler.begin_active();
-       cell!=dof_handler.end(); ++cell)
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+         dof_handler.begin_active();
+       cell != dof_handler.end();
+       ++cell)
     {
-      local_dof_indices.resize (cell->get_fe().dofs_per_cell);
-      cell->get_dof_indices (local_dof_indices);
+      local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+      cell->get_dof_indices(local_dof_indices);
 
       deallog << cell << std::endl;
-      for (unsigned int i=0; i<local_dof_indices.size(); ++i)
+      for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
         deallog << local_dof_indices[i] << ' ';
       deallog << std::endl;
     }
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

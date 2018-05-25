@@ -17,40 +17,42 @@
 // make sure we can start several tasks at once and that they actually do
 // something at the same time
 
-#include "../tests.h"
-#include <unistd.h>
-
 #include <deal.II/base/thread_management.h>
 
+#include <unistd.h>
 
-void test (int i)
+#include "../tests.h"
+
+
+void
+test(int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
-  sleep (1);
+  sleep(1);
   deallog << "Task " << i << " finished!" << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   {
-    Threads::Task<> t1 = Threads::new_task (test, 1);
+    Threads::Task<> t1 = Threads::new_task(test, 1);
     {
-      Threads::Task<> t2 = Threads::new_task (test, 2);
+      Threads::Task<> t2 = Threads::new_task(test, 2);
 
-      t1.join ();
-      t2.join ();
+      t1.join();
+      t2.join();
     }
 
     deallog << "OK" << std::endl;
   }
 
-  deallog.detach ();
-  logfile.close ();
-  sort_file_contents ("output");
+  deallog.detach();
+  logfile.close();
+  sort_file_contents("output");
 }

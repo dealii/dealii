@@ -18,15 +18,17 @@
 // AdditionalData structures of the solvers const. This test simply
 // instantiates that class, to make sure it still compiles
 
-#include "../tests.h"
 #include <deal.II/lac/solver_selector.h>
+
+#include "../tests.h"
 
 DEAL_II_NAMESPACE_OPEN
 // instantiation here
 template class SolverSelector<>;
 DEAL_II_NAMESPACE_CLOSE
 
-int main ()
+int
+main()
 {
   initlog();
 

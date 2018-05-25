@@ -12,18 +12,19 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
-#include "../tests.h"
-
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+
+#include "../tests.h"
 
 
 // Check that the block vector class support update_ghost_values. This method
 // doesn't do anything but is needed for genericity.
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   using namespace dealii;
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
   TrilinosWrappers::MPI::BlockVector bv;

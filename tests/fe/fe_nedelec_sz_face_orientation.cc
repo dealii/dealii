@@ -15,30 +15,40 @@
 
 // Test FE_NedelecSZ<3> for meshes with faces with non-standard orientation.
 
-#include "../tests.h"
-#include<deal.II/base/quadrature_lib.h>
-#include<deal.II/dofs/dof_handler.h>
-#include<deal.II/fe/fe_nedelec_sz.h>
-#include<deal.II/fe/fe_nedelec.h>
-#include<deal.II/fe/fe_values.h>
-#include<deal.II/grid/grid_generator.h>
-#include<deal.II/grid/tria.h>
-#include<deal.II/lac/constraint_matrix.h>
-#include<deal.II/lac/vector.h>
-#include<deal.II/numerics/fe_field_function.h>
-#include<deal.II/numerics/vector_tools.h>
+#include <deal.II/base/quadrature_lib.h>
 
-void create_reference_triangulation (Triangulation<3> &tria)
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_nedelec_sz.h>
+#include <deal.II/fe/fe_values.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
+
+void create_reference_triangulation(Triangulation<3> &tria)
 {
-  std::vector<unsigned int> repetitions (3, 1);
+  std::vector<unsigned int> repetitions(3, 1);
 
   repetitions[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle (tria, repetitions, Point<3> (-1.0, 0.0, 0.0), Point<3> (1.0, 1.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(
+    tria, repetitions, Point<3>(-1.0, 0.0, 0.0), Point<3>(1.0, 1.0, 1.0));
 }
 
-void create_triangulation (Triangulation<3> &tria, const bool face_orientation, const bool face_flip, const bool face_rotation)
+void create_triangulation(Triangulation<3> &tria,
+                          const bool        face_orientation,
+                          const bool        face_flip,
+                          const bool        face_rotation)
 {
-  std::vector<CellData<3> > cells (2);
+  std::vector<CellData<3>> cells(2);
 
   cells[0].vertices[0] = 0;
   cells[0].vertices[1] = 1;
@@ -157,59 +167,69 @@ void create_triangulation (Triangulation<3> &tria, const bool face_orientation, 
 
   cells[1].material_id = 0;
 
-  std::vector<Point<3> > vertices (12);
+  std::vector<Point<3>> vertices(12);
 
-  vertices[0] = Point<3> (-1.0, 0.0, 0.0);
-  vertices[1] = Point<3> ();
-  vertices[2] = Point<3> (1.0, 0.0, 0.0);
-  vertices[3] = Point<3> (-1.0, 0.0, 1.0);
-  vertices[4] = Point<3> (0.0, 0.0, 1.0);
-  vertices[5] = Point<3> (1.0, 0.0, 1.0);
-  vertices[6] = Point<3> (-1.0, 1.0, 0.0);
-  vertices[7] = Point<3> (0.0, 1.0, 0.0);
-  vertices[8] = Point<3> (1.0, 1.0, 0.0);
-  vertices[9] = Point<3> (-1.0, 1.0, 1.0);
-  vertices[10] = Point<3> (0.0, 1.0, 1.0);
-  vertices[11] = Point<3> (1.0, 1.0, 1.0);
-  tria.create_triangulation (vertices, cells, SubCellData ());
+  vertices[0]  = Point<3>(-1.0, 0.0, 0.0);
+  vertices[1]  = Point<3>();
+  vertices[2]  = Point<3>(1.0, 0.0, 0.0);
+  vertices[3]  = Point<3>(-1.0, 0.0, 1.0);
+  vertices[4]  = Point<3>(0.0, 0.0, 1.0);
+  vertices[5]  = Point<3>(1.0, 0.0, 1.0);
+  vertices[6]  = Point<3>(-1.0, 1.0, 0.0);
+  vertices[7]  = Point<3>(0.0, 1.0, 0.0);
+  vertices[8]  = Point<3>(1.0, 1.0, 0.0);
+  vertices[9]  = Point<3>(-1.0, 1.0, 1.0);
+  vertices[10] = Point<3>(0.0, 1.0, 1.0);
+  vertices[11] = Point<3>(1.0, 1.0, 1.0);
+  tria.create_triangulation(vertices, cells, SubCellData());
 }
 
-void evaluate (const FiniteElement<3> &fe, const DoFHandler<3> &dof_handler)
+void
+evaluate(const FiniteElement<3> &fe, const DoFHandler<3> &dof_handler)
 {
-  const FEValuesExtractors::Vector component (0);
-  const Quadrature<3> quadrature(Point<3>(0.5, 0.5, 0.5));
-  FEValues<3> fe_values (fe, quadrature, update_quadrature_points | update_values | update_gradients);
+  const FEValuesExtractors::Vector component(0);
+  const Quadrature<3>              quadrature(Point<3>(0.5, 0.5, 0.5));
+  FEValues<3>                      fe_values(fe,
+                        quadrature,
+                        update_quadrature_points | update_values |
+                          update_gradients);
 
-  for (DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active (); cell != dof_handler.end (); ++cell)
+  for (DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
+       cell != dof_handler.end();
+       ++cell)
     {
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         {
-          deallog << "DoF#" << i << ", value=[" << fe_values[component].value(i, 0) << "], curl=[" << fe_values[component].curl(i, 0) << "]" << std::endl;
+          deallog << "DoF#" << i << ", value=["
+                  << fe_values[component].value(i, 0) << "], curl=["
+                  << fe_values[component].curl(i, 0) << "]" << std::endl;
         }
     }
 }
 
-void run (const bool face_orientation, const bool face_flip, const bool face_rotation)
+void
+run(const bool face_orientation, const bool face_flip, const bool face_rotation)
 {
-//  Triangulation<3> tria_ref;
-//  create_reference_triangulation (tria_ref);
+  //  Triangulation<3> tria_ref;
+  //  create_reference_triangulation (tria_ref);
 
-  FE_NedelecSZ<3> fe (1);
-//  DoFHandler<3> dof_handler_ref (tria_ref);
-//  dof_handler_ref.distribute_dofs (fe);
+  FE_NedelecSZ<3> fe(1);
+  //  DoFHandler<3> dof_handler_ref (tria_ref);
+  //  dof_handler_ref.distribute_dofs (fe);
 
   Triangulation<3> tria;
-  create_triangulation (tria, face_orientation, face_flip, face_rotation);
+  create_triangulation(tria, face_orientation, face_flip, face_rotation);
 
-  DoFHandler<3> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  DoFHandler<3> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
-  evaluate (fe, dof_handler);
+  evaluate(fe, dof_handler);
 }
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -217,7 +237,8 @@ int main()
     for (int face_flip = 0; face_flip <= 1; ++face_flip)
       for (int face_rotation = 0; face_rotation <= 1; ++face_rotation)
         {
-          deallog << face_orientation << face_flip << face_rotation << std::endl;
-          run (face_orientation, face_flip, face_rotation);
+          deallog << face_orientation << face_flip << face_rotation
+                  << std::endl;
+          run(face_orientation, face_flip, face_rotation);
         }
 }

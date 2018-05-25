@@ -17,16 +17,19 @@
 #define dealii_solver_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/lac/vector_memory.h>
+
 #include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/vector_memory.h>
 
 // Ignore deprecation warnings for auto_ptr.
 #include <boost/signals2.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class Vector;
+template <typename number>
+class Vector;
 
 /**
  * A base class for iterative linear solvers. This class provides interfaces
@@ -36,14 +39,15 @@ template <typename number> class Vector;
  *
  * <h3>Requirements common to derived solver classes</h3>
  *
- * In general, iterative solvers do not rely on any special structure of matrices or
- * the format of storage. Rather, they only require that matrices and vectors define
- * certain operations such as matrix-vector products, or scalar products
- * between vectors. Consequently, this class as well as the derived classes and their member
- * functions implementing concrete linear solvers are templated on the types
- * of matrices and vectors. However, there are some common requirements a
- * matrix or vector type must fulfill to qualify as an acceptable type for the
- * solvers in this hierarchy. These requirements are listed below.
+ * In general, iterative solvers do not rely on any special structure of
+ * matrices or the format of storage. Rather, they only require that matrices
+ * and vectors define certain operations such as matrix-vector products, or
+ * scalar products between vectors. Consequently, this class as well as the
+ * derived classes and their member functions implementing concrete linear
+ * solvers are templated on the types of matrices and vectors. However, there
+ * are some common requirements a matrix or vector type must fulfill to qualify
+ * as an acceptable type for the solvers in this hierarchy. These requirements
+ * are listed below.
  *
  * The classes we show below are not any concrete class. Rather, they are
  * intended to form a "signature" which a concrete class has to conform to.
@@ -246,7 +250,8 @@ template <typename number> class Vector;
  *  SolverControl::State
  *  Step3::write_intermediate_solution (const unsigned int    iteration,
  *                                      const double          , //check_value
- *                                      const Vector<double> &current_iterate) const
+ *                                      const Vector<double> &current_iterate)
+ * const
  *    {
  *      DataOut<2> data_out;
  *      data_out.attach_dof_handler (dof_handler);
@@ -254,8 +259,8 @@ template <typename number> class Vector;
  *      data_out.build_patches ();
  *
  *      std::ofstream output ((std::string("solution-")
- *                             + Utilities::int_to_string(iteration,4) + ".vtu").c_str());
- *      data_out.write_vtu (output);
+ *                             + Utilities::int_to_string(iteration,4) +
+ * ".vtu").c_str()); data_out.write_vtu (output);
  *
  *      return SolverControl::success;
  *    }
@@ -318,7 +323,7 @@ template <typename number> class Vector;
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005,
  * 2014
  */
-template <class VectorType = Vector<double> >
+template <class VectorType = Vector<double>>
 class Solver : public Subscriptor
 {
 public:
@@ -336,8 +341,8 @@ public:
    * responsibility to guarantee that the lifetime of the two arguments is at
    * least as long as that of the solver object.
    */
-  Solver (SolverControl            &solver_control,
-          VectorMemory<VectorType> &vector_memory);
+  Solver(SolverControl &           solver_control,
+         VectorMemory<VectorType> &vector_memory);
 
   /**
    * Constructor. Takes a control object which evaluates the conditions for
@@ -349,7 +354,7 @@ public:
    * responsibility to guarantee that the lifetime of the argument is at least
    * as long as that of the solver object.
    */
-  Solver (SolverControl &solver_control);
+  Solver(SolverControl &solver_control);
 
   /**
    * Connect a function object that will be called periodically within
@@ -380,9 +385,11 @@ public:
    * library for more information on connection management.
    */
   boost::signals2::connection
-  connect (const std::function<SolverControl::State (const unsigned int iteration,
-                                                     const double       check_value,
-                                                     const VectorType   &current_iterate)> &slot);
+  connect(
+    const std::function<SolverControl::State(const unsigned int iteration,
+                                             const double       check_value,
+                                             const VectorType &current_iterate)>
+      &slot);
 
 
 
@@ -412,12 +419,13 @@ private:
   {
     typedef SolverControl::State result_type;
 
-    SolverControl::State operator() (const SolverControl::State state1,
-                                     const SolverControl::State state2) const;
+    SolverControl::State
+    operator()(const SolverControl::State state1,
+               const SolverControl::State state2) const;
 
     template <typename Iterator>
-    SolverControl::State operator() (const Iterator begin,
-                                     const Iterator end) const;
+    SolverControl::State
+    operator()(const Iterator begin, const Iterator end) const;
   };
 
 protected:
@@ -441,10 +449,12 @@ protected:
    * signal is called, but not the vector that will be returned if the
    * signal's return value indicates that the iteration should be terminated.
    */
-  boost::signals2::signal<SolverControl::State (const unsigned int iteration,
-                                                const double       check_value,
-                                                const VectorType   &current_iterate),
-                                                      StateCombiner> iteration_status;
+  boost::signals2::signal<SolverControl::State(
+                            const unsigned int iteration,
+                            const double       check_value,
+                            const VectorType & current_iterate),
+                          StateCombiner>
+    iteration_status;
 };
 
 
@@ -452,17 +462,14 @@ protected:
 
 
 template <class VectorType>
-inline
-SolverControl::State
-Solver<VectorType>::StateCombiner::operator ()(const SolverControl::State state1,
-                                               const SolverControl::State state2) const
+inline SolverControl::State
+Solver<VectorType>::StateCombiner::
+operator()(const SolverControl::State state1,
+           const SolverControl::State state2) const
 {
-  if ((state1 == SolverControl::failure)
-      ||
-      (state2 == SolverControl::failure))
+  if ((state1 == SolverControl::failure) || (state2 == SolverControl::failure))
     return SolverControl::failure;
-  else if ((state1 == SolverControl::iterate)
-           ||
+  else if ((state1 == SolverControl::iterate) ||
            (state2 == SolverControl::iterate))
     return SolverControl::iterate;
   else
@@ -472,16 +479,16 @@ Solver<VectorType>::StateCombiner::operator ()(const SolverControl::State state1
 
 template <class VectorType>
 template <typename Iterator>
-inline
-SolverControl::State
-Solver<VectorType>::StateCombiner::operator ()(const Iterator begin,
-                                               const Iterator end) const
+inline SolverControl::State
+Solver<VectorType>::StateCombiner::operator()(const Iterator begin,
+                                              const Iterator end) const
 {
-  Assert (begin != end, ExcMessage ("You can't combine iterator states if no state is given."));
+  Assert(begin != end,
+         ExcMessage("You can't combine iterator states if no state is given."));
 
   // combine the first with all of the following states
   SolverControl::State state = *begin;
-  Iterator p = begin;
+  Iterator             p     = begin;
   ++p;
   for (; p != end; ++p)
     state = this->operator()(state, *p);
@@ -491,28 +498,24 @@ Solver<VectorType>::StateCombiner::operator ()(const Iterator begin,
 
 
 template <class VectorType>
-inline
-Solver<VectorType>::Solver (SolverControl        &solver_control,
-                            VectorMemory<VectorType> &vector_memory)
-  :
+inline Solver<VectorType>::Solver(SolverControl &           solver_control,
+                                  VectorMemory<VectorType> &vector_memory) :
   memory(vector_memory)
 {
   // connect the solver control object to the signal. SolverControl::check
   // only takes two arguments, the iteration and the check_value, and so
   // we simply ignore the third argument that is passed in whenever the
   // signal is executed
-  connect (std::bind(&SolverControl::check,
-                     std::ref(solver_control),
-                     std::placeholders::_1,
-                     std::placeholders::_2));
+  connect(std::bind(&SolverControl::check,
+                    std::ref(solver_control),
+                    std::placeholders::_1,
+                    std::placeholders::_2));
 }
 
 
 
 template <class VectorType>
-inline
-Solver<VectorType>::Solver (SolverControl &solver_control)
-  :
+inline Solver<VectorType>::Solver(SolverControl &solver_control) :
   // use the static memory object this class owns
   memory(static_vector_memory)
 {
@@ -520,23 +523,23 @@ Solver<VectorType>::Solver (SolverControl &solver_control)
   // only takes two arguments, the iteration and the check_value, and so
   // we simply ignore the third argument that is passed in whenever the
   // signal is executed
-  connect (std::bind(&SolverControl::check,
-                     std::ref(solver_control),
-                     std::placeholders::_1,
-                     std::placeholders::_2));
+  connect(std::bind(&SolverControl::check,
+                    std::ref(solver_control),
+                    std::placeholders::_1,
+                    std::placeholders::_2));
 }
 
 
 
 template <class VectorType>
-inline
-boost::signals2::connection
-Solver<VectorType>::
-connect (const std::function<SolverControl::State (const unsigned int iteration,
-                                                   const double       check_value,
-                                                   const VectorType   &current_iterate)> &slot)
+inline boost::signals2::connection
+Solver<VectorType>::connect(
+  const std::function<SolverControl::State(const unsigned int iteration,
+                                           const double       check_value,
+                                           const VectorType & current_iterate)>
+    &slot)
 {
-  return iteration_status.connect (slot);
+  return iteration_status.connect(slot);
 }
 
 

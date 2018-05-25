@@ -16,34 +16,38 @@
 
 // check serialization for Monomial
 
-#include "serialization.h"
 #include <deal.II/base/polynomial.h>
+
 #include <boost/serialization/vector.hpp>
 
+#include "serialization.h"
 
-void test ()
+
+void
+test()
 {
-  unsigned int n1 = 3;
-  double coefficient1 = 5.;
+  unsigned int n1           = 3;
+  double       coefficient1 = 5.;
 
   Polynomials::Monomial<double> m1(n1, coefficient1);
 
-  unsigned int n2 = 3;
-  double coefficient2 = 2.;
+  unsigned int n2           = 3;
+  double       coefficient2 = 2.;
 
   Polynomials::Monomial<double> m2(n2, coefficient2);
 
-  verify (m1, m2);
+  verify(m1, m2);
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

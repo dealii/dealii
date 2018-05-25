@@ -13,16 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-//include header twice to see if the include guards are set correctly
+// include header twice to see if the include guards are set correctly
 #include HEADER
 #include HEADER
 
 #if !defined(DEAL_II_NAMESPACE_OPEN) && !defined(dealii_revision_h)
-#error "HEADER does not include config.h."
+#  error "HEADER does not include config.h."
 #endif
 
 
-int main()
+int
+main()
 {
   return 0;
 }

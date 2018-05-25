@@ -24,5 +24,5 @@ main()
 {
   initlog();
 
-  CHECK_SYS2(FE_Q<2>(1),3,FE_DGQ<2>(2),2,2);
+  CHECK_SYS2(FE_Q<2>(1), 3, FE_DGQ<2>(2), 2, 2);
 }

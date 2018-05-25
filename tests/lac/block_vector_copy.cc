@@ -15,52 +15,54 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/lac/block_vector.h>
+
 #include <iostream>
-#include <vector>
 #include <list>
+#include <vector>
 
-void test ()
+#include "../tests.h"
+
+void
+test()
 {
-  std::vector<double>   v(9);
+  std::vector<double> v(9);
   for (unsigned int i = 0; i < v.size(); ++i)
-    v[i] = double(i+1);
+    v[i] = double(i + 1);
 
-  std::vector<types::global_dof_index>  partition(3);
+  std::vector<types::global_dof_index> partition(3);
   for (unsigned int i = 0; i < partition.size(); ++i)
     partition[i] = 3;
 
   dealii::BlockVector<double> b(partition);
-  AssertThrow (b.n_blocks() == partition.size(),
-               ExcInternalError());
+  AssertThrow(b.n_blocks() == partition.size(), ExcInternalError());
 
-  unsigned int      size = 0;
+  unsigned int size = 0;
   for (unsigned int i = 0; i < b.n_blocks(); ++i)
     {
-      AssertThrow (b.block(i).size() == partition[i], ExcInternalError());
+      AssertThrow(b.block(i).size() == partition[i], ExcInternalError());
       size += b.block(i).size();
     }
-  AssertThrow (b.size() == size, ExcInternalError());
+  AssertThrow(b.size() == size, ExcInternalError());
 
   for (unsigned int i = 0; i < b.size(); ++i)
     {
       b(i) = v[i];
-      AssertThrow (b(i) == v[i], ExcInternalError());
+      AssertThrow(b(i) == v[i], ExcInternalError());
     }
 
   dealii::BlockVector<double> c;
   c = b;
-  AssertThrow (c == b, ExcInternalError());
-  AssertThrow (c.n_blocks() == b.n_blocks(), ExcInternalError());
+  AssertThrow(c == b, ExcInternalError());
+  AssertThrow(c.n_blocks() == b.n_blocks(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
@@ -78,11 +80,12 @@ int main ()
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &e)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
@@ -94,7 +97,8 @@ int main ()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -107,4 +111,3 @@ int main ()
 
   std::cerr.rdbuf(old_cerr_buf);
 }
-

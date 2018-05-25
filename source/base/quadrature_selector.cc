@@ -13,17 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/quadrature_selector.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/quadrature_selector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
 Quadrature<dim>
-QuadratureSelector<dim>::
-create_quadrature (const std::string &s,
-                   const unsigned int order)
+QuadratureSelector<dim>::create_quadrature(const std::string &s,
+                                           const unsigned int order)
 {
   if (s == "gauss")
     {
@@ -34,15 +33,20 @@ create_quadrature (const std::string &s,
     {
       AssertThrow(order == 0, ExcInvalidOrder(s, order));
 
-      if (s == "midpoint")        return QMidpoint<dim>();
-      else if (s == "milne")      return QMilne<dim>();
-      else if (s == "simpson")    return QSimpson<dim>();
-      else if (s == "trapez")     return QTrapez<dim>();
-      else if (s == "weddle")     return QWeddle<dim>();
+      if (s == "midpoint")
+        return QMidpoint<dim>();
+      else if (s == "milne")
+        return QMilne<dim>();
+      else if (s == "simpson")
+        return QSimpson<dim>();
+      else if (s == "trapez")
+        return QTrapez<dim>();
+      else if (s == "weddle")
+        return QWeddle<dim>();
     }
 
   // we didn't find this name
-  AssertThrow (false, ExcInvalidQuadrature(s));
+  AssertThrow(false, ExcInvalidQuadrature(s));
   // return something to suppress
   // stupid warnings by some
   // compilers
@@ -52,13 +56,11 @@ create_quadrature (const std::string &s,
 
 
 template <int dim>
-QuadratureSelector<dim>::QuadratureSelector (const std::string &s,
-                                             const unsigned int order)
-  :
-  Quadrature<dim> (create_quadrature(s, order).get_points(),
-                   create_quadrature(s, order).get_weights())
-{
-}
+QuadratureSelector<dim>::QuadratureSelector(const std::string &s,
+                                            const unsigned int order) :
+  Quadrature<dim>(create_quadrature(s, order).get_points(),
+                  create_quadrature(s, order).get_weights())
+{}
 
 
 

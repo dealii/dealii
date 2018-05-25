@@ -18,13 +18,13 @@
 
 #include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_NANOFLANN
+#ifdef DEAL_II_WITH_NANOFLANN
 
-#include <deal.II/base/point.h>
+#  include <deal.II/base/point.h>
 
-#include <memory>
+#  include <nanoflann.hpp>
 
-#include <nanoflann.hpp>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -46,16 +46,16 @@ DEAL_II_NAMESPACE_OPEN
  * > A k-d tree is a binary tree in which every node is a $k$-dimensional point.
  * > Every non-leaf node can be thought of as implicitly generating a splitting
  * > hyperplane that divides the space into two parts, known as half-spaces.
- * > Points to the left of this hyperplane are represented by the left subtree of
- * > that node and points right of the hyperplane are represented by the right
- * > subtree. The hyperplane direction is chosen in the following way: every node
- * > in the tree is associated with one of the $k$-dimensions, with the hyperplane
- * > perpendicular to that dimension's axis. So, for example, if for a particular
- * > split the "x" axis is chosen, all points in the subtree with a smaller "x"
- * > value than the node will appear in the left subtree and all points with
- * > larger "x" value will be in the right subtree. In such a case, the
- * > hyperplane would be set by the $x$-value of the point, and its normal would be
- * > the unit $x$-axis.
+ * > Points to the left of this hyperplane are represented by the left subtree
+ * of > that node and points right of the hyperplane are represented by the
+ * right > subtree. The hyperplane direction is chosen in the following way:
+ * every node > in the tree is associated with one of the $k$-dimensions, with
+ * the hyperplane > perpendicular to that dimension's axis. So, for example, if
+ * for a particular > split the "x" axis is chosen, all points in the subtree
+ * with a smaller "x" > value than the node will appear in the left subtree and
+ * all points with > larger "x" value will be in the right subtree. In such a
+ * case, the > hyperplane would be set by the $x$-value of the point, and its
+ * normal would be > the unit $x$-axis.
  *
  * @author Luca Heltai, 2017.
  */
@@ -89,8 +89,8 @@ public:
    * your points, and do not call set_points() again, then all following results
    * will likely be wrong.
    */
-  KDTree(const unsigned int             &max_leaf_size = 10,
-         const std::vector<Point<dim> > &pts           = std::vector<Point<dim> >());
+  KDTree(const unsigned int &           max_leaf_size = 10,
+         const std::vector<Point<dim>> &pts = std::vector<Point<dim>>());
 
 
   /**
@@ -110,35 +110,37 @@ public:
      * Reference to the vector of points from which we want to compute
      * the distance.
      */
-    const std::vector<Point<dim> > &points;
+    const std::vector<Point<dim>> &points;
 
 
     /**
      * The constructor needs the vector of points from which we want to build
      * the tree.
      */
-    PointCloudAdaptor (const std::vector<Point<dim> > &_points);
+    PointCloudAdaptor(const std::vector<Point<dim>> &_points);
 
 
     /**
      * Return number of points in the data set (required by nanoflann).
      */
-    size_t kdtree_get_point_count() const;
+    size_t
+    kdtree_get_point_count() const;
 
 
     /**
      * Return the L2 distance between points
      */
-    coord_t kdtree_distance (const coord_t *p1,
-                             const size_t idx_p2,
-                             const size_t size) const;
+    coord_t
+    kdtree_distance(const coord_t *p1,
+                    const size_t   idx_p2,
+                    const size_t   size) const;
 
 
     /**
      * Return the d-th component of the idx-th point in the class.
      */
-    coord_t kdtree_get_pt (const size_t idx,
-                           const int d) const;
+    coord_t
+    kdtree_get_pt(const size_t idx, const int d) const;
 
 
     /**
@@ -149,17 +151,20 @@ public:
      * expected dimensionality (e.g. 2 or 3 for point clouds).
      */
     template <class BBOX>
-    bool kdtree_get_bbox (BBOX &) const;
+    bool
+    kdtree_get_bbox(BBOX &) const;
   };
 
 
   /**
    * A typedef for the actual KDTree object.
    */
-  typedef
-  typename nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloudAdaptor>,
-           PointCloudAdaptor, dim, unsigned int>
-           NanoFlannKDTree;
+  typedef typename nanoflann::KDTreeSingleIndexAdaptor<
+    nanoflann::L2_Simple_Adaptor<double, PointCloudAdaptor>,
+    PointCloudAdaptor,
+    dim,
+    unsigned int>
+    NanoFlannKDTree;
 
 
   /**
@@ -180,19 +185,21 @@ public:
    *
    * @param[in] pts A collection of points
    */
-  void set_points (const std::vector<Point<dim> > &pts);
+  void
+  set_points(const std::vector<Point<dim>> &pts);
 
 
   /**
    * A const accessor to the @p i'th one among the underlying points.
    */
-  const Point<dim> &operator[] (const unsigned int i) const;
+  const Point<dim> &operator[](const unsigned int i) const;
 
 
   /**
    * The number of points currently stored by this class.
    */
-  unsigned int size() const;
+  unsigned int
+  size() const;
 
 
   /**
@@ -206,10 +213,10 @@ public:
    *
    * @return A vector of indices and distances to @p target of the matching points
    */
-  std::vector<std::pair<unsigned int, double> >
-  get_points_within_ball (const Point<dim> &target,
-                          const double     &radius,
-                          const bool        sorted=false) const;
+  std::vector<std::pair<unsigned int, double>>
+  get_points_within_ball(const Point<dim> &target,
+                         const double &    radius,
+                         const bool        sorted = false) const;
 
   /**
    * Fill and return a vector with the indices and distances of the closest @p n_points
@@ -220,9 +227,9 @@ public:
    *
    * @return A vector of pairs of indices and distances of the matching points
    */
-  std::vector<std::pair<unsigned int, double> >
-  get_closest_points (const Point<dim>  &target,
-                      const unsigned int n_points) const;
+  std::vector<std::pair<unsigned int, double>>
+  get_closest_points(const Point<dim> & target,
+                     const unsigned int n_points) const;
 
 private:
   /**
@@ -245,11 +252,11 @@ private:
 
 
 //------------ inline functions -------------
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 
 template <int dim>
-inline
-unsigned int KDTree<dim>::size() const
+inline unsigned int
+KDTree<dim>::size() const
 {
   if (adaptor)
     return adaptor->points.size();
@@ -260,8 +267,7 @@ unsigned int KDTree<dim>::size() const
 
 
 template <int dim>
-inline const Point<dim> &
-KDTree<dim>::operator[] (const unsigned int i) const
+inline const Point<dim> &KDTree<dim>::operator[](const unsigned int i) const
 {
   AssertIndexRange(i, size());
   return adaptor->points[i];
@@ -270,8 +276,8 @@ KDTree<dim>::operator[] (const unsigned int i) const
 
 
 template <int dim>
-KDTree<dim>::PointCloudAdaptor::PointCloudAdaptor(const std::vector<Point<dim> > &_points)
-  :
+KDTree<dim>::PointCloudAdaptor::PointCloudAdaptor(
+  const std::vector<Point<dim>> &_points) :
   points(_points)
 {}
 
@@ -290,7 +296,7 @@ template <int dim>
 inline double
 KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const size_t idx, int d) const
 {
-  AssertIndexRange(d,dim);
+  AssertIndexRange(d, dim);
   return points[idx][d];
 }
 
@@ -299,7 +305,7 @@ KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const size_t idx, int d) const
 template <int dim>
 template <class BBOX>
 inline bool
-KDTree<dim>::PointCloudAdaptor::kdtree_get_bbox (BBOX &) const
+KDTree<dim>::PointCloudAdaptor::kdtree_get_bbox(BBOX &) const
 {
   return false;
 }
@@ -308,19 +314,19 @@ KDTree<dim>::PointCloudAdaptor::kdtree_get_bbox (BBOX &) const
 
 template <int dim>
 inline double
-KDTree<dim>::PointCloudAdaptor::kdtree_distance (const double *p1,
-                                                 const size_t idx_p2,
-                                                 const size_t size) const
+KDTree<dim>::PointCloudAdaptor::kdtree_distance(const double *p1,
+                                                const size_t  idx_p2,
+                                                const size_t  size) const
 {
   AssertDimension(size, dim);
-  double res=0.0;
-  for (size_t d=0; d<size; ++d)
-    res += (p1[d]-points[idx_p2][d]) * (p1[d]-points[idx_p2][d]);
+  double res = 0.0;
+  for (size_t d = 0; d < size; ++d)
+    res += (p1[d] - points[idx_p2][d]) * (p1[d] - points[idx_p2][d]);
   return std::sqrt(res);
 }
-#endif
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_NANO_FLANN
+#endif // DEAL_II_WITH_NANO_FLANN
 #endif

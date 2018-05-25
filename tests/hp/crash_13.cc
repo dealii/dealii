@@ -26,13 +26,12 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   hp::FECollection<dim> fe;
-  fe.push_back (FESystem<dim>(FE_Q<dim>(1), 1,
-                              FE_DGQ<dim>(0), 1));
-  fe.push_back (FESystem<dim>(FE_Q<dim>(1), 1,
-                              FE_DGQ<dim>(1), 1));
+  fe.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_DGQ<dim>(0), 1));
+  fe.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_DGQ<dim>(1), 1));
 
-  test_no_hanging_nodes (fe);
+  test_no_hanging_nodes(fe);
 }

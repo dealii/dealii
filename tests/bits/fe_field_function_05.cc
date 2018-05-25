@@ -24,24 +24,27 @@
 // FEFieldFunction but the (same) exception is triggered in a
 // different place
 
-#include "../tests.h"
-
 #include <deal.II/base/utilities.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/grid/manifold_lib.h>
+
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/numerics/fe_field_function.h>
 #include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 
 template <int dim>
 class F : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p,
-                        const unsigned int) const
+  virtual double
+  value(const Point<dim> &p, const unsigned int) const
   {
     return p.square();
   }
@@ -49,16 +52,17 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   const SphericalManifold<dim> boundary_description;
 
-  Triangulation<dim>   triangulation;
-  GridGenerator::hyper_ball (triangulation);
-  triangulation.set_manifold (0, boundary_description);
-  triangulation.refine_global (1);
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_ball(triangulation);
+  triangulation.set_manifold(0, boundary_description);
+  triangulation.refine_global(1);
 
-  FE_Q<dim> fe(2);
+  FE_Q<dim>       fe(2);
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
@@ -67,10 +71,10 @@ void test()
   // can be represented exactly, so
   // that we can compare again later
   Vector<double> solution(dof_handler.n_dofs());
-  VectorTools::interpolate (dof_handler, F<dim>(), solution);
+  VectorTools::interpolate(dof_handler, F<dim>(), solution);
 
-  Functions::FEFieldFunction<2> fe_function (dof_handler, solution);
-  std::vector<Point<dim> > points;
+  Functions::FEFieldFunction<2> fe_function(dof_handler, solution);
+  std::vector<Point<dim>>       points;
 
   // add only one points but also set
   // the active cell to one that
@@ -86,27 +90,24 @@ void test()
   // (it's too far away from that
   // cell, and the inverse mapping
   // does not converge
-  points.push_back (Point<dim>(-0.27999999999999992, -0.62999999999999989));
-  fe_function.set_active_cell (typename DoFHandler<dim>::active_cell_iterator
-                               (&triangulation,
-                                1,
-                                4,
-                                &dof_handler));
+  points.push_back(Point<dim>(-0.27999999999999992, -0.62999999999999989));
+  fe_function.set_active_cell(typename DoFHandler<dim>::active_cell_iterator(
+    &triangulation, 1, 4, &dof_handler));
 
-  std::vector<double> m (points.size());
-  fe_function.value_list (points, m);
+  std::vector<double> m(points.size());
+  fe_function.value_list(points, m);
 
-  for (unsigned int i=0; i<m.size(); ++i)
-    AssertThrow (std::fabs(m[i] - points[i].square())
-                 <
-                 1e-10 * std::fabs(m[i] + points[i].square()),
-                 ExcInternalError());
+  for (unsigned int i = 0; i < m.size(); ++i)
+    AssertThrow(std::fabs(m[i] - points[i].square()) <
+                  1e-10 * std::fabs(m[i] + points[i].square()),
+                ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -114,4 +115,3 @@ int main ()
 
   return 0;
 }
-

@@ -16,63 +16,63 @@
 
 // same as gmres_reorthogonalize_01 but forces re-orthogonalization.
 
-#include "../tests.h"
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 
 template <typename number>
-void test (unsigned int variant)
+void
+test(unsigned int variant)
 {
   const unsigned int n = 64;
-  Vector<number> rhs(n), sol(n);
+  Vector<number>     rhs(n), sol(n);
   rhs = 1.;
 
   FullMatrix<number> matrix(n, n);
-  for (unsigned int i=0; i<n; ++i)
-    for (unsigned int j=0; j<n; ++j)
-      matrix(i,j) = random_value<double>(-.1, .1);
+  for (unsigned int i = 0; i < n; ++i)
+    for (unsigned int j = 0; j < n; ++j)
+      matrix(i, j) = random_value<double>(-.1, .1);
 
   // put diagonal entries of different strengths. these are very challenging
   // for GMRES and will usually take a lot of iterations until the Krylov
   // subspace is complete enough
   if (variant == 0)
-    for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = (i+1);
+    for (unsigned int i = 0; i < n; ++i)
+      matrix(i, i) = (i + 1);
   else if (variant == 1)
-    for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = (i+1) * (i+1) * (i+1) * (i+1);
+    for (unsigned int i = 0; i < n; ++i)
+      matrix(i, i) = (i + 1) * (i + 1) * (i + 1) * (i + 1);
   else if (variant == 2)
-    for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = 1e10*(i+1);
+    for (unsigned int i = 0; i < n; ++i)
+      matrix(i, i) = 1e10 * (i + 1);
   else if (variant == 3)
-    for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = 1e10*(i+1)*(i+1)*(i+1)*(i+1);
+    for (unsigned int i = 0; i < n; ++i)
+      matrix(i, i) = 1e10 * (i + 1) * (i + 1) * (i + 1) * (i + 1);
   else if (variant == 4)
-    for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = 1e30*(i+1);
+    for (unsigned int i = 0; i < n; ++i)
+      matrix(i, i) = 1e30 * (i + 1);
   else if (variant == 5)
-    for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = 1e30*(i+1)*(i+1)*(i+1)*(i+1);
+    for (unsigned int i = 0; i < n; ++i)
+      matrix(i, i) = 1e30 * (i + 1) * (i + 1) * (i + 1) * (i + 1);
   else
     Assert(false, ExcMessage("Invalid variant"));
-  if (std::is_same<number,float>::value == true)
+  if (std::is_same<number, float>::value == true)
     Assert(variant < 4, ExcMessage("Invalid_variant"));
 
-  deallog.push(Utilities::int_to_string(variant,1));
+  deallog.push(Utilities::int_to_string(variant, 1));
 
-  SolverControl control(1000, 1e2*std::numeric_limits<number>::epsilon());
-  typename SolverGMRES<Vector<number> >::AdditionalData data;
-  data.max_n_tmp_vectors = 80;
+  SolverControl control(1000, 1e2 * std::numeric_limits<number>::epsilon());
+  typename SolverGMRES<Vector<number>>::AdditionalData data;
+  data.max_n_tmp_vectors          = 80;
   data.force_re_orthogonalization = true;
 
-  SolverGMRES<Vector<number> > solver(control, data);
-  auto print_re_orthogonalization =
-    [](int accumulated_iterations)
-  {
+  SolverGMRES<Vector<number>> solver(control, data);
+  auto print_re_orthogonalization = [](int accumulated_iterations) {
     deallog.get_file_stream() << "Re-orthogonalization enabled at step "
                               << accumulated_iterations << std::endl;
   };
@@ -82,7 +82,8 @@ void test (unsigned int variant)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
@@ -103,4 +104,3 @@ int main()
   test<float>(3);
   deallog.pop();
 }
-

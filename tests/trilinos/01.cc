@@ -18,33 +18,37 @@
 // check setting elements in a trilinos matrix using
 // TrilinosWrappers::SparseMatrix::set()
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::SparseMatrix &m)
+
+void
+test(TrilinosWrappers::SparseMatrix &m)
 {
   // first set a few entries
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.m(); ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        m.set(i, j, i * j * .5 + .5);
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   // then make sure we retrieve the same ones
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.m(); ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
         {
-          AssertThrow (m(i,j) == i*j*.5+.5, ExcInternalError());
-          AssertThrow (m.el(i,j) == i*j*.5+.5, ExcInternalError());
+          AssertThrow(m(i, j) == i * j * .5 + .5, ExcInternalError());
+          AssertThrow(m.el(i, j) == i * j * .5 + .5, ExcInternalError());
         }
       else
         {
-          AssertThrow (m.el(i,j) == 0, ExcInternalError());
+          AssertThrow(m.el(i, j) == 0, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
@@ -52,22 +56,25 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
       {
-        TrilinosWrappers::SparseMatrix m (5U,5U,3U);
-        test (m);
+        TrilinosWrappers::SparseMatrix m(5U, 5U, 3U);
+        test(m);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -80,7 +87,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

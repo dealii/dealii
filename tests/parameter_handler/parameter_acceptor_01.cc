@@ -15,28 +15,30 @@
 
 // Classical way of working with parameters.
 
-#include "../tests.h"
 #include <deal.II/base/parameter_acceptor.h>
 
-template<int dim>
+#include "../tests.h"
+
+template <int dim>
 class Test : public ParameterAcceptor
 {
 public:
-  virtual void declare_parameters(ParameterHandler &prm)
+  virtual void
+  declare_parameters(ParameterHandler &prm)
   {
-    prm.declare_entry("A double", "0.0", Patterns::Double(),
-                      "Documentation");
+    prm.declare_entry("A double", "0.0", Patterns::Double(), "Documentation");
   };
 
-  virtual void parse_parameters(ParameterHandler &prm)
+  virtual void
+  parse_parameters(ParameterHandler &prm)
   {
-    deallog << "Double: "
-            << prm.get_double("A double") << std::endl;
+    deallog << "Double: " << prm.get_double("A double") << std::endl;
   };
 };
 
 
-int main ()
+int
+main()
 {
   initlog();
   Test<2> a;

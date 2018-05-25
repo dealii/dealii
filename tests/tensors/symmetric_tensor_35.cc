@@ -60,34 +60,42 @@ inv(t2)
 //    3.5000  -1.0000  -4.0000
 //    8.0000  -4.0000  -8.0000
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
-int main ()
+#include "../tests.h"
+
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(5);
   deallog.attach(logfile);
 
   deallog << "Symmetric Tensor dim 1" << std::endl;
-  SymmetricTensor<2,1> t1;
+  SymmetricTensor<2, 1> t1;
   t1[0][0] = 2.0;
   deallog << invert(t1) << std::endl;
-  Assert((static_cast<Tensor<2,1> >(invert(t1))*static_cast<Tensor<2,1> >(t1) - unit_symmetric_tensor<1>()).norm() < 1e-12,
-         ExcMessage("Dim 1 inverse symmetric tensor definition is incorrect"));
+  Assert(
+    (static_cast<Tensor<2, 1>>(invert(t1)) * static_cast<Tensor<2, 1>>(t1) -
+     unit_symmetric_tensor<1>())
+        .norm() < 1e-12,
+    ExcMessage("Dim 1 inverse symmetric tensor definition is incorrect"));
 
   deallog << "Symmetric Tensor dim 2" << std::endl;
-  SymmetricTensor<2,2> t2;
+  SymmetricTensor<2, 2> t2;
   t2[0][0] = 2.0;
   t2[0][1] = 1.0;
   t2[1][1] = 1.5;
   deallog << invert(t2) << std::endl;
-  Assert((static_cast<Tensor<2,2> >(invert(t2))*static_cast<Tensor<2,2> >(t2) - unit_symmetric_tensor<2>()).norm() < 1e-12,
-         ExcMessage("Dim 2 inverse symmetric tensor definition is incorrect"));
+  Assert(
+    (static_cast<Tensor<2, 2>>(invert(t2)) * static_cast<Tensor<2, 2>>(t2) -
+     unit_symmetric_tensor<2>())
+        .norm() < 1e-12,
+    ExcMessage("Dim 2 inverse symmetric tensor definition is incorrect"));
 
   deallog << "Symmetric Tensor dim 3" << std::endl;
-  SymmetricTensor<2,3> t3;
+  SymmetricTensor<2, 3> t3;
   t3[0][0] = 2.0;
   t3[0][1] = 1.0;
   t3[0][2] = 1.5;
@@ -95,8 +103,11 @@ int main ()
   t3[1][2] = 0.25;
   t3[2][2] = 1.25;
   deallog << invert(t3) << std::endl;
-  Assert((static_cast<Tensor<2,3> >(invert(t3))*static_cast<Tensor<2,3> >(t3) - unit_symmetric_tensor<3>()).norm() < 1e-12,
-         ExcMessage("Dim 3 inverse symmetric tensor definition is incorrect"));
+  Assert(
+    (static_cast<Tensor<2, 3>>(invert(t3)) * static_cast<Tensor<2, 3>>(t3) -
+     unit_symmetric_tensor<3>())
+        .norm() < 1e-12,
+    ExcMessage("Dim 3 inverse symmetric tensor definition is incorrect"));
 
   deallog << "OK" << std::endl;
 }

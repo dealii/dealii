@@ -15,9 +15,9 @@
 
 
 
-// check FullMatrix::matrix_scalar_product. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// check FullMatrix::matrix_scalar_product. like the full_matrix_* tests, but
+// use complex-valued matrices and vectors; this time we actually store complex
+// values in them
 
 
 #include "../tests.h"
@@ -25,18 +25,17 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
-  Vector<std::complex<number> > v,w;
-  make_complex_range_vector (v);
-  make_complex_domain_vector (w);
-  for (unsigned int i=0; i<w.size(); ++i)
-    w(i) = w(i)+std::complex<number>(1.);
+  FullMatrix<std::complex<number>> m;
+  make_complex_matrix(m);
+  Vector<std::complex<number>> v, w;
+  make_complex_range_vector(v);
+  make_complex_domain_vector(w);
+  for (unsigned int i = 0; i < w.size(); ++i)
+    w(i) = w(i) + std::complex<number>(1.);
 
-  deallog << m.matrix_scalar_product (v,w) << std::endl;
+  deallog << m.matrix_scalar_product(v, w) << std::endl;
 }

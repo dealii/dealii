@@ -13,14 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/la_vector.h>
-#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/multigrid/mg_base.h>
 
 
@@ -29,9 +30,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename VectorType>
 void
-MGSmootherBase<VectorType>::apply (const unsigned int level,
-                                   VectorType         &u,
-                                   const VectorType   &rhs) const
+MGSmootherBase<VectorType>::apply(const unsigned int level,
+                                  VectorType &       u,
+                                  const VectorType & rhs) const
 {
   u = typename VectorType::value_type(0.);
   smooth(level, u, rhs);

@@ -14,114 +14,118 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-#include <deal.II/algorithms/operator.h>
 #include <deal.II/algorithms/newton.h>
+#include <deal.II/algorithms/operator.h>
+
 #include <deal.II/numerics/vector_tools.h>
 
+#include "../tests.h"
 
-//test computing square root of 2 with newton's method
+
+// test computing square root of 2 with newton's method
 
 using namespace dealii;
 
 class SquareRoot : public Subscriptor
 {
 public:
-  void start_vector (Vector<double> &start) const;
-  void residual (AnyData &out, const AnyData &in);
-  void solve (AnyData &out, const AnyData &in);
+  void
+  start_vector(Vector<double> &start) const;
+  void
+  residual(AnyData &out, const AnyData &in);
+  void
+  solve(AnyData &out, const AnyData &in);
 };
 
-class SquareRootResidual : public
-  Algorithms::OperatorBase
+class SquareRootResidual : public Algorithms::OperatorBase
 {
-  SmartPointer<SquareRoot, SquareRootResidual>
-  discretization;
-public:
+  SmartPointer<SquareRoot, SquareRootResidual> discretization;
 
-  SquareRootResidual(SquareRoot &problem)
-    : discretization(&problem)
+public:
+  SquareRootResidual(SquareRoot &problem) : discretization(&problem)
   {}
 
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator()(AnyData &out, const AnyData &in)
   {
-    discretization->residual(out,in);
+    discretization->residual(out, in);
   }
 };
 
-class SquareRootSolver : public
-  Algorithms::OperatorBase
+class SquareRootSolver : public Algorithms::OperatorBase
 {
-  SmartPointer<SquareRoot, SquareRootSolver>
-  solver;
-public:
+  SmartPointer<SquareRoot, SquareRootSolver> solver;
 
-  SquareRootSolver(SquareRoot &problem)
-    : solver(&problem)
+public:
+  SquareRootSolver(SquareRoot &problem) : solver(&problem)
   {}
 
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator()(AnyData &out, const AnyData &in)
   {
-    solver->solve(out,in);
+    solver->solve(out, in);
   }
 };
 
-void SquareRoot::residual (AnyData &out, const AnyData &in)
+void
+SquareRoot::residual(AnyData &out, const AnyData &in)
 {
-  Vector<double> &v = *out.entry<Vector<double>*>(0);
-  //residuum = 0
-  v(0) = 0.;
-  const Vector<double> &x = *in.entry<const Vector<double>*>("Newton iterate");
-  v(0) = x*x - 2.;
+  Vector<double> &v = *out.entry<Vector<double> *>(0);
+  // residuum = 0
+  v(0)                    = 0.;
+  const Vector<double> &x = *in.entry<const Vector<double> *>("Newton iterate");
+  v(0)                    = x * x - 2.;
 }
 
-void SquareRoot::solve (AnyData &out, const AnyData &in)
+void
+SquareRoot::solve(AnyData &out, const AnyData &in)
 {
-  Vector<double> &v = *out.entry<Vector<double>*>(0);
-  v(0) = 0;
-  const Vector<double> &x = *in.entry<const Vector<double>*>("Newton iterate");
-  const Vector<double> &r = *in.entry<const Vector<double>*>("Newton residual");
+  Vector<double> &v       = *out.entry<Vector<double> *>(0);
+  v(0)                    = 0;
+  const Vector<double> &x = *in.entry<const Vector<double> *>("Newton iterate");
+  const Vector<double> &r =
+    *in.entry<const Vector<double> *>("Newton residual");
 
-  v(0) = 1./2./x(0)* r(0);
+  v(0) = 1. / 2. / x(0) * r(0);
 }
 
 
 
-void test ()
+void
+test()
 {
-  SquareRoot square_root;
-  SquareRootSolver sq_solver (square_root);
-  SquareRootResidual sq_residual (square_root);
+  SquareRoot         square_root;
+  SquareRootSolver   sq_solver(square_root);
+  SquareRootResidual sq_residual(square_root);
 
-  Algorithms::OutputOperator<Vector<double> > output;
+  Algorithms::OutputOperator<Vector<double>> output;
 
-  Algorithms::Newton<Vector<double> > newton(
-    sq_residual,
-    sq_solver);
+  Algorithms::Newton<Vector<double>> newton(sq_residual, sq_solver);
   newton.initialize(output);
 
   AnyData in_data;
   AnyData out_data;
 
-  Vector<double> solution (1);
+  Vector<double> solution(1);
   solution = 10.;
-  out_data.add<Vector<double>*>(&solution, "solution");
+  out_data.add<Vector<double> *>(&solution, "solution");
 
   newton.control.set_reduction(1.e-20);
   newton.control.log_history(true);
   newton.debug_vectors = true;
   newton(out_data, in_data);
-  deallog << " square root " << (*out_data.read<Vector<double>*>(0))(0) << std::endl;
+  deallog << " square root " << (*out_data.read<Vector<double> *>(0))(0)
+          << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 
-  test ();
+  test();
 }

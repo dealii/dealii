@@ -18,16 +18,19 @@
 // check that Subscriptor objects need to be empty before assigning.
 
 
-#include "../tests.h"
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
+
 #include <iostream>
 #include <vector>
+
+#include "../tests.h"
 
 class Test : public Subscriptor
 {};
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
@@ -38,7 +41,7 @@ int main()
     Subscriptor subscriptor_1;
     Subscriptor subscriptor_2;
 
-    SmartPointer<Subscriptor> smart (&subscriptor_1);
+    SmartPointer<Subscriptor> smart(&subscriptor_1);
 
     subscriptor_2 = subscriptor_1;
   }
@@ -48,7 +51,7 @@ int main()
       Subscriptor subscriptor_1;
       Subscriptor subscriptor_2;
 
-      SmartPointer<Subscriptor> smart (&subscriptor_2);
+      SmartPointer<Subscriptor> smart(&subscriptor_2);
 
       subscriptor_2 = subscriptor_1;
     }
@@ -62,7 +65,7 @@ int main()
       Subscriptor subscriptor_1;
       Subscriptor subscriptor_2;
 
-      SmartPointer<Subscriptor> smart (&subscriptor_1);
+      SmartPointer<Subscriptor> smart(&subscriptor_1);
 
       subscriptor_2 = std::move(subscriptor_1);
     }
@@ -76,7 +79,7 @@ int main()
       Subscriptor subscriptor_1;
       Subscriptor subscriptor_2;
 
-      SmartPointer<Subscriptor> smart (&subscriptor_2);
+      SmartPointer<Subscriptor> smart(&subscriptor_2);
 
       subscriptor_2 = std::move(subscriptor_1);
     }
@@ -85,4 +88,3 @@ int main()
       deallog << e.get_exc_name() << std::endl;
     }
 }
-

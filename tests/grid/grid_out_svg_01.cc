@@ -13,39 +13,41 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
+
+#include "../tests.h"
 
 
 using namespace dealii;
 
-Triangulation<2,2> create_grid()
+Triangulation<2, 2>
+create_grid()
 {
-  Triangulation<2,2> triangulation;
+  Triangulation<2, 2> triangulation;
 
   double inner_radius = .5;
   double outer_radius = 1.;
 
   Point<2> center(0., 0.);
 
-  GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, inner_radius, outer_radius);
+  GridGenerator::hyper_cube_with_cylindrical_hole(
+    triangulation, inner_radius, outer_radius);
   triangulation.reset_manifold(0);
   triangulation.refine_global(1);
 
   Triangulation<2>::active_cell_iterator
 
-  cell = triangulation.begin_active(),
-  endc = triangulation.end();
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
 
-  for (; cell!=endc; ++cell)
+  for (; cell != endc; ++cell)
     {
-      for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+      for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
         {
           const double distance_from_center = center.distance(cell->vertex(v));
 
@@ -62,16 +64,17 @@ Triangulation<2,2> create_grid()
   return triangulation;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
-  GridOut grid_out;
+  GridOut           grid_out;
   GridOutFlags::Svg svg_flags;
 
-  svg_flags.coloring = GridOutFlags::Svg::level_number;
+  svg_flags.coloring          = GridOutFlags::Svg::level_number;
   svg_flags.label_material_id = true;
-  svg_flags.background = GridOutFlags::Svg::transparent;
+  svg_flags.background        = GridOutFlags::Svg::transparent;
 
   grid_out.set_flags(svg_flags);
   grid_out.write_svg(create_grid(), deallog.get_file_stream());

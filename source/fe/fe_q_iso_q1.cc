@@ -15,37 +15,42 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/fe/fe_q_iso_q1.h>
-#include <deal.II/fe/fe_nothing.h>
-
-#include <vector>
-#include <sstream>
 #include <deal.II/base/std_cxx14/memory.h>
+
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
+
+#include <deal.II/lac/vector.h>
+
+#include <sstream>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 
-
-
 template <int dim, int spacedim>
-FE_Q_iso_Q1<dim,spacedim>::FE_Q_iso_Q1 (const unsigned int subdivisions)
-  :
-  FE_Q_Base<TensorProductPolynomials<dim,Polynomials::PiecewisePolynomial<double> >, dim, spacedim> (
-    TensorProductPolynomials<dim,Polynomials::PiecewisePolynomial<double> >
-    (Polynomials::generate_complete_Lagrange_basis_on_subdivisions(subdivisions, 1)),
+FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions) :
+  FE_Q_Base<
+    TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
+    dim,
+    spacedim>(
+    TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>(
+      Polynomials::generate_complete_Lagrange_basis_on_subdivisions(
+        subdivisions,
+        1)),
     FiniteElementData<dim>(this->get_dpo_vector(subdivisions),
-                           1, subdivisions,
+                           1,
+                           subdivisions,
                            FiniteElementData<dim>::H1),
-    std::vector<bool> (1, false))
+    std::vector<bool>(1, false))
 {
-  Assert (subdivisions > 0,
-          ExcMessage ("This element can only be used with a positive number of "
-                      "subelements"));
+  Assert(subdivisions > 0,
+         ExcMessage("This element can only be used with a positive number of "
+                    "subelements"));
 
-  QTrapez<1> trapez;
-  QIterated<1> points (trapez, subdivisions);
+  QTrapez<1>   trapez;
+  QIterated<1> points(trapez, subdivisions);
 
   this->initialize(points.get_points());
 }
@@ -54,16 +59,15 @@ FE_Q_iso_Q1<dim,spacedim>::FE_Q_iso_Q1 (const unsigned int subdivisions)
 
 template <int dim, int spacedim>
 std::string
-FE_Q_iso_Q1<dim,spacedim>::get_name () const
+FE_Q_iso_Q1<dim, spacedim>::get_name() const
 {
   // note that the FETools::get_fe_by_name function depends on the
   // particular format of the string this function returns, so they have to be
   // kept in sync
 
   std::ostringstream namebuf;
-  namebuf << "FE_Q_iso_Q1<"
-          << Utilities::dim_string(dim,spacedim)
-          << ">(" << this->degree << ")";
+  namebuf << "FE_Q_iso_Q1<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
   return namebuf.str();
 }
 
@@ -71,20 +75,19 @@ FE_Q_iso_Q1<dim,spacedim>::get_name () const
 
 template <int dim, int spacedim>
 void
-FE_Q_iso_Q1<dim,spacedim>::
-convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                        std::vector<double>                &nodal_values) const
+FE_Q_iso_Q1<dim, spacedim>::
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const
 {
-  AssertDimension (support_point_values.size(),
-                   this->get_unit_support_points().size());
-  AssertDimension (support_point_values.size(),
-                   nodal_values.size());
-  AssertDimension (this->dofs_per_cell,
-                   nodal_values.size());
+  AssertDimension(support_point_values.size(),
+                  this->get_unit_support_points().size());
+  AssertDimension(support_point_values.size(), nodal_values.size());
+  AssertDimension(this->dofs_per_cell, nodal_values.size());
 
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      AssertDimension (support_point_values[i].size(), 1);
+      AssertDimension(support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
     }
@@ -93,21 +96,21 @@ convert_generalized_support_point_values_to_dof_values (const std::vector<Vector
 
 
 template <int dim, int spacedim>
-std::unique_ptr<FiniteElement<dim,spacedim> >
-FE_Q_iso_Q1<dim,spacedim>::clone() const
+std::unique_ptr<FiniteElement<dim, spacedim>>
+FE_Q_iso_Q1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_iso_Q1<dim,spacedim>>(*this);
+  return std_cxx14::make_unique<FE_Q_iso_Q1<dim, spacedim>>(*this);
 }
 
 
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_Q_iso_Q1<dim,spacedim>::
-compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
+FE_Q_iso_Q1<dim, spacedim>::compare_for_face_domination(
+  const FiniteElement<dim, spacedim> &fe_other) const
 {
-  if (const FE_Q_iso_Q1<dim,spacedim> *fe_q_iso_q1_other
-      = dynamic_cast<const FE_Q_iso_Q1<dim,spacedim>*>(&fe_other))
+  if (const FE_Q_iso_Q1<dim, spacedim> *fe_q_iso_q1_other =
+        dynamic_cast<const FE_Q_iso_Q1<dim, spacedim> *>(&fe_other))
     {
       // different behavior as in FE_Q: as FE_Q_iso_Q1(2) is not a subspace of
       // FE_Q_iso_Q1(3), need that the element degrees are multiples of each
@@ -123,7 +126,8 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
       else
         return FiniteElementDomination::neither_element_dominates;
     }
-  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
+  else if (const FE_Nothing<dim> *fe_nothing =
+             dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
     {
       if (fe_nothing->is_dominating())
         {
@@ -131,13 +135,14 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
         }
       else
         {
-          // the FE_Nothing has no degrees of freedom and it is typically used in
-          // a context where we don't require any continuity along the interface
+          // the FE_Nothing has no degrees of freedom and it is typically used
+          // in a context where we don't require any continuity along the
+          // interface
           return FiniteElementDomination::no_requirements;
         }
     }
 
-  Assert (false, ExcNotImplemented());
+  Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 

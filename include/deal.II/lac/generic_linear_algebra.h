@@ -18,11 +18,10 @@
 
 #include <deal.II/base/config.h>
 
-
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/precondition.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -36,13 +35,13 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace LinearAlgebraDealII
 {
-  typedef Vector<double> Vector;
+  typedef Vector<double>      Vector;
   typedef BlockVector<double> BlockVector;
 
   typedef SparseMatrix<double> SparseMatrix;
 
-  typedef PreconditionSSOR<SparseMatrix > PreconditionSSOR;
-}
+  typedef PreconditionSSOR<SparseMatrix> PreconditionSSOR;
+} // namespace LinearAlgebraDealII
 
 
 DEAL_II_NAMESPACE_CLOSE
@@ -50,11 +49,11 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_WITH_PETSC
 
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
-#include <deal.II/lac/petsc_precondition.h>
-#include <deal.II/lac/petsc_solver.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
+#  include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#  include <deal.II/lac/petsc_precondition.h>
+#  include <deal.II/lac/petsc_solver.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -68,7 +67,7 @@ namespace LinearAlgebraPETSc
 {
   using namespace dealii;
 
-  typedef PETScWrappers::SolverCG SolverCG;
+  typedef PETScWrappers::SolverCG    SolverCG;
   typedef PETScWrappers::SolverGMRES SolverGMRES;
 
   /**
@@ -126,9 +125,9 @@ namespace LinearAlgebraPETSc
      */
     typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
 
-  }
+  } // namespace MPI
 
-}
+} // namespace LinearAlgebraPETSc
 DEAL_II_NAMESPACE_CLOSE
 
 
@@ -136,11 +135,11 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_precondition.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/trilinos_solver.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_precondition.h>
+#  include <deal.II/lac/trilinos_solver.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -154,7 +153,7 @@ namespace LinearAlgebraTrilinos
 {
   using namespace dealii;
 
-  typedef TrilinosWrappers::SolverCG SolverCG;
+  typedef TrilinosWrappers::SolverCG    SolverCG;
   typedef TrilinosWrappers::SolverGMRES SolverGMRES;
 
   /**
@@ -185,7 +184,8 @@ namespace LinearAlgebraTrilinos
      */
     typedef TrilinosWrappers::BlockSparseMatrix BlockSparseMatrix;
 
-    typedef TrilinosWrappers::BlockSparsityPattern BlockCompressedSparsityPattern;
+    typedef TrilinosWrappers::BlockSparsityPattern
+      BlockCompressedSparsityPattern;
 
     /**
      * Typedef for the AMG preconditioner type.
@@ -213,9 +213,9 @@ namespace LinearAlgebraTrilinos
     typedef TrilinosWrappers::PreconditionSSOR PreconditionSSOR;
 
 
-  }
+  } // namespace MPI
 
-}
+} // namespace LinearAlgebraTrilinos
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -19,10 +19,11 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/polynomial.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/subscriptor.h>
 
 #include <vector>
 
@@ -39,7 +40,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace Polynomials
 {
-
   /**
    * Definition of piecewise 1D polynomials for the unit interval. This space
    * allows the description of interpolating polynomials on parts of the unit
@@ -66,10 +66,10 @@ namespace Polynomials
      * If the number of intervals is one, the piecewise polynomial behaves
      * exactly like a usual polynomial.
      */
-    PiecewisePolynomial (const Polynomial<number> &coefficients_on_interval,
-                         const unsigned int        n_intervals,
-                         const unsigned int        interval,
-                         const bool                spans_next_interval);
+    PiecewisePolynomial(const Polynomial<number> &coefficients_on_interval,
+                        const unsigned int        n_intervals,
+                        const unsigned int        interval,
+                        const bool                spans_next_interval);
 
     /**
      * Return the value of this polynomial at the given point, evaluating the
@@ -77,7 +77,8 @@ namespace Polynomials
      * the given interval (and possible the next one to the right when it
      * spans over that range).
      */
-    number value (const number x) const;
+    number
+    value(const number x) const;
 
     /**
      * Return the values and the derivatives of the Polynomial at point
@@ -93,8 +94,8 @@ namespace Polynomials
      * responsibility to avoid evaluation at these points when it does not
      * make sense.
      */
-    void value (const number         x,
-                std::vector<number> &values) const;
+    void
+    value(const number x, std::vector<number> &values) const;
 
     /**
      * Return the values and the derivatives of the Polynomial at point
@@ -111,25 +112,27 @@ namespace Polynomials
      * responsibility to avoid evaluation at these points when it does not
      * make sense.
      */
-    void value (const number         x,
-                const unsigned int n_derivatives,
-                number *values) const;
+    void
+    value(const number       x,
+          const unsigned int n_derivatives,
+          number *           values) const;
 
     /**
      * Degree of the polynomial. This is the degree of the underlying base
      * polynomial.
      */
-    unsigned int degree () const;
+    unsigned int
+    degree() const;
 
     /**
      * Write or read the data of this object to or from a stream for the
      * purpose of serialization.
      */
     template <class Archive>
-    void serialize (Archive &ar, const unsigned int version);
+    void
+    serialize(Archive &ar, const unsigned int version);
 
   protected:
-
     /**
      * Underlying polynomial object that is scaled to a subinterval and
      * concatenated accordingly.
@@ -137,12 +140,14 @@ namespace Polynomials
     Polynomial<number> polynomial;
 
     /**
-     * A variable storing the number of intervals that the unit interval is divided into.
+     * A variable storing the number of intervals that the unit interval is
+     * divided into.
      */
     unsigned int n_intervals;
 
     /**
-     * A variable storing the index of the current polynomial in the range of intervals.
+     * A variable storing the index of the current polynomial in the range of
+     * intervals.
      */
     unsigned int interval;
 
@@ -160,11 +165,12 @@ namespace Polynomials
    * in smaller intervals for a given degree on the subintervals and number of
    * intervals.
    */
-  std::vector<PiecewisePolynomial<double> >
-  generate_complete_Lagrange_basis_on_subdivisions (const unsigned int n_subdivisions,
-                                                    const unsigned int base_degree);
+  std::vector<PiecewisePolynomial<double>>
+  generate_complete_Lagrange_basis_on_subdivisions(
+    const unsigned int n_subdivisions,
+    const unsigned int base_degree);
 
-}
+} // namespace Polynomials
 
 
 /** @} */
@@ -174,9 +180,8 @@ namespace Polynomials
 namespace Polynomials
 {
   template <typename number>
-  inline
-  unsigned int
-  PiecewisePolynomial<number>::degree () const
+  inline unsigned int
+  PiecewisePolynomial<number>::degree() const
   {
     return polynomial.degree();
   }
@@ -184,37 +189,36 @@ namespace Polynomials
 
 
   template <typename number>
-  inline
-  number
-  PiecewisePolynomial<number>::value (const number x) const
+  inline number
+  PiecewisePolynomial<number>::value(const number x) const
   {
-    AssertIndexRange (interval, n_intervals);
+    AssertIndexRange(interval, n_intervals);
     number y = x;
     // shift polynomial if necessary
     if (n_intervals > 1)
       {
-        const number step = 1./n_intervals;
+        const number step = 1. / n_intervals;
 
         // polynomial spans over two intervals
         if (spans_two_intervals == true)
           {
             const number offset = step * interval;
-            if (x<offset)
+            if (x < offset)
               return 0;
-            else if (x>offset+step+step)
+            else if (x > offset + step + step)
               return 0;
-            else if (x<offset+step)
-              y = x-offset;
+            else if (x < offset + step)
+              y = x - offset;
             else
-              y = offset+step+step-x;
+              y = offset + step + step - x;
           }
         else
           {
             const number offset = step * interval;
-            if (x<offset || x>offset+step)
+            if (x < offset || x > offset + step)
               return 0;
             else
-              y = x-offset;
+              y = x - offset;
           }
 
         return polynomial.value(y);
@@ -227,9 +231,8 @@ namespace Polynomials
 
   template <typename number>
   template <class Archive>
-  inline
-  void
-  PiecewisePolynomial<number>::serialize (Archive &ar, const unsigned int)
+  inline void
+  PiecewisePolynomial<number>::serialize(Archive &ar, const unsigned int)
   {
     // forward to serialization function in the base class.
     ar &static_cast<Subscriptor &>(*this);
@@ -239,7 +242,7 @@ namespace Polynomials
     ar &spans_two_intervals;
   }
 
-}
+} // namespace Polynomials
 
 DEAL_II_NAMESPACE_CLOSE
 

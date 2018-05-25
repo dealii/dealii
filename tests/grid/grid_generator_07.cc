@@ -17,40 +17,45 @@
 
 // Test GridGenerator::create_triangulation_with_removed_cells
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   Triangulation<dim> triangulation;
   Triangulation<dim> tr;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (3);
+  GridGenerator::hyper_cube(triangulation);
+  triangulation.refine_global(3);
 
   // remove all cells but the first. this is the hardest case to handle as it
   // makes a bunch of vertices unused
-  std::set<typename Triangulation<dim>::active_cell_iterator>
-  cells_to_remove;
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = ++triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    cells_to_remove.insert (cell);
+  std::set<typename Triangulation<dim>::active_cell_iterator> cells_to_remove;
+  for (typename Triangulation<dim>::active_cell_iterator cell =
+         ++triangulation.begin_active();
+       cell != triangulation.end();
+       ++cell)
+    cells_to_remove.insert(cell);
 
-  GridGenerator::create_triangulation_with_removed_cells(triangulation,
-                                                         cells_to_remove, tr);
+  GridGenerator::create_triangulation_with_removed_cells(
+    triangulation, cells_to_remove, tr);
   GridOut go;
   go.write_gnuplot(tr, out);
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

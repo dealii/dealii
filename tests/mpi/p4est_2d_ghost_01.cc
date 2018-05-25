@@ -17,101 +17,101 @@
 
 // check existence of ghost layer in 2d
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (true)
     {
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+      if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       GridGenerator::subdivided_hyper_cube(tr, 2);
 
-      if (myid==0)
+      if (myid == 0)
         {
-
           std::vector<types::subdomain_id> cell_subd(tr.n_active_cells());
 
           GridTools::get_subdomain_association(tr, cell_subd);
-          for (unsigned int i=0; i<tr.n_active_cells(); ++i)
+          for (unsigned int i = 0; i < tr.n_active_cells(); ++i)
             deallog << cell_subd[i] << " ";
           deallog << std::endl;
         }
 
-      //check that all local
-      //neighbors have the
-      //correct level and a valid
-      //subdomainid
-      typename Triangulation<dim,dim>::active_cell_iterator cell;
+      // check that all local
+      // neighbors have the
+      // correct level and a valid
+      // subdomainid
+      typename Triangulation<dim, dim>::active_cell_iterator cell;
 
-      for (cell = tr.begin_active();
-           cell != tr.end();
-           ++cell)
+      for (cell = tr.begin_active(); cell != tr.end(); ++cell)
         {
           if (cell->subdomain_id() != (unsigned int)myid)
             {
-              AssertThrow (cell->is_ghost() || cell->is_artificial(),
-                           ExcInternalError());
+              AssertThrow(cell->is_ghost() || cell->is_artificial(),
+                          ExcInternalError());
               continue;
             }
 
-          for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+          for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell; ++n)
             {
               if (cell->at_boundary(n))
                 continue;
-              AssertThrow (cell->neighbor(n).state() == IteratorState::valid,
-                           ExcInternalError());
+              AssertThrow(cell->neighbor(n).state() == IteratorState::valid,
+                          ExcInternalError());
 
-              AssertThrow ( cell->neighbor(n)->level() == cell->level(),
-                            ExcInternalError());
+              AssertThrow(cell->neighbor(n)->level() == cell->level(),
+                          ExcInternalError());
 
-              AssertThrow (!cell->neighbor(n)->has_children(), ExcInternalError() );
-              AssertThrow ( cell->neighbor(n)->subdomain_id()< numprocs, ExcInternalError());
+              AssertThrow(!cell->neighbor(n)->has_children(),
+                          ExcInternalError());
+              AssertThrow(cell->neighbor(n)->subdomain_id() < numprocs,
+                          ExcInternalError());
 
               // all neighbors of
               // locally owned cells
               // must be ghosts but
               // can't be artificial
-              AssertThrow (cell->neighbor(n)->is_ghost(), ExcInternalError());
-              AssertThrow (!cell->neighbor(n)->is_artificial(), ExcInternalError());
+              AssertThrow(cell->neighbor(n)->is_ghost(), ExcInternalError());
+              AssertThrow(!cell->neighbor(n)->is_artificial(),
+                          ExcInternalError());
             }
-
-
         }
 
-      const unsigned int checksum = tr.get_checksum ();
-      deallog << "Checksum: "
-              << checksum
-              << std::endl;
+      const unsigned int checksum = tr.get_checksum();
+      deallog << "Checksum: " << checksum << std::endl;
     }
 
   deallog << "OK" << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));
@@ -126,5 +126,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

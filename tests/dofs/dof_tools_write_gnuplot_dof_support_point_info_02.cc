@@ -15,25 +15,25 @@
 
 // Check DoFTools::write_gnuplot_dof_support_point_info with a mapping
 
-#include "../tests.h"
-
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
-
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_manifold.h>
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 template <int dim>
 void
-test ()
+test()
 {
   std::ostream &out = deallog.get_file_stream();
 
@@ -42,26 +42,25 @@ test ()
   Triangulation<dim> triangulation;
   GridGenerator::quarter_hyper_shell(triangulation, center, 0.5, 1.0);
 
-  static const PolarManifold<dim,dim> manifold(center);
-  triangulation.set_manifold (0, manifold);
+  static const PolarManifold<dim, dim> manifold(center);
+  triangulation.set_manifold(0, manifold);
   triangulation.set_all_manifold_ids_on_boundary(0);
   triangulation.set_all_manifold_ids(0);
 
-  FE_Q<dim> fe (2);
+  FE_Q<dim> fe(2);
 
-  DoFHandler<dim> dof_handler (triangulation);
-  dof_handler.distribute_dofs (fe);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(fe);
 
   MappingManifold<dim> mapping;
 
-  std::map<types::global_dof_index, Point<dim> > support_points;
-  DoFTools::map_dofs_to_support_points (mapping,
-                                        dof_handler,
-                                        support_points);
+  std::map<types::global_dof_index, Point<dim>> support_points;
+  DoFTools::map_dofs_to_support_points(mapping, dof_handler, support_points);
 
   out << "set view equal xy" << std::endl
-      << "plot '-' using 1:2 with lines, '-' with labels point pt 2 offset 1,1" << std::endl;
-  GridOut().write_gnuplot (triangulation, deallog.get_file_stream());
+      << "plot '-' using 1:2 with lines, '-' with labels point pt 2 offset 1,1"
+      << std::endl;
+  GridOut().write_gnuplot(triangulation, deallog.get_file_stream());
   out << "e" << std::endl;
 
   DoFTools::write_gnuplot_dof_support_point_info(deallog.get_file_stream(),
@@ -71,9 +70,9 @@ test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
   test<2>();
 }
-

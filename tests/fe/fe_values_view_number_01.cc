@@ -15,27 +15,33 @@
 
 // Check that we get the right type of CurlType with Custom number type.
 
-#include "../tests.h"
 #include <deal.II/fe/fe_values.h>
 
 #include <fstream>
 
+#include "../tests.h"
+
 
 
 template <typename Number>
-void test ()
+void
+test()
 {
-  if (typeid(typename internal::CurlType<1, Number>::type) != typeid(Tensor<1,1,Number>) )
+  if (typeid(typename internal::CurlType<1, Number>::type) !=
+      typeid(Tensor<1, 1, Number>))
     deallog << "NOT OK!" << std::endl;
-  if (typeid(typename internal::CurlType<2, Number>::type) != typeid(Tensor<1,1,Number>) )
+  if (typeid(typename internal::CurlType<2, Number>::type) !=
+      typeid(Tensor<1, 1, Number>))
     deallog << "NOT OK!" << std::endl;
-  if (typeid(typename internal::CurlType<3, Number>::type) != typeid(Tensor<1,3,Number>) )
+  if (typeid(typename internal::CurlType<3, Number>::type) !=
+      typeid(Tensor<1, 3, Number>))
     deallog << "NOT OK!" << std::endl;
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   test<double>();

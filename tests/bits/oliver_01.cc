@@ -21,11 +21,13 @@
 // pointer, which leads to an ambiguity. Fix this by having an additional
 // operator= in the iterator/reference class
 
-#include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   initlog();
 
@@ -33,7 +35,7 @@ int main ()
   if (false)
     {
       SparseMatrix<double>::iterator *i;
-      (*i)->value () = (int)0;
+      (*i)->value() = (int)0;
     }
 
   deallog << "OK" << std::endl;

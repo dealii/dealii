@@ -14,12 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-#include "interpolate_common.h"
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
+
+#include "interpolate_common.h"
 
 
 // Same as interpolate_system_2.cc but using the new constructor:
@@ -28,11 +29,11 @@
 //
 
 template <int dim, typename T>
-void check(T function, const unsigned int degree)
+void
+check(T function, const unsigned int degree)
 {
-  FESystem<dim> fe = {FE_RaviartThomas<dim>(degree)^2,
-                      FESystem<dim>(FE_RaviartThomas<dim>(degree), 2)^1
-                     };
+  FESystem<dim> fe = {FE_RaviartThomas<dim>(degree) ^ 2,
+                      FESystem<dim>(FE_RaviartThomas<dim>(degree), 2) ^ 1};
   deallog << fe.get_name() << std::endl;
 
   std::vector<double> dofs(fe.dofs_per_cell);
@@ -42,10 +43,12 @@ void check(T function, const unsigned int degree)
   function.vector_value_list(fe.get_generalized_support_points(), values);
 
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
-  deallog << " vector " << vector_difference(fe, dofs, function, 0) << std::endl;
+  deallog << " vector " << vector_difference(fe, dofs, function, 0)
+          << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

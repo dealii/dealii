@@ -19,8 +19,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-internal::SolverBicgstabData::SolverBicgstabData ()
-  :
+internal::SolverBicgstabData::SolverBicgstabData() :
   alpha(0.),
   beta(0.),
   omega(0.),

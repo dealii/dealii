@@ -14,26 +14,28 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 // test the method set_tex_table_caption
 // it creates a caption for the whole table
 
-int main ()
+int
+main()
 {
   initlog();
 
   TableHandler table;
 
-  for (unsigned int i=1; i<=10; ++i)
+  for (unsigned int i = 1; i <= 10; ++i)
     {
       table.add_value("numbers", i);
-      table.add_value("squares", i*i);
+      table.add_value("squares", i * i);
       table.add_value("square roots", sqrt(i));
     }
 

@@ -16,19 +16,20 @@
 
 // test the ArrayView constructor that converts from std::vector
 
-#include "../tests.h"
-
 #include <deal.II/base/array_view.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   // converting a non-const vector to an ArrayView to const or
   // non-const data should work
   {
-    std::vector<double> v(10);
-    ArrayView<double> a1 (v);
-    ArrayView<const double> a2 (v);
+    std::vector<double>     v(10);
+    ArrayView<double>       a1(v);
+    ArrayView<const double> a2(v);
   }
 
   // converting a const vector to an ArrayView to const
@@ -37,7 +38,7 @@ void test ()
   // converting to an ArrayView<double> will not work
   {
     const std::vector<double> v(10);
-    ArrayView<const double> a2 (v);
+    ArrayView<const double>   a2(v);
   }
 
   deallog << "OK" << std::endl;
@@ -45,9 +46,10 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

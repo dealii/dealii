@@ -16,25 +16,28 @@
 // the same as timer.cc but also test the new functions last_wall_time(),
 // cpu_time() and last_cpu_time().
 
-#include "../tests.h"
 #include <deal.II/base/timer.h>
+
+#include "../tests.h"
 
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn(unsigned int n)
 {
-  for (unsigned int i=0 ; i<n ; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j=1 ; j<100000 ; ++j)
+      for (unsigned int j = 1; j < 100000; ++j)
         {
-          s += 1./j * i;
+          s += 1. / j * i;
         }
     }
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -56,8 +59,7 @@ int main ()
 
   t.reset();
   AssertThrow(t.wall_time() == 0., ExcInternalError());
-  AssertThrow(t.cpu_time()== 0., ExcInternalError());
+  AssertThrow(t.cpu_time() == 0., ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
-

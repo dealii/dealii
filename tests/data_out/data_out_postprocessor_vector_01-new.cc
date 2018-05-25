@@ -22,22 +22,27 @@
 // writing postprocessors simpler
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/base/function.h>
+
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/base/function.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_postprocessor.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 
 
@@ -48,41 +53,45 @@ template <int dim>
 class LaplaceProblem
 {
 public:
-  LaplaceProblem ();
-  void run ();
+  LaplaceProblem();
+  void
+  run();
 
 private:
-  void make_grid_and_dofs ();
-  void solve ();
-  void output_results () const;
+  void
+  make_grid_and_dofs();
+  void
+  solve();
+  void
+  output_results() const;
 
-  Triangulation<dim>   triangulation;
-  FESystem<dim>            fe;
-  DoFHandler<dim>      dof_handler;
+  Triangulation<dim> triangulation;
+  FESystem<dim>      fe;
+  DoFHandler<dim>    dof_handler;
 
-  Vector<double>       solution;
+  Vector<double> solution;
 };
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem ()
-  :
-  fe (FE_Q<dim>(1),2),
-  dof_handler (triangulation)
+LaplaceProblem<dim>::LaplaceProblem() :
+  fe(FE_Q<dim>(1), 2),
+  dof_handler(triangulation)
 {}
 
 
 
 template <int dim>
-void LaplaceProblem<dim>::make_grid_and_dofs ()
+void
+LaplaceProblem<dim>::make_grid_and_dofs()
 {
-  GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (1);
-  triangulation.begin_active()->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
+  GridGenerator::hyper_cube(triangulation, 0, 1);
+  triangulation.refine_global(1);
+  triangulation.begin_active()->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 
-  dof_handler.distribute_dofs (fe);
-  solution.reinit (dof_handler.n_dofs());
+  dof_handler.distribute_dofs(fe);
+  solution.reinit(dof_handler.n_dofs());
 }
 
 
@@ -91,23 +100,21 @@ template <int dim>
 class SinesAndCosines : public Function<dim>
 {
 public:
-  SinesAndCosines ()
-    :
-    Function<dim> (2)
+  SinesAndCosines() : Function<dim>(2)
   {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component) const
+  double
+  value(const Point<dim> &p, const unsigned int component) const
   {
     switch (component)
       {
-      case 0:
-        return std::sin (p.norm());
-      case 1:
-        return std::cos (p.norm());
-      default:
-        Assert (false, ExcNotImplemented());
-        return 0;
+        case 0:
+          return std::sin(p.norm());
+        case 1:
+          return std::cos(p.norm());
+        default:
+          Assert(false, ExcNotImplemented());
+          return 0;
       }
   }
 };
@@ -115,14 +122,13 @@ public:
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve()
 {
   // dummy solve. just insert some
   // values as mentioned at the top
   // of the file
-  VectorTools::interpolate (dof_handler,
-                            SinesAndCosines<dim>(),
-                            solution);
+  VectorTools::interpolate(dof_handler, SinesAndCosines<dim>(), solution);
 }
 
 
@@ -130,25 +136,25 @@ template <int dim>
 class MyPostprocessor : public DataPostprocessorVector<dim>
 {
 public:
-  MyPostprocessor ()
-    :
-    DataPostprocessorVector<dim> ("magnitude_times_d", update_values)
+  MyPostprocessor() :
+    DataPostprocessorVector<dim>("magnitude_times_d", update_values)
   {}
 
-  virtual
-  void
-  evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
-                         std::vector<Vector<double> >                    &computed_quantities) const
+  virtual void
+  evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &input_data,
+                        std::vector<Vector<double>> &computed_quantities) const
   {
-    for (unsigned int q=0; q<input_data.solution_values.size(); ++q)
+    for (unsigned int q = 0; q < input_data.solution_values.size(); ++q)
       {
-        Assert (computed_quantities[q].size() == dim,
-                ExcInternalError());
+        Assert(computed_quantities[q].size() == dim, ExcInternalError());
 
-        for (unsigned int d=0; d<dim; ++d)
-          computed_quantities[q](d) = input_data.solution_values[q](0)*input_data.solution_values[q](0) + input_data.solution_values[q](1)*input_data.solution_values[q](1);
-        AssertThrow (std::fabs(computed_quantities[q](0)-1) < 1e-12,
-                     ExcInternalError());
+        for (unsigned int d = 0; d < dim; ++d)
+          computed_quantities[q](d) =
+            input_data.solution_values[q](0) *
+              input_data.solution_values[q](0) +
+            input_data.solution_values[q](1) * input_data.solution_values[q](1);
+        AssertThrow(std::fabs(computed_quantities[q](0) - 1) < 1e-12,
+                    ExcInternalError());
       }
   }
 };
@@ -156,38 +162,41 @@ public:
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results () const
+void
+LaplaceProblem<dim>::output_results() const
 {
   MyPostprocessor<dim> p;
-  DataOut<dim> data_out;
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, p);
-  data_out.build_patches ();
-  data_out.write_gnuplot (logfile);
+  DataOut<dim>         data_out;
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(solution, p);
+  data_out.build_patches();
+  data_out.write_gnuplot(logfile);
 }
 
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run()
 {
   make_grid_and_dofs();
-  solve ();
-  output_results ();
+  solve();
+  output_results();
 }
 
 
 
-int main ()
+int
+main()
 {
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);
 
   LaplaceProblem<2> laplace_problem_2d;
-  laplace_problem_2d.run ();
+  laplace_problem_2d.run();
 
   LaplaceProblem<3> laplace_problem_3d;
-  laplace_problem_3d.run ();
+  laplace_problem_3d.run();
 
   return 0;
 }

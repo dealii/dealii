@@ -16,25 +16,27 @@
 
 // Tests LAPACKFullMatrix::set(i,j,a)
 
-#include "../tests.h"
 #include <deal.II/lac/lapack_full_matrix.h>
 
 #include <iostream>
 #include <tuple>
 
+#include "../tests.h"
+
 template <typename NumberType>
-void test(const unsigned int n=3, const unsigned int k=6)
+void
+test(const unsigned int n = 3, const unsigned int k = 6)
 {
-  LAPACKFullMatrix<NumberType> A(n,k);
-  A.set(0,1,2.);
-  AssertThrow(A(0,1) == 2., ExcInternalError());
+  LAPACKFullMatrix<NumberType> A(n, k);
+  A.set(0, 1, 2.);
+  AssertThrow(A(0, 1) == 2., ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   test<double>();
-
 }

@@ -18,11 +18,13 @@
 // ParameterHandler::declare_entry did not allow to redeclare an
 // entry. make sure this works now
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   try
     {
@@ -30,18 +32,15 @@ int main ()
       deallog.attach(logfile);
 
       ParameterHandler prm;
-      prm.declare_entry ("int",
-                         "1",
-                         Patterns::Integer());
-      prm.declare_entry ("int",
-                         "2",
-                         Patterns::Integer());
+      prm.declare_entry("int", "1", Patterns::Integer());
+      prm.declare_entry("int", "2", Patterns::Integer());
 
-      prm.print_parameters (logfile, ParameterHandler::Text);
+      prm.print_parameters(logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -54,7 +53,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

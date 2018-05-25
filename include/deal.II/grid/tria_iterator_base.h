@@ -29,7 +29,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace IteratorState
 {
-
   /**
    * The three states an iterator can be in: valid, past-the-end and invalid.
    */
@@ -42,7 +41,7 @@ namespace IteratorState
     /// Iterator is invalid, probably due to an error
     invalid
   };
-}
+} // namespace IteratorState
 
 
 

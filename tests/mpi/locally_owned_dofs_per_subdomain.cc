@@ -17,44 +17,48 @@
 // DoFTools::locally_owned_dofs_per_subdomain wrongly sized the array
 // it returns when we have some processors that don't own any cells
 
-#include "../tests.h"
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/distributed/shared_tria.h>
+
 #include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  parallel::shared::Triangulation<dim>
-  triangulation (MPI_COMM_WORLD,
-                 ::Triangulation<dim>::none,
-                 false,
-                 parallel::shared::Triangulation<dim>::partition_zorder);
+  parallel::shared::Triangulation<dim> triangulation(
+    MPI_COMM_WORLD,
+    ::Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::partition_zorder);
   GridGenerator::hyper_cube(triangulation, -1.0, 1.0);
 
-  FE_Q<dim> fe(1);
-  DoFHandler<dim> dof_handler (triangulation);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
   // this used to crash here:
   const IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
 
-  deallog << "dim=" << dim
-          << std::endl
+  deallog << "dim=" << dim << std::endl
           << "rank=" << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
           << std::endl
-          << "  n_dofs=" << dof_handler.n_dofs()
-          << std::endl
-          << "  n_locally_owned_dofs="
-          << locally_owned_dofs.n_elements()
+          << "  n_dofs=" << dof_handler.n_dofs() << std::endl
+          << "  n_locally_owned_dofs=" << locally_owned_dofs.n_elements()
           << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   MPILogInitAll all;
 

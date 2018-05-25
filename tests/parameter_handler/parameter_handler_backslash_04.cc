@@ -14,8 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
+#include "../tests.h"
 
 /*
  * Test that ParameterHandler does *not* join lines for things like
@@ -24,22 +25,23 @@
  *                     c
  */
 
-int main ()
+int
+main()
 {
   initlog();
 
   for (unsigned int i = 0; i < 2; ++i)
     {
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
-      prm.declare_entry ("Function",
-                         "a",
-                         Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.declare_entry("Function",
+                        "a",
+                        Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
+      prm.leave_subsection();
 
       // We need a local path for the file to get consistent output messages.
-      const int chdir_return_code = chdir (SOURCE_DIR);
-      AssertThrow (chdir_return_code == 0, ExcInternalError());
+      const int chdir_return_code = chdir(SOURCE_DIR);
+      AssertThrow(chdir_return_code == 0, ExcInternalError());
       // test both relevant parse_input functions. They should fail with a
       // specific exception.
       try
@@ -50,15 +52,15 @@ int main ()
             }
           else
             {
-              std::ifstream input_stream
-              ("prm/parameter_handler_backslash_04.prm");
+              std::ifstream input_stream(
+                "prm/parameter_handler_backslash_04.prm");
               prm.parse_input(input_stream);
             }
 
           std::string list;
-          prm.enter_subsection ("Testing");
-          list = prm.get ("Function");
-          prm.leave_subsection ();
+          prm.enter_subsection("Testing");
+          list = prm.get("Function");
+          prm.leave_subsection();
 
           deallog << list << std::endl;
         }

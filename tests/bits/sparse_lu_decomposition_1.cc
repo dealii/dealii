@@ -22,20 +22,22 @@
 // it was fixed around 2003-05-22
 
 
-#include "../tests.h"
 #include <deal.II/base/smartpointer.h>
+
 #include <deal.II/lac/sparse_ilu.h>
 
+#include "../tests.h"
 
 
-int main ()
+
+int
+main()
 {
   initlog();
 
-  SmartPointer<SparseLUDecomposition<double> > sparse_decomp;
+  SmartPointer<SparseLUDecomposition<double>> sparse_decomp;
 
   deallog << "OK" << std::endl;
 
   return 0;
 }
-

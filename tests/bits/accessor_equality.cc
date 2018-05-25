@@ -16,66 +16,67 @@
 
 // test for equality of accessor objects
 
-#include "../tests.h"
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << dim << 'd' << std::endl;
 
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria,0,1);
-  tria.refine_global (1);
+  GridGenerator::hyper_cube(tria, 0, 1);
+  tria.refine_global(1);
 
   deallog << tria.begin_active() << std::endl;
 
   // test a few comparison operators
   {
-    const typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active();
-    AssertThrow (cell == cell, ExcInternalError());
-    AssertThrow (! (cell != cell), ExcInternalError());
-    AssertThrow (! (cell < cell), ExcInternalError());
+    const typename Triangulation<dim>::active_cell_iterator cell =
+      tria.begin_active();
+    AssertThrow(cell == cell, ExcInternalError());
+    AssertThrow(!(cell != cell), ExcInternalError());
+    AssertThrow(!(cell < cell), ExcInternalError());
   }
 
   // same with non-active iterators
   {
-    const typename Triangulation<dim>::cell_iterator
-    cell = tria.begin();
-    AssertThrow (cell == cell, ExcInternalError());
-    AssertThrow (! (cell != cell), ExcInternalError());
-    AssertThrow (! (cell < cell), ExcInternalError());
+    const typename Triangulation<dim>::cell_iterator cell = tria.begin();
+    AssertThrow(cell == cell, ExcInternalError());
+    AssertThrow(!(cell != cell), ExcInternalError());
+    AssertThrow(!(cell < cell), ExcInternalError());
   }
 
-  FE_Q<dim> fe (1);
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
   // now do the same tests with the
   // DoFHandler iterators
   {
-    const typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active();
-    AssertThrow (cell == cell, ExcInternalError());
-    AssertThrow (! (cell != cell), ExcInternalError());
-    AssertThrow (! (cell < cell), ExcInternalError());
+    const typename DoFHandler<dim>::active_cell_iterator cell =
+      dof_handler.begin_active();
+    AssertThrow(cell == cell, ExcInternalError());
+    AssertThrow(!(cell != cell), ExcInternalError());
+    AssertThrow(!(cell < cell), ExcInternalError());
   }
   {
-    const typename DoFHandler<dim>::cell_iterator
-    cell = dof_handler.begin();
-    AssertThrow (cell == cell, ExcInternalError());
-    AssertThrow (! (cell != cell), ExcInternalError());
-    AssertThrow (! (cell < cell), ExcInternalError());
+    const typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
+    AssertThrow(cell == cell, ExcInternalError());
+    AssertThrow(!(cell != cell), ExcInternalError());
+    AssertThrow(!(cell < cell), ExcInternalError());
   }
 
   // finally check that two iterators
@@ -87,8 +88,8 @@ void test ()
   // completely forbids comparing iterators
   // into different DoFHandlers at all
   {
-    DoFHandler<dim> dof_handler2 (tria);
-    dof_handler2.distribute_dofs (fe);
+    DoFHandler<dim> dof_handler2(tria);
+    dof_handler2.distribute_dofs(fe);
     try
       {
         (dof_handler.begin_active() != dof_handler2.begin_active());
@@ -101,13 +102,14 @@ void test ()
 }
 
 
-int main ()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 }

@@ -18,17 +18,20 @@
 
 
 
+#include <deal.II/base/point.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/point.h>
-#include <deal.II/lac/vector.h>
+
 #include <deal.II/fe/fe_update_flags.h>
+
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/data_component_interpretation.h>
 
 #include <boost/any.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -112,13 +115,13 @@ namespace DataPostprocessorInputs
    * Let us consider a complete example of a postprocessor that computes
    * the fluid norm of the stress $\|\sigma\| = \|\eta \nabla u\|$ from the
    * viscosity $\eta$ and the gradient of the fluid velocity, $\nabla u$,
-   * assuming that the viscosity is something that depends on the cell's material
-   * id. This can be done using a class we derive from DataPostprocessorScalar
-   * where we overload the DataPostprocessor::evaluate_vector_field() function
-   * that receives the values and gradients of the velocity (plus of
-   * other solution variables such as the pressure, but let's ignore those
-   * for the moment). Then we could use code such as this, assuming that we
-   * use a hp::DoFHandler:
+   * assuming that the viscosity is something that depends on the cell's
+   * material id. This can be done using a class we derive from
+   * DataPostprocessorScalar where we overload the
+   * DataPostprocessor::evaluate_vector_field() function that receives the
+   * values and gradients of the velocity (plus of other solution variables such
+   * as the pressure, but let's ignore those for the moment). Then we could use
+   * code such as this, assuming that we use a hp::DoFHandler:
    * @code
    *   template <int dim>
    *   class ComputeStress : public DataPostprocessorScalar<dim>
@@ -127,15 +130,16 @@ namespace DataPostprocessorInputs
    *       ... // overload other necessary member variables
    *       virtual
    *       void
-   *       evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
-   *                              std::vector<Vector<double> >               &computed_quantities) const
+   *       evaluate_vector_field (const DataPostprocessorInputs::Vector<dim>
+   * &input_data, std::vector<Vector<double> > &computed_quantities) const
    *       {
    *         const typename hp::DoFHandler<dim>::cell_iterator
-   *           current_cell = input_data.template get_cell<hp::DoFHandler<dim> >();
-   *         const viscosity = look_up_viscosity (current_cell->material_id());
+   *           current_cell = input_data.template get_cell<hp::DoFHandler<dim>
+   * >(); const viscosity = look_up_viscosity (current_cell->material_id());
    *
    *         for (unsigned int q=0; q<input_data.solution_gradients.size(); ++q)
-   *           computed_quantities[q][0] = (viscosity * input_data.solution_gradients[q]).norm();
+   *           computed_quantities[q][0] = (viscosity *
+   * input_data.solution_gradients[q]).norm();
    *       }
    *   };
    * @endcode
@@ -161,7 +165,7 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<Tensor<1, spacedim> > normals;
+    std::vector<Tensor<1, spacedim>> normals;
 
     /**
      * An array of coordinates corresponding to the locations at which
@@ -175,7 +179,7 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<Point<spacedim> >     evaluation_points;
+    std::vector<Point<spacedim>> evaluation_points;
 
     /**
      * Set the cell that is currently being used in evaluating the data
@@ -187,7 +191,7 @@ namespace DataPostprocessorInputs
      */
     template <typename DoFHandlerType>
     void
-    set_cell (const typename DoFHandlerType::cell_iterator &cell);
+    set_cell(const typename DoFHandlerType::cell_iterator &cell);
 
     /**
      * Query the cell on which we currently produce graphical output.
@@ -196,7 +200,7 @@ namespace DataPostprocessorInputs
      */
     template <typename DoFHandlerType>
     typename DoFHandlerType::cell_iterator
-    get_cell () const;
+    get_cell() const;
 
   private:
     /**
@@ -230,7 +234,7 @@ namespace DataPostprocessorInputs
      * points used to create graphical output from one cell, face, or other
      * object.
      */
-    std::vector<double>               solution_values;
+    std::vector<double> solution_values;
 
     /**
      * An array of gradients of the (scalar) solution at each of the evaluation
@@ -245,12 +249,12 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<Tensor<1, spacedim> > solution_gradients;
+    std::vector<Tensor<1, spacedim>> solution_gradients;
 
     /**
-     * An array of second derivatives of the (scalar) solution at each of the evaluation
-     * points used to create graphical output from one cell, face, or other
-     * object.
+     * An array of second derivatives of the (scalar) solution at each of the
+     * evaluation points used to create graphical output from one cell, face, or
+     * other object.
      *
      * This array is only filled if a user-derived class overloads the
      * DataPostprocessor::get_needed_update_flags(), and the function
@@ -260,7 +264,7 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<Tensor<2, spacedim> > solution_hessians;
+    std::vector<Tensor<2, spacedim>> solution_hessians;
   };
 
 
@@ -290,12 +294,12 @@ namespace DataPostprocessorInputs
      * vector runs over the components of the finite element field for which
      * output will be generated.
      */
-    std::vector<dealii::Vector<double> >            solution_values;
+    std::vector<dealii::Vector<double>> solution_values;
 
     /**
-     * An array of gradients of a vector-valued solution at each of the evaluation
-     * points used to create graphical output from one cell, face, or other
-     * object.
+     * An array of gradients of a vector-valued solution at each of the
+     * evaluation points used to create graphical output from one cell, face, or
+     * other object.
      *
      * The outer vector runs over the evaluation points, whereas the inner
      * vector runs over the components of the finite element field for which
@@ -309,12 +313,12 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<std::vector<Tensor<1, spacedim> > > solution_gradients;
+    std::vector<std::vector<Tensor<1, spacedim>>> solution_gradients;
 
     /**
-     * An array of second derivatives of a vector-valued solution at each of the evaluation
-     * points used to create graphical output from one cell, face, or other
-     * object.
+     * An array of second derivatives of a vector-valued solution at each of the
+     * evaluation points used to create graphical output from one cell, face, or
+     * other object.
      *
      * The outer vector runs over the evaluation points, whereas the inner
      * vector runs over the components of the finite element field for which
@@ -328,10 +332,10 @@ namespace DataPostprocessorInputs
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
      */
-    std::vector<std::vector<Tensor<2, spacedim> > > solution_hessians;
+    std::vector<std::vector<Tensor<2, spacedim>>> solution_hessians;
   };
 
-}
+} // namespace DataPostprocessorInputs
 
 
 /**
@@ -398,8 +402,8 @@ namespace DataPostprocessorInputs
  * hand, in step-29 we implement a postprocessor that only computes the
  * magnitude of a complex number given by a two-component finite element. It
  * seems silly to have to implement four virtual functions for this
- * (evaluate_scalar_field() or evaluate_vector_field(), get_names(), get_update_flags() and
- * get_data_component_interpretation()).
+ * (evaluate_scalar_field() or evaluate_vector_field(), get_names(),
+ * get_update_flags() and get_data_component_interpretation()).
  *
  * To this end there are three classes DataPostprocessorScalar,
  * DataPostprocessorVector, and DataPostprocessorTensor that are meant to be
@@ -421,16 +425,15 @@ namespace DataPostprocessorInputs
  * @author Tobias Leicht, 2007, Wolfgang Bangerth, 2016
  */
 template <int dim>
-class DataPostprocessor: public Subscriptor
+class DataPostprocessor : public Subscriptor
 {
 public:
-
   /**
    * Destructor. This function doesn't actually do anything but is marked as
    * virtual to ensure that data postprocessors can be destroyed through
    * pointers to the base class.
    */
-  virtual ~DataPostprocessor () override = default;
+  virtual ~DataPostprocessor() override = default;
 
   /**
    * This is the main function which actually performs the postprocessing. The
@@ -447,29 +450,29 @@ public:
    * Otherwise those vectors will be in an unspecified state.
    *
    * This function is called when the finite element field that is being
-   * converted into graphical data by DataOut or similar classes represents scalar
-   * data, i.e. the finite element in use has only a single vector component.
+   * converted into graphical data by DataOut or similar classes represents
+   * scalar data, i.e. the finite element in use has only a single vector
+   * component.
    */
-  virtual
-  void
-  evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &input_data,
-                         std::vector<Vector<double> >               &computed_quantities) const;
+  virtual void
+  evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &input_data,
+                        std::vector<Vector<double>> &computed_quantities) const;
 
   /**
    * Same as the evaluate_scalar_field() function, but this
    * function is called when the original data vector represents vector data,
    * i.e. the finite element in use has multiple vector components.
    */
-  virtual
-  void
-  evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
-                         std::vector<Vector<double> >               &computed_quantities) const;
+  virtual void
+  evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &input_data,
+                        std::vector<Vector<double>> &computed_quantities) const;
 
   /**
    * Return the vector of strings describing the names of the computed
    * quantities.
    */
-  virtual std::vector<std::string> get_names () const = 0;
+  virtual std::vector<std::string>
+  get_names() const = 0;
 
   /**
    * This function returns information about how the individual components of
@@ -493,9 +496,8 @@ public:
    * DataComponentInterpretation::component_is_part_of_vector,
    * DataComponentInterpretation::component_is_scalar) for (u,v,p).
    */
-  virtual
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  get_data_component_interpretation () const;
+  virtual std::vector<DataComponentInterpretation::DataComponentInterpretation>
+  get_data_component_interpretation() const;
 
   /**
    * Return, which data has to be provided to compute the derived quantities.
@@ -504,7 +506,8 @@ public:
    * with DataOutFaces, you may also ask for a update of normals via the @p
    * update_normal_vectors flag.
    */
-  virtual UpdateFlags get_needed_update_flags () const = 0;
+  virtual UpdateFlags
+  get_needed_update_flags() const = 0;
 };
 
 
@@ -547,15 +550,16 @@ public:
    * be used in combination with DataOutFaces, you may also ask for a update
    * of normals via the @p update_normal_vectors flag.
    */
-  DataPostprocessorScalar (const std::string &name,
-                           const UpdateFlags  update_flags);
+  DataPostprocessorScalar(const std::string &name,
+                          const UpdateFlags  update_flags);
 
   /**
    * Return the vector of strings describing the names of the computed
    * quantities. Given the purpose of this class, this is a vector with a
    * single entry equal to the name given to the constructor.
    */
-  virtual std::vector<std::string> get_names () const override;
+  virtual std::vector<std::string>
+  get_names() const override;
 
   /**
    * This function returns information about how the individual components of
@@ -564,16 +568,16 @@ public:
    * scalar result variable, the returned value is obviously
    * DataComponentInterpretation::component_is_scalar.
    */
-  virtual
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  get_data_component_interpretation () const override;
+  virtual std::vector<DataComponentInterpretation::DataComponentInterpretation>
+  get_data_component_interpretation() const override;
 
   /**
    * Return, which data has to be provided to compute the derived quantities.
    * The flags returned here are the ones passed to the constructor of this
    * class.
    */
-  virtual UpdateFlags get_needed_update_flags () const override;
+  virtual UpdateFlags
+  get_needed_update_flags() const override;
 
 private:
   /**
@@ -631,8 +635,9 @@ private:
  *
  *   virtual
  *   void
- *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &input_data,
- *                          std::vector<Vector<double> >               &computed_quantities) const
+ *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim>
+ * &input_data, std::vector<Vector<double> >               &computed_quantities)
+ * const
  *   {
  *     // ensure that there really are as many output slots
  *     // as there are points at which DataOut provides the
@@ -682,12 +687,12 @@ private:
  * @image html data_postprocessor_vector_1.png
  *
  * In the second image, the background color corresponds to the magnitude of the
- * gradient vector and the vector glyphs to the gradient itself. It may be surprising
- * at first to see that from each vertex, multiple vectors originate, going in
- * different directions. But that is because the solution is only continuous:
- * in general, the gradient is discontinuous across edges, and so the multiple
- * vectors originating from each vertex simply represent the differing
- * gradients of the solution at each adjacent cell.
+ * gradient vector and the vector glyphs to the gradient itself. It may be
+ * surprising at first to see that from each vertex, multiple vectors originate,
+ * going in different directions. But that is because the solution is only
+ * continuous: in general, the gradient is discontinuous across edges, and so
+ * the multiple vectors originating from each vertex simply represent the
+ * differing gradients of the solution at each adjacent cell.
  *
  * The output above -- namely, the gradient $\nabla u$ of the solution --
  * corresponds to the temperature gradient if one interpreted step-6 as solving
@@ -698,8 +703,9 @@ private:
  * that conducts heat well, and consequently the temperature gradient is small.
  * On the other hand, the "heat flux" corresponds to the quantity
  * $a(\mathbf x) \nabla u(\mathbf x)$. For the
- * solution of that equation, the flux should be continuous across the interface.
- * This is easily verified by the following modification of the postprocessor:
+ * solution of that equation, the flux should be continuous across the
+ * interface. This is easily verified by the following modification of the
+ * postprocessor:
  * @code
  * template <int dim>
  * class HeatFluxPostprocessor : public DataPostprocessorVector<dim>
@@ -710,13 +716,15 @@ private:
  *     // like above, but now also make sure that DataOut provides
  *     // us with coordinates of the evaluation points:
  *     DataPostprocessorVector<dim> ("heat_flux",
- *                                   update_gradients | update_quadrature_points)
+ *                                   update_gradients |
+ * update_quadrature_points)
  *   {}
  *
  *   virtual
  *   void
- *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &input_data,
- *                          std::vector<Vector<double> >               &computed_quantities) const
+ *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim>
+ * &input_data, std::vector<Vector<double> >               &computed_quantities)
+ * const
  *   {
  *     AssertDimension (input_data.solution_gradients.size(),
  *                      computed_quantities.size());
@@ -782,15 +790,16 @@ public:
    * be used in combination with DataOutFaces, you may also ask for a update
    * of normals via the @p update_normal_vectors flag.
    */
-  DataPostprocessorVector (const std::string &name,
-                           const UpdateFlags  update_flags);
+  DataPostprocessorVector(const std::string &name,
+                          const UpdateFlags  update_flags);
 
   /**
    * Return the vector of strings describing the names of the computed
    * quantities. Given the purpose of this class, this is a vector with dim
    * entries all equal to the name given to the constructor.
    */
-  virtual std::vector<std::string> get_names () const override;
+  virtual std::vector<std::string>
+  get_names() const override;
 
   /**
    * This function returns information about how the individual components of
@@ -799,16 +808,16 @@ public:
    * vector result variable, the returned value is obviously
    * DataComponentInterpretation::component_is_part repeated dim times.
    */
-  virtual
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  get_data_component_interpretation () const override;
+  virtual std::vector<DataComponentInterpretation::DataComponentInterpretation>
+  get_data_component_interpretation() const override;
 
   /**
    * Return which data has to be provided to compute the derived quantities.
    * The flags returned here are the ones passed to the constructor of this
    * class.
    */
-  virtual UpdateFlags get_needed_update_flags () const override;
+  virtual UpdateFlags
+  get_needed_update_flags() const override;
 
 private:
   /**
@@ -885,8 +894,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
- *                            std::vector<Vector<double> >               &computed_quantities) const
+ *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim>
+ * &input_data, std::vector<Vector<double> >               &computed_quantities)
+ * const
  *     {
  *       // ensure that there really are as many output slots
  *       // as there are points at which DataOut provides the
@@ -911,10 +921,10 @@ private:
  *     }
  *   };
  * @endcode
- * The only tricky part in this piece of code is how to sort the <code>dim*dim</code>
- * elements of the strain tensor into the one vector of computed output
- * quantities -- in other words, how to <i>unroll</i> the elements of
- * the tensor into the vector. This is facilitated by the
+ * The only tricky part in this piece of code is how to sort the
+ * <code>dim*dim</code> elements of the strain tensor into the one vector of
+ * computed output quantities -- in other words, how to <i>unroll</i> the
+ * elements of the tensor into the vector. This is facilitated by the
  * Tensor::component_to_unrolled_index() function that takes a
  * pair of indices that specify a particular element of the
  * tensor and returns a vector index that is then used in the code
@@ -933,8 +943,8 @@ private:
  *     std::vector<DataComponentInterpretation::DataComponentInterpretation>
  *     data_component_interpretation
  *     (dim, DataComponentInterpretation::component_is_part_of_vector);
- *     data_out.add_data_vector (solution, std::vector<std::string>(dim,"displacement"),
- *                               DataOut<dim>::type_dof_data,
+ *     data_out.add_data_vector (solution,
+ * std::vector<std::string>(dim,"displacement"), DataOut<dim>::type_dof_data,
  *                               data_component_interpretation);
  *     data_out.add_data_vector (solution, grad_u);
  *     data_out.build_patches ();
@@ -949,15 +959,17 @@ private:
  * @image html data_postprocessor_tensor_0.png
  * @image html data_postprocessor_tensor_1.png
  *
- * These pictures show an ellipse representing the gradient tensor at, on average,
- * every tenth mesh point. You may want to read through the documentation of the
- * Visit visualization program (see https://wci.llnl.gov/simulation/computer-codes/visit/)
- * for an interpretation of how exactly tensors are visualizated.
+ * These pictures show an ellipse representing the gradient tensor at, on
+ * average, every tenth mesh point. You may want to read through the
+ * documentation of the Visit visualization program (see
+ * https://wci.llnl.gov/simulation/computer-codes/visit/) for an interpretation
+ * of how exactly tensors are visualizated.
  *
- * In elasticity, one is often interested not in the gradient of the displacement,
- * but in the "strain", i.e., the symmetrized version of the gradient
- * $\varepsilon=\frac 12 (\nabla u + \nabla u^T)$. This is easily facilitated with
- * the following minor modification:
+ * In elasticity, one is often interested not in the gradient of the
+ * displacement, but in the "strain", i.e., the symmetrized version of the
+ * gradient
+ * $\varepsilon=\frac 12 (\nabla u + \nabla u^T)$. This is easily facilitated
+ * with the following minor modification:
  * @code
  *   template <int dim>
  *   class StrainPostprocessor : public DataPostprocessorTensor<dim>
@@ -971,8 +983,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
- *                            std::vector<Vector<double> >               &computed_quantities) const
+ *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim>
+ * &input_data, std::vector<Vector<double> >               &computed_quantities)
+ * const
  *     {
  *       AssertDimension (input_data.solution_gradients.size(),
  *                        computed_quantities.size());
@@ -1021,15 +1034,16 @@ public:
    * be used in combination with DataOutFaces, you may also ask for a update
    * of normals via the @p update_normal_vectors flag.
    */
-  DataPostprocessorTensor (const std::string &name,
-                           const UpdateFlags  update_flags);
+  DataPostprocessorTensor(const std::string &name,
+                          const UpdateFlags  update_flags);
 
   /**
    * Return the vector of strings describing the names of the computed
    * quantities. Given the purpose of this class, this is a vector with dim
    * entries all equal to the name given to the constructor.
    */
-  virtual std::vector<std::string> get_names () const override;
+  virtual std::vector<std::string>
+  get_names() const override;
 
   /**
    * This function returns information about how the individual components of
@@ -1038,16 +1052,16 @@ public:
    * vector result variable, the returned value is obviously
    * DataComponentInterpretation::component_is_part repeated dim times.
    */
-  virtual
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  get_data_component_interpretation () const override;
+  virtual std::vector<DataComponentInterpretation::DataComponentInterpretation>
+  get_data_component_interpretation() const override;
 
   /**
    * Return which data has to be provided to compute the derived quantities.
    * The flags returned here are the ones passed to the constructor of this
    * class.
    */
-  virtual UpdateFlags get_needed_update_flags () const override;
+  virtual UpdateFlags
+  get_needed_update_flags() const override;
 
 private:
   /**
@@ -1064,17 +1078,17 @@ private:
 
 namespace DataPostprocessorInputs
 {
-
   template <int spacedim>
   template <typename DoFHandlerType>
   void
-  CommonInputs<spacedim>::set_cell (const typename DoFHandlerType::cell_iterator &new_cell)
+  CommonInputs<spacedim>::set_cell(
+    const typename DoFHandlerType::cell_iterator &new_cell)
   {
     // see if we had previously already stored a cell that has the same
     // data type; if so, reuse the memory location and avoid calling 'new'
     // inside boost::any
-    if (typename DoFHandlerType::cell_iterator * storage_location
-        = boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell))
+    if (typename DoFHandlerType::cell_iterator *storage_location =
+          boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell))
       *storage_location = new_cell;
     else
       // if we had nothing stored before, or if we had stored a different
@@ -1087,24 +1101,27 @@ namespace DataPostprocessorInputs
   template <int spacedim>
   template <typename DoFHandlerType>
   typename DoFHandlerType::cell_iterator
-  CommonInputs<spacedim>::get_cell () const
+  CommonInputs<spacedim>::get_cell() const
   {
-    Assert(cell.empty() == false,
-           ExcMessage ("You are trying to access the cell associated with a "
-                       "DataPostprocessorInputs::Scalar object for which no cell has "
-                       "been set."));
-    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) != nullptr,
-           ExcMessage ("You are trying to access the cell associated with a "
-                       "DataPostprocessorInputs::Scalar with a DoFHandler type that "
-                       "is different from the type with which it has been set. For "
-                       "example, if the cell for which output is currently being "
-                       "generated belongs to a hp::DoFHandler<2,3> object, then you can "
-                       "only call the current function with a template argument "
-                       "equal to hp::DoFHandler<2,3>, but not with any other class "
-                       "type or dimension template argument."));
+    Assert(
+      cell.empty() == false,
+      ExcMessage("You are trying to access the cell associated with a "
+                 "DataPostprocessorInputs::Scalar object for which no cell has "
+                 "been set."));
+    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) !=
+             nullptr,
+           ExcMessage(
+             "You are trying to access the cell associated with a "
+             "DataPostprocessorInputs::Scalar with a DoFHandler type that "
+             "is different from the type with which it has been set. For "
+             "example, if the cell for which output is currently being "
+             "generated belongs to a hp::DoFHandler<2,3> object, then you can "
+             "only call the current function with a template argument "
+             "equal to hp::DoFHandler<2,3>, but not with any other class "
+             "type or dimension template argument."));
     return boost::any_cast<typename DoFHandlerType::cell_iterator>(cell);
   }
-}
+} // namespace DataPostprocessorInputs
 
 #endif
 

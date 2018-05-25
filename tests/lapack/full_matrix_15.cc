@@ -14,15 +14,17 @@
 // ---------------------------------------------------------------------
 
 
-// test LAPACKFullMatrix::compute_cholesky_factorization by comparing with FullMatrix
+// test LAPACKFullMatrix::compute_cholesky_factorization by comparing with
+// FullMatrix
 
-#include "../tests.h"
-#include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+
+#include "../tests.h"
+#include "create_matrix.h"
 
 
 template <typename NumberType>
@@ -41,8 +43,8 @@ test(const unsigned int size)
   M.compute_cholesky_factorization();
   // factorization is stored in the lower diagonal part
   for (unsigned int i = 0; i < size; ++i)
-    for (unsigned int j=i+1; j < size; ++j)
-      M(i,j) = 0.;
+    for (unsigned int j = i + 1; j < size; ++j)
+      M(i, j) = 0.;
 
   FullMatrix<NumberType> diff(size);
   diff = M;
@@ -62,14 +64,15 @@ test(const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 
-  const std::vector<unsigned int> sizes = {{1,3,11,17,32,64,200,391}};
+  const std::vector<unsigned int> sizes = {{1, 3, 11, 17, 32, 64, 200, 391}};
   for (const auto &s : sizes)
     {
       // test<float>(s);

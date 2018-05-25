@@ -18,9 +18,12 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+
 #include <deal.II/dofs/dof_objects.h>
+
 #include <vector>
 
 
@@ -31,8 +34,6 @@ namespace internal
 {
   namespace DoFHandlerImplementation
   {
-
-
     /**
      * Structure for storing degree of freedom information for cells,
      * organized by levels.
@@ -91,64 +92,60 @@ namespace internal
        * next dofs_per_cell indices are for the current cell.
        */
       const types::global_dof_index *
-      get_cell_cache_start (const unsigned int obj_index,
-                            const unsigned int dofs_per_cell) const;
+      get_cell_cache_start(const unsigned int obj_index,
+                           const unsigned int dofs_per_cell) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar, const unsigned int version);
     };
 
 
 
     template <int dim>
-    inline
-    const types::global_dof_index *
-    DoFLevel<dim>::get_cell_cache_start (const unsigned int obj_index,
-                                         const unsigned int dofs_per_cell) const
+    inline const types::global_dof_index *
+    DoFLevel<dim>::get_cell_cache_start(const unsigned int obj_index,
+                                        const unsigned int dofs_per_cell) const
     {
-      Assert (obj_index*dofs_per_cell+dofs_per_cell
-              <=
-              cell_dof_indices_cache.size(),
-              ExcInternalError());
+      Assert(obj_index * dofs_per_cell + dofs_per_cell <=
+               cell_dof_indices_cache.size(),
+             ExcInternalError());
 
-      return cell_dof_indices_cache.data()+(obj_index*dofs_per_cell);
+      return cell_dof_indices_cache.data() + (obj_index * dofs_per_cell);
     }
 
 
 
     template <int dim>
-    inline
-    std::size_t
-    DoFLevel<dim>::memory_consumption () const
+    inline std::size_t
+    DoFLevel<dim>::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption (cell_dof_indices_cache) +
-              MemoryConsumption::memory_consumption (dof_object));
+      return (MemoryConsumption::memory_consumption(cell_dof_indices_cache) +
+              MemoryConsumption::memory_consumption(dof_object));
     }
 
 
     template <int dim>
     template <class Archive>
-    inline
-    void
-    DoFLevel<dim>::serialize (Archive &ar,
-                              const unsigned int)
+    inline void
+    DoFLevel<dim>::serialize(Archive &ar, const unsigned int)
     {
       ar &cell_dof_indices_cache;
       ar &dof_object;
     }
-  }
-}
+  } // namespace DoFHandlerImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

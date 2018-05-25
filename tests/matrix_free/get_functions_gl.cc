@@ -31,62 +31,63 @@ std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
-  typedef double number;
+  typedef double               number;
   const SphericalManifold<dim> manifold;
-  Triangulation<dim> tria;
-  GridGenerator::hyper_ball (tria);
-  typename Triangulation<dim>::active_cell_iterator
-  cell = tria.begin_active (),
-  endc = tria.end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+  Triangulation<dim>           tria;
+  GridGenerator::hyper_ball(tria);
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
+                                                    endc = tria.end();
+  for (; cell != endc; ++cell)
+    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
-  tria.set_manifold (0, manifold);
+  tria.set_manifold(0, manifold);
 
   // refine first and last cell
-  tria.begin(tria.n_levels()-1)->set_refine_flag();
+  tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  tria.refine_global (4-dim);
+  tria.refine_global(4 - dim);
 
-  FE_Q<dim> fe (QGaussLobatto<1>(fe_degree+1));
-  DoFHandler<dim> dof (tria);
+  FE_Q<dim>       fe(QGaussLobatto<1>(fe_degree + 1));
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
 
   ConstraintMatrix constraints;
-  DoFTools::make_hanging_node_constraints (dof, constraints);
+  DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
-  //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells()
+  // std::cout << "Number of cells: " <<
+  // dof.get_triangulation().n_active_cells()
   //          << std::endl;
-  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
-  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
+  // std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  // std::cout << "Number of constraints: " << constraints.n_constraints() <<
+  // std::endl;
 
-  Vector<number> solution (dof.n_dofs());
+  Vector<number> solution(dof.n_dofs());
 
   // create vector with random entries
-  for (unsigned int i=0; i<dof.n_dofs(); ++i)
+  for (unsigned int i = 0; i < dof.n_dofs(); ++i)
     {
       if (constraints.is_constrained(i))
         continue;
       const double entry = random_value<double>();
-      solution(i) = entry;
+      solution(i)        = entry;
     }
   constraints.distribute(solution);
 
-  MatrixFree<dim,number> mf_data;
-  deallog << "Test with fe_degree " << fe_degree
-          << std::endl;
-  const QGaussLobatto<1> quad (fe_degree+1);
-  MappingQ<dim> mapping (2);
-  typename MatrixFree<dim,number>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim,number>::AdditionalData::none;
-  data.mapping_update_flags = update_gradients | update_hessians;
-  mf_data.reinit (mapping, dof, constraints, quad, data);
-  MatrixFreeTest<dim,fe_degree,fe_degree+1,number> mf (mf_data, mapping);
-  mf.test_functions (solution);
+  MatrixFree<dim, number> mf_data;
+  deallog << "Test with fe_degree " << fe_degree << std::endl;
+  const QGaussLobatto<1>                           quad(fe_degree + 1);
+  MappingQ<dim>                                    mapping(2);
+  typename MatrixFree<dim, number>::AdditionalData data;
+  data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
+  data.mapping_update_flags  = update_gradients | update_hessians;
+  mf_data.reinit(mapping, dof, constraints, quad, data);
+  MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data, mapping);
+  mf.test_functions(solution);
 }

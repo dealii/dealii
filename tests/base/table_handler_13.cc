@@ -17,22 +17,24 @@
 // use the org-mode in TableHandler::write_text
 
 
-#include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   TableHandler table;
-  table.set_auto_fill_mode (true);
+  table.set_auto_fill_mode(true);
 
-  std::string keys[3] = { "key1", "key2", "key3" };
+  std::string keys[3] = {"key1", "key2", "key3"};
 
   // fill rows 1 and 2 partially
   table.add_value(keys[0], 0);
@@ -50,14 +52,11 @@ int main ()
 
   // produce output. hope that row 4 is
   // completely padded
-  table.write_text(deallog.get_file_stream(),
-                   TableHandler::org_mode_table);
+  table.write_text(deallog.get_file_stream(), TableHandler::org_mode_table);
 
   // now again fill row 4 partially
   table.add_value(keys[0], 1);
 
   // produce output. hope that we get 3 rows
-  table.write_text(deallog.get_file_stream(),
-                   TableHandler::org_mode_table);
-
+  table.write_text(deallog.get_file_stream(), TableHandler::org_mode_table);
 }

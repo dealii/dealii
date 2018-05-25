@@ -14,16 +14,17 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/fe/mapping.h>
+
+#include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
 std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-Mapping<dim, spacedim>::get_vertices (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+Mapping<dim, spacedim>::get_vertices(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
   std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
   for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -35,47 +36,47 @@ Mapping<dim, spacedim>::get_vertices (
 
 
 template <int dim, int spacedim>
-Point<dim-1>
-Mapping<dim,spacedim>::
-project_real_point_to_unit_point_on_face (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int &face_no,
-  const Point<spacedim> &p) const
+Point<dim - 1>
+Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int &                                        face_no,
+  const Point<spacedim> &                                     p) const
 {
-  //The function doesn't make physical sense for dim=1
-  Assert(dim>1, ExcNotImplemented());
-  //Not implemented for higher dimensions
-  Assert(dim<=3, ExcNotImplemented());
+  // The function doesn't make physical sense for dim=1
+  Assert(dim > 1, ExcNotImplemented());
+  // Not implemented for higher dimensions
+  Assert(dim <= 3, ExcNotImplemented());
 
   Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
 
-  Point<dim-1> unit_face_pt;
+  Point<dim - 1> unit_face_pt;
 
-  if (dim==2)
+  if (dim == 2)
     {
       if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
-        unit_face_pt = Point<dim-1>(unit_cell_pt(1));
+        unit_face_pt = Point<dim - 1>(unit_cell_pt(1));
       else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
-        unit_face_pt = Point<dim-1>(unit_cell_pt(0));
+        unit_face_pt = Point<dim - 1>(unit_cell_pt(0));
     }
-  else if (dim==3)
+  else if (dim == 3)
     {
       if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
-        unit_face_pt = Point<dim-1>(unit_cell_pt(1), unit_cell_pt(2));
+        unit_face_pt = Point<dim - 1>(unit_cell_pt(1), unit_cell_pt(2));
       else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
-        unit_face_pt = Point<dim-1>(unit_cell_pt(0), unit_cell_pt(2));
+        unit_face_pt = Point<dim - 1>(unit_cell_pt(0), unit_cell_pt(2));
       else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 2)
-        unit_face_pt = Point<dim-1>(unit_cell_pt(0), unit_cell_pt(1));
+        unit_face_pt = Point<dim - 1>(unit_cell_pt(0), unit_cell_pt(1));
     }
 
   return unit_face_pt;
 }
 
-/*------------------------------ InternalDataBase ------------------------------*/
+/*------------------------------ InternalDataBase
+ * ------------------------------*/
 
 
 template <int dim, int spacedim>
-Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
+Mapping<dim, spacedim>::InternalDataBase::InternalDataBase() :
   update_each(update_default)
 {}
 
@@ -83,7 +84,7 @@ Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
 
 template <int dim, int spacedim>
 std::size_t
-Mapping<dim, spacedim>::InternalDataBase::memory_consumption () const
+Mapping<dim, spacedim>::InternalDataBase::memory_consumption() const
 {
   return sizeof(*this);
 }

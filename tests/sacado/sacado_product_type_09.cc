@@ -18,34 +18,35 @@
 
 
 #include <deal.II/base/symmetric_tensor.h>
+
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
 #include "../tests.h"
 
 
-int main()
+int
+main()
 {
-  typedef Sacado::Fad::DFad<double> Sdouble;
+  typedef Sacado::Fad::DFad<double>  Sdouble;
   typedef Sacado::Fad::DFad<Sdouble> SSdouble;
   initlog();
 
 
   // check product with Tensor<2,dim>
-  Tensor<2,2,double> t;
-  SymmetricTensor<2,2,SSdouble> st;
-  SSdouble a(2,0,7.0);
-  SSdouble b(2,1,3.0);
-  a.val() = Sdouble(2,0,7.0);
-  b.val() = Sdouble(2,1,3.0);
+  Tensor<2, 2, double>            t;
+  SymmetricTensor<2, 2, SSdouble> st;
+  SSdouble                        a(2, 0, 7.0);
+  SSdouble                        b(2, 1, 3.0);
+  a.val() = Sdouble(2, 0, 7.0);
+  b.val() = Sdouble(2, 1, 3.0);
 
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
+  for (unsigned int i = 0; i < 2; ++i)
+    for (unsigned int j = 0; j < 2; ++j)
       {
-        t[i][j] = (1.+(i+1)*(j*2));
-        st[i][j] = 2.*a+i*j*b;
+        t[i][j]  = (1. + (i + 1) * (j * 2));
+        st[i][j] = 2. * a + i * j * b;
       }
 
-  deallog << scalar_product(t,st) << std::endl;
-  deallog << scalar_product(st,t) << std::endl;
-
+  deallog << scalar_product(t, st) << std::endl;
+  deallog << scalar_product(st, t) << std::endl;
 }

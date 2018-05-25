@@ -18,48 +18,55 @@
 #ifndef tests_base_simplex_h
 #define tests_base_simplex_h
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
-
-#include "simplex.h"
 
 #include <numeric>
 
+#include "../tests.h"
+#include "simplex.h"
+
 
 // Helper functions
-template<int dim>
-std::array<Point<dim>, dim+1> get_simplex();
+template <int dim>
+std::array<Point<dim>, dim + 1>
+get_simplex();
 
-template<>
-std::array<Point<1>, 2> get_simplex()
+template <>
+std::array<Point<1>, 2>
+get_simplex()
 {
   return {{Point<1>(3), Point<1>(5)}};
 }
 
 
-template<>
-std::array<Point<2>, 3> get_simplex()
+template <>
+std::array<Point<2>, 3>
+get_simplex()
 {
-  return {{Point<2>(4,2), Point<2>(3,3), Point<2>(2,2.5)}};
+  return {{Point<2>(4, 2), Point<2>(3, 3), Point<2>(2, 2.5)}};
 }
 
 
-template<>
-std::array<Point<3>, 4> get_simplex()
+template <>
+std::array<Point<3>, 4>
+get_simplex()
 {
-  return {{Point<3>(4,2,0), Point<3>(3,3,0), Point<3>(2,2.5,0), Point<3>(4.5, 3, 2)}};
+  return {{Point<3>(4, 2, 0),
+           Point<3>(3, 3, 0),
+           Point<3>(2, 2.5, 0),
+           Point<3>(4.5, 3, 2)}};
 }
 
 
 // Exact integral of 1/R times a polynomial computed using Maple.
-double exact_integral_one_over_r(const unsigned int vertex_index,
-                                 const unsigned int i,
-                                 const unsigned int j)
+double
+exact_integral_one_over_r(const unsigned int vertex_index,
+                          const unsigned int i,
+                          const unsigned int j)
 {
   Assert(vertex_index < 4, ExcInternalError());
-  Assert(i<6, ExcNotImplemented());
-  Assert(j<6, ExcNotImplemented());
+  Assert(i < 6, ExcNotImplemented());
+  Assert(j < 6, ExcNotImplemented());
 
   // The integrals are computed using the following maple snippet of
   // code:
@@ -72,7 +79,8 @@ double exact_integral_one_over_r(const unsigned int vertex_index,
   //     elif index = 2 then
   //        return int(int(x^N *y^M/sqrt(x^2+(y-1)^2), x=0.0..1.0), y=0.0..1.0);
   //     elif index = 3 then
-  //        return int(int((1-x)^N *(1-y)^M/sqrt(x^2+y^2), x=0.0..1.0), y=0.0..1.0);
+  //        return int(int((1-x)^N *(1-y)^M/sqrt(x^2+y^2), x=0.0..1.0),
+  //        y=0.0..1.0);
   //     end if;
   //  end proc;
   //  Digits := 20;
@@ -237,54 +245,55 @@ double exact_integral_one_over_r(const unsigned int vertex_index,
 
 
 
-double exact_integral_one_over_r_middle(const unsigned int i,
-                                        const unsigned int j)
+double
+exact_integral_one_over_r_middle(const unsigned int i, const unsigned int j)
 {
-  Assert(i<6, ExcNotImplemented());
-  Assert(j<6, ExcNotImplemented());
+  Assert(i < 6, ExcNotImplemented());
+  Assert(j < 6, ExcNotImplemented());
 
-// The integrals are computed using the following Mathematica snippet of
-// code:
-//
-// x0 = 0.5
-// y0 = 0.5
-// Do[Do[Print["v[", n, "][", m, "]=",
-//    NumberForm[
-//     NIntegrate[
-//      x^n*y^m/Sqrt[(x - x0)^2 + (y - y0)^2], {x, 0, 1}, {y, 0, 1},
-//      MaxRecursion -> 10000, PrecisionGoal -> 9], 9], ";"], {n, 0,
-//    4}], {m, 0, 4}]
+  // The integrals are computed using the following Mathematica snippet of
+  // code:
+  //
+  // x0 = 0.5
+  // y0 = 0.5
+  // Do[Do[Print["v[", n, "][", m, "]=",
+  //    NumberForm[
+  //     NIntegrate[
+  //      x^n*y^m/Sqrt[(x - x0)^2 + (y - y0)^2], {x, 0, 1}, {y, 0, 1},
+  //      MaxRecursion -> 10000, PrecisionGoal -> 9], 9], ";"], {n, 0,
+  //    4}], {m, 0, 4}]
 
 
   static double v[6][6] = {{0}};
 
   if (v[0][0] == 0)
     {
-      v[0][0] = 3.52549435;;
+      v[0][0] = 3.52549435;
+      ;
       v[1][0] = 1.76274717;
-      v[2][0]=1.07267252;
-      v[3][0]=0.727635187;
-      v[4][0]=0.53316959;
-      v[0][1]=1.76274717;
-      v[1][1]=0.881373587;
-      v[2][1]=0.536336258;
-      v[3][1]=0.363817594;
-      v[4][1]=0.266584795;
-      v[0][2]=1.07267252;
-      v[1][2]=0.536336258;
-      v[2][2]=0.329313861;
-      v[3][2]=0.225802662;
-      v[4][2]=0.167105787;
-      v[0][3]=0.727635187;
-      v[1][3]=0.363817594;
-      v[2][3]=0.225802662;
-      v[3][3]=0.156795196;
-      v[4][3]=0.117366283;
-      v[0][4]=0.53316959;
-      v[1][4]=0.266584795;
-      v[2][4]=0.167105787;
-      v[3][4]=0.117366283;
-      v[4][4]=0.0887410133;
+      v[2][0] = 1.07267252;
+      v[3][0] = 0.727635187;
+      v[4][0] = 0.53316959;
+      v[0][1] = 1.76274717;
+      v[1][1] = 0.881373587;
+      v[2][1] = 0.536336258;
+      v[3][1] = 0.363817594;
+      v[4][1] = 0.266584795;
+      v[0][2] = 1.07267252;
+      v[1][2] = 0.536336258;
+      v[2][2] = 0.329313861;
+      v[3][2] = 0.225802662;
+      v[4][2] = 0.167105787;
+      v[0][3] = 0.727635187;
+      v[1][3] = 0.363817594;
+      v[2][3] = 0.225802662;
+      v[3][3] = 0.156795196;
+      v[4][3] = 0.117366283;
+      v[0][4] = 0.53316959;
+      v[1][4] = 0.266584795;
+      v[2][4] = 0.167105787;
+      v[3][4] = 0.117366283;
+      v[4][4] = 0.0887410133;
     }
   return v[i][j];
 }

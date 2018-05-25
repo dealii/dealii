@@ -18,14 +18,16 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/smartpointer.h>
+
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/thread_management.h>
+
 #include <deal.II/lac/vector.h>
 
-#include <vector>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -43,9 +45,10 @@ DEAL_II_NAMESPACE_OPEN
  * for auxiliary vectors. One could allocate and release them anew every time,
  * but this may be expensive in some situations if it has to happen very
  * frequently. A common case for this is when an iterative method is used to
- * invert a matrix in each iteration of an outer solver, such as when inverting a
- * matrix block for a Schur complement solver. (step-20 does this, for example,
- * but instead just keeps a vector around permanently for temporary storage.)
+ * invert a matrix in each iteration of an outer solver, such as when inverting
+ * a matrix block for a Schur complement solver. (step-20 does this, for
+ * example, but instead just keeps a vector around permanently for temporary
+ * storage.)
  *
  * In such situations, allocating and deallocating vectors anew in each call
  * to the inner solver is expensive and leads to memory fragmentation. The
@@ -100,17 +103,16 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 1998-2003; Wolfgang Bangerth, 2017.
  */
-template <typename VectorType = dealii::Vector<double> >
+template <typename VectorType = dealii::Vector<double>>
 class VectorMemory : public Subscriptor
 {
 public:
-
   /**
    * Virtual destructor. This destructor is declared @p virtual to allow
    * destroying objects of derived type through pointers to this base
    * class.
    */
-  virtual ~VectorMemory () override = default;
+  virtual ~VectorMemory() override = default;
 
   /**
    * Return a pointer to a new vector. The number of elements or their
@@ -130,7 +132,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual VectorType *alloc () = 0;
+  virtual VectorType *
+  alloc() = 0;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -146,7 +149,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual void free (const VectorType *const) = 0;
+  virtual void
+  free(const VectorType *const) = 0;
 
   /**
    * @addtogroup Exceptions
@@ -156,9 +160,10 @@ public:
   /**
    * Vector was not allocated from this memory pool.
    */
-  DeclExceptionMsg(ExcNotAllocatedHere,
-                   "You are trying to deallocate a vector from a memory pool, but this "
-                   "vector has not actually been allocated by the same pool before.");
+  DeclExceptionMsg(
+    ExcNotAllocatedHere,
+    "You are trying to deallocate a vector from a memory pool, but this "
+    "vector has not actually been allocated by the same pool before.");
 
   //@}
 
@@ -169,11 +174,11 @@ public:
    * to the constructor of this class. The destructor then automatically
    * returns the vector's ownership to the same VectorMemory object.
    *
-   * Pointers of this type are therefore safe in the sense that they automatically
-   * call VectorMemory::free() when they are destroyed, whether that happens
-   * at the end of a code block or because local variables are destroyed during
-   * exception unwinding. These kinds of object thus relieve the user from
-   * using vector management functions explicitly.
+   * Pointers of this type are therefore safe in the sense that they
+   * automatically call VectorMemory::free() when they are destroyed, whether
+   * that happens at the end of a code block or because local variables are
+   * destroyed during exception unwinding. These kinds of object thus relieve
+   * the user from using vector management functions explicitly.
    *
    * In many senses, this class acts like <code>std::unique_ptr</code> in that
    * it is the unique owner of a chunk of memory that it frees upon destruction.
@@ -184,7 +189,8 @@ public:
    *
    * @author Guido Kanschat, 2009; Wolfgang Bangerth, 2017.
    */
-  class Pointer : public std::unique_ptr<VectorType, std::function<void (VectorType *)> >
+  class Pointer
+    : public std::unique_ptr<VectorType, std::function<void(VectorType *)>>
   {
   public:
     /**
@@ -206,7 +212,8 @@ public:
      * Move operator: this releases the vector owned by the current Pointer
      * and then steals the internal data owned by @p p.
      */
-    Pointer &operator = (Pointer &&p) noexcept = default;
+    Pointer &
+    operator=(Pointer &&p) noexcept = default;
 
     /**
      * Constructor. This constructor automatically allocates a vector from
@@ -230,7 +237,7 @@ public:
  * This class allocates and deletes vectors as needed from the global heap,
  * i.e. performs no specially adapted actions for memory management.
  */
-template <typename VectorType = dealii::Vector<double> >
+template <typename VectorType = dealii::Vector<double>>
 class PrimitiveVectorMemory : public VectorMemory<VectorType>
 {
 public:
@@ -256,7 +263,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual VectorType *alloc () override;
+  virtual VectorType *
+  alloc() override;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -275,7 +283,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual void free (const VectorType *const v) override;
+  virtual void
+  free(const VectorType *const v) override;
 };
 
 
@@ -307,7 +316,7 @@ public:
  *
  * @author Guido Kanschat, 1999, 2007; Wolfgang Bangerth, 2017.
  */
-template <typename VectorType = dealii::Vector<double> >
+template <typename VectorType = dealii::Vector<double>>
 class GrowingVectorMemory : public VectorMemory<VectorType>
 {
 public:
@@ -320,8 +329,8 @@ public:
    * Constructor.  The argument allows to preallocate a certain number of
    * vectors. The default is not to do this.
    */
-  GrowingVectorMemory (const size_type initial_size = 0,
-                       const bool log_statistics = false);
+  GrowingVectorMemory(const size_type initial_size   = 0,
+                      const bool      log_statistics = false);
 
   /**
    * Destructor. The destructor also checks that all vectors that have been
@@ -349,7 +358,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual VectorType *alloc () override;
+  virtual VectorType *
+  alloc() override;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -368,17 +378,20 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual void free (const VectorType *const) override;
+  virtual void
+  free(const VectorType *const) override;
 
   /**
    * Release all vectors that are not currently in use.
    */
-  static void release_unused_memory ();
+  static void
+  release_unused_memory();
 
   /**
    * Memory consumed by this class and all currently allocated vectors.
    */
-  virtual std::size_t memory_consumption() const;
+  virtual std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -387,7 +400,7 @@ private:
    * is be a flag telling whether the vector is used, the second
    * a pointer to the vector itself.
    */
-  typedef std::pair<bool, std::unique_ptr<VectorType> > entry_type;
+  typedef std::pair<bool, std::unique_ptr<VectorType>> entry_type;
 
   /**
    * The class providing the actual storage for the memory pool.
@@ -413,7 +426,8 @@ private:
     /**
      * Create data vector; does nothing after first initialization
      */
-    void initialize(const size_type size);
+    void
+    initialize(const size_type size);
 
     /**
      * Pointer to the storage object
@@ -456,9 +470,10 @@ namespace internal
 {
   namespace GrowingVectorMemoryImplementation
   {
-    void release_all_unused_memory();
+    void
+    release_all_unused_memory();
   }
-}
+} // namespace internal
 
 /*@}*/
 
@@ -467,21 +482,18 @@ namespace internal
 
 
 template <typename VectorType>
-inline
-VectorMemory<VectorType>::Pointer::Pointer(VectorMemory<VectorType> &mem)
-  :
-  std::unique_ptr<VectorType, std::function<void (VectorType *)> >
-  (mem.alloc(), [&mem](VectorType *v)
-{
-  mem.free(v);
-})
+inline VectorMemory<VectorType>::Pointer::Pointer(
+  VectorMemory<VectorType> &mem) :
+  std::unique_ptr<VectorType, std::function<void(VectorType *)>>(
+    mem.alloc(),
+    [&mem](VectorType *v) { mem.free(v); })
 {}
 
 
 
 template <typename VectorType>
 VectorType *
-PrimitiveVectorMemory<VectorType>::alloc ()
+PrimitiveVectorMemory<VectorType>::alloc()
 {
   return new VectorType();
 }
@@ -490,11 +502,10 @@ PrimitiveVectorMemory<VectorType>::alloc ()
 
 template <typename VectorType>
 void
-PrimitiveVectorMemory<VectorType>::free (const VectorType *const v)
+PrimitiveVectorMemory<VectorType>::free(const VectorType *const v)
 {
   delete v;
 }
-
 
 
 

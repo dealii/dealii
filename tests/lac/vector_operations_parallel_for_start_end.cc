@@ -16,51 +16,56 @@
 
 // check that internal::VectorOperations::parallel_for works for start-end
 
-#include "../tests.h"
 #include <deal.II/base/index_set.h>
+
 #include <deal.II/lac/vector_operations_internal.h>
 
+#include "../tests.h"
 
 
 
 template <typename Number>
-void check ()
+void
+check()
 {
-  for (unsigned int test=0; test<5; ++test)
+  for (unsigned int test = 0; test < 5; ++test)
     {
-      const unsigned int size = 17 + test*1101;
+      const unsigned int size = 17 + test * 1101;
 
-      std::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
-      thread_loop_partitioner.reset(new ::dealii::parallel::internal::TBBPartitioner());
+      std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        thread_loop_partitioner;
+      thread_loop_partitioner.reset(
+        new ::dealii::parallel::internal::TBBPartitioner());
 
       Number *val;
-      Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*size);
+      Utilities::System::posix_memalign(
+        (void **)&val, 64, sizeof(Number) * size);
 
-      const Number s = 3.1415;
+      const Number                                   s = 3.1415;
       internal::VectorOperations::Vector_set<Number> setter(s, val);
 
       // now break the size in chunks
-      const unsigned int n_chunks = 3;
+      const unsigned int n_chunks   = 3;
       const unsigned int chunk_size = size / n_chunks;
       for (unsigned int i = 0; i <= n_chunks; ++i)
         {
-          const unsigned int begin = i*chunk_size;
-          const unsigned int end   = std::min((i+1)*chunk_size, size);
-          internal::VectorOperations::parallel_for(setter, begin, end,
-                                                   thread_loop_partitioner);
+          const unsigned int begin = i * chunk_size;
+          const unsigned int end   = std::min((i + 1) * chunk_size, size);
+          internal::VectorOperations::parallel_for(
+            setter, begin, end, thread_loop_partitioner);
         }
 
       // check values:
       for (unsigned int i = 0; i < size; ++i)
-        AssertThrow(val[i] == s,
-                    ExcInternalError());
+        AssertThrow(val[i] == s, ExcInternalError());
 
       free(val);
     }
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

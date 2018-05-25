@@ -17,39 +17,45 @@
 
 // check VectorTools::interpolate_based_on_material_id
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
 
-#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_dgq.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/fe/fe_dgq.h>
 
 #include <vector>
 
+#include "../tests.h"
+
 
 template <int dim>
-class F :  public Function<dim>
+class F : public Function<dim>
 {
 public:
-  F (const unsigned int q) : q(q) {}
+  F(const unsigned int q) : q(q)
+  {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int) const
+  virtual double
+  value(const Point<dim> &p, const unsigned int) const
   {
-    double v=0;
-    for (unsigned int d=0; d<dim; ++d)
-      for (unsigned int i=0; i<=q; ++i)
-        v += (d+1)*(i+1)*std::pow (p[d], 1.*i);
+    double v = 0;
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int i = 0; i <= q; ++i)
+        v += (d + 1) * (i + 1) * std::pow(p[d], 1. * i);
     return v;
   }
 
@@ -60,49 +66,49 @@ private:
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  Triangulation<dim>     triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (3);
-  std::map<types::material_id, const Function<dim>*> functions;
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = triangulation.begin_active();
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_cube(triangulation);
+  triangulation.refine_global(3);
+  std::map<types::material_id, const Function<dim> *> functions;
+  for (typename Triangulation<dim>::active_cell_iterator cell =
+         triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     {
       cell->set_material_id(cell->index() % 128);
       if (functions.find(cell->index() % 128) == functions.end())
-        functions[cell->index() % 128]
-          = new Functions::ConstantFunction<dim>(cell->index() % 128);
+        functions[cell->index() % 128] =
+          new Functions::ConstantFunction<dim>(cell->index() % 128);
     }
 
-  for (unsigned int p=1; p<7-dim; ++p)
+  for (unsigned int p = 1; p < 7 - dim; ++p)
     {
-      FE_DGQ<dim>              fe(p);
-      DoFHandler<dim>        dof_handler(triangulation);
-      dof_handler.distribute_dofs (fe);
+      FE_DGQ<dim>     fe(p);
+      DoFHandler<dim> dof_handler(triangulation);
+      dof_handler.distribute_dofs(fe);
 
-      Vector<double> interpolant (dof_handler.n_dofs());
-      VectorTools::interpolate_based_on_material_id (MappingQGeneric<dim>(1),
-                                                     dof_handler,
-                                                     functions,
-                                                     interpolant);
-      for (typename DoFHandler<dim>::active_cell_iterator
-           cell = dof_handler.begin_active();
+      Vector<double> interpolant(dof_handler.n_dofs());
+      VectorTools::interpolate_based_on_material_id(
+        MappingQGeneric<dim>(1), dof_handler, functions, interpolant);
+      for (typename DoFHandler<dim>::active_cell_iterator cell =
+             dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell)
         {
-          Vector<double> values (fe.dofs_per_cell);
-          cell->get_dof_values (interpolant, values);
-          for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-            AssertThrow (values[i] == cell->index() % 128, ExcInternalError());
+          Vector<double> values(fe.dofs_per_cell);
+          cell->get_dof_values(interpolant, values);
+          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+            AssertThrow(values[i] == cell->index() % 128, ExcInternalError());
         }
     }
 
-  for (typename std::map<types::material_id, const Function<dim>*>::iterator
-       p = functions.begin();
-       p != functions.end(); ++p)
+  for (typename std::map<types::material_id, const Function<dim> *>::iterator
+         p = functions.begin();
+       p != functions.end();
+       ++p)
     delete p->second;
 
   deallog << "OK" << std::endl;
@@ -110,10 +116,11 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
-  deallog << std::setprecision (3);
+  deallog << std::setprecision(3);
 
   deallog.attach(logfile);
 
@@ -121,4 +128,3 @@ int main ()
   test<2>();
   test<3>();
 }
-

@@ -15,20 +15,21 @@
 
 
 #ifndef dealii_slepc_spectral_transformation_h
-#define dealii_slepc_spectral_transformation_h
+#  define dealii_slepc_spectral_transformation_h
 
 
-#include <deal.II/base/config.h>
+#  include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_SLEPC
+#  ifdef DEAL_II_WITH_SLEPC
 
-#  include <deal.II/lac/exceptions.h>
-#  include <deal.II/lac/petsc_solver.h>
+#    include <deal.II/lac/exceptions.h>
+#    include <deal.II/lac/petsc_solver.h>
 
-#  include <petscksp.h>
-#  include <slepceps.h>
+#    include <petscksp.h>
 
-#  include <memory>
+#    include <slepceps.h>
+
+#    include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -36,11 +37,10 @@ namespace PETScWrappers
 {
   // forward declarations
   class SolverBase;
-}
+} // namespace PETScWrappers
 
 namespace SLEPcWrappers
 {
-
   /**
    * Base class for spectral transformation classes using the SLEPc solvers
    * which are selected based on flags passed to the spectral transformation.
@@ -51,9 +51,9 @@ namespace SLEPcWrappers
    * the solver object <code>eigensolver</code>:
    * @code
    *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
-   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142);
-   *  SLEPcWrappers::TransformationShift shift (mpi_communicator,additional_data);
-   *  eigensolver.set_transformation (shift);
+   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data
+   * (3.142); SLEPcWrappers::TransformationShift shift
+   * (mpi_communicator,additional_data); eigensolver.set_transformation (shift);
    * @endcode
    * and later calling the <code>solve()</code> function as usual:
    * @code
@@ -70,17 +70,16 @@ namespace SLEPcWrappers
   class TransformationBase
   {
   protected:
-
     /**
      * Constructor.
      */
-    TransformationBase (const MPI_Comm &mpi_communicator);
+    TransformationBase(const MPI_Comm &mpi_communicator);
 
   public:
     /**
      * Destructor.
      */
-    virtual ~TransformationBase ();
+    virtual ~TransformationBase();
 
     /**
      * Set a flag to indicate how the transformed matrices are being stored in
@@ -90,7 +89,8 @@ namespace SLEPcWrappers
      * library
      * http://www.grycap.upv.es/slepc/documentation/current/docs/manualpages/ST/STMatMode.html
      */
-    void set_matrix_mode(const STMatMode mode);
+    void
+    set_matrix_mode(const STMatMode mode);
 
     /**
      * Set solver to be used when solving a system of linear algebraic
@@ -110,7 +110,6 @@ namespace SLEPcWrappers
      * transformation object.
      */
     friend class SolverBase;
-
   };
 
   /**
@@ -122,17 +121,15 @@ namespace SLEPcWrappers
   class TransformationShift : public TransformationBase
   {
   public:
-
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
     struct AdditionalData
     {
-
       /**
        * Constructor. By default, set the shift parameter to zero.
        */
-      AdditionalData (const double shift_parameter = 0);
+      AdditionalData(const double shift_parameter = 0);
 
       /**
        * Shift parameter.
@@ -144,12 +141,11 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationShift (const MPI_Comm &mpi_communicator,
-                         const AdditionalData &data = AdditionalData());
+    TransformationShift(const MPI_Comm &      mpi_communicator,
+                        const AdditionalData &data = AdditionalData());
 
 
   protected:
-
     /**
      * Store a copy of the flags for this particular solver.
      */
@@ -166,7 +162,6 @@ namespace SLEPcWrappers
   class TransformationShiftInvert : public TransformationBase
   {
   public:
-
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
@@ -175,7 +170,7 @@ namespace SLEPcWrappers
       /**
        * Constructor. By default, set the shift parameter to zero.
        */
-      AdditionalData (const double shift_parameter = 0);
+      AdditionalData(const double shift_parameter = 0);
 
       /**
        * Shift parameter.
@@ -187,11 +182,10 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationShiftInvert (const MPI_Comm &mpi_communicator,
-                               const AdditionalData &data = AdditionalData());
+    TransformationShiftInvert(const MPI_Comm &      mpi_communicator,
+                              const AdditionalData &data = AdditionalData());
 
   protected:
-
     /**
      * Store a copy of the flags for this particular solver.
      */
@@ -215,7 +209,6 @@ namespace SLEPcWrappers
   class TransformationSpectrumFolding : public TransformationBase
   {
   public:
-
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
@@ -224,7 +217,7 @@ namespace SLEPcWrappers
       /**
        * Constructor. By default, set the shift parameter to zero.
        */
-      AdditionalData (const double shift_parameter = 0);
+      AdditionalData(const double shift_parameter = 0);
 
       /**
        * Shift parameter.
@@ -236,11 +229,11 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationSpectrumFolding (const MPI_Comm &mpi_communicator,
-                                   const AdditionalData &data = AdditionalData());
+    TransformationSpectrumFolding(
+      const MPI_Comm &      mpi_communicator,
+      const AdditionalData &data = AdditionalData());
 
   protected:
-
     /**
      * Store a copy of the flags for this particular solver.
      */
@@ -256,7 +249,6 @@ namespace SLEPcWrappers
   class TransformationCayley : public TransformationBase
   {
   public:
-
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
@@ -265,8 +257,8 @@ namespace SLEPcWrappers
       /**
        * Constructor. Requires two shift parameters
        */
-      AdditionalData (const double shift_parameter     = 0,
-                      const double antishift_parameter = 0);
+      AdditionalData(const double shift_parameter     = 0,
+                     const double antishift_parameter = 0);
 
       /**
        * Shift parameter.
@@ -283,22 +275,21 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationCayley (const MPI_Comm &mpi_communicator,
-                          const AdditionalData &data = AdditionalData());
+    TransformationCayley(const MPI_Comm &      mpi_communicator,
+                         const AdditionalData &data = AdditionalData());
 
   protected:
-
     /**
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
   };
 
-}
+} // namespace SLEPcWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_SLEPC
+#  endif // DEAL_II_WITH_SLEPC
 
 /*--------------------   slepc_spectral_transformation.h   ------------------*/
 

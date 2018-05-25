@@ -19,29 +19,30 @@
 
 
 // all include files you need here
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1)
+void
+test(unsigned int ref = 1)
 {
-  deallog << "Testing dim=" << dim
-          << ", spacedim="<< spacedim << std::endl;
+  deallog << "Testing dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
-  Tensor<1,spacedim> periodicity;
+  Tensor<1, spacedim> periodicity;
   periodicity[0] = 5.0;
 
-  FlatManifold<dim,spacedim> manifold(periodicity);
+  FlatManifold<dim, spacedim> manifold(periodicity);
 
-  Quadrature<spacedim> quad;
-  std::vector<std::vector<Point<spacedim> > >ps(10,std::vector<Point<spacedim> >(2));
-  Point<spacedim> middle;
-  std::vector<double > ws(2, 0.5);
+  Quadrature<spacedim>                      quad;
+  std::vector<std::vector<Point<spacedim>>> ps(10,
+                                               std::vector<Point<spacedim>>(2));
+  Point<spacedim>                           middle;
+  std::vector<double>                       ws(2, 0.5);
 
   // Case 1: both points are close to left boundary of periodicity
   ps[0][0][0] = 1;
@@ -73,29 +74,30 @@ void test(unsigned int ref=1)
 
   // Case 9: Corner cases
   ps[8][0][0] = -1e-10;
-  ps[8][1][0] = 5+1e-10;
+  ps[8][1][0] = 5 + 1e-10;
   // Case 10: same, opposite order
-  ps[9][0][0] = 5+1e-10;
+  ps[9][0][0] = 5 + 1e-10;
   ps[9][1][0] = -1e-10;
 
-  for (unsigned int i=0; i<ps.size(); ++i)
+  for (unsigned int i = 0; i < ps.size(); ++i)
     {
-      middle = manifold.get_new_point(make_array_view(ps[i]),
-                                      make_array_view(ws));
-      deallog << "P0: " << ps[i][0] << " , P1: " << ps[i][1] << " , Middle: " << middle << std::endl;
+      middle =
+        manifold.get_new_point(make_array_view(ps[i]), make_array_view(ws));
+      deallog << "P0: " << ps[i][0] << " , P1: " << ps[i][1]
+              << " , Middle: " << middle << std::endl;
     }
-
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1,1>();
-  test<1,2>();
-  test<2,2>();
-  test<2,3>();
-  test<3,3>();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 
   return 0;
 }

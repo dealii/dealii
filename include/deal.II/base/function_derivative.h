@@ -17,9 +17,10 @@
 #define dealii_function_derivative_h
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/auto_derivative_function.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -49,9 +50,9 @@ public:
    * direction vector of the differentiation and the step size <tt>h</tt> of
    * the difference formula.
    */
-  FunctionDerivative (const Function<dim> &f,
-                      const Point<dim>    &direction,
-                      const double         h = 1.e-6);
+  FunctionDerivative(const Function<dim> &f,
+                     const Point<dim> &   direction,
+                     const double         h = 1.e-6);
 
   /**
    * Constructor. Provided are the functions to compute derivatives of and the
@@ -65,9 +66,9 @@ public:
    * The number of quadrature point must still be the same, when values are
    * accessed.
    */
-  FunctionDerivative (const Function<dim>            &f,
-                      const std::vector<Point<dim> > &direction,
-                      const double                    h = 1.e-6);
+  FunctionDerivative(const Function<dim> &          f,
+                     const std::vector<Point<dim>> &direction,
+                     const double                   h = 1.e-6);
 
   /**
    * Choose the difference formula. This is set to the default in the
@@ -77,29 +78,33 @@ public:
    * (<tt>UpwindEuler</tt>), second order symmetric Euler (<tt>Euler</tt>) and
    * a symmetric fourth order formula (<tt>FourthOrder</tt>).
    */
-  void set_formula (typename AutoDerivativeFunction<dim>::DifferenceFormula formula
-                    = AutoDerivativeFunction<dim>::Euler);
+  void
+  set_formula(typename AutoDerivativeFunction<dim>::DifferenceFormula formula =
+                AutoDerivativeFunction<dim>::Euler);
   /**
    * Change the base step size of the difference formula
    */
-  void set_h (const double h);
+  void
+  set_h(const double h);
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int component = 0) const override;
+  virtual double
+  value(const Point<dim> &p, const unsigned int component = 0) const override;
 
-  virtual void vector_value(const Point<dim> &p,
-                            Vector<double> &value) const override;
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &value) const override;
 
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double>            &values,
-                           const unsigned int              component = 0) const override;
+  virtual void
+  value_list(const std::vector<Point<dim>> &points,
+             std::vector<double> &          values,
+             const unsigned int             component = 0) const override;
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
    * This is not exact (but will usually be close) because calculating the
    * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -120,7 +125,7 @@ private:
   /**
    * Helper object. Contains the increment vector for the formula.
    */
-  std::vector<Tensor<1,dim> > incr;
+  std::vector<Tensor<1, dim>> incr;
 };
 
 DEAL_II_NAMESPACE_CLOSE

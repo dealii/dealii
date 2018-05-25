@@ -16,8 +16,8 @@
 
 
 // check FullMatrix::trace. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// complex-valued matrices and vectors; this time we actually store complex
+// values in them
 
 
 #include "../tests.h"
@@ -25,12 +25,11 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_complex_square_matrix (m);
+  FullMatrix<std::complex<number>> m;
+  make_complex_square_matrix(m);
   deallog << m.trace() << std::endl;
 }

@@ -14,8 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
+#include "../tests.h"
 
 /*
  * If a parameter file line ends in a '\', then the whitespace at at the
@@ -30,16 +31,17 @@
  */
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   for (unsigned int i = 0; i < 2; ++i)
     {
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
-      prm.declare_entry ("value", "value", Patterns::Anything());
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.declare_entry("value", "value", Patterns::Anything());
+      prm.leave_subsection();
 
       // test both relevant parse_input functions
       if (i == 0)
@@ -48,15 +50,15 @@ int main ()
         }
       else
         {
-          std::ifstream input_stream
-          (SOURCE_DIR "/prm/parameter_handler_backslash_07.prm");
+          std::ifstream input_stream(SOURCE_DIR
+                                     "/prm/parameter_handler_backslash_07.prm");
           prm.parse_input(input_stream);
         }
 
       std::string list;
-      prm.enter_subsection ("Testing");
-      list = prm.get ("value");
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      list = prm.get("value");
+      prm.leave_subsection();
 
       deallog << list << std::endl;
     }

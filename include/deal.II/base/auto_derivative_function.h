@@ -76,7 +76,6 @@ template <int dim>
 class AutoDerivativeFunction : public Function<dim>
 {
 public:
-
   /**
    * Names of difference formulas.
    */
@@ -125,20 +124,21 @@ public:
    * formula of the set_formula() function. Change this preset formula by
    * calling the set_formula() function.
    */
-  AutoDerivativeFunction (const double h,
-                          const unsigned int n_components = 1,
-                          const double       initial_time = 0.0);
+  AutoDerivativeFunction(const double       h,
+                         const unsigned int n_components = 1,
+                         const double       initial_time = 0.0);
 
   /**
    * Virtual destructor; absolutely necessary in this case.
    */
-  virtual ~AutoDerivativeFunction () override = default;
+  virtual ~AutoDerivativeFunction() override = default;
 
   /**
    * Choose the difference formula. See the enum #DifferenceFormula for
    * available choices.
    */
-  void set_formula (const DifferenceFormula formula = Euler);
+  void
+  set_formula(const DifferenceFormula formula = Euler);
 
   /**
    * Takes the difference step size <tt>h</tt>. It's within the user's
@@ -148,7 +148,8 @@ public:
    * choice for functions with an absolute value of about 1, that furthermore
    * does not vary to much.
    */
-  void set_h (const double h);
+  void
+  set_h(const double h);
 
   /**
    * Return the gradient of the specified component of the function at the
@@ -157,8 +158,9 @@ public:
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
    */
-  virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                  const unsigned int  component = 0) const override;
+  virtual Tensor<1, dim>
+  gradient(const Point<dim> & p,
+           const unsigned int component = 0) const override;
 
   /**
    * Return the gradient of all components of the function at the given point.
@@ -166,8 +168,9 @@ public:
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
    */
-  virtual void vector_gradient (const Point<dim>            &p,
-                                std::vector<Tensor<1,dim> > &gradients) const override;
+  virtual void
+  vector_gradient(const Point<dim> &           p,
+                  std::vector<Tensor<1, dim>> &gradients) const override;
 
   /**
    * Set <tt>gradients</tt> to the gradients of the specified component of the
@@ -178,9 +181,10 @@ public:
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
    */
-  virtual void gradient_list (const std::vector<Point<dim> > &points,
-                              std::vector<Tensor<1,dim> >    &gradients,
-                              const unsigned int              component = 0) const override;
+  virtual void
+  gradient_list(const std::vector<Point<dim>> &points,
+                std::vector<Tensor<1, dim>> &  gradients,
+                const unsigned int             component = 0) const override;
 
   /**
    * Set <tt>gradients</tt> to the gradients of the function at the
@@ -194,19 +198,19 @@ public:
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
    */
-  virtual void vector_gradient_list (const std::vector<Point<dim> > &points,
-                                     std::vector<std::vector<Tensor<1,dim> > > &gradients) const override;
+  virtual void
+  vector_gradient_list(
+    const std::vector<Point<dim>> &           points,
+    std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
 
   /**
    * Return a #DifferenceFormula of the order <tt>ord</tt> at minimum.
    */
-  static
-  DifferenceFormula
-  get_formula_of_order (const unsigned int ord);
+  static DifferenceFormula
+  get_formula_of_order(const unsigned int ord);
 
 
 private:
-
   /**
    * Step size of the difference formula. Set by the set_h() function.
    */
@@ -215,7 +219,7 @@ private:
   /**
    * Includes the unit vectors scaled by <tt>h</tt>.
    */
-  std::vector<Tensor<1,dim> > ht;
+  std::vector<Tensor<1, dim>> ht;
 
   /**
    * Difference formula. Set by the set_formula() function.

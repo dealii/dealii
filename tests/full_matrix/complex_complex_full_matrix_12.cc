@@ -16,8 +16,8 @@
 
 
 // check FullMatrix::all_zero. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// complex-valued matrices and vectors; this time we actually store complex
+// values in them
 
 
 #include "../tests.h"
@@ -25,15 +25,13 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m(3,3);
+  FullMatrix<std::complex<number>> m(3, 3);
   deallog << m.all_zero() << std::endl;
 
-  make_complex_matrix (m);
+  make_complex_matrix(m);
   deallog << m.all_zero() << std::endl;
 }
-

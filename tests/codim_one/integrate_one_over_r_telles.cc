@@ -20,41 +20,46 @@
 #include <deal.II/base/utilities.h>
 
 // all include files needed for the program
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_q.h>
-#include "../base/simplex.h"
 
 #include <string>
+
+#include "../base/simplex.h"
 
 using namespace std;
 using namespace dealii;
 
 int
-main ()
+main()
 {
   initlog();
   deallog << std::fixed;
 
   deallog << endl
           << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]" << endl
-          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being" << endl
+          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being"
+          << endl
           << "the distance from (x,y) to four vertices of the square." << endl
           << endl;
 
 
-  std::vector<Point<2> > vertices = FE_Q<2>(1).get_unit_support_points();
+  std::vector<Point<2>> vertices = FE_Q<2>(1).get_unit_support_points();
 
-  for (unsigned int m=1; m<7; ++m)
+  for (unsigned int m = 1; m < 7; ++m)
     {
       deallog << " =========Quadrature Order: " << m
               << " =============================== " << endl;
-      deallog << " ============================================================ " << endl;
-      unsigned int index=0;
+      deallog
+        << " ============================================================ "
+        << endl;
+      unsigned int index = 0;
       {
         deallog << " ===============Vertex: " << vertices[index]
                 << " ============================= " << endl;
-        QTelles<2> quad(m, vertices[index]);
+        QTelles<2>        quad(m, vertices[index]);
         QGaussOneOverR<2> quad2(m, vertices[index]);
 
 
@@ -62,37 +67,31 @@ main ()
           {
             for (unsigned int j = 0; j < 6; ++j)
               {
-
-                double exact_integral  = exact_integral_one_over_r(index, i,j);
+                double exact_integral  = exact_integral_one_over_r(index, i, j);
                 double approx_integral = 0;
                 double approx_integral_2 = 0;
 
-                for (unsigned int q=0; q< quad.size(); ++q)
+                for (unsigned int q = 0; q < quad.size(); ++q)
                   {
                     double x = quad.point(q)[0];
                     double y = quad.point(q)[1];
-                    double R = sqrt(x*x+y*y);
-                    approx_integral += ( pow(x, (double)i) *
-                                         pow(y, (double)j) / R *
-                                         quad.weight(q) );
+                    double R = sqrt(x * x + y * y);
+                    approx_integral += (pow(x, (double)i) * pow(y, (double)j) /
+                                        R * quad.weight(q));
                   }
 
-                for (unsigned int q=0; q< quad2.size(); ++q)
+                for (unsigned int q = 0; q < quad2.size(); ++q)
                   {
                     double x = quad2.point(q)[0];
                     double y = quad2.point(q)[1];
-                    double R = sqrt(x*x+y*y);
-                    approx_integral_2 += ( pow(x, (double)i) *
-                                           pow(y, (double)j) *
-                                           quad2.weight(q) );
+                    double R = sqrt(x * x + y * y);
+                    approx_integral_2 +=
+                      (pow(x, (double)i) * pow(y, (double)j) * quad2.weight(q));
                   }
 
-                deallog << "f(x,y) = x^" << i
-                        << " y^" << j
-                        << ", Errors = "
-                        << approx_integral - exact_integral
-                        << ", "
-                        << approx_integral_2 - exact_integral
+                deallog << "f(x,y) = x^" << i << " y^" << j
+                        << ", Errors = " << approx_integral - exact_integral
+                        << ", " << approx_integral_2 - exact_integral
                         << std::endl;
               }
           }

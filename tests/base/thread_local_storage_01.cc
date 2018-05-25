@@ -16,20 +16,21 @@
 
 // verify that thread local storage works as advertised
 
-#include "../tests.h"
+#include <deal.II/base/thread_local_storage.h>
+#include <deal.II/base/thread_management.h>
+
 #include <atomic>
 
-#include <deal.II/base/thread_management.h>
-#include <deal.II/base/thread_local_storage.h>
+#include "../tests.h"
 
 
 struct X
 {
-  X ()
+  X()
   {
     deallog << "Creating" << std::endl;
   };
-  ~X ()
+  ~X()
   {
     deallog << "Destroying " << std::endl;
   };
@@ -40,7 +41,8 @@ Threads::ThreadLocalStorage<X> *tls_data;
 
 static std::atomic<int> counter(0);
 
-void execute (int i)
+void
+execute(int i)
 {
   tls_data->get().i = i;
 
@@ -54,11 +56,12 @@ void execute (int i)
 
   // wait in order to make sure that the
   // thread lives longer than the TLS object
-  sleep (5);
+  sleep(5);
 }
 
 
-void test ()
+void
+test()
 {
   // create a thread local storage object
   tls_data = new Threads::ThreadLocalStorage<X>();
@@ -69,12 +72,13 @@ void test ()
   // create 5 individual thread specific
   // storage locations
   Threads::ThreadGroup<> tg;
-  for (unsigned int i=10; i<15; ++i)
-    tg += Threads::new_thread (execute, i);
+  for (unsigned int i = 10; i < 15; ++i)
+    tg += Threads::new_thread(execute, i);
 
   // spin lock until all threads have created
   // their objects
-  while (counter != 5);
+  while (counter != 5)
+    ;
 
   // delete the TLS object. this should also
   // destroy all the objects created so far,
@@ -93,15 +97,15 @@ void test ()
   deallog << "Done." << std::endl;
 
   // now make sure the threads all finish
-  tg.join_all ();
+  tg.join_all();
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

@@ -21,8 +21,9 @@
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  test_with_2d_deformed_mesh<dim, 2, 1> (FESystem<dim>(FE_Q<dim>(1), 2));
-  test_with_2d_deformed_mesh<dim, 1, 2> (FESystem<dim>(FE_Q<dim>(2), 1));
+  test_with_2d_deformed_mesh<dim, 2, 1>(FESystem<dim>(FE_Q<dim>(1), 2));
+  test_with_2d_deformed_mesh<dim, 1, 2>(FESystem<dim>(FE_Q<dim>(2), 1));
 }

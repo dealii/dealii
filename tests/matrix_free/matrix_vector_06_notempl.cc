@@ -19,8 +19,9 @@
 // polynomial degree, which requires to read it as a run time parameter in a
 // separate code path in FEEvaluation
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
+
+#include "../tests.h"
 #include "create_mesh.h"
 
 std::ofstream logfile("output");
@@ -28,44 +29,45 @@ std::ofstream logfile("output");
 #include "matrix_vector_common.h"
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  create_mesh (tria);
-  tria.begin_active ()->set_refine_flag();
+  create_mesh(tria);
+  tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   typename Triangulation<dim>::active_cell_iterator cell, endc;
-  cell = tria.begin_active ();
+  cell = tria.begin_active();
   endc = tria.end();
-  for (; cell!=endc; ++cell)
-    if (cell->center().norm()<0.5)
+  for (; cell != endc; ++cell)
+    if (cell->center().norm() < 0.5)
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  tria.begin(tria.n_levels()-1)->set_refine_flag();
+  tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   tria.refine_global(1);
-  cell = tria.begin_active ();
-  for (unsigned int i=0; i<10-3*dim; ++i)
+  cell = tria.begin_active();
+  for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
     {
-      cell = tria.begin_active ();
-      endc = tria.end();
+      cell                 = tria.begin_active();
+      endc                 = tria.end();
       unsigned int counter = 0;
-      for (; cell!=endc; ++cell, ++counter)
-        if (counter % (7-i) == 0)
+      for (; cell != endc; ++cell, ++counter)
+        if (counter % (7 - i) == 0)
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
-  FE_Q<dim> fe (fe_degree);
-  DoFHandler<dim> dof (tria);
+  FE_Q<dim>       fe(fe_degree);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values (dof, 0, Functions::ZeroFunction<dim>(),
-                                            constraints);
+  VectorTools::interpolate_boundary_values(
+    dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   // do not enable templates in FEEvaluation
-  do_test<dim, -1, double, fe_degree+1> (dof, constraints);
+  do_test<dim, -1, double, fe_degree + 1>(dof, constraints);
 }

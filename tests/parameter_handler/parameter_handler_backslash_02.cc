@@ -14,8 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
+#include "../tests.h"
 
 /*
  * Test that ParameterHandler can read parameters of the form
@@ -30,18 +31,19 @@
  * aside from whitespace and a continuation ('\') character.
  */
 
-int main ()
+int
+main()
 {
   initlog();
 
   for (unsigned int i = 0; i < 2; ++i)
     {
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
-      prm.declare_entry ("Function",
-                         "a",
-                         Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.declare_entry("Function",
+                        "a",
+                        Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
+      prm.leave_subsection();
 
       // test both relevant parse_input functions
       if (i == 0)
@@ -50,15 +52,15 @@ int main ()
         }
       else
         {
-          std::ifstream input_stream
-          (SOURCE_DIR "/prm/parameter_handler_backslash_02.prm");
+          std::ifstream input_stream(SOURCE_DIR
+                                     "/prm/parameter_handler_backslash_02.prm");
           prm.parse_input(input_stream);
         }
 
       std::string list;
-      prm.enter_subsection ("Testing");
-      list = prm.get ("Function");
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      list = prm.get("Function");
+      prm.leave_subsection();
 
       deallog << list << std::endl;
     }

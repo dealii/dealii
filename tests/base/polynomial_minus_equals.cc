@@ -18,17 +18,18 @@
 //
 // check on the Polynomial::operator -=
 
-#include "../tests.h"
-
 #include <deal.II/base/polynomial.h>
 
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
+
 using namespace dealii;
 
 
-int main ()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(3);

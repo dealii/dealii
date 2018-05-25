@@ -16,46 +16,49 @@
 
 // Tests LAPACKFullMatrix::mTmult
 
-#include "../tests.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
 
+#include "../tests.h"
 
 
-void test()
+
+void
+test()
 {
-  const unsigned int m=2;
-  const unsigned int n=3;
-  const unsigned int k=4;
-  FullMatrix<double> A(m, k), B(n, k), C(m, n), OC(m,n);
+  const unsigned int       m = 2;
+  const unsigned int       n = 3;
+  const unsigned int       k = 4;
+  FullMatrix<double>       A(m, k), B(n, k), C(m, n), OC(m, n);
   LAPACKFullMatrix<double> AL(m, k), BL(n, k), CL(m, n);
-  for (unsigned int i=0; i<m; ++i)
-    for (unsigned int j=0; j<k; ++j)
-      A(i,j) = AL(i,j) = random_value<double>();
-  for (unsigned int i=0; i<n; ++i)
-    for (unsigned int j=0; j<k; ++j)
-      B(i,j) = BL(i,j) = random_value<double>();
+  for (unsigned int i = 0; i < m; ++i)
+    for (unsigned int j = 0; j < k; ++j)
+      A(i, j) = AL(i, j) = random_value<double>();
+  for (unsigned int i = 0; i < n; ++i)
+    for (unsigned int j = 0; j < k; ++j)
+      B(i, j) = BL(i, j) = random_value<double>();
 
   A.mTmult(C, B);
   AL.mTmult(CL, BL);
   AL.mTmult(OC, BL);
-  for (unsigned int i=0; i<m; ++i)
-    for (unsigned int j=0; j<n; ++j)
+  for (unsigned int i = 0; i < m; ++i)
+    for (unsigned int j = 0; j < n; ++j)
       {
-        Assert(std::abs(C(i,j)-CL(i,j)) < 1e-13, ExcInternalError());
-        Assert(std::abs(C(i,j)-OC(i,j)) < 1e-13, ExcInternalError());
+        Assert(std::abs(C(i, j) - CL(i, j)) < 1e-13, ExcInternalError());
+        Assert(std::abs(C(i, j) - OC(i, j)) < 1e-13, ExcInternalError());
       }
 
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 

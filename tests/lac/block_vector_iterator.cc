@@ -15,28 +15,31 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/lac/block_vector.h>
-#include <vector>
+
 #include <algorithm>
+#include <functional>
 #include <numeric>
 #include <utility>
-#include <functional>
+#include <vector>
+
+#include "../tests.h"
 
 template <typename number>
-bool operator == (const BlockVector<number> &v1,
-                  const BlockVector<number> &v2)
+bool
+operator==(const BlockVector<number> &v1, const BlockVector<number> &v2)
 {
   if (v1.size() != v2.size())
     return false;
-  for (unsigned int i=0; i<v1.size(); ++i)
+  for (unsigned int i = 0; i < v1.size(); ++i)
     if (v1(i) != v2(i))
       return false;
   return true;
 }
 
 
-void test ()
+void
+test()
 {
   std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 2;
@@ -53,17 +56,17 @@ void test ()
 
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
       // initialize other vector
       // through iterators
       BlockVector<double>::iterator p2 = v2.begin();
-      for (unsigned int i=0; i<v1.size(); ++i, ++p2)
+      for (unsigned int i = 0; i < v1.size(); ++i, ++p2)
         *p2 = i;
-      Assert (p2==v2.end(), ExcInternalError());
+      Assert(p2 == v2.end(), ExcInternalError());
 
       // check that the two vectors are equal
-      deallog << "Check 1: " << (v1==v2 ? "true" : "false") << std::endl;
+      deallog << "Check 1: " << (v1 == v2 ? "true" : "false") << std::endl;
     };
 
   // Check 1: initialization via
@@ -74,14 +77,14 @@ void test ()
 
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
       // initialize other vector
       // through iterators into first
       // vector
       BlockVector<double> v2(ivector, v1.begin(), v1.end());
       // check that the two vectors are equal
-      deallog << "Check 2: " << (v1==v2 ? "true" : "false") << std::endl;
+      deallog << "Check 2: " << (v1 == v2 ? "true" : "false") << std::endl;
     };
 
   // Check 3: loop forward and back
@@ -92,22 +95,22 @@ void test ()
       BlockVector<double> v1(ivector);
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
 
       BlockVector<double>::iterator p1 = v1.begin();
-      for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-        Assert (*p1 == i, ExcInternalError());
+      for (unsigned int i = 0; i < v1.size(); ++i, ++p1)
+        Assert(*p1 == i, ExcInternalError());
 
-      Assert (p1 == v1.end(), ExcInternalError());
+      Assert(p1 == v1.end(), ExcInternalError());
 
       // move back into allowable
       // region
       --p1;
 
       // check backwards
-      for (unsigned int i=0; i<v1.size(); ++i, --p1)
-        Assert (*p1 == v1.size()-i-1, ExcInternalError());
+      for (unsigned int i = 0; i < v1.size(); ++i, --p1)
+        Assert(*p1 == v1.size() - i - 1, ExcInternalError());
 
       // if we came thus far,
       // everything is alright
@@ -122,25 +125,25 @@ void test ()
       BlockVector<double> v1(ivector);
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
 
       BlockVector<double>::const_iterator p1 = v1.begin();
-      for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-        Assert (*p1 == i, ExcInternalError());
+      for (unsigned int i = 0; i < v1.size(); ++i, ++p1)
+        Assert(*p1 == i, ExcInternalError());
 
-      Assert (p1 == v1.end(), ExcInternalError());
+      Assert(p1 == v1.end(), ExcInternalError());
 
       // move back into allowable
       // region
       --p1;
 
       // check backwards
-      for (unsigned int i=0; i<v1.size(); ++i, --p1)
+      for (unsigned int i = 0; i < v1.size(); ++i, --p1)
         {
           const double val = *p1;
-          const double ref = v1.size()-i-1;
-          Assert (val==ref, ExcInternalError());
+          const double ref = v1.size() - i - 1;
+          Assert(val == ref, ExcInternalError());
         };
 
       // if we came thus far,
@@ -155,61 +158,65 @@ void test ()
       BlockVector<double> v1(ivector);
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
 
       // check std::distance
       // algorithm
       deallog << "Check 5: "
-              << (std::distance (v1.begin(), v1.end()) ==
-                  static_cast<signed int>(v1.size()) ?
-                  "true" : "false")
+              << (std::distance(v1.begin(), v1.end()) ==
+                      static_cast<signed int>(v1.size()) ?
+                    "true" :
+                    "false")
               << std::endl;
 
       // check std::copy
       BlockVector<double> v2(ivector);
-      std::copy (v1.begin(), v1.end(), v2.begin());
+      std::copy(v1.begin(), v1.end(), v2.begin());
       deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
 
       // check std::transform
-      std::transform (v1.begin(), v1.end(), v2.begin(),
-                      std::bind (std::multiplies<double>(),
-                                 std::placeholders::_1,
-                                 2.0));
-      v2 *= 1./2;
+      std::transform(
+        v1.begin(),
+        v1.end(),
+        v2.begin(),
+        std::bind(std::multiplies<double>(), std::placeholders::_1, 2.0));
+      v2 *= 1. / 2;
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 
 
       // check operators +/-, +=/-=
       deallog << "Check 8: "
-              << (std::distance(v1.begin(), v1.begin()+3) == 3 ?
-                  "true" : "false")
+              << (std::distance(v1.begin(), v1.begin() + 3) == 3 ? "true" :
+                                                                   "false")
               << std::endl;
       deallog << "Check 9: "
-              << (std::distance(v1.end()-6, v1.end()) == 6 ?
-                  "true" : "false")
+              << (std::distance(v1.end() - 6, v1.end()) == 6 ? "true" : "false")
               << std::endl;
       deallog << "Check 10: "
               << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ?
-                  "true" : "false")
+                    "true" :
+                    "false")
               << std::endl;
       deallog << "Check 11: "
-              << (std::distance(v1.begin(), (v1.begin()+=7)) == 7 ?
-                  "true" : "false")
+              << (std::distance(v1.begin(), (v1.begin() += 7)) == 7 ? "true" :
+                                                                      "false")
               << std::endl;
       deallog << "Check 12: "
-              << (std::distance((v1.end()-=4), v1.end()) == 4 ?
-                  "true" : "false")
+              << (std::distance((v1.end() -= 4), v1.end()) == 4 ? "true" :
+                                                                  "false")
               << std::endl;
 
       // check advance
       BlockVector<double>::iterator p2 = v1.begin();
-      std::advance (p2, v1.size());
-      deallog << "Check 13: " << (p2 == v1.end() ? "true" : "false") << std::endl;
+      std::advance(p2, v1.size());
+      deallog << "Check 13: " << (p2 == v1.end() ? "true" : "false")
+              << std::endl;
 
       BlockVector<double>::const_iterator p3 = v1.begin();
-      std::advance (p3, v1.size());
-      deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false") << std::endl;
+      std::advance(p3, v1.size());
+      deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false")
+              << std::endl;
     };
 
   // Check 15: initialization through
@@ -219,7 +226,7 @@ void test ()
       BlockVector<double> v1(ivector);
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
 
       // initialize a normal vector
@@ -228,7 +235,7 @@ void test ()
 
       // and reverse way
       BlockVector<double> v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 15: " << (v1==v3 ? "true" : "false") << std::endl;
+      deallog << "Check 15: " << (v1 == v3 ? "true" : "false") << std::endl;
     };
 
   // Check 16: initialization through
@@ -239,7 +246,7 @@ void test ()
       BlockVector<double> v1(ivector);
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
 
       // initialize a normal vector
@@ -248,7 +255,7 @@ void test ()
 
       // and reverse way
       BlockVector<double> v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 16: " << (v1==v3 ? "true" : "false") << std::endl;
+      deallog << "Check 16: " << (v1 == v3 ? "true" : "false") << std::endl;
     };
 
   // Check 17: initialization through
@@ -259,7 +266,7 @@ void test ()
       BlockVector<double> v1(ivector);
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
 
       // initialize a normal vector
@@ -268,7 +275,7 @@ void test ()
 
       // and reverse way
       const BlockVector<double> v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 17: " << (v1==v3 ? "true" : "false") << std::endl;
+      deallog << "Check 17: " << (v1 == v3 ? "true" : "false") << std::endl;
     };
 
   // Check 18: initialization through
@@ -279,7 +286,7 @@ void test ()
       BlockVector<double> v0(ivector);
       // initialize first vector with
       // simple loop
-      for (unsigned int i=0; i<v0.size(); ++i)
+      for (unsigned int i = 0; i < v0.size(); ++i)
         v0(i) = i;
 
       const BlockVector<double> v1 = v0;
@@ -290,21 +297,21 @@ void test ()
 
       // and reverse way
       const BlockVector<double> v3(ivector, v2.begin(), v2.end());
-      deallog << "Check 18: " << (v1==v3 ? "true" : "false") << std::endl;
+      deallog << "Check 18: " << (v1 == v3 ? "true" : "false") << std::endl;
     };
 
   // Check 19: operator[]
   if (true)
     {
       BlockVector<double> v1(ivector);
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         v1(i) = i;
 
-      for (unsigned int i=0; i<v1.size(); ++i)
+      for (unsigned int i = 0; i < v1.size(); ++i)
         {
-          const BlockVector<double>::iterator p = (v1.begin()+i);
-          for (unsigned int j=0; j<v1.size(); ++j)
-            Assert (p[(signed)j-(signed)i] == j, ExcInternalError());
+          const BlockVector<double>::iterator p = (v1.begin() + i);
+          for (unsigned int j = 0; j < v1.size(); ++j)
+            Assert(p[(signed)j - (signed)i] == j, ExcInternalError());
         };
 
       // if we came thus far,
@@ -315,9 +322,8 @@ void test ()
 
 
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
@@ -326,11 +332,12 @@ int main ()
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &e)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << e.what() << std::endl
@@ -342,7 +349,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl
@@ -356,4 +364,3 @@ int main ()
 
   return 0;
 }
-

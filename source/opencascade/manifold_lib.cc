@@ -19,22 +19,20 @@
 #ifdef DEAL_II_WITH_OPENCASCADE
 
 
-#include <GCPnts_AbscissaPoint.hxx>
-#include <BRepAdaptor_Curve.hxx>
-#include <BRepAdaptor_CompCurve.hxx>
-#include <BRepAdaptor_HCurve.hxx>
-#include <BRepAdaptor_HCompCurve.hxx>
-#include <GCPnts_AbscissaPoint.hxx>
-#include <ShapeAnalysis_Curve.hxx>
-#include <BRep_Tool.hxx>
-#include <BRepTools.hxx>
-#include <ShapeAnalysis_Surface.hxx>
-#include <TopoDS.hxx>
-
-#include <Standard_Version.hxx>
-#if (OCC_VERSION_MAJOR < 7)
-#  include <Handle_Adaptor3d_HCurve.hxx>
-#endif
+#  include <BRepAdaptor_CompCurve.hxx>
+#  include <BRepAdaptor_Curve.hxx>
+#  include <BRepAdaptor_HCompCurve.hxx>
+#  include <BRepAdaptor_HCurve.hxx>
+#  include <BRepTools.hxx>
+#  include <BRep_Tool.hxx>
+#  include <GCPnts_AbscissaPoint.hxx>
+#  include <ShapeAnalysis_Curve.hxx>
+#  include <ShapeAnalysis_Surface.hxx>
+#  include <Standard_Version.hxx>
+#  include <TopoDS.hxx>
+#  if (OCC_VERSION_MAJOR < 7)
+#    include <Handle_Adaptor3d_HCurve.hxx>
+#  endif
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -42,8 +40,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace OpenCASCADE
 {
-
-
   namespace
   {
     /**
@@ -51,15 +47,18 @@ namespace OpenCASCADE
      * TopoDS_Shape. This function will fail when the given shape is
      * not of topological dimension one.
      */
-    Handle_Adaptor3d_HCurve curve_adaptor(const TopoDS_Shape &shape)
+    Handle_Adaptor3d_HCurve
+    curve_adaptor(const TopoDS_Shape &shape)
     {
-      Assert( (shape.ShapeType() == TopAbs_WIRE) ||
-              (shape.ShapeType() == TopAbs_EDGE),
-              ExcUnsupportedShape());
+      Assert((shape.ShapeType() == TopAbs_WIRE) ||
+               (shape.ShapeType() == TopAbs_EDGE),
+             ExcUnsupportedShape());
       if (shape.ShapeType() == TopAbs_WIRE)
-        return Handle(BRepAdaptor_HCompCurve)(new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
+        return Handle(BRepAdaptor_HCompCurve)(
+          new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
       else if (shape.ShapeType() == TopAbs_EDGE)
-        return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
+        return Handle(BRepAdaptor_HCurve)(
+          new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
 
       Assert(false, ExcInternalError());
       return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve());
@@ -67,18 +66,21 @@ namespace OpenCASCADE
 
 
 
-// Helper internal functions.
-    double shape_length(const TopoDS_Shape &sh)
+    // Helper internal functions.
+    double
+    shape_length(const TopoDS_Shape &sh)
     {
       Handle_Adaptor3d_HCurve adapt = curve_adaptor(sh);
       return GCPnts_AbscissaPoint::Length(adapt->GetCurve());
     }
-  }
+  } // namespace
 
-  /*============================== NormalProjectionManifold ==============================*/
+  /*============================== NormalProjectionManifold
+   * ==============================*/
   template <int dim, int spacedim>
-  NormalProjectionManifold<dim,spacedim>::NormalProjectionManifold(const TopoDS_Shape &sh,
-      const double tolerance) :
+  NormalProjectionManifold<dim, spacedim>::NormalProjectionManifold(
+    const TopoDS_Shape &sh,
+    const double        tolerance) :
     sh(sh),
     tolerance(tolerance)
   {
@@ -87,37 +89,41 @@ namespace OpenCASCADE
 
 
 
-  template<int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
-  NormalProjectionManifold<dim,spacedim>::clone() const
+  template <int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim>>
+  NormalProjectionManifold<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim,spacedim> >(new NormalProjectionManifold(sh, tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new NormalProjectionManifold(sh, tolerance));
   }
 
 
 
   template <int dim, int spacedim>
-  Point<spacedim>  NormalProjectionManifold<dim,spacedim>::
-  project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                       const Point<spacedim>                  &candidate) const
+  Point<spacedim>
+  NormalProjectionManifold<dim, spacedim>::project_to_manifold(
+    const ArrayView<const Point<spacedim>> &surrounding_points,
+    const Point<spacedim> &                 candidate) const
   {
     (void)surrounding_points;
-#ifdef DEBUG
-    for (unsigned int i=0; i<surrounding_points.size(); ++i)
+#  ifdef DEBUG
+    for (unsigned int i = 0; i < surrounding_points.size(); ++i)
       Assert(closest_point(sh, surrounding_points[i], tolerance)
-             .distance(surrounding_points[i]) <
-             std::max(tolerance*surrounding_points[i].norm(), tolerance),
+                 .distance(surrounding_points[i]) <
+               std::max(tolerance * surrounding_points[i].norm(), tolerance),
              ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
-#endif
-    return closest_point(sh, candidate,tolerance);
+#  endif
+    return closest_point(sh, candidate, tolerance);
   }
 
 
-  /*============================== DirectionalProjectionManifold ==============================*/
+  /*============================== DirectionalProjectionManifold
+   * ==============================*/
   template <int dim, int spacedim>
-  DirectionalProjectionManifold<dim,spacedim>::DirectionalProjectionManifold(const TopoDS_Shape &sh,
-      const Tensor<1,spacedim> &direction,
-      const double tolerance) :
+  DirectionalProjectionManifold<dim, spacedim>::DirectionalProjectionManifold(
+    const TopoDS_Shape &       sh,
+    const Tensor<1, spacedim> &direction,
+    const double               tolerance) :
     sh(sh),
     direction(direction),
     tolerance(tolerance)
@@ -127,168 +133,191 @@ namespace OpenCASCADE
 
 
 
-  template<int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
-  DirectionalProjectionManifold<dim,spacedim>::clone() const
+  template <int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim>>
+  DirectionalProjectionManifold<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim,spacedim> >
-           (new DirectionalProjectionManifold(sh, direction, tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new DirectionalProjectionManifold(sh, direction, tolerance));
   }
 
 
 
   template <int dim, int spacedim>
-  Point<spacedim>  DirectionalProjectionManifold<dim,spacedim>::
-  project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                       const Point<spacedim>                  &candidate) const
+  Point<spacedim>
+  DirectionalProjectionManifold<dim, spacedim>::project_to_manifold(
+    const ArrayView<const Point<spacedim>> &surrounding_points,
+    const Point<spacedim> &                 candidate) const
   {
     (void)surrounding_points;
-#ifdef DEBUG
-    for (unsigned int i=0; i<surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i],tolerance)
-             .distance(surrounding_points[i]) <
-             std::max(tolerance*surrounding_points[i].norm(), tolerance),
+#  ifdef DEBUG
+    for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+      Assert(closest_point(sh, surrounding_points[i], tolerance)
+                 .distance(surrounding_points[i]) <
+               std::max(tolerance * surrounding_points[i].norm(), tolerance),
              ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
-#endif
+#  endif
     return line_intersection(sh, candidate, direction, tolerance);
   }
 
 
 
-  /*============================== NormalToMeshProjectionManifold ==============================*/
+  /*============================== NormalToMeshProjectionManifold
+   * ==============================*/
   template <int dim, int spacedim>
-  NormalToMeshProjectionManifold<dim,spacedim>::NormalToMeshProjectionManifold(const TopoDS_Shape &sh,
-      const double tolerance) :
+  NormalToMeshProjectionManifold<dim, spacedim>::NormalToMeshProjectionManifold(
+    const TopoDS_Shape &sh,
+    const double        tolerance) :
     sh(sh),
     tolerance(tolerance)
   {
     Assert(spacedim == 3, ExcNotImplemented());
-    Assert(std::get<0>(count_elements(sh)) > 0,
-           ExcMessage("NormalToMeshProjectionManifold needs a shape containing faces to operate."));
+    Assert(
+      std::get<0>(count_elements(sh)) > 0,
+      ExcMessage(
+        "NormalToMeshProjectionManifold needs a shape containing faces to operate."));
   }
 
-  template<int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
-  NormalToMeshProjectionManifold<dim,spacedim>::clone() const
+  template <int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim>>
+  NormalToMeshProjectionManifold<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim, spacedim> >
-           (new NormalToMeshProjectionManifold<dim,spacedim>(sh,tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new NormalToMeshProjectionManifold<dim, spacedim>(sh, tolerance));
   }
 
 
   template <int dim, int spacedim>
-  Point<spacedim>  NormalToMeshProjectionManifold<dim,spacedim>::
-  project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                       const Point<spacedim>                  &candidate) const
+  Point<spacedim>
+  NormalToMeshProjectionManifold<dim, spacedim>::project_to_manifold(
+    const ArrayView<const Point<spacedim>> &surrounding_points,
+    const Point<spacedim> &                 candidate) const
   {
     TopoDS_Shape out_shape;
-    Tensor<1,3> average_normal;
-#ifdef DEBUG
-    for (unsigned int i=0; i<surrounding_points.size(); ++i)
+    Tensor<1, 3> average_normal;
+#  ifdef DEBUG
+    for (unsigned int i = 0; i < surrounding_points.size(); ++i)
       {
         Assert(closest_point(sh, surrounding_points[i], tolerance)
-               .distance(surrounding_points[i]) <
-               std::max(tolerance*surrounding_points[i].norm(), tolerance),
+                   .distance(surrounding_points[i]) <
+                 std::max(tolerance * surrounding_points[i].norm(), tolerance),
                ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
       }
-#endif
+#  endif
 
     switch (surrounding_points.size())
       {
-      case 2:
-      {
-        for (unsigned int i=0; i<surrounding_points.size(); ++i)
+        case 2:
           {
-            std::tuple<Point<3>,  Tensor<1,3>, double, double>
-            p_and_diff_forms =
-              closest_point_and_differential_forms(sh,
-                                                   surrounding_points[i],
-                                                   tolerance);
-            average_normal += std::get<1>(p_and_diff_forms);
+            for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+              {
+                std::tuple<Point<3>, Tensor<1, 3>, double, double>
+                  p_and_diff_forms = closest_point_and_differential_forms(
+                    sh, surrounding_points[i], tolerance);
+                average_normal += std::get<1>(p_and_diff_forms);
+              }
+
+            average_normal /= 2.0;
+
+            Assert(
+              average_normal.norm() > 1e-4,
+              ExcMessage(
+                "Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
+
+            Tensor<1, 3> T = surrounding_points[0] - surrounding_points[1];
+            T /= T.norm();
+            average_normal = average_normal - (average_normal * T) * T;
+            average_normal /= average_normal.norm();
+            break;
           }
+        case 4:
+          {
+            Tensor<1, 3> u = surrounding_points[1] - surrounding_points[0];
+            Tensor<1, 3> v = surrounding_points[2] - surrounding_points[0];
+            const double n1_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                         u[2] * v[0] - u[0] * v[2],
+                                         u[0] * v[1] - u[1] * v[0]};
+            Tensor<1, 3> n1(n1_coords);
+            n1 = n1 / n1.norm();
+            u  = surrounding_points[2] - surrounding_points[3];
+            v  = surrounding_points[1] - surrounding_points[3];
+            const double n2_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                         u[2] * v[0] - u[0] * v[2],
+                                         u[0] * v[1] - u[1] * v[0]};
+            Tensor<1, 3> n2(n2_coords);
+            n2 = n2 / n2.norm();
 
-        average_normal/=2.0;
+            average_normal = (n1 + n2) / 2.0;
 
-        Assert(average_normal.norm() > 1e-4,
-               ExcMessage("Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
+            Assert(
+              average_normal.norm() > tolerance,
+              ExcMessage(
+                "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
 
-        Tensor<1,3> T = surrounding_points[0]-surrounding_points[1];
-        T /= T.norm();
-        average_normal = average_normal-(average_normal*T)*T;
-        average_normal /= average_normal.norm();
-        break;
-      }
-      case 4:
-      {
-        Tensor<1,3> u = surrounding_points[1]-surrounding_points[0];
-        Tensor<1,3> v = surrounding_points[2]-surrounding_points[0];
-        const double n1_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
-        Tensor<1,3> n1(n1_coords);
-        n1 = n1/n1.norm();
-        u = surrounding_points[2]-surrounding_points[3];
-        v = surrounding_points[1]-surrounding_points[3];
-        const double n2_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
-        Tensor<1,3> n2(n2_coords);
-        n2 = n2/n2.norm();
+            average_normal /= average_normal.norm();
+            break;
+          }
+        case 8:
+          {
+            Tensor<1, 3> u = surrounding_points[1] - surrounding_points[0];
+            Tensor<1, 3> v = surrounding_points[2] - surrounding_points[0];
+            const double n1_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                         u[2] * v[0] - u[0] * v[2],
+                                         u[0] * v[1] - u[1] * v[0]};
+            Tensor<1, 3> n1(n1_coords);
+            n1 = n1 / n1.norm();
+            u  = surrounding_points[2] - surrounding_points[3];
+            v  = surrounding_points[1] - surrounding_points[3];
+            const double n2_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                         u[2] * v[0] - u[0] * v[2],
+                                         u[0] * v[1] - u[1] * v[0]};
+            Tensor<1, 3> n2(n2_coords);
+            n2 = n2 / n2.norm();
+            u  = surrounding_points[4] - surrounding_points[7];
+            v  = surrounding_points[6] - surrounding_points[7];
+            const double n3_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                         u[2] * v[0] - u[0] * v[2],
+                                         u[0] * v[1] - u[1] * v[0]};
+            Tensor<1, 3> n3(n3_coords);
+            n3 = n3 / n3.norm();
+            u  = surrounding_points[6] - surrounding_points[7];
+            v  = surrounding_points[5] - surrounding_points[7];
+            const double n4_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                         u[2] * v[0] - u[0] * v[2],
+                                         u[0] * v[1] - u[1] * v[0]};
+            Tensor<1, 3> n4(n4_coords);
+            n4 = n4 / n4.norm();
 
-        average_normal = (n1+n2)/2.0;
+            average_normal = (n1 + n2 + n3 + n4) / 4.0;
 
-        Assert(average_normal.norm() > tolerance,
-               ExcMessage("Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
+            Assert(
+              average_normal.norm() > tolerance,
+              ExcMessage(
+                "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
 
-        average_normal /= average_normal.norm();
-        break;
-      }
-      case 8:
-      {
-        Tensor<1,3> u = surrounding_points[1]-surrounding_points[0];
-        Tensor<1,3> v = surrounding_points[2]-surrounding_points[0];
-        const double n1_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
-        Tensor<1,3> n1(n1_coords);
-        n1 = n1/n1.norm();
-        u = surrounding_points[2]-surrounding_points[3];
-        v = surrounding_points[1]-surrounding_points[3];
-        const double n2_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
-        Tensor<1,3> n2(n2_coords);
-        n2 = n2/n2.norm();
-        u = surrounding_points[4]-surrounding_points[7];
-        v = surrounding_points[6]-surrounding_points[7];
-        const double n3_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
-        Tensor<1,3> n3(n3_coords);
-        n3 = n3/n3.norm();
-        u = surrounding_points[6]-surrounding_points[7];
-        v = surrounding_points[5]-surrounding_points[7];
-        const double n4_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
-        Tensor<1,3> n4(n4_coords);
-        n4 = n4/n4.norm();
-
-        average_normal = (n1+n2+n3+n4)/4.0;
-
-        Assert(average_normal.norm() > tolerance,
-               ExcMessage("Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
-
-        average_normal /= average_normal.norm();
-        break;
-      }
-      default:
-      {
-        AssertThrow(false, ExcNotImplemented());
-        break;
-      }
+            average_normal /= average_normal.norm();
+            break;
+          }
+        default:
+          {
+            AssertThrow(false, ExcNotImplemented());
+            break;
+          }
       }
 
     return line_intersection(sh, candidate, average_normal, tolerance);
   }
 
 
-  /*============================== ArclengthProjectionLineManifold ==============================*/
+  /*============================== ArclengthProjectionLineManifold
+   * ==============================*/
   template <int dim, int spacedim>
-  ArclengthProjectionLineManifold<dim,spacedim>::ArclengthProjectionLineManifold(const TopoDS_Shape &sh,
-      const double tolerance):
+  ArclengthProjectionLineManifold<dim, spacedim>::
+    ArclengthProjectionLineManifold(const TopoDS_Shape &sh,
+                                    const double        tolerance) :
 
-    ChartManifold<dim,spacedim,1>(sh.Closed() ?
-                                  Point<1>(shape_length(sh)) :
-                                  Point<1>()),
+    ChartManifold<dim, spacedim, 1>(sh.Closed() ? Point<1>(shape_length(sh)) :
+                                                  Point<1>()),
     sh(sh),
     curve(curve_adaptor(sh)),
     tolerance(tolerance),
@@ -299,64 +328,70 @@ namespace OpenCASCADE
 
 
 
-  template<int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
+  template <int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim>>
   ArclengthProjectionLineManifold<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim, spacedim> >
-           (new ArclengthProjectionLineManifold(sh,tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new ArclengthProjectionLineManifold(sh, tolerance));
   }
 
 
 
   template <int dim, int spacedim>
   Point<1>
-  ArclengthProjectionLineManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
+  ArclengthProjectionLineManifold<dim, spacedim>::pull_back(
+    const Point<spacedim> &space_point) const
   {
-    double t (0.0);
+    double              t(0.0);
     ShapeAnalysis_Curve curve_analysis;
-    gp_Pnt proj;
-    const double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
-    Assert(dist < tolerance*length, ExcPointNotOnManifold<spacedim>(space_point));
+    gp_Pnt              proj;
+    const double        dist = curve_analysis.Project(
+      curve->GetCurve(), point(space_point), tolerance, proj, t, true);
+    Assert(dist < tolerance * length,
+           ExcPointNotOnManifold<spacedim>(space_point));
     (void)dist; // Silence compiler warning in Release mode.
-    return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
+    return Point<1>(GCPnts_AbscissaPoint::Length(
+      curve->GetCurve(), curve->GetCurve().FirstParameter(), t));
   }
 
 
 
   template <int dim, int spacedim>
   Point<spacedim>
-  ArclengthProjectionLineManifold<dim,spacedim>::push_forward(const Point<1> &chart_point) const
+  ArclengthProjectionLineManifold<dim, spacedim>::push_forward(
+    const Point<1> &chart_point) const
   {
-    GCPnts_AbscissaPoint AP(curve->GetCurve(), chart_point[0], curve->GetCurve().FirstParameter());
+    GCPnts_AbscissaPoint AP(
+      curve->GetCurve(), chart_point[0], curve->GetCurve().FirstParameter());
     gp_Pnt P = curve->GetCurve().Value(AP.Parameter());
     return point<spacedim>(P);
   }
 
   template <int dim, int spacedim>
-  NURBSPatchManifold<dim, spacedim>::
-  NURBSPatchManifold( const TopoDS_Face &face,
-                      const double tolerance)
-    :
+  NURBSPatchManifold<dim, spacedim>::NURBSPatchManifold(
+    const TopoDS_Face &face,
+    const double       tolerance) :
     face(face),
     tolerance(tolerance)
   {}
 
 
 
-  template<int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
-  NURBSPatchManifold<dim,spacedim>::clone() const
+  template <int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim>>
+  NURBSPatchManifold<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim, spacedim> >
-           (new NURBSPatchManifold<dim,spacedim>(face,tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new NURBSPatchManifold<dim, spacedim>(face, tolerance));
   }
 
 
 
-  template <int dim, int spacedim>  Point<2>
-  NURBSPatchManifold<dim, spacedim>::
-  pull_back(const Point<spacedim> &space_point) const
+  template <int dim, int spacedim>
+  Point<2>
+  NURBSPatchManifold<dim, spacedim>::pull_back(
+    const Point<spacedim> &space_point) const
   {
     Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
 
@@ -366,50 +401,52 @@ namespace OpenCASCADE
     double u = proj_params.X();
     double v = proj_params.Y();
 
-    return Point<2>(u,v);
+    return Point<2>(u, v);
   }
 
   template <int dim, int spacedim>
   Point<spacedim>
-  NURBSPatchManifold<dim, spacedim>::
-  push_forward(const Point<2> &chart_point) const
+  NURBSPatchManifold<dim, spacedim>::push_forward(
+    const Point<2> &chart_point) const
   {
-    return ::dealii::OpenCASCADE::push_forward<spacedim>(face, chart_point[0], chart_point[1]);
+    return ::dealii::OpenCASCADE::push_forward<spacedim>(
+      face, chart_point[0], chart_point[1]);
   }
 
   template <int dim, int spacedim>
-  DerivativeForm<1,2,spacedim>
-  NURBSPatchManifold<dim,spacedim>::
-  push_forward_gradient(const Point<2> &chart_point) const
+  DerivativeForm<1, 2, spacedim>
+  NURBSPatchManifold<dim, spacedim>::push_forward_gradient(
+    const Point<2> &chart_point) const
   {
-    DerivativeForm<1,2,spacedim> DX;
+    DerivativeForm<1, 2, spacedim> DX;
     Handle(Geom_Surface) surf = BRep_Tool::Surface(face);
 
     gp_Pnt q;
     gp_Vec Du, Dv;
-    surf->D1(chart_point[0],chart_point[1], q, Du, Dv);
+    surf->D1(chart_point[0], chart_point[1], q, Du, Dv);
 
     DX[0][0] = Du.X();
     DX[1][0] = Du.Y();
-    if (spacedim>2)
+    if (spacedim > 2)
       DX[2][0] = Du.Z();
     else
-      Assert(std::abs(Du.Z()) < tolerance,
-             ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
+      Assert(
+        std::abs(Du.Z()) < tolerance,
+        ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
     DX[0][1] = Dv.X();
     DX[1][1] = Dv.Y();
-    if (spacedim>2)
+    if (spacedim > 2)
       DX[2][1] = Dv.Z();
     else
-      Assert(std::abs(Dv.Z()) < tolerance,
-             ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
+      Assert(
+        std::abs(Dv.Z()) < tolerance,
+        ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
     return DX;
   }
 
   template <int dim, int spacedim>
   std::tuple<double, double, double, double>
-  NURBSPatchManifold<dim,spacedim>::
-  get_uv_bounds() const
+  NURBSPatchManifold<dim, spacedim>::get_uv_bounds() const
   {
     Standard_Real umin, umax, vmin, vmax;
     BRepTools::UVBounds(face, umin, umax, vmin, vmax);
@@ -417,7 +454,7 @@ namespace OpenCASCADE
   }
 
 // Explicit instantiations
-#include "manifold_lib.inst"
+#  include "manifold_lib.inst"
 } // end namespace OpenCASCADE
 
 DEAL_II_NAMESPACE_CLOSE

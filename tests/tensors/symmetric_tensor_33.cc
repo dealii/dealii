@@ -16,50 +16,55 @@
 // Check SymmetricTensor::norm() for complex-valued rank-2 tensors by
 // computing it via multiplication
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
+
+#include "../tests.h"
 
 
 template <int rank, int dim>
-void check ()
+void
+check()
 {
   // build a regular tensor
-  SymmetricTensor<rank,dim> t, t_conj;
+  SymmetricTensor<rank, dim> t, t_conj;
 
   // build one in which all numbers are the same but purely imaginary
-  SymmetricTensor<rank,dim,std::complex<double> > ti, ti_conj;
+  SymmetricTensor<rank, dim, std::complex<double>> ti, ti_conj;
 
   // build one in which all numbers have both real and imaginary components
-  SymmetricTensor<rank,dim,std::complex<double> > tc, tc_conj;
+  SymmetricTensor<rank, dim, std::complex<double>> tc, tc_conj;
 
-  for (unsigned int i=0; i<t.n_independent_components; ++i)
+  for (unsigned int i = 0; i < t.n_independent_components; ++i)
     {
-      t.access_raw_entry(i)  = 1.0 * (i+1);
-      ti.access_raw_entry(i) = std::complex<double>(0,1.0*(i+1));
-      tc.access_raw_entry(i) = std::complex<double>(1.0*(i+1),1.0*(i+1));
+      t.access_raw_entry(i)  = 1.0 * (i + 1);
+      ti.access_raw_entry(i) = std::complex<double>(0, 1.0 * (i + 1));
+      tc.access_raw_entry(i) =
+        std::complex<double>(1.0 * (i + 1), 1.0 * (i + 1));
 
-      t_conj.access_raw_entry(i)  = 1.0 * (i+1);
-      ti_conj.access_raw_entry(i) = std::complex<double>(0,-1.0*(i+1));
-      tc_conj.access_raw_entry(i) = std::complex<double>(1.0*(i+1),-1.0*(i+1));
+      t_conj.access_raw_entry(i)  = 1.0 * (i + 1);
+      ti_conj.access_raw_entry(i) = std::complex<double>(0, -1.0 * (i + 1));
+      tc_conj.access_raw_entry(i) =
+        std::complex<double>(1.0 * (i + 1), -1.0 * (i + 1));
     }
 
-  deallog << t.norm() << " vs " << std::sqrt(t_conj*t) << std::endl
-          << ti.norm() << " vs " << std::sqrt(ti_conj*ti) << std::endl
-          << tc.norm() << " vs " << std::sqrt(tc_conj*tc) << std::endl
+  deallog << t.norm() << " vs " << std::sqrt(t_conj * t) << std::endl
+          << ti.norm() << " vs " << std::sqrt(ti_conj * ti) << std::endl
+          << tc.norm() << " vs " << std::sqrt(tc_conj * tc) << std::endl
           << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
   deallog << "check rank 2 tensors" << std::endl;
-  check<2,1>();
-  check<2,2>();
-  check<2,3>();
+  check<2, 1>();
+  check<2, 2>();
+  check<2, 3>();
 
   deallog << "OK" << std::endl;
 }

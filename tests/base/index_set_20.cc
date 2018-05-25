@@ -16,12 +16,14 @@
 
 // test IndexSet::add_indices(IndexSet)
 
-#include "../tests.h"
-#include <stdlib.h>
-
 #include <deal.II/base/index_set.h>
 
-void testor(IndexSet &a, IndexSet &other, bool verbose=true)
+#include <stdlib.h>
+
+#include "../tests.h"
+
+void
+testor(IndexSet &a, IndexSet &other, bool verbose = true)
 {
   IndexSet merged(a);
 
@@ -37,20 +39,17 @@ void testor(IndexSet &a, IndexSet &other, bool verbose=true)
       merged.print(deallog);
     }
 
-  for (unsigned int i=0; i<merged.size(); ++i)
+  for (unsigned int i = 0; i < merged.size(); ++i)
     {
-      Assert(
-        merged.is_element(i)
-        ==
-        (a.is_element(i) || other.is_element(i)),
-        ExcInternalError());
+      Assert(merged.is_element(i) == (a.is_element(i) || other.is_element(i)),
+             ExcInternalError());
     }
 }
 
 
 
-
-void test()
+void
+test()
 {
   const int size = 10;
 
@@ -75,15 +74,15 @@ void test()
   testor(id, id2);
 
   deallog << "* random tests... " << std::endl;
-  for (unsigned int i=0; i<10; ++i)
+  for (unsigned int i = 0; i < 10; ++i)
     {
-      const int size=100;
-      IndexSet a(size);
-      IndexSet b(size);
-      for (unsigned int i=0; i<9*a.size()/10; ++i)
+      const int size = 100;
+      IndexSet  a(size);
+      IndexSet  b(size);
+      for (unsigned int i = 0; i < 9 * a.size() / 10; ++i)
         {
-          a.add_index (Testing::rand() % a.size());
-          b.add_index (Testing::rand() % a.size());
+          a.add_index(Testing::rand() % a.size());
+          b.add_index(Testing::rand() % a.size());
         }
       testor(a, b, false);
     }
@@ -91,12 +90,10 @@ void test()
 
 
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

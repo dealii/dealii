@@ -13,10 +13,12 @@
 //
 //-----------------------------------------------------------
 
-#include <deal.II/sundials/ida.h>
 #include <deal.II/base/parameter_handler.h>
+
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
+
+#include <deal.II/sundials/ida.h>
 
 using namespace dealii;
 
@@ -54,33 +56,28 @@ using namespace dealii;
  */
 class HarmonicOscillator
 {
-
 public:
-  HarmonicOscillator(double _kappa=1.0) :
+  HarmonicOscillator(double _kappa = 1.0) :
     y(2),
     y_dot(2),
     diff(2),
-    J(2,2),
-    A(2,2),
-    Jinv(2,2),
+    J(2, 2),
+    A(2, 2),
+    Jinv(2, 2),
     kappa(_kappa)
   {
     diff[0] = 1.0;
     diff[1] = 1.0;
 
-    time_stepper.reinit_vector = [&] (Vector<double> &v)
-    {
-      v.reinit(2);
-    };
+    time_stepper.reinit_vector = [&](Vector<double> &v) { v.reinit(2); };
 
 
     typedef Vector<double> VectorType;
 
-    time_stepper.residual = [&](const double t,
+    time_stepper.residual = [&](const double      t,
                                 const VectorType &y,
                                 const VectorType &y_dot,
-                                VectorType &res) ->int
-    {
+                                VectorType &      res) -> int {
       res = y_dot;
       A.vmult_add(res, y);
       return 0;
@@ -89,72 +86,68 @@ public:
     time_stepper.setup_jacobian = [&](const double,
                                       const VectorType &,
                                       const VectorType &,
-                                      const double alpha) ->int
-    {
-      A(0,1) = -1.0;
-      A(1,0) = kappa*kappa;
+                                      const double alpha) -> int {
+      A(0, 1) = -1.0;
+      A(1, 0) = kappa * kappa;
 
       J = A;
 
-      J(0,0) = alpha;
-      J(1,1) = alpha;
+      J(0, 0) = alpha;
+      J(1, 1) = alpha;
 
       Jinv.invert(J);
       return 0;
     };
 
     time_stepper.solve_jacobian_system = [&](const VectorType &src,
-                                             VectorType &dst) ->int
-    {
-      Jinv.vmult(dst,src);
+                                             VectorType &      dst) -> int {
+      Jinv.vmult(dst, src);
       return 0;
     };
 
-    time_stepper.output_step = [&](const double t,
-                                   const VectorType &sol,
-                                   const VectorType &sol_dot,
-                                   const unsigned int step_number) -> int
-    {
+    time_stepper.output_step = [&](const double       t,
+                                   const VectorType & sol,
+                                   const VectorType & sol_dot,
+                                   const unsigned int step_number) -> int {
       // In this test, don't output anything.
       return 0;
     };
 
-    time_stepper.solver_should_restart = [](const double,
-                                            VectorType &,
-                                            VectorType &) ->bool
-    {
-      return false;
-    };
+    time_stepper.solver_should_restart =
+      [](const double, VectorType &, VectorType &) -> bool { return false; };
 
 
-    time_stepper.differential_components = [&]() -> IndexSet
-    {
+    time_stepper.differential_components = [&]() -> IndexSet {
       return complete_index_set(2);
     };
   }
 
-  void run()
+  void
+  run()
   {
     y[1] = kappa;
-    time_stepper.solve_dae(y,y_dot);
+    time_stepper.solve_dae(y, y_dot);
   }
-  SUNDIALS::IDA<Vector<double> >  time_stepper;
+  SUNDIALS::IDA<Vector<double>> time_stepper;
+
 private:
-  Vector<double> y;
-  Vector<double> y_dot;
-  Vector<double> diff;
+  Vector<double>     y;
+  Vector<double>     y_dot;
+  Vector<double>     diff;
   FullMatrix<double> J;
   FullMatrix<double> A;
   FullMatrix<double> Jinv;
-  double kappa;
+  double             kappa;
 };
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, numbers::invalid_unsigned_int);
 
-  HarmonicOscillator ode(2*numbers::PI);
+  HarmonicOscillator ode(2 * numbers::PI);
   ode.run();
   return 0;
 }

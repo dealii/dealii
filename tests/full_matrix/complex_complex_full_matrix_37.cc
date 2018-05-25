@@ -16,8 +16,8 @@
 
 
 // check FullMatrix::equ. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// complex-valued matrices and vectors; this time we actually store complex
+// values in them
 
 
 #include "../tests.h"
@@ -25,16 +25,14 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m,n;
-  make_complex_matrix (m);
-  make_complex_matrix (n);
-  m.equ (3.14159, n);
+  FullMatrix<std::complex<number>> m, n;
+  make_complex_matrix(m);
+  make_complex_matrix(n);
+  m.equ(3.14159, n);
 
-  print_matrix (m);
+  print_matrix(m);
 }
-

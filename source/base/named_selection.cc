@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/algorithms/named_selection.h>
 #include <deal.II/algorithms/any_data.h>
+#include <deal.II/algorithms/named_selection.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -22,9 +22,8 @@ void
 NamedSelection::initialize(const AnyData &data)
 {
   indices.resize(names.size());
-  for (unsigned int i=0; i<names.size(); ++i)
+  for (unsigned int i = 0; i < names.size(); ++i)
     indices[i] = data.find(names[i]);
 }
 
 DEAL_II_NAMESPACE_CLOSE
-

@@ -18,60 +18,77 @@
 // series of meshes with adaptive meshes for FESystem(FE_Q,2). Same as
 // transfer_matrix_free_02 but using two components (and fewer meshes).
 
-#include "../tests.h"
-#include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/dofs/dof_tools.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/lac/la_parallel_vector.h>
+
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 
+#include "../tests.h"
+
 
 template <int dim, typename Number>
-void check(const unsigned int fe_degree)
+void
+check(const unsigned int fe_degree)
 {
-  FESystem<dim> fe (FE_Q<dim>(fe_degree), 2);
+  FESystem<dim> fe(FE_Q<dim>(fe_degree), 2);
   deallog << "FE: " << fe.get_name() << std::endl;
 
   // run a few different sizes...
-  unsigned int sizes [] = {1, 3};
-  for (unsigned int cycle=0; cycle<sizeof(sizes)/sizeof(unsigned int); ++cycle)
+  unsigned int sizes[] = {1, 3};
+  for (unsigned int cycle = 0; cycle < sizeof(sizes) / sizeof(unsigned int);
+       ++cycle)
     {
       unsigned int n_refinements = 0;
-      unsigned int n_subdiv = sizes[cycle];
+      unsigned int n_subdiv      = sizes[cycle];
       if (n_subdiv > 1)
-        while (n_subdiv%2 == 0)
+        while (n_subdiv % 2 == 0)
           {
             n_refinements += 1;
             n_subdiv /= 2;
           }
-      n_refinements += 6-2*dim;
+      n_refinements += 6 - 2 * dim;
       if (fe_degree < 3)
         n_refinements += 1;
 
-      parallel::distributed::Triangulation<dim>
-      tr(MPI_COMM_WORLD,
-         Triangulation<dim>::limit_level_difference_at_vertices,
-         parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+      parallel::distributed::Triangulation<dim> tr(
+        MPI_COMM_WORLD,
+        Triangulation<dim>::limit_level_difference_at_vertices,
+        parallel::distributed::Triangulation<
+          dim>::construct_multigrid_hierarchy);
       GridGenerator::subdivided_hyper_cube(tr, n_subdiv);
       tr.refine_global(n_refinements);
 
       // adaptive refinement into a circle
-      for (typename Triangulation<dim>::active_cell_iterator cell=tr.begin_active(); cell != tr.end(); ++cell)
-        if (cell->is_locally_owned() &&
-            cell->center().norm() < 0.5)
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             tr.begin_active();
+           cell != tr.end();
+           ++cell)
+        if (cell->is_locally_owned() && cell->center().norm() < 0.5)
           cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
-      for (typename Triangulation<dim>::active_cell_iterator cell=tr.begin_active(); cell != tr.end(); ++cell)
-        if (cell->is_locally_owned() &&
-            cell->center().norm() > 0.3 && cell->center().norm() < 0.4)
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             tr.begin_active();
+           cell != tr.end();
+           ++cell)
+        if (cell->is_locally_owned() && cell->center().norm() > 0.3 &&
+            cell->center().norm() < 0.4)
           cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
-      for (typename Triangulation<dim>::active_cell_iterator cell=tr.begin_active(); cell != tr.end(); ++cell)
-        if (cell->is_locally_owned() &&
-            cell->center().norm() > 0.33 && cell->center().norm() < 0.37)
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             tr.begin_active();
+           cell != tr.end();
+           ++cell)
+        if (cell->is_locally_owned() && cell->center().norm() > 0.33 &&
+            cell->center().norm() < 0.37)
           cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
 
@@ -81,15 +98,15 @@ void check(const unsigned int fe_degree)
       mgdof.distribute_dofs(fe);
       mgdof.distribute_mg_dofs(fe);
 
-      MGConstrainedDoFs mg_constrained_dofs;
-      Functions::ZeroFunction<dim> zero_function;
+      MGConstrainedDoFs               mg_constrained_dofs;
+      Functions::ZeroFunction<dim>    zero_function;
       typename FunctionMap<dim>::type dirichlet_boundary;
       dirichlet_boundary[0] = &zero_function;
       mg_constrained_dofs.initialize(mgdof, dirichlet_boundary);
 
       // build reference
-      MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double> >
-      transfer_ref(mg_constrained_dofs);
+      MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>>
+        transfer_ref(mg_constrained_dofs);
       transfer_ref.build_matrices(mgdof);
 
       // build matrix-free transfer
@@ -97,39 +114,45 @@ void check(const unsigned int fe_degree)
       transfer.build(mgdof);
 
       // check prolongation for all levels using random vector
-      for (unsigned int level=1; level<mgdof.get_triangulation().n_global_levels(); ++level)
+      for (unsigned int level = 1;
+           level < mgdof.get_triangulation().n_global_levels();
+           ++level)
         {
           LinearAlgebra::distributed::Vector<Number> v1, v2;
           LinearAlgebra::distributed::Vector<double> v1_cpy, v2_cpy, v3;
-          v1.reinit(mgdof.locally_owned_mg_dofs(level-1), MPI_COMM_WORLD);
+          v1.reinit(mgdof.locally_owned_mg_dofs(level - 1), MPI_COMM_WORLD);
           v2.reinit(mgdof.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
           v3.reinit(mgdof.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
-          for (unsigned int i=0; i<v1.local_size(); ++i)
+          for (unsigned int i = 0; i < v1.local_size(); ++i)
             v1.local_element(i) = random_value<double>();
           v1_cpy = v1;
           transfer.prolongate(level, v2, v1);
           transfer_ref.prolongate(level, v3, v1_cpy);
           v2_cpy = v2;
           v3 -= v2_cpy;
-          deallog << "Diff prolongate   l" << level << ": " << v3.l2_norm() << std::endl;
+          deallog << "Diff prolongate   l" << level << ": " << v3.l2_norm()
+                  << std::endl;
         }
 
       // check restriction for all levels using random vector
-      for (unsigned int level=1; level<mgdof.get_triangulation().n_global_levels(); ++level)
+      for (unsigned int level = 1;
+           level < mgdof.get_triangulation().n_global_levels();
+           ++level)
         {
           LinearAlgebra::distributed::Vector<Number> v1, v2;
           LinearAlgebra::distributed::Vector<double> v1_cpy, v2_cpy, v3;
           v1.reinit(mgdof.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
-          v2.reinit(mgdof.locally_owned_mg_dofs(level-1), MPI_COMM_WORLD);
-          v3.reinit(mgdof.locally_owned_mg_dofs(level-1), MPI_COMM_WORLD);
-          for (unsigned int i=0; i<v1.local_size(); ++i)
+          v2.reinit(mgdof.locally_owned_mg_dofs(level - 1), MPI_COMM_WORLD);
+          v3.reinit(mgdof.locally_owned_mg_dofs(level - 1), MPI_COMM_WORLD);
+          for (unsigned int i = 0; i < v1.local_size(); ++i)
             v1.local_element(i) = random_value<double>();
           v1_cpy = v1;
           transfer.restrict_and_add(level, v2, v1);
           transfer_ref.restrict_and_add(level, v3, v1_cpy);
           v2_cpy = v2;
           v3 -= v2_cpy;
-          deallog << "Diff restrict     l" << level << ": " << v3.l2_norm() << std::endl;
+          deallog << "Diff restrict     l" << level << ": " << v3.l2_norm()
+                  << std::endl;
 
           v2 = 1.;
           v3 = 1.;
@@ -137,23 +160,25 @@ void check(const unsigned int fe_degree)
           transfer_ref.restrict_and_add(level, v3, v1_cpy);
           v2_cpy = v2;
           v3 -= v2_cpy;
-          deallog << "Diff restrict add l" << level << ": " << v3.l2_norm() << std::endl;
+          deallog << "Diff restrict add l" << level << ": " << v3.l2_norm()
+                  << std::endl;
         }
       deallog << std::endl;
     }
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   // no threading in this test...
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   mpi_initlog();
 
-  check<2,double>(1);
-  check<2,double>(3);
-  check<3,double>(1);
-  check<3,double>(3);
-  check<2,float> (2);
-  check<3,float> (2);
+  check<2, double>(1);
+  check<2, double>(3);
+  check<3, double>(1);
+  check<3, double>(3);
+  check<2, float>(2);
+  check<3, float>(2);
 }

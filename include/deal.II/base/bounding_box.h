@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
@@ -36,12 +37,14 @@ enum class NeighborType
   not_neighbors = 0,
 
   /**
-   * simple neighbors: the boxes intersect with an intersection of dimension at most spacedim - 2
+   * simple neighbors: the boxes intersect with an intersection of dimension at
+   * most spacedim - 2
    */
   simple_neighbors = 1,
 
   /**
-   * attached neighbors: neighbors with an intersection of dimension > spacedim - 2
+   * attached neighbors: neighbors with an intersection of dimension > spacedim
+   * - 2
    */
   attached_neighbors = 2,
 
@@ -90,7 +93,7 @@ enum class NeighborType
  *
  * @author Giovanni Alzetta, 2017.
  */
-template <int spacedim, typename Number=double>
+template <int spacedim, typename Number = double>
 class BoundingBox
 {
 public:
@@ -98,19 +101,21 @@ public:
    * Standard constructor. Creates an object that corresponds to an empty box,
    * i.e. a degenerate box with both points being the origin.
    */
-  BoundingBox () = default;
+  BoundingBox() = default;
 
   /**
    * Standard constructor for non-empty boxes: it uses a pair of points
    * which describe the box: one for the bottom and one for the top
    * corner.
    */
-  BoundingBox (const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &boundary_points);
+  BoundingBox(const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
+                &boundary_points);
 
   /**
    * Return the boundary_points
    */
-  const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &get_boundary_points () const;
+  const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
+  get_boundary_points() const;
 
   /**
    * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
@@ -118,56 +123,67 @@ public:
    *
    * Return an enumerator of type NeighborType.
    */
-  NeighborType get_neighbor_type (const BoundingBox<spacedim,Number> &other_bbox) const;
+  NeighborType
+  get_neighbor_type(const BoundingBox<spacedim, Number> &other_bbox) const;
 
   /**
    * Enlarge the current object so that it contains @p other_bbox .
    * If the current object already contains @p other_bbox then it is not changed
    * by this function.
    */
-  void merge_with(const BoundingBox<spacedim,Number> &other_bbox);
+  void
+  merge_with(const BoundingBox<spacedim, Number> &other_bbox);
 
   /**
    * Return true if the point is inside the Bounding Box, false otherwise.
    */
-  bool point_inside (const Point<spacedim, Number> &p) const;
+  bool
+  point_inside(const Point<spacedim, Number> &p) const;
 
   /**
    * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.
    */
-  double volume() const;
+  double
+  volume() const;
 
   /**
    * Boost serialization function
    */
-  template<class Archive>
-  void serialize(Archive &ar, const unsigned int version );
+  template <class Archive>
+  void
+  serialize(Archive &ar, const unsigned int version);
 
 private:
-  std::pair<Point<spacedim,Number>,Point<spacedim,Number>> boundary_points;
+  std::pair<Point<spacedim, Number>, Point<spacedim, Number>> boundary_points;
 };
 
-/*------------------------------- Inline functions: BoundingBox ---------------------------*/
+/*------------------------------- Inline functions: BoundingBox
+ * ---------------------------*/
 
 #ifndef DOXYGEN
 
 
 template <int spacedim, typename Number>
-inline
-BoundingBox<spacedim, Number>::BoundingBox (const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &boundary_points)
+inline BoundingBox<spacedim, Number>::BoundingBox(
+  const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
+    &boundary_points)
 {
-  //We check the Bounding Box is not degenerate
-  for (unsigned int i=0; i<spacedim; ++i)
-    Assert (boundary_points.first[i] <= boundary_points.second[i],
-            ExcMessage ("Bounding Box can't be created: the point's order should be bottom left, top right!"));
+  // We check the Bounding Box is not degenerate
+  for (unsigned int i = 0; i < spacedim; ++i)
+    Assert(
+      boundary_points.first[i] <= boundary_points.second[i],
+      ExcMessage(
+        "Bounding Box can't be created: the point's order should be bottom left, top right!"));
 
   this->boundary_points = boundary_points;
 }
 
 
 template <int spacedim, typename Number>
-template<class Archive>
-void BoundingBox<spacedim, Number>::serialize(Archive &ar, const unsigned int /*version*/)
+template <class Archive>
+void
+BoundingBox<spacedim, Number>::serialize(Archive &ar,
+                                         const unsigned int /*version*/)
 {
   ar &boundary_points;
 }

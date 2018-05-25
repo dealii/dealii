@@ -16,45 +16,57 @@
 
 // check intergrid transfer
 
-#include "../tests.h"
 #include <deal.II/base/function_derivative.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/data_out_stack.h>
 
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/intergrid_map.h>
-#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/data_out_stack.h>
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 namespace DoFToolsEx
 {
   /// transfers solution between differently refined grids
   template <int dim, class InVector, class OutVector>
-  void transfer(const DoFHandler<dim> &source_dof, const InVector &source_vector, const DoFHandler<dim> &target_dof, OutVector &target_vector);
-}
+  void
+  transfer(const DoFHandler<dim> &source_dof,
+           const InVector &       source_vector,
+           const DoFHandler<dim> &target_dof,
+           OutVector &            target_vector);
+} // namespace DoFToolsEx
 
 /**
  * Detailed desc.
- * Does it make sense to have InVector and OutVector templates? Shouldn't just one Vector be enough?
+ * Does it make sense to have InVector and OutVector templates? Shouldn't just
+ * one Vector be enough?
  *
  * @param
  *
  */
 template <int dim, class InVector, class OutVector>
 void
-DoFToolsEx::transfer(const DoFHandler<dim> &source_dof, const InVector &source_vector, const DoFHandler<dim> &target_dof, OutVector &target_vector)
+DoFToolsEx::transfer(const DoFHandler<dim> &source_dof,
+                     const InVector &       source_vector,
+                     const DoFHandler<dim> &target_dof,
+                     OutVector &            target_vector)
 {
   // any sanity tests? Trias derived from same coarse grid?
 
   // build mappings between the cells
-  InterGridMap<DoFHandler<dim> > source2target, target2source;
+  InterGridMap<DoFHandler<dim>> source2target, target2source;
   source2target.make_mapping(source_dof, target_dof);
   target2source.make_mapping(target_dof, source_dof);
 
@@ -70,13 +82,16 @@ DoFToolsEx::transfer(const DoFHandler<dim> &source_dof, const InVector &source_v
         {
           // cell has not been coarsend, but possibly been refined
           cell->get_dof_values(source_vector, local_dofs);
-          source2target[cell]->set_dof_values_by_interpolation(local_dofs, target_vector);
+          source2target[cell]->set_dof_values_by_interpolation(local_dofs,
+                                                               target_vector);
         }
       else
         {
           // the source cell has been coarsened
-          Assert(cell->level() > source2target[cell]->level(), ExcInternalError());
-          target2source[ source2target[cell] ]->get_interpolated_dof_values(source_vector, local_dofs);
+          Assert(cell->level() > source2target[cell]->level(),
+                 ExcInternalError());
+          target2source[source2target[cell]]->get_interpolated_dof_values(
+            source_vector, local_dofs);
           source2target[cell]->set_dof_values(local_dofs, target_vector);
         }
     }
@@ -88,15 +103,17 @@ DoFToolsEx::transfer(const DoFHandler<dim> &source_dof, const InVector &source_v
 class TestFunction : public Function<2>
 {
 public:
-  TestFunction() : Function<2>() {}
-  virtual double value(const Point<2> &p,
-                       const unsigned int) const
+  TestFunction() : Function<2>()
+  {}
+  virtual double
+  value(const Point<2> &p, const unsigned int) const
   {
-    return std::sin(3.14159*p(0))*std::sin(3.14159*p(1));
+    return std::sin(3.14159 * p(0)) * std::sin(3.14159 * p(1));
   }
 };
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -132,7 +149,8 @@ int main()
   FE_Q<2> fe(1);
 
   // dof handlers
-  DoFHandler<2> dof(tria), refined_dof(refined_tria), coarse_dof(coarse_tria), both_dof(both_tria);
+  DoFHandler<2> dof(tria), refined_dof(refined_tria), coarse_dof(coarse_tria),
+    both_dof(both_tria);
   dof.distribute_dofs(fe);
   refined_dof.distribute_dofs(fe);
   coarse_dof.distribute_dofs(fe);
@@ -140,11 +158,12 @@ int main()
 
   // interpolate test function onto tria
   Vector<double> sol(dof.n_dofs());
-  TestFunction test_function;
+  TestFunction   test_function;
   VectorTools::interpolate(dof, test_function, sol);
 
   // setup solution vectors
-  Vector<double> refined_sol(refined_dof.n_dofs()), coarse_sol(coarse_dof.n_dofs()), both_sol(both_dof.n_dofs());
+  Vector<double> refined_sol(refined_dof.n_dofs()),
+    coarse_sol(coarse_dof.n_dofs()), both_sol(both_dof.n_dofs());
 
   // transfer solutions
   DoFToolsEx::transfer(dof, sol, refined_dof, refined_sol);
@@ -185,7 +204,7 @@ int main()
   // test output using DataOutStack
   DataOutStack<2> data_out_stack;
   data_out_stack.declare_data_vector("dof", DataOutStack<2>::dof_vector);
-  data_out_stack.new_parameter_value(0.,0.);
+  data_out_stack.new_parameter_value(0., 0.);
   data_out_stack.attach_dof_handler(dof);
   data_out_stack.add_data_vector(sol, "dof");
   data_out_stack.build_patches();

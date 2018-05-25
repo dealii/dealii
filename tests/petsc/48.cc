@@ -17,37 +17,40 @@
 
 // check PETScWrappers::MPI::Vector::ratio
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (PETScWrappers::MPI::Vector &v,
-           PETScWrappers::MPI::Vector &w,
-           PETScWrappers::MPI::Vector &x)
+
+void
+test(PETScWrappers::MPI::Vector &v,
+     PETScWrappers::MPI::Vector &w,
+     PETScWrappers::MPI::Vector &x)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
-      w(i) = i+1.;
-      x(i) = i+2.;
+      w(i) = i + 1.;
+      x(i) = i + 2.;
     }
 
-  v.compress (VectorOperation::insert);
-  w.compress (VectorOperation::insert);
-  x.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
+  w.compress(VectorOperation::insert);
+  x.compress(VectorOperation::insert);
 
-  v.ratio (w, x);
+  v.ratio(w, x);
 
   // make sure we get the expected result
-  const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
-  for (unsigned int i=0; i<v.size(); ++i)
+  const double eps = typeid(PetscScalar) == typeid(double) ? 1e-14 : 1e-5;
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w(i) == i+1., ExcInternalError());
-      AssertThrow (x(i) == i+2., ExcInternalError());
-      AssertThrow (std::fabs(v(i) - (i+1.)/(i+2.)) < eps*v(i),
-                   ExcInternalError());
+      AssertThrow(w(i) == i + 1., ExcInternalError());
+      AssertThrow(x(i) == i + 2., ExcInternalError());
+      AssertThrow(std::fabs(v(i) - (i + 1.) / (i + 2.)) < eps * v(i),
+                  ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -55,13 +58,14 @@ void test (PETScWrappers::MPI::Vector &v,
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         IndexSet indices(100);
         indices.add_range(0, 100);
@@ -70,11 +74,11 @@ int main (int argc,char **argv)
         PETScWrappers::MPI::Vector x(indices, MPI_COMM_WORLD);
         test(v, w, x);
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -87,7 +91,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

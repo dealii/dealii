@@ -25,20 +25,19 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_matrix (m);
-  Vector<std::complex<number> > x, y;
-  make_range_vector (x);
-  make_domain_vector (y);
+  FullMatrix<std::complex<number>> m;
+  make_matrix(m);
+  Vector<std::complex<number>> x, y;
+  make_range_vector(x);
+  make_domain_vector(y);
   for (std::complex<number> &entry : y)
     entry += std::complex<number>(1.0, 0.0);
 
-  m.backward (x, y);
-  print_vector (x);
-  print_vector (y);
+  m.backward(x, y);
+  print_vector(x);
+  print_vector(y);
 }

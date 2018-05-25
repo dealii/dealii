@@ -16,37 +16,42 @@
 
 // check function MGTools::max_level_for_coarse_mesh()
 
-#include "../tests.h"
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-
-#include <deal.II/numerics/vector_tools.h>
-
-#include <deal.II/base/index_set.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/grid_refinement.h>
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/multigrid.h>
 
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
+
 template <int dim>
-void test ()
+void
+test()
 {
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,Triangulation<dim>::
-                                                 limit_level_difference_at_vertices,
-                                                 parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  GridGenerator::hyper_cube(tria,0,1);
+  parallel::distributed::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  GridGenerator::hyper_cube(tria, 0, 1);
   tria.refine_global(1);
-  for (unsigned int cycle=0; cycle<2; ++cycle)
+  for (unsigned int cycle = 0; cycle < 2; ++cycle)
     {
-      for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
-           cell != tria.end(); ++cell)
-        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (typename parallel::distributed::Triangulation<
+             dim>::active_cell_iterator cell = tria.begin_active();
+           cell != tria.end();
+           ++cell)
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           {
             if (dim == 2)
               if (cell->vertex(v)[0] < 0.25 && cell->vertex(v)[1] < 0.25)
@@ -55,7 +60,8 @@ void test ()
                   break;
                 }
             if (dim == 3)
-              if (cell->vertex(v)[0] < 0.25 && cell->vertex(v)[1] < 0.25 && cell->vertex(v)[2] < 0.25)
+              if (cell->vertex(v)[0] < 0.25 && cell->vertex(v)[1] < 0.25 &&
+                  cell->vertex(v)[2] < 0.25)
                 {
                   cell->set_refine_flag();
                   break;
@@ -64,17 +70,19 @@ void test ()
       tria.execute_coarsening_and_refinement();
     }
 
-  const unsigned int max_possible_level = MGTools::max_level_for_coarse_mesh(tria);
-  deallog << "Max possible level for coarse mesh: "
-          << max_possible_level << std::endl;
+  const unsigned int max_possible_level =
+    MGTools::max_level_for_coarse_mesh(tria);
+  deallog << "Max possible level for coarse mesh: " << max_possible_level
+          << std::endl;
 }
 
 
 
-int main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  MPILogInitAll all;
+  MPILogInitAll                    all;
 
   deallog.push("2d");
   test<2>();

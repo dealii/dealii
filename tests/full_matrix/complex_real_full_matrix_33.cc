@@ -25,14 +25,12 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_matrix (m);
-  m.swap_row (2, 4);
-  print_matrix (m);
+  FullMatrix<std::complex<number>> m;
+  make_matrix(m);
+  m.swap_row(2, 4);
+  print_matrix(m);
 }
-

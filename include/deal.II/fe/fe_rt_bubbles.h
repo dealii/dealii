@@ -17,11 +17,13 @@
 #define dealii_fe_raviart_thomas_bubbles_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/table.h>
-#include <deal.II/base/polynomials_rt_bubbles.h>
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomials_rt_bubbles.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
 
@@ -55,9 +57,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * For this enhanced Raviart-Thomas element, the node values are not cell
  * and face moments with respect to certain polynomials, but the values in
- * Gauss-Lobatto quadrature points. The nodal values on edges (faces in <i>3D</i>)
- * are evaluated first, according to the natural ordering of the edges (faces) of
- * a cell. The interior degrees of freedom are evaluated last.
+ * Gauss-Lobatto quadrature points. The nodal values on edges (faces in
+ * <i>3D</i>) are evaluated first, according to the natural ordering of the
+ * edges (faces) of a cell. The interior degrees of freedom are evaluated last.
  *
  * For an RT-Bubbles element of degree <i>k</i>, we choose
  * <i>(k+1)<sup>dim-1</sup></i> Gauss-Lobatto points on each face. These points
@@ -66,11 +68,12 @@ DEAL_II_NAMESPACE_OPEN
  * Gauss-Lobatto formula for integration. The mass matrix assembled with the
  * use of this same quadrature rule, is block diagonal with blocks
  * corresponding to quadrature points. See
- * <i><a href="https://arxiv.org/abs/1710.06742">"Higher order multipoint flux mixed
- * finite element methods on quadrilaterals and hexahedra"</a></i> for more details.
+ * <i><a href="https://arxiv.org/abs/1710.06742">"Higher order multipoint flux
+ * mixed finite element methods on quadrilaterals and hexahedra"</a></i> for
+ * more details.
  *
- * The elements of degree $k=3$ in <i>2D</i> and $k=2$ in <i>3D</i> are shown in the
- * figures below (filled arrows indicate DoFs for which continuity across
+ * The elements of degree $k=3$ in <i>2D</i> and $k=2$ in <i>3D</i> are shown in
+ * the figures below (filled arrows indicate DoFs for which continuity across
  * the edges (faces in <i>3D</i>) is required).
  *
  * <table> <tr> <td align="center">
@@ -85,31 +88,30 @@ DEAL_II_NAMESPACE_OPEN
  * @author Eldar Khattatov, 2018
  */
 template <int dim>
-class FE_RT_Bubbles
-  :
-  public FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>
+class FE_RT_Bubbles : public FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>
 {
 public:
   /**
    * Constructor for the RT_Bubbles element of degree @p k.
    */
-  FE_RT_Bubbles (const unsigned int k);
+  FE_RT_Bubbles(const unsigned int k);
 
   /**
    * Returns a string that uniquely identifies a finite element. This class
    * returns <tt>FE_RT_Bubbles<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual std::unique_ptr<FiniteElement<dim,dim> >
-  clone () const override;
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
+  clone() const override;
 
   // documentation inherited from the base class
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double> &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
 private:
   /**
@@ -119,14 +121,14 @@ private:
    * FiniteElementData.
    */
   static std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree);
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * Compute the vector used for the @p restriction_is_additive field passed
    * to the base class's constructor.
    */
   static std::vector<bool>
-  get_ria_vector (const unsigned int degree);
+  get_ria_vector(const unsigned int degree);
 
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
@@ -137,7 +139,8 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void
+  initialize_support_points(const unsigned int rt_degree);
 };
 
 

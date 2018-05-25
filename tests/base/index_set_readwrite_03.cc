@@ -17,24 +17,26 @@
 // document a bug in IndexSet::block_read() and block_write(),
 // because largest_range was not serialized/reset.
 
-#include "../tests.h"
-#include <stdlib.h>
-
 #include <deal.II/base/index_set.h>
 
+#include <stdlib.h>
 
-void test ()
+#include "../tests.h"
+
+
+void
+test()
 {
   IndexSet is1(250);
-  is1.add_range(125,200);
-  is1.add_range(0,75);
+  is1.add_range(125, 200);
+  is1.add_range(0, 75);
 
   {
     std::ofstream out("a.idxset");
     is1.block_write(out);
   }
 
-  IndexSet is2;
+  IndexSet      is2;
   std::ifstream in("a.idxset");
   is2.block_read(in);
 
@@ -44,15 +46,15 @@ void test ()
 
   deallog << "OK" << std::endl;
 
-  std::remove ("a.idxset");
+  std::remove("a.idxset");
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

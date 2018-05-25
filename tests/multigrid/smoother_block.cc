@@ -15,13 +15,17 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/block_vector.h>
+
 #include <deal.II/lac/block_matrix_array.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/multigrid/mg_block_smoother.h>
+
 #include <algorithm>
+
+#include "../tests.h"
 
 using namespace std;
 
@@ -37,10 +41,11 @@ public:
    */
   ScalingMatrix(number scaling_factor = 1.);
   /**
-  * Apply preconditioner.
-  */
+   * Apply preconditioner.
+   */
   template <typename VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult(VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose
@@ -50,12 +55,14 @@ public:
    * vmult().
    */
   template <typename VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult(VectorType &, const VectorType &) const;
   /**
    * Apply preconditioner, adding to the previous value.
    */
   template <typename VectorType>
-  void vmult_add (VectorType &, const VectorType &) const;
+  void
+  vmult_add(VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose
@@ -65,7 +72,8 @@ public:
    * vmult_add().
    */
   template <typename VectorType>
-  void Tvmult_add (VectorType &, const VectorType &) const;
+  void
+  Tvmult_add(VectorType &, const VectorType &) const;
 
 private:
   number factor;
@@ -75,16 +83,14 @@ private:
 //----------------------------------------------------------------------//
 
 template <typename number>
-ScalingMatrix<number>::ScalingMatrix(number factor)
-  :
-  factor(factor)
+ScalingMatrix<number>::ScalingMatrix(number factor) : factor(factor)
 {}
 
 
 template <typename number>
 template <typename VectorType>
 inline void
-ScalingMatrix<number>::vmult (VectorType &dst, const VectorType &src) const
+ScalingMatrix<number>::vmult(VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
 }
@@ -92,7 +98,7 @@ ScalingMatrix<number>::vmult (VectorType &dst, const VectorType &src) const
 template <typename number>
 template <typename VectorType>
 inline void
-ScalingMatrix<number>::Tvmult (VectorType &dst, const VectorType &src) const
+ScalingMatrix<number>::Tvmult(VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
 }
@@ -100,7 +106,7 @@ ScalingMatrix<number>::Tvmult (VectorType &dst, const VectorType &src) const
 template <typename number>
 template <typename VectorType>
 inline void
-ScalingMatrix<number>::vmult_add (VectorType &dst, const VectorType &src) const
+ScalingMatrix<number>::vmult_add(VectorType &dst, const VectorType &src) const
 {
   dst.add(factor, src);
 }
@@ -110,7 +116,7 @@ ScalingMatrix<number>::vmult_add (VectorType &dst, const VectorType &src) const
 template <typename number>
 template <typename VectorType>
 inline void
-ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
+ScalingMatrix<number>::Tvmult_add(VectorType &dst, const VectorType &src) const
 {
   dst.add(factor, src);
 }
@@ -118,15 +124,16 @@ ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
 //----------------------------------------------------------------------//
 
 template <typename MatrixType, class RELAX>
-void check_smoother(const MGLevelObject<MatrixType> &m,
-                    const MGLevelObject<RELAX> &r)
+void
+check_smoother(const MGLevelObject<MatrixType> &m,
+               const MGLevelObject<RELAX> &     r)
 {
-  GrowingVectorMemory<BlockVector<double> > mem;
+  GrowingVectorMemory<BlockVector<double>>   mem;
   MGSmootherBlock<MatrixType, RELAX, double> smoother;
 
   smoother.initialize(m, r);
 
-  for (unsigned int l=m.min_level(); l<= m.max_level(); ++l)
+  for (unsigned int l = m.min_level(); l <= m.max_level(); ++l)
     {
       deallog << "Level " << l << std::endl;
 
@@ -134,28 +141,28 @@ void check_smoother(const MGLevelObject<MatrixType> &m,
       BlockVector<double> &f = *mem.alloc();
       u.reinit(m[l].n_block_rows(), 3);
       f.reinit(u);
-      for (unsigned int b=0; b<f.n_blocks(); ++b)
-        for (unsigned int i=0; i<f.block(b).size(); ++i)
-          f.block(b)(i) = (b+1)*(i+l);
+      for (unsigned int b = 0; b < f.n_blocks(); ++b)
+        for (unsigned int i = 0; i < f.block(b).size(); ++i)
+          f.block(b)(i) = (b + 1) * (i + l);
 
       deallog << "First step" << std::endl;
       smoother.set_steps(1);
       smoother.smooth(l, u, f);
 
-      for (unsigned int b=0; b<u.n_blocks(); ++b)
+      for (unsigned int b = 0; b < u.n_blocks(); ++b)
         {
-          for (unsigned int i=0; i<u.block(b).size(); ++i)
-            deallog << '\t' << (int) (u.block(b)(i)+.5);
+          for (unsigned int i = 0; i < u.block(b).size(); ++i)
+            deallog << '\t' << (int)(u.block(b)(i) + .5);
           deallog << std::endl;
         }
 
       deallog << "Second step" << std::endl;
       smoother.smooth(l, u, f);
 
-      for (unsigned int b=0; b<u.n_blocks(); ++b)
+      for (unsigned int b = 0; b < u.n_blocks(); ++b)
         {
-          for (unsigned int i=0; i<u.block(b).size(); ++i)
-            deallog << '\t' << (int) (u.block(b)(i)+.5);
+          for (unsigned int i = 0; i < u.block(b).size(); ++i)
+            deallog << '\t' << (int)(u.block(b)(i) + .5);
           deallog << std::endl;
         }
 
@@ -164,10 +171,10 @@ void check_smoother(const MGLevelObject<MatrixType> &m,
       smoother.set_steps(2);
       smoother.smooth(l, u, f);
 
-      for (unsigned int b=0; b<u.n_blocks(); ++b)
+      for (unsigned int b = 0; b < u.n_blocks(); ++b)
         {
-          for (unsigned int i=0; i<u.block(b).size(); ++i)
-            deallog << '\t' << (int) (u.block(b)(i)+.5);
+          for (unsigned int i = 0; i < u.block(b).size(); ++i)
+            deallog << '\t' << (int)(u.block(b)(i) + .5);
           deallog << std::endl;
         }
 
@@ -176,26 +183,27 @@ void check_smoother(const MGLevelObject<MatrixType> &m,
     }
 }
 
-void check()
+void
+check()
 {
   ScalingMatrix<double> s1(-1.);
   ScalingMatrix<double> s2(2.);
   ScalingMatrix<double> s8(8.);
 
-  GrowingVectorMemory<Vector<double> > mem;
-  MGLevelObject<BlockMatrixArray<double> > A (2,4);
-  MGLevelObject<BlockTrianglePrecondition<double> > P(2,4);
+  GrowingVectorMemory<Vector<double>>              mem;
+  MGLevelObject<BlockMatrixArray<double>>          A(2, 4);
+  MGLevelObject<BlockTrianglePrecondition<double>> P(2, 4);
 
-  for (unsigned int l=A.min_level(); l<= A.max_level(); ++l)
+  for (unsigned int l = A.min_level(); l <= A.max_level(); ++l)
     {
       A[l].initialize(3, 3);
       P[l].reinit(3);
-      for (unsigned int b=0; b<A[l].n_block_rows(); ++b)
+      for (unsigned int b = 0; b < A[l].n_block_rows(); ++b)
         {
-          P[l].enter(s2, b, b, A[l].n_block_rows()-b);
+          P[l].enter(s2, b, b, A[l].n_block_rows() - b);
           A[l].enter(s8, b, b, 1);
-          for (unsigned int b2=0; b2<A[l].n_block_rows(); ++b2)
-            A[l].enter(s1,b,b2,1.);
+          for (unsigned int b2 = 0; b2 < A[l].n_block_rows(); ++b2)
+            A[l].enter(s1, b, b2, 1.);
         }
     }
 
@@ -203,7 +211,8 @@ void check()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

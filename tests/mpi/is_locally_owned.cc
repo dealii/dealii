@@ -17,73 +17,72 @@
 
 // check CellAccessor::is_locally_owned
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "hyper_cube" << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::subdivided_hyper_cube(tr, 3);
 
-  typename Triangulation<dim,dim>::active_cell_iterator cell;
+  typename Triangulation<dim, dim>::active_cell_iterator cell;
 
-  for (cell = tr.begin_active();
-       cell != tr.end();
-       ++cell)
+  for (cell = tr.begin_active(); cell != tr.end(); ++cell)
     {
       if (cell->is_locally_owned())
         {
-          if (myid==0)
-            deallog << cell << ": locally owned"
-                    << std::endl;
-          Assert (!cell->is_ghost() && !cell->is_artificial(),
-                  ExcInternalError());
+          if (myid == 0)
+            deallog << cell << ": locally owned" << std::endl;
+          Assert(!cell->is_ghost() && !cell->is_artificial(),
+                 ExcInternalError());
         }
       else if (cell->is_ghost())
         {
-          if (myid==0)
-            deallog << cell << ": ghost"
-                    << std::endl;
-          Assert (!cell->is_locally_owned() && !cell->is_artificial(),
-                  ExcInternalError());
+          if (myid == 0)
+            deallog << cell << ": ghost" << std::endl;
+          Assert(!cell->is_locally_owned() && !cell->is_artificial(),
+                 ExcInternalError());
         }
       else if (cell->is_artificial())
         {
-          if (myid==0)
-            deallog << cell << ": artificial"
-                    << std::endl;
-          Assert (!cell->is_locally_owned() && !cell->is_ghost(),
-                  ExcInternalError());
+          if (myid == 0)
+            deallog << cell << ": artificial" << std::endl;
+          Assert(!cell->is_locally_owned() && !cell->is_ghost(),
+                 ExcInternalError());
         }
       else
-        Assert (false, ExcInternalError());
+        Assert(false, ExcInternalError());
     }
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));
@@ -98,5 +97,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

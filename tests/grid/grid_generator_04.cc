@@ -17,15 +17,17 @@
 
 // Test GridGenerator::hyper_cube_with_hole
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   GridOut go;
   go.set_flags(GridOutFlags::Ucd(false, true));
@@ -52,11 +54,10 @@ void test(std::ostream &out)
   Nzs.push_back(3);
   Nzs.push_back(4);
 
-  for (unsigned int i=0; i<radii.size(); ++i)
-    for (unsigned int k=0; k< (dim == 2 ? 1 : Ls.size()); ++k)
-      for (unsigned int l=0; l< (dim == 2 ? 1 : Ls.size()); ++l)
+  for (unsigned int i = 0; i < radii.size(); ++i)
+    for (unsigned int k = 0; k < (dim == 2 ? 1 : Ls.size()); ++k)
+      for (unsigned int l = 0; l < (dim == 2 ? 1 : Ls.size()); ++l)
         {
-
           out << "               ====================" << std::endl
               << "Inner radius = " << radii[i] << std::endl
               << "Outer radius = " << radiiext[i] << std::endl
@@ -67,7 +68,8 @@ void test(std::ostream &out)
           // No colorize
           try
             {
-              GridGenerator::hyper_cube_with_cylindrical_hole(tr, radii[i], radiiext[i], Ls[k], Nzs[l], false);
+              GridGenerator::hyper_cube_with_cylindrical_hole(
+                tr, radii[i], radiiext[i], Ls[k], Nzs[l], false);
             }
           catch (...)
             {
@@ -81,7 +83,8 @@ void test(std::ostream &out)
           out << "Colorize       ====================" << std::endl;
           try
             {
-              GridGenerator::hyper_cube_with_cylindrical_hole(tr, radii[i], radiiext[i], Ls[k], Nzs[l], true);
+              GridGenerator::hyper_cube_with_cylindrical_hole(
+                tr, radii[i], radiiext[i], Ls[k], Nzs[l], true);
             }
           catch (...)
             {
@@ -96,7 +99,8 @@ void test(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

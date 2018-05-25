@@ -16,8 +16,8 @@
 
 
 // check FullMatrix::invert. like the full_matrix_* tests, but use
-// complex-valued matrices and vectors; this time we actually store complex values
-// in them
+// complex-valued matrices and vectors; this time we actually store complex
+// values in them
 
 
 #include "../tests.h"
@@ -25,42 +25,29 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  for (unsigned int n=1; n<=5; ++n)
+  for (unsigned int n = 1; n <= 5; ++n)
     {
-      const std::complex<number> array[] = { std::complex<number> (50.0, 50.0),
-                                             std::complex<number> (2.0, 6.0),
-                                             std::complex<number> (3.0, 1.0),
-                                             std::complex<number> (4.0, 6.0),
-                                             std::complex<number> (5.0, 1.0),
-                                             std::complex<number> (6.0, 2.0),
-                                             std::complex<number> (50.0, 50.0),
-                                             std::complex<number> (8.0, 2.0),
-                                             std::complex<number> (9.0, 7.0),
-                                             std::complex<number> (0.0, 2.0),
-                                             std::complex<number> (1.0, 3.0),
-                                             std::complex<number> (2.0, 8.0),
-                                             std::complex<number> (50.0, 50.0),
-                                             std::complex<number> (4.0, 8.0),
-                                             std::complex<number> (5.0, 3.0),
-                                             std::complex<number> (6.0, 4.0),
-                                             std::complex<number> (7.0, 9.0),
-                                             std::complex<number> (8.0, 4.0),
-                                             std::complex<number> (50.0, 50.0),
-                                             std::complex<number> (0.0, 4.0),
-                                             std::complex<number> (1.0, 5.0),
-                                             std::complex<number> (2.0, 0.0),
-                                             std::complex<number> (3.0, 5.0),
-                                             std::complex<number> (4.0, 0.0),
-                                             std::complex<number> (50.0, 50.0)
-                                           };
+      const std::complex<number> array[] = {
+        std::complex<number>(50.0, 50.0), std::complex<number>(2.0, 6.0),
+        std::complex<number>(3.0, 1.0),   std::complex<number>(4.0, 6.0),
+        std::complex<number>(5.0, 1.0),   std::complex<number>(6.0, 2.0),
+        std::complex<number>(50.0, 50.0), std::complex<number>(8.0, 2.0),
+        std::complex<number>(9.0, 7.0),   std::complex<number>(0.0, 2.0),
+        std::complex<number>(1.0, 3.0),   std::complex<number>(2.0, 8.0),
+        std::complex<number>(50.0, 50.0), std::complex<number>(4.0, 8.0),
+        std::complex<number>(5.0, 3.0),   std::complex<number>(6.0, 4.0),
+        std::complex<number>(7.0, 9.0),   std::complex<number>(8.0, 4.0),
+        std::complex<number>(50.0, 50.0), std::complex<number>(0.0, 4.0),
+        std::complex<number>(1.0, 5.0),   std::complex<number>(2.0, 0.0),
+        std::complex<number>(3.0, 5.0),   std::complex<number>(4.0, 0.0),
+        std::complex<number>(50.0, 50.0)};
 
-      FullMatrix<std::complex<number> > m (n,n,array), p(n,n);
-      p.invert (m);
-      print_matrix (p);
+      FullMatrix<std::complex<number>> m(n, n, array), p(n, n);
+      p.invert(m);
+      print_matrix(p);
     }
 }

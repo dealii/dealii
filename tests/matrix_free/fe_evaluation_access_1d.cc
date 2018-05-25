@@ -18,14 +18,16 @@
 // FEEvaluationAccess<1,1,double> didn't compile because we had
 // conflicting partial specializations of this class
 
-#include "../tests.h"
 #include <deal.II/matrix_free/fe_evaluation.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   initlog();
 
-  FEEvaluationAccess<1,1,double,false> *test; // didn't compile before
-  deallog <<  "OK" << std::endl;
+  FEEvaluationAccess<1, 1, double, false> *test; // didn't compile before
+  deallog << "OK" << std::endl;
 }

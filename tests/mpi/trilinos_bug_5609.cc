@@ -20,35 +20,36 @@
 //   http://software.sandia.gov/bugzilla/show_bug.cgi?id=5609
 
 
-#include "../tests.h"
+#include <Epetra_FEVector.h>
 #include <Epetra_Map.h>
 #include <Epetra_MpiComm.h>
-#include <Epetra_FEVector.h>
-
 #include <mpi.h>
 
 #include <iostream>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   int NumElements = 4;
 
-  Epetra_MpiComm Comm (MPI_COMM_WORLD);
-  Epetra_Map     Map(NumElements, 0, Comm);
+  Epetra_MpiComm  Comm(MPI_COMM_WORLD);
+  Epetra_Map      Map(NumElements, 0, Comm);
   Epetra_FEVector x1(Map);
-  x1.PutScalar (0);
+  x1.PutScalar(0);
 
   // let all processors set global entry 0 to 1
-  const int GID = 0;
+  const int    GID   = 0;
   const double value = 1;
   x1.ReplaceGlobalValues(1, &GID, &value);
-  x1.GlobalAssemble (Insert);
-  if (Comm.MyPID()==0)
-    AssertThrow (x1[0][0] == 1, ExcInternalError());
+  x1.GlobalAssemble(Insert);
+  if (Comm.MyPID() == 0)
+    AssertThrow(x1[0][0] == 1, ExcInternalError());
 
   // copy vector
-  Epetra_FEVector x2 (x1);
+  Epetra_FEVector x2(x1);
 
   x2.PutScalar(0);
 
@@ -57,20 +58,22 @@ void test ()
   // the value (as non-local data in x1 should
   // be been eliminated after calling
   // GlobalAssemble).
-  if (Comm.MyPID()==0)
+  if (Comm.MyPID() == 0)
     x2.ReplaceGlobalValues(1, &GID, &value);
-  x2.GlobalAssemble (Insert);
+  x2.GlobalAssemble(Insert);
 
-  if (Comm.MyPID()==0)
-    AssertThrow (x1[0][0] == 1, ExcInternalError());
+  if (Comm.MyPID() == 0)
+    AssertThrow(x1[0][0] == 1, ExcInternalError());
 }
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)

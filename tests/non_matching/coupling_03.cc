@@ -15,16 +15,20 @@
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/non_matching/coupling.h>
 
-#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+
+#include <deal.II/non_matching/coupling.h>
 
 #include <deal.II/numerics/matrix_tools.h>
 
@@ -36,26 +40,27 @@ using namespace dealii;
 // and immersed dimension, with a non trivial component selection in both
 // space_dh, and immersed_dh, and check that constants are projected correctly.
 
-template<int dim, int spacedim>
-void test()
+template <int dim, int spacedim>
+void
+test()
 {
-  deallog << "dim: " << dim << ", spacedim: "
-          << spacedim << std::endl;
+  deallog << "dim: " << dim << ", spacedim: " << spacedim << std::endl;
 
-  Triangulation<dim,spacedim> tria;
-  Triangulation<spacedim,spacedim> space_tria;
+  Triangulation<dim, spacedim>      tria;
+  Triangulation<spacedim, spacedim> space_tria;
 
-  GridGenerator::hyper_cube(tria,-.4,.3);
-  GridGenerator::hyper_cube(space_tria,-1,1);
+  GridGenerator::hyper_cube(tria, -.4, .3);
+  GridGenerator::hyper_cube(space_tria, -1, 1);
 
   tria.refine_global(1);
   space_tria.refine_global(2);
 
-  FESystem<dim,spacedim> fe(FE_Q<dim,spacedim>(1), spacedim+1);
-  FESystem<spacedim,spacedim> space_fe(FE_Q<spacedim,spacedim>(1), spacedim+1);
+  FESystem<dim, spacedim>      fe(FE_Q<dim, spacedim>(1), spacedim + 1);
+  FESystem<spacedim, spacedim> space_fe(FE_Q<spacedim, spacedim>(1),
+                                        spacedim + 1);
 
-  ComponentMask immersed_mask(spacedim+1, false);
-  ComponentMask space_mask(spacedim+1, false);
+  ComponentMask immersed_mask(spacedim + 1, false);
+  ComponentMask space_mask(spacedim + 1, false);
 
   immersed_mask.set(0, true);
   space_mask.set(spacedim, true);
@@ -63,8 +68,8 @@ void test()
   deallog << "FE      : " << fe.get_name() << std::endl
           << "Space FE: " << space_fe.get_name() << std::endl;
 
-  DoFHandler<dim,spacedim> dh(tria);
-  DoFHandler<spacedim,spacedim> space_dh(space_tria);
+  DoFHandler<dim, spacedim>      dh(tria);
+  DoFHandler<spacedim, spacedim> space_dh(space_tria);
 
   dh.distribute_dofs(fe);
   space_dh.distribute_dofs(space_fe);
@@ -79,20 +84,18 @@ void test()
   SparsityPattern sparsity;
   {
     DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
-    NonMatching::create_coupling_sparsity_pattern(space_dh, dh,
-                                                  quad, dsp, constraints,
-                                                  space_mask, immersed_mask);
+    NonMatching::create_coupling_sparsity_pattern(
+      space_dh, dh, quad, dsp, constraints, space_mask, immersed_mask);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
-  NonMatching::create_coupling_mass_matrix(space_dh, dh, quad, coupling,
-                                           constraints,
-                                           space_mask, immersed_mask);
+  NonMatching::create_coupling_mass_matrix(
+    space_dh, dh, quad, coupling, constraints, space_mask, immersed_mask);
 
   SparsityPattern mass_sparsity;
   {
     DynamicSparsityPattern dsp(dh.n_dofs(), dh.n_dofs());
-    DoFTools::make_sparsity_pattern(dh,dsp);
+    DoFTools::make_sparsity_pattern(dh, dsp);
     mass_sparsity.copy_from(dsp);
   }
   SparseMatrix<double> mass_matrix(mass_sparsity);
@@ -114,8 +117,8 @@ void test()
   // matrix couples only the first component of the immersed space, with the
   // last component of the embedding space.
   Vector<double> real_ones(dh.n_dofs());
-  for (unsigned int i=0; i<dh.n_dofs()/(spacedim+1); ++i)
-    real_ones((spacedim+1)*i) = 1.0;
+  for (unsigned int i = 0; i < dh.n_dofs() / (spacedim + 1); ++i)
+    real_ones((spacedim + 1) * i) = 1.0;
 
   ones -= real_ones;
 
@@ -124,12 +127,13 @@ void test()
 
 
 
-int main()
+int
+main()
 {
   initlog();
-  test<1,1>();
-  test<1,2>();
-  test<2,2>();
-  test<2,3>();
-  test<3,3>();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 }

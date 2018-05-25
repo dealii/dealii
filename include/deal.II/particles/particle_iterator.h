@@ -17,120 +17,132 @@
 #define dealii_particles_particle_iterator_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/particles/particle_accessor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
-  template <int, int> class ParticleHandler;
+  template <int, int>
+  class ParticleHandler;
 
   /**
    * A class that is used to iterate over particles. Together with the
    * ParticleAccessor class this is used to hide the internal implementation
    * of the particle class and the particle container.
    */
-  template<int dim, int spacedim=dim>
+  template <int dim, int spacedim = dim>
   class ParticleIterator
   {
   public:
     /**
      * Empty constructor. Such an object is not usable!
      */
-    ParticleIterator () = default;
+    ParticleIterator() = default;
 
     /**
      * Constructor of the iterator. Takes a reference to the particle
      * container, and an iterator to the cell-particle pair.
      */
-    ParticleIterator (const std::multimap<internal::LevelInd, Particle<dim,spacedim> > &map,
-                      const typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator &particle);
+    ParticleIterator(
+      const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
+      const typename std::multimap<internal::LevelInd,
+                                   Particle<dim, spacedim>>::iterator
+        &particle);
 
     /**
      * Dereferencing operator, returns a reference to an accessor. Usage is thus
      * like <tt>(*i).get_id ();</tt>
      */
-    const ParticleAccessor<dim,spacedim> &operator * () const;
+    const ParticleAccessor<dim, spacedim> &operator*() const;
 
     /**
      * Dereferencing operator, non-@p const version.
      */
-    ParticleAccessor<dim,spacedim> &operator * ();
+    ParticleAccessor<dim, spacedim> &operator*();
 
     /**
      * Assignment operator.
      */
-    ParticleIterator &operator = (const ParticleIterator &);
+    ParticleIterator &
+    operator=(const ParticleIterator &);
 
     /**
-     * Dereferencing operator, returns a pointer of the particle pointed to. Usage
-     * is thus like <tt>i->get_id ();</tt>
+     * Dereferencing operator, returns a pointer of the particle pointed to.
+     * Usage is thus like <tt>i->get_id ();</tt>
      *
      * There is a @p const and a non-@p const version.
      */
-    const ParticleAccessor<dim,spacedim> *operator -> () const;
+    const ParticleAccessor<dim, spacedim> *operator->() const;
 
     /**
      * Dereferencing operator, non-@p const version.
      */
-    ParticleAccessor<dim,spacedim> *operator -> ();
+    ParticleAccessor<dim, spacedim> *operator->();
 
     /**
      * Compare for equality.
      */
-    bool operator == (const ParticleIterator<dim,spacedim> &) const;
+    bool
+    operator==(const ParticleIterator<dim, spacedim> &) const;
 
     /**
      * Compare for inequality.
      */
-    bool operator != (const ParticleIterator<dim,spacedim> &) const;
+    bool
+    operator!=(const ParticleIterator<dim, spacedim> &) const;
 
     /**
      * Prefix <tt>++</tt> operator: <tt>++iterator</tt>. This operator advances
      * the iterator to the next element and returns a reference to
      * <tt>*this</tt>.
      */
-    ParticleIterator &operator ++ ();
+    ParticleIterator &
+    operator++();
 
     /**
      * Postfix <tt>++</tt> operator: <tt>iterator++</tt>. This operator advances
      * the iterator to the next element, but returns an iterator to the element
      * previously pointed to.
      */
-    ParticleIterator operator ++ (int);
+    ParticleIterator
+    operator++(int);
 
     /**
      * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator moves
      * the iterator to the previous element and returns a reference to
      * <tt>*this</tt>.
      */
-    ParticleIterator &operator -- ();
+    ParticleIterator &
+    operator--();
 
     /**
      * Postfix <tt>--</tt> operator: <tt>iterator--</tt>. This operator moves
-     * the iterator to the previous element, but returns an iterator to the element
-     * previously pointed to.
+     * the iterator to the previous element, but returns an iterator to the
+     * element previously pointed to.
      */
-    ParticleIterator operator -- (int);
+    ParticleIterator
+    operator--(int);
 
     /**
      * Mark the class as bidirectional iterator and declare some typedefs which
      * are standard for iterators and are used by algorithms to enquire about
      * the specifics of the iterators they work on.
      */
-    typedef std::bidirectional_iterator_tag iterator_category;
-    typedef ParticleAccessor<dim,spacedim>  value_type;
-    typedef std::ptrdiff_t                  difference_type;
-    typedef ParticleAccessor<dim,spacedim> *pointer;
-    typedef ParticleAccessor<dim,spacedim> &reference;
+    typedef std::bidirectional_iterator_tag  iterator_category;
+    typedef ParticleAccessor<dim, spacedim>  value_type;
+    typedef std::ptrdiff_t                   difference_type;
+    typedef ParticleAccessor<dim, spacedim> *pointer;
+    typedef ParticleAccessor<dim, spacedim> &reference;
 
   private:
     /**
      * The accessor to the actual particle.
      */
-    ParticleAccessor<dim,spacedim> accessor;
+    ParticleAccessor<dim, spacedim> accessor;
   };
-}
+} // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE
 

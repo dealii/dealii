@@ -13,50 +13,59 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
 #include "../lapack/create_matrix.h"
+#include "../tests.h"
 
 // test pseudo_inverse(const NumberType ratio) for symmetric matrices
 
-#include <deal.II/base/logstream.h>
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/timer.h>
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/process_grid.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/scalapack.h>
+#include <deal.II/lac/vector.h>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <algorithm>
 #include <memory>
 
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size, const NumberType tol)
+void
+test(const unsigned int size,
+     const unsigned int block_size,
+     const NumberType   tol)
 {
-  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
-  ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
+  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
+  const unsigned int n_mpi_processes(
+    Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(
+    Utilities::MPI::this_mpi_process(mpi_communicator));
+  ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
+    std::make_shared<Utilities::MPI::ProcessGrid>(
+      mpi_communicator, size, size, block_size, block_size);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
+        << " " << grid->get_process_grid_columns() << std::endl;
 
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_A(size), singular_A(size);
   create_spd(full_A);
   singular_A = full_A;
-  // Setting last row and column of the matrix to zero to make the matrix singular.
-  for (unsigned int i=0; i<size; ++i)
+  // Setting last row and column of the matrix to zero to make the matrix
+  // singular.
+  for (unsigned int i = 0; i < size; ++i)
     {
-      singular_A(i,size-1) = 0;
-      singular_A(size-1,i) = 0;
+      singular_A(i, size - 1) = 0;
+      singular_A(size - 1, i) = 0;
     }
   const NumberType ratio = 1e-8;
 
@@ -71,7 +80,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   inverse_A.invert();
 
   ScaLAPACKMatrix<NumberType> scalapack_A_2(size, grid, block_size);
-  scalapack_A_2 = full_A;
+  scalapack_A_2             = full_A;
   const unsigned int rank_2 = scalapack_A_2.pseudoinverse(ratio);
 
   FullMatrix<NumberType> full_inverse(size);
@@ -79,32 +88,33 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   FullMatrix<NumberType> full_pseudo_inverse(size);
   scalapack_A_2.copy_to(full_pseudo_inverse);
 
-  if (this_mpi_process==0)
+  if (this_mpi_process == 0)
     {
       std::cout << "ranks: " << rank_1 << "/" << size << "  &  ";
       std::cout << rank_2 << "/" << size << std::endl;
       double norm = full_pseudo_inverse.frobenius_norm();
-      full_inverse.add(-1,full_pseudo_inverse);
+      full_inverse.add(-1, full_pseudo_inverse);
       norm = full_inverse.frobenius_norm() / norm;
-      AssertThrow(norm<tol,ExcInternalError());
+      AssertThrow(norm < tol, ExcInternalError());
     }
   pcout << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, numbers::invalid_unsigned_int);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
-
-  const std::vector<unsigned int> sizes = {{200,400,600}};
-  const std::vector<unsigned int> blocks = {{32,64}};
+  const std::vector<unsigned int> sizes  = {{200, 400, 600}};
+  const std::vector<unsigned int> blocks = {{32, 64}};
 
   const double tol = 1e-10;
 
   for (const auto &s : sizes)
     for (const auto &b : blocks)
       if (b <= s)
-        test<double>(s,b,tol);
+        test<double>(s, b, tol);
 }

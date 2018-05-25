@@ -17,56 +17,66 @@
 // get an affine transformation out of it.
 
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
+
 #include <numeric>
+
+#include "../tests.h"
 #include "simplex.h"
 
-void test(int n)
+void
+test(int n)
 {
   const unsigned int dim = 2;
 
   {
-    QSplit<2> quad(QTrianglePolar(n), Point<2>(.3,.4));
+    QSplit<2> quad(QTrianglePolar(n), Point<2>(.3, .4));
 
-    for (auto p:quad.get_points())
+    for (auto p : quad.get_points())
       deallog << p << std::endl;
 
-    deallog << std::endl << "# Area: " << std::accumulate(quad.get_weights().begin(),
-                                                          quad.get_weights().end(),
-                                                          0.0) << std::endl << std::endl;
+    deallog << std::endl
+            << "# Area: "
+            << std::accumulate(
+                 quad.get_weights().begin(), quad.get_weights().end(), 0.0)
+            << std::endl
+            << std::endl;
 
-    if (quad.size() == n*n*4)
+    if (quad.size() == n * n * 4)
       deallog << "# Size OK" << std::endl;
     else
       deallog << "# Size NOT OK" << std::endl;
-
   }
   {
-    QSplit<2> quad(QTrianglePolar(n), Point<2>(0,.2));
+    QSplit<2> quad(QTrianglePolar(n), Point<2>(0, .2));
 
-    for (auto p:quad.get_points())
+    for (auto p : quad.get_points())
       deallog << p << std::endl;
 
-    deallog << std::endl << "# Area: " << std::accumulate(quad.get_weights().begin(),
-                                                          quad.get_weights().end(),
-                                                          0.0) << std::endl << std::endl;
-    if (quad.size() == n*n*3)
+    deallog << std::endl
+            << "# Area: "
+            << std::accumulate(
+                 quad.get_weights().begin(), quad.get_weights().end(), 0.0)
+            << std::endl
+            << std::endl;
+    if (quad.size() == n * n * 3)
       deallog << "# Size OK" << std::endl;
     else
       deallog << "# Size NOT OK" << std::endl;
-
   }
   {
-    QSplit<2> quad(QTrianglePolar(n), Point<2>(1,0));
+    QSplit<2> quad(QTrianglePolar(n), Point<2>(1, 0));
 
-    for (auto p:quad.get_points())
+    for (auto p : quad.get_points())
       deallog << p << std::endl;
 
-    deallog << std::endl << "# Area: " << std::accumulate(quad.get_weights().begin(),
-                                                          quad.get_weights().end(),
-                                                          0.0) << std::endl << std::endl;
-    if (quad.size() == n*n*2)
+    deallog << std::endl
+            << "# Area: "
+            << std::accumulate(
+                 quad.get_weights().begin(), quad.get_weights().end(), 0.0)
+            << std::endl
+            << std::endl;
+    if (quad.size() == n * n * 2)
       deallog << "# Size OK" << std::endl;
     else
       deallog << "# Size NOT OK" << std::endl;
@@ -74,7 +84,8 @@ void test(int n)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   test(5);

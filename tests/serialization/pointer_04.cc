@@ -21,49 +21,45 @@
 // on the stack; boost::serialization can't know that and must create a new
 // object on the heap which we later have to destroy by hand
 
-#include "serialization.h"
-
 #include <boost/serialization/utility.hpp>
+
 #include <typeinfo>
+
+#include "serialization.h"
 
 int object_number = 1;
 
 class C
 {
 public:
-  C ()
+  C()
   {
     object_number = ::object_number++;
-    deallog << "Default constructor. Object number "
-            << object_number
+    deallog << "Default constructor. Object number " << object_number
             << std::endl;
   }
 
-  C (const C &)
+  C(const C &)
   {
     object_number = ::object_number++;
-    deallog << "copy constructor. Object number "
-            << object_number
-            << std::endl;
+    deallog << "copy constructor. Object number " << object_number << std::endl;
   }
 
-  ~C ()
+  ~C()
   {
-    deallog << "destructor. Object number "
-            << object_number
-            << std::endl;
+    deallog << "destructor. Object number " << object_number << std::endl;
   }
 
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int version)
+  void
+  serialize(Archive &ar, const unsigned int version)
   {
-    deallog << "Serializing object number "
-            << object_number
-            << " via " << typeid(Archive).name()
-            << std::endl;
+    deallog << "Serializing object number " << object_number << " via "
+            << typeid(Archive).name() << std::endl;
   }
 
-  bool operator == (const C &) const
+  bool
+  operator==(const C &) const
   {
     return true;
   }
@@ -74,21 +70,22 @@ private:
 
 
 template <typename T>
-bool compare (const std::pair<T *,T *> &t1,
-              const std::pair<T *,T *> &t2)
+bool
+compare(const std::pair<T *, T *> &t1, const std::pair<T *, T *> &t2)
 {
   return (*t1.first == *t2.first) && (*t1.second == *t2.second);
 }
 
 
-void test ()
+void
+test()
 {
   {
-    C c;
-    std::pair<C *,C *> pair_1 (&c, &c);
-    std::pair<C *,C *> pair_2;
+    C                   c;
+    std::pair<C *, C *> pair_1(&c, &c);
+    std::pair<C *, C *> pair_2;
 
-    verify (pair_1, pair_2);
+    verify(pair_1, pair_2);
 
     // boost::serialize should have
     // recognized that the two pointers in
@@ -96,8 +93,8 @@ void test ()
     // consequently re-create only one object
     // that the two components of the
     // re-created pair point to
-    AssertThrow (pair_2.first == pair_2.second, ExcInternalError());
-    AssertThrow (object_number == 3, ExcInternalError());
+    AssertThrow(pair_2.first == pair_2.second, ExcInternalError());
+    AssertThrow(object_number == 3, ExcInternalError());
 
     // destroy the newly created object. this
     // must succeed and would likely throw
@@ -109,13 +106,14 @@ void test ()
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

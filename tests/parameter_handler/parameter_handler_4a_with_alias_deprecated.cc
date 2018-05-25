@@ -19,11 +19,13 @@
 // ParameterHandler::print_parameters(LaTeX). like the _4a test but
 // with aliased parameters
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   try
     {
@@ -31,53 +33,44 @@ int main ()
       deallog.attach(logfile);
 
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
+      prm.enter_subsection("Testing");
       {
-        prm.enter_subsection ("Testing 2");
+        prm.enter_subsection("Testing 2");
         {
-          prm.declare_entry ("string list 2",
-                             "a",
-                             Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-                             "docs 1");
-          prm.declare_entry ("int 2",
-                             "1",
-                             Patterns::Integer());
-          prm.declare_entry ("double 2",
-                             "3.1415926",
-                             Patterns::Double(),
-                             "docs 3");
+          prm.declare_entry(
+            "string list 2",
+            "a",
+            Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+            "docs 1");
+          prm.declare_entry("int 2", "1", Patterns::Integer());
+          prm.declare_entry(
+            "double 2", "3.1415926", Patterns::Double(), "docs 3");
         }
-        prm.leave_subsection ();
+        prm.leave_subsection();
 
-        prm.declare_entry ("string list",
-                           "a",
-                           Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-                           "docs 1");
-        prm.declare_entry ("int",
-                           "1",
-                           Patterns::Integer());
-        prm.declare_alias ("int",
-                           "int_alias");
-        prm.declare_entry ("double",
-                           "3.1415926",
-                           Patterns::Double(),
-                           "docs 3");
-        prm.declare_alias ("double",
-                           "double_alias",
-                           true);
+        prm.declare_entry(
+          "string list",
+          "a",
+          Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+          "docs 1");
+        prm.declare_entry("int", "1", Patterns::Integer());
+        prm.declare_alias("int", "int_alias");
+        prm.declare_entry("double", "3.1415926", Patterns::Double(), "docs 3");
+        prm.declare_alias("double", "double_alias", true);
       }
-      prm.leave_subsection ();
+      prm.leave_subsection();
 
       // read and then write
       // parameters. take same input file
       // as for parameter_handler_3, but
       // use different output format
       prm.parse_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
-      prm.print_parameters (logfile, ParameterHandler::LaTeX);
+      prm.print_parameters(logfile, ParameterHandler::LaTeX);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -90,7 +83,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

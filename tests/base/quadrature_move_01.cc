@@ -14,25 +14,27 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
+
+#include "../tests.h"
 
 
 template <class Quad, typename... Args>
-std::string check_q_move(Args &&...args)
+std::string
+check_q_move(Args &&... args)
 {
-  Quad quad1(args...);
+  Quad               quad1(args...);
   const unsigned int size1 = quad1.size();
 
   std::vector<double> weights1 = quad1.get_weights();
 
-  Quad quad2(std::move(quad1));
+  Quad               quad2(std::move(quad1));
   const unsigned int size2 = quad2.size();
 
   std::vector<double> weights2 = quad2.get_weights();
 
-  if (size1 != size2) return "NOPE";
+  if (size1 != size2)
+    return "NOPE";
 
   for (unsigned short i = 0; i < size1; ++i)
     if (std::fabs(weights1[i] - weights2[i]) > 1.0e-16)
@@ -43,7 +45,8 @@ std::string check_q_move(Args &&...args)
 
 
 template <template <int dim> class Quad, typename... Args>
-void check_quadrature_move(Args &&...args)
+void
+check_quadrature_move(Args &&... args)
 {
   deallog << check_q_move<Quad<1>>(std::forward<Args>(args)...) << 1 << " "
           << check_q_move<Quad<2>>(std::forward<Args>(args)...) << 2 << " "
@@ -52,7 +55,8 @@ void check_quadrature_move(Args &&...args)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -32,23 +32,22 @@ code is written, without having to look up the exact definition of something.
 
 <h3>Notes on deal.II indentation</h3>
 
-<p>deal.II uses <code>astyle</code> 2.04 to normalize indentation. A
+<p>deal.II uses <code>clang-format</code> 6.0 to normalize indentation. A
 style file is provided at
 <code>
 <pre>
-  ./contrib/styles/astyle.rc
+  ${SOURCE_DIR}/.clang-format
 </pre>
 </code>
 
 <p>Before a commit, you should run
 <code>
 <pre>
-  astyle --options=&lt;SOURCE DIRECTORY&gt;/contrib/styles/astyle.rc &lt;file&gt;
+  clang-format -i &lt;file&gt;
 </pre>
 </code>
 on each of your files. This will make sure indentation is conforming to the
-style guidelines outlined in this page. Alternatively, if you are using a recent
-version of the library, you can run
+style guidelines outlined in this page. Alternatively, you can run
 <code>
 <pre>
   make indent
@@ -73,10 +72,9 @@ source files.
   equivalents (i.e., use <code>&&</code>, <code>||</code>, and <code>!</code>
   instead of <code>and</code>, <code>or</code>, and <code>not</code>).
 
-<li> In the implementation files, after each function, at least three
-  empty lines are expected to
-  enable better readability. One empty line occurs in functions to
-  group blocks of code, two empty lines are not enough to visibly
+<li> In the implementation files, after each function, three empty lines are
+  expected to enable better readability. One empty line occurs in functions to
+  group blocks of code, since two empty lines are not enough to visibly
   distinguish sufficiently that the code belongs to two different functions.</li>
 
 <li> Whenever an integer variable can only assume nonnegative values,

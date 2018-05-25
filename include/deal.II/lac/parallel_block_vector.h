@@ -17,6 +17,7 @@
 #define dealii_parallel_block_vector_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/lac/la_parallel_block_vector.h>
 
 #include <cstring>
@@ -53,8 +54,8 @@ namespace parallel
     using LinearAlgebra::distributed::BlockVector;
 
     /*@}*/
-  }
-}
+  } // namespace distributed
+} // namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE
 

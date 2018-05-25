@@ -18,34 +18,39 @@
 // Test interaction with p4est with a simple coarse grid in 2d. here, we test
 // that refining a mesh actually works
 
-#include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
+#include "coarse_grid_common.h"
 
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(tr);
   tr.begin_active()->set_refine_flag();
-  tr.execute_coarsening_and_refinement ();
+  tr.execute_coarsening_and_refinement();
 
   write_vtk(tr, "2");
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -53,6 +58,4 @@ int main(int argc, char *argv[])
   deallog.push("2d");
   test<2>(logfile);
   deallog.pop();
-
-
 }

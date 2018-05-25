@@ -17,12 +17,13 @@
 // check for a bug reported by Luca Heltai 2006-03-07 on the mailing
 // list. the test should actually output "nan", but prints "0"
 
+#include <cfenv>
+#include <limits>
+
 #include "../tests.h"
 
-#include <limits>
-#include <cfenv>
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
@@ -43,4 +44,3 @@ int main ()
 
   return 0;
 }
-

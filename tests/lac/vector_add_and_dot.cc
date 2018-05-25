@@ -16,26 +16,27 @@
 
 // check that Vector::add_and_dot works correctly
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
 
+#include "../tests.h"
 
 
 
 template <typename number>
-void check ()
+void
+check()
 {
-  for (unsigned int test=0; test<5; ++test)
+  for (unsigned int test = 0; test < 5; ++test)
     {
-      const unsigned int size = 17 + test*1101;
-      Vector<number> v1 (size), v2(size), v3(size), check(size);
-      for (unsigned int i=0; i<size; ++i)
+      const unsigned int size = 17 + test * 1101;
+      Vector<number>     v1(size), v2(size), v3(size), check(size);
+      for (unsigned int i = 0; i < size; ++i)
         {
           v1(i) = 0.1 + 0.005 * i;
           v2(i) = -5.2 + 0.18 * i;
-          v3(i) = 3.14159 + 2.7183/(1.+i);
+          v3(i) = 3.14159 + 2.7183 / (1. + i);
         }
-      check = v1;
+      check               = v1;
       const number factor = 0.01432;
 
       // do things by hand once
@@ -44,7 +45,7 @@ void check ()
 
       // then do it a second time with the add_and_dot function
       const number prod_check = check.add_and_dot(factor, v2, v3);
-      if (test == 0 && std::is_same<number,double>::value)
+      if (test == 0 && std::is_same<number, double>::value)
         {
           deallog << "Vector add reference:   ";
           v1.print(deallog);
@@ -52,14 +53,14 @@ void check ()
           check.print(deallog);
         }
 
-      deallog << "Add and dot should be " << prod/static_cast<number>(size)
-              << ", is " << prod_check/static_cast<number>(size)
-              << std::endl;
+      deallog << "Add and dot should be " << prod / static_cast<number>(size)
+              << ", is " << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
@@ -69,8 +70,6 @@ int main()
   check<float>();
   check<double>();
   check<long double>();
-  check<std::complex<double> >();
+  check<std::complex<double>>();
   deallog << "OK" << std::endl;
 }
-
-

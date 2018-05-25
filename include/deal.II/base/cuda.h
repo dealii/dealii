@@ -20,12 +20,13 @@
 
 #ifdef DEAL_II_WITH_CUDA
 
-#include <deal.II/base/exceptions.h>
+#  include <deal.II/base/exceptions.h>
 
-#include <cusolverDn.h>
-#include <cusolverSp.h>
-#include <cusparse.h>
-#include <vector>
+#  include <cusolverDn.h>
+#  include <cusolverSp.h>
+#  include <cusparse.h>
+
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 namespace Utilities
@@ -71,9 +72,11 @@ namespace Utilities
      * Allocate @p n_elements on the device.
      */
     template <typename T>
-    inline void malloc(T *&pointer, const unsigned int n_elements)
+    inline void
+    malloc(T *&pointer, const unsigned int n_elements)
     {
-      cudaError_t cuda_error_code = cudaMalloc(&pointer, n_elements * sizeof(T));
+      cudaError_t cuda_error_code =
+        cudaMalloc(&pointer, n_elements * sizeof(T));
       AssertCuda(cuda_error_code);
     }
 
@@ -81,7 +84,8 @@ namespace Utilities
      * Free memory on the device.
      */
     template <typename T>
-    inline void free(T *&pointer)
+    inline void
+    free(T *&pointer)
     {
       cudaError_t cuda_error_code = cudaFree(pointer);
       AssertCuda(cuda_error_code);
@@ -92,12 +96,13 @@ namespace Utilities
      * Copy the elements in @p pointer_dev to the host in @p vector_host.
      */
     template <typename T>
-    inline void copy_to_host(const T *pointer_dev,
-                             std::vector<T> &vector_host)
+    inline void
+    copy_to_host(const T *pointer_dev, std::vector<T> &vector_host)
     {
-      cudaError_t cuda_error_code =
-        cudaMemcpy(vector_host.data(), pointer_dev,
-                   vector_host.size() * sizeof(T), cudaMemcpyDeviceToHost);
+      cudaError_t cuda_error_code = cudaMemcpy(vector_host.data(),
+                                               pointer_dev,
+                                               vector_host.size() * sizeof(T),
+                                               cudaMemcpyDeviceToHost);
       AssertCuda(cuda_error_code);
     }
 
@@ -106,16 +111,17 @@ namespace Utilities
      * memory needs to be allocate on the device before this function is called.
      */
     template <typename T>
-    inline void copy_to_dev(const std::vector<T> &vector_host,
-                            T *pointer_dev)
+    inline void
+    copy_to_dev(const std::vector<T> &vector_host, T *pointer_dev)
     {
-      cudaError_t cuda_error_code =
-        cudaMemcpy(pointer_dev, vector_host.data(),
-                   vector_host.size() * sizeof(T), cudaMemcpyHostToDevice);
+      cudaError_t cuda_error_code = cudaMemcpy(pointer_dev,
+                                               vector_host.data(),
+                                               vector_host.size() * sizeof(T),
+                                               cudaMemcpyHostToDevice);
       AssertCuda(cuda_error_code);
     }
-  }
-}
+  } // namespace CUDA
+} // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -14,33 +14,33 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_petsc_solver_h
-#define dealii_petsc_solver_h
+#  define dealii_petsc_solver_h
 
 
-#include <deal.II/base/config.h>
+#  include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/lac/exceptions.h>
-#  include <deal.II/lac/solver_control.h>
+#    include <deal.II/lac/exceptions.h>
+#    include <deal.II/lac/solver_control.h>
 
-#  include <petscksp.h>
+#    include <petscksp.h>
 
-#  include <memory>
+#    include <memory>
 
-#ifdef DEAL_II_WITH_SLEPC
-#include <deal.II/lac/slepc_spectral_transformation.h>
-#endif
+#    ifdef DEAL_II_WITH_SLEPC
+#      include <deal.II/lac/slepc_spectral_transformation.h>
+#    endif
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_SLEPC
+#    ifdef DEAL_II_WITH_SLEPC
 namespace SLEPcWrappers
 {
   // forward declarations
   class TransformationBase;
-}
-#endif
+} // namespace SLEPcWrappers
+#    endif
 
 namespace PETScWrappers
 {
@@ -88,8 +88,9 @@ namespace PETScWrappers
    * @verbatim
    *   [1]PETSC ERROR: PCSetVector() line 1173 in src/ksp/pc/interface/precon.c
    *   [1]PETSC ERROR:   Arguments must have same communicators!
-   *   [1]PETSC ERROR:   Different communicators in the two objects: Argument # 1 and 2!
-   *   [1]PETSC ERROR: KSPSetUp() line 195 in src/ksp/ksp/interface/itfunc.c
+   *   [1]PETSC ERROR:   Different communicators in the two objects: Argument #
+   * 1 and 2! [1]PETSC ERROR: KSPSetUp() line 195 in
+   * src/ksp/ksp/interface/itfunc.c
    * @endverbatim
    *
    * This error, on which one can spend a very long time figuring out what
@@ -116,13 +117,12 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverBase (SolverControl  &cn,
-                const MPI_Comm &mpi_communicator);
+    SolverBase(SolverControl &cn, const MPI_Comm &mpi_communicator);
 
     /**
      * Destructor.
      */
-    virtual ~SolverBase () = default;
+    virtual ~SolverBase() = default;
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
@@ -132,39 +132,42 @@ namespace PETScWrappers
      * performance reasons. See class Documentation.
      */
     void
-    solve (const MatrixBase         &A,
-           VectorBase               &x,
-           const VectorBase         &b,
-           const PreconditionerBase &preconditioner);
+    solve(const MatrixBase &        A,
+          VectorBase &              x,
+          const VectorBase &        b,
+          const PreconditionerBase &preconditioner);
 
 
     /**
      * Resets the contained preconditioner and solver object. See class
      * description for more details.
      */
-    virtual void reset();
+    virtual void
+    reset();
 
 
     /**
      * Sets a prefix name for the solver object. Useful when customizing the
      * PETSc KSP object with command-line options.
      */
-    void set_prefix(const std::string &prefix);
+    void
+    set_prefix(const std::string &prefix);
 
 
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+    SolverControl &
+    control() const;
 
     /**
      * initialize the solver with the preconditioner. This function is
      * intended for use with SLEPc spectral transformation class.
      */
-    void initialize(const PreconditionerBase &preconditioner);
+    void
+    initialize(const PreconditionerBase &preconditioner);
 
   protected:
-
     /**
      * Reference to the object that controls convergence of the iterative
      * solver. In fact, for these PETSc wrappers, PETSc does so itself, but we
@@ -182,7 +185,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is requested by the derived class.
      */
-    virtual void set_solver_type (KSP &ksp) const = 0;
+    virtual void
+    set_solver_type(KSP &ksp) const = 0;
 
     /**
      * Solver prefix name to qualify options specific to the PETSc KSP object
@@ -199,12 +203,12 @@ namespace PETScWrappers
      * deal.II's own SolverControl objects to see if convergence has been
      * reached.
      */
-    static
-    PetscErrorCode convergence_test (KSP                 ksp,
-                                     const PetscInt      iteration,
-                                     const PetscReal     residual_norm,
-                                     KSPConvergedReason *reason,
-                                     void               *solver_control);
+    static PetscErrorCode
+    convergence_test(KSP                 ksp,
+                     const PetscInt      iteration,
+                     const PetscReal     residual_norm,
+                     KSPConvergedReason *reason,
+                     void *              solver_control);
 
     /**
      * A structure that contains the PETSc solver and preconditioner objects.
@@ -228,12 +232,12 @@ namespace PETScWrappers
       /**
        * Destructor
        */
-      ~SolverData ();
+      ~SolverData();
 
       /**
        * Object for Krylov subspace solvers.
        */
-      KSP  ksp;
+      KSP ksp;
     };
 
     /**
@@ -242,13 +246,13 @@ namespace PETScWrappers
      */
     std::unique_ptr<SolverData> solver_data;
 
-#ifdef DEAL_II_WITH_SLEPC
+#    ifdef DEAL_II_WITH_SLEPC
     /**
      * Make the transformation class a friend, since it needs to set the KSP
      * solver.
      */
     friend class SLEPcWrappers::TransformationBase;
-#endif
+#    endif
   };
 
 
@@ -271,8 +275,7 @@ namespace PETScWrappers
       /**
        * Constructor. By default, set the damping parameter to one.
        */
-      explicit
-      AdditionalData (const double omega = 1);
+      explicit AdditionalData(const double omega = 1);
 
       /**
        * Relaxation parameter.
@@ -296,9 +299,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverRichardson (SolverControl        &cn,
-                      const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                      const AdditionalData &data = AdditionalData());
+    SolverRichardson(SolverControl &       cn,
+                     const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                     const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -310,7 +313,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -347,9 +351,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverChebychev (SolverControl        &cn,
-                     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                     const AdditionalData &data = AdditionalData());
+    SolverChebychev(SolverControl &       cn,
+                    const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                    const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -361,7 +365,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -397,9 +402,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverCG (SolverControl        &cn,
-              const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-              const AdditionalData &data = AdditionalData());
+    SolverCG(SolverControl &       cn,
+             const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+             const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -411,7 +416,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -447,9 +453,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverBiCG (SolverControl        &cn,
-                const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                const AdditionalData &data = AdditionalData());
+    SolverBiCG(SolverControl &       cn,
+               const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+               const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -461,7 +467,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -484,8 +491,8 @@ namespace PETScWrappers
        * Constructor. By default, set the number of temporary vectors to 30,
        * i.e. do a restart every 30 iterations.
        */
-      AdditionalData (const unsigned int restart_parameter = 30,
-                      const bool right_preconditioning = false);
+      AdditionalData(const unsigned int restart_parameter     = 30,
+                     const bool         right_preconditioning = false);
 
       /**
        * Maximum number of tmp vectors.
@@ -514,9 +521,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverGMRES (SolverControl        &cn,
-                 const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                 const AdditionalData &data = AdditionalData());
+    SolverGMRES(SolverControl &       cn,
+                const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -528,7 +535,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -565,9 +573,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverBicgstab (SolverControl        &cn,
-                    const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                    const AdditionalData &data = AdditionalData());
+    SolverBicgstab(SolverControl &       cn,
+                   const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                   const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -579,7 +587,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
   /**
@@ -614,9 +623,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverCGS (SolverControl        &cn,
-               const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-               const AdditionalData &data = AdditionalData());
+    SolverCGS(SolverControl &       cn,
+              const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+              const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -628,7 +637,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -664,9 +674,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverTFQMR (SolverControl        &cn,
-                 const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                 const AdditionalData &data = AdditionalData());
+    SolverTFQMR(SolverControl &       cn,
+                const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -678,9 +688,9 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
-
 
 
 
@@ -720,9 +730,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverTCQMR (SolverControl        &cn,
-                 const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                 const AdditionalData &data = AdditionalData());
+    SolverTCQMR(SolverControl &       cn,
+                const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -734,7 +744,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -770,9 +781,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverCR (SolverControl        &cn,
-              const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-              const AdditionalData &data = AdditionalData());
+    SolverCR(SolverControl &       cn,
+             const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+             const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -784,7 +795,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -821,9 +833,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverLSQR (SolverControl        &cn,
-                const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                const AdditionalData &data = AdditionalData());
+    SolverLSQR(SolverControl &       cn,
+               const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+               const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -835,7 +847,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
 
@@ -876,9 +889,9 @@ namespace PETScWrappers
      * to be done with this solver. Otherwise, PETSc will generate hard to
      * track down errors, see the documentation of the SolverBase class.
      */
-    SolverPreOnly (SolverControl        &cn,
-                   const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                   const AdditionalData &data = AdditionalData());
+    SolverPreOnly(SolverControl &       cn,
+                  const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                  const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -890,7 +903,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
   };
 
   /**
@@ -928,23 +942,23 @@ namespace PETScWrappers
     /**
      * Constructor
      */
-    SparseDirectMUMPS (SolverControl        &cn,
-                       const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                       const AdditionalData &data = AdditionalData());
+    SparseDirectMUMPS(SolverControl &       cn,
+                      const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                      const AdditionalData &data = AdditionalData());
 
     /**
      * The method to solve the linear system.
      */
-    void solve (const MatrixBase &A,
-                VectorBase       &x,
-                const VectorBase &b);
+    void
+    solve(const MatrixBase &A, VectorBase &x, const VectorBase &b);
 
     /**
      * The method allows to take advantage if the system matrix is symmetric
      * by using LDL^T decomposition instead of more expensive LU. The argument
      * indicates whether the matrix is symmetric or not.
      */
-    void set_symmetric_mode (const bool flag);
+    void
+    set_symmetric_mode(const bool flag);
 
   protected:
     /**
@@ -952,7 +966,8 @@ namespace PETScWrappers
      */
     const AdditionalData additional_data;
 
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type(KSP &ksp) const override;
 
   private:
     /**
@@ -961,12 +976,12 @@ namespace PETScWrappers
      * deal.II's own SolverControl objects to see if convergence has been
      * reached.
      */
-    static
-    PetscErrorCode convergence_test (KSP                ksp,
-                                     const PetscInt     iteration,
-                                     const PetscReal    residual_norm,
-                                     KSPConvergedReason *reason,
-                                     void               *solver_control);
+    static PetscErrorCode
+    convergence_test(KSP                 ksp,
+                     const PetscInt      iteration,
+                     const PetscReal     residual_norm,
+                     KSPConvergedReason *reason,
+                     void *              solver_control);
 
     /**
      * A structure that contains the PETSc solver and preconditioner objects.
@@ -978,7 +993,7 @@ namespace PETScWrappers
       /**
        * Destructor
        */
-      ~SolverDataMUMPS ();
+      ~SolverDataMUMPS();
 
       KSP ksp;
       PC  pc;
@@ -992,13 +1007,13 @@ namespace PETScWrappers
      */
     bool symmetric_mode;
   };
-}
+} // namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_PETSC
+#  endif // DEAL_II_WITH_PETSC
 
-/*----------------------------   petsc_solver.h     ---------------------------*/
+/*----------------------------   petsc_solver.h ---------------------------*/
 
 #endif
-/*----------------------------   petsc_solver.h     ---------------------------*/
+/*----------------------------   petsc_solver.h ---------------------------*/

@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/lac/sparsity_pattern.h>
+
 #include "../tests.h"
 #include "fe_tools_common.h"
-#include <deal.II/lac/sparsity_pattern.h>
 
 // check
 //   FETools::back_interpolate(6)
@@ -26,8 +27,7 @@
 
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2)
+check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 {
   // only check if both elements have
   // support points. otherwise,
@@ -41,22 +41,20 @@ check_this (const FiniteElement<dim> &fe1,
     return;
   // we need to have dof_constraints
   // for this test
-  if (!fe1.constraints_are_implemented() ||
-      !fe2.constraints_are_implemented())
+  if (!fe1.constraints_are_implemented() || !fe2.constraints_are_implemented())
     return;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
-  tria.refine_global (2);
+  tria.refine_global(2);
 
-  std::unique_ptr<DoFHandler<dim> > dof1(make_dof_handler (tria, fe1));
+  std::unique_ptr<DoFHandler<dim>> dof1(make_dof_handler(tria, fe1));
 
-  Vector<double> in (dof1->n_dofs());
-  for (unsigned int i=0; i<in.size(); ++i)
+  Vector<double> in(dof1->n_dofs());
+  for (unsigned int i = 0; i < in.size(); ++i)
     in(i) = i;
-  Vector<double> out (dof1->n_dofs());
+  Vector<double> out(dof1->n_dofs());
 
-  FETools::back_interpolate (*dof1, in, fe2, out);
-  output_vector (out);
+  FETools::back_interpolate(*dof1, in, fe2, out);
+  output_vector(out);
 }
-

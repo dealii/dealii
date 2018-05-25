@@ -17,9 +17,11 @@
 #ifndef dealii_time_step_control_h
 #define dealii_time_step_control_h
 
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
+
 #include <deal.II/lac/vector_memory.h>
+
 #include <cstdio>
 
 DEAL_II_NAMESPACE_OPEN
@@ -74,67 +76,78 @@ namespace Algorithms
     /**
      * Constructor setting default values
      */
-    TimestepControl (double start = 0.,
-                     double final = 1.,
-                     double tolerance = 1.e-2,
-                     double start_step = 1.e-2,
-                     double print_step = -1.,
-                     double max_step = 1.);
+    TimestepControl(double start      = 0.,
+                    double final      = 1.,
+                    double tolerance  = 1.e-2,
+                    double start_step = 1.e-2,
+                    double print_step = -1.,
+                    double max_step   = 1.);
 
     /**
      * Declare the control parameters for parameter handler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters(ParameterHandler &param);
     /**
      * Read the control parameters from a parameter handler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters(ParameterHandler &param);
 
     /**
      * The left end of the time interval.
      */
-    double start () const;
+    double
+    start() const;
     /**
      * The right end of the time interval. The control mechanism ensures that
      * the final time step ends at this point.
      */
-    double final () const;
+    double
+    final() const;
     /**
      * The tolerance value controlling the time steps.
      */
-    double tolerance () const;
+    double
+    tolerance() const;
     /**
      * The size of the current time step.
      */
-    double step () const;
+    double
+    step() const;
 
     /**
      * The current time.
      */
-    double now () const;
+    double
+    now() const;
 
     /**
      * Compute the size of the next step and return true if it differs from
      * the current step size. Advance the current time by the new step size.
      */
-    bool advance ();
+    bool
+    advance();
 
     /**
      * Set start value.
      */
-    void start (double);
+    void
+    start(double);
     /**
      * Set final time value.
      */
-    void final (double);
+    void
+    final(double);
     /**
      * Set tolerance
      */
-    void tolerance (double);
+    void
+    tolerance(double);
     /**
      * Set strategy.
      */
-    void strategy (Strategy);
+    void strategy(Strategy);
 
     /**
      * Set size of the first step. This may be overwritten by the time
@@ -143,36 +156,42 @@ namespace Algorithms
      * @param[in] step The size of the first step, which may be overwritten by
      * the time stepping strategy.
      */
-    void start_step (const double step);
+    void
+    start_step(const double step);
 
     /**
      * Set size of the maximum step size.
      */
-    void max_step (double);
+    void
+    max_step(double);
 
     /**
      * Set now() equal to start(). Initialize step() and print() to their
      * initial values.
      */
-    void restart ();
+    void
+    restart();
     /**
      * Return true if this timestep should be written to disk.
      */
-    bool print ();
+    bool
+    print();
     /**
      * Set the output name template.
      */
-    void file_name_format (const char *);
-    const char *file_name_format ();
-  private:
+    void
+    file_name_format(const char *);
+    const char *
+    file_name_format();
 
-    double start_val;
-    double final_val;
-    double tolerance_val;
+  private:
+    double   start_val;
+    double   final_val;
+    double   tolerance_val;
     Strategy strategy_val;
-    double start_step_val;
-    double max_step_val;
-    double min_step_val;
+    double   start_step_val;
+    double   max_step_val;
+    double   min_step_val;
     /**
      * The size of the current time step. This may differ from @p step_val, if
      * we aimed at @p final_val.
@@ -189,87 +208,87 @@ namespace Algorithms
 
 
   inline double
-  TimestepControl::start () const
+  TimestepControl::start() const
   {
     return start_val;
   }
 
 
   inline double
-  TimestepControl::final () const
+  TimestepControl::final() const
   {
     return final_val;
   }
 
 
   inline double
-  TimestepControl::step () const
+  TimestepControl::step() const
   {
     return current_step_val;
   }
 
 
   inline double
-  TimestepControl::tolerance () const
+  TimestepControl::tolerance() const
   {
     return tolerance_val;
   }
 
 
   inline double
-  TimestepControl::now () const
+  TimestepControl::now() const
   {
     return now_val;
   }
 
 
   inline void
-  TimestepControl::start (double t)
+  TimestepControl::start(double t)
   {
     start_val = t;
   }
 
 
   inline void
-  TimestepControl::final (double t)
+  TimestepControl::final(double t)
   {
     final_val = t;
   }
 
 
   inline void
-  TimestepControl::tolerance (double t)
+  TimestepControl::tolerance(double t)
   {
     tolerance_val = t;
   }
 
 
   inline void
-  TimestepControl::strategy (Strategy t)
+  TimestepControl::strategy(Strategy t)
   {
     strategy_val = t;
   }
 
 
   inline void
-  TimestepControl::start_step (const double t)
+  TimestepControl::start_step(const double t)
   {
     start_step_val = t;
   }
 
 
   inline void
-  TimestepControl::max_step (double t)
+  TimestepControl::max_step(double t)
   {
     max_step_val = t;
   }
 
 
   inline void
-  TimestepControl::restart ()
+  TimestepControl::restart()
   {
-    now_val = start_val;
-    step_val = start_step_val;
+    now_val          = start_val;
+    step_val         = start_step_val;
     current_step_val = step_val;
     if (print_step > 0.)
       next_print_val = now_val + print_step;
@@ -279,18 +298,18 @@ namespace Algorithms
 
 
   inline void
-  TimestepControl::file_name_format (const char *fmt)
+  TimestepControl::file_name_format(const char *fmt)
   {
     strcpy(format, fmt);
   }
 
 
   inline const char *
-  TimestepControl::file_name_format ()
+  TimestepControl::file_name_format()
   {
     return format;
   }
-}
+} // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -17,20 +17,24 @@
 
 // Test that anisotropic refinement really doesn't work
 
-#include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
+#include "coarse_grid_common.h"
 
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -40,22 +44,22 @@ void test(std::ostream & /*out*/)
 
   try
     {
-      tr.execute_coarsening_and_refinement ();
+      tr.execute_coarsening_and_refinement();
     }
   catch (ExceptionBase &e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   deal_II_exceptions::disable_abort_on_exception();
 
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 #else
   (void)argc;
   (void)argv;

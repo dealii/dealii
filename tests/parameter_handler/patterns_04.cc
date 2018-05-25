@@ -15,9 +15,11 @@
 
 // pattern_factory tests
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
 #include <memory>
+
+#include "../tests.h"
 
 
 void
@@ -47,12 +49,13 @@ test(const Patterns::PatternBase &p)
 
 using namespace Patterns;
 
-int main()
+int
+main()
 {
   initlog();
   test(Integer());
   test(Integer(-1));
-  test(Integer(-1,50));
+  test(Integer(-1, 50));
 
   test(Double());
   test(Double(0.0, 50.0));
@@ -64,10 +67,10 @@ int main()
   test(List(Bool()));
 
   test(Selection("alpha|beta"));
-  test(List(Double(),0,3,";"));
+  test(List(Double(), 0, 3, ";"));
 
   test(Map(Integer(), Double()));
-  test(Map(Integer(0,10), Double(), 0, 10, ";", "="));
+  test(Map(Integer(0, 10), Double(), 0, 10, ";", "="));
 
   deallog << "OK" << std::endl;
 }

@@ -19,90 +19,109 @@
 //       schemes, cells may be traversed in different order in a distributed
 //       triangulation as opposed to a shared triangulation.
 
-#include "../tests.h"
-#include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/shared_tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/base/tensor.h>
+
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 template <int dim>
-void compare_meshes (DoFHandler<dim> &shared_dof_handler, DoFHandler<dim> &distributed_dof_handler)
+void
+compare_meshes(DoFHandler<dim> &shared_dof_handler,
+               DoFHandler<dim> &distributed_dof_handler)
 {
-  FE_Q<dim> fe (2);
+  FE_Q<dim> fe(2);
 
   shared_dof_handler.distribute_dofs(fe);
   distributed_dof_handler.distribute_dofs(fe);
 
-  IndexSet shared_dofs = shared_dof_handler.locally_owned_dofs();
+  IndexSet shared_dofs      = shared_dof_handler.locally_owned_dofs();
   IndexSet distributed_dofs = distributed_dof_handler.locally_owned_dofs();
-  Assert(shared_dofs==distributed_dofs, ExcInternalError());
+  Assert(shared_dofs == distributed_dofs, ExcInternalError());
   shared_dofs.print(deallog.get_file_stream());
 
-  std::vector<IndexSet> shared_dofs_per_proc = shared_dof_handler.locally_owned_dofs_per_processor();
-  std::vector<IndexSet> distributed_dofs_per_proc = distributed_dof_handler.locally_owned_dofs_per_processor();
-  for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-    Assert(shared_dofs_per_proc[i]==distributed_dofs_per_proc[i], ExcInternalError());
+  std::vector<IndexSet> shared_dofs_per_proc =
+    shared_dof_handler.locally_owned_dofs_per_processor();
+  std::vector<IndexSet> distributed_dofs_per_proc =
+    distributed_dof_handler.locally_owned_dofs_per_processor();
+  for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+       ++i)
+    Assert(shared_dofs_per_proc[i] == distributed_dofs_per_proc[i],
+           ExcInternalError());
 
   typename DoFHandler<dim>::active_cell_iterator
-  cell = distributed_dof_handler.begin_active(),
-  endc = distributed_dof_handler.end();
-  for (; cell!=endc; ++cell)
+    cell = distributed_dof_handler.begin_active(),
+    endc = distributed_dof_handler.end();
+  for (; cell != endc; ++cell)
     {
       if (cell->subdomain_id() == numbers::artificial_subdomain_id)
         continue;
 
-      typename Triangulation<dim>::active_cell_iterator
-      tria_shared_cell = cell->id().to_cell(shared_dof_handler.get_triangulation());
-      typename DoFHandler<dim>::active_cell_iterator dof_shared_cell(&shared_dof_handler.get_triangulation(),
-          tria_shared_cell->level(),
-          tria_shared_cell->index(),
-          &shared_dof_handler);
+      typename Triangulation<dim>::active_cell_iterator tria_shared_cell =
+        cell->id().to_cell(shared_dof_handler.get_triangulation());
+      typename DoFHandler<dim>::active_cell_iterator dof_shared_cell(
+        &shared_dof_handler.get_triangulation(),
+        tria_shared_cell->level(),
+        tria_shared_cell->index(),
+        &shared_dof_handler);
 
-      std::vector<types::global_dof_index> distributed_cell_dofs(fe.dofs_per_cell);
+      std::vector<types::global_dof_index> distributed_cell_dofs(
+        fe.dofs_per_cell);
       std::vector<types::global_dof_index> shared_cell_dofs(fe.dofs_per_cell);
       cell->get_dof_indices(distributed_cell_dofs);
       dof_shared_cell->get_dof_indices(shared_cell_dofs);
-      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-        Assert(distributed_cell_dofs[i]==shared_cell_dofs[i], ExcInternalError());
+      for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        Assert(distributed_cell_dofs[i] == shared_cell_dofs[i],
+               ExcInternalError());
     }
 }
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  parallel::shared::Triangulation<dim> shared_tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing
-                                                   (Triangulation<dim>::limit_level_difference_at_vertices), true,
-                                                   typename parallel::shared::Triangulation<dim>::Settings
-                                                   (parallel::shared::Triangulation<dim>::partition_zorder));
+  parallel::shared::Triangulation<dim> shared_tria(
+    MPI_COMM_WORLD,
+    typename Triangulation<dim>::MeshSmoothing(
+      Triangulation<dim>::limit_level_difference_at_vertices),
+    true,
+    typename parallel::shared::Triangulation<dim>::Settings(
+      parallel::shared::Triangulation<dim>::partition_zorder));
   DoFHandler<dim> shared_dof_handler(shared_tria);
 
-  parallel::distributed::Triangulation<dim> distributed_tria(MPI_COMM_WORLD,Triangulation<dim>::
-                                                             limit_level_difference_at_vertices);
+  parallel::distributed::Triangulation<dim> distributed_tria(
+    MPI_COMM_WORLD, Triangulation<dim>::limit_level_difference_at_vertices);
   DoFHandler<dim> distributed_dof_handler(distributed_tria);
 
-  GridGenerator::subdivided_hyper_cube(shared_tria,3,-1,1);
-  GridGenerator::subdivided_hyper_cube(distributed_tria,3,-1,1);
+  GridGenerator::subdivided_hyper_cube(shared_tria, 3, -1, 1);
+  GridGenerator::subdivided_hyper_cube(distributed_tria, 3, -1, 1);
 
-  compare_meshes(shared_dof_handler,distributed_dof_handler);
+  compare_meshes(shared_dof_handler, distributed_dof_handler);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  MPILogInitAll all;
+  MPILogInitAll                    all;
 
   deallog.push("2d");
   test<2>();
@@ -113,5 +132,3 @@ int main(int argc, char *argv[])
 
   deallog << "OK" << std::endl;
 }
-
-

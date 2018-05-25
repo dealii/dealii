@@ -15,11 +15,12 @@
 
 // check that we can move a FESystem<dim> object in a reasonable way.
 
-#include "../tests.h"
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
 #include <string>
+
+#include "../tests.h"
 
 template <int dim>
 void
@@ -28,7 +29,8 @@ check(const FiniteElement<dim> &fe)
   deallog << fe.get_name() << std::endl;
   deallog << "components: " << fe.n_components() << std::endl;
   deallog << "blocks: " << fe.n_blocks() << std::endl;
-  deallog << "conforms H1: " << fe.conforms(FiniteElementData<dim>::H1) << std::endl;
+  deallog << "conforms H1: " << fe.conforms(FiniteElementData<dim>::H1)
+          << std::endl;
   deallog << "n_base_elements: " << fe.n_base_elements() << std::endl;
   deallog << std::endl;
 }
@@ -37,9 +39,9 @@ template <int dim>
 void
 move()
 {
-  FESystem<dim> fe (FE_Q<dim>(2), dim, FE_Q<dim>(1), 1);
+  FESystem<dim> fe(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1);
   check(fe);
-  FESystem<dim> fe2 (std::move(fe));
+  FESystem<dim> fe2(std::move(fe));
   check(fe);
   check(fe2);
 }
@@ -55,6 +57,3 @@ main()
 
   return 0;
 }
-
-
-

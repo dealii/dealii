@@ -15,42 +15,47 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator*(Vector) on two vectors that are
-// orthogonal
+// check TrilinosWrappers::MPI::Vector::operator*(Vector) on two vectors that
+// are orthogonal
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::MPI::Vector &v,
-           TrilinosWrappers::MPI::Vector &w)
+
+void
+test(TrilinosWrappers::MPI::Vector &v, TrilinosWrappers::MPI::Vector &w)
 {
   // set only certain elements of each
   // vector, but disjoint sets of elements
-  for (unsigned int i=0; i<v.size(); ++i)
-    if (i%3 == 0)
+  for (unsigned int i = 0; i < v.size(); ++i)
+    if (i % 3 == 0)
       v(i) = i;
     else
       w(i) = i;
-  v.compress (VectorOperation::insert);
-  w.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
+  w.compress(VectorOperation::insert);
 
   // make sure the scalar product is zero
-  AssertThrow (v*w == 0, ExcInternalError());
+  AssertThrow(v * w == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
@@ -60,12 +65,13 @@ int main (int argc,char **argv)
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         TrilinosWrappers::MPI::Vector w;
         w.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        test (v,w);
+        test(v, w);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -78,7 +84,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

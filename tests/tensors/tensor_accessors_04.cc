@@ -15,13 +15,15 @@
 
 // Test TensorAccessors::contract3
 
-#include "../tests.h"
+#include <deal.II/base/table_indices.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_accessors.h>
-#include <deal.II/base/table_indices.h>
+
+#include "../tests.h"
 
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -34,15 +36,16 @@ int main()
     deallog << "left:   " << a << std::endl;
     deallog << "middle: " << b << std::endl;
     deallog << "right:  " << c << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<0, 0, 5, int>(a, b, c)  << std::endl;
+    deallog << "Result: " << TensorAccessors::contract3<0, 0, 5, int>(a, b, c)
+            << std::endl;
     deallog << std::endl;
   }
 
-  int c_left [5] = {0, 1, 2, 3, 4};
-  Tensor<1, 5, int> left (c_left);
+  int               c_left[5] = {0, 1, 2, 3, 4};
+  Tensor<1, 5, int> left(c_left);
 
-  int c_right [5] = {0, 100, 200, 300, 400};
-  const Tensor<1, 5, int> right (c_right);
+  int                     c_right[5] = {0, 100, 200, 300, 400};
+  const Tensor<1, 5, int> right(c_right);
 
 
   // Contract rank 1, rank 1, rank 0:
@@ -52,7 +55,9 @@ int main()
     deallog << "left:   " << left << std::endl;
     deallog << "middle: " << right << std::endl;
     deallog << "right:  " << c << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<1, 0, 5, int>(left, right, c)  << std::endl;
+    deallog << "Result: "
+            << TensorAccessors::contract3<1, 0, 5, int>(left, right, c)
+            << std::endl;
     deallog << std::endl;
   }
 
@@ -64,7 +69,9 @@ int main()
     deallog << "left:   " << c << std::endl;
     deallog << "middle: " << left << std::endl;
     deallog << "right:  " << right << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<0, 1, 5, int>(c, left, right)  << std::endl;
+    deallog << "Result: "
+            << TensorAccessors::contract3<0, 1, 5, int>(c, left, right)
+            << std::endl;
     deallog << std::endl;
   }
 
@@ -80,7 +87,9 @@ int main()
     deallog << "left:   " << left << std::endl;
     deallog << "middle: " << middle << std::endl;
     deallog << "right:  " << right << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<1, 1, 5, int>(left, middle, right)  << std::endl;
+    deallog << "Result: "
+            << TensorAccessors::contract3<1, 1, 5, int>(left, middle, right)
+            << std::endl;
     deallog << std::endl;
     // manually verified to be equal to the old implementation
     // deallog << contract3(left, middle, right) << std::endl;
@@ -98,10 +107,12 @@ int main()
     deallog << "left:   " << middle << std::endl;
     deallog << "middle: " << middle3 << std::endl;
     deallog << "right:  " << right << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<2, 1, 5, int>(middle, middle3, right)  << std::endl;
+    deallog << "Result: "
+            << TensorAccessors::contract3<2, 1, 5, int>(middle, middle3, right)
+            << std::endl;
     deallog << std::endl;
-//     manually verified to be equal to the old implementation
-//     deallog << contract3(middle, middle3, right) << std::endl;
+    //     manually verified to be equal to the old implementation
+    //     deallog << contract3(middle, middle3, right) << std::endl;
   }
 
   // Contract rank 1, rank 3, rank 2:
@@ -109,10 +120,12 @@ int main()
     deallog << "left:   " << left << std::endl;
     deallog << "middle: " << middle3 << std::endl;
     deallog << "right:  " << middle << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<1, 2, 5, int>(left, middle3, middle)  << std::endl;
+    deallog << "Result: "
+            << TensorAccessors::contract3<1, 2, 5, int>(left, middle3, middle)
+            << std::endl;
     deallog << std::endl;
-//     manually verified to be equal to the old implementation
-//     deallog << contract3(left, middle3, middle) << std::endl;
+    //     manually verified to be equal to the old implementation
+    //     deallog << contract3(left, middle3, middle) << std::endl;
   }
 
 
@@ -130,9 +143,12 @@ int main()
     deallog << "left:   " << left2 << std::endl;
     deallog << "middle: " << middle4 << std::endl;
     deallog << "right:  " << middle << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<2, 2, 5, long int>(left2, middle4, middle)  << std::endl;
+    deallog << "Result: "
+            << TensorAccessors::contract3<2, 2, 5, long int>(
+                 left2, middle4, middle)
+            << std::endl;
     deallog << std::endl;
-//     manually verified to be equal to the old implementation
-//     deallog << contract3(left2, middle4, middle) << std::endl;
+    //     manually verified to be equal to the old implementation
+    //     deallog << contract3(left2, middle4, middle) << std::endl;
   }
 }

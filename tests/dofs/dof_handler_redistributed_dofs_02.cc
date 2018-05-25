@@ -16,29 +16,33 @@
 // hp::FECollection doesn't recreate the copy.
 
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 
-#include  "../tests.h"
+#include <deal.II/hp/dof_handler.h>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
-  constexpr int dim = 2;
+  constexpr int dim      = 2;
   constexpr int spacedim = 2;
 
-  Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_cube (tria);
-  FE_Q<dim,spacedim> fe(1);
+  Triangulation<dim, spacedim> tria;
+  GridGenerator::hyper_cube(tria);
+  FE_Q<dim, spacedim>             fe(1);
   hp::FECollection<dim, spacedim> fe_collection(fe);
 
-  hp::DoFHandler<dim,spacedim> dh(tria);
+  hp::DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe_collection);
 
-  SmartPointer<const hp::FECollection<dim,spacedim>> fe_p(&dh.get_fe_collection());
+  SmartPointer<const hp::FECollection<dim, spacedim>> fe_p(
+    &dh.get_fe_collection());
 
   dh.distribute_dofs(*fe_p);
 

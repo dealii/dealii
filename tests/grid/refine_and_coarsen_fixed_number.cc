@@ -17,20 +17,23 @@
 // the value 1.0 is passed as top_fraction (resp. bottom_fraction) to
 // the function GridRefinement::refine_and_coarsen_fixed_number.
 
-#include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 using namespace dealii;
 
-int main(int argc, const char *argv[])
+int
+main(int argc, const char *argv[])
 {
   initlog();
 
   Triangulation<2> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(4);
 
   Vector<float> indicator(tria.n_active_cells());

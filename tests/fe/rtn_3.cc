@@ -18,20 +18,22 @@
 // in the past. compare it also with the number of dofs per cell of the RT
 // element
 
-#include "../tests.h"
 #include <deal.II/fe/fe_raviart_thomas.h>
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 #define PRECISION 8
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int degree=0; degree<9-2*dim; ++degree)
+  for (unsigned int degree = 0; degree < 9 - 2 * dim; ++degree)
     {
       FE_RaviartThomasNodal<dim> fe_rtn(degree);
       deallog << fe_rtn.get_name() << ' ' << fe_rtn.dofs_per_cell << std::endl;
@@ -39,7 +41,8 @@ void test ()
       if (dim != 3)
         {
           FE_RaviartThomas<dim> fe_rt(degree);
-          deallog << fe_rt.get_name() << ' ' << fe_rt.dofs_per_cell << std::endl;
+          deallog << fe_rt.get_name() << ' ' << fe_rt.dofs_per_cell
+                  << std::endl;
         }
     }
 }
@@ -48,7 +51,7 @@ void test ()
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

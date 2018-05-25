@@ -18,20 +18,21 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
+
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/grid/tria.h>
 
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/grid/tria.h>
 
-#include <tuple>
 #include <functional>
-#include <set>
-#include <vector>
 #include <list>
+#include <set>
+#include <tuple>
 #include <utility>
+#include <vector>
 
 #ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
@@ -42,13 +43,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace parallel
 {
-
 #ifdef DEAL_II_WITH_MPI
 
 
   namespace shared
   {
-
     /**
      * This class provides a parallel triangulation for which every processor
      * knows about every cell of the global mesh (unlike for the
@@ -100,11 +99,14 @@ namespace parallel
      *
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
+    class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
     {
     public:
-      typedef typename dealii::Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
-      typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
+      typedef
+        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
+          active_cell_iterator;
+      typedef typename dealii::Triangulation<dim, spacedim>::cell_iterator
+        cell_iterator;
 
       /**
        * Configuration flags for distributed Triangulations to be set in the
@@ -173,9 +175,9 @@ namespace parallel
          *     {
          *       // user defined partitioning scheme: assign subdomain_ids
          *       // round-robin in a mostly random way:
-         *       std::vector<unsigned int> assignment = {0,0,1,2,0,0,2,1,0,2,2,1,2,2,0,0};
-         *       typename Triangulation<dim>::active_cell_iterator
-         *         cell = tria.begin_active(),
+         *       std::vector<unsigned int> assignment =
+         * {0,0,1,2,0,0,2,1,0,2,2,1,2,2,0,0}; typename
+         * Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
          *         endc = tria.end();
          *       unsigned int index = 0;
          *       for (; cell != endc; ++cell, ++index)
@@ -186,7 +188,8 @@ namespace parallel
          *     {
          *       parallel::shared::Triangulation<dim> tria(...,
          *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
-         *       tria.signals.post_refinement.connect (std::bind(&mypartition<dim>, std::ref(tria)));
+         *       tria.signals.post_refinement.connect
+         * (std::bind(&mypartition<dim>, std::ref(tria)));
          *     }
          *  @endcode
          *
@@ -198,7 +201,8 @@ namespace parallel
          *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
          *       tria.signals.post_refinement.connect ([&tria]()
          *                                             {
-         *                                               // user defined partitioning scheme
+         *                                               // user defined
+         * partitioning scheme
          *                                               // as above
          *                                               ...
          *                                             }
@@ -208,13 +212,15 @@ namespace parallel
          *
          *
          * @note If you plan to use a custom partition with geometric multigrid,
-         * you must manually partition the level cells in addition to the active cells.
+         * you must manually partition the level cells in addition to the active
+         * cells.
          */
         partition_custom_signal = 0x4,
 
         /**
          * This flag needs to be set to use the geometric multigrid
-         * functionality. This option requires additional computation and communication.
+         * functionality. This option requires additional computation and
+         * communication.
          *
          * Note: This flag should always be set alongside a flag for an
          * active cell partitioning method.
@@ -232,16 +238,17 @@ namespace parallel
        *
        * Otherwise all non-locally owned cells are considered ghost.
        */
-      Triangulation (MPI_Comm mpi_communicator,
-                     const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing =
-                       (dealii::Triangulation<dim,spacedim>::none),
-                     const bool allow_artificial_cells = false,
-                     const Settings settings = partition_auto);
+      Triangulation(
+        MPI_Comm mpi_communicator,
+        const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing =
+          (dealii::Triangulation<dim, spacedim>::none),
+        const bool     allow_artificial_cells = false,
+        const Settings settings               = partition_auto);
 
       /**
        * Destructor.
        */
-      virtual ~Triangulation () override = default;
+      virtual ~Triangulation() override = default;
 
       /**
        * Coarsen and refine the mesh according to refinement and coarsening
@@ -251,7 +258,8 @@ namespace parallel
        * addition of calling dealii::GridTools::partition_triangulation() at
        * the end.
        */
-      virtual void execute_coarsening_and_refinement () override;
+      virtual void
+      execute_coarsening_and_refinement() override;
 
       /**
        * Create a triangulation.
@@ -259,9 +267,10 @@ namespace parallel
        * This function also partitions triangulation based on the MPI
        * communicator provided to the constructor.
        */
-      virtual void create_triangulation (const std::vector< Point< spacedim > > &vertices,
-                                         const std::vector< CellData< dim > > &cells,
-                                         const SubCellData &subcelldata) override;
+      virtual void
+      create_triangulation(const std::vector<Point<spacedim>> &vertices,
+                           const std::vector<CellData<dim>> &  cells,
+                           const SubCellData &subcelldata) override;
 
       /**
        * Copy @p other_tria to this triangulation.
@@ -269,22 +278,26 @@ namespace parallel
        * This function also partitions triangulation based on the MPI
        * communicator provided to the constructor.
        *
-       * @note This function can not be used with parallel::distributed::Triangulation,
-       * since it only stores those cells that it owns, one layer of ghost cells around
-       * the ones it locally owns, and a number of artificial cells.
+       * @note This function can not be used with
+       * parallel::distributed::Triangulation, since it only stores those cells
+       * that it owns, one layer of ghost cells around the ones it locally owns,
+       * and a number of artificial cells.
        */
-      virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria) override;
+      virtual void
+      copy_triangulation(
+        const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
       /**
        * Read the data of this object from a stream for the purpose of
        * serialization. Throw away the previous content.
        *
-       * This function first does the same work as in dealii::Triangulation::load,
-       * then partitions the triangulation based on the MPI communicator
-       * provided to the constructor.
+       * This function first does the same work as in
+       * dealii::Triangulation::load, then partitions the triangulation based on
+       * the MPI communicator provided to the constructor.
        */
       template <class Archive>
-      void load (Archive &ar, const unsigned int version);
+      void
+      load(Archive &ar, const unsigned int version);
 
       /**
        * Return a vector of length Triangulation::n_active_cells() where each
@@ -294,34 +307,36 @@ namespace parallel
        * artificial cells that do not store who the owner of the cell is in
        * their subdomain_id field.
        */
-      const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
+      const std::vector<types::subdomain_id> &
+      get_true_subdomain_ids_of_cells() const;
 
       /**
        * Return a vector of length Triangulation::n_cells(level) where each
        * element stores the level subdomain id of the owner of this cell. The
-       * elements of the vector are obviously the same as the level subdomain ids
-       * for locally owned and ghost cells, but are also correct for
+       * elements of the vector are obviously the same as the level subdomain
+       * ids for locally owned and ghost cells, but are also correct for
        * artificial cells that do not store who the owner of the cell is in
        * their level_subdomain_id field.
        */
-      const std::vector<types::subdomain_id> &get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
+      const std::vector<types::subdomain_id> &
+      get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
 
       /**
        * Return allow_artificial_cells , namely true if artificial cells are
        * allowed.
        */
-      bool with_artificial_cells() const;
+      bool
+      with_artificial_cells() const;
 
     protected:
-
       /**
        * Override the function to update the number cache so we can fill data
        * like @p level_ghost_owners.
        */
-      virtual void update_number_cache () override;
+      virtual void
+      update_number_cache() override;
 
     private:
-
       /**
        * Settings
        */
@@ -336,7 +351,8 @@ namespace parallel
        * This function calls GridTools::partition_triangulation () and if
        * requested in the constructor of the class marks artificial cells.
        */
-      void partition();
+      void
+      partition();
 
       /**
        * A vector containing subdomain IDs of cells obtained by partitioning
@@ -353,32 +369,31 @@ namespace parallel
       std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
 
       /**
-       * A vector containing level subdomain IDs of cells obtained by partitioning
-       * each level.
+       * A vector containing level subdomain IDs of cells obtained by
+       * partitioning each level.
        *
        * The original partition information is stored to allow using sequential
        * DoF distribution and partitioning functions with semi-artificial
        * cells.
        */
-      std::vector<std::vector<types::subdomain_id>> true_level_subdomain_ids_of_cells;
+      std::vector<std::vector<types::subdomain_id>>
+        true_level_subdomain_ids_of_cells;
     };
 
     template <int dim, int spacedim>
     template <class Archive>
     void
-    Triangulation<dim,spacedim>::load (Archive &ar,
-                                       const unsigned int version)
+    Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int version)
     {
-      dealii::Triangulation<dim,spacedim>::load (ar, version);
+      dealii::Triangulation<dim, spacedim>::load(ar, version);
       partition();
-      this->update_number_cache ();
+      this->update_number_cache();
     }
-  }
+  } // namespace shared
 #else
 
   namespace shared
   {
-
     /**
      * Dummy class the compiler chooses for parallel shared triangulations if
      * we didn't actually configure deal.II with the MPI library. The
@@ -391,29 +406,32 @@ namespace parallel
      * MPI is not available.
      */
     template <int dim, int spacedim = dim>
-    class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
+    class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
     {
     public:
       /**
        * Constructor. Deleted to make sure that objects of this type cannot be
        * constructed (see also the class documentation).
        */
-      Triangulation () = delete;
+      Triangulation() = delete;
 
       /**
        * A dummy function to return empty vector.
        */
-      const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
+      const std::vector<types::subdomain_id> &
+      get_true_subdomain_ids_of_cells() const;
 
       /**
        * A dummy function to return empty vector.
        */
-      const std::vector<types::subdomain_id> &get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
+      const std::vector<types::subdomain_id> &
+      get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
 
       /**
        * A dummy function which always returns true.
        */
-      bool with_artificial_cells() const;
+      bool
+      with_artificial_cells() const;
 
     private:
       /**
@@ -426,11 +444,11 @@ namespace parallel
        */
       std::vector<types::subdomain_id> true_level_subdomain_ids_of_cells;
     };
-  }
+  } // namespace shared
 
 
 #endif
-}
+} // namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE
 

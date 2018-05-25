@@ -19,33 +19,37 @@
 // TrilinosWrappers::SparseMatrix::set(). like trilinos_01, but use a different
 // constructor for the sparse matrix
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::SparseMatrix &m)
+
+void
+test(TrilinosWrappers::SparseMatrix &m)
 {
   // first set a few entries
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.m(); ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        m.set(i, j, i * j * .5 + .5);
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   // then make sure we retrieve the same ones
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.m(); ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
         {
-          AssertThrow (m(i,j) == i*j*.5+.5, ExcInternalError());
-          AssertThrow (m.el(i,j) == i*j*.5+.5, ExcInternalError());
+          AssertThrow(m(i, j) == i * j * .5 + .5, ExcInternalError());
+          AssertThrow(m.el(i, j) == i * j * .5 + .5, ExcInternalError());
         }
       else
         {
-          AssertThrow (m.el(i,j) == 0, ExcInternalError());
+          AssertThrow(m.el(i, j) == 0, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
@@ -53,26 +57,31 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
     {
       {
-        std::vector<unsigned int> row_lengths (5,3U);
+        std::vector<unsigned int> row_lengths(5, 3U);
         row_lengths.back() = 2;
-        TrilinosWrappers::SparseMatrix m (static_cast<types::global_dof_index>(5U),
-                                          static_cast<types::global_dof_index>(5U),row_lengths);
-        test (m);
+        TrilinosWrappers::SparseMatrix m(
+          static_cast<types::global_dof_index>(5U),
+          static_cast<types::global_dof_index>(5U),
+          row_lengths);
+        test(m);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -85,7 +94,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -23,26 +23,27 @@
 char logname[] = "output";
 
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
 #include <vector>
 
+#include "../tests.h"
 
 
 
-void test_with_wrong_face_orientation ()
+void
+test_with_wrong_face_orientation()
 {
-  Triangulation<3>     triangulation;
-  GridGenerator::hyper_ball (triangulation);
-  triangulation.begin_active()->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
+  Triangulation<3> triangulation;
+  GridGenerator::hyper_ball(triangulation);
+  triangulation.begin_active()->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 
   Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
   ++cell;
@@ -51,13 +52,13 @@ void test_with_wrong_face_orientation ()
   deallog << "cell=" << cell << std::endl;
   deallog << "cell->neighbor(3)=" << cell->neighbor(3) << std::endl;
   deallog << "cell->face_orientation(3)="
-          << (cell->face_orientation(3) ? "true" : "false")
+          << (cell->face_orientation(3) ? "true" : "false") << std::endl;
+
+  const Triangulation<3>::active_cell_iterator neighbor_child =
+    cell->neighbor_child_on_subface(3, 1);
+
+  deallog << "cell->neighbor_child_on_subface(3,1)=" << neighbor_child
           << std::endl;
-
-  const Triangulation<3>::active_cell_iterator neighbor_child
-    = cell->neighbor_child_on_subface (3, 1);
-
-  deallog << "cell->neighbor_child_on_subface(3,1)=" << neighbor_child << std::endl;
   deallog << "cell->neighbor_child_on_subface(3,1)->neighbor(5)="
           << neighbor_child->neighbor(5) << std::endl;
 
@@ -66,17 +67,18 @@ void test_with_wrong_face_orientation ()
           << std::endl;
 
   deallog << "cell->face(3)=" << cell->face(3) << std::endl;
-  for (unsigned int i=0; i<4; ++i)
-    deallog << "cell->face(3)->child(" << i << ")="
-            << cell->face(3)->child(i) << std::endl;
+  for (unsigned int i = 0; i < 4; ++i)
+    deallog << "cell->face(3)->child(" << i << ")=" << cell->face(3)->child(i)
+            << std::endl;
 
-  for (unsigned int i=0; i<6; ++i)
-    deallog << "cell->neighbor(3)->face(" << i << ")="
-            << cell->neighbor(3)->face(i) << std::endl;
+  for (unsigned int i = 0; i < 6; ++i)
+    deallog << "cell->neighbor(3)->face(" << i
+            << ")=" << cell->neighbor(3)->face(i) << std::endl;
 
-  for (unsigned int i=0; i<6; ++i)
-    deallog << "cell->neighbor_child_on_subface(3,1)->face(" << i << ")="
-            << cell->neighbor_child_on_subface(3,1)->face(i) << std::endl;
+  for (unsigned int i = 0; i < 6; ++i)
+    deallog << "cell->neighbor_child_on_subface(3,1)->face(" << i
+            << ")=" << cell->neighbor_child_on_subface(3, 1)->face(i)
+            << std::endl;
 
   // The following assertion was originally in
   // make_hanging_node_constraints and
@@ -93,22 +95,22 @@ void test_with_wrong_face_orientation ()
   // CellAccessor::neighbor_child_on_subface it
   // should work. let's make sure we get the
   // status we expect.
-  AssertThrow (cell->face(3)->child(1) ==
-               neighbor_child->face(cell->neighbor_of_neighbor(3)),
-               ExcInternalError());
+  AssertThrow(cell->face(3)->child(1) ==
+                neighbor_child->face(cell->neighbor_of_neighbor(3)),
+              ExcInternalError());
 }
 
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile(logname);
-  deallog << std::setprecision (3);
+  deallog << std::setprecision(3);
 
   deallog.attach(logfile);
 
-  test_with_wrong_face_orientation ();
+  test_with_wrong_face_orientation();
 
   deallog << "OK" << std::endl;
 }
-

@@ -17,20 +17,27 @@
 // check VectorTools::project for Vector<double> arguments and hp
 
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
+
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/dofs/dof_accessor.h>
+
+#include "../tests.h"
 
 
 
@@ -40,11 +47,11 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p,
-                        const unsigned int = 0) const
+  virtual double
+  value(const Point<dim> &p, const unsigned int = 0) const
   {
     double s = 1;
-    for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int i = 0; i < dim; ++i)
       s *= p[i];
     return s;
   }
@@ -52,53 +59,57 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   // create 2 triangulations with the
   // same coarse grid, and refine
   // them differently
   Triangulation<dim> tria;
 
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global (2);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(2);
 
   hp::FECollection<dim> fe;
   fe.push_back(FE_Q<dim>(1));
-  hp::DoFHandler<dim> dh (tria);
-  dh.distribute_dofs (fe);
+  hp::DoFHandler<dim> dh(tria);
+  dh.distribute_dofs(fe);
 
   Vector<double> v(dh.n_dofs());
 
   ConstraintMatrix cm;
-  cm.close ();
-  VectorTools::project (dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(),
-                        v);
+  cm.close();
+  VectorTools::project(
+    dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dh.begin_active();
-       cell != dh.end(); ++cell)
-    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+         dh.begin_active();
+       cell != dh.end();
+       ++cell)
+    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       {
         // check that the error is
         // somewhat small. it won't
         // be zero since we project
         // and do not interpolate
-        Assert (std::fabs (v(cell->vertex_dof_index(i,0,cell->active_fe_index())) -
-                           F<dim>().value (cell->vertex(i)))
-                < 1e-4,
-                ExcInternalError());
-        deallog << cell->vertex(i) << ' ' << v(cell->vertex_dof_index(i,0,cell->active_fe_index()))
+        Assert(
+          std::fabs(v(cell->vertex_dof_index(i, 0, cell->active_fe_index())) -
+                    F<dim>().value(cell->vertex(i))) < 1e-4,
+          ExcInternalError());
+        deallog << cell->vertex(i) << ' '
+                << v(cell->vertex_dof_index(i, 0, cell->active_fe_index()))
                 << std::endl;
       }
 }
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
   test<1>();
   test<2>();
   test<3>();
 }
-

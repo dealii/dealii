@@ -13,10 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.templates.h>
-
-#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -26,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 // see https://github.com/dealii/dealii/issues/2875
 #ifndef DEAL_II_MSVC
 
-#include "la_parallel_block_vector.inst"
+#  include "la_parallel_block_vector.inst"
 
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same
@@ -37,15 +36,16 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-#define TEMPL_COPY_CONSTRUCTOR(S1,S2)                                   \
-  template BlockVector<S1>& BlockVector<S1>::operator=<S2> (const BlockVector<S2> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2)                 \
+    template BlockVector<S1> &BlockVector<S1>::operator= \
+      <S2>(const BlockVector<S2> &)
 
-    TEMPL_COPY_CONSTRUCTOR(double,float);
-    TEMPL_COPY_CONSTRUCTOR(float,double);
+    TEMPL_COPY_CONSTRUCTOR(double, float);
+    TEMPL_COPY_CONSTRUCTOR(float, double);
 
-#undef TEMPL_COPY_CONSTRUCTOR
-  }
-}
+#  undef TEMPL_COPY_CONSTRUCTOR
+  } // namespace distributed
+} // namespace LinearAlgebra
 
 #endif // ! DEAL_II_MSVC
 

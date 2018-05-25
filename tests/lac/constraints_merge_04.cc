@@ -18,21 +18,23 @@
 // merge and print a bunch of ConstrainMatrices. test the case where we have
 // conflicting constraints and the left object wins
 
-#include "../tests.h"
 #include <deal.II/lac/constraint_matrix.h>
+
+#include "../tests.h"
 
 
 
 std::ofstream logfile("output");
 
 
-void merge_check ()
+void
+merge_check()
 {
   deallog << "Checking ConstraintMatrix::merge" << std::endl;
 
   // check twice, once with closed
   // objects, once with open ones
-  for (unsigned int run=0; run<2; ++run)
+  for (unsigned int run = 0; run < 2; ++run)
     {
       deallog << "Checking with " << (run == 0 ? "open" : "closed")
               << " objects" << std::endl;
@@ -42,45 +44,45 @@ void merge_check ()
       ConstraintMatrix c1, c2;
 
       // enter simple line
-      c1.add_line (0);
-      c1.add_entry (0, 11, 1.);
-      c1.set_inhomogeneity (0, 42);
+      c1.add_line(0);
+      c1.add_entry(0, 11, 1.);
+      c1.set_inhomogeneity(0, 42);
 
       // fill second constraints
       // object that has a conflict
-      c2.add_line (0);
-      c2.add_entry (0, 13, 2.);
-      c2.set_inhomogeneity (0, 142);
+      c2.add_line(0);
+      c2.add_entry(0, 13, 2.);
+      c2.set_inhomogeneity(0, 142);
       // in one of the two runs,
       // close the objects
       if (run == 1)
         {
-          c1.close ();
-          c2.close ();
+          c1.close();
+          c2.close();
         };
 
       // now merge the two and print the
       // results
       try
         {
-          c1.merge (c2, ConstraintMatrix::left_object_wins);
+          c1.merge(c2, ConstraintMatrix::left_object_wins);
         }
       catch (...)
         {
-          Assert (false, ExcInternalError());
+          Assert(false, ExcInternalError());
         }
 
-      c1.print (logfile);
+      c1.print(logfile);
     }
 }
 
 
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
+  deallog << std::setprecision(2);
+  logfile << std::setprecision(2);
   deallog.attach(logfile);
 
-  merge_check ();
+  merge_check();
 }
-

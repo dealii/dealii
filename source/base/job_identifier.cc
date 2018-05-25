@@ -14,10 +14,11 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/job_identifier.h>
+
 #include <ctime>
 
 #ifdef DEAL_II_HAVE_UNISTD_H
-# include <unistd.h>
+#  include <unistd.h>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -29,11 +30,11 @@ JobIdentifier dealjobid;
 JobIdentifier::JobIdentifier()
 {
   time_t t = std::time(nullptr);
-  id = std::string("JobId ");
+  id       = std::string("JobId ");
 
 #if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
   char name[100];
-  gethostname(name,99);
+  gethostname(name, 99);
   id += std::string(name) + std::string(" ");
 #else
   id += std::string("unknown ");
@@ -44,7 +45,7 @@ JobIdentifier::JobIdentifier()
 
 
 const std::string
-JobIdentifier::operator ()() const
+JobIdentifier::operator()() const
 {
   return id;
 }
@@ -53,7 +54,7 @@ JobIdentifier::operator ()() const
 std::string
 JobIdentifier::base_name(const char *filename)
 {
-  std::string name(filename);
+  std::string            name(filename);
   std::string::size_type pos;
   pos = name.rfind('/');
   if (pos != std::string::npos)

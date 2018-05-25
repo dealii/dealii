@@ -18,31 +18,34 @@
 // test that using ParameterHandler::set with a parameter that doesn't conform
 // to the specs leads to an error
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+#include "../tests.h"
+
+void
+check()
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "3", Patterns::Integer());
+  prm.declare_entry("test_1", "3", Patterns::Integer());
 
   try
     {
-      prm.set ("test_1", "3.1415");
+      prm.set("test_1", "3.1415");
     }
   catch (const ParameterHandler::ExcValueDoesNotMatchPattern &)
     {
       deallog << "OK" << std::endl;
     }
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check ();
+  check();
 
   return 0;
 }

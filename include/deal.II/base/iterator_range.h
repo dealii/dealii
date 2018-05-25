@@ -136,32 +136,34 @@ public:
      *
      * @param iterator An iterator to which this object is supposed to point.
      */
-    IteratorOverIterators (const BaseIterator &iterator);
+    IteratorOverIterators(const BaseIterator &iterator);
 
     /**
      * Dereferencing operator.
      * @return The iterator within the collection currently pointed to.
      */
-    BaseIterator operator* () const;
+    BaseIterator operator*() const;
 
     /**
      * Dereferencing operator.
      * @return The iterator within the collection currently pointed to.
      */
-    const BaseIterator *operator-> () const;
+    const BaseIterator *operator->() const;
 
     /**
      * Prefix increment operator. Move the current iterator to the next
      * element of the collection and return the new value.
      */
-    IteratorOverIterators &operator ++ ();
+    IteratorOverIterators &
+    operator++();
 
     /**
      * Postfix increment operator. Move the current iterator to the next
      * element of the collection, but return the previous value of the
      * iterator.
      */
-    IteratorOverIterators operator ++ (int);
+    IteratorOverIterators
+    operator++(int);
 
     /**
      * Comparison operator
@@ -169,7 +171,8 @@ public:
      * @return Returns whether the current iterator points to a different
      * object than the iterator represented by the argument.
      */
-    bool operator != (const IteratorOverIterators &i_o_i);
+    bool
+    operator!=(const IteratorOverIterators &i_o_i);
 
     /**
      * Mark the class as forward iterator and declare some typedefs which are
@@ -179,8 +182,8 @@ public:
     typedef std::forward_iterator_tag          iterator_category;
     typedef Iterator                           value_type;
     typedef typename Iterator::difference_type difference_type;
-    typedef Iterator                          *pointer;
-    typedef Iterator                          &reference;
+    typedef Iterator *                         pointer;
+    typedef Iterator &                         reference;
 
   private:
     /**
@@ -209,19 +212,20 @@ public:
    * @param[in] end   An iterator pointing past the last element represented
    * by this range.
    */
-  IteratorRange (const iterator begin,
-                 const iterator end);
+  IteratorRange(const iterator begin, const iterator end);
 
   /**
    * Return the iterator pointing to the first element of this range.
    */
-  IteratorOverIterators begin();
+  IteratorOverIterators
+  begin();
 
   /**
    * Return the iterator pointing to the element past the last element of this
    * range.
    */
-  IteratorOverIterators end();
+  IteratorOverIterators
+  end();
 
 private:
   /**
@@ -236,19 +240,16 @@ private:
 
 
 template <typename Iterator>
-inline
-IteratorRange<Iterator>::IteratorOverIterators::
-IteratorOverIterators (const BaseIterator &iterator)
-  :
-  element_of_iterator_collection (iterator)
+inline IteratorRange<Iterator>::IteratorOverIterators::IteratorOverIterators(
+  const BaseIterator &iterator) :
+  element_of_iterator_collection(iterator)
 {}
 
 
 
 template <typename Iterator>
-inline
-typename IteratorRange<Iterator>::IteratorOverIterators::BaseIterator
-IteratorRange<Iterator>::IteratorOverIterators::operator* () const
+inline typename IteratorRange<Iterator>::IteratorOverIterators::BaseIterator
+  IteratorRange<Iterator>::IteratorOverIterators::operator*() const
 {
   return element_of_iterator_collection;
 }
@@ -256,9 +257,9 @@ IteratorRange<Iterator>::IteratorOverIterators::operator* () const
 
 
 template <typename Iterator>
-inline
-const typename IteratorRange<Iterator>::IteratorOverIterators::BaseIterator *
-IteratorRange<Iterator>::IteratorOverIterators::operator-> () const
+inline const typename IteratorRange<
+  Iterator>::IteratorOverIterators::BaseIterator *
+  IteratorRange<Iterator>::IteratorOverIterators::operator->() const
 {
   return &element_of_iterator_collection;
 }
@@ -266,9 +267,8 @@ IteratorRange<Iterator>::IteratorOverIterators::operator-> () const
 
 
 template <typename Iterator>
-inline
-typename IteratorRange<Iterator>::IteratorOverIterators &
-IteratorRange<Iterator>::IteratorOverIterators::operator ++ ()
+inline typename IteratorRange<Iterator>::IteratorOverIterators &
+IteratorRange<Iterator>::IteratorOverIterators::operator++()
 {
   ++element_of_iterator_collection;
   return *this;
@@ -277,9 +277,8 @@ IteratorRange<Iterator>::IteratorOverIterators::operator ++ ()
 
 
 template <typename Iterator>
-inline
-typename IteratorRange<Iterator>::IteratorOverIterators
-IteratorRange<Iterator>::IteratorOverIterators::operator ++ (int)
+inline typename IteratorRange<Iterator>::IteratorOverIterators
+IteratorRange<Iterator>::IteratorOverIterators::operator++(int)
 {
   const IteratorOverIterators old_value = *this;
   ++element_of_iterator_collection;
@@ -289,37 +288,30 @@ IteratorRange<Iterator>::IteratorOverIterators::operator ++ (int)
 
 
 template <typename Iterator>
-inline
-bool
-IteratorRange<Iterator>::IteratorOverIterators::operator != (const IteratorOverIterators &i_o_i)
+inline bool
+IteratorRange<Iterator>::IteratorOverIterators::
+operator!=(const IteratorOverIterators &i_o_i)
 {
   return element_of_iterator_collection != i_o_i.element_of_iterator_collection;
 }
 
 
 template <typename Iterator>
-inline
-IteratorRange<Iterator>::IteratorRange ()
-  :
-  it_begin(),
-  it_end()
+inline IteratorRange<Iterator>::IteratorRange() : it_begin(), it_end()
 {}
 
 
 
 template <typename Iterator>
-inline
-IteratorRange<Iterator>::IteratorRange (const iterator b,
-                                        const iterator e)
-  :
+inline IteratorRange<Iterator>::IteratorRange(const iterator b,
+                                              const iterator e) :
   it_begin(b),
   it_end(e)
 {}
 
 
 template <typename Iterator>
-inline
-typename IteratorRange<Iterator>::IteratorOverIterators
+inline typename IteratorRange<Iterator>::IteratorOverIterators
 IteratorRange<Iterator>::begin()
 {
   return IteratorOverIterators(it_begin);
@@ -327,8 +319,7 @@ IteratorRange<Iterator>::begin()
 
 
 template <typename Iterator>
-inline
-typename IteratorRange<Iterator>::IteratorOverIterators
+inline typename IteratorRange<Iterator>::IteratorOverIterators
 IteratorRange<Iterator>::end()
 {
   return IteratorOverIterators(it_end);

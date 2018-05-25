@@ -15,15 +15,17 @@
 
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
 #include <array>
+
+#include "../tests.h"
 
 /*
  * Verify that the correct exception (ExcGridHasInvalidCell) is thrown when
@@ -31,7 +33,8 @@
  */
 
 template <int dim>
-void check_parallelepiped (std::ofstream &logfile)
+void
+check_parallelepiped(std::ofstream &logfile)
 {
   // Data structure defining dim coordinates that make up a
   // parallelepiped.
@@ -39,34 +42,34 @@ void check_parallelepiped (std::ofstream &logfile)
 
   switch (dim)
     {
-    case 1:
-      edges[0][0] = -0.5;
-      break;
+      case 1:
+        edges[0][0] = -0.5;
+        break;
 
-    case 2:
-      edges[0][1] = 0.5;
-      edges[1][0] = 0.5;
-      break;
+      case 2:
+        edges[0][1] = 0.5;
+        edges[1][0] = 0.5;
+        break;
 
-    case 3:
-      edges[0][0] = 1.0;
-      edges[1][1] = 1.0;
-      edges[2][2] = -1.0;
-      break;
+      case 3:
+        edges[0][0] = 1.0;
+        edges[1][1] = 1.0;
+        edges[2][2] = -1.0;
+        break;
 
-    default:
-      Assert (false, ExcInternalError ());
+      default:
+        Assert(false, ExcInternalError());
     }
 
   Point<dim> origin;
 
-  Triangulation<dim> triangulation;
+  Triangulation<dim>        triangulation;
   std::vector<unsigned int> subdivisions;
 
   try
     {
-      GridGenerator::subdivided_parallelepiped<dim>(triangulation, origin, edges,
-                                                    subdivisions, false);
+      GridGenerator::subdivided_parallelepiped<dim>(
+        triangulation, origin, edges, subdivisions, false);
     }
   catch (ExceptionBase &exc)
     {
@@ -74,10 +77,11 @@ void check_parallelepiped (std::ofstream &logfile)
     }
 }
 
-int main ()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
 
   check_parallelepiped<1>(logfile);
   check_parallelepiped<2>(logfile);

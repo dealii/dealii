@@ -15,11 +15,12 @@
 
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 template <int dim>
 bool
@@ -30,25 +31,23 @@ pred_mat_id(const typename Triangulation<dim>::active_cell_iterator &cell)
 
 template <int dim>
 void
-write_mat_id_to_file (const Triangulation<dim> &tria)
+write_mat_id_to_file(const Triangulation<dim> &tria)
 {
-  int count = 0;
-  typename Triangulation<dim>::active_cell_iterator
-  cell = tria.begin_active(),
-  endc = tria.end();
+  int                                               count = 0;
+  typename Triangulation<dim>::active_cell_iterator cell  = tria.begin_active(),
+                                                    endc  = tria.end();
   for (; cell != endc; ++cell, ++count)
     {
-      deallog
-          << count << " "
-          << static_cast<int>(cell->material_id())
-          << std::endl;
+      deallog << count << " " << static_cast<int>(cell->material_id())
+              << std::endl;
     }
   deallog << std::endl;
 }
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "dim = " << dim << std::endl;
 
@@ -59,13 +58,11 @@ void test ()
   typedef typename Triangulation<dim>::active_cell_iterator cell_iterator;
 
   // Mark a small block at the corner of the hypercube
-  cell_iterator
-  cell = tria.begin_active(),
-  endc = tria.end();
+  cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     {
       bool mark = true;
-      for (unsigned int d=0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()[d] > 0.5)
           {
             mark = false;
@@ -82,21 +79,24 @@ void test ()
   write_mat_id_to_file(tria);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    const std::string filename =
+      "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
     std::ofstream f(filename.c_str());
-    GridOut().write_vtk (tria, f);
+    GridOut().write_vtk(tria, f);
   }
 
-  std::function<bool (const cell_iterator &)> predicate = pred_mat_id<dim>;
+  std::function<bool(const cell_iterator &)> predicate = pred_mat_id<dim>;
 
   // Compute a halo layer around material id 2 and set it to material id 3
-  const std::vector<cell_iterator> active_halo_layer
-    = GridTools::compute_active_cell_halo_layer(tria, predicate); // General predicate
+  const std::vector<cell_iterator> active_halo_layer =
+    GridTools::compute_active_cell_halo_layer(tria,
+                                              predicate); // General predicate
 
   AssertThrow(active_halo_layer.size() > 0, ExcMessage("No halo layer found."));
-  for (typename std::vector<cell_iterator>::const_iterator
-       it = active_halo_layer.begin();
-       it != active_halo_layer.end(); ++it)
+  for (typename std::vector<cell_iterator>::const_iterator it =
+         active_halo_layer.begin();
+       it != active_halo_layer.end();
+       ++it)
     {
       (*it)->set_material_id(3);
     }
@@ -105,19 +105,21 @@ void test ()
   write_mat_id_to_file(tria);
   // Write to file to visually check result
   {
-    const std::string filename = "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    const std::string filename =
+      "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
     std::ofstream f(filename.c_str());
-    GridOut().write_vtk (tria, f);
+    GridOut().write_vtk(tria, f);
   }
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 
   return 0;
 }

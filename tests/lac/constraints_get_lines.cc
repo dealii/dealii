@@ -18,31 +18,33 @@
 // test: test the ConstraintMatrix::get_lines() range object
 
 
-#include "../tests.h"
 #include <deal.II/lac/constraint_matrix.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   ConstraintMatrix cm;
 
   // an inhomogeneous constraint
-  cm.add_line (4);
-  cm.set_inhomogeneity (4, 3.14159);
+  cm.add_line(4);
+  cm.set_inhomogeneity(4, 3.14159);
 
   // a homogeneous constraint that is
   // constrained to the inhomogeneous one
-  cm.add_line (1);
-  cm.add_entry (1, 2, 42.);
-  cm.add_entry (1, 4, 1.);
+  cm.add_line(1);
+  cm.add_entry(1, 2, 42.);
+  cm.add_entry(1, 4, 1.);
 
   // and a standard homogeneous constraint
-  cm.add_line (17);
+  cm.add_line(17);
   cm.add_entry(17, 6, 2.);
   cm.add_entry(17, 15, 3.);
 
   // a "singular" constraint
-  cm.add_line (3);
+  cm.add_line(3);
 
   // now close the constraint matrix
   cm.close();
@@ -59,7 +61,8 @@ void test ()
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
   test();

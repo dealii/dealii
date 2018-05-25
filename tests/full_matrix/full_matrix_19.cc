@@ -23,19 +23,16 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
-  for (unsigned int n=1; n<=3; ++n)
+  for (unsigned int n = 1; n <= 3; ++n)
     {
-      const number array[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+      const number array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-      FullMatrix<number> m(n,n, array);
-      print_matrix (m);
-      deallog << m.determinant () << std::endl;
+      FullMatrix<number> m(n, n, array);
+      print_matrix(m);
+      deallog << m.determinant() << std::endl;
     }
 }
-
-

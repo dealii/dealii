@@ -18,17 +18,20 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
+
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #ifdef DEAL_II_WITH_MPI
-#include <mpi.h>
-#include <deal.II/base/index_set.h>
+#  include <deal.II/base/index_set.h>
+
+#  include <mpi.h>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -46,7 +49,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace SparsityTools
 {
-
   /**
    * Enumerator with options for partitioner
    */
@@ -98,11 +100,11 @@ namespace SparsityTools
    * methods you will want to partition the mesh, not the matrix. This can be
    * done by calling @p GridTools::partition_triangulation.
    */
-  void partition (const SparsityPattern     &sparsity_pattern,
-                  const unsigned int         n_partitions,
-                  std::vector<unsigned int> &partition_indices,
-                  const Partitioner partitioner = Partitioner::metis
-                 );
+  void
+  partition(const SparsityPattern &    sparsity_pattern,
+            const unsigned int         n_partitions,
+            std::vector<unsigned int> &partition_indices,
+            const Partitioner          partitioner = Partitioner::metis);
 
 
   /**
@@ -115,12 +117,12 @@ namespace SparsityTools
    * into consideration. If not then the size of this vector must equal to the
    * number of active cells in the triangulation.
    */
-  void partition (const SparsityPattern           &sparsity_pattern,
-                  const std::vector<unsigned int> &cell_weights,
-                  const unsigned int               n_partitions,
-                  std::vector<unsigned int>       &partition_indices,
-                  const Partitioner                partitioner = Partitioner::metis
-                 );
+  void
+  partition(const SparsityPattern &          sparsity_pattern,
+            const std::vector<unsigned int> &cell_weights,
+            const unsigned int               n_partitions,
+            std::vector<unsigned int> &      partition_indices,
+            const Partitioner                partitioner = Partitioner::metis);
 
   /**
    * Using a coloring algorithm provided by ZOLTAN to color nodes whose
@@ -154,8 +156,9 @@ namespace SparsityTools
    * GraphColoring::make_graph_coloring() which is tailored to graph
    * coloring arising in shared-memory parallel assembly of matrices.
    */
-  unsigned int color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
-                                       std::vector<unsigned int> &color_indices);
+  unsigned int
+  color_sparsity_pattern(const SparsityPattern &    sparsity_pattern,
+                         std::vector<unsigned int> &color_indices);
 
   /**
    * For a given sparsity pattern, compute a re-enumeration of row/column
@@ -207,9 +210,11 @@ namespace SparsityTools
    * part of the algorithm that chooses starting indices.
    */
   void
-  reorder_Cuthill_McKee (const DynamicSparsityPattern &sparsity,
-                         std::vector<DynamicSparsityPattern::size_type> &new_indices,
-                         const std::vector<DynamicSparsityPattern::size_type> &starting_indices = std::vector<DynamicSparsityPattern::size_type>());
+  reorder_Cuthill_McKee(
+    const DynamicSparsityPattern &                        sparsity,
+    std::vector<DynamicSparsityPattern::size_type> &      new_indices,
+    const std::vector<DynamicSparsityPattern::size_type> &starting_indices =
+      std::vector<DynamicSparsityPattern::size_type>());
 
   /**
    * For a given sparsity pattern, compute a re-enumeration of row/column
@@ -233,8 +238,9 @@ namespace SparsityTools
    * the lowest number of nodes.
    */
   void
-  reorder_hierarchical (const DynamicSparsityPattern                   &sparsity,
-                        std::vector<DynamicSparsityPattern::size_type> &new_indices);
+  reorder_hierarchical(
+    const DynamicSparsityPattern &                  sparsity,
+    std::vector<DynamicSparsityPattern::size_type> &new_indices);
 
 #ifdef DEAL_II_WITH_MPI
   /**
@@ -261,11 +267,12 @@ namespace SparsityTools
    * PETScWrappers::MPI::SparseMatrix for it to work correctly in a parallel
    * computation.
    */
-  void distribute_sparsity_pattern
-  (DynamicSparsityPattern                               &dsp,
-   const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
-   const MPI_Comm                                       &mpi_comm,
-   const IndexSet                                       &myrange);
+  void
+  distribute_sparsity_pattern(
+    DynamicSparsityPattern &                              dsp,
+    const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
+    const MPI_Comm &                                      mpi_comm,
+    const IndexSet &                                      myrange);
 
   /**
    * Similar to the function above, but for BlockDynamicSparsityPattern
@@ -279,11 +286,11 @@ namespace SparsityTools
    *
    * @param myrange Typically the locally relevant DoFs.
    */
-  void distribute_sparsity_pattern
-  (BlockDynamicSparsityPattern &dsp,
-   const std::vector<IndexSet> &owned_set_per_cpu,
-   const MPI_Comm              &mpi_comm,
-   const IndexSet              &myrange);
+  void
+  distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
+                              const std::vector<IndexSet> &owned_set_per_cpu,
+                              const MPI_Comm &             mpi_comm,
+                              const IndexSet &             myrange);
 
 #endif
 
@@ -291,40 +298,42 @@ namespace SparsityTools
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcMETISNotInstalled,
-                    "The function you called requires METIS, but you did not "
-                    "configure deal.II with METIS.");
+  DeclExceptionMsg(ExcMETISNotInstalled,
+                   "The function you called requires METIS, but you did not "
+                   "configure deal.II with METIS.");
 
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidNumberOfPartitions,
-                  int,
-                  << "The number of partitions you gave is " << arg1
-                  << ", but must be greater than zero.");
+  DeclException1(ExcInvalidNumberOfPartitions,
+                 int,
+                 << "The number of partitions you gave is " << arg1
+                 << ", but must be greater than zero.");
 
   /**
    * Exception
    */
-  DeclException1 (ExcMETISError,
-                  int,
-                  << "    An error with error number " << arg1
-                  << " occurred while calling a METIS function");
+  DeclException1(ExcMETISError,
+                 int,
+                 << "    An error with error number " << arg1
+                 << " occurred while calling a METIS function");
 
   /**
    * Exception
    */
-  DeclException2 (ExcInvalidArraySize,
-                  int, int,
-                  << "The array has size " << arg1 << " but should have size "
-                  << arg2);
+  DeclException2(ExcInvalidArraySize,
+                 int,
+                 int,
+                 << "The array has size " << arg1 << " but should have size "
+                 << arg2);
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcZOLTANNotInstalled,
-                    "The function you called requires ZOLTAN, but you did not "
-                    "configure deal.II with ZOLTAN or zoltan_cpp.h is not available.");
-}
+  DeclExceptionMsg(
+    ExcZOLTANNotInstalled,
+    "The function you called requires ZOLTAN, but you did not "
+    "configure deal.II with ZOLTAN or zoltan_cpp.h is not available.");
+} // namespace SparsityTools
 
 /**
  * @}

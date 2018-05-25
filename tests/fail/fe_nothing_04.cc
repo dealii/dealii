@@ -18,63 +18,67 @@
 // test that FE_Nothing works as intended
 
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/fe/fe_nothing.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_raviart_thomas.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_refinement.h>
+
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  Triangulation<dim>       triangulation;
-  GridGenerator :: hyper_cube (triangulation, -0.5, 0.5);
+  Triangulation<dim> triangulation;
+  GridGenerator ::hyper_cube(triangulation, -0.5, 0.5);
   triangulation.refine_global(4);
 
-  hp::FECollection<dim>    fe_collection;
+  hp::FECollection<dim> fe_collection;
 
   // test the behavior of the FE_Nothing element
   // in multicomponent systems (for, e.g., solving
   // Stokes' equations).
 
-  fe_collection.push_back (FESystem<dim>(FE_RaviartThomas<dim>(0), 1,
-                                         FE_DGQ<dim>(0), 1));
+  fe_collection.push_back(
+    FESystem<dim>(FE_RaviartThomas<dim>(0), 1, FE_DGQ<dim>(0), 1));
 
-  fe_collection.push_back (FESystem<dim>(FE_Nothing<dim>(dim), 1,
-                                         FE_Nothing<dim>(), 1));
+  fe_collection.push_back(
+    FESystem<dim>(FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1));
 
 
-  hp::DoFHandler<dim>      dof_handler (triangulation);
+  hp::DoFHandler<dim> dof_handler(triangulation);
 
   // loop over cells, and set cells
   // within a circle to be of type
   // FE_Nothing, while outside the
   // circle to be of type RT(0)/DG(0)
 
-  typename hp::DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
+                                                              .begin_active(),
+                                                     endc = dof_handler.end();
 
   for (; cell != endc; cell++)
     {
       Point<dim> center = cell->center();
-      if (std::sqrt(center.square()) < 0.25 )
+      if (std::sqrt(center.square()) < 0.25)
         cell->set_active_fe_index(1);
       else
         cell->set_active_fe_index(0);
@@ -82,28 +86,27 @@ void test ()
 
   // attempt to distribute dofs
 
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
   deallog << "   Number of active cells:       "
-          << triangulation.n_active_cells()
-          << std::endl
-          << "   Number of degrees of freedom: "
-          << dof_handler.n_dofs()
+          << triangulation.n_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  //test<1> ();
-  test<2> ();
-  test<3> ();
+  // test<1> ();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

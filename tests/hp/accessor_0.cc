@@ -26,7 +26,8 @@
 
 #include "../tests.h"
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::boolalpha;
@@ -38,15 +39,15 @@ int main()
   triangulation.refine_global(2);
 
   hp::FECollection<1> fe_collection;
-  hp::DoFHandler<1> dof_handler(triangulation);
+  hp::DoFHandler<1>   dof_handler(triangulation);
   fe_collection.push_back(FE_Q<1>(2));
   fe_collection.push_back(FE_Q<1>(4));
   fe_collection.push_back(FE_Q<1>(6));
 
   const unsigned int n_fe_indices = 3;
   {
-    typename hp::DoFHandler<1>::active_cell_iterator
-    cell = dof_handler.begin_active();
+    typename hp::DoFHandler<1>::active_cell_iterator cell =
+      dof_handler.begin_active();
     dof_handler.begin_active()->set_active_fe_index(1);
     ++cell; // go to cell 1
     ++cell; // go to cell 2
@@ -60,16 +61,13 @@ int main()
 
   std::vector<types::global_dof_index> dof_indices;
 
-  typename hp::DoFHandler<1>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
+  typename hp::DoFHandler<1>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
-      deallog << "==================================="
-              << std::endl;
-      deallog << "cell center: "
-              << cell->center()
-              << std::endl;
+      deallog << "===================================" << std::endl;
+      deallog << "cell center: " << cell->center() << std::endl;
 
       dof_indices.resize(fe_collection[cell->active_fe_index()].dofs_per_cell);
       cell->get_dof_indices(dof_indices);
@@ -86,16 +84,16 @@ int main()
 
       // see if we have a neighbor on the right. If so, the common vertex
       // should be associated with two FE indices.
-      const typename hp::DoFHandler<1>::active_cell_iterator neighbor = cell->neighbor(1);
+      const typename hp::DoFHandler<1>::active_cell_iterator neighbor =
+        cell->neighbor(1);
       if (neighbor != dof_handler.end())
         {
-          const unsigned int current_index = cell->active_fe_index();
+          const unsigned int current_index  = cell->active_fe_index();
           const unsigned int neighbor_index = neighbor->active_fe_index();
           deallog << "dof index (current cell, current index): "
                   << cell->face(1)->dof_index(0, current_index)
                   << " (neighbor cell, current index): "
-                  << neighbor->face(0)->dof_index(0, current_index)
-                  << std::endl
+                  << neighbor->face(0)->dof_index(0, current_index) << std::endl
                   << "dof index (current cell, neighbor index): "
                   << cell->face(1)->dof_index(0, neighbor_index)
                   << " (neighbor cell, neighbor index): "
@@ -107,15 +105,16 @@ int main()
         {
           const bool index_is_active = cell->fe_index_is_active(fe_index);
           deallog << "cell uses fe index " << fe_index << ": "
-                  << index_is_active
-                  << std::endl;
+                  << index_is_active << std::endl;
 
-          for (unsigned int face_n = 0; face_n < GeometryInfo<1>::faces_per_cell;
+          for (unsigned int face_n = 0;
+               face_n < GeometryInfo<1>::faces_per_cell;
                ++face_n)
             {
-              AssertThrow (&cell->face(face_n)->get_fe(fe_index) == &fe_collection[fe_index],
-                           ExcMessage("The result of get_fe should always return"
-                                      " a known finite element."));
+              AssertThrow(&cell->face(face_n)->get_fe(fe_index) ==
+                            &fe_collection[fe_index],
+                          ExcMessage("The result of get_fe should always return"
+                                     " a known finite element."));
 
               if (index_is_active)
                 {

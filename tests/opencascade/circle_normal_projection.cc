@@ -17,58 +17,59 @@
 // Create a circle, a Triangulation, and try to project normally on
 // it.
 
-#include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/opencascade/manifold_lib.h>
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-
-#include <gp_Pnt.hxx>
-#include <gp_Dir.hxx>
-#include <gp_Ax2.hxx>
-#include <GC_MakeCircle.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
-#include <TopoDS_Wire.hxx>
+#include <GC_MakeCircle.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopoDS_Wire.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Pnt.hxx>
+
+#include "../tests.h"
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   // The circle passing through the
   // vertices of the unit square
-  gp_Dir z_axis(0.,0.,1.);
-  gp_Pnt center(.5,.5,0.);
-  gp_Ax2 axis(center, z_axis);
-  Standard_Real radius(std::sqrt(2.)/2.);
+  gp_Dir        z_axis(0., 0., 1.);
+  gp_Pnt        center(.5, .5, 0.);
+  gp_Ax2        axis(center, z_axis);
+  Standard_Real radius(std::sqrt(2.) / 2.);
 
   GC_MakeCircle make_circle(axis, radius);
   Handle(Geom_Circle) circle = make_circle.Value();
-  TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(circle);
+  TopoDS_Edge edge           = BRepBuilderAPI_MakeEdge(circle);
 
   // Create a boundary projector.
-  NormalProjectionManifold<2,3> boundary_line(edge);
+  NormalProjectionManifold<2, 3> boundary_line(edge);
 
   // This one is for checking: This
   // is what deal.II would do for a
   // circle.
-  SphericalManifold<2,3> boundary_line_deal (Point<3>(.5,.5,0));
+  SphericalManifold<2, 3> boundary_line_deal(Point<3>(.5, .5, 0));
 
 
 
   // The unit square.
-  Triangulation<2,3> tria;
+  Triangulation<2, 3> tria;
   GridGenerator::hyper_cube(tria);
 
   // Set the exterior boundary
@@ -88,7 +89,7 @@ int main ()
   // You can open the generated file
   // with paraview.
   GridOut gridout;
-  gridout.write_ucd (tria, logfile);
+  gridout.write_ucd(tria, logfile);
 
   return 0;
 }

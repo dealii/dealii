@@ -15,19 +15,21 @@
 
 // check PointerMatrix:checkTvmult_add
 
-#include "../tests.h"
-#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 template <typename number>
 void
-checkTvmult_add(FullMatrix<number> &A, Vector<number> &V, char *name =
-                  "Test Matrix")
+checkTvmult_add(FullMatrix<number> &A,
+                Vector<number> &    V,
+                char *              name = "Test Matrix")
 {
   deallog << "Tvmult_add" << std::endl;
 
-  PointerMatrix<FullMatrix<number>, Vector<number> > P(&A, name);
+  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name);
 
   deallog << "Result vector set to all ones and to be added with result"
           << std::endl;
@@ -59,14 +61,12 @@ checkTvmult_add(FullMatrix<number> &A, Vector<number> &V, char *name =
 int
 main()
 {
-
   std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  const double Adata[] =
-  { 2, 3, 4, 5 };
+  const double Adata[] = {2, 3, 4, 5};
 
   FullMatrix<double> A(2, 2);
   A.fill(Adata);

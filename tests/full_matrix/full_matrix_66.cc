@@ -23,13 +23,11 @@
 
 
 
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
   m = IdentityMatrix(5);
-  print_matrix (m);
+  print_matrix(m);
 }
-

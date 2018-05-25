@@ -16,17 +16,20 @@
 
 // Test VectorFunctionTensorFunction
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
+
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-class X : public TensorFunction<1,dim>
+class X : public TensorFunction<1, dim>
 {
 public:
-  virtual Tensor<1,dim> value (const Point<dim> &p) const
+  virtual Tensor<1, dim>
+  value(const Point<dim> &p) const
   {
     return p;
   }
@@ -34,37 +37,33 @@ public:
 
 
 template <int dim>
-void check1 ()
+void
+check1()
 {
-  X<dim> x;
-  VectorFunctionFromTensorFunction<dim>
-  object (x, 1, dim+2);
+  X<dim>                                x;
+  VectorFunctionFromTensorFunction<dim> object(x, 1, dim + 2);
 
-  AssertThrow (object.n_components == dim+2, ExcInternalError());
+  AssertThrow(object.n_components == dim + 2, ExcInternalError());
 
-  for (unsigned int i=0; i<10; ++i)
+  for (unsigned int i = 0; i < 10; ++i)
     {
       Point<dim> p;
-      for (unsigned int d=0; d<dim; ++d)
-        p[d] = i+d;
+      for (unsigned int d = 0; d < dim; ++d)
+        p[d] = i + d;
 
-      for (unsigned int c=0; c<dim+2; ++c)
-        if (c==0 || c==dim+1)
-          AssertThrow (object.value(p,c) == 0,
-                       ExcInternalError())
-          else
-            AssertThrow (object.value(p,c) == p[c-1],
-                         ExcInternalError());
+      for (unsigned int c = 0; c < dim + 2; ++c)
+        if (c == 0 || c == dim + 1)
+          AssertThrow(object.value(p, c) == 0,
+                      ExcInternalError()) else AssertThrow(object.value(p, c) ==
+                                                             p[c - 1],
+                                                           ExcInternalError());
 
-      Vector<double> v(dim+2);
-      object.vector_value (p, v);
-      for (unsigned int c=0; c<dim+2; ++c)
-        if (c==0 || c==dim+1)
-          AssertThrow (v(c) == 0,
-                       ExcInternalError())
-          else
-            AssertThrow (v(c) == p[c-1],
-                         ExcInternalError());
+      Vector<double> v(dim + 2);
+      object.vector_value(p, v);
+      for (unsigned int c = 0; c < dim + 2; ++c)
+        if (c == 0 || c == dim + 1)
+          AssertThrow(v(c) == 0, ExcInternalError()) else AssertThrow(
+            v(c) == p[c - 1], ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -72,16 +71,14 @@ void check1 ()
 
 
 
-
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 
-  check1<1> ();
-  check1<2> ();
-  check1<3> ();
+  check1<1>();
+  check1<2>();
+  check1<3>();
 }
-
-

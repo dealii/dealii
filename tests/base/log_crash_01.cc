@@ -18,11 +18,13 @@
 // document crash in deallog related to missing newline
 
 
-#include "../tests.h"
 #include <limits>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

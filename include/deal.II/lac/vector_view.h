@@ -18,8 +18,10 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
+
 #include <deal.II/lac/vector.h>
 
 #include <cstdio>
@@ -133,7 +135,6 @@ template <typename Number>
 class DEAL_II_DEPRECATED VectorView : public Vector<Number>
 {
 public:
-
   /**
    * Declare type for container size.
    */
@@ -204,27 +205,30 @@ public:
    * In any case, you should not rely on this behavior, and you should only
    * call this reinit function if you really know what you are doing.
    */
-  virtual void reinit (const size_type N,
-                       const bool         omit_zeroing_entries=false) override;
+  virtual void
+  reinit(const size_type N, const bool omit_zeroing_entries = false) override;
 
   /**
    * This reinit function is equivalent to constructing a new object with the
    * given size, starting from the pointer ptr.
    */
-  void reinit(const size_type N, Number *ptr);
+  void
+  reinit(const size_type N, Number *ptr);
 
   /**
    * This reinit function is equivalent to constructing a new object with the
    * given size, starting from the pointer ptr. The same considerations made
    * for the constructor apply here.
    */
-  void reinit(const size_type N, const Number *ptr);
+  void
+  reinit(const size_type N, const Number *ptr);
 
   /**
    * This function is here to prevent memory corruption. It should never be
    * called, and will throw an exception if you try to do so.
    */
-  virtual void swap (Vector<Number> &v) override;
+  virtual void
+  swap(Vector<Number> &v) override;
 };
 
 
@@ -235,36 +239,34 @@ public:
 #ifndef DOXYGEN
 
 template <typename Number>
-inline
-VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
+inline VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
 {
-  this->vec_size      = new_size;
-  this->max_vec_size  = new_size;
+  this->vec_size     = new_size;
+  this->max_vec_size = new_size;
   // release the pointer, but do not delete the object pointed to
   this->values.release();
-  this->values.reset (ptr);
+  this->values.reset(ptr);
 }
 
 
 
 template <typename Number>
-inline
-VectorView<Number>::VectorView(const size_type new_size, const Number *ptr)
+inline VectorView<Number>::VectorView(const size_type new_size,
+                                      const Number *  ptr)
 {
-  this->vec_size      = new_size;
-  this->max_vec_size  = new_size;
-  this->values.reset (const_cast<Number *>(ptr));
+  this->vec_size     = new_size;
+  this->max_vec_size = new_size;
+  this->values.reset(const_cast<Number *>(ptr));
 }
 
 
 
 template <typename Number>
-inline
-VectorView<Number>::~VectorView()
+inline VectorView<Number>::~VectorView()
 {
   // avoid that the base class releases
   // memory it doesn't own
-  this->vec_size = 0;
+  this->vec_size     = 0;
   this->max_vec_size = 0;
 
   // release the pointer, but do not delete the object pointed to
@@ -273,11 +275,10 @@ VectorView<Number>::~VectorView()
 
 
 template <typename Number>
-inline
-void VectorView<Number>::reinit(const size_type N,
-                                const bool omit_zeroing_entries)
+inline void
+VectorView<Number>::reinit(const size_type N, const bool omit_zeroing_entries)
 {
-  this->vec_size = N;
+  this->vec_size     = N;
   this->max_vec_size = N;
   if (omit_zeroing_entries == false)
     Vector<Number>::operator=(static_cast<Number>(0));
@@ -285,32 +286,32 @@ void VectorView<Number>::reinit(const size_type N,
 
 
 template <typename Number>
-inline
-void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
+inline void
+VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 {
-  this->vec_size      = new_size;
-  this->max_vec_size  = new_size;
+  this->vec_size     = new_size;
+  this->max_vec_size = new_size;
   // release the pointer, but do not delete the object pointed to
   this->values.release();
-  this->values.reset (ptr);
+  this->values.reset(ptr);
 }
 
 
 template <typename Number>
-inline
-void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
+inline void
+VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 {
-  this->vec_size      = new_size;
-  this->max_vec_size  = new_size;
+  this->vec_size     = new_size;
+  this->max_vec_size = new_size;
   // release the pointer, but do not delete the object pointed to
   this->values.release();
-  this->values.reset (const_cast<Number *>(ptr));
+  this->values.reset(const_cast<Number *>(ptr));
 }
 
 
 template <typename Number>
-inline
-void VectorView<Number>::swap(Vector<Number> &)
+inline void
+VectorView<Number>::swap(Vector<Number> &)
 {
   AssertThrow(false, ExcMessage("Can't swap a VectorView with a Vector!"));
 }

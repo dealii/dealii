@@ -17,34 +17,39 @@
 
 // check Vector<double>::reinit(fast)
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
-  v.reinit (13, true);
+  v.reinit(13, true);
 
-  AssertThrow (v.size() == 13, ExcInternalError());
+  AssertThrow(v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -57,7 +62,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

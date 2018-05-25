@@ -17,28 +17,32 @@
 
 // check the P1NC element's gradient on a genuine quadrilateral.
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/fe/fe_p1nc.h>
+#include <deal.II/fe/fe_values.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
 #include <string>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-Point<dim> bilinear (const Point<dim> &p)
+Point<dim>
+bilinear(const Point<dim> &p)
 {
   Point<dim> q = p;
-  if (dim>=2)
+  if (dim >= 2)
     {
-      q(0) = 16.*p(0) +4.*p(1) -10.*p(0)*p(1);
-      q(1) = 6.*p(1) +4.*p(0)*p(1);
+      q(0) = 16. * p(0) + 4. * p(1) - 10. * p(0) * p(1);
+      q(1) = 6. * p(1) + 4. * p(0) * p(1);
     }
 
   return q;
@@ -51,24 +55,23 @@ void
 check()
 {
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation, 0., 1.);
-  GridTools::transform (&bilinear<dim>, triangulation);
+  GridGenerator::hyper_cube(triangulation, 0., 1.);
+  GridTools::transform(&bilinear<dim>, triangulation);
 
-  FE_P1NC fe;
-  DoFHandler<dim> dof_handler (triangulation);
+  FE_P1NC         fe;
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  QGauss<dim> quadrature(3);
-  FEValues<dim> fe_values (fe, quadrature, update_gradients | update_q_points);
-  fe_values.reinit (dof_handler.begin_active());
+  QGauss<dim>   quadrature(3);
+  FEValues<dim> fe_values(fe, quadrature, update_gradients | update_q_points);
+  fe_values.reinit(dof_handler.begin_active());
 
-  for (unsigned int q=0; q<quadrature.size(); ++q)
+  for (unsigned int q = 0; q < quadrature.size(); ++q)
     {
-      deallog << "index=" << q
-              << " position=" << fe_values.quadrature_point(q)
+      deallog << "index=" << q << " position=" << fe_values.quadrature_point(q)
               << " values=";
-      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-        deallog << '[' << fe_values.shape_grad(i,q) << "] ";
+      for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        deallog << '[' << fe_values.shape_grad(i, q) << "] ";
       deallog << std::endl;
     }
 }
@@ -76,7 +79,7 @@ check()
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(5);
   deallog << std::fixed;
   deallog.attach(logfile);

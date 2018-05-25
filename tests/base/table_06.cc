@@ -23,33 +23,30 @@
 // typically fail even if the implementation of TableBase is correct. When
 // adjusting the output, make sure to check this test with valgrind.
 
-#include "../tests.h"
-
 #include <deal.II/base/table.h>
+
+#include "../tests.h"
 
 // make function virtual to ensure that the function table is correctly copied
 class FunctionBase
 {
 public:
-  ~FunctionBase() {}
+  ~FunctionBase()
+  {}
 
-  virtual void do_test() = 0;
+  virtual void
+  do_test() = 0;
 };
 
 class Function
 {
 public:
-  Function ()
-    :
-    size_ (2)
+  Function() : size_(2)
   {
     deallog << "Construct object" << std::endl;
   }
 
-  Function (const Function &f)
-    :
-    size_ (f.size_),
-    vec (f.vec)
+  Function(const Function &f) : size_(f.size_), vec(f.vec)
   {
     deallog << "Copy construct object" << std::endl;
   }
@@ -59,29 +56,31 @@ public:
     deallog << "Destruct with size " << vec.size() << std::endl;
   }
 
-  virtual void do_test()
+  virtual void
+  do_test()
   {
     vec.resize(size_++);
     deallog << "Resize vector to " << vec.size() << std::endl;
   }
 
 private:
-  unsigned int size_;
+  unsigned int              size_;
   std::vector<unsigned int> vec;
 };
 
-int main()
+int
+main()
 {
   initlog();
-  dealii::Table<2,Function> table;
-  table.reinit(dealii::TableIndices<2>(2,1));
+  dealii::Table<2, Function> table;
+  table.reinit(dealii::TableIndices<2>(2, 1));
   table[1][0].do_test();
   table[0][0].do_test();
-  table.reinit(dealii::TableIndices<2>(1,1), false);
+  table.reinit(dealii::TableIndices<2>(1, 1), false);
   table[0][0].do_test();
-  table.reinit(dealii::TableIndices<2>(1,1), true);
+  table.reinit(dealii::TableIndices<2>(1, 1), true);
   table[0][0].do_test();
-  table.reinit(0,0);
-  table.reinit(dealii::TableIndices<2>(2,2));
+  table.reinit(0, 0);
+  table.reinit(dealii::TableIndices<2>(2, 2));
   table[0][1].do_test();
 }

@@ -18,23 +18,26 @@
 // its completion. the task sleeps for a bit to make sure that the waiting
 // code works alright
 
-#include "../tests.h"
-#include <unistd.h>
-
 #include <deal.II/base/thread_management.h>
 
+#include <unistd.h>
 
-void test ()
+#include "../tests.h"
+
+
+void
+test()
 {
-  sleep (3);
+  sleep(3);
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  Threads::Task<> t = Threads::new_task (test);
-  t.join ();
+  Threads::Task<> t = Threads::new_task(test);
+  t.join();
 }

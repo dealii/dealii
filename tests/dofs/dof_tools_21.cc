@@ -14,17 +14,21 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-#include "dof_tools_periodic.h"
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/lac/vector.h>
+
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
+
 #include <sstream>
+
+#include "../tests.h"
+#include "dof_tools_periodic.h"
 
 // A simple test for
 //   DoFTools::
@@ -42,43 +46,40 @@
 
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
-  Functions::CosineFunction<dim> test_func (dof_handler.get_fe().n_components ());
+  Functions::CosineFunction<dim> test_func(dof_handler.get_fe().n_components());
 
   ConstraintMatrix cm;
 
   // Apply periodic boundary conditions only in the one direction where
   // we can match the (locally refined) faces:
-  DoFTools::make_periodicity_constraints (dof_handler.begin(0)->face(0),
-                                          dof_handler.begin(0)->face(1),
-                                          cm);
-  cm.close ();
+  DoFTools::make_periodicity_constraints(
+    dof_handler.begin(0)->face(0), dof_handler.begin(0)->face(1), cm);
+  cm.close();
 
-  deallog << cm.n_constraints () << std::endl;
-  deallog << cm.max_constraint_indirections () << std::endl;
+  deallog << cm.n_constraints() << std::endl;
+  deallog << cm.max_constraint_indirections() << std::endl;
 
-  QGauss<dim> quadrature (6);
+  QGauss<dim> quadrature(6);
 
-  Vector<double> unconstrained (dof_handler.n_dofs ());
-  Vector<double> constrained (dof_handler.n_dofs ());
+  Vector<double> unconstrained(dof_handler.n_dofs());
+  Vector<double> constrained(dof_handler.n_dofs());
 
   // Ensure that we can interpolate:
   if (dof_handler.get_fe().get_unit_support_points().size() == 0)
     return;
 
-  VectorTools::interpolate (dof_handler,
-                            test_func,
-                            unconstrained);
+  VectorTools::interpolate(dof_handler, test_func, unconstrained);
 
   constrained = unconstrained;
-  cm.distribute (constrained);
+  cm.distribute(constrained);
 
   constrained -= unconstrained;
 
   const double p_l2_error = constrained.l2_norm();
 
-  Assert (p_l2_error < 1e-11, ExcInternalError());
+  Assert(p_l2_error < 1e-11, ExcInternalError());
 
   deallog << "L2_Error : " << p_l2_error << std::endl;
 }

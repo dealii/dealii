@@ -26,9 +26,10 @@
 // Tests TridiagonalMatrix::print
 
 
-#include "../tests.h"
 #include <deal.II/lac/tridiagonal_matrix.h>
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 
@@ -38,13 +39,15 @@ void
 matrix1(TridiagonalMatrix<number> &M)
 {
   const unsigned int n = M.n();
-  for (unsigned int i=0; i<n; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      M(i,i) = 2.;
+      M(i, i) = 2.;
       // Set both diagonals, one will
       // override other.
-      if (i>0) M(i,i-1) = -1.;
-      if (i<n-1) M(i,i+1) = -1.;
+      if (i > 0)
+        M(i, i - 1) = -1.;
+      if (i < n - 1)
+        M(i, i + 1) = -1.;
     }
 }
 
@@ -55,11 +58,13 @@ void
 matrix4(TridiagonalMatrix<number> &M)
 {
   const unsigned int n = M.n();
-  for (unsigned int i=0; i<n; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      M(i,i) = 2.+i;
-      if (i>0) M(i,i-1) = 0.-i;
-      if (i<n-1) M(i,i+1) = -1.-i;
+      M(i, i) = 2. + i;
+      if (i > 0)
+        M(i, i - 1) = 0. - i;
+      if (i < n - 1)
+        M(i, i + 1) = -1. - i;
     }
 }
 
@@ -69,51 +74,51 @@ void
 check_vmult(TridiagonalMatrix<number> &M)
 {
   const unsigned int n = M.n();
-  Vector<number> u(n);
-  Vector<number> v(n);
-  Vector<number> w(n);
+  Vector<number>     u(n);
+  Vector<number>     v(n);
+  Vector<number>     w(n);
 
-  for (unsigned int i=0; i<n; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     u(i) = 1 << i;
 
   deallog << "u     ";
-  for (unsigned int i=0; i<u.size(); ++i)
+  for (unsigned int i = 0; i < u.size(); ++i)
     deallog << ' ' << std::setw(6) << u(i);
   deallog << std::endl;
 
-  M.vmult(v,u);
+  M.vmult(v, u);
 
   deallog << "u^TMw ";
-  for (unsigned int i=0; i<w.size(); ++i)
+  for (unsigned int i = 0; i < w.size(); ++i)
     {
-      w = 0.;
+      w    = 0.;
       w(i) = 2.;
-//      number p1 = v*w;
-      number p2 = M.matrix_scalar_product(u,w);
+      //      number p1 = v*w;
+      number p2 = M.matrix_scalar_product(u, w);
       deallog << ' ' << std::setw(6) << p2;
     }
   deallog << std::endl;
 
   deallog << "vmult ";
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << std::setw(6) << v(i);
   deallog << std::endl;
 
-  M.Tvmult_add(v,u);
+  M.Tvmult_add(v, u);
   deallog << "+Tvm  ";
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << std::setw(6) << v(i);
   deallog << std::endl;
 
-  M.Tvmult(v,u);
+  M.Tvmult(v, u);
   deallog << "Tvmult";
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << std::setw(6) << v(i);
   deallog << std::endl;
 
-  M.vmult_add(v,u);
+  M.vmult_add(v, u);
   deallog << "+vm   ";
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << std::setw(6) << v(i);
   deallog << std::endl;
 }
@@ -123,7 +128,7 @@ template <typename number>
 void
 check(unsigned int size)
 {
-  TridiagonalMatrix<number>M(size, true);
+  TridiagonalMatrix<number> M(size, true);
   deallog << "all_zero " << M.all_zero();
   matrix1(M);
   deallog << " " << M.all_zero() << std::endl;
@@ -136,7 +141,8 @@ check(unsigned int size)
   check_vmult(M);
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

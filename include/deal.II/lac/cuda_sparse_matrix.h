@@ -17,13 +17,16 @@
 #define dealii_cuda_sparse_matrix_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/subscriptor.h>
 
 #ifdef DEAL_II_WITH_CUDA
-#include <deal.II/base/cuda.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/cuda_vector.h>
-#include <cusparse.h>
+#  include <deal.II/base/cuda.h>
+
+#  include <deal.II/lac/cuda_vector.h>
+#  include <deal.II/lac/sparse_matrix.h>
+
+#  include <cusparse.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,7 +45,7 @@ namespace CUDAWrappers
    * @date 2018
    */
   template <typename Number>
-  class SparseMatrix: public virtual Subscriptor
+  class SparseMatrix : public virtual Subscriptor
   {
   public:
     /**
@@ -75,11 +78,11 @@ namespace CUDAWrappers
     SparseMatrix();
 
     /**
-     * Constructor. Takes a Utilities::CUDA::Handle and a sparse matrix on the host.
-     * The sparse matrix on the host is copied on the device and the elements
-     * are reordered according to the format supported by cuSPARSE.
+     * Constructor. Takes a Utilities::CUDA::Handle and a sparse matrix on the
+     * host. The sparse matrix on the host is copied on the device and the
+     * elements are reordered according to the format supported by cuSPARSE.
      */
-    SparseMatrix(Utilities::CUDA::Handle &handle,
+    SparseMatrix(Utilities::CUDA::Handle &             handle,
                  const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
 
     /**
@@ -103,8 +106,9 @@ namespace CUDAWrappers
      * to the device and the elementes are reordered according to the format
      * supported by cuSPARSE.
      */
-    void reinit(Utilities::CUDA::Handle &handle,
-                const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
+    void
+    reinit(Utilities::CUDA::Handle &             handle,
+           const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
     //@}
 
     /**
@@ -115,20 +119,23 @@ namespace CUDAWrappers
      * Return the dimension of the codomain (or range) space. Note that the
      * matrix is of dimension $m \times n$.
      */
-    size_type m() const;
+    size_type
+    m() const;
 
     /**
      * Return the dimension of the domain space. Note that the matrix is of
      * dimension $m \times n$.
      */
-    size_type n() const;
+    size_type
+    n() const;
 
     /**
      * Return the number of nonzero elements of this matrix. Actually, it
      * returns the number of entries in the sparsity pattern; if any of the
      * entries should happen to be zero, it is counted anyway.
      */
-    std::size_t n_nonzero_elements() const;
+    std::size_t
+    n_nonzero_elements() const;
     //@}
 
     /**
@@ -138,12 +145,14 @@ namespace CUDAWrappers
     /**
      * Multiply the entire matrix by a fixed factor.
      */
-    SparseMatrix &operator*= (const Number factor);
+    SparseMatrix &
+    operator*=(const Number factor);
 
     /**
      * Divide the entrie matrix by a fixed factor.
      */
-    SparseMatrix &operator/= (const Number factor);
+    SparseMatrix &
+    operator/=(const Number factor);
     //@}
 
     /**
@@ -154,31 +163,35 @@ namespace CUDAWrappers
      * Matrix-vector multiplication: let $dst = M \cdot src$ with $M$
      * being this matrix.
      */
-    void vmult(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-               const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
+    void
+    vmult(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+          const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
      * Matrix-vector multiplication: let $dst = M^T \cdot src$ with
      * $M$ being this matrix. This function does the same as vmult() but
      * takes this transposed matrix.
      */
-    void Tvmult(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-                const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
+    void
+    Tvmult(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+           const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
      * Adding matrix-vector multiplication. Add $M \cdot src$ on $dst$
      * with $M$ being this matrix.
      */
-    void vmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-                   const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
+    void
+    vmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+              const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
      * Adding matrix-vector multiplication. Add $M^T \cdot src$ to
      * $dst$ with $M$ being this matrix. This function foes the same
      * as vmult_add() but takes the transposed matrix.
      */
-    void Tvmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-                    const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
+    void
+    Tvmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+               const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
      * Return the square of the norm of the vector $v$ with respect to the
@@ -189,13 +202,17 @@ namespace CUDAWrappers
      *
      * Obviously, the matrix needs to be quadratic for this operation.
      */
-    Number matrix_norm_square(const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
+    Number
+    matrix_norm_square(
+      const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
 
     /**
      * Compute the matrix scalar product $\left(u,Mv\right)$.
      */
-    Number matrix_scalar_product(const LinearAlgebra::CUDAWrappers::Vector<Number> &u,
-                                 const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
+    Number
+    matrix_scalar_product(
+      const LinearAlgebra::CUDAWrappers::Vector<Number> &u,
+      const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
 
     /**
      * Compute the residual of an equation $M \cdot x=b$, where the residual is
@@ -204,9 +221,10 @@ namespace CUDAWrappers
      *
      * Source $x$ and destination $dst$ must not be the same vector.
      */
-    Number residual(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
-                    const LinearAlgebra::CUDAWrappers::Vector<Number> &x,
-                    const LinearAlgebra::CUDAWrappers::Vector<Number> &b) const;
+    Number
+    residual(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+             const LinearAlgebra::CUDAWrappers::Vector<Number> &x,
+             const LinearAlgebra::CUDAWrappers::Vector<Number> &b) const;
     //@}
 
     /**
@@ -219,7 +237,8 @@ namespace CUDAWrappers
      * columns). This is the natural matrix norm that is compatible to the
      * $l_1$-norm for vectors, i.e., $|Mv|_1\leq |M|_1 |v|_1$.
      */
-    Number l1_norm() const;
+    Number
+    l1_norm() const;
 
     /**
      * Return the $l_\infty$-norm of the matrix, that is
@@ -228,13 +247,15 @@ namespace CUDAWrappers
      * compatible to the $l_\infty$-norm of vectors, i.e., $|Mv|_\infty \leq
      * |M|_\infty |v|_\infty$.
      */
-    Number linfty_norm() const;
+    Number
+    linfty_norm() const;
 
     /**
      * Return the frobenius norm of the matrix, i.e., the square root of the
      * sum of squares of all entries in the matrix.
      */
-    Number frobenius_norm() const;
+    Number
+    frobenius_norm() const;
     //@}
 
     /**
@@ -252,8 +273,8 @@ namespace CUDAWrappers
 
   private:
     /**
-     * cuSPARSE handle used to call cuSPARSE functions. The cuSPARSE handle needs
-     * to be mutable to be called in a const function.
+     * cuSPARSE handle used to call cuSPARSE functions. The cuSPARSE handle
+     * needs to be mutable to be called in a const function.
      */
     mutable cusparseHandle_t cusparse_handle;
 
@@ -296,8 +317,8 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline
-  unsigned int SparseMatrix<Number>::m() const
+  inline unsigned int
+  SparseMatrix<Number>::m() const
   {
     return n_rows;
   }
@@ -305,8 +326,8 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline
-  unsigned int SparseMatrix<Number>::n() const
+  inline unsigned int
+  SparseMatrix<Number>::n() const
   {
     return n_cols;
   }
@@ -314,12 +335,12 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline
-  std::size_t SparseMatrix<Number>::n_nonzero_elements() const
+  inline std::size_t
+  SparseMatrix<Number>::n_nonzero_elements() const
   {
     return nnz;
   }
-}
+} // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 

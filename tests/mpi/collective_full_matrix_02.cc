@@ -17,44 +17,49 @@
 
 // check Utilities::MPI::sum() for LAPACKFullMatrix objects
 
-#include "../tests.h"
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
-template <typename NumberType>
-void test(const unsigned int m = 13, const unsigned int n = 5)
-{
-  Assert( Utilities::MPI::job_supports_mpi(), ExcInternalError());
+#include "../tests.h"
 
-  LAPACKFullMatrix<NumberType> full_matrix(m,n);
+template <typename NumberType>
+void
+test(const unsigned int m = 13, const unsigned int n = 5)
+{
+  Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
+
+  LAPACKFullMatrix<NumberType> full_matrix(m, n);
   {
     unsigned int index = 0;
     for (unsigned int i = 0; i < full_matrix.m(); ++i)
       for (unsigned int j = 0; j < full_matrix.n(); ++j)
-        full_matrix(i,j) = index++;
+        full_matrix(i, j) = index++;
   }
 
-  LAPACKFullMatrix<NumberType> full_matrix_original(m,n);
+  LAPACKFullMatrix<NumberType> full_matrix_original(m, n);
   full_matrix_original = full_matrix;
 
   // inplace
   Utilities::MPI::sum(full_matrix, MPI_COMM_WORLD, full_matrix);
 
-  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   for (unsigned int i = 0; i < full_matrix.m(); ++i)
     for (unsigned int j = 0; j < full_matrix.n(); ++j)
-      Assert (full_matrix(i,j) == full_matrix_original(i,j) * double(numprocs), ExcInternalError());
+      Assert(full_matrix(i, j) == full_matrix_original(i, j) * double(numprocs),
+             ExcInternalError());
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "Ok" << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
       deallog.push("float");
@@ -69,5 +74,4 @@ int main(int argc, char *argv[])
       test<float>();
       test<double>();
     }
-
 }

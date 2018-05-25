@@ -16,47 +16,50 @@
 
 // check Tensor<2,dim>::operator[] (TableIndices)
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+
 #include <deal.II/lac/vector.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void check ()
+void
+check()
 {
-  typedef Tensor<3,dim> T;
-  T t;
-  for (unsigned int i=0; i<T::n_independent_components; ++i)
-    t[T::unrolled_to_component_indices (i)] = (i+1)*(i+2);
+  typedef Tensor<3, dim> T;
+  T                      t;
+  for (unsigned int i = 0; i < T::n_independent_components; ++i)
+    t[T::unrolled_to_component_indices(i)] = (i + 1) * (i + 2);
 
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = 0; j < dim; ++j)
+      for (unsigned int k = 0; k < dim; ++k)
         {
-          AssertThrow (TableIndices<3>(i,j,k)
-                       ==
-                       T::unrolled_to_component_indices (i*dim*dim+j*dim+k),
-                       ExcInternalError());
-          AssertThrow (T::component_to_unrolled_index(TableIndices<3>(i,j,k))
-                       ==
-                       i*dim*dim+j*dim+k,
-                       ExcInternalError());
-          AssertThrow (t[TableIndices<3>(i,j,k)] == t[i][j][k],
-                       ExcInternalError());
+          AssertThrow(
+            TableIndices<3>(i, j, k) ==
+              T::unrolled_to_component_indices(i * dim * dim + j * dim + k),
+            ExcInternalError());
+          AssertThrow(T::component_to_unrolled_index(TableIndices<3>(
+                        i, j, k)) == i * dim * dim + j * dim + k,
+                      ExcInternalError());
+          AssertThrow(t[TableIndices<3>(i, j, k)] == t[i][j][k],
+                      ExcInternalError());
         }
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  check<1> ();
-  check<2> ();
-  check<3> ();
+  check<1>();
+  check<2>();
+  check<3>();
 
   deallog << "OK" << std::endl;
 }

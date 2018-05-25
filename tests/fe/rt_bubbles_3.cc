@@ -17,28 +17,28 @@
 
 // Output is the constraint matrices of the RT_Bubbles element
 
-#include "../tests.h"
 #include <deal.II/fe/fe_rt_bubbles.h>
 
 #include <string>
 
+#include "../tests.h"
+
 #define PRECISION 8
 
 
-template<int dim>
+template <int dim>
 void
 test(const unsigned int degree)
 {
-  deallog << "FE_RT_Bubbles<" << dim << "> (" << degree << ")"
-          << std::endl;
+  deallog << "FE_RT_Bubbles<" << dim << "> (" << degree << ")" << std::endl;
 
-  FE_RT_Bubbles<dim> fe_rt_bubbles(degree);
+  FE_RT_Bubbles<dim>        fe_rt_bubbles(degree);
   const FullMatrix<double> &constraints = fe_rt_bubbles.constraints();
 
-  for (unsigned int i=0; i<constraints.m(); ++i)
+  for (unsigned int i = 0; i < constraints.m(); ++i)
     {
-      for (unsigned int j=0; j<constraints.n(); ++j)
-        deallog << constraints(i,j) << ' ';
+      for (unsigned int j = 0; j < constraints.n(); ++j)
+        deallog << constraints(i, j) << ' ';
       deallog << std::endl;
     }
 
@@ -50,12 +50,12 @@ test(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  for (unsigned int degree=1; degree<4; ++degree)
+  for (unsigned int degree = 1; degree < 4; ++degree)
     {
       test<2>(degree);
       test<3>(degree);

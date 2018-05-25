@@ -17,17 +17,19 @@
 //   dealii::BlockVector<double>
 //   dealii::BlockSparseMatrix<double>
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
+
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -36,16 +38,20 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/sparse_matrix.h>
+
 #include <deal.II/numerics/matrix_tools.h>
 
-#define PRINTME(name, var) \
-  deallog << name << ": [block 0] " << var.block(0) \
-          << "  [block 1] " << var.block(1) << std::endl;
+#include "../tests.h"
+
+#define PRINTME(name, var)                                            \
+  deallog << name << ": [block 0] " << var.block(0) << "  [block 1] " \
+          << var.block(1) << std::endl;
 
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
@@ -53,34 +59,33 @@ int main()
   static const int dim = 2;
 
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
   MappingQGeneric<dim> mapping_q1(1);
-  FESystem<dim> fe(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1);
-  DoFHandler<dim> dof_handler(triangulation);
+  FESystem<dim>        fe(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1);
+  DoFHandler<dim>      dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe);
 
-  std::vector<types::global_dof_index> dofs_per_component (2);
-  DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
-  const unsigned int n_u = dofs_per_component[0],
-                     n_p = dofs_per_component[1];
+  std::vector<types::global_dof_index> dofs_per_component(2);
+  DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
+  const unsigned int n_u = dofs_per_component[0], n_p = dofs_per_component[1];
 
   BlockDynamicSparsityPattern dsp(2, 2);
-  dsp.block(0, 0).reinit (n_u, n_u);
-  dsp.block(1, 0).reinit (n_p, n_u);
-  dsp.block(0, 1).reinit (n_u, n_p);
-  dsp.block(1, 1).reinit (n_p, n_p);
-  dsp.collect_sizes ();
-  DoFTools::make_sparsity_pattern (dof_handler, dsp);
+  dsp.block(0, 0).reinit(n_u, n_u);
+  dsp.block(1, 0).reinit(n_p, n_u);
+  dsp.block(0, 1).reinit(n_u, n_p);
+  dsp.block(1, 1).reinit(n_p, n_p);
+  dsp.collect_sizes();
+  DoFTools::make_sparsity_pattern(dof_handler, dsp);
 
   BlockSparsityPattern sparsity_pattern;
   sparsity_pattern.copy_from(dsp);
   sparsity_pattern.compress();
 
-  BlockSparseMatrix<double> a (sparsity_pattern);
-  BlockSparseMatrix<double> b (sparsity_pattern);
+  BlockSparseMatrix<double> a(sparsity_pattern);
+  BlockSparseMatrix<double> b(sparsity_pattern);
 
   for (unsigned int i = 0; i < a.n(); ++i)
     {
@@ -94,7 +99,7 @@ int main()
   auto op_b = linear_operator<BlockVector<double>>(b);
 
   {
-    decltype(op_a) op_x (a);
+    decltype(op_a) op_x(a);
     op_a = a;
     op_b = b;
   }
@@ -105,7 +110,7 @@ int main()
   op_a.reinit_domain_vector(u, true);
   for (unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double)(i + 1);
     }
 
   PRINTME("u", u);
@@ -151,8 +156,8 @@ int main()
 
   // operator*, operator*=
 
-  op_b.vmult(v,u);
-  op_a.vmult(w,v);
+  op_b.vmult(v, u);
+  op_a.vmult(w, v);
   PRINTME("(A(Bu))", x);
 
   (op_a * op_b).vmult(x, u);
@@ -165,8 +170,8 @@ int main()
 
   // solver interface:
 
-  SolverControl solver_control (1000, 1e-10);
-  SolverGMRES<BlockVector<double>> solver (solver_control);
+  SolverControl                    solver_control(1000, 1e-10);
+  SolverGMRES<BlockVector<double>> solver(solver_control);
 
   deallog.depth_file(0);
   solver.solve(op_b, v, u, PreconditionIdentity());
@@ -193,11 +198,13 @@ int main()
   deallog.depth_file(3);
   PRINTME("(inverse_operator(B)*B)u", w);
 
-  SolverControl inner_solver_control (1000, 1e-12);
-  SolverCG<BlockVector<double>> inner_solver (solver_control);
+  SolverControl                 inner_solver_control(1000, 1e-12);
+  SolverCG<BlockVector<double>> inner_solver(solver_control);
 
   deallog.depth_file(0);
-  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()), v, u,
+  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()),
+               v,
+               u,
                PreconditionIdentity());
   deallog.depth_file(3);
   PRINTME("solve(inverse_operator(B), v, u) == Bu", v);

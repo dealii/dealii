@@ -16,15 +16,17 @@
 
 // Test Polynomial
 
-#include "../tests.h"
 #include <deal.II/base/function_lib.h>
 
+#include "../tests.h"
+
 template <int dim>
-void check()
+void
+check()
 {
   unsigned int n_mon = 3;
 
-  Table<2,double> exponents(n_mon,dim);
+  Table<2, double> exponents(n_mon, dim);
 
   for (unsigned int i = 0; i < n_mon; ++i)
     for (unsigned int d = 0; d < dim; ++d)
@@ -32,12 +34,12 @@ void check()
 
   std::vector<double> coeffs(n_mon);
   for (unsigned int i = 0; i < n_mon; ++i)
-    coeffs[i] = std::pow(-1.0,static_cast<double>(i))*(i+1);
+    coeffs[i] = std::pow(-1.0, static_cast<double>(i)) * (i + 1);
 
   Functions::Polynomial<dim> poly(exponents, coeffs);
 
   Point<dim> p;
-  for (unsigned int d=0; d<dim; ++d)
+  for (unsigned int d = 0; d < dim; ++d)
     p[d] = d;
 
   deallog << dim << "-D check" << std::endl;
@@ -47,7 +49,7 @@ void check()
       deallog << coeffs[i];
       for (unsigned int d = 0; d < dim; ++d)
         deallog << " x" << d << "^" << exponents[i][d];
-      if (i < n_mon-1)
+      if (i < n_mon - 1)
         deallog << " + ";
     }
   deallog << std::endl;
@@ -62,20 +64,16 @@ void check()
   deallog << "Gradient: " << poly.gradient(p) << std::endl;
   deallog << " gradients checked" << std::endl;
   deallog << std::endl;
-
 }
 
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 
   check<1>();
   check<2>();
   check<3>();
-
 }
-
-
-

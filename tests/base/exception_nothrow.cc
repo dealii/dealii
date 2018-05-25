@@ -18,9 +18,10 @@
 
 #include "../tests.h"
 
-int main ()
+int
+main()
 {
   initlog();
   deal_II_exceptions::disable_abort_on_exception();
-  AssertNothrow(1==2, ExcInternalError());
+  AssertNothrow(1 == 2, ExcInternalError());
 }

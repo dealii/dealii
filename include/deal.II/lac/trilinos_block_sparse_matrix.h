@@ -23,11 +23,12 @@
 
 #  include <deal.II/base/table.h>
 #  include <deal.II/base/template_constraints.h>
+
 #  include <deal.II/lac/block_matrix_base.h>
-#  include <deal.II/lac/trilinos_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_parallel_block_vector.h>
-#  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
 
 #  include <cmath>
 
@@ -35,12 +36,12 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 class BlockSparsityPattern;
-template <typename number> class BlockSparseMatrix;
+template <typename number>
+class BlockSparseMatrix;
 
 
 namespace TrilinosWrappers
 {
-
   /*! @addtogroup TrilinosWrappers
    *@{
    */
@@ -79,7 +80,7 @@ namespace TrilinosWrappers
     /**
      * Typedef the type of the underlying matrix.
      */
-    typedef BaseClass::BlockType  BlockType;
+    typedef BaseClass::BlockType BlockType;
 
     /**
      * Import the typedefs from the base class.
@@ -104,19 +105,19 @@ namespace TrilinosWrappers
      * reinit(BlockSparsityPattern). The number of blocks per row and column
      * are then determined by that function.
      */
-    BlockSparseMatrix () = default;
+    BlockSparseMatrix() = default;
 
     /**
      * Destructor.
      */
-    ~BlockSparseMatrix () override;
+    ~BlockSparseMatrix() override;
 
     /**
      * Pseudo copy operator only copying empty objects. The sizes of the block
      * matrices need to be the same.
      */
     BlockSparseMatrix &
-    operator = (const BlockSparseMatrix &) = default;
+    operator=(const BlockSparseMatrix &) = default;
 
     /**
      * This operator assigns a scalar to a matrix. Since this does usually not
@@ -128,7 +129,7 @@ namespace TrilinosWrappers
      * previously used.
      */
     BlockSparseMatrix &
-    operator = (const double d);
+    operator=(const double d);
 
     /**
      * Resize the matrix, by setting the number of block rows and columns.
@@ -143,8 +144,8 @@ namespace TrilinosWrappers
      * SparsityPattern class here but rather let the user call whatever
      * function she desires.
      */
-    void reinit (const size_type n_block_rows,
-                 const size_type n_block_columns);
+    void
+    reinit(const size_type n_block_rows, const size_type n_block_columns);
 
     /**
      * Resize the matrix, by using an array of Epetra maps to determine the
@@ -152,9 +153,10 @@ namespace TrilinosWrappers
      * assumes that a quadratic block matrix is generated.
      */
     template <typename BlockSparsityPatternType>
-    void reinit (const std::vector<Epetra_Map>  &input_maps,
-                 const BlockSparsityPatternType &block_sparsity_pattern,
-                 const bool                      exchange_data = false);
+    void
+    reinit(const std::vector<Epetra_Map> & input_maps,
+           const BlockSparsityPatternType &block_sparsity_pattern,
+           const bool                      exchange_data = false);
 
     /**
      * Resize the matrix, by using an array of index sets to determine the
@@ -162,10 +164,11 @@ namespace TrilinosWrappers
      * assumes that a quadratic block matrix is generated.
      */
     template <typename BlockSparsityPatternType>
-    void reinit (const std::vector<IndexSet>    &input_maps,
-                 const BlockSparsityPatternType &block_sparsity_pattern,
-                 const MPI_Comm                 &communicator  = MPI_COMM_WORLD,
-                 const bool                      exchange_data = false);
+    void
+    reinit(const std::vector<IndexSet> &   input_maps,
+           const BlockSparsityPatternType &block_sparsity_pattern,
+           const MPI_Comm &                communicator  = MPI_COMM_WORLD,
+           const bool                      exchange_data = false);
 
     /**
      * Resize the matrix and initialize it by the given sparsity pattern.
@@ -173,7 +176,8 @@ namespace TrilinosWrappers
      * which all elements are stored locally.
      */
     template <typename BlockSparsityPatternType>
-    void reinit (const BlockSparsityPatternType &block_sparsity_pattern);
+    void
+    reinit(const BlockSparsityPatternType &block_sparsity_pattern);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -184,9 +188,10 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet arguments instead.
      */
     DEAL_II_DEPRECATED
-    void reinit (const std::vector<Epetra_Map>             &input_maps,
-                 const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
-                 const double                               drop_tolerance=1e-13);
+    void
+    reinit(const std::vector<Epetra_Map> &            input_maps,
+           const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
+           const double                               drop_tolerance = 1e-13);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -195,8 +200,9 @@ namespace TrilinosWrappers
      * deal.II matrix can be filtered away). Since no Epetra_Map is given, all
      * the elements will be locally stored.
      */
-    void reinit (const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
-                 const double                               drop_tolerance=1e-13);
+    void
+    reinit(const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
+           const double                               drop_tolerance = 1e-13);
 
     /**
      * Return the state of the matrix, i.e., whether compress() needs to be
@@ -205,7 +211,8 @@ namespace TrilinosWrappers
      * expensive to keep track of all operations that lead to the need for
      * compress().
      */
-    bool is_compressed () const;
+    bool
+    is_compressed() const;
 
     /**
      * This function collects the sizes of the sub-objects and stores them in
@@ -217,18 +224,21 @@ namespace TrilinosWrappers
      * <tt>compress()</tt>, so you don't need to call that function in case
      * you use <tt>collect_sizes()</tt>.
      */
-    void collect_sizes ();
+    void
+    collect_sizes();
 
     /**
      * Return the total number of nonzero elements of this matrix (summed
      * over all MPI processes).
      */
-    size_type n_nonzero_elements () const;
+    size_type
+    n_nonzero_elements() const;
 
     /**
      * Return the MPI communicator object in use with this matrix.
      */
-    MPI_Comm get_mpi_communicator () const;
+    MPI_Comm
+    get_mpi_communicator() const;
 
     /**
      * Return a vector of the underlying Trilinos Epetra_Map that sets the
@@ -240,7 +250,8 @@ namespace TrilinosWrappers
      * IndexSet arguments.
      */
     DEAL_II_DEPRECATED
-    std::vector<Epetra_Map> domain_partitioner () const;
+    std::vector<Epetra_Map>
+    domain_partitioner() const;
 
     /**
      * Return a vector of the underlying Trilinos Epetra_Map that sets the
@@ -252,21 +263,24 @@ namespace TrilinosWrappers
      * IndexSet arguments.
      */
     DEAL_II_DEPRECATED
-    std::vector<Epetra_Map> range_partitioner () const;
+    std::vector<Epetra_Map>
+    range_partitioner() const;
 
     /**
      * Return the partitioning of the domain space for the individual blocks of
      * this matrix, i.e., the partitioning of the block vectors this matrix has
      * to be multiplied with.
      */
-    std::vector<IndexSet> locally_owned_domain_indices() const;
+    std::vector<IndexSet>
+    locally_owned_domain_indices() const;
 
     /**
      * Return the partitioning of the range space for the individual blocks of
      * this matrix, i.e., the partitioning of the block vectors that result
      * from matrix-vector products.
      */
-    std::vector<IndexSet> locally_owned_range_indices() const;
+    std::vector<IndexSet>
+    locally_owned_range_indices() const;
 
     /**
      * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
@@ -275,8 +289,8 @@ namespace TrilinosWrappers
      * to define TrilinosWrappers::SparseMatrix::vmult.
      */
     template <typename VectorType1, typename VectorType2>
-    void vmult (VectorType1       &dst,
-                const VectorType2 &src) const;
+    void
+    vmult(VectorType1 &dst, const VectorType2 &src) const;
 
     /**
      * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
@@ -284,8 +298,8 @@ namespace TrilinosWrappers
      * matrix.
      */
     template <typename VectorType1, typename VectorType2>
-    void Tvmult (VectorType1       &dst,
-                 const VectorType2 &src) const;
+    void
+    Tvmult(VectorType1 &dst, const VectorType2 &src) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -299,9 +313,10 @@ namespace TrilinosWrappers
      *
      * This function only applicable if the matrix only has one block row.
      */
-    TrilinosScalar residual (MPI::BlockVector       &dst,
-                             const MPI::BlockVector &x,
-                             const MPI::BlockVector &b) const;
+    TrilinosScalar
+    residual(MPI::BlockVector &      dst,
+             const MPI::BlockVector &x,
+             const MPI::BlockVector &b) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -310,9 +325,10 @@ namespace TrilinosWrappers
      *
      * This function is only applicable if the matrix only has one block row.
      */
-    TrilinosScalar residual (MPI::BlockVector       &dst,
-                             const MPI::Vector      &x,
-                             const MPI::BlockVector &b) const;
+    TrilinosScalar
+    residual(MPI::BlockVector &      dst,
+             const MPI::Vector &     x,
+             const MPI::BlockVector &b) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -321,9 +337,10 @@ namespace TrilinosWrappers
      *
      * This function is only applicable if the matrix only has one block column.
      */
-    TrilinosScalar residual (MPI::Vector            &dst,
-                             const MPI::BlockVector &x,
-                             const MPI::Vector      &b) const;
+    TrilinosScalar
+    residual(MPI::Vector &           dst,
+             const MPI::BlockVector &x,
+             const MPI::Vector &     b) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -332,9 +349,10 @@ namespace TrilinosWrappers
      *
      * This function is only applicable if the matrix only has one block.
      */
-    TrilinosScalar residual (MPI::Vector       &dst,
-                             const MPI::Vector &x,
-                             const MPI::Vector &b) const;
+    TrilinosScalar
+    residual(MPI::Vector &      dst,
+             const MPI::Vector &x,
+             const MPI::Vector &b) const;
 
     /**
      * Make the clear() function in the base class visible, though it is
@@ -350,18 +368,24 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException4 (ExcIncompatibleRowNumbers,
-                    int, int, int, int,
-                    << "The blocks [" << arg1 << ',' << arg2 << "] and ["
-                    << arg3 << ',' << arg4 << "] have differing row numbers.");
+    DeclException4(ExcIncompatibleRowNumbers,
+                   int,
+                   int,
+                   int,
+                   int,
+                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
+                   << ',' << arg4 << "] have differing row numbers.");
 
     /**
      * Exception
      */
-    DeclException4 (ExcIncompatibleColNumbers,
-                    int, int, int, int,
-                    << "The blocks [" << arg1 << ',' << arg2 << "] and ["
-                    << arg3 << ',' << arg4 << "] have differing column numbers.");
+    DeclException4(ExcIncompatibleColNumbers,
+                   int,
+                   int,
+                   int,
+                   int,
+                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
+                   << ',' << arg4 << "] have differing column numbers.");
     ///@}
 
   private:
@@ -369,33 +393,36 @@ namespace TrilinosWrappers
      * Internal version of (T)vmult with two block vectors
      */
     template <typename VectorType1, typename VectorType2>
-    void vmult (VectorType1       &dst,
-                const VectorType2 &src,
-                const bool         transpose,
-                const std::integral_constant<bool, true>,
-                const std::integral_constant<bool, true>) const;
+    void
+    vmult(VectorType1 &      dst,
+          const VectorType2 &src,
+          const bool         transpose,
+          const std::integral_constant<bool, true>,
+          const std::integral_constant<bool, true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a block vector
      * but the destination vector is a non-block vector
      */
     template <typename VectorType1, typename VectorType2>
-    void vmult (VectorType1       &dst,
-                const VectorType2 &src,
-                const bool         transpose,
-                const std::integral_constant<bool, false>,
-                const std::integral_constant<bool, true>) const;
+    void
+    vmult(VectorType1 &      dst,
+          const VectorType2 &src,
+          const bool         transpose,
+          const std::integral_constant<bool, false>,
+          const std::integral_constant<bool, true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a non-block
      * vector but the destination vector is a block vector
      */
     template <typename VectorType1, typename VectorType2>
-    void vmult (VectorType1       &dst,
-                const VectorType2 &src,
-                const bool         transpose,
-                const std::integral_constant<bool, true>,
-                const std::integral_constant<bool, false>) const;
+    void
+    vmult(VectorType1 &      dst,
+          const VectorType2 &src,
+          const bool         transpose,
+          const std::integral_constant<bool, true>,
+          const std::integral_constant<bool, false>) const;
 
     /**
      * Internal version of (T)vmult where both source vector and the
@@ -403,43 +430,42 @@ namespace TrilinosWrappers
      * consists of only one block)
      */
     template <typename VectorType1, typename VectorType2>
-    void vmult (VectorType1       &dst,
-                const VectorType2 &src,
-                const bool         transpose,
-                const std::integral_constant<bool, false>,
-                const std::integral_constant<bool, false>) const;
+    void
+    vmult(VectorType1 &      dst,
+          const VectorType2 &src,
+          const bool         transpose,
+          const std::integral_constant<bool, false>,
+          const std::integral_constant<bool, false>) const;
   };
 
 
 
   /*@}*/
 
-// ------------- inline and template functions -----------------
+  // ------------- inline and template functions -----------------
 
 
 
-  inline
-  BlockSparseMatrix &
-  BlockSparseMatrix::operator = (const double d)
+  inline BlockSparseMatrix &
+  BlockSparseMatrix::operator=(const double d)
   {
-    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+    Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
-    for (size_type r=0; r<this->n_block_rows(); ++r)
-      for (size_type c=0; c<this->n_block_cols(); ++c)
-        this->block(r,c) = d;
+    for (size_type r = 0; r < this->n_block_rows(); ++r)
+      for (size_type c = 0; c < this->n_block_cols(); ++c)
+        this->block(r, c) = d;
 
     return *this;
   }
 
 
 
-  inline
-  bool
-  BlockSparseMatrix::is_compressed () const
+  inline bool
+  BlockSparseMatrix::is_compressed() const
   {
     bool compressed = true;
-    for (size_type row=0; row<n_block_rows(); ++row)
-      for (size_type col=0; col<n_block_cols(); ++col)
+    for (size_type row = 0; row < n_block_rows(); ++row)
+      for (size_type col = 0; col < n_block_cols(); ++col)
         if (block(row, col).is_compressed() == false)
           {
             compressed = false;
@@ -452,12 +478,12 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType1, typename VectorType2>
-  inline
-  void
-  BlockSparseMatrix::vmult (VectorType1       &dst,
-                            const VectorType2 &src) const
+  inline void
+  BlockSparseMatrix::vmult(VectorType1 &dst, const VectorType2 &src) const
   {
-    vmult(dst, src, false,
+    vmult(dst,
+          src,
+          false,
           std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
           std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
   }
@@ -465,12 +491,12 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType1, typename VectorType2>
-  inline
-  void
-  BlockSparseMatrix::Tvmult (VectorType1       &dst,
-                             const VectorType2 &src) const
+  inline void
+  BlockSparseMatrix::Tvmult(VectorType1 &dst, const VectorType2 &src) const
   {
-    vmult(dst, src, true,
+    vmult(dst,
+          src,
+          true,
           std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
           std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
   }
@@ -478,100 +504,95 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType1, typename VectorType2>
-  inline
-  void
-  BlockSparseMatrix::vmult (VectorType1       &dst,
-                            const VectorType2 &src,
-                            const bool         transpose,
-                            std::integral_constant<bool, true>,
-                            std::integral_constant<bool, true>) const
+  inline void
+  BlockSparseMatrix::vmult(VectorType1 &      dst,
+                           const VectorType2 &src,
+                           const bool         transpose,
+                           std::integral_constant<bool, true>,
+                           std::integral_constant<bool, true>) const
   {
     if (transpose == true)
-      BaseClass::Tvmult_block_block (dst, src);
+      BaseClass::Tvmult_block_block(dst, src);
     else
-      BaseClass::vmult_block_block (dst, src);
-  }
-
-
-
-
-  template <typename VectorType1, typename VectorType2>
-  inline
-  void
-  BlockSparseMatrix::vmult (VectorType1       &dst,
-                            const VectorType2 &src,
-                            const bool         transpose,
-                            std::integral_constant<bool, false>,
-                            std::integral_constant<bool, true>) const
-  {
-    if (transpose == true)
-      BaseClass::Tvmult_nonblock_block (dst, src);
-    else
-      BaseClass::vmult_nonblock_block (dst, src);
+      BaseClass::vmult_block_block(dst, src);
   }
 
 
 
   template <typename VectorType1, typename VectorType2>
-  inline
-  void
-  BlockSparseMatrix::vmult (VectorType1       &dst,
-                            const VectorType2 &src,
-                            const bool         transpose,
-                            std::integral_constant<bool, true>,
-                            std::integral_constant<bool, false>) const
+  inline void
+  BlockSparseMatrix::vmult(VectorType1 &      dst,
+                           const VectorType2 &src,
+                           const bool         transpose,
+                           std::integral_constant<bool, false>,
+                           std::integral_constant<bool, true>) const
   {
     if (transpose == true)
-      BaseClass::Tvmult_block_nonblock (dst, src);
+      BaseClass::Tvmult_nonblock_block(dst, src);
     else
-      BaseClass::vmult_block_nonblock (dst, src);
+      BaseClass::vmult_nonblock_block(dst, src);
   }
 
 
 
   template <typename VectorType1, typename VectorType2>
-  inline
-  void
-  BlockSparseMatrix::vmult (VectorType1       &dst,
-                            const VectorType2 &src,
-                            const bool         transpose,
-                            std::integral_constant<bool, false>,
-                            std::integral_constant<bool, false>) const
+  inline void
+  BlockSparseMatrix::vmult(VectorType1 &      dst,
+                           const VectorType2 &src,
+                           const bool         transpose,
+                           std::integral_constant<bool, true>,
+                           std::integral_constant<bool, false>) const
   {
     if (transpose == true)
-      BaseClass::Tvmult_nonblock_nonblock (dst, src);
+      BaseClass::Tvmult_block_nonblock(dst, src);
     else
-      BaseClass::vmult_nonblock_nonblock (dst, src);
+      BaseClass::vmult_block_nonblock(dst, src);
   }
 
 
 
-  inline
-  std::vector<IndexSet>
-  BlockSparseMatrix::locally_owned_domain_indices () const
+  template <typename VectorType1, typename VectorType2>
+  inline void
+  BlockSparseMatrix::vmult(VectorType1 &      dst,
+                           const VectorType2 &src,
+                           const bool         transpose,
+                           std::integral_constant<bool, false>,
+                           std::integral_constant<bool, false>) const
   {
-    Assert (this->n_block_cols() != 0, ExcNotInitialized());
-    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+    if (transpose == true)
+      BaseClass::Tvmult_nonblock_nonblock(dst, src);
+    else
+      BaseClass::vmult_nonblock_nonblock(dst, src);
+  }
+
+
+
+  inline std::vector<IndexSet>
+  BlockSparseMatrix::locally_owned_domain_indices() const
+  {
+    Assert(this->n_block_cols() != 0, ExcNotInitialized());
+    Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<IndexSet> domain_indices;
     for (size_type c = 0; c < this->n_block_cols(); ++c)
-      domain_indices.push_back(this->sub_objects[0][c]->locally_owned_domain_indices());
+      domain_indices.push_back(
+        this->sub_objects[0][c]->locally_owned_domain_indices());
 
     return domain_indices;
   }
 
 
 
-  inline
-  std::vector<IndexSet>
-  BlockSparseMatrix::locally_owned_range_indices () const
+  inline std::vector<IndexSet>
+  BlockSparseMatrix::locally_owned_range_indices() const
   {
-    Assert (this->n_block_cols() != 0, ExcNotInitialized());
-    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+    Assert(this->n_block_cols() != 0, ExcNotInitialized());
+    Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<IndexSet> range_indices;
     for (size_type r = 0; r < this->n_block_rows(); ++r)
-      range_indices.push_back(this->sub_objects[r][0]->locally_owned_range_indices());
+      range_indices.push_back(
+        this->sub_objects[r][0]->locally_owned_range_indices());
 
     return range_indices;
   }
@@ -582,7 +603,6 @@ namespace TrilinosWrappers
   {
     namespace BlockLinearOperatorImplementation
     {
-
       /**
        * This is an extension class to BlockLinearOperators for Trilinos block
        * sparse matrices.
@@ -617,22 +637,24 @@ namespace TrilinosWrappers
          * called under any conditions.
          */
         template <typename... Args>
-        TrilinosBlockPayload (const Args &...)
+        TrilinosBlockPayload(const Args &...)
         {
-          static_assert(typeid(PayloadBlockType)==typeid(internal::LinearOperatorImplementation::TrilinosPayload),
-                        "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
+          static_assert(
+            typeid(PayloadBlockType) ==
+              typeid(internal::LinearOperatorImplementation::TrilinosPayload),
+            "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
         }
       };
 
-    } /*namespace BlockLinearOperator*/
-  } /* namespace internal */
+    } // namespace BlockLinearOperatorImplementation
+  }   /* namespace internal */
 
 
-}/* namespace TrilinosWrappers */
+} /* namespace TrilinosWrappers */
 
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif    // DEAL_II_WITH_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
-#endif    // dealii_trilinos_block_sparse_matrix_h
+#endif // dealii_trilinos_block_sparse_matrix_h

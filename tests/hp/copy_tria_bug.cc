@@ -15,17 +15,19 @@
 
 // document a bug in hp::DoFHandler and copy_triangulation
 
-#include "../tests.h"
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/hp/dof_handler.h>
+
+#include "../tests.h"
 
 
 using namespace dealii;
@@ -33,9 +35,10 @@ using namespace dealii;
 
 
 template <int dim>
-void test1()
+void
+test1()
 {
-  Triangulation<dim> tr1;
+  Triangulation<dim>  tr1;
   hp::DoFHandler<dim> dofh(tr1);
 
   Triangulation<dim> tr2;
@@ -44,11 +47,10 @@ void test1()
   tr1.copy_triangulation(tr2);
 
   dofh.begin_active()->set_active_fe_index(0);
-
-
 }
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -17,84 +17,100 @@
 
 // check CylindricalManifold
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
+
 #include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_c1.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
+
 
 template <int dim>
-void check ()
+void
+check()
 {
-  AssertThrow (false, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented());
 }
 
 template <>
-void check<2> ()
+void
+check<2>()
 {
-  constexpr int dim = 2;
+  constexpr int      dim = 2;
   Triangulation<dim> triangulation;
-  GridGenerator::truncated_cone (triangulation);
+  GridGenerator::truncated_cone(triangulation);
   static const FlatManifold<dim> boundary;
-  triangulation.set_manifold (0, boundary);
+  triangulation.set_manifold(0, boundary);
 
-  triangulation.refine_global (2);
+  triangulation.refine_global(2);
 
 
-  const typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active();
-  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+  const typename Triangulation<dim>::active_cell_iterator cell =
+    triangulation.begin_active();
+  for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+       ++face_no)
     {
-      const typename Triangulation<dim>::face_iterator face=cell->face(face_no);
+      const typename Triangulation<dim>::face_iterator face =
+        cell->face(face_no);
       if (face->boundary_id() != numbers::internal_face_boundary_id)
         {
           deallog << face->boundary_id() << std::endl;
           typename Manifold<dim>::FaceVertexNormals normals;
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
+               ++v)
             deallog << face->vertex(v) << ": " << normals[v] << std::endl;
         }
     }
 }
 
 template <>
-void check<3> ()
+void
+check<3>()
 {
-  constexpr int dim = 3;
+  constexpr int      dim = 3;
   Triangulation<dim> triangulation;
-  GridGenerator::truncated_cone (triangulation);
+  GridGenerator::truncated_cone(triangulation);
   static const CylindricalManifold<dim> boundary;
-  triangulation.set_manifold (0, boundary);
+  triangulation.set_manifold(0, boundary);
 
-  triangulation.refine_global (2);
+  triangulation.refine_global(2);
 
-  const typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active();
-  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+  const typename Triangulation<dim>::active_cell_iterator cell =
+    triangulation.begin_active();
+  for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+       ++face_no)
     {
-      const typename Triangulation<dim>::face_iterator face=cell->face(face_no);
+      const typename Triangulation<dim>::face_iterator face =
+        cell->face(face_no);
       if (face->boundary_id() != numbers::internal_face_boundary_id)
         {
           deallog << face->boundary_id() << std::endl;
           typename Manifold<dim>::FaceVertexNormals normals;
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
+               ++v)
             deallog << face->vertex(v) << ": " << normals[v] << std::endl;
         }
     }
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check<2> ();
-  check<3> ();
+  check<2>();
+  check<3>();
 }

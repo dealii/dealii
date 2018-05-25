@@ -16,11 +16,12 @@
 // Test that mixed floating point type multiplications with std::complex
 // are possible.
 
-#include "../tests.h"
-
 #include <deal.II/base/template_constraints.h>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 

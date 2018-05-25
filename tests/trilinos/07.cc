@@ -17,50 +17,57 @@
 
 // check TrilinosWrappers::SparseMatrix::linfty_norm
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::SparseMatrix &m)
+
+void
+test(TrilinosWrappers::SparseMatrix &m)
 {
   // first set a few entries. count how many
   // entries we have
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.m(); ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        m.set(i, j, i * j * .5 + .5);
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   // compare against the exact value of the
   // linfty-norm (max row-sum)
   deallog << m.linfty_norm() << std::endl;
-  Assert (m.linfty_norm() == 8.5, ExcInternalError());
+  Assert(m.linfty_norm() == 8.5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
     {
       {
-        TrilinosWrappers::SparseMatrix m (5U,5U,3U);
-        test (m);
+        TrilinosWrappers::SparseMatrix m(5U, 5U, 3U);
+        test(m);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -73,7 +80,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

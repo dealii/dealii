@@ -17,28 +17,28 @@
 // Test TensorProductManifold by refining and generating normals for
 // a manually constructed cylinder hull.
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tensor_product_manifold.h>
+
 #include "../tests.h"
 
 
-#include <deal.II/grid/tensor_product_manifold.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-
-
-void test()
+void
+test()
 {
   std::ostream &out = deallog.get_file_stream();
 
-  FunctionManifold<1,1> F("x","x");
-  PolarManifold<2,2> G;
+  FunctionManifold<1, 1> F("x", "x");
+  PolarManifold<2, 2>    G;
 
-  TensorProductManifold<2, 1,1,1, 2,2,2> manifold(F, G);
+  TensorProductManifold<2, 1, 1, 1, 2, 2, 2> manifold(F, G);
 
   // make a hull of a cylinder
-  Triangulation<2,3> tria;
+  Triangulation<2, 3> tria;
   {
-    Triangulation<3,3> volume_tria;
+    Triangulation<3, 3> volume_tria;
     GridGenerator::cylinder(volume_tria);
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
@@ -51,17 +51,17 @@ void test()
 
   out << "set view equal xyz" << std::endl
       << "splot '-' with lines, '-' with vectors " << std::endl;
-  GridOut().write_gnuplot (tria, out);
+  GridOut().write_gnuplot(tria, out);
   out << "e" << std::endl;
 
-  Triangulation<2,3>::active_cell_iterator it = tria.begin_active();
-  for (; it!=tria.end(); ++it)
+  Triangulation<2, 3>::active_cell_iterator it = tria.begin_active();
+  for (; it != tria.end(); ++it)
     {
-      Point<3> p = it->center(true);
-      Tensor<1,3> t1 = manifold.get_tangent_vector(p, it->vertex(0));
-      Tensor<1,3> t2 = manifold.get_tangent_vector(p, it->vertex(1));
-      Tensor<1,3> n = cross_product_3d(t1, t2);
-      n/=-n.norm();
+      Point<3>     p  = it->center(true);
+      Tensor<1, 3> t1 = manifold.get_tangent_vector(p, it->vertex(0));
+      Tensor<1, 3> t2 = manifold.get_tangent_vector(p, it->vertex(1));
+      Tensor<1, 3> n  = cross_product_3d(t1, t2);
+      n /= -n.norm();
       out << it->center() << " " << n << std::endl;
     }
   out << "e" << std::endl;
@@ -69,7 +69,8 @@ void test()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -77,4 +78,3 @@ int main ()
 
   return 0;
 }
-

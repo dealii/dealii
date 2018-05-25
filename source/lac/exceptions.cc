@@ -26,38 +26,35 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LACExceptions
 {
-  ExcPETScError::ExcPETScError (const int error_code)
-    :
-    error_code (error_code)
+  ExcPETScError::ExcPETScError(const int error_code) : error_code(error_code)
   {}
 
-  void ExcPETScError::print_info (std::ostream &out) const
+  void
+  ExcPETScError::print_info(std::ostream &out) const
   {
     out << "deal.II encountered an error while calling a PETSc function."
         << std::endl;
 #ifdef DEAL_II_WITH_PETSC
     // PetscErrorMessage changes the value in a pointer to refer to a
     // statically allocated description of the current error message.
-    const char *petsc_message;
-    const PetscErrorCode ierr = PetscErrorMessage (error_code, &petsc_message,
-                                                   /*specific=*/nullptr);
+    const char *         petsc_message;
+    const PetscErrorCode ierr = PetscErrorMessage(error_code,
+                                                  &petsc_message,
+                                                  /*specific=*/nullptr);
     if (ierr == 0 && petsc_message != nullptr)
       {
         out << "The description of the error provided by PETSc is \""
-            << petsc_message
-            << "\"."
-            << std::endl;
+            << petsc_message << "\"." << std::endl;
       }
     else
       {
-        out << "PETSc was not able to determine a description for this particular error code."
-            << std::endl;
+        out
+          << "PETSc was not able to determine a description for this particular error code."
+          << std::endl;
       }
 #endif // DEAL_II_WITH_PETSC
-    out << "The numerical value of the original error code is "
-        << error_code
-        << "."
-        << std::endl;
+    out << "The numerical value of the original error code is " << error_code
+        << "." << std::endl;
   }
 } // namespace LACExceptions
 

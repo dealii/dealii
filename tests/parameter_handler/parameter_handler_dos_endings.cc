@@ -16,14 +16,17 @@
 
 // ParameterHandler could not handle files with DOS line endings.
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
 #include <sstream>
 #include <string>
 
+#include "../tests.h"
+
 using namespace dealii;
 
-void test ()
+void
+test()
 {
   ParameterHandler foo;
   foo.enter_subsection("bar");
@@ -47,16 +50,17 @@ void test ()
   foo.parse_input(input_stream);
 
   foo.enter_subsection("bar");
-  deallog << foo.get ("val") << std::endl;
+  deallog << foo.get("val") << std::endl;
   foo.leave_subsection();
 }
 
-int main ()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);
 
-  test ();
+  test();
 
   return 0;
 }

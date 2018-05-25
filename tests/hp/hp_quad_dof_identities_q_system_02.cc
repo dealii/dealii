@@ -19,50 +19,48 @@
 // arrangement of base elements and multiplicities than in the _01 test
 
 
-#include "../tests.h"
-#include <deal.II/hp/fe_collection.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+
+#include <deal.II/hp/fe_collection.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   hp::FECollection<dim> fe_collection;
-  for (unsigned int i=1; i<8-dim; ++i)
+  for (unsigned int i = 1; i < 8 - dim; ++i)
     {
       // add the system three times, with
       // different numbers of base elements
       // and multiplicities
-      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),3));
-      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),2,
-                                             FE_Q<dim>(i),1));
-      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),1,
-                                             FE_Q<dim>(i),2));
+      fe_collection.push_back(FESystem<dim>(FE_Q<dim>(i), 3));
+      fe_collection.push_back(FESystem<dim>(FE_Q<dim>(i), 2, FE_Q<dim>(i), 1));
+      fe_collection.push_back(FESystem<dim>(FE_Q<dim>(i), 1, FE_Q<dim>(i), 2));
     }
 
-  for (unsigned int i=0; i<fe_collection.size(); ++i)
-    for (unsigned int j=0; j<fe_collection.size(); ++j)
+  for (unsigned int i = 0; i < fe_collection.size(); ++i)
+    for (unsigned int j = 0; j < fe_collection.size(); ++j)
       {
-        const std::vector<std::pair<unsigned int, unsigned int> >
-        identities = fe_collection[i].hp_quad_dof_identities (fe_collection[j]);
+        const std::vector<std::pair<unsigned int, unsigned int>> identities =
+          fe_collection[i].hp_quad_dof_identities(fe_collection[j]);
 
-        deallog << "Identities for "
-                << fe_collection[i].get_name() << " and "
-                << fe_collection[j].get_name() << ": "
-                << identities.size()
+        deallog << "Identities for " << fe_collection[i].get_name() << " and "
+                << fe_collection[j].get_name() << ": " << identities.size()
                 << std::endl;
 
-        for (unsigned int k=0; k<identities.size(); ++k)
+        for (unsigned int k = 0; k < identities.size(); ++k)
           {
-            Assert (identities[k].first < fe_collection[i].dofs_per_quad,
-                    ExcInternalError());
-            Assert (identities[k].second < fe_collection[j].dofs_per_quad,
-                    ExcInternalError());
+            Assert(identities[k].first < fe_collection[i].dofs_per_quad,
+                   ExcInternalError());
+            Assert(identities[k].second < fe_collection[j].dofs_per_quad,
+                   ExcInternalError());
 
-            deallog << identities[k].first << ' '
-                    << identities[k].second
+            deallog << identities[k].first << ' ' << identities[k].second
                     << std::endl;
           }
       }
@@ -70,15 +68,16 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

@@ -14,17 +14,19 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_matrix_out_h
-#define dealii_matrix_out_h
+#  define dealii_matrix_out_h
 
-#include <deal.II/base/config.h>
-#include <deal.II/base/data_out_base.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/block_sparse_matrix.h>
+#  include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
-#  include <deal.II/lac/trilinos_sparse_matrix.h>
-#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#endif
+#  include <deal.II/base/data_out_base.h>
+
+#  include <deal.II/lac/block_sparse_matrix.h>
+#  include <deal.II/lac/sparse_matrix.h>
+
+#  ifdef DEAL_II_WITH_TRILINOS
+#    include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_sparse_matrix.h>
+#  endif
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -66,7 +68,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup output
  * @author Wolfgang Bangerth, 2001
  */
-class MatrixOut : public DataOutInterface<2,2>
+class MatrixOut : public DataOutInterface<2, 2>
 {
 public:
   /**
@@ -84,7 +86,7 @@ public:
      * If @p true, only show the absolute values of the matrix entries, rather
      * than their true values including the sign. Default value is @p false.
      */
-    bool         show_absolute_values;
+    bool show_absolute_values;
 
     /**
      * If larger than one, do not show each element of the matrix, but rather
@@ -106,15 +108,15 @@ public:
      * Default constructor. Set all elements of this structure to their
      * default values.
      */
-    Options (const bool         show_absolute_values = false,
-             const unsigned int block_size           = 1,
-             const bool         discontinuous        = false);
+    Options(const bool         show_absolute_values = false,
+            const unsigned int block_size           = 1,
+            const bool         discontinuous        = false);
   };
 
   /**
    * Destructor. Declared in order to make it virtual.
    */
-  virtual ~MatrixOut () override = default;
+  virtual ~MatrixOut() override = default;
 
   /**
    * Generate a list of patches from the given matrix and use the given string
@@ -134,17 +136,17 @@ public:
    * <tt>n()</tt>, which return the number of rows and columns, respectively.
    */
   template <class Matrix>
-  void build_patches (const Matrix      &matrix,
-                      const std::string &name,
-                      const Options      options = Options(false, 1, false));
+  void
+  build_patches(const Matrix &     matrix,
+                const std::string &name,
+                const Options      options = Options(false, 1, false));
 
 private:
-
   /**
    * Abbreviate the somewhat lengthy name for the dealii::DataOutBase::Patch
    * class.
    */
-  typedef DataOutBase::Patch<2,2> Patch;
+  typedef DataOutBase::Patch<2, 2> Patch;
 
   /**
    * This is a list of patches that is created each time build_patches() is
@@ -163,13 +165,14 @@ private:
    * they shall write to a file.
    */
   virtual const std::vector<Patch> &
-  get_patches () const override;
+  get_patches() const override;
 
   /**
    * Virtual function through which the names of data sets are obtained by the
    * output functions of the base class.
    */
-  virtual std::vector<std::string> get_dataset_names () const override;
+  virtual std::vector<std::string>
+  get_dataset_names() const override;
 
   /**
    * Get the value of the matrix at gridpoint <tt>(i,j)</tt>. Depending on the
@@ -179,10 +182,11 @@ private:
    * matrix entries is taken.
    */
   template <class Matrix>
-  static double get_gridpoint_value (const Matrix       &matrix,
-                                     const size_type     i,
-                                     const size_type     j,
-                                     const Options      &options);
+  static double
+  get_gridpoint_value(const Matrix &  matrix,
+                      const size_type i,
+                      const size_type j,
+                      const Options & options);
 };
 
 
@@ -199,11 +203,12 @@ namespace internal
        * Return the element with given indices of a sparse matrix.
        */
       template <typename number>
-      double get_element (const dealii::SparseMatrix<number> &matrix,
-                          const types::global_dof_index             i,
-                          const types::global_dof_index             j)
+      double
+      get_element(const dealii::SparseMatrix<number> &matrix,
+                  const types::global_dof_index       i,
+                  const types::global_dof_index       j)
       {
-        return matrix.el(i,j);
+        return matrix.el(i, j);
       }
 
 
@@ -212,24 +217,25 @@ namespace internal
        * Return the element with given indices of a block sparse matrix.
        */
       template <typename number>
-      double get_element (const dealii::BlockSparseMatrix<number> &matrix,
-                          const types::global_dof_index                  i,
-                          const types::global_dof_index                  j)
+      double
+      get_element(const dealii::BlockSparseMatrix<number> &matrix,
+                  const types::global_dof_index            i,
+                  const types::global_dof_index            j)
       {
-        return matrix.el(i,j);
+        return matrix.el(i, j);
       }
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
       /**
        * Return the element with given indices of a Trilinos sparse matrix.
        */
-      inline
-      double get_element (const TrilinosWrappers::SparseMatrix &matrix,
-                          const types::global_dof_index             i,
-                          const types::global_dof_index             j)
+      inline double
+      get_element(const TrilinosWrappers::SparseMatrix &matrix,
+                  const types::global_dof_index         i,
+                  const types::global_dof_index         j)
       {
-        return matrix.el(i,j);
+        return matrix.el(i, j);
       }
 
 
@@ -238,21 +244,21 @@ namespace internal
        * Return the element with given indices of a Trilinos block sparse
        * matrix.
        */
-      inline
-      double get_element (const TrilinosWrappers::BlockSparseMatrix &matrix,
-                          const types::global_dof_index                  i,
-                          const types::global_dof_index                  j)
+      inline double
+      get_element(const TrilinosWrappers::BlockSparseMatrix &matrix,
+                  const types::global_dof_index              i,
+                  const types::global_dof_index              j)
       {
-        return matrix.el(i,j);
+        return matrix.el(i, j);
       }
-#endif
+#  endif
 
 
-#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_PETSC
       // no need to do anything: PETSc matrix objects do not distinguish
       // between operator() and el(i,j), so we can safely access elements
       // through the generic function below
-#endif
+#  endif
 
 
       /**
@@ -261,25 +267,25 @@ namespace internal
        * <tt>operator()</tt> on the matrix.
        */
       template <class Matrix>
-      double get_element (const Matrix       &matrix,
-                          const types::global_dof_index     i,
-                          const types::global_dof_index     j)
+      double
+      get_element(const Matrix &                matrix,
+                  const types::global_dof_index i,
+                  const types::global_dof_index j)
       {
-        return matrix(i,j);
+        return matrix(i, j);
       }
-    }
-  }
-}
+    } // namespace
+  }   // namespace MatrixOutImplementation
+} // namespace internal
 
 
 
 template <class Matrix>
-inline
-double
-MatrixOut::get_gridpoint_value (const Matrix   &matrix,
-                                const size_type i,
-                                const size_type j,
-                                const Options  &options)
+inline double
+MatrixOut::get_gridpoint_value(const Matrix &  matrix,
+                               const size_type i,
+                               const size_type j,
+                               const Options & options)
 {
   // special case if block size is
   // one since we then don't need all
@@ -287,25 +293,30 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
   if (options.block_size == 1)
     {
       if (options.show_absolute_values == true)
-        return std::fabs(internal::MatrixOutImplementation::get_element (matrix, i, j));
+        return std::fabs(
+          internal::MatrixOutImplementation::get_element(matrix, i, j));
       else
-        return internal::MatrixOutImplementation::get_element (matrix, i, j);
+        return internal::MatrixOutImplementation::get_element(matrix, i, j);
     }
 
   // if blocksize greater than one,
   // then compute average of elements
-  double average = 0;
+  double    average    = 0;
   size_type n_elements = 0;
-  for (size_type row=i*options.block_size;
-       row < std::min(size_type(matrix.m()),
-                      size_type((i+1)*options.block_size)); ++row)
-    for (size_type col=j*options.block_size;
+  for (size_type row = i * options.block_size;
+       row <
+       std::min(size_type(matrix.m()), size_type((i + 1) * options.block_size));
+       ++row)
+    for (size_type col = j * options.block_size;
          col < std::min(size_type(matrix.m()),
-                        size_type((j+1)*options.block_size)); ++col, ++n_elements)
+                        size_type((j + 1) * options.block_size));
+         ++col, ++n_elements)
       if (options.show_absolute_values == true)
-        average += std::fabs(internal::MatrixOutImplementation::get_element (matrix, row, col));
+        average += std::fabs(
+          internal::MatrixOutImplementation::get_element(matrix, row, col));
       else
-        average += internal::MatrixOutImplementation::get_element (matrix, row, col);
+        average +=
+          internal::MatrixOutImplementation::get_element(matrix, row, col);
   average /= n_elements;
   return average;
 }
@@ -314,17 +325,14 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
 
 template <class Matrix>
 void
-MatrixOut::build_patches (const Matrix      &matrix,
-                          const std::string &name,
-                          const Options      options)
+MatrixOut::build_patches(const Matrix &     matrix,
+                         const std::string &name,
+                         const Options      options)
 {
-  size_type
-  gridpoints_x = (matrix.n() / options.block_size
-                  +
-                  (matrix.n() % options.block_size != 0 ? 1 : 0)),
-                 gridpoints_y = (matrix.m() / options.block_size
-                                 +
-                                 (matrix.m() % options.block_size != 0 ? 1 : 0));
+  size_type gridpoints_x = (matrix.n() / options.block_size +
+                            (matrix.n() % options.block_size != 0 ? 1 : 0)),
+            gridpoints_y = (matrix.m() / options.block_size +
+                            (matrix.m() % options.block_size != 0 ? 1 : 0));
 
   // If continuous, the number of
   // plotted patches is matrix size-1
@@ -336,13 +344,13 @@ MatrixOut::build_patches (const Matrix      &matrix,
 
   // first clear old data and set it
   // to virgin state
-  patches.clear ();
-  patches.resize ((gridpoints_x) * (gridpoints_y));
+  patches.clear();
+  patches.resize((gridpoints_x) * (gridpoints_y));
 
   // now build the patches
-  size_type index=0;
-  for (size_type i=0; i<gridpoints_y; ++i)
-    for (size_type j=0; j<gridpoints_x; ++j, ++index)
+  size_type index = 0;
+  for (size_type i = 0; i < gridpoints_y; ++i)
+    for (size_type j = 0; j < gridpoints_x; ++j, ++index)
       {
         // within each patch, order
         // the points in such a way
@@ -367,34 +375,42 @@ MatrixOut::build_patches (const Matrix      &matrix,
         patches[index].vertices[0](0) = j;
         patches[index].vertices[0](1) = static_cast<signed int>(-i);
         patches[index].vertices[1](0) = j;
-        patches[index].vertices[1](1) = static_cast<signed int>(-i-1);
-        patches[index].vertices[2](0) = j+1;
+        patches[index].vertices[1](1) = static_cast<signed int>(-i - 1);
+        patches[index].vertices[2](0) = j + 1;
         patches[index].vertices[2](1) = static_cast<signed int>(-i);
-        patches[index].vertices[3](0) = j+1;
-        patches[index].vertices[3](1) = static_cast<signed int>(-i-1);
+        patches[index].vertices[3](0) = j + 1;
+        patches[index].vertices[3](1) = static_cast<signed int>(-i - 1);
         // next scale all the patch
         // coordinates by the block
         // size, to get original
         // coordinates
-        for (unsigned int v=0; v<4; ++v)
+        for (unsigned int v = 0; v < 4; ++v)
           patches[index].vertices[v] *= options.block_size;
 
         patches[index].n_subdivisions = 1;
 
-        patches[index].data.reinit (1,4);
+        patches[index].data.reinit(1, 4);
         if (options.discontinuous)
           {
-            patches[index].data(0,0) = get_gridpoint_value(matrix, i, j, options);
-            patches[index].data(0,1) = get_gridpoint_value(matrix, i, j, options);
-            patches[index].data(0,2) = get_gridpoint_value(matrix, i, j, options);
-            patches[index].data(0,3) = get_gridpoint_value(matrix, i, j, options);
+            patches[index].data(0, 0) =
+              get_gridpoint_value(matrix, i, j, options);
+            patches[index].data(0, 1) =
+              get_gridpoint_value(matrix, i, j, options);
+            patches[index].data(0, 2) =
+              get_gridpoint_value(matrix, i, j, options);
+            patches[index].data(0, 3) =
+              get_gridpoint_value(matrix, i, j, options);
           }
         else
           {
-            patches[index].data(0,0) = get_gridpoint_value(matrix, i,   j,   options);
-            patches[index].data(0,1) = get_gridpoint_value(matrix, i+1, j,   options);
-            patches[index].data(0,2) = get_gridpoint_value(matrix, i,   j+1, options);
-            patches[index].data(0,3) = get_gridpoint_value(matrix, i+1, j+1, options);
+            patches[index].data(0, 0) =
+              get_gridpoint_value(matrix, i, j, options);
+            patches[index].data(0, 1) =
+              get_gridpoint_value(matrix, i + 1, j, options);
+            patches[index].data(0, 2) =
+              get_gridpoint_value(matrix, i, j + 1, options);
+            patches[index].data(0, 3) =
+              get_gridpoint_value(matrix, i + 1, j + 1, options);
           }
       };
 

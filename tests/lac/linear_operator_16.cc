@@ -18,18 +18,19 @@
 // test the null_operator LinearOperator and its payload initialization
 
 
-#include "../tests.h"
-#include "../testmatrix.h"
-
+#include <deal.II/lac/linear_operator_tools.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/linear_operator_tools.h>
+#include <deal.II/lac/vector.h>
+
+#include "../testmatrix.h"
+#include "../tests.h"
 
 using namespace dealii;
 
-int main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   initlog();
@@ -37,13 +38,13 @@ int main (int argc, char *argv[])
   // Need to get the linear operator to do some nonsense work to verify
   // that it can indeed be used as expected
   const unsigned int size = 32;
-  unsigned int dim = (size-1)*(size-1);
+  unsigned int       dim  = (size - 1) * (size - 1);
 
   // Make matrix
   FDMatrix testproblem(size, size);
 
   {
-    SparsityPattern sp (dim, dim);
+    SparsityPattern sp(dim, dim);
     testproblem.five_point_structure(sp);
     sp.compress();
 
@@ -51,18 +52,18 @@ int main (int argc, char *argv[])
     A.reinit(sp);
     testproblem.five_point(A);
 
-    Vector<double>       f(dim);
-    Vector<double>       u(dim);
+    Vector<double> f(dim);
+    Vector<double> u(dim);
 
-    const auto lo_A = linear_operator<Vector<double> >(A);
-    const auto lo_null = null_operator(lo_A);
+    const auto lo_A           = linear_operator<Vector<double>>(A);
+    const auto lo_null        = null_operator(lo_A);
     const auto lo_A_plus_null = lo_A + lo_null;
 
     u = lo_A_plus_null * f;
   }
 
   {
-    DynamicSparsityPattern csp (dim, dim);
+    DynamicSparsityPattern csp(dim, dim);
     testproblem.five_point_structure(csp);
 
     TrilinosWrappers::SparseMatrix A;
@@ -74,11 +75,11 @@ int main (int argc, char *argv[])
     TrilinosWrappers::MPI::Vector u;
     u.reinit(complete_index_set(dim));
 
-    A.compress (VectorOperation::insert);
-    f.compress (VectorOperation::insert);
-    u.compress (VectorOperation::insert);
+    A.compress(VectorOperation::insert);
+    f.compress(VectorOperation::insert);
+    u.compress(VectorOperation::insert);
 
-    const auto lo_A = linear_operator<TrilinosWrappers::MPI::Vector>(A);
+    const auto lo_A    = linear_operator<TrilinosWrappers::MPI::Vector>(A);
     const auto lo_null = null_operator(lo_A);
     const auto lo_A_plus_null = lo_A + lo_null;
 

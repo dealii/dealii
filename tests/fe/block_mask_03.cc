@@ -21,30 +21,31 @@
 // constructor
 
 
-#include "../tests.h"
 #include <deal.II/fe/block_mask.h>
 
+#include "../tests.h"
 
 
 
-
-void test ()
+void
+test()
 {
   std::vector<bool> v(12, false);
-  BlockMask     m(12, false);
+  BlockMask         m(12, false);
 
   // verify equality
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow (m[i] == v[i], ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow(m[i] == v[i], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

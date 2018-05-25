@@ -19,12 +19,13 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
@@ -43,35 +44,44 @@ namespace internal
   struct MFWorkerInterface
   {
   public:
-    virtual ~MFWorkerInterface() {}
+    virtual ~MFWorkerInterface()
+    {}
 
     /// Starts the communication for the update ghost values operation
-    virtual void vector_update_ghosts_start() = 0;
+    virtual void
+    vector_update_ghosts_start() = 0;
 
     /// Finishes the communication for the update ghost values operation
-    virtual void vector_update_ghosts_finish() = 0;
+    virtual void
+    vector_update_ghosts_finish() = 0;
 
     /// Starts the communication for the vector compress operation
-    virtual void vector_compress_start() = 0;
+    virtual void
+    vector_compress_start() = 0;
 
     /// Finishes the communication for the vector compress operation
-    virtual void vector_compress_finish() = 0;
+    virtual void
+    vector_compress_finish() = 0;
 
     /// Zeros part of the vector accroding to a given range as stored in
     /// DoFInfo
-    virtual void zero_dst_vector_range(const unsigned int range_index) = 0;
+    virtual void
+    zero_dst_vector_range(const unsigned int range_index) = 0;
 
     /// Runs the cell work specified by MatrixFree::loop or
     /// MatrixFree::cell_loop
-    virtual void cell(const std::pair<unsigned int,unsigned int> &cell_range) = 0;
+    virtual void
+    cell(const std::pair<unsigned int, unsigned int> &cell_range) = 0;
 
     /// Runs the body of the work on interior faces specified by
     /// MatrixFree::loop
-    virtual void face(const std::pair<unsigned int,unsigned int> &face_range) = 0;
+    virtual void
+    face(const std::pair<unsigned int, unsigned int> &face_range) = 0;
 
     /// Runs the body of the work on boundary faces specified by
     /// MatrixFree::loop
-    virtual void boundary(const std::pair<unsigned int,unsigned int> &face_range) = 0;
+    virtual void
+    boundary(const std::pair<unsigned int, unsigned int> &face_range) = 0;
   };
 
 
@@ -79,7 +89,8 @@ namespace internal
   namespace MatrixFreeFunctions
   {
     // forward declaration of internal data structure
-    template <typename Number> struct ConstraintValues;
+    template <typename Number>
+    struct ConstraintValues;
 
     /**
      * A struct that collects all information related to parallelization with
@@ -94,36 +105,41 @@ namespace internal
       // preblocking and even versions with postblocking. partition_partition
       // and partition_color are deprecated but kept for backward
       // compatibility.
-      enum TasksParallelScheme {none,
-                                partition_partition,
-                                partition_color,
-                                color
-                               };
+      enum TasksParallelScheme
+      {
+        none,
+        partition_partition,
+        partition_color,
+        color
+      };
 
       /**
        * Constructor.
        */
-      TaskInfo ();
+      TaskInfo();
 
       /**
        * Clears all the data fields and resets them
        * to zero.
        */
-      void clear ();
+      void
+      clear();
 
       /**
        * Runs the matrix-free loop.
        */
-      void loop(MFWorkerInterface &worker) const;
+      void
+      loop(MFWorkerInterface &worker) const;
 
       /**
        * Determines the position of cells with ghosts for distributed-memory
        * calculations.
        */
-      void collect_boundary_cells (const unsigned int n_active_cells,
-                                   const unsigned int n_active_and_ghost_cells,
-                                   const unsigned int vectorization_length,
-                                   std::vector<unsigned int> &boundary_cells);
+      void
+      collect_boundary_cells(const unsigned int n_active_cells,
+                             const unsigned int n_active_and_ghost_cells,
+                             const unsigned int vectorization_length,
+                             std::vector<unsigned int> &boundary_cells);
 
       /**
        * Sets up the blocks for running the cell loop based on the options
@@ -162,13 +178,14 @@ namespace internal
        * according to the renumbering returned by this function.
        */
       void
-      create_blocks_serial (const std::vector<unsigned int> &boundary_cells,
-                            const std::vector<unsigned int> &cells_close_to_boundary,
-                            const unsigned int               dofs_per_cell,
-                            const std::vector<unsigned int> &cell_vectorization_categories,
-                            const bool cell_vectorization_categories_strict,
-                            std::vector<unsigned int>       &renumbering,
-                            std::vector<unsigned char>      &incompletely_filled_vectorization);
+      create_blocks_serial(
+        const std::vector<unsigned int> &boundary_cells,
+        const std::vector<unsigned int> &cells_close_to_boundary,
+        const unsigned int               dofs_per_cell,
+        const std::vector<unsigned int> &cell_vectorization_categories,
+        const bool                       cell_vectorization_categories_strict,
+        std::vector<unsigned int> &      renumbering,
+        std::vector<unsigned char> &     incompletely_filled_vectorization);
 
       /**
        * First step in the block creation for the task-parallel blocking setup.
@@ -188,9 +205,10 @@ namespace internal
        * according to the renumbering returned by this function.
        */
       void
-      initial_setup_blocks_tasks (const std::vector<unsigned int> &boundary_cells,
-                                  std::vector<unsigned int>       &renumbering,
-                                  std::vector<unsigned char>      &incompletely_filled_vectorization);
+      initial_setup_blocks_tasks(
+        const std::vector<unsigned int> &boundary_cells,
+        std::vector<unsigned int> &      renumbering,
+        std::vector<unsigned char> &     incompletely_filled_vectorization);
 
       /**
        * This helper function determines a block size if the user decided not
@@ -198,7 +216,8 @@ namespace internal
        * computed based on the number of hardware threads on the system and
        * the number of macro cells that we should work on.
        */
-      void guess_block_size (const unsigned int dofs_per_cell);
+      void
+      guess_block_size(const unsigned int dofs_per_cell);
 
       /**
        * This method goes through all cells that have been filled into @p
@@ -221,9 +240,9 @@ namespace internal
        * @param connectivity (in/out) Determines whether cells `i` and `j` are
        * conflicting, expressed by an entry in position (i,j).
        *
-       * @param renumbering (in/out) At output, the element j of this variable gives
-       * the original number of the cell that is reordered to place j by the
-       * ordering due to the thread graph.
+       * @param renumbering (in/out) At output, the element j of this variable
+       * gives the original number of the cell that is reordered to place j by
+       * the ordering due to the thread graph.
        *
        * @param irregular_cells (in/out) Informs the current function whether
        * some SIMD lanes in VectorizedArray would not be filled for a given
@@ -232,10 +251,11 @@ namespace internal
        * @param hp_bool Defines whether we are in hp mode or not
        */
       void
-      make_thread_graph_partition_color (DynamicSparsityPattern     &connectivity,
-                                         std::vector<unsigned int>  &renumbering,
-                                         std::vector<unsigned char> &irregular_cells,
-                                         const bool                 hp_bool);
+      make_thread_graph_partition_color(
+        DynamicSparsityPattern &    connectivity,
+        std::vector<unsigned int> & renumbering,
+        std::vector<unsigned char> &irregular_cells,
+        const bool                  hp_bool);
 
       /**
        * This function goes through all cells that have been filled into @p
@@ -259,9 +279,9 @@ namespace internal
        * @param connectivity (in/out) Determines whether cells `i` and `j` are
        * conflicting, expressed by an entry in position (i,j).
        *
-       * @param renumbering (in/out) At output, the element j of this variable gives
-       * the original number of the cell that is reordered to place j by the
-       * ordering due to the thread graph.
+       * @param renumbering (in/out) At output, the element j of this variable
+       * gives the original number of the cell that is reordered to place j by
+       * the ordering due to the thread graph.
        *
        * @param irregular_cells (in/out) Informs the current function whether
        * some SIMD lanes in VectorizedArray would not be filled for a given
@@ -270,11 +290,12 @@ namespace internal
        * @param hp_bool Defines whether we are in hp mode or not
        */
       void
-      make_thread_graph_partition_partition (const std::vector<unsigned int> &cell_active_fe_index,
-                                             DynamicSparsityPattern     &connectivity,
-                                             std::vector<unsigned int>  &renumbering,
-                                             std::vector<unsigned char> &irregular_cells,
-                                             const bool                 hp_bool);
+      make_thread_graph_partition_partition(
+        const std::vector<unsigned int> &cell_active_fe_index,
+        DynamicSparsityPattern &         connectivity,
+        std::vector<unsigned int> &      renumbering,
+        std::vector<unsigned char> &     irregular_cells,
+        const bool                       hp_bool);
 
       /**
        * Either calls make_thread_graph_partition_color() or
@@ -289,9 +310,9 @@ namespace internal
        * @param connectivity (in/out) Determines whether cells `i` and `j` are
        * conflicting, expressed by an entry in position (i,j).
        *
-       * @param renumbering (in/out) At output, the element j of this variable gives
-       * the original number of the cell that is reordered to place j by the
-       * ordering due to the thread graph.
+       * @param renumbering (in/out) At output, the element j of this variable
+       * gives the original number of the cell that is reordered to place j by
+       * the ordering due to the thread graph.
        *
        * @param irregular_cells (in/out) Informs the current function whether
        * some SIMD lanes in VectorizedArray would not be filled for a given
@@ -300,51 +321,55 @@ namespace internal
        * @param hp_bool Defines whether we are in hp mode or not
        */
       void
-      make_thread_graph (const std::vector<unsigned int> &cell_active_fe_index,
-                         DynamicSparsityPattern     &connectivity,
-                         std::vector<unsigned int>  &renumbering,
-                         std::vector<unsigned char> &irregular_cells,
-                         const bool                 hp_bool);
+      make_thread_graph(const std::vector<unsigned int> &cell_active_fe_index,
+                        DynamicSparsityPattern &         connectivity,
+                        std::vector<unsigned int> &      renumbering,
+                        std::vector<unsigned char> &     irregular_cells,
+                        const bool                       hp_bool);
 
       /**
        * This function computes the connectivity between blocks of cells from
        * the connectivity between the individual cells.
        */
-      void make_connectivity_cells_to_blocks
-      (const std::vector<unsigned char> &irregular_cells,
-       const DynamicSparsityPattern     &connectivity_cells,
-       DynamicSparsityPattern           &connectivity_blocks) const;
+      void
+      make_connectivity_cells_to_blocks(
+        const std::vector<unsigned char> &irregular_cells,
+        const DynamicSparsityPattern &    connectivity_cells,
+        DynamicSparsityPattern &          connectivity_blocks) const;
 
       /**
        * Function to create coloring on the second layer within each
        * partition.
        */
-      void make_coloring_within_partitions_pre_blocked
-      (const DynamicSparsityPattern          &connectivity,
-       const unsigned int                    partition,
-       const std::vector<unsigned int>       &cell_partition,
-       const std::vector<unsigned int>       &partition_list,
-       const std::vector<unsigned int>       &partition_size,
-       std::vector<unsigned int>             &partition_color_list);
+      void
+      make_coloring_within_partitions_pre_blocked(
+        const DynamicSparsityPattern &   connectivity,
+        const unsigned int               partition,
+        const std::vector<unsigned int> &cell_partition,
+        const std::vector<unsigned int> &partition_list,
+        const std::vector<unsigned int> &partition_size,
+        std::vector<unsigned int> &      partition_color_list);
 
       /**
        * Function to create partitioning on the second layer within each
        * partition.
        */
-      void make_partitioning_within_partitions_post_blocked
-      (const DynamicSparsityPattern          &connectivity,
-       const std::vector<unsigned int>       &cell_active_fe_index,
-       const unsigned int                    partition,
-       const unsigned int                    cluster_size,
-       const bool                            hp_bool,
-       const std::vector<unsigned int>       &cell_partition,
-       const std::vector<unsigned int>       &partition_list,
-       const std::vector<unsigned int>       &partition_size,
-       std::vector<unsigned int>             &partition_partition_list,
-       std::vector<unsigned char>            &irregular_cells);
+      void
+      make_partitioning_within_partitions_post_blocked(
+        const DynamicSparsityPattern &   connectivity,
+        const std::vector<unsigned int> &cell_active_fe_index,
+        const unsigned int               partition,
+        const unsigned int               cluster_size,
+        const bool                       hp_bool,
+        const std::vector<unsigned int> &cell_partition,
+        const std::vector<unsigned int> &partition_list,
+        const std::vector<unsigned int> &partition_size,
+        std::vector<unsigned int> &      partition_partition_list,
+        std::vector<unsigned char> &     irregular_cells);
 
       /**
-       * This function creates partitions according to the provided connectivity graph.
+       * This function creates partitions according to the provided connectivity
+       * graph.
        *
        * @param connectivity Connectivity between (blocks of cells)
        *
@@ -363,37 +388,39 @@ namespace internal
        * @param partition number of partitions created
        */
       void
-      make_partitioning (const DynamicSparsityPattern &connectivity,
-                         const unsigned int            cluster_size,
-                         std::vector<unsigned int>    &cell_partition,
-                         std::vector<unsigned int>    &partition_list,
-                         std::vector<unsigned int>    &partition_size,
-                         unsigned int                 &partition) const;
+      make_partitioning(const DynamicSparsityPattern &connectivity,
+                        const unsigned int            cluster_size,
+                        std::vector<unsigned int> &   cell_partition,
+                        std::vector<unsigned int> &   partition_list,
+                        std::vector<unsigned int> &   partition_size,
+                        unsigned int &                partition) const;
 
       /**
        * Update fields of task info for task graph set up in
        * make_thread_graph.
        */
       void
-      update_task_info (const unsigned int     partition);
+      update_task_info(const unsigned int partition);
 
       /**
        * Creates a task graph from a connectivity structure.
        */
-      void create_flow_graph();
+      void
+      create_flow_graph();
 
       /**
        * Returns the memory consumption of the class.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Prints minimum, average, and maximal memory consumption over the MPI
        * processes.
        */
       template <typename StreamType>
-      void print_memory_statistics (StreamType &out,
-                                    std::size_t data_length) const;
+      void
+      print_memory_statistics(StreamType &out, std::size_t data_length) const;
 
       /**
        * Number of physical cells in the mesh, not cell batches after

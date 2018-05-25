@@ -18,18 +18,20 @@
 // check querying the number of nonzero elements in
 // SparseMatrix when we don't store the diagonal elements explicitly
 
-#include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  SparsityPattern sp (5,5,3);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
-  sp.compress ();
+  SparsityPattern sp(5, 5, 3);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 5; ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
+  sp.compress();
 
   SparseMatrix<double> m(sp);
 
@@ -38,34 +40,35 @@ void test ()
   // matrices we also always store the
   // diagonal element
   unsigned int counter = 0;
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      if (((i+2*j+1) % 3 == 0) || (i==j))
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.n(); ++j)
+      if (((i + 2 * j + 1) % 3 == 0) || (i == j))
         {
-          m.set (i,j, i*j*.5+.5);
+          m.set(i, j, i * j * .5 + .5);
           ++counter;
         }
 
   deallog << m.n_nonzero_elements() << std::endl;
-  Assert (m.n_nonzero_elements() == counter,
-          ExcInternalError());
+  Assert(m.n_nonzero_elements() == counter, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -78,7 +81,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

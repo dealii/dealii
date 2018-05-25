@@ -18,10 +18,13 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
+
 #include <deal.II/lac/vector.h>
-#include <vector>
+
 #include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -109,66 +112,73 @@ public:
    * information on this.
    */
   template <typename number>
-  void evaluate (const std::vector<Vector<number> > &values,
-                 const std::vector<double>                   &y_values,
-                 const unsigned int                           n_intervals,
-                 const IntervalSpacing                        interval_spacing = linear);
+  void
+  evaluate(const std::vector<Vector<number>> &values,
+           const std::vector<double> &        y_values,
+           const unsigned int                 n_intervals,
+           const IntervalSpacing              interval_spacing = linear);
 
   /**
    * This function is only a wrapper to the above one in case you have only
    * one data set.
    */
   template <typename number>
-  void evaluate (const Vector<number>          &values,
-                 const unsigned int             n_intervals,
-                 const IntervalSpacing          interval_spacing = linear);
+  void
+  evaluate(const Vector<number> &values,
+           const unsigned int    n_intervals,
+           const IntervalSpacing interval_spacing = linear);
 
   /**
    * Write the histogram computed by the @p evaluate function to a stream in a
    * format suitable to the GNUPLOT program. The function generates 2d or 3d
    * histograms.
    */
-  void write_gnuplot (std::ostream &out) const;
+  void
+  write_gnuplot(std::ostream &out) const;
 
   /**
    * Return allowed names for the interval spacing as string. At present this
    * is "linear|logarithmic".
    */
-  static std::string get_interval_spacing_names ();
+  static std::string
+  get_interval_spacing_names();
 
   /**
    * Get a string containing one of the names returned by the above function
    * and return the respective value of @p IntervalSpacing. Throw an error if
    * the string is no valid one.
    */
-  static IntervalSpacing parse_interval_spacing (const std::string &name);
+  static IntervalSpacing
+  parse_interval_spacing(const std::string &name);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * Exception.
    */
-  DeclExceptionMsg (ExcEmptyData,
-                    "Your input argument to this function does not appear to "
-                    "have any data in it.");
+  DeclExceptionMsg(ExcEmptyData,
+                   "Your input argument to this function does not appear to "
+                   "have any data in it.");
   /**
    * Exception.
    */
-  DeclException2 (ExcIncompatibleArraySize,
-                  int, int,
-                  << "The two array sizes " << arg1 << " and " << arg2
-                  << " must match, but don't.");
+  DeclException2(ExcIncompatibleArraySize,
+                 int,
+                 int,
+                 << "The two array sizes " << arg1 << " and " << arg2
+                 << " must match, but don't.");
   /**
    * Exception.
    */
-  DeclException1 (ExcInvalidName,
-                  std::string,
-                  << "The given name <" << arg1
-                  << "> does not match any of the known formats.");
+  DeclException1(ExcInvalidName,
+                 std::string,
+                 << "The given name <" << arg1
+                 << "> does not match any of the known formats.");
 
 private:
   /**
@@ -180,24 +190,24 @@ private:
      * Constructor. Sets the bounds and sets the number of values in this
      * interval to zero.
      */
-    Interval (const double left_point,
-              const double right_point);
+    Interval(const double left_point, const double right_point);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
     /**
      * Left bound of the interval.
      */
-    double       left_point;
+    double left_point;
 
     /**
      * Right bound of the interval.
      */
-    double       right_point;
+    double right_point;
 
     /**
      * Number of values in this interval.
@@ -216,20 +226,20 @@ private:
    * negative numbers to be larger than the largest positive number.
    */
   template <typename number>
-  static bool logarithmic_less (const number n1,
-                                const number n2);
+  static bool
+  logarithmic_less(const number n1, const number n2);
 
   /**
    * Vector holding one set of intervals for each data set given to the @p
    * evaluate function.
    */
-  std::vector<std::vector<Interval> > intervals;
+  std::vector<std::vector<Interval>> intervals;
 
   /**
    * Values for the depth axis of 3d histograms. Stored in the @p evaluate
    * function.
    */
-  std::vector<double>            y_values;
+  std::vector<double> y_values;
 };
 
 

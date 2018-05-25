@@ -23,10 +23,10 @@ main()
 {
   initlog();
 
-  CHECK_ALL(Q_Bubbles,1,2);
-  CHECK_ALL(Q_Bubbles,2,2);
-  CHECK_ALL(Q_Bubbles,3,2);
+  CHECK_ALL(Q_Bubbles, 1, 2);
+  CHECK_ALL(Q_Bubbles, 2, 2);
+  CHECK_ALL(Q_Bubbles, 3, 2);
 
-  CHECK_ALL(Q_Bubbles,1,3);
-  CHECK_ALL(Q_Bubbles,2,3);
+  CHECK_ALL(Q_Bubbles, 1, 3);
+  CHECK_ALL(Q_Bubbles, 2, 3);
 }

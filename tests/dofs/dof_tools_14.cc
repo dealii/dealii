@@ -14,20 +14,19 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/lac/vector.h>
+
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <deal.II/lac/vector.h>
 
 // check
 //   DoFTools::count_boundary_dofs
 
 
 
-
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // no other args
   deallog << dof_handler.n_boundary_dofs() << std::endl;
@@ -39,7 +38,6 @@ check_this (const DoFHandler<dim> &dof_handler)
 
   // with std::set
   std::set<types::boundary_id> s;
-  s.insert (0);
+  s.insert(0);
   deallog << dof_handler.n_boundary_dofs(s) << std::endl;
-
 }

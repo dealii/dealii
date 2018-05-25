@@ -21,85 +21,85 @@
 // violates the Triangulation<dim>::limit_level_difference_at_vertices
 // constraint we have requested
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/intergrid_map.h>
-#include <deal.II/base/utilities.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
 bool
-satisfies_level1_at_vertex_rule (const Triangulation<dim> &tr)
+satisfies_level1_at_vertex_rule(const Triangulation<dim> &tr)
 {
-  std::vector<unsigned int> min_adjacent_cell_level (tr.n_vertices(),
-                                                     tr.n_levels());
-  std::vector<unsigned int> max_adjacent_cell_level (tr.n_vertices(),
-                                                     0);
+  std::vector<unsigned int> min_adjacent_cell_level(tr.n_vertices(),
+                                                    tr.n_levels());
+  std::vector<unsigned int> max_adjacent_cell_level(tr.n_vertices(), 0);
 
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = tr.begin_active();
-       cell != tr.end(); ++cell)
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (typename Triangulation<dim>::active_cell_iterator cell =
+         tr.begin_active();
+       cell != tr.end();
+       ++cell)
+    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-        min_adjacent_cell_level[cell->vertex_index(v)]
-          = std::min<unsigned int>
-            (min_adjacent_cell_level[cell->vertex_index(v)],
-             cell->level());
-        max_adjacent_cell_level[cell->vertex_index(v)]
-          = std::max<unsigned int> (min_adjacent_cell_level[cell->vertex_index(v)],
-                                    cell->level());
+        min_adjacent_cell_level[cell->vertex_index(v)] = std::min<unsigned int>(
+          min_adjacent_cell_level[cell->vertex_index(v)], cell->level());
+        max_adjacent_cell_level[cell->vertex_index(v)] = std::max<unsigned int>(
+          min_adjacent_cell_level[cell->vertex_index(v)], cell->level());
       }
 
-  for (unsigned int k=0; k<tr.n_vertices(); ++k)
+  for (unsigned int k = 0; k < tr.n_vertices(); ++k)
     if (tr.vertex_used(k))
-      if (max_adjacent_cell_level[k] -
-          min_adjacent_cell_level[k] > 1)
+      if (max_adjacent_cell_level[k] - min_adjacent_cell_level[k] > 1)
         return false;
   return true;
 }
 
 
 template <int dim>
-void test()
+void
+test()
 {
-  Triangulation<dim> triangulation (Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> triangulation(
+    Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(triangulation);
-  triangulation.refine_global (2);
+  triangulation.refine_global(2);
 
-  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
     triangulation.begin(1)->child(c)->set_refine_flag();
-  for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
     (--triangulation.begin(2))->child(c)->set_coarsen_flag();
 
-  triangulation.prepare_coarsening_and_refinement ();
+  triangulation.prepare_coarsening_and_refinement();
 
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
+  for (typename Triangulation<dim>::active_cell_iterator cell =
+         triangulation.begin_active();
+       cell != triangulation.end();
+       ++cell)
     deallog << cell << ' '
             << (cell->refine_flag_set() ?
-                "to be refined" :
-                (cell->coarsen_flag_set() ?
-                 "to be coarsened" :
-                 ""))
+                  "to be refined" :
+                  (cell->coarsen_flag_set() ? "to be coarsened" : ""))
             << std::endl;
 
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 
   // verify that none of the cells
   // violates the level-1-at-vertex rule
-  AssertThrow (satisfies_level1_at_vertex_rule (triangulation),
-               ExcInternalError());
+  AssertThrow(satisfies_level1_at_vertex_rule(triangulation),
+              ExcInternalError());
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

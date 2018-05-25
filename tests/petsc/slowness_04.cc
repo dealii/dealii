@@ -28,104 +28,106 @@
 // matrix in a consecutive fashion, but rather according to the order of
 // degrees of freedom in the sequence of cells that we traverse
 
-#include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   const unsigned int N = 200;
 
   // first find a random permutation of the
   // indices
-  std::vector<unsigned int> permutation (N);
+  std::vector<unsigned int> permutation(N);
   {
-    std::vector<unsigned int> unused_indices (N);
-    for (unsigned int i=0; i<N; i++)
+    std::vector<unsigned int> unused_indices(N);
+    for (unsigned int i = 0; i < N; i++)
       unused_indices[i] = i;
 
-    for (unsigned int i=0; i<N; i++)
+    for (unsigned int i = 0; i < N; i++)
       {
         // pick a random element among the
         // unused indices
-        const unsigned int k = Testing::rand() % (N-i);
-        permutation[i] = unused_indices[k];
+        const unsigned int k = Testing::rand() % (N - i);
+        permutation[i]       = unused_indices[k];
 
         // then swap this used element to the
         // end where we won't consider it any
         // more
-        std::swap (unused_indices[k], unused_indices[N-i-1]);
+        std::swap(unused_indices[k], unused_indices[N - i - 1]);
       }
   }
 
   // build the sparse matrix
-  PETScWrappers::MPI::SparseMatrix matrix (PETSC_COMM_WORLD,
-                                           N*N, N*N,
-                                           N*N, N*N,
-                                           5);
-  for (unsigned int i_=0; i_<N; i_++)
-    for (unsigned int j_=0; j_<N; j_++)
+  PETScWrappers::MPI::SparseMatrix matrix(
+    PETSC_COMM_WORLD, N * N, N * N, N * N, N * N, 5);
+  for (unsigned int i_ = 0; i_ < N; i_++)
+    for (unsigned int j_ = 0; j_ < N; j_++)
       {
-        const unsigned int i=permutation[i_];
-        const unsigned int j=permutation[j_];
+        const unsigned int i = permutation[i_];
+        const unsigned int j = permutation[j_];
 
-        const unsigned int global = i*N+j;
+        const unsigned int global = i * N + j;
         matrix.add(global, global, Testing::rand());
-        if (j>0)
+        if (j > 0)
           {
-            matrix.add(global-1, global, Testing::rand());
-            matrix.add(global, global-1, Testing::rand());
+            matrix.add(global - 1, global, Testing::rand());
+            matrix.add(global, global - 1, Testing::rand());
           }
-        if (j<N-1)
+        if (j < N - 1)
           {
-            matrix.add(global+1, global, Testing::rand());
-            matrix.add(global, global+1, Testing::rand());
+            matrix.add(global + 1, global, Testing::rand());
+            matrix.add(global, global + 1, Testing::rand());
           }
-        if (i>0)
+        if (i > 0)
           {
-            matrix.add(global-N, global, Testing::rand());
-            matrix.add(global, global-N, Testing::rand());
+            matrix.add(global - N, global, Testing::rand());
+            matrix.add(global, global - N, Testing::rand());
           }
-        if (i<N-1)
+        if (i < N - 1)
           {
-            matrix.add(global+N, global, Testing::rand());
-            matrix.add(global, global+N, Testing::rand());
+            matrix.add(global + N, global, Testing::rand());
+            matrix.add(global, global + N, Testing::rand());
           }
       }
-  matrix.compress (VectorOperation::add);
+  matrix.compress(VectorOperation::add);
 
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  PETScWrappers::MPI::Vector v1(PETSC_COMM_WORLD, N*N, N*N);
-  PETScWrappers::MPI::Vector v2(PETSC_COMM_WORLD, N*N, N*N);
-  for (unsigned int i=0; i<N*N; ++i)
+  PETScWrappers::MPI::Vector v1(PETSC_COMM_WORLD, N * N, N * N);
+  PETScWrappers::MPI::Vector v2(PETSC_COMM_WORLD, N * N, N * N);
+  for (unsigned int i = 0; i < N * N; ++i)
     v1(i) = i;
-  matrix.vmult (v2, v1);
+  matrix.vmult(v2, v1);
 
-  deallog << v1 *v2 << std::endl;
+  deallog << v1 * v2 << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        test ();
+        test();
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -138,7 +140,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

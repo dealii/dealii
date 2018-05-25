@@ -15,31 +15,36 @@
 
 
 
-// check TrilinosWrappers::MPI::Vector::operator = (dealii::Vector<TrilinosScalar>)
+// check TrilinosWrappers::MPI::Vector::operator =
+// (dealii::Vector<TrilinosScalar>)
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (TrilinosWrappers::MPI::Vector &v)
+
+void
+test(TrilinosWrappers::MPI::Vector &v)
 {
-  dealii::Vector<TrilinosScalar> w (v.size());
+  dealii::Vector<TrilinosScalar> w(v.size());
 
-  for (unsigned int i=0; i<w.size(); ++i)
+  for (unsigned int i = 0; i < w.size(); ++i)
     w(i) = i;
 
   v = w;
 
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w(i) == i, ExcInternalError());
-      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow(w(i) == i, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -47,11 +52,13 @@ void test (TrilinosWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
@@ -59,12 +66,13 @@ int main (int argc,char **argv)
       {
         TrilinosWrappers::MPI::Vector v;
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        test (v);
+        test(v);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -77,7 +85,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

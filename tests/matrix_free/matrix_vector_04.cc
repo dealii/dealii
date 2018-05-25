@@ -28,23 +28,23 @@ std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   const SphericalManifold<dim> manifold;
-  Triangulation<dim> tria;
-  GridGenerator::hyper_shell (tria, Point<dim>(),
-                              0.5, 1., 96, true);
+  Triangulation<dim>           tria;
+  GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1., 96, true);
   tria.set_all_manifold_ids(0);
-  tria.set_manifold (0, manifold);
+  tria.set_manifold(0, manifold);
   if (dim == 2)
-    tria.refine_global (2);
+    tria.refine_global(2);
 
-  FE_Q<dim> fe (fe_degree);
-  DoFHandler<dim> dof (tria);
+  FE_Q<dim>       fe(fe_degree);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
-  do_test<dim, fe_degree, double, fe_degree+1> (dof, constraints);
+  do_test<dim, fe_degree, double, fe_degree + 1>(dof, constraints);
 }

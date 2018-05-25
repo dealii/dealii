@@ -20,15 +20,13 @@
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test_index_set<DynamicSparsityPattern> (false);
+  test_index_set<DynamicSparsityPattern>(false);
 }
-
-
-

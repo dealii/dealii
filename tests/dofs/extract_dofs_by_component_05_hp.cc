@@ -23,60 +23,63 @@
 // DoFTools::count_dofs_per_component with argument only_once=false
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_raviart_thomas.h>
-#include <deal.II/fe/fe_nedelec.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/hp/dof_handler.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
 void
-check ()
+check()
 {
   Triangulation<dim> tr;
-  GridGenerator::hyper_cube(tr, -1,1);
-  tr.refine_global (1);
+  GridGenerator::hyper_cube(tr, -1, 1);
+  tr.refine_global(1);
 
   // create an FECollection and set
   // one cell to use the second
   // element of this collection
   hp::FECollection<dim> element;
-  for (unsigned int i=0; i<2; ++i)
-    element.push_back (FESystem<dim> (FE_Q<dim>(1+i), 1,
-                                      FE_Nedelec<dim>(0), 1));
+  for (unsigned int i = 0; i < 2; ++i)
+    element.push_back(
+      FESystem<dim>(FE_Q<dim>(1 + i), 1, FE_Nedelec<dim>(0), 1));
   hp::DoFHandler<dim> dof(tr);
   dof.begin_active()->set_active_fe_index(1);
   dof.distribute_dofs(element);
 
-  std::vector<types::global_dof_index> count (element.n_components());
-  DoFTools::count_dofs_per_component (dof, count, false);
+  std::vector<types::global_dof_index> count(element.n_components());
+  DoFTools::count_dofs_per_component(dof, count, false);
 
-  for (unsigned int d=0; d<count.size(); ++d)
+  for (unsigned int d = 0; d < count.size(); ++d)
     deallog << count[d] << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  deallog.push ("2d");
-  check<2> ();
-  deallog.pop ();
-  deallog.push ("3d");
-  check<3> ();
-  deallog.pop ();
+  deallog.push("2d");
+  check<2>();
+  deallog.pop();
+  deallog.push("3d");
+  check<3>();
+  deallog.pop();
 }

@@ -22,54 +22,54 @@
 
 
 // all include files you need here
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1)
+void
+test(unsigned int ref = 1)
 {
-  deallog << "Testing dim=" << dim
-          << ", spacedim="<< spacedim << std::endl;
+  deallog << "Testing dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
-  Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_cube (tria);
+  Triangulation<dim, spacedim> tria;
+  GridGenerator::hyper_cube(tria);
   Point<spacedim> center;
-  for (unsigned int i=0; i<dim; ++i)
+  for (unsigned int i = 0; i < dim; ++i)
     center[i] = .25;
 
   // const SphericalManifold<dim,spacedim> boundary(center,center.norm());
   // triangulation.set_manifold (0, boundary_description);
 
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell;
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell;
 
   tria.begin_active()->set_all_manifold_ids(1);
   tria.refine_global(ref);
 
   for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
-      deallog << "C: " << cell
-              << ", mid: " << (int)cell->manifold_id() << std::endl;
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      deallog << "C: " << cell << ", mid: " << (int)cell->manifold_id()
+              << std::endl;
+      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         deallog << "f: " << cell->face(f)
                 << ", mid: " << (int)cell->face(f)->manifold_id() << std::endl;
     }
-
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1,1>();
-  test<1,2>();
-  test<2,2>();
-  test<2,3>();
-  test<3,3>();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 
   return 0;
 }

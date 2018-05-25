@@ -16,51 +16,56 @@
 
 // check Tensor<0,dim>
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+
 #include <deal.II/lac/vector.h>
 
+#include "../tests.h"
+
 template <typename U, typename V>
-void compare (const U &u, const V &v)
+void
+compare(const U &u, const V &v)
 {
-  AssertThrow (static_cast<double>(u)==static_cast<double>(v), ExcInternalError());
+  AssertThrow(static_cast<double>(u) == static_cast<double>(v),
+              ExcInternalError());
 }
 
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  typedef Tensor<0,1> T;
-  T t1(13.), t2(42);
+  typedef Tensor<0, 1> T;
+  T                    t1(13.), t2(42);
 
-  compare (T(), 0.);
-  compare (T(13.), 13.);
-  compare (T(t1), 13.);
-  compare (static_cast<double>(t1), 13.);
-  compare (static_cast<double &>(t1), 13.);
-  compare ((T() = t1), 13.);
-  compare ((T() = 13.), 13.);
-  compare ((t1==t1), true);
-  compare ((t1==t2), false);
-  compare ((t1!=t2), true);
-  compare ((t1!=t1), false);
-  compare ((T() += t1), t1);
-  compare ((T() -= t1), -t1);
-  compare (T(13.)*=3., 39.);
-  compare (T(39)/=3., 13.);
-  compare ((t1*t2), 13*42);
-  compare ((t1+t2), 13+42);
-  compare ((t1-t2), 13-42);
-  compare (-t1, -13.);
-  compare (T(-12).norm(), 12.);
-  compare (T(-12).norm_square(), 12*12.);
+  compare(T(), 0.);
+  compare(T(13.), 13.);
+  compare(T(t1), 13.);
+  compare(static_cast<double>(t1), 13.);
+  compare(static_cast<double &>(t1), 13.);
+  compare((T() = t1), 13.);
+  compare((T() = 13.), 13.);
+  compare((t1 == t1), true);
+  compare((t1 == t2), false);
+  compare((t1 != t2), true);
+  compare((t1 != t1), false);
+  compare((T() += t1), t1);
+  compare((T() -= t1), -t1);
+  compare(T(13.) *= 3., 39.);
+  compare(T(39) /= 3., 13.);
+  compare((t1 * t2), 13 * 42);
+  compare((t1 + t2), 13 + 42);
+  compare((t1 - t2), 13 - 42);
+  compare(-t1, -13.);
+  compare(T(-12).norm(), 12.);
+  compare(T(-12).norm_square(), 12 * 12.);
 
   t1.clear();
-  compare (t1, 0.);
+  compare(t1, 0.);
 
   deallog << "OK" << std::endl;
 }

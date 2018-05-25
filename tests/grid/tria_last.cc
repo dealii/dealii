@@ -19,12 +19,13 @@
 // and tria.last_active() still produce something sensible in that
 // case
 
-#include "../tests.h"
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 std::ofstream logfile("output");
@@ -32,27 +33,29 @@ std::ofstream logfile("output");
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(3);
-  for (unsigned int i=0; i<2; ++i)
+  for (unsigned int i = 0; i < 2; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = tria.begin_active(2); cell != tria.end(); ++cell)
-        cell->set_coarsen_flag ();
-      tria.execute_coarsening_and_refinement ();
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             tria.begin_active(2);
+           cell != tria.end();
+           ++cell)
+        cell->set_coarsen_flag();
+      tria.execute_coarsening_and_refinement();
     }
 
   deallog << tria.n_levels() << ' ' << tria.n_global_levels() << ' '
-          << tria.last() << ' '
-          << tria.last_active()
-          << std::endl;
+          << tria.last() << ' ' << tria.last_active() << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

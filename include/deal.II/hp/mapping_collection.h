@@ -17,12 +17,14 @@
 #define dealii_mapping_collection_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/fe.h>
 
-#include <vector>
+#include <deal.II/base/subscriptor.h>
+
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/mapping_q1.h>
+
 #include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -50,7 +52,7 @@ namespace hp
    *
    * @author Oliver Kayser-Herold, 2005
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim = dim>
   class MappingCollection : public Subscriptor
   {
   public:
@@ -58,7 +60,7 @@ namespace hp
      * Default constructor. Leads to an empty collection that can later be
      * filled using push_back().
      */
-    MappingCollection () = default;
+    MappingCollection() = default;
 
     /**
      * Conversion constructor. This constructor creates a MappingCollection
@@ -66,12 +68,13 @@ namespace hp
      * desired, though it would probably be clearer to add all mappings the
      * same way.
      */
-    explicit MappingCollection (const Mapping<dim,spacedim> &mapping);
+    explicit MappingCollection(const Mapping<dim, spacedim> &mapping);
 
     /**
      * Copy constructor.
      */
-    MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection);
+    MappingCollection(
+      const MappingCollection<dim, spacedim> &mapping_collection);
 
     /**
      * Adds a new mapping to the MappingCollection. Generally, you will
@@ -85,7 +88,8 @@ namespace hp
      * is later destroyed by this object upon destruction of the entire
      * collection.
      */
-    void push_back (const Mapping<dim,spacedim> &new_mapping);
+    void
+    push_back(const Mapping<dim, spacedim> &new_mapping);
 
     /**
      * Return the mapping object which was specified by the user for the
@@ -94,26 +98,27 @@ namespace hp
      * @pre @p index must be between zero and the number of elements of the
      * collection.
      */
-    const Mapping<dim,spacedim> &
-    operator[] (const unsigned int index) const;
+    const Mapping<dim, spacedim> &operator[](const unsigned int index) const;
 
     /**
      * Return the number of mapping objects stored in this container.
      */
-    unsigned int size () const;
+    unsigned int
+    size() const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
   private:
     /**
      * The real container, which stores pointers to the different Mapping
      * objects.
      */
-    std::vector<std::shared_ptr<const Mapping<dim,spacedim> > > mappings;
+    std::vector<std::shared_ptr<const Mapping<dim, spacedim>>> mappings;
   };
 
 
@@ -133,23 +138,22 @@ namespace hp
    * collection can then be used in all of those places where such a
    * collection is needed.
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim = dim>
   struct StaticMappingQ1
   {
   public:
     /**
      * The publicly available static $Q_1$ mapping collection object.
      */
-    static MappingCollection<dim,spacedim> mapping_collection;
+    static MappingCollection<dim, spacedim> mapping_collection;
   };
 
 
   /* --------------- inline functions ------------------- */
 
   template <int dim, int spacedim>
-  inline
-  unsigned int
-  MappingCollection<dim,spacedim>::size () const
+  inline unsigned int
+  MappingCollection<dim, spacedim>::size() const
   {
     return mappings.size();
   }
@@ -157,12 +161,10 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  inline
-  const Mapping<dim,spacedim> &
-  MappingCollection<dim,spacedim>::operator[] (const unsigned int index) const
+  inline const Mapping<dim, spacedim> &MappingCollection<dim, spacedim>::
+                                       operator[](const unsigned int index) const
   {
-    Assert (index < mappings.size (),
-            ExcIndexRange (index, 0, mappings.size ()));
+    Assert(index < mappings.size(), ExcIndexRange(index, 0, mappings.size()));
     return *mappings[index];
   }
 

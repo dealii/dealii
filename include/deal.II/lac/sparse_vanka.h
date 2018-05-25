@@ -19,20 +19,26 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/multithread_info.h>
 
-#include <vector>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/smartpointer.h>
+
 #include <map>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class FullMatrix;
-template <typename number> class SparseMatrix;
-template <typename number> class Vector;
+template <typename number>
+class FullMatrix;
+template <typename number>
+class SparseMatrix;
+template <typename number>
+class Vector;
 
-template <typename number> class SparseVanka;
-template <typename number> class SparseBlockVanka;
+template <typename number>
+class SparseVanka;
+template <typename number>
+class SparseBlockVanka;
 
 /*! @addtogroup Preconditioners
  *@{
@@ -142,7 +148,7 @@ public:
    * Call the initialize() function before using this object as preconditioner
    * (vmult()).
    */
-  SparseVanka ();
+  SparseVanka();
 
   /**
    * Constructor. Gets the matrix for preconditioning and a bit vector with
@@ -170,9 +176,9 @@ public:
    * parameter is ignored if not in multithreaded mode.
    */
   SparseVanka(const SparseMatrix<number> &M,
-              const std::vector<bool>    &selected,
+              const std::vector<bool> &   selected,
               const bool                  conserve_memory = false,
-              const unsigned int          n_threads       = MultithreadInfo::n_threads());
+              const unsigned int n_threads = MultithreadInfo::n_threads());
 
   /**
    * Destructor. Delete all allocated matrices.
@@ -188,9 +194,9 @@ public:
     /**
      * Constructor. For the parameters' description, see below.
      */
-    AdditionalData (const std::vector<bool> &selected,
-                    const bool               conserve_memory = false,
-                    const unsigned int       n_threads       = MultithreadInfo::n_threads());
+    AdditionalData(const std::vector<bool> &selected,
+                   const bool               conserve_memory = false,
+                   const unsigned int n_threads = MultithreadInfo::n_threads());
 
     /**
      * Indices of those degrees of freedom that we shall work on.
@@ -220,24 +226,25 @@ public:
    * After this function is called the preconditioner is ready to be used
    * (using the <code>vmult</code> function of derived classes).
    */
-  void initialize (const SparseMatrix<number> &M,
-                   const AdditionalData       &additional_data);
+  void
+  initialize(const SparseMatrix<number> &M,
+             const AdditionalData &      additional_data);
 
   /**
    * Do the preconditioning. This function takes the residual in @p src and
    * returns the resulting update vector in @p dst.
    */
   template <typename number2>
-  void vmult (Vector<number2>       &dst,
-              const Vector<number2> &src) const;
+  void
+  vmult(Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Apply transpose preconditioner. This function takes the residual in @p
    * src  and returns the resulting update vector in @p dst.
    */
   template <typename number2>
-  void Tvmult (Vector<number2>       &dst,
-               const Vector<number2> &src) const;
+  void
+  Tvmult(Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
@@ -246,7 +253,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type m () const;
+  size_type
+  m() const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
@@ -255,7 +263,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type n () const;
+  size_type
+  n() const;
 
 protected:
   /**
@@ -280,21 +289,23 @@ protected:
    * pointer
    */
   template <typename number2>
-  void apply_preconditioner (Vector<number2>         &dst,
-                             const Vector<number2>   &src,
-                             const std::vector<bool> *const dof_mask = nullptr) const;
+  void
+  apply_preconditioner(Vector<number2> &              dst,
+                       const Vector<number2> &        src,
+                       const std::vector<bool> *const dof_mask = nullptr) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
    * Pointer to the matrix.
    */
-  SmartPointer<const SparseMatrix<number>,SparseVanka<number> > matrix;
+  SmartPointer<const SparseMatrix<number>, SparseVanka<number>> matrix;
 
   /**
    * Conserve memory flag.
@@ -316,7 +327,8 @@ private:
    * Array of inverse matrices, one for each degree of freedom. Only those
    * elements will be used that are tagged in @p selected.
    */
-  mutable std::vector<SmartPointer<FullMatrix<float>,SparseVanka<number> > > inverses;
+  mutable std::vector<SmartPointer<FullMatrix<float>, SparseVanka<number>>>
+    inverses;
 
   /**
    * The dimension of the range space.
@@ -331,7 +343,8 @@ private:
   /**
    * Compute the inverses of all selected diagonal elements.
    */
-  void compute_inverses ();
+  void
+  compute_inverses();
 
   /**
    * Compute the inverses at positions in the range <tt>[begin,end)</tt>. In
@@ -339,8 +352,8 @@ private:
    * with the whole range, but in multithreaded mode, several copies of this
    * function are spawned.
    */
-  void compute_inverses (const size_type begin,
-                         const size_type end);
+  void
+  compute_inverses(const size_type begin, const size_type end);
 
   /**
    * Compute the inverse of the block located at position @p row. Since the
@@ -349,8 +362,8 @@ private:
    * the vector makes the process significantly faster than in the case where
    * this function re-creates it each time.
    */
-  void compute_inverse (const size_type         row,
-                        std::vector<size_type> &local_indices);
+  void
+  compute_inverse(const size_type row, std::vector<size_type> &local_indices);
 
   /**
    * Make the derived class a friend. This seems silly, but is actually
@@ -364,7 +377,8 @@ private:
    * the address of a function of the base class in order to call it through
    * the multithreading framework, so the derived class has to be a friend.
    */
-  template <typename T> friend class SparseBlockVanka;
+  template <typename T>
+  friend class SparseBlockVanka;
 };
 
 
@@ -530,25 +544,26 @@ public:
   /**
    * Constructor. Pass all arguments except for @p n_blocks to the base class.
    */
-  SparseBlockVanka (const SparseMatrix<number> &M,
-                    const std::vector<bool>    &selected,
-                    const unsigned int          n_blocks,
-                    const BlockingStrategy      blocking_strategy,
-                    const bool                  conserve_memory = false,
-                    const unsigned int          n_threads       = MultithreadInfo::n_threads());
+  SparseBlockVanka(const SparseMatrix<number> &M,
+                   const std::vector<bool> &   selected,
+                   const unsigned int          n_blocks,
+                   const BlockingStrategy      blocking_strategy,
+                   const bool                  conserve_memory = false,
+                   const unsigned int n_threads = MultithreadInfo::n_threads());
 
   /**
    * Apply the preconditioner.
    */
   template <typename number2>
-  void vmult (Vector<number2>       &dst,
-              const Vector<number2> &src) const;
+  void
+  vmult(Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -563,15 +578,16 @@ private:
    * be @p true for <tt>l!=i</tt>. This computation is done in the
    * constructor, to avoid recomputing each time the preconditioner is called.
    */
-  std::vector<std::vector<bool> > dof_masks;
+  std::vector<std::vector<bool>> dof_masks;
 
   /**
    * Compute the contents of the field @p dof_masks. This function is called
    * from the constructor.
    */
-  void compute_dof_masks (const SparseMatrix<number> &M,
-                          const std::vector<bool>    &selected,
-                          const BlockingStrategy      blocking_strategy);
+  void
+  compute_dof_masks(const SparseMatrix<number> &M,
+                    const std::vector<bool> &   selected,
+                    const BlockingStrategy      blocking_strategy);
 };
 
 /*@}*/
@@ -581,7 +597,7 @@ private:
 
 template <typename number>
 inline typename SparseVanka<number>::size_type
-SparseVanka<number>::m () const
+SparseVanka<number>::m() const
 {
   Assert(_m != 0, ExcNotInitialized());
   return _m;
@@ -589,7 +605,7 @@ SparseVanka<number>::m () const
 
 template <typename number>
 inline typename SparseVanka<number>::size_type
-SparseVanka<number>::n () const
+SparseVanka<number>::n() const
 {
   Assert(_n != 0, ExcNotInitialized());
   return _n;
@@ -598,8 +614,8 @@ SparseVanka<number>::n () const
 template <typename number>
 template <typename number2>
 inline void
-SparseVanka<number>::Tvmult (Vector<number2>       &/*dst*/,
-                             const Vector<number2> &/*src*/) const
+SparseVanka<number>::Tvmult(Vector<number2> & /*dst*/,
+                            const Vector<number2> & /*src*/) const
 {
   AssertThrow(false, ExcNotImplemented());
 }

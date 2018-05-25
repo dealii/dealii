@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/fe/mapping_q_generic.h>
 
 #include <cmath>
@@ -52,18 +53,18 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005,
  * Wolfgang Bangerth, 2015
  */
-template <int dim, int spacedim=dim>
-class MappingQ1 : public MappingQGeneric<dim,spacedim>
+template <int dim, int spacedim = dim>
+class MappingQ1 : public MappingQGeneric<dim, spacedim>
 {
 public:
   /**
    * Default constructor.
    */
-  MappingQ1 ();
+  MappingQ1();
 
   // for documentation, see the Mapping base class
-  virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  virtual std::unique_ptr<Mapping<dim, spacedim>>
+  clone() const override;
 };
 
 
@@ -83,7 +84,7 @@ public:
  * mapping object. This object can then be used in all of those places where
  * such an object is needed.
  */
-template <int dim, int spacedim=dim>
+template <int dim, int spacedim = dim>
 struct StaticMappingQ1
 {
   /**

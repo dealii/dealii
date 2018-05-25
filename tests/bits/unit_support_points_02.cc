@@ -27,40 +27,42 @@
 //    FESystem(FE_Q, 1,  FE_DGP, 1)
 // (the latter not having any support points for the second component).
 
-#include "../tests.h"
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void check2 (const FiniteElement<dim> &fe)
+void
+check2(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  const std::vector<Point<dim-1> > unit_f_s_p
-    = fe.get_unit_face_support_points ();
-  for (unsigned int i=0; i<unit_f_s_p.size(); ++i)
+  const std::vector<Point<dim - 1>> unit_f_s_p =
+    fe.get_unit_face_support_points();
+  for (unsigned int i = 0; i < unit_f_s_p.size(); ++i)
     deallog << i << ' ' << unit_f_s_p[i] << std::endl;
 }
 
 
 template <int dim>
-void check ()
+void
+check()
 {
-  check2 (FESystem<dim> (FE_Q<dim> (2), 1,
-                         FE_DGQ<dim> (2), 1));
-  check2 (FESystem<dim> (FE_Q<dim> (2), 1,
-                         FE_DGP<dim> (2), 1));
+  check2(FESystem<dim>(FE_Q<dim>(2), 1, FE_DGQ<dim>(2), 1));
+  check2(FESystem<dim>(FE_Q<dim>(2), 1, FE_DGP<dim>(2), 1));
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check<2> ();
-  check<3> ();
+  check<2>();
+  check<3>();
   return 0;
 }

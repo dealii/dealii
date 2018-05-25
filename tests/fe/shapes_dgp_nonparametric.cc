@@ -14,17 +14,20 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
-#include "shapes.h"
 #include <deal.II/fe/fe_dgp_nonparametric.h>
 #include <deal.II/fe/mapping_q1.h>
+
 #include <string>
+
+#include "../tests.h"
+#include "shapes.h"
 
 #define PRECISION 8
 
 
 template <int dim>
-void plot_FE_DGPNonparametric_shape_functions()
+void
+plot_FE_DGPNonparametric_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 
@@ -40,20 +43,20 @@ void plot_FE_DGPNonparametric_shape_functions()
   plot_shape_functions(m, p2, "DGPNonparametric2");
   plot_face_shape_functions(m, p2, "DGPNonparametric2");
 
-//    FE_DGPNonparametric<dim> p3(3);
-//    plot_shape_functions(m, p3, "DGPNonparametric3");
-//    plot_face_shape_functions(m, p3, "DGPNonparametric3");
+  //    FE_DGPNonparametric<dim> p3(3);
+  //    plot_shape_functions(m, p3, "DGPNonparametric3");
+  //    plot_face_shape_functions(m, p3, "DGPNonparametric3");
 
-//    FE_DGPNonparametric<dim> p4(4);
-//    plot_shape_functions(m, p4, "DGPNonparametric4");
-//    plot_face_shape_functions(m, p4, "DGPNonparametric4");
+  //    FE_DGPNonparametric<dim> p4(4);
+  //    plot_shape_functions(m, p4, "DGPNonparametric4");
+  //    plot_face_shape_functions(m, p4, "DGPNonparametric4");
 }
 
 
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
 

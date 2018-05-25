@@ -25,51 +25,55 @@
 // was wrongly implemented, so it was removed in the process
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global (2);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(2);
 
-  FE_Q<dim> fe(1);
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+    dof_handler.begin_active();
   ++cell;
 
-  typename DoFHandler<dim>::face_iterator
-  face = dof_handler.begin_active()->face(0);
+  typename DoFHandler<dim>::face_iterator face =
+    dof_handler.begin_active()->face(0);
   face = cell->face(0);
   deallog << cell->face(0) << ' ' << face << std::endl;
-  Assert (cell->face(0) == face, ExcInternalError());
-  Assert (!(cell->face(0) != face), ExcInternalError());
+  Assert(cell->face(0) == face, ExcInternalError());
+  Assert(!(cell->face(0) != face), ExcInternalError());
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   return 0;
 }

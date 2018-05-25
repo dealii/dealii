@@ -24,9 +24,9 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   DoFHandler<dim> dof;
   dof.initialize(tr, fe);
-  dof.distribute_mg_dofs (fe);
+  dof.distribute_mg_dofs(fe);
 
-  const unsigned int level = tr.n_levels()-1;
+  const unsigned int level = tr.n_levels() - 1;
 
   {
     deallog.push("t");
@@ -49,13 +49,14 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog.push("2D");
-  test_global_refinement<Triangulation<2> >(&test_block_list<2>);
+  test_global_refinement<Triangulation<2>>(&test_block_list<2>);
   deallog.pop();
   deallog.push("3D");
-  test_global_refinement<Triangulation<3> >(&test_block_list<3>);
+  test_global_refinement<Triangulation<3>>(&test_block_list<3>);
   deallog.pop();
 }

@@ -13,21 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
-#include <type_traits>
-
 #include <deal.II/base/vectorization.h>
 
-int main()
+#include <type_traits>
+
+#include "../tests.h"
+
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname);
 
-  if (!std::is_pod<VectorizedArray<double> >::value)
-    logfile << "Not OK because VectorizedArray<double> is not POD!" << std::endl;
+  if (!std::is_pod<VectorizedArray<double>>::value)
+    logfile << "Not OK because VectorizedArray<double> is not POD!"
+            << std::endl;
 
-  if (!std::is_trivial<VectorizedArray<double> >::value)
-    logfile << "Not OK because VectorizedArray<double> is not trivial!" << std::endl;
+  if (!std::is_trivial<VectorizedArray<double>>::value)
+    logfile << "Not OK because VectorizedArray<double> is not trivial!"
+            << std::endl;
 
   logfile << "OK" << std::endl;
   logfile.close();

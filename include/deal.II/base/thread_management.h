@@ -14,36 +14,37 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_thread_management_h
-#define dealii_thread_management_h
+#  define dealii_thread_management_h
 
 
-#include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/template_constraints.h>
-#include <deal.II/base/multithread_info.h>
+#  include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_THREADS
-#  include <thread>
-#  include <mutex>
-#  include <condition_variable>
-#endif
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/multithread_info.h>
+#  include <deal.II/base/template_constraints.h>
 
-#include <iterator>
-#include <vector>
-#include <list>
-#include <utility>
-#include <functional>
-#include <memory>
-#include <tuple>
-
-
-#ifdef DEAL_II_WITH_THREADS
-#  ifdef DEAL_II_USE_MT_POSIX
-#    include <pthread.h>
+#  ifdef DEAL_II_WITH_THREADS
+#    include <condition_variable>
+#    include <mutex>
+#    include <thread>
 #  endif
-#  include <tbb/task.h>
-#  include <tbb/tbb_stddef.h>
-#endif
+
+#  include <functional>
+#  include <iterator>
+#  include <list>
+#  include <memory>
+#  include <tuple>
+#  include <utility>
+#  include <vector>
+
+
+#  ifdef DEAL_II_WITH_THREADS
+#    ifdef DEAL_II_USE_MT_POSIX
+#      include <pthread.h>
+#    endif
+#    include <tbb/task.h>
+#    include <tbb/tbb_stddef.h>
+#  endif
 
 
 
@@ -99,27 +100,33 @@ namespace Threads
        * Constructor. Lock the mutex. Since this is a dummy mutex class, this
        * of course does nothing.
        */
-      ScopedLock (DummyThreadMutex &) {}
+      ScopedLock(DummyThreadMutex &)
+      {}
 
       /**
        * Destructor. Unlock the mutex. Since this is a dummy mutex class, this
        * of course does nothing. We still don't declare it as 'default' to avoid
        * warnings about objects of this class being unused.
        */
-      ~ScopedLock () {}
+      ~ScopedLock()
+      {}
     };
 
     /**
      * Simulate acquisition of the mutex. As this class does nothing really,
      * this function does nothing as well.
      */
-    inline void acquire () const {}
+    inline void
+    acquire() const
+    {}
 
     /**
      * Simulate release of the mutex. As this class does nothing really, this
      * function does nothing as well.
      */
-    inline void release () const {}
+    inline void
+    release() const
+    {}
   };
 
 
@@ -149,14 +156,18 @@ namespace Threads
      * some data will now be available. Since in single threaded mode, this
      * function of course does nothing.
      */
-    inline void signal () const {}
+    inline void
+    signal() const
+    {}
 
     /**
      * Signal to multiple listener that a condition has been met, i.e. that
      * some data will now be available. Since in single threaded mode, this
      * function of course does nothing.
      */
-    inline void broadcast () const {}
+    inline void
+    broadcast() const
+    {}
 
     /**
      * Wait for the condition to be signalled. Signal variables need to be
@@ -165,7 +176,9 @@ namespace Threads
      * description of the mechanisms. Since in single threaded mode, this
      * function of course does nothing, but returns immediately.
      */
-    inline void wait (DummyThreadMutex &) const {}
+    inline void
+    wait(DummyThreadMutex &) const
+    {}
   };
 
 
@@ -193,15 +206,16 @@ namespace Threads
      * the number of threads to be synchronized is one, this constructor
      * raises an exception if the <code>count</code> argument is one.
      */
-    DummyBarrier (const unsigned int  count,
-                  const char         *name = nullptr,
-                  void               *arg  = nullptr);
+    DummyBarrier(const unsigned int count,
+                 const char *       name = nullptr,
+                 void *             arg  = nullptr);
 
     /**
      * Wait for all threads to reach this point. Since there may only be one
      * thread, return immediately, i.e. this function is a no-op.
      */
-    inline int wait () const
+    inline int
+    wait() const
     {
       return 0;
     }
@@ -209,7 +223,9 @@ namespace Threads
     /**
      * Dump the state of this object. Here: do nothing.
      */
-    inline void dump () const {}
+    inline void
+    dump() const
+    {}
 
     /**
      * @addtogroup Exceptions
@@ -219,16 +235,17 @@ namespace Threads
     /**
      * Exception.
      */
-    DeclException1 (ExcBarrierSizeNotUseful,
-                    int,
-                    << "In single-thread mode, barrier sizes other than 1 are not "
-                    << "useful. You gave " << arg1 << ".");
+    DeclException1(
+      ExcBarrierSizeNotUseful,
+      int,
+      << "In single-thread mode, barrier sizes other than 1 are not "
+      << "useful. You gave " << arg1 << ".");
 
     //@}
   };
 
 
-#ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_THREADS
 
   /**
    * Class implementing a Mutex. Mutexes are used to lock data structures to
@@ -269,7 +286,7 @@ namespace Threads
       /**
        * Constructor. Lock the mutex.
        */
-      ScopedLock (Mutex &m) : mutex(m)
+      ScopedLock(Mutex &m) : mutex(m)
       {
         mutex.acquire();
       }
@@ -278,9 +295,9 @@ namespace Threads
        * Destructor. Unlock the mutex. Since this is a dummy mutex class, this
        * of course does nothing.
        */
-      ~ScopedLock ()
+      ~ScopedLock()
       {
-        mutex.release ();
+        mutex.release();
       }
 
     private:
@@ -293,15 +310,13 @@ namespace Threads
     /**
      * Default constructor.
      */
-    Mutex () = default;
+    Mutex() = default;
 
     /**
      * Copy constructor. As discussed in this class's documentation, no state
      * is copied from the object given as argument.
      */
-    Mutex (const Mutex &)
-      :
-      mutex()
+    Mutex(const Mutex &) : mutex()
     {}
 
 
@@ -309,7 +324,8 @@ namespace Threads
      * Copy operators. As discussed in this class's documentation, no state
      * is copied from the object given as argument.
      */
-    Mutex &operator = (const Mutex &)
+    Mutex &
+    operator=(const Mutex &)
     {
       return *this;
     }
@@ -318,7 +334,8 @@ namespace Threads
     /**
      * Acquire a mutex.
      */
-    inline void acquire ()
+    inline void
+    acquire()
     {
       mutex.lock();
     }
@@ -326,7 +343,8 @@ namespace Threads
     /**
      * Release the mutex again.
      */
-    inline void release ()
+    inline void
+    release()
     {
       mutex.unlock();
     }
@@ -358,7 +376,8 @@ namespace Threads
      * Signal to a single listener that a condition has been met, i.e. that
      * some data will now be available.
      */
-    inline void signal ()
+    inline void
+    signal()
     {
       condition_variable.notify_one();
     }
@@ -367,7 +386,8 @@ namespace Threads
      * Signal to multiple listener that a condition has been met, i.e. that
      * some data will now be available.
      */
-    inline void broadcast ()
+    inline void
+    broadcast()
     {
       condition_variable.notify_all();
     }
@@ -381,10 +401,11 @@ namespace Threads
      * The mutex is assumed held at the entry to this function but is released
      * upon exit.
      */
-    inline void wait (Mutex &mutex)
+    inline void
+    wait(Mutex &mutex)
     {
       std::unique_lock<std::mutex> lock(mutex.mutex, std::adopt_lock);
-      condition_variable.wait (lock);
+      condition_variable.wait(lock);
     }
 
   private:
@@ -416,14 +437,14 @@ namespace Threads
     /**
      * Constructor. Initialize the underlying POSIX barrier data structure.
      */
-    PosixThreadBarrier (const unsigned int  count,
-                        const char         *name = nullptr,
-                        void               *arg  = nullptr);
+    PosixThreadBarrier(const unsigned int count,
+                       const char *       name = nullptr,
+                       void *             arg  = nullptr);
 
     /**
      * Destructor. Release all resources.
      */
-    ~PosixThreadBarrier ();
+    ~PosixThreadBarrier();
 
     /**
      * Wait for all threads to reach this point. The return value is zero for
@@ -431,18 +452,19 @@ namespace Threads
      * some non-zero value. The operating system picks the special thread by
      * some not further known method.
      */
-    int wait ();
+    int
+    wait();
 
   private:
     /**
      * Data object storing the POSIX data which we need to call the POSIX
      * functions.
      */
-#ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     pthread_barrier_t barrier;
-#else
+#    else
     unsigned int count;
-#endif
+#    endif
   };
 
 
@@ -452,13 +474,13 @@ namespace Threads
    */
   typedef PosixThreadBarrier Barrier;
 
-#else
+#  else
   /**
    * In non-multithread mode, the mutex and thread management classes are
    * aliased to dummy classes that actually do nothing, in particular not lock
    * objects. Likewise for the barrier class.
    */
-  typedef DummyThreadMutex     Mutex;
+  typedef DummyThreadMutex Mutex;
 
   /**
    * In non-multithread mode, the mutex and thread management classes are
@@ -472,15 +494,14 @@ namespace Threads
    * aliased to dummy classes that actually do nothing, in particular not lock
    * objects. Likewise for the barrier class.
    */
-  typedef DummyBarrier         Barrier;
-#endif
+  typedef DummyBarrier Barrier;
+#  endif
 
-}
+} // namespace Threads
 
 
 namespace Threads
 {
-
   /**
    * Return the number of presently existing threads. This function may be
    * useful in a situation where a large number of threads are concurrently,
@@ -510,7 +531,8 @@ namespace Threads
    *
    * @ingroup threads
    */
-  unsigned int n_existing_threads ();
+  unsigned int
+  n_existing_threads();
 
   /**
    * Return a number used as id of this thread. This number is generated using
@@ -523,7 +545,8 @@ namespace Threads
    *
    * @ingroup threads
    */
-  unsigned int this_thread_id ();
+  unsigned int
+  this_thread_id();
 
   /**
    * Split the range <code>[begin,end)</code> into <code>n_intervals</code>
@@ -540,10 +563,10 @@ namespace Threads
    * @ingroup threads
    */
   template <typename ForwardIterator>
-  std::vector<std::pair<ForwardIterator,ForwardIterator> >
-  split_range (const ForwardIterator &begin,
-               const ForwardIterator &end,
-               const unsigned int n_intervals);
+  std::vector<std::pair<ForwardIterator, ForwardIterator>>
+  split_range(const ForwardIterator &begin,
+              const ForwardIterator &end,
+              const unsigned int     n_intervals);
 
   /**
    * Split the interval <code>[begin,end)</code> into subintervals of (almost)
@@ -553,10 +576,10 @@ namespace Threads
    *
    * @ingroup threads
    */
-  std::vector<std::pair<unsigned int,unsigned int> >
-  split_interval (const unsigned int begin,
-                  const unsigned int end,
-                  const unsigned int n_intervals);
+  std::vector<std::pair<unsigned int, unsigned int>>
+  split_interval(const unsigned int begin,
+                 const unsigned int end,
+                 const unsigned int n_intervals);
 
   /**
    * @cond internal
@@ -586,8 +609,8 @@ namespace Threads
      * <code>std::exception</code> is caught, it passes over control to this
      * function, which will then provide some output.
      */
-    [[noreturn]]
-    void handle_std_exception (const std::exception &exc);
+    [[noreturn]] void
+    handle_std_exception(const std::exception &exc);
 
     /**
      * @internal
@@ -596,8 +619,8 @@ namespace Threads
      * <code>std::exception</code>, so there is little way to provide
      * something more useful.
      */
-    [[noreturn]]
-    void handle_unknown_exception ();
+    [[noreturn]] void
+    handle_unknown_exception();
 
     /**
      * @internal
@@ -606,7 +629,8 @@ namespace Threads
      * of existing threads. It is not thought for use in application programs,
      * but only for use in the template functions below.
      */
-    void register_thread ();
+    void
+    register_thread();
 
     /**
      * @internal
@@ -615,69 +639,69 @@ namespace Threads
      * of existing threads. It is not thought for use in application programs,
      * but only for use in the template functions below.
      */
-    void deregister_thread ();
-  }
+    void
+    deregister_thread();
+  } // namespace internal
 
   /**
    * @endcond
    */
 
-}   // end declarations of namespace Threads
+} // namespace Threads
 
 /* ----------- implementation of functions in namespace Threads ---------- */
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 namespace Threads
 {
   template <typename ForwardIterator>
-  std::vector<std::pair<ForwardIterator,ForwardIterator> >
-  split_range (const ForwardIterator &begin,
-               const ForwardIterator &end,
-               const unsigned int     n_intervals)
+  std::vector<std::pair<ForwardIterator, ForwardIterator>>
+  split_range(const ForwardIterator &begin,
+              const ForwardIterator &end,
+              const unsigned int     n_intervals)
   {
-    typedef std::pair<ForwardIterator,ForwardIterator> IteratorPair;
+    typedef std::pair<ForwardIterator, ForwardIterator> IteratorPair;
 
     // in non-multithreaded mode, we often have the case that this
     // function is called with n_intervals==1, so have a shortcut here
     // to handle that case efficiently
 
-    if (n_intervals==1)
-      return (std::vector<IteratorPair>
-              (1, IteratorPair(begin, end)));
+    if (n_intervals == 1)
+      return (std::vector<IteratorPair>(1, IteratorPair(begin, end)));
 
     // if more than one interval requested, do the full work
-    const unsigned int n_elements              = std::distance (begin, end);
+    const unsigned int n_elements              = std::distance(begin, end);
     const unsigned int n_elements_per_interval = n_elements / n_intervals;
     const unsigned int residual                = n_elements % n_intervals;
 
-    std::vector<IteratorPair> return_values (n_intervals);
+    std::vector<IteratorPair> return_values(n_intervals);
 
     return_values[0].first = begin;
-    for (unsigned int i=0; i<n_intervals; ++i)
+    for (unsigned int i = 0; i < n_intervals; ++i)
       {
-        if (i != n_intervals-1)
+        if (i != n_intervals - 1)
           {
             return_values[i].second = return_values[i].first;
             // note: the cast is performed to avoid a warning of gcc
             // that in the library `dist>=0' is checked (dist has a
             // template type, which here is unsigned if no cast is
             // performed)
-            std::advance (return_values[i].second,
-                          static_cast<signed int>(n_elements_per_interval));
+            std::advance(return_values[i].second,
+                         static_cast<signed int>(n_elements_per_interval));
             // distribute residual in division equally among the first
             // few subintervals
             if (i < residual)
               ++return_values[i].second;
 
-            return_values[i+1].first = return_values[i].second;
+            return_values[i + 1].first = return_values[i].second;
           }
         else
           return_values[i].second = end;
       }
     return return_values;
   }
-}
+} // namespace Threads
 
-#endif // DOXYGEN
+#  endif // DOXYGEN
 
 namespace Threads
 {
@@ -691,21 +715,26 @@ namespace Threads
      * specializations for reference types (which need to be stored as
      * pointers to the object being referenced), and for type void.
      */
-    template <typename RT> struct return_value
+    template <typename RT>
+    struct return_value
     {
     private:
       RT value;
+
     public:
       typedef RT &reference_type;
 
-      inline return_value () : value() {}
+      inline return_value() : value()
+      {}
 
-      inline reference_type get ()
+      inline reference_type
+      get()
       {
         return value;
       }
 
-      inline void set (RT &&v)
+      inline void
+      set(RT &&v)
       {
         value = std::move(v);
       }
@@ -717,27 +746,30 @@ namespace Threads
      *
      * Given an arbitrary type RT, store an element of it and grant access to
      * it through functions get() and set(). This is the specialization for
-     * reference types: since references cannot be set after construction time, we
-     * store a pointer instead, which holds the address of the object being
+     * reference types: since references cannot be set after construction time,
+     * we store a pointer instead, which holds the address of the object being
      * referenced.
      */
-    template <typename RT> struct return_value<RT &>
+    template <typename RT>
+    struct return_value<RT &>
     {
     private:
       RT *value;
+
     public:
       typedef RT &reference_type;
 
-      inline return_value ()
-        : value(nullptr)
+      inline return_value() : value(nullptr)
       {}
 
-      inline reference_type get () const
+      inline reference_type
+      get() const
       {
         return *value;
       }
 
-      inline void set (RT &v)
+      inline void
+      set(RT &v)
       {
         value = &v;
       }
@@ -752,38 +784,42 @@ namespace Threads
      * type void: there is obviously nothing to store, so no function set(),
      * and a function get() that returns void.
      */
-    template <> struct return_value<void>
+    template <>
+    struct return_value<void>
     {
       typedef void reference_type;
 
-      static inline void get () {}
+      static inline void
+      get()
+      {}
     };
-  }
+  } // namespace internal
 
 
 
   namespace internal
   {
     template <typename RT>
-    inline void call (const std::function<RT ()> &function,
-                      internal::return_value<RT> &ret_val)
+    inline void
+    call(const std::function<RT()> & function,
+         internal::return_value<RT> &ret_val)
     {
-      ret_val.set (function());
+      ret_val.set(function());
     }
 
 
-    inline void call (const std::function<void ()> &function,
-                      internal::return_value<void> &)
+    inline void
+    call(const std::function<void()> &function, internal::return_value<void> &)
     {
       function();
     }
-  }
+  } // namespace internal
 
 
 
   namespace internal
   {
-#ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_THREADS
 
     /**
      * A class that represents threads. For each thread, we create exactly one
@@ -811,7 +847,7 @@ namespace Threads
        * the ThreadDescriptor.  This makes sure the object stays alive
        * until the thread exits.
        */
-      std::shared_ptr<return_value<RT> > ret_val;
+      std::shared_ptr<return_value<RT>> ret_val;
 
       /**
        * A bool variable that is initially false, is set to true when a new
@@ -854,12 +890,10 @@ namespace Threads
       /**
        * Default constructor.
        */
-      ThreadDescriptor ()
-        :
-        thread_is_active (false)
+      ThreadDescriptor() : thread_is_active(false)
       {}
 
-      ~ThreadDescriptor ()
+      ~ThreadDescriptor()
       {
         if (!thread_is_active)
           return;
@@ -871,18 +905,20 @@ namespace Threads
        * Start the thread and let it put its return value into the ret_val
        * object.
        */
-      void start (const std::function<RT ()> &function)
+      void
+      start(const std::function<RT()> &function)
       {
         thread_is_active = true;
-        ret_val = std::make_shared<return_value<RT>>();
-        thread = std::thread (thread_entry_point, function, ret_val);
+        ret_val          = std::make_shared<return_value<RT>>();
+        thread           = std::thread(thread_entry_point, function, ret_val);
       }
 
 
       /**
        * Wait for the thread to end.
        */
-      void join ()
+      void
+      join()
       {
         // see if the thread hasn't been joined yet. if it has, then
         // join() is a no-op. use schmidt's double-checking strategy
@@ -890,47 +926,46 @@ namespace Threads
         if (thread_is_active == false)
           return;
 
-        Mutex::ScopedLock lock (thread_is_active_mutex);
+        Mutex::ScopedLock lock(thread_is_active_mutex);
         if (thread_is_active == true)
           {
-            Assert (thread.joinable(), ExcInternalError());
-            thread.join ();
+            Assert(thread.joinable(), ExcInternalError());
+            thread.join();
             thread_is_active = false;
           }
       }
 
     private:
-
       /**
        * The function that runs on the thread.
        */
-      static
-      void thread_entry_point (const std::function<RT ()> &function,
-                               std::shared_ptr<return_value<RT> > ret_val)
+      static void
+      thread_entry_point(const std::function<RT()> &       function,
+                         std::shared_ptr<return_value<RT>> ret_val)
       {
         // call the function in question. since an exception that is
         // thrown from one of the called functions will not propagate
         // to the main thread, it will kill the program if not treated
         // here before we return to the operating system's thread
         // library
-        internal::register_thread ();
+        internal::register_thread();
         try
           {
-            call (function, *ret_val);
+            call(function, *ret_val);
           }
         catch (const std::exception &exc)
           {
-            internal::handle_std_exception (exc);
+            internal::handle_std_exception(exc);
           }
         catch (...)
           {
-            internal::handle_unknown_exception ();
+            internal::handle_unknown_exception();
           }
-        internal::deregister_thread ();
+        internal::deregister_thread();
       }
     };
 
-#else
+#  else
     /**
      * A class that represents threads. For each thread, we create exactly one
      * of these objects -- exactly one because it carries the returned value
@@ -946,27 +981,29 @@ namespace Threads
        * An object that will hold the value returned by the function called on
        * the thread.
        */
-      std::shared_ptr<return_value<RT> > ret_val;
+      std::shared_ptr<return_value<RT>> ret_val;
 
       /**
        * Start the thread and let it put its return value into the ret_val
        * object.
        */
-      void start (const std::function<RT ()> &function)
+      void
+      start(const std::function<RT()> &function)
       {
         ret_val = std::make_shared<return_value<RT>>();
-        call (function, *ret_val);
+        call(function, *ret_val);
       }
 
       /**
        * Wait for the thread to end.
        */
-      void join ()
+      void
+      join()
       {}
     };
 
-#endif
-  }
+#  endif
+  } // namespace internal
 
 
   /**
@@ -998,12 +1035,11 @@ namespace Threads
     /**
      * Construct a thread object with a function object.
      */
-    Thread (const std::function<RT ()> &function)
-      :
-      thread_descriptor (new internal::ThreadDescriptor<RT>())
+    Thread(const std::function<RT()> &function) :
+      thread_descriptor(new internal::ThreadDescriptor<RT>())
     {
       // in a second step, start the thread.
-      thread_descriptor->start (function);
+      thread_descriptor->start(function);
     }
 
     /**
@@ -1011,14 +1047,12 @@ namespace Threads
      * this way, except for assigning it a thread object that holds data
      * created by the new_thread() functions.
      */
-    Thread () = default;
+    Thread() = default;
 
     /**
      * Copy constructor.
      */
-    Thread (const Thread<RT> &t)
-      :
-      thread_descriptor (t.thread_descriptor)
+    Thread(const Thread<RT> &t) : thread_descriptor(t.thread_descriptor)
     {}
 
     /**
@@ -1026,10 +1060,11 @@ namespace Threads
      * If you have used the default constructor of this class and have not
      * assigned a thread object to it, then this function is a no-op.
      */
-    void join () const
+    void
+    join() const
     {
       if (thread_descriptor)
-        thread_descriptor->join ();
+        thread_descriptor->join();
     }
 
     /**
@@ -1045,9 +1080,9 @@ namespace Threads
      * the returned object, instead of the returned object. This
      * allows writing code such as
      * @code
-     *   Threads::Thread<int> t = Threads::new_thread (...function returning an int...);
-     *   t.return_value() = 42;      // overwrite returned value
-     *   int i = t.return_value();   // i is now 42
+     *   Threads::Thread<int> t = Threads::new_thread (...function returning an
+     * int...); t.return_value() = 42;      // overwrite returned value int i =
+     * t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
      * the function needs to return a writable (non-@p const) reference to support
@@ -1072,9 +1107,9 @@ namespace Threads
      * return a writable (non-@p const) reference.
      */
     typename internal::return_value<RT>::reference_type
-    return_value ()
+    return_value()
     {
-      join ();
+      join();
       return thread_descriptor->ret_val->get();
     }
 
@@ -1082,7 +1117,8 @@ namespace Threads
      * Return true if this object has had a thread associated with it, either
      * by using the non-default constructor or by assignment.
      */
-    bool valid () const
+    bool
+    valid() const
     {
       return static_cast<bool>(thread_descriptor);
     }
@@ -1093,7 +1129,8 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * thread, the check is simply to compare these pointers.
      */
-    bool operator == (const Thread &t) const
+    bool
+    operator==(const Thread &t) const
     {
       return thread_descriptor == t.thread_descriptor;
     }
@@ -1104,7 +1141,7 @@ namespace Threads
      * operating system functions to work on it. This also makes sure that the
      * object lives as long as there is at least one subscriber to it.
      */
-    std::shared_ptr<internal::ThreadDescriptor<RT> > thread_descriptor;
+    std::shared_ptr<internal::ThreadDescriptor<RT>> thread_descriptor;
   };
 
 
@@ -1120,7 +1157,8 @@ namespace Threads
     template <typename T>
     struct maybe_make_ref
     {
-      static T act (T &t)
+      static T
+      act(T &t)
       {
         return t;
       }
@@ -1138,16 +1176,17 @@ namespace Threads
     template <typename T>
     struct maybe_make_ref<T &>
     {
-      static std::reference_wrapper<T> act (T &t)
+      static std::reference_wrapper<T>
+      act(T &t)
       {
         return std::ref(t);
       }
     };
-  }
+  } // namespace internal
 
 
 
-// ----------- thread starters for functions not taking any parameters
+  // ----------- thread starters for functions not taking any parameters
 
   /**
    * Overload of the new_thread function for objects that can be converted to
@@ -1158,9 +1197,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT>
-  inline
-  Thread<RT>
-  new_thread (const std::function<RT ()> &function)
+  inline Thread<RT>
+  new_thread(const std::function<RT()> &function)
   {
     return Thread<RT>(function);
   }
@@ -1217,7 +1255,8 @@ namespace Threads
    *   new_thread() will of course typically be more complicated.
    *   In particular, they will likely <i>capture</i> variables
    *   from the surrounding context and use them within the lambda.
-   *   See https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
+   *   See
+   * https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
    *   for more on how lambda functions work.
    *
    * @note If you pass a lambda function as an argument to the
@@ -1231,13 +1270,12 @@ namespace Threads
    * @ingroup CPP11
    */
   template <typename FunctionObjectType>
-  inline
-  auto
-  new_thread (FunctionObjectType function_object)
-  -> Thread<decltype(function_object())>
+  inline auto
+  new_thread(FunctionObjectType function_object)
+    -> Thread<decltype(function_object())>
   {
     typedef decltype(function_object()) return_type;
-    return Thread<return_type>(std::function<return_type ()>(function_object));
+    return Thread<return_type>(std::function<return_type()>(function_object));
   }
 
 
@@ -1249,15 +1287,11 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename... Args>
-  inline
-  Thread<RT>
-  new_thread (RT (*fun_ptr)(Args...),
-              typename identity<Args>::type... args)
+  inline Thread<RT>
+  new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return
-      new_thread (std::function<RT ()>
-                  (std::bind(fun_ptr,
-                             internal::maybe_make_ref<Args>::act(args)...)));
+    return new_thread(std::function<RT()>(
+      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
   }
 
 
@@ -1268,39 +1302,33 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
-  inline
-  Thread<RT>
-  new_thread (RT (C::*fun_ptr)(Args...),
-              typename identity<C>::type &c,
-              typename identity<Args>::type... args)
+  inline Thread<RT>
+  new_thread(RT (C::*fun_ptr)(Args...),
+             typename identity<C>::type &c,
+             typename identity<Args>::type... args)
   {
-    return
-      new_thread (std::function<RT ()>
-                  (std::bind(fun_ptr, std::ref(c),
-                             internal::maybe_make_ref<Args>::act(args)...)));
+    return new_thread(std::function<RT()>(std::bind(
+      fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 
-#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+#  ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
   /**
    * Overload of the new_thread function for const member functions.
    *
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
-  inline
-  Thread<RT>
-  new_thread (RT (C::*fun_ptr)(Args...) const,
-              typename identity<const C>::type &c,
-              typename identity<Args>::type... args)
+  inline Thread<RT>
+  new_thread(RT (C::*fun_ptr)(Args...) const,
+             typename identity<const C>::type &c,
+             typename identity<Args>::type... args)
   {
-    return
-      new_thread (std::function<RT ()>
-                  (std::bind(fun_ptr, std::cref(c),
-                             internal::maybe_make_ref<Args>::act(args)...)));
+    return new_thread(std::function<RT()>(std::bind(
+      fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
-#endif
+#  endif
 
-// ------------------------ ThreadGroup -------------------------------------
+  // ------------------------ ThreadGroup -------------------------------------
 
   /**
    * A container for thread objects. Allows to add new thread objects and wait
@@ -1317,9 +1345,10 @@ namespace Threads
     /**
      * Add another thread object to the collection.
      */
-    ThreadGroup &operator += (const Thread<RT> &t)
+    ThreadGroup &
+    operator+=(const Thread<RT> &t)
     {
-      threads.push_back (t);
+      threads.push_back(t);
       return *this;
     }
 
@@ -1329,29 +1358,33 @@ namespace Threads
      * function more than once, and you can also add new thread objects
      * between subsequent calls to this function if you want.
      */
-    void join_all () const
+    void
+    join_all() const
     {
-      for (typename std::list<Thread<RT> >::const_iterator
-           t=threads.begin(); t!=threads.end(); ++t)
-        t->join ();
+      for (typename std::list<Thread<RT>>::const_iterator t = threads.begin();
+           t != threads.end();
+           ++t)
+        t->join();
     }
 
   private:
     /**
      * List of thread objects.
      */
-    std::list<Thread<RT> > threads;
+    std::list<Thread<RT>> threads;
   };
 
 
-  template <typename> class Task;
+  template <typename>
+  class Task;
 
 
   namespace internal
   {
-#ifdef DEAL_II_WITH_THREADS
+#  ifdef DEAL_II_WITH_THREADS
 
-    template <typename> struct TaskDescriptor;
+    template <typename>
+    struct TaskDescriptor;
 
     /**
      * The task class for TBB that is used by the TaskDescriptor class.
@@ -1359,26 +1392,26 @@ namespace Threads
     template <typename RT>
     struct TaskEntryPoint : public tbb::task
     {
-      TaskEntryPoint (TaskDescriptor<RT> &task_descriptor)
-        :
-        task_descriptor (task_descriptor)
+      TaskEntryPoint(TaskDescriptor<RT> &task_descriptor) :
+        task_descriptor(task_descriptor)
       {}
 
-      virtual tbb::task *execute () override
+      virtual tbb::task *
+      execute() override
       {
         // call the function object and put the return value into the
         // proper place
         try
           {
-            call (task_descriptor.function, task_descriptor.ret_val);
+            call(task_descriptor.function, task_descriptor.ret_val);
           }
         catch (const std::exception &exc)
           {
-            internal::handle_std_exception (exc);
+            internal::handle_std_exception(exc);
           }
         catch (...)
           {
-            internal::handle_unknown_exception ();
+            internal::handle_unknown_exception();
           }
         return nullptr;
       }
@@ -1417,7 +1450,7 @@ namespace Threads
       /**
        * The function and its arguments that are to be run on the task.
        */
-      std::function<RT ()> function;
+      std::function<RT()> function;
 
       /**
        * Variable holding the data the TBB needs to work with a task. Set by
@@ -1440,36 +1473,35 @@ namespace Threads
       bool task_is_done;
 
     public:
-
       /**
        * Constructor. Take the function to be run on this task as argument.
        */
-      TaskDescriptor (const std::function<RT ()> &function);
+      TaskDescriptor(const std::function<RT()> &function);
 
       /**
        * Default constructor. Throws an exception since we want to queue a
        * task immediately upon construction of these objects to make sure that
        * each TaskDescriptor object corresponds to exactly one task.
        */
-      TaskDescriptor ();
+      TaskDescriptor();
 
       /**
        * Copy constructor. Throws an exception since we want to make sure that
        * each TaskDescriptor object corresponds to exactly one task.
        */
-      TaskDescriptor (const TaskDescriptor &);
+      TaskDescriptor(const TaskDescriptor &);
 
       /**
        * Destructor.
        */
-      ~TaskDescriptor ();
+      ~TaskDescriptor();
 
       /**
        * Copy operator. Throws an exception since we want to make sure that
        * each TaskDescriptor object corresponds to exactly one task.
        */
       TaskDescriptor &
-      operator = (const TaskDescriptor &);
+      operator=(const TaskDescriptor &);
 
       /**
        * Queue up the task to the scheduler. We need to do this in a separate
@@ -1477,86 +1509,84 @@ namespace Threads
        * object and that can only reliably happen if the current object is
        * completely constructed already.
        */
-      void queue_task ();
+      void
+      queue_task();
 
       /**
        * Join a task, i.e. wait for it to finish. This function can safely be
        * called from different threads at the same time, and can also be
        * called more than once.
        */
-      void join ();
+      void
+      join();
 
 
-      template <typename> friend struct TaskEntryPoint;
+      template <typename>
+      friend struct TaskEntryPoint;
       friend class dealii::Threads::Task<RT>;
     };
 
 
 
     template <typename RT>
-    inline
-    TaskDescriptor<RT>::TaskDescriptor (const std::function<RT ()> &function)
-      :
-      function (function),
+    inline TaskDescriptor<RT>::TaskDescriptor(
+      const std::function<RT()> &function) :
+      function(function),
       task(nullptr),
-      task_is_done (false)
+      task_is_done(false)
     {}
 
 
     template <typename RT>
-    inline
-    void
-    TaskDescriptor<RT>::queue_task ()
+    inline void
+    TaskDescriptor<RT>::queue_task()
     {
       // use the pattern described in the TBB book on pages 230/231
       // ("Start a large task in parallel with the main program")
       task = new (tbb::task::allocate_root()) tbb::empty_task;
-      task->set_ref_count (2);
+      task->set_ref_count(2);
 
-      tbb::task *worker = new (task->allocate_child()) TaskEntryPoint<RT>(*this);
+      tbb::task *worker =
+        new (task->allocate_child()) TaskEntryPoint<RT>(*this);
 
       // in earlier versions of the TBB, task::spawn was a regular
       // member function; however, in later versions, it was converted
       // into a static function. we could always call it as a regular member
       // function of *task, but that appears to confuse the NVidia nvcc
       // compiler. consequently, the following work-around:
-#if TBB_VERSION_MAJOR >= 4
-      tbb::task::spawn (*worker);
-#else
-      task->spawn (*worker);
-#endif
+#    if TBB_VERSION_MAJOR >= 4
+      tbb::task::spawn(*worker);
+#    else
+      task->spawn(*worker);
+#    endif
     }
 
 
 
     template <typename RT>
-    TaskDescriptor<RT>::TaskDescriptor ()
-      :
-      task_is_done (false)
+    TaskDescriptor<RT>::TaskDescriptor() : task_is_done(false)
     {
-      Assert (false, ExcInternalError());
+      Assert(false, ExcInternalError());
     }
 
 
 
     template <typename RT>
-    TaskDescriptor<RT>::TaskDescriptor (const TaskDescriptor &)
-      :
-      task_is_done (false)
+    TaskDescriptor<RT>::TaskDescriptor(const TaskDescriptor &) :
+      task_is_done(false)
     {
       // we shouldn't be getting here -- task descriptors
       // can't be copied
-      Assert (false, ExcInternalError());
+      Assert(false, ExcInternalError());
     }
 
 
 
     template <typename RT>
-    inline
-    TaskDescriptor<RT>::~TaskDescriptor ()
+    inline TaskDescriptor<RT>::~TaskDescriptor()
     {
       // wait for the task to complete for sure
-      join ();
+      join();
 
       // now destroy the empty task structure. the book recommends to
       // spawn it as well and let the scheduler destroy the object
@@ -1568,27 +1598,26 @@ namespace Threads
       // of the arena". rather, let's explicitly destroy the empty
       // task object. before that, make sure that the task has been
       // shut down, expressed by a zero reference count
-      AssertNothrow (task != nullptr, ExcInternalError());
-      AssertNothrow (task->ref_count()==0, ExcInternalError());
-      task->destroy (*task);
+      AssertNothrow(task != nullptr, ExcInternalError());
+      AssertNothrow(task->ref_count() == 0, ExcInternalError());
+      task->destroy(*task);
     }
 
 
     template <typename RT>
     TaskDescriptor<RT> &
-    TaskDescriptor<RT>::operator = (const TaskDescriptor &)
+    TaskDescriptor<RT>::operator=(const TaskDescriptor &)
     {
       // we shouldn't be getting here -- task descriptors
       // can't be copied
-      Assert (false, ExcInternalError());
+      Assert(false, ExcInternalError());
       return *this;
     }
 
 
     template <typename RT>
-    inline
-    void
-    TaskDescriptor<RT>::join ()
+    inline void
+    TaskDescriptor<RT>::join()
     {
       // if the task is already done, just return. this makes sure we
       // call tbb::Task::wait_for_all() exactly once, as required by
@@ -1609,7 +1638,7 @@ namespace Threads
 
 
 
-#else        // no threading enabled
+#  else // no threading enabled
 
     /**
      * A way to describe tasks. Since we are in non-MT mode at this place,
@@ -1627,27 +1656,31 @@ namespace Threads
        * Constructor. Call the given function and emplace the return value
        * into the slot reserved for this purpose.
        */
-      TaskDescriptor (const std::function<RT ()> &function)
+      TaskDescriptor(const std::function<RT()> &function)
       {
-        call (function, ret_val);
+        call(function, ret_val);
       }
 
       /**
        * Wait for the task to return. Since we are in non-MT mode here, there
        * is nothing to do.
        */
-      static void join () {}
+      static void
+      join()
+      {}
 
       /**
        * Run the task. Since we are here in non-MT mode, there is nothing to
        * do that the constructor hasn't already done.
        */
-      static void queue_task () {}
+      static void
+      queue_task()
+      {}
     };
 
-#endif
+#  endif
 
-  }
+  } // namespace internal
 
 
 
@@ -1672,12 +1705,13 @@ namespace Threads
      * @post Using this constructor automatically makes the task object
      * joinable().
      */
-    Task (const std::function<RT ()> &function_object)
+    Task(const std::function<RT()> &function_object)
     {
       // create a task descriptor and tell it to queue itself up with
       // the scheduling system
-      task_descriptor = std::make_shared<internal::TaskDescriptor<RT>>(function_object);
-      task_descriptor->queue_task ();
+      task_descriptor =
+        std::make_shared<internal::TaskDescriptor<RT>>(function_object);
+      task_descriptor->queue_task();
     }
 
 
@@ -1687,9 +1721,7 @@ namespace Threads
      * @post Using this constructor automatically makes the task object
      * joinable().
      */
-    Task (const Task<RT> &t)
-      :
-      task_descriptor (t.task_descriptor)
+    Task(const Task<RT> &t) : task_descriptor(t.task_descriptor)
     {}
 
 
@@ -1701,7 +1733,7 @@ namespace Threads
      * @post Using this constructor leaves the object in an unjoinable state,
      * i.e., joinable() will return false.
      */
-    Task () = default;
+    Task() = default;
 
     /**
      * Join the task represented by this object, i.e. wait for it to finish.
@@ -1714,10 +1746,11 @@ namespace Threads
      * constructor of this class and have not assigned a task object to it. In
      * other words, the function joinable() must return true.
      */
-    void join () const
+    void
+    join() const
     {
-      AssertThrow (joinable(), ExcNoTask());
-      task_descriptor->join ();
+      AssertThrow(joinable(), ExcNoTask());
+      task_descriptor->join();
     }
 
     /**
@@ -1732,10 +1765,11 @@ namespace Threads
      * returns true, it will continue to return true until the task object it
      * reports on is assigned to from another object.
      */
-    bool joinable () const
+    bool
+    joinable() const
     {
       return (task_descriptor !=
-              std::shared_ptr<internal::TaskDescriptor<RT> >());
+              std::shared_ptr<internal::TaskDescriptor<RT>>());
     }
 
 
@@ -1752,9 +1786,9 @@ namespace Threads
      * the returned object, instead of the returned object. This
      * allows writing code such as
      * @code
-     *   Threads::Task<int> t = Threads::new_task (...function returning an int...);
-     *   t.return_value() = 42;      // overwrite returned value
-     *   int i = t.return_value();   // i is now 42
+     *   Threads::Task<int> t = Threads::new_task (...function returning an
+     * int...); t.return_value() = 42;      // overwrite returned value int i =
+     * t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
      * the function needs to return a writable (non-@p const) reference to support
@@ -1783,9 +1817,9 @@ namespace Threads
      * other words, the function joinable() must return true.
      */
     typename internal::return_value<RT>::reference_type
-    return_value ()
+    return_value()
     {
-      join ();
+      join();
       return task_descriptor->ret_val.get();
     }
 
@@ -1795,9 +1829,10 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * task, the check is simply to compare these pointers.
      */
-    bool operator == (const Task &t) const
+    bool
+    operator==(const Task &t) const
     {
-      AssertThrow (joinable(), ExcNoTask());
+      AssertThrow(joinable(), ExcNoTask());
       return task_descriptor == t.task_descriptor;
     }
 
@@ -1809,17 +1844,17 @@ namespace Threads
     /**
      * Exception
      */
-    DeclExceptionMsg (ExcNoTask,
-                      "The current object is not associated with a task that "
-                      "can be joined. It may have been detached, or you "
-                      "may have already joined it in the past.");
+    DeclExceptionMsg(ExcNoTask,
+                     "The current object is not associated with a task that "
+                     "can be joined. It may have been detached, or you "
+                     "may have already joined it in the past.");
     //@}
   private:
     /**
      * Shared pointer to the object representing the task. This makes sure that
      * the object lives as long as there is at least one subscriber to it.
      */
-    std::shared_ptr<internal::TaskDescriptor<RT> > task_descriptor;
+    std::shared_ptr<internal::TaskDescriptor<RT>> task_descriptor;
   };
 
 
@@ -1833,9 +1868,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT>
-  inline
-  Task<RT>
-  new_task (const std::function<RT ()> &function)
+  inline Task<RT>
+  new_task(const std::function<RT()> &function)
   {
     return Task<RT>(function);
   }
@@ -1892,7 +1926,8 @@ namespace Threads
    *   new_task() will of course typically be more complicated.
    *   In particular, they will likely <i>capture</i> variables
    *   from the surrounding context and use them within the lambda.
-   *   See https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
+   *   See
+   * https://en.wikipedia.org/wiki/Anonymous_function#C.2B.2B_.28since_C.2B.2B11.29
    *   for more on how lambda functions work.
    *
    * @note If you pass a lambda function as an argument to the
@@ -1906,14 +1941,13 @@ namespace Threads
    * @ingroup CPP11
    */
   template <typename FunctionObjectType>
-  inline
-  auto
-  new_task (FunctionObjectType function_object)
-  -> Task<decltype(function_object())>
+  inline auto
+  new_task(FunctionObjectType function_object)
+    -> Task<decltype(function_object())>
   {
     typedef decltype(function_object()) return_type;
     dealii::MultithreadInfo::initialize_multithreading();
-    return Task<return_type>(std::function<return_type ()>(function_object));
+    return Task<return_type>(std::function<return_type()>(function_object));
   }
 
 
@@ -1925,15 +1959,11 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename... Args>
-  inline
-  Task<RT>
-  new_task (RT (*fun_ptr)(Args...),
-            typename identity<Args>::type... args)
+  inline Task<RT>
+  new_task(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return
-      new_task (std::function<RT ()>
-                (std::bind(fun_ptr,
-                           internal::maybe_make_ref<Args>::act(args)...)));
+    return new_task(std::function<RT()>(
+      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
   }
 
 
@@ -1944,40 +1974,34 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
-  inline
-  Task<RT>
-  new_task (RT (C::*fun_ptr)(Args...),
-            typename identity<C>::type &c,
-            typename identity<Args>::type... args)
+  inline Task<RT>
+  new_task(RT (C::*fun_ptr)(Args...),
+           typename identity<C>::type &c,
+           typename identity<Args>::type... args)
   {
-    return
-      new_task (std::function<RT ()>
-                (std::bind(fun_ptr, std::ref(c),
-                           internal::maybe_make_ref<Args>::act(args)...)));
+    return new_task(std::function<RT()>(std::bind(
+      fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 
-#ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+#  ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
   /**
    * Overload of the new_task function.
    *
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
-  inline
-  Task<RT>
-  new_task (RT (C::*fun_ptr)(Args...) const,
-            typename identity<const C>::type &c,
-            typename identity<Args>::type... args)
+  inline Task<RT>
+  new_task(RT (C::*fun_ptr)(Args...) const,
+           typename identity<const C>::type &c,
+           typename identity<Args>::type... args)
   {
-    return
-      new_task (std::function<RT ()>
-                (std::bind(fun_ptr, std::cref(c),
-                           internal::maybe_make_ref<Args>::act(args)...)));
+    return new_task(std::function<RT()>(std::bind(
+      fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
-#endif
+#  endif
 
 
-// ------------------------ TaskGroup -------------------------------------
+  // ------------------------ TaskGroup -------------------------------------
 
   /**
    * A container for task objects. Allows to add new task objects and wait for
@@ -1999,9 +2023,10 @@ namespace Threads
     /**
      * Add another task object to the collection.
      */
-    TaskGroup &operator += (const Task<RT> &t)
+    TaskGroup &
+    operator+=(const Task<RT> &t)
     {
-      tasks.push_back (t);
+      tasks.push_back(t);
       return *this;
     }
 
@@ -2011,21 +2036,23 @@ namespace Threads
      * function more than once, and you can also add new task objects between
      * subsequent calls to this function if you want.
      */
-    void join_all () const
+    void
+    join_all() const
     {
-      for (typename std::list<Task<RT> >::const_iterator
-           t=tasks.begin(); t!=tasks.end(); ++t)
-        t->join ();
+      for (typename std::list<Task<RT>>::const_iterator t = tasks.begin();
+           t != tasks.end();
+           ++t)
+        t->join();
     }
 
   private:
     /**
      * List of task objects.
      */
-    std::list<Task<RT> > tasks;
+    std::list<Task<RT>> tasks;
   };
 
-}   // end of implementation of namespace Threads
+} // namespace Threads
 
 /**
  * @}

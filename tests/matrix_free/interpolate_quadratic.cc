@@ -21,11 +21,10 @@
 // cartesian meshes are treated correctly. The test case is without any
 // constraints
 
-#include "../tests.h"
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 
-
+#include "../tests.h"
 #include "interpolate_functions_common.h"
 
 
@@ -33,73 +32,80 @@ template <int dim>
 class CompareFunction : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p, const unsigned int ) const
+  virtual double
+  value(const Point<dim> &p, const unsigned int) const
   {
     double value = 1.;
-    for (unsigned int d=0; d<dim; ++d)
-      for (unsigned int e=0; e<dim; ++e)
-        value += (1.3 + 0.9 * d * (e+1) - 1.4 * (d+1) * (e-1.)) * p[d] * p[e];
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int e = 0; e < dim; ++e)
+        value +=
+          (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.)) * p[d] * p[e];
     return value;
   }
-  virtual Tensor<1,dim> gradient (const Point<dim> &p, const unsigned int ) const
+  virtual Tensor<1, dim>
+  gradient(const Point<dim> &p, const unsigned int) const
   {
-    Tensor<1,dim> grad;
-    for (unsigned int d=0; d<dim; ++d)
-      for (unsigned int e=0; e<dim; ++e)
+    Tensor<1, dim> grad;
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int e = 0; e < dim; ++e)
         {
-          grad[d] += (1.3 + 0.9 * d * (e+1) - 1.4 * (d+1) * (e-1.)) * p[e];
-          grad[e] += (1.3 + 0.9 * d * (e+1) - 1.4 * (d+1) * (e-1.)) * p[d];
+          grad[d] +=
+            (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.)) * p[e];
+          grad[e] +=
+            (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.)) * p[d];
         }
     return grad;
   }
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p, const unsigned int ) const
+  virtual SymmetricTensor<2, dim>
+  hessian(const Point<dim> &p, const unsigned int) const
   {
-    SymmetricTensor<2,dim> hess;
-    for (unsigned int d=0; d<dim; ++d)
-      for (unsigned int e=0; e<dim; ++e)
-        hess[d][e] += (1.3 + 0.9 * d * (e+1) - 1.4 * (d+1) * (e-1.)) * (d==e ? 2.0 : 1.0);
+    SymmetricTensor<2, dim> hess;
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int e = 0; e < dim; ++e)
+        hess[d][e] += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.)) *
+                      (d == e ? 2.0 : 1.0);
     return hess;
   }
-
 };
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   if (fe_degree < 2)
     return;
 
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
   {
-    FE_Q<dim> fe (fe_degree);
-    DoFHandler<dim> dof (tria);
+    FE_Q<dim>       fe(fe_degree);
+    DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
     ConstraintMatrix constraints;
     constraints.close();
-    do_test<dim, fe_degree, double> (dof, constraints);
+    do_test<dim, fe_degree, double>(dof, constraints);
   }
   {
-    FE_DGQ<dim> fe (fe_degree);
-    DoFHandler<dim> dof (tria);
+    FE_DGQ<dim>     fe(fe_degree);
+    DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
     ConstraintMatrix constraints;
     constraints.close();
-    do_test<dim, fe_degree, double> (dof, constraints);
+    do_test<dim, fe_degree, double>(dof, constraints);
   }
   deallog << "Test without templates on FEEvaluation" << std::endl;
   {
-    FE_DGQ<dim> fe (fe_degree);
-    DoFHandler<dim> dof (tria);
+    FE_DGQ<dim>     fe(fe_degree);
+    DoFHandler<dim> dof(tria);
     dof.distribute_dofs(fe);
 
     ConstraintMatrix constraints;
     constraints.close();
-    do_test<dim, -1, double> (dof, constraints);
+    do_test<dim, -1, double>(dof, constraints);
   }
 }

@@ -14,10 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
@@ -32,7 +34,7 @@ int main()
   {
     Vector<double> u(10);
     for (unsigned int i = 0; i < u.size(); ++i)
-      u[i] = (double)(i+1);
+      u[i] = (double)(i + 1);
 
     deallog << "vector:          " << u;
 
@@ -52,4 +54,3 @@ int main()
     deallog << "old object size: " << v.size() << std::endl;
   }
 }
-

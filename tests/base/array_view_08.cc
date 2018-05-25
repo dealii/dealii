@@ -16,56 +16,64 @@
 
 // test ArrayView::begin and ArrayView::end
 
-#include "../tests.h"
-
 #include <deal.II/base/array_view.h>
 
 #include <type_traits>
 
+#include "../tests.h"
+
 template <typename T>
-constexpr
-bool
+constexpr bool
 is_const_reference()
 {
   return std::is_reference<T>::value &&
          std::is_const<typename std::remove_reference<T>::type>::value;
 }
 
-void test ()
+void
+test()
 {
   // test for a mutable view of a mutable vector
   {
-    std::vector<int> v (10);
-    ArrayView<int> a (&v[4], 3);
-    AssertThrow (a.begin() == &v[4], ExcInternalError());
-    AssertThrow (a.end() == &v[7], ExcInternalError());
+    std::vector<int> v(10);
+    ArrayView<int>   a(&v[4], 3);
+    AssertThrow(a.begin() == &v[4], ExcInternalError());
+    AssertThrow(a.end() == &v[7], ExcInternalError());
 
-    static_assert(std::is_reference<decltype(*a.begin())>::value, "type should be a reference");
-    static_assert(std::is_reference<decltype(*a.end())>::value, "type should be a reference");
-    static_assert(!is_const_reference<decltype(*a.begin())>(), "type should not be const");
-    static_assert(!is_const_reference<decltype(*a.end())>(), "type should not be const");
+    static_assert(std::is_reference<decltype(*a.begin())>::value,
+                  "type should be a reference");
+    static_assert(std::is_reference<decltype(*a.end())>::value,
+                  "type should be a reference");
+    static_assert(!is_const_reference<decltype(*a.begin())>(),
+                  "type should not be const");
+    static_assert(!is_const_reference<decltype(*a.end())>(),
+                  "type should not be const");
   }
 
   // and an immutable view of a mutable vector
   {
-    std::vector<int> v (10);
-    const ArrayView<const int> a (&v[4], 3);
-    AssertThrow (a.begin() == &v[4], ExcInternalError());
-    AssertThrow (a.end() == &v[7], ExcInternalError());
+    std::vector<int>           v(10);
+    const ArrayView<const int> a(&v[4], 3);
+    AssertThrow(a.begin() == &v[4], ExcInternalError());
+    AssertThrow(a.end() == &v[7], ExcInternalError());
 
-    static_assert(is_const_reference<decltype(*a.begin())>(), "type should be const reference");
-    static_assert(is_const_reference<decltype(*a.end())>(), "type should be const reference");
+    static_assert(is_const_reference<decltype(*a.begin())>(),
+                  "type should be const reference");
+    static_assert(is_const_reference<decltype(*a.end())>(),
+                  "type should be const reference");
   }
 
   // and an immutable view of an immutable vector
   {
-    const std::vector<int> v (10, 42);
-    const ArrayView<const int> a (&v[4], 3);
-    AssertThrow (a.begin() == &v[4], ExcInternalError());
-    AssertThrow (a.end() == &v[7], ExcInternalError());
+    const std::vector<int>     v(10, 42);
+    const ArrayView<const int> a(&v[4], 3);
+    AssertThrow(a.begin() == &v[4], ExcInternalError());
+    AssertThrow(a.end() == &v[7], ExcInternalError());
 
-    static_assert(is_const_reference<decltype(*a.begin())>(), "type should be const reference");
-    static_assert(is_const_reference<decltype(*a.end())>(), "type should be const reference");
+    static_assert(is_const_reference<decltype(*a.begin())>(),
+                  "type should be const reference");
+    static_assert(is_const_reference<decltype(*a.end())>(),
+                  "type should be const reference");
   }
 
   deallog << "OK" << std::endl;
@@ -73,9 +81,10 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

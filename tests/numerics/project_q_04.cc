@@ -21,8 +21,9 @@
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=1; p<6-dim; ++p)
-    test_with_2d_deformed_mesh (FE_Q<dim>(p), p);
+  for (unsigned int p = 1; p < 6 - dim; ++p)
+    test_with_2d_deformed_mesh(FE_Q<dim>(p), p);
 }

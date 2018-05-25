@@ -17,11 +17,12 @@
 #define dealii_fe_block_mask_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 
-#include <vector>
 #include <iosfwd>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -47,10 +48,10 @@ DEAL_II_NAMESPACE_OPEN
  * block of a Stokes element (see
  * @ref vector_valued):
  * @code
- *   FESystem<dim> stokes_fe (FESystem<dim>(FE_Q<dim>(2), dim), 1,    // Q2 element for the velocities
- *                            FE_Q<dim>(1),                     1);     // Q1 element for the pressure
- *   FEValuesExtractors::Scalar pressure(dim);
- *   BlockMask pressure_mask = stokes_fe.block_mask (pressure);
+ *   FESystem<dim> stokes_fe (FESystem<dim>(FE_Q<dim>(2), dim), 1,    // Q2
+ * element for the velocities FE_Q<dim>(1),                     1);     // Q1
+ * element for the pressure FEValuesExtractors::Scalar pressure(dim); BlockMask
+ * pressure_mask = stokes_fe.block_mask (pressure);
  * @endcode
  * Note that by wrapping the velocity elements into a single FESystem object
  * we make sure that the overall element has only 2 blocks. The result is a
@@ -77,7 +78,7 @@ public:
    * constructor results in a block mask that always returns <code>true</code>
    * whenever asked whether a block is selected.
    */
-  BlockMask () = default;
+  BlockMask() = default;
 
   /**
    * Initialize an object of this type with a set of selected blocks specified
@@ -88,7 +89,7 @@ public:
    * the given vector is zero, then this interpreted as the case where
    * <i>every</i> block is selected.
    */
-  BlockMask (const std::vector<bool> &block_mask);
+  BlockMask(const std::vector<bool> &block_mask);
 
   /**
    * Initialize the block mask with a number of elements that are either all
@@ -98,8 +99,7 @@ public:
    * @param initializer The value each of these elements is supposed to have:
    * either true or false.
    */
-  BlockMask (const unsigned int n_blocks,
-             const bool         initializer);
+  BlockMask(const unsigned int n_blocks, const bool initializer);
 
   /**
    * If this block mask has been initialized with a mask of size greater than
@@ -109,7 +109,8 @@ public:
    * would return true when calling represents_the_all_selected_mask()) then
    * return zero since no definite size is known.
    */
-  unsigned int size () const;
+  unsigned int
+  size() const;
 
   /**
    * Return whether a particular block is selected by this mask. If this mask
@@ -124,7 +125,7 @@ public:
    * given index needs to be between zero and the number of blocks that this
    * mask represents.
    */
-  bool operator[] (const unsigned int block_index) const;
+  bool operator[](const unsigned int block_index) const;
 
   /**
    * Return whether this block mask represents a mask with exactly
@@ -136,7 +137,7 @@ public:
    * say that a block is selected.
    */
   bool
-  represents_n_blocks (const unsigned int n) const;
+  represents_n_blocks(const unsigned int n) const;
 
   /**
    * Return the number of blocks that are selected by this mask.
@@ -152,7 +153,8 @@ public:
    * be omitted and the result of size() is taken.
    */
   unsigned int
-  n_selected_blocks (const unsigned int overall_number_of_blocks = numbers::invalid_unsigned_int) const;
+  n_selected_blocks(const unsigned int overall_number_of_blocks =
+                      numbers::invalid_unsigned_int) const;
 
   /**
    * Return the index of the first selected block. The argument is there for
@@ -161,7 +163,8 @@ public:
    * The function throws an exception if no block is selected at all.
    */
   unsigned int
-  first_selected_block (const unsigned int overall_number_of_blocks = numbers::invalid_unsigned_int) const;
+  first_selected_block(const unsigned int overall_number_of_blocks =
+                         numbers::invalid_unsigned_int) const;
 
   /**
    * Return true if this mask represents a default constructed mask that
@@ -169,36 +172,39 @@ public:
    * size() function will return zero.
    */
   bool
-  represents_the_all_selected_mask () const;
+  represents_the_all_selected_mask() const;
 
   /**
    * Return a block mask that contains the union of the blocks selected by the
    * current object and the one passed as an argument.
    */
-  BlockMask operator | (const BlockMask &mask) const;
+  BlockMask
+  operator|(const BlockMask &mask) const;
 
   /**
    * Return a block mask that has only those elements set that are set both in
    * the current object as well as the one passed as an argument.
    */
-  BlockMask operator & (const BlockMask &mask) const;
+  BlockMask operator&(const BlockMask &mask) const;
 
   /**
    * Return whether this object and the argument are identical.
    */
-  bool operator== (const BlockMask &mask) const;
+  bool
+  operator==(const BlockMask &mask) const;
 
   /**
    * Return whether this object and the argument are not identical.
    */
-  bool operator!= (const BlockMask &mask) const;
+  bool
+  operator!=(const BlockMask &mask) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
   std::size_t
-  memory_consumption () const;
+  memory_consumption() const;
 
 private:
   /**
@@ -208,9 +214,8 @@ private:
 
   // make the output operator a friend so it can access
   // the block_mask array
-  friend
-  std::ostream &operator << (std::ostream &out,
-                             const BlockMask &mask);
+  friend std::ostream &
+  operator<<(std::ostream &out, const BlockMask &mask);
 };
 
 
@@ -224,38 +229,31 @@ private:
  * @param out The stream to write to.
  * @param mask The mask to write. @return A reference to the first argument.
  */
-std::ostream &operator << (std::ostream &out,
-                           const BlockMask &mask);
+std::ostream &
+operator<<(std::ostream &out, const BlockMask &mask);
 
 
 // -------------------- inline functions ---------------------
 
-inline
-BlockMask::BlockMask(const std::vector<bool> &block_mask)
-  :
-  block_mask (block_mask)
+inline BlockMask::BlockMask(const std::vector<bool> &block_mask) :
+  block_mask(block_mask)
 {}
 
 
-inline
-BlockMask::BlockMask(const unsigned int n_blocks,
-                     const bool         initializer)
-  :
-  block_mask (n_blocks, initializer)
+inline BlockMask::BlockMask(const unsigned int n_blocks,
+                            const bool         initializer) :
+  block_mask(n_blocks, initializer)
 {}
 
 
-inline
-unsigned int
-BlockMask::size () const
+inline unsigned int
+BlockMask::size() const
 {
   return block_mask.size();
 }
 
 
-inline
-bool
-BlockMask::operator [](const unsigned int block_index) const
+inline bool BlockMask::operator[](const unsigned int block_index) const
 {
   // if the mask represents the all-block mask
   // then always return true
@@ -265,42 +263,34 @@ BlockMask::operator [](const unsigned int block_index) const
     {
       // otherwise check the validity of the index and
       // return whatever is appropriate
-      Assert (block_index < block_mask.size(),
-              ExcIndexRange (block_index, 0, block_mask.size()));
+      Assert(block_index < block_mask.size(),
+             ExcIndexRange(block_index, 0, block_mask.size()));
       return block_mask[block_index];
     }
 }
 
 
-inline
-bool
+inline bool
 BlockMask::represents_n_blocks(const unsigned int n) const
 {
-  return ((block_mask.size() == 0)
-          ||
-          (block_mask.size() == n));
+  return ((block_mask.size() == 0) || (block_mask.size() == n));
 }
 
 
-inline
-unsigned int
+inline unsigned int
 BlockMask::n_selected_blocks(const unsigned int n) const
 {
   if ((n != numbers::invalid_unsigned_int) && (size() > 0))
-    AssertDimension (n, size());
+    AssertDimension(n, size());
 
-  const unsigned int real_n = (n != numbers::invalid_unsigned_int
-                               ?
-                               n
-                               :
-                               size());
+  const unsigned int real_n = (n != numbers::invalid_unsigned_int ? n : size());
   if (block_mask.size() == 0)
     return real_n;
   else
     {
-      AssertDimension (real_n, block_mask.size());
+      AssertDimension(real_n, block_mask.size());
       unsigned int c = 0;
-      for (unsigned int i=0; i<block_mask.size(); ++i)
+      for (unsigned int i = 0; i < block_mask.size(); ++i)
         if (block_mask[i] == true)
           ++c;
       return c;
@@ -308,40 +298,37 @@ BlockMask::n_selected_blocks(const unsigned int n) const
 }
 
 
-inline
-unsigned int
+inline unsigned int
 BlockMask::first_selected_block(const unsigned int n) const
 {
   if ((n != numbers::invalid_unsigned_int) && (size() > 0))
-    AssertDimension (n, size());
+    AssertDimension(n, size());
 
   if (block_mask.size() == 0)
     return 0;
   else
     {
-      for (unsigned int c=0; c<block_mask.size(); ++c)
+      for (unsigned int c = 0; c < block_mask.size(); ++c)
         if (block_mask[c] == true)
           return c;
 
-      Assert (false, ExcMessage ("No block is selected at all!"));
+      Assert(false, ExcMessage("No block is selected at all!"));
       return numbers::invalid_unsigned_int;
     }
 }
 
 
 
-inline
-bool
-BlockMask::represents_the_all_selected_mask () const
+inline bool
+BlockMask::represents_the_all_selected_mask() const
 {
   return (block_mask.size() == 0);
 }
 
 
 
-inline
-BlockMask
-BlockMask::operator | (const BlockMask &mask) const
+inline BlockMask
+BlockMask::operator|(const BlockMask &mask) const
 {
   // if one of the two masks denotes the all-block mask,
   // then return the other one
@@ -354,8 +341,8 @@ BlockMask::operator | (const BlockMask &mask) const
       // if both masks have individual entries set, form
       // the combination of the two
       AssertDimension(block_mask.size(), mask.block_mask.size());
-      std::vector<bool> new_mask (block_mask.size());
-      for (unsigned int i=0; i<block_mask.size(); ++i)
+      std::vector<bool> new_mask(block_mask.size());
+      for (unsigned int i = 0; i < block_mask.size(); ++i)
         new_mask[i] = (block_mask[i] || mask.block_mask[i]);
 
       return new_mask;
@@ -363,9 +350,7 @@ BlockMask::operator | (const BlockMask &mask) const
 }
 
 
-inline
-BlockMask
-BlockMask::operator & (const BlockMask &mask) const
+inline BlockMask BlockMask::operator&(const BlockMask &mask) const
 {
   // if one of the two masks denotes the all-block mask,
   // then return the other one
@@ -378,8 +363,8 @@ BlockMask::operator & (const BlockMask &mask) const
       // if both masks have individual entries set, form
       // the combination of the two
       AssertDimension(block_mask.size(), mask.block_mask.size());
-      std::vector<bool> new_mask (block_mask.size());
-      for (unsigned int i=0; i<block_mask.size(); ++i)
+      std::vector<bool> new_mask(block_mask.size());
+      for (unsigned int i = 0; i < block_mask.size(); ++i)
         new_mask[i] = (block_mask[i] && mask.block_mask[i]);
 
       return new_mask;
@@ -387,17 +372,15 @@ BlockMask::operator & (const BlockMask &mask) const
 }
 
 
-inline
-bool
-BlockMask::operator== (const BlockMask &mask) const
+inline bool
+BlockMask::operator==(const BlockMask &mask) const
 {
   return block_mask == mask.block_mask;
 }
 
 
-inline
-bool
-BlockMask::operator!= (const BlockMask &mask) const
+inline bool
+BlockMask::operator!=(const BlockMask &mask) const
 {
   return block_mask != mask.block_mask;
 }

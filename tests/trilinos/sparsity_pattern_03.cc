@@ -17,20 +17,20 @@
 
 // check TrilinosWrappers::SparsityPattern::print
 
-#include "sparsity_pattern_common.h"
 #include <deal.II/base/utilities.h>
 
-int main (int argc, char **argv)
+#include "sparsity_pattern_common.h"
+
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  print ();
+  print();
 }
-
-
-

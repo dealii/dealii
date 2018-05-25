@@ -15,14 +15,16 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/parsed_function.h>
+
+#include "../tests.h"
 
 // Test proxy class
 
 
-int main ()
+int
+main()
 {
   initlog();
   auto &prm = ParameterAcceptor::prm;
@@ -31,6 +33,8 @@ int main ()
   ParameterAcceptorProxy<Functions::ParsedFunction<2>> f2("Function 2D");
   ParameterAcceptorProxy<Functions::ParsedFunction<3>> f3("Function 3D");
 
-  ParameterAcceptor::initialize(SOURCE_DIR"/parameter_acceptor_parameters/parameter_acceptor_proxy_01.prm");
+  ParameterAcceptor::initialize(
+    SOURCE_DIR
+    "/parameter_acceptor_parameters/parameter_acceptor_proxy_01.prm");
   prm.log_parameters(deallog);
 }

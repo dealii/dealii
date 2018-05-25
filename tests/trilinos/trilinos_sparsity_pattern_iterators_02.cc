@@ -21,41 +21,41 @@
 // The accessors keep a cache that is administered via a shared
 // pointer. make sure that copying these objects works as expected
 
-#include "../tests.h"
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   TrilinosWrappers::SparsityPattern sp;
 
-  sp.reinit(5,7,3);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<7; ++j)
-      if ((i+2*j+1) % 3 == 0)
+  sp.reinit(5, 7, 3);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 7; ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
         {
-          deallog << "Creating sparsity pattern entry "
-                  << i << ' ' << j << std::endl;
-          sp.add (i,j);
+          deallog << "Creating sparsity pattern entry " << i << ' ' << j
+                  << std::endl;
+          sp.add(i, j);
         }
-  sp.compress ();
+  sp.compress();
 
   // get an iterator to the first row, then copy it
   TrilinosWrappers::SparsityPattern::const_iterator p = sp.begin(0);
-  TrilinosWrappers::SparsityPattern::const_iterator q (p);
+  TrilinosWrappers::SparsityPattern::const_iterator q(p);
 
   // now reset 'p' to the second row, and output what elements both
   // 'p' and 'q' point to
   p = sp.begin(1);
 
-  for (unsigned int i=0; i<2; ++i, ++p)
-    deallog << "p[" << i << "]: "
-            << p->row() << ' ' << p->column()
+  for (unsigned int i = 0; i < 2; ++i, ++p)
+    deallog << "p[" << i << "]: " << p->row() << ' ' << p->column()
             << std::endl;
 
-  for (unsigned int i=0; i<2; ++i, ++q)
-    deallog << "q[" << i << "]: "
-            << q->row() << ' ' << q->column()
+  for (unsigned int i = 0; i < 2; ++i, ++q)
+    deallog << "q[" << i << "]: " << q->row() << ' ' << q->column()
             << std::endl;
 
 
@@ -64,32 +64,33 @@ void test ()
   q = p;
   p = sp.begin(1);
 
-  for (unsigned int i=0; i<2; ++i, ++p)
-    deallog << "p[" << i << "]: "
-            << p->row() << ' ' << p->column()
+  for (unsigned int i = 0; i < 2; ++i, ++p)
+    deallog << "p[" << i << "]: " << p->row() << ' ' << p->column()
             << std::endl;
 
-  for (unsigned int i=0; i<2; ++i, ++q)
-    deallog << "q[" << i << "]: "
-            << q->row() << ' ' << q->column()
+  for (unsigned int i = 0; i < 2; ++i, ++q)
+    deallog << "q[" << i << "]: " << q->row() << ' ' << q->column()
             << std::endl;
 }
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -102,7 +103,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

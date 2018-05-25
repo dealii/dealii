@@ -15,15 +15,18 @@
 
 // Check to_string and to_value
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
+
 #include <memory>
+
+#include "../tests.h"
 
 using dealii::Patterns::Tools::to_string;
 using dealii::Patterns::Tools::to_value;
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -32,6 +35,5 @@ int main()
   auto s = to_string(a);
   to_value("2 : mondo", a);
 
-  deallog << "From: " << s
-          << " to " << to_string(a) << std::endl;
+  deallog << "From: " << s << " to " << to_string(a) << std::endl;
 }

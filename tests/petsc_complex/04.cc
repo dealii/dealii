@@ -16,21 +16,25 @@
 
 // check querying matrix sizes
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_sparse_matrix.h>
+
 #include <iostream>
 
+#include "../tests.h"
 
-void test (PETScWrappers::SparseMatrix &m)
+
+void
+test(PETScWrappers::SparseMatrix &m)
 {
-  AssertThrow (m.m() == 5, ExcInternalError());
-  AssertThrow (m.n() == 5, ExcInternalError());
+  AssertThrow(m.m() == 5, ExcInternalError());
+  AssertThrow(m.n() == 5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -39,14 +43,14 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::SparseMatrix m (5,5,3);
-        test (m);
+        PETScWrappers::SparseMatrix m(5, 5, 3);
+        test(m);
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -59,7 +63,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

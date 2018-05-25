@@ -15,15 +15,18 @@
 
 
 
-#include "../tests.h"
 #include <deal.II/distributed/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test1 ()
+void
+test1()
 {
   // test 1: hypercube
   if (true)
@@ -31,17 +34,15 @@ void test1 ()
       parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
       GridGenerator::hyper_cube(tria);
 
-      for (unsigned int i=0; i<2; ++i)
+      for (unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: "
-                  << GridTools::maximal_cell_diameter (tria)
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
                   << std::endl;
-          Assert (GridTools::maximal_cell_diameter (tria)
-                  >=
-                  GridTools::minimal_cell_diameter (tria),
-                  ExcInternalError());
+          Assert(GridTools::maximal_cell_diameter(tria) >=
+                   GridTools::minimal_cell_diameter(tria),
+                 ExcInternalError());
         };
     };
 
@@ -52,31 +53,30 @@ void test1 ()
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
       tria.reset_manifold(0);
 
-      for (unsigned int i=0; i<2; ++i)
+      for (unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: "
-                  << GridTools::maximal_cell_diameter (tria)
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
                   << std::endl;
-          Assert (GridTools::maximal_cell_diameter (tria)
-                  >=
-                  GridTools::minimal_cell_diameter (tria),
-                  ExcInternalError());
+          Assert(GridTools::maximal_cell_diameter(tria) >=
+                   GridTools::minimal_cell_diameter(tria),
+                 ExcInternalError());
         };
     };
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   MPILogInitAll mpi_init_log;
 
-  test1<2> ();
-  test1<3> ();
+  test1<2>();
+  test1<3>();
 
   return 0;
 }
-

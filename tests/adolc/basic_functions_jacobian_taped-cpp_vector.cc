@@ -19,24 +19,26 @@
 //  - Update to using C++ data structures where possible
 //  - Test that the tracing of active dependent/independent variables still
 //    works with these structures
-// Adapted from https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb
+// Adapted from
+// https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb
 
-#include "../tests.h"
 #include <adolc/adouble.h>
 #include <adolc/drivers/drivers.h>
 #include <adolc/taping.h>
-
 #include <math.h>
 
-void test_reset_vector_values (const bool reset_values, const int tape_index)
+#include "../tests.h"
+
+void
+test_reset_vector_values(const bool reset_values, const int tape_index)
 {
   const unsigned int m = 5;  // Dependents
   const unsigned int n = 10; // Independents
 
-  std::vector<double> xp (n, 0.0);
-  std::vector<double> yp (m, 0.0);
-  std::vector<adouble> x (n, 1.0); // Dep. variable values initially set here
-  std::vector<adouble> y (m, 1.0);
+  std::vector<double>  xp(n, 0.0);
+  std::vector<double>  yp(m, 0.0);
+  std::vector<adouble> x(n, 1.0); // Dep. variable values initially set here
+  std::vector<adouble> y(m, 1.0);
 
   if (reset_values == false)
     for (unsigned int i = 0; i < n; i++)
@@ -47,7 +49,7 @@ void test_reset_vector_values (const bool reset_values, const int tape_index)
     {
       x[i] <<= xp[i];
       for (unsigned int j = 0; j < m; ++j)
-        y[j] *= (j+1)*x[i];
+        y[j] *= (j + 1) * x[i];
     }
   for (unsigned int j = 0; j < m; ++j)
     y[j] >>= yp[j];
@@ -66,20 +68,16 @@ void test_reset_vector_values (const bool reset_values, const int tape_index)
 
   deallog << "Evaluation points:" << std::endl;
   for (unsigned int i = 0; i < n; ++i)
-    deallog
-        << "  x[" << i << "]: " << xp[i]
-        << std::endl;
+    deallog << "  x[" << i << "]: " << xp[i] << std::endl;
 
   deallog << "Function values:" << std::endl;
   for (unsigned int j = 0; j < m; ++j)
-    deallog
-        << "  f[" << j << "]: " << f[j]
-        << "  y[" << j << "]: " << yp[j]
-        << std::endl;
+    deallog << "  f[" << j << "]: " << f[j] << "  y[" << j << "]: " << yp[j]
+            << std::endl;
 
   // --- Jacobian ---
 
-  double **J = new double*[m];
+  double **J = new double *[m];
   for (unsigned int j = 0; j < m; ++j)
     J[j] = new double[n];
 
@@ -89,7 +87,7 @@ void test_reset_vector_values (const bool reset_values, const int tape_index)
   for (unsigned int j = 0; j < m; j++)
     {
       for (unsigned int i = 0; i < n; i++)
-        deallog << J[j][i] << (i<n-1?",":"");
+        deallog << J[j][i] << (i < n - 1 ? "," : "");
 
       deallog << std::endl;
     }
@@ -105,13 +103,15 @@ void test_reset_vector_values (const bool reset_values, const int tape_index)
   J = nullptr;
 }
 
-int main(void)
+int
+main(void)
 {
   initlog();
 
   deallog << "Setting dependent variables a priori" << std::endl;
   test_reset_vector_values(false, 1); // This works
   deallog << std::endl;
-  deallog << "Setting dependent variables after function definition" << std::endl;
+  deallog << "Setting dependent variables after function definition"
+          << std::endl;
   test_reset_vector_values(true, 2); // This doesn't
 }

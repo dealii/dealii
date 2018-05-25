@@ -18,15 +18,18 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mg_level_object.h>
+
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/component_mask.h>
+
+#include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/vector_memory.h>
 
-#include <deal.II/base/mg_level_object.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/component_mask.h>
 #include <deal.II/multigrid/mg_base.h>
 
 #include <memory>
@@ -36,7 +39,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, int spacedim> class DoFHandler;
+template <int dim, int spacedim>
+class DoFHandler;
 
 /*
  * MGTransferBase is defined in mg_base.h
@@ -60,7 +64,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 
 protected:
@@ -75,8 +80,9 @@ protected:
    * re-ordering and grouping of components.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const DoFHandler<dim,spacedim> &mg_dof);
+  void
+  build_matrices(const DoFHandler<dim, spacedim> &dof,
+                 const DoFHandler<dim, spacedim> &mg_dof);
 
   /**
    * Flag of selected components.
@@ -109,7 +115,7 @@ protected:
   /**
    * Sizes of the multi-level vectors.
    */
-  mutable std::vector<std::vector<types::global_dof_index> > sizes;
+  mutable std::vector<std::vector<types::global_dof_index>> sizes;
 
   /**
    * Start index of each component.
@@ -119,7 +125,7 @@ protected:
   /**
    * Start index of each component on all levels.
    */
-  std::vector<std::vector<types::global_dof_index> > mg_component_start;
+  std::vector<std::vector<types::global_dof_index>> mg_component_start;
 
   /**
    * Call build_matrices() function first.
@@ -127,34 +133,33 @@ protected:
   DeclException0(ExcMatricesNotBuilt);
 
 private:
-  std::vector<std::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
+  std::vector<std::shared_ptr<BlockSparsityPattern>> prolongation_sparsities;
 
 protected:
-
   /**
    * The actual prolongation matrix. column indices belong to the dof indices
    * of the mother cell, i.e. the coarse level. while row indices belong to
    * the child cell, i.e. the fine level.
    */
-  std::vector<std::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
+  std::vector<std::shared_ptr<BlockSparseMatrix<double>>> prolongation_matrices;
 
   /**
    * Holds the mapping for the <tt>copy_to/from_mg</tt>-functions. The data is
    * first the global index, then the level index.
    */
-  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
-  copy_to_and_from_indices;
+  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int>>>
+    copy_to_and_from_indices;
 
   /**
    * Store the boundary_indices. These are needed for the boundary values in
    * the restriction matrix.
    */
-  std::vector<std::set<types::global_dof_index> > boundary_indices;
+  std::vector<std::set<types::global_dof_index>> boundary_indices;
 };
 
-//TODO:[GK] Update documentation for copy_* functions
+// TODO:[GK] Update documentation for copy_* functions
 
-//TODO: Use same kind of template argument as MGTransferSelect
+// TODO: Use same kind of template argument as MGTransferSelect
 
 /**
  * Implementation of the MGTransferBase interface for block matrices and
@@ -168,27 +173,27 @@ protected:
  * @author Guido Kanschat, 2001, 2002, 2003
  */
 template <typename number>
-class MGTransferSelect : public MGTransferBase<Vector<number> >,
-  private MGTransferComponentBase
+class MGTransferSelect : public MGTransferBase<Vector<number>>,
+                         private MGTransferComponentBase
 {
 public:
   /**
    * Constructor without constraint matrices. Use this constructor only with
    * discontinuous finite elements or with no local refinement.
    */
-  MGTransferSelect ();
+  MGTransferSelect();
 
   /**
    * Constructor with constraint matrices.
    */
-  MGTransferSelect (const ConstraintMatrix &constraints);
+  MGTransferSelect(const ConstraintMatrix &constraints);
 
   /**
    * Destructor.
    */
-  virtual ~MGTransferSelect () override = default;
+  virtual ~MGTransferSelect() override = default;
 
-//TODO: rewrite docs; make sure defaulted args are actually allowed
+  // TODO: rewrite docs; make sure defaulted args are actually allowed
   /**
    * Actually build the prolongation matrices for grouped components.
    *
@@ -215,31 +220,35 @@ public:
    * @arg boundary_indices: holds the boundary indices on each level.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const DoFHandler<dim,spacedim> &mg_dof,
-                       unsigned int selected,
-                       unsigned int mg_selected,
-                       const std::vector<unsigned int> &target_component
-                       = std::vector<unsigned int>(),
-                       const std::vector<unsigned int> &mg_target_component
-                       = std::vector<unsigned int>(),
-                       const std::vector<std::set<types::global_dof_index> > &boundary_indices
-                       = std::vector<std::set<types::global_dof_index> >()
-                      );
+  void
+  build_matrices(
+    const DoFHandler<dim, spacedim> &dof,
+    const DoFHandler<dim, spacedim> &mg_dof,
+    unsigned int                     selected,
+    unsigned int                     mg_selected,
+    const std::vector<unsigned int> &target_component =
+      std::vector<unsigned int>(),
+    const std::vector<unsigned int> &mg_target_component =
+      std::vector<unsigned int>(),
+    const std::vector<std::set<types::global_dof_index>> &boundary_indices =
+      std::vector<std::set<types::global_dof_index>>());
 
   /**
    * Change selected component. Handle with care!
    */
-  void select (const unsigned int component,
-               const unsigned int mg_component = numbers::invalid_unsigned_int);
+  void
+  select(const unsigned int component,
+         const unsigned int mg_component = numbers::invalid_unsigned_int);
 
-  virtual void prolongate (const unsigned int    to_level,
-                           Vector<number>       &dst,
-                           const Vector<number> &src) const override;
+  virtual void
+  prolongate(const unsigned int    to_level,
+             Vector<number> &      dst,
+             const Vector<number> &src) const override;
 
-  virtual void restrict_and_add (const unsigned int    from_level,
-                                 Vector<number>       &dst,
-                                 const Vector<number> &src) const override;
+  virtual void
+  restrict_and_add(const unsigned int    from_level,
+                   Vector<number> &      dst,
+                   const Vector<number> &src) const override;
 
   /**
    * Transfer from a vector on the global grid to a multilevel vector for the
@@ -249,9 +258,9 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_to_mg (const DoFHandler<dim,spacedim>        &mg_dof,
-              MGLevelObject<Vector<number> > &dst,
-              const Vector<number2>          &src) const;
+  copy_to_mg(const DoFHandler<dim, spacedim> &mg_dof,
+             MGLevelObject<Vector<number>> &  dst,
+             const Vector<number2> &          src) const;
 
   /**
    * Transfer from multilevel vector to normal vector.
@@ -261,9 +270,9 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg (const DoFHandler<dim,spacedim>              &mg_dof,
-                Vector<number2>                      &dst,
-                const MGLevelObject<Vector<number> > &src) const;
+  copy_from_mg(const DoFHandler<dim, spacedim> &    mg_dof,
+               Vector<number2> &                    dst,
+               const MGLevelObject<Vector<number>> &src) const;
 
   /**
    * Add a multi-level vector to a normal vector.
@@ -272,9 +281,9 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg_add (const DoFHandler<dim,spacedim>              &mg_dof,
-                    Vector<number2>                      &dst,
-                    const MGLevelObject<Vector<number> > &src) const;
+  copy_from_mg_add(const DoFHandler<dim, spacedim> &    mg_dof,
+                   Vector<number2> &                    dst,
+                   const MGLevelObject<Vector<number>> &src) const;
 
   /**
    * Transfer from a vector on the global grid to a multilevel vector for the
@@ -284,9 +293,9 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_to_mg (const DoFHandler<dim,spacedim>        &mg_dof,
-              MGLevelObject<Vector<number> > &dst,
-              const BlockVector<number2>     &src) const;
+  copy_to_mg(const DoFHandler<dim, spacedim> &mg_dof,
+             MGLevelObject<Vector<number>> &  dst,
+             const BlockVector<number2> &     src) const;
 
   /**
    * Transfer from multilevel vector to normal vector.
@@ -296,9 +305,9 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg (const DoFHandler<dim,spacedim>              &mg_dof,
-                BlockVector<number2>                 &dst,
-                const MGLevelObject<Vector<number> > &src) const;
+  copy_from_mg(const DoFHandler<dim, spacedim> &    mg_dof,
+               BlockVector<number2> &               dst,
+               const MGLevelObject<Vector<number>> &src) const;
 
   /**
    * Add a multi-level vector to a normal vector.
@@ -307,14 +316,15 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg_add (const DoFHandler<dim,spacedim>              &mg_dof,
-                    BlockVector<number2>                 &dst,
-                    const MGLevelObject<Vector<number> > &src) const;
+  copy_from_mg_add(const DoFHandler<dim, spacedim> &    mg_dof,
+                   BlockVector<number2> &               dst,
+                   const MGLevelObject<Vector<number>> &src) const;
 
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -322,27 +332,27 @@ private:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  do_copy_from_mg (const DoFHandler<dim,spacedim>              &mg_dof,
-                   OutVector                            &dst,
-                   const MGLevelObject<Vector<number> > &src) const;
+  do_copy_from_mg(const DoFHandler<dim, spacedim> &    mg_dof,
+                  OutVector &                          dst,
+                  const MGLevelObject<Vector<number>> &src) const;
 
   /**
    * Implementation of the public function.
    */
   template <int dim, class OutVector, int spacedim>
   void
-  do_copy_from_mg_add (const DoFHandler<dim,spacedim>              &mg_dof,
-                       OutVector                            &dst,
-                       const MGLevelObject<Vector<number> > &src) const;
+  do_copy_from_mg_add(const DoFHandler<dim, spacedim> &    mg_dof,
+                      OutVector &                          dst,
+                      const MGLevelObject<Vector<number>> &src) const;
 
   /**
    * Actual implementation of copy_to_mg().
    */
   template <int dim, class InVector, int spacedim>
   void
-  do_copy_to_mg (const DoFHandler<dim,spacedim>        &mg_dof,
-                 MGLevelObject<Vector<number> > &dst,
-                 const InVector                 &src) const;
+  do_copy_to_mg(const DoFHandler<dim, spacedim> &mg_dof,
+                MGLevelObject<Vector<number>> &  dst,
+                const InVector &                 src) const;
   /**
    * Selected component of global vector.
    */
@@ -375,9 +385,8 @@ MGTransferSelect<number>::select(const unsigned int component,
                                  const unsigned int mg_component)
 {
   selected_component = component;
-  mg_selected_component = (mg_component == numbers::invalid_unsigned_int)
-                          ? component
-                          : mg_component;
+  mg_selected_component =
+    (mg_component == numbers::invalid_unsigned_int) ? component : mg_component;
 }
 
 DEAL_II_NAMESPACE_CLOSE

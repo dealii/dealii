@@ -17,41 +17,43 @@
 
 // Test DoFTools::map_dofs_to_support_points for parallel DoFHandlers
 
-#include "../tests.h"
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q_generic.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_ball(tr);
   tr.reset_manifold(0);
-  tr.refine_global (1);
+  tr.refine_global(1);
 
   const FE_Q<dim> fe(1);
   DoFHandler<dim> dofh(tr);
-  dofh.distribute_dofs (fe);
+  dofh.distribute_dofs(fe);
 
-  std::map<types::global_dof_index, Point<dim> > points;
-  DoFTools::map_dofs_to_support_points (MappingQGeneric<dim>(1),
-                                        dofh,
-                                        points);
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  std::map<types::global_dof_index, Point<dim>> points;
+  DoFTools::map_dofs_to_support_points(MappingQGeneric<dim>(1), dofh, points);
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      for (typename std::map<types::global_dof_index, Point<dim> >::const_iterator
-           p = points.begin();
+      for (typename std::map<types::global_dof_index,
+                             Point<dim>>::const_iterator p = points.begin();
            p != points.end();
            ++p)
-        deallog << p->first << " -> " << p->second
-                << std::endl;
+        deallog << p->first << " -> " << p->second << std::endl;
     }
 
   // the result of the call above is
@@ -59,29 +61,28 @@ void test()
   // contains exactly the locally
   // relevant dofs, so test this
   IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
+  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
 
-  for (unsigned int i=0; i<dofh.n_dofs(); ++i)
+  for (unsigned int i = 0; i < dofh.n_dofs(); ++i)
     {
       if (relevant_set.is_element(i))
         {
-          AssertThrow (points.find(i) != points.end(),
-                       ExcInternalError());
+          AssertThrow(points.find(i) != points.end(), ExcInternalError());
         }
       else
         {
-          AssertThrow (points.find(i) == points.end(),
-                       ExcInternalError());
+          AssertThrow(points.find(i) == points.end(), ExcInternalError());
         }
     }
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));
@@ -108,5 +109,4 @@ int main(int argc, char *argv[])
       test<3>();
       deallog.pop();
     }
-
 }

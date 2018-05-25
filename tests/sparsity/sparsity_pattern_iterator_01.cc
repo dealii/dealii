@@ -17,21 +17,23 @@
 
 // test SparsityPattern::iterator
 
-#include "../tests.h"
 #include <deal.II/lac/sparsity_pattern.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  SparsityPattern sp (5,5,3);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
-  sp.compress ();
+  SparsityPattern sp(5, 5, 3);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 5; ++j)
+      if ((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
+  sp.compress();
 
   SparsityPattern::const_iterator i = sp.begin();
-  for (; i!=sp.end(); ++i)
+  for (; i != sp.end(); ++i)
     deallog << i->row() << ' ' << i->column() << std::endl;
 
   deallog << "OK" << std::endl;
@@ -39,17 +41,19 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -62,7 +66,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

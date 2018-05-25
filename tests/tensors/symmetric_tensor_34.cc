@@ -15,62 +15,65 @@
 
 // Test that we can convert a SymmetricTensor<4,dim> to a Tensor<4,dim>
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void initialize (SymmetricTensor<2,dim> &st)
+void initialize(SymmetricTensor<2, dim> &st)
 {
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      st[i][j] = (i+1)*dim + (j-i);
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = i; j < dim; ++j)
+      st[i][j] = (i + 1) * dim + (j - i);
 }
 
 
 template <int dim>
-void initialize (SymmetricTensor<4,dim> &st)
+void initialize(SymmetricTensor<4, dim> &st)
 {
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        for (unsigned int l=k; l<dim; ++l)
-          st[i][j][k][l] = (i+1)*dim + (j-i)  +  (k+1)*dim + (l-k);
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = i; j < dim; ++j)
+      for (unsigned int k = 0; k < dim; ++k)
+        for (unsigned int l = k; l < dim; ++l)
+          st[i][j][k][l] = (i + 1) * dim + (j - i) + (k + 1) * dim + (l - k);
 }
 
 
 
 template <int rank, int dim>
-void check ()
+void
+check()
 {
   // build a regular tensor
-  SymmetricTensor<rank,dim> st;
-  initialize (st);
+  SymmetricTensor<rank, dim> st;
+  initialize(st);
   deallog << "st=" << st << std::endl;
 
-  Tensor<rank,dim>          t (st);   // check conversion constructor
+  Tensor<rank, dim> t(st); // check conversion constructor
   deallog << "t =" << t << std::endl;
 
-  t = st;                             // check assignment operator
+  t = st; // check assignment operator
   deallog << "t =" << t << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
   deallog << "checking rank 2 tensors" << std::endl;
-  check<2,1>();
-  check<2,2>();
-  check<2,3>();
+  check<2, 1>();
+  check<2, 2>();
+  check<2, 3>();
 
   deallog << "checking rank 4 tensors" << std::endl;
-  check<4,1>();
-  check<4,2>();
-  check<4,3>();
+  check<4, 1>();
+  check<4, 2>();
+  check<4, 3>();
 
   deallog << "OK" << std::endl;
 }

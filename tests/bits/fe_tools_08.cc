@@ -14,22 +14,21 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/lac/sparsity_pattern.h>
+
 #include "../tests.h"
 #include "fe_tools_common.h"
-#include <deal.II/lac/sparsity_pattern.h>
 
 // check
 //   FETools::extrapolate(5)
 
 
 
-
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2)
+check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 {
-  deallog << std::setprecision (10);
+  deallog << std::setprecision(10);
 
   // only check if both elements have
   // support points. otherwise,
@@ -50,18 +49,18 @@ check_this (const FiniteElement<dim> &fe1,
   if (!fe2.isotropic_restriction_is_implemented())
     return;
 
-  std::unique_ptr<Triangulation<dim> > tria(make_tria<dim>());
-  std::unique_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
-  std::unique_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
-  ConstraintMatrix cm;
-  DoFTools::make_hanging_node_constraints (*dof2, cm);
-  cm.close ();
+  std::unique_ptr<Triangulation<dim>> tria(make_tria<dim>());
+  std::unique_ptr<DoFHandler<dim>>    dof1(make_dof_handler(*tria, fe1));
+  std::unique_ptr<DoFHandler<dim>>    dof2(make_dof_handler(*tria, fe2));
+  ConstraintMatrix                    cm;
+  DoFTools::make_hanging_node_constraints(*dof2, cm);
+  cm.close();
 
-  Vector<double> in (dof1->n_dofs());
-  for (unsigned int i=0; i<in.size(); ++i) in(i) = i;
-  Vector<double> out (dof2->n_dofs());
+  Vector<double> in(dof1->n_dofs());
+  for (unsigned int i = 0; i < in.size(); ++i)
+    in(i) = i;
+  Vector<double> out(dof2->n_dofs());
 
-  FETools::extrapolate (*dof1, in, *dof2, cm, out);
-  output_vector (out);
+  FETools::extrapolate(*dof1, in, *dof2, cm, out);
+  output_vector(out);
 }
-

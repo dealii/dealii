@@ -17,15 +17,17 @@
 // test ConstraintMatrix::shift for a ConstraintMatrix object
 // initialized with an IndexSet object
 
-#include "../tests.h"
-
 #include <deal.II/base/index_set.h>
+
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#include "../tests.h"
+
 using namespace dealii;
 
-void test()
+void
+test()
 {
   const int size = 20;
 
@@ -37,7 +39,9 @@ void test()
   index_set.add_index(8);
   index_set.print(deallog);
 
-  deallog << "Create ConstraintMatrix with constraints u(2)=.5*u(5), u(5)=.7*u(8)" << std::endl;
+  deallog
+    << "Create ConstraintMatrix with constraints u(2)=.5*u(5), u(5)=.7*u(8)"
+    << std::endl;
   dealii::ConstraintMatrix constraints1(index_set);
   constraints1.add_line(5);
   constraints1.add_entry(5, 8, .7);
@@ -46,11 +50,12 @@ void test()
   dealii::ConstraintMatrix constraints2(constraints1);
   constraints1.print(deallog.get_file_stream());
 
-  constraints1.shift(size/2);
+  constraints1.shift(size / 2);
   deallog << "Shifted constraints" << std::endl;
   constraints1.print(deallog.get_file_stream());
 
-  constraints1.merge(constraints2, ConstraintMatrix::no_conflicts_allowed, true);
+  constraints1.merge(
+    constraints2, ConstraintMatrix::no_conflicts_allowed, true);
   deallog << "Shifted and merged constraints" << std::endl;
   constraints1.print(deallog.get_file_stream());
 
@@ -59,13 +64,14 @@ void test()
   constraints1.print(deallog.get_file_stream());
 
   Vector<double> vec(size);
-  for (unsigned int i=0; i<size; ++i)
+  for (unsigned int i = 0; i < size; ++i)
     vec(i) = i;
   constraints1.distribute(vec);
   vec.print(deallog.get_file_stream(), 3, true, false);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

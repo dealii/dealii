@@ -17,43 +17,48 @@
 
 // check PETScWrappers::MPI::Vector::operator() in set-mode
 
-#include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
 
-void test (PETScWrappers::MPI::Vector &v)
+
+void
+test(PETScWrappers::MPI::Vector &v)
 {
   deallog << "Complex test" << std::endl;
 
   // set only certain elements of the vector. have a bit pattern of
   // where we actually wrote elements to
-  std::vector<bool> pattern (v.size(), false);
-  for (unsigned int k=0; k<v.size(); k+=1+k)
+  std::vector<bool> pattern(v.size(), false);
+  for (unsigned int k = 0; k < v.size(); k += 1 + k)
     {
-      v(k)       = std::complex<double> (0.,k);
+      v(k)       = std::complex<double>(0., k);
       pattern[k] = true;
     }
 
-  v.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
 
   // check that they are ok, and this time all of them
-  for (unsigned int k=0; k<v.size(); ++k)
+  for (unsigned int k = 0; k < v.size(); ++k)
     {
       const PetscScalar el = v(k);
-      AssertThrow ( ( (pattern[k] == true) && (PetscRealPart(el) == 0.) && (PetscImaginaryPart(el) == k) )
-                    ||
-                    ( (pattern[k] == false) && (PetscRealPart(el) == 0.) && (PetscImaginaryPart(el) == 0.)),
-                    ExcInternalError());
+      AssertThrow(((pattern[k] == true) && (PetscRealPart(el) == 0.) &&
+                   (PetscImaginaryPart(el) == k)) ||
+                    ((pattern[k] == false) && (PetscRealPart(el) == 0.) &&
+                     (PetscImaginaryPart(el) == 0.)),
+                  ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -63,12 +68,13 @@ int main (int argc,char **argv)
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, 100, 100);
-        test (v);
+        test(v);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -81,7 +87,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

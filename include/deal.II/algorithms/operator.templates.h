@@ -18,7 +18,9 @@
 
 
 #include <deal.II/algorithms/operator.h>
+
 #include <deal.II/base/logstream.h>
+
 #include <deal.II/lac/vector_element_access.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -26,33 +28,35 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  OutputOperator<VectorType>::OutputOperator()
-    :
-    step (numbers::invalid_unsigned_int),
+  OutputOperator<VectorType>::OutputOperator() :
+    step(numbers::invalid_unsigned_int),
     os(nullptr)
   {}
 
   template <typename VectorType>
-  void OutputOperator<VectorType>::initialize_stream(std::ostream &stream)
+  void
+  OutputOperator<VectorType>::initialize_stream(std::ostream &stream)
   {
-    os =&stream;
+    os = &stream;
   }
 
   template <typename VectorType>
   OutputOperator<VectorType> &
-  OutputOperator<VectorType>::operator<< (const AnyData &vectors)
+  OutputOperator<VectorType>::operator<<(const AnyData &vectors)
   {
     if (os == nullptr)
       {
         deallog << "Step " << step << std::endl;
-        for (unsigned int i=0; i<vectors.size(); ++i)
+        for (unsigned int i = 0; i < vectors.size(); ++i)
           {
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
-            if (v == nullptr) continue;
+            if (v == nullptr)
+              continue;
             deallog << vectors.name(i);
-            for (unsigned int j=0; j<v->size(); ++j)
+            for (unsigned int j = 0; j < v->size(); ++j)
               deallog << ' '
-                      << ::dealii::internal::ElementAccess<VectorType>::get(*v, j);
+                      << ::dealii::internal::ElementAccess<VectorType>::get(*v,
+                                                                            j);
             deallog << std::endl;
           }
         deallog << std::endl;
@@ -60,19 +64,21 @@ namespace Algorithms
     else
       {
         (*os) << ' ' << step;
-        for (unsigned int i=0; i<vectors.size(); ++i)
+        for (unsigned int i = 0; i < vectors.size(); ++i)
           {
             const VectorType *v = vectors.try_read_ptr<VectorType>(i);
-            if (v == nullptr) continue;
-            for (unsigned int j=0; j<v->size(); ++j)
+            if (v == nullptr)
+              continue;
+            for (unsigned int j = 0; j < v->size(); ++j)
               (*os) << ' '
-                    << ::dealii::internal::ElementAccess<VectorType>::get(*v, j);
+                    << ::dealii::internal::ElementAccess<VectorType>::get(*v,
+                                                                          j);
           }
         (*os) << std::endl;
       }
     return *this;
   }
-}
+} // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE
 

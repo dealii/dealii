@@ -17,40 +17,41 @@
 #define dealii_sundials_arkode_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/mpi.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
-#include <deal.II/base/logstream.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/mpi.h>
-#ifdef DEAL_II_WITH_PETSC
-#  include <deal.II/lac/petsc_parallel_block_vector.h>
-#  include <deal.II/lac/petsc_parallel_vector.h>
-#endif
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
+#  include <deal.II/base/conditional_ostream.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/logstream.h>
+#  include <deal.II/base/mpi.h>
+#  include <deal.II/base/parameter_handler.h>
+#  ifdef DEAL_II_WITH_PETSC
+#    include <deal.II/lac/petsc_parallel_block_vector.h>
+#    include <deal.II/lac/petsc_parallel_vector.h>
+#  endif
+#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_memory.h>
 
+#  include <arkode/arkode.h>
+#  include <arkode/arkode_impl.h>
+#  include <nvector/nvector_serial.h>
+#  ifdef DEAL_II_WITH_MPI
+#    include <nvector/nvector_parallel.h>
+#  endif
+#  include <boost/signals2.hpp>
 
-#include <arkode/arkode.h>
-#include <arkode/arkode_impl.h>
-#include <nvector/nvector_serial.h>
-#ifdef DEAL_II_WITH_MPI
-#  include <nvector/nvector_parallel.h>
-#endif
-#include <sundials/sundials_math.h>
-#include <sundials/sundials_types.h>
+#  include <sundials/sundials_math.h>
+#  include <sundials/sundials_types.h>
 
-#include <boost/signals2.hpp>
-#include <memory>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for ARKODE error codes.
-#define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
+#  define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
 
 /**
  * A namespace for dealing with ODE solvers through the SUNDIALS package.
@@ -271,8 +272,8 @@ namespace SUNDIALS
    * \f]
    * and $y(0)=(0, k)$.
    *
-   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k t)$,
-   * $y_1'(t) = -k^2 \sin(k t)$.
+   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k
+   *t)$, $y_1'(t) = -k^2 \sin(k t)$.
    *
    * A minimal implementation, using only explicit RK methods, is given by the
    * following code snippet:
@@ -306,11 +307,10 @@ namespace SUNDIALS
    *
    * @author Luca Heltai, 2017.
    */
-  template<typename VectorType=Vector<double> >
+  template <typename VectorType = Vector<double>>
   class ARKode
   {
   public:
-
     /**
      * Additional parameters that can be passed to the ARKode class.
      */
@@ -331,10 +331,12 @@ namespace SUNDIALS
        *
        * @param minimum_step_size Minimum step size
        * @param maximum_order Maximum ARK order
-       * @param maximum_non_linear_iterations Maximum number of nonlinear iterations
-       * @param implicit_function_is_linear Specifies that the implicit portion of the problem is linear
-       * @param implicit_function_is_time_independent Specifies that the implicit portion of the problem
-       *        is linear and time independent
+       * @param maximum_non_linear_iterations Maximum number of nonlinear
+       * iterations
+       * @param implicit_function_is_linear Specifies that the implicit portion
+       * of the problem is linear
+       * @param implicit_function_is_time_independent Specifies that the
+       * implicit portion of the problem is linear and time independent
        *
        * Error parameters:
        *
@@ -343,16 +345,16 @@ namespace SUNDIALS
        */
       AdditionalData(
         // Initial parameters
-        const double &initial_time = 0.0,
-        const double &final_time = 1.0,
+        const double &initial_time      = 0.0,
+        const double &final_time        = 1.0,
         const double &initial_step_size = 1e-2,
-        const double &output_period = 1e-1,
+        const double &output_period     = 1e-1,
         // Running parameters
-        const double &minimum_step_size = 1e-6,
-        const unsigned int &maximum_order = 5,
-        const unsigned int &maximum_non_linear_iterations = 10,
-        const bool implicit_function_is_linear = false,
-        const bool implicit_function_is_time_independent = false,
+        const double &      minimum_step_size                     = 1e-6,
+        const unsigned int &maximum_order                         = 5,
+        const unsigned int &maximum_non_linear_iterations         = 10,
+        const bool          implicit_function_is_linear           = false,
+        const bool          implicit_function_is_time_independent = false,
         // Error parameters
         const double &absolute_tolerance = 1e-6,
         const double &relative_tolerance = 1e-5) :
@@ -366,7 +368,8 @@ namespace SUNDIALS
         output_period(output_period),
         maximum_non_linear_iterations(maximum_non_linear_iterations),
         implicit_function_is_linear(implicit_function_is_linear),
-        implicit_function_is_time_independent(implicit_function_is_time_independent)
+        implicit_function_is_time_independent(
+          implicit_function_is_time_independent)
       {}
 
       /**
@@ -399,30 +402,35 @@ namespace SUNDIALS
        * end
        * @endcode
        *
-       * These are one-to-one with the options you can pass at construction time.
+       * These are one-to-one with the options you can pass at construction
+       * time.
        *
        * The options you pass at construction time are set as default values in
        * the ParameterHandler object `prm`. You can later modify them by parsing
-       * a parameter file using `prm`. The values of the parameter will be updated
-       * whenever the content of `prm` is updated.
+       * a parameter file using `prm`. The values of the parameter will be
+       * updated whenever the content of `prm` is updated.
        *
        * Make sure that this class lives longer than `prm`. Undefined behaviour
        * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
-      void add_parameters(ParameterHandler &prm)
+      void
+      add_parameters(ParameterHandler &prm)
       {
         prm.add_parameter("Initial time", initial_time);
         prm.add_parameter("Final time", final_time);
         prm.add_parameter("Time interval between each output", output_period);
 
         prm.enter_subsection("Running parameters");
-        prm.add_parameter("Initial step size",initial_step_size);
+        prm.add_parameter("Initial step size", initial_step_size);
         prm.add_parameter("Minimum step size", minimum_step_size);
         prm.add_parameter("Maximum order of ARK", maximum_order);
-        prm.add_parameter("Maximum number of nonlinear iterations", maximum_non_linear_iterations);
-        prm.add_parameter("Implicit function is linear", implicit_function_is_linear);
-        prm.add_parameter("Implicit function is time independent", implicit_function_is_time_independent);
+        prm.add_parameter("Maximum number of nonlinear iterations",
+                          maximum_non_linear_iterations);
+        prm.add_parameter("Implicit function is linear",
+                          implicit_function_is_linear);
+        prm.add_parameter("Implicit function is time independent",
+                          implicit_function_is_time_independent);
         prm.leave_subsection();
 
         prm.enter_subsection("Error control");
@@ -500,8 +508,8 @@ namespace SUNDIALS
      * @param data ARKode configuration data
      * @param mpi_comm MPI communicator
      */
-    ARKode(const AdditionalData &data=AdditionalData(),
-           const MPI_Comm mpi_comm = MPI_COMM_WORLD);
+    ARKode(const AdditionalData &data     = AdditionalData(),
+           const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
@@ -512,7 +520,8 @@ namespace SUNDIALS
      * Integrate the initial value problem. This function returns the final
      * number of computed steps.
      */
-    unsigned int solve_ode(VectorType &solution);
+    unsigned int
+    solve_ode(VectorType &solution);
 
     /**
      * Clear internal memory and start with clean objects. This function is
@@ -528,9 +537,8 @@ namespace SUNDIALS
      * @param[in] h  The new starting time step
      * @param[in,out] y   The new initial solution
      */
-    void reset(const double &t,
-               const double &h,
-               const VectorType &y);
+    void
+    reset(const double &t, const double &h, const VectorType &y);
 
     /**
      * A function object that users need to supply and that is intended to
@@ -551,12 +559,12 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an assertion
-     *       will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an
+     * assertion will be thrown.
      */
-    std::function<int(const double t,
-                      const VectorType &y,
-                      VectorType &explicit_f)> explicit_function;
+    std::function<
+      int(const double t, const VectorType &y, VectorType &explicit_f)>
+      explicit_function;
 
     /**
      * A function object that users may supply and that is intended to compute
@@ -571,12 +579,11 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an assertion
-     *       will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an
+     * assertion will be thrown.
      */
-    std::function<int(const double t,
-                      const VectorType &y,
-                      VectorType &res)> implicit_function;
+    std::function<int(const double t, const VectorType &y, VectorType &res)>
+      implicit_function;
 
     /**
      * A function object that users may supply and that is intended to
@@ -620,51 +627,55 @@ namespace SUNDIALS
      *
      * @param[in] t  the current time
      * @param[in] gamma  the current factor to use in the jacobian computation
-     * @param[in] ypred  is the predicted $y$ vector for the current ARKode internal step
+     * @param[in] ypred  is the predicted $y$ vector for the current ARKode
+     * internal step
      * @param[in] fpred  is the value of the implicit right-hand side at ypred,
      *        $f_I (t_n, ypred)$.
      *
-     * @param[in] convfail – an input flag used to indicate any problem that occurred
-     *   during the solution of the nonlinear equation on the current time step
-     *   for which the linear solver is being used. This flag can be used to help
-     *   decide whether the Jacobian data kept by a linear solver needs to be
-     *   updated or not. Its possible values are:
+     * @param[in] convfail – an input flag used to indicate any problem that
+     * occurred during the solution of the nonlinear equation on the current
+     * time step for which the linear solver is being used. This flag can be
+     * used to help decide whether the Jacobian data kept by a linear solver
+     * needs to be updated or not. Its possible values are:
      *
-     *   - ARK_NO_FAILURES: this value is passed if either this is the first call
-     *     for this step, or the local error test failed on the previous attempt at
-     *     this step (but the Newton iteration converged).
+     *   - ARK_NO_FAILURES: this value is passed if either this is the first
+     * call for this step, or the local error test failed on the previous
+     * attempt at this step (but the Newton iteration converged).
      *
      *   - ARK_FAIL_BAD_J: this value is passed if (a) the previous Newton
      *     corrector iteration did not converge and the linear solver's setup
-     *     function indicated that its Jacobian-related data is not current, or (b)
-     *     during the previous Newton corrector iteration, the linear solver's
+     *     function indicated that its Jacobian-related data is not current, or
+     * (b) during the previous Newton corrector iteration, the linear solver's
      *     solve function failed in a recoverable manner and the linear solver's
-     *     setup function indicated that its Jacobian-related data is not current.
+     *     setup function indicated that its Jacobian-related data is not
+     * current.
      *
      *   - ARK_FAIL_OTHER: this value is passed if during the current internal
-     *     step try, the previous Newton iteration failed to converge even though
-     *     the linear solver was using current Jacobian-related data.
+     *     step try, the previous Newton iteration failed to converge even
+     * though the linear solver was using current Jacobian-related data.
      *
-     * @param[out] j_is_current: a boolean to be filled in by setup_jacobian(). The value
-     * should be set to `true` if the Jacobian data is current after the call,
-     * and should be set to `false` if its Jacobian data is not current. If
-     * setup_jacobian() calls for re-evaluation of Jacobian data (based on
-     * convfail and ARKode state data), then it should set `j_is_current` to
-     * `true` unconditionally, otherwise an infinite loop can result.
+     * @param[out] j_is_current: a boolean to be filled in by setup_jacobian().
+     * The value should be set to `true` if the Jacobian data is current after
+     * the call, and should be set to `false` if its Jacobian data is not
+     * current. If setup_jacobian() calls for re-evaluation of Jacobian data
+     * (based on convfail and ARKode state data), then it should set
+     * `j_is_current` to `true` unconditionally, otherwise an infinite loop can
+     * result.
      *
      * This function should return:
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an assertion
-     *       will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an
+     * assertion will be thrown.
      */
-    std::function<int(const int convfail,
-                      const double t,
-                      const double gamma,
+    std::function<int(const int         convfail,
+                      const double      t,
+                      const double      gamma,
                       const VectorType &ypred,
                       const VectorType &fpred,
-                      bool &j_is_current)> setup_jacobian;
+                      bool &            j_is_current)>
+      setup_jacobian;
 
     /**
      * A function object that users may supply and that is intended to solve
@@ -697,24 +708,26 @@ namespace SUNDIALS
      *
      * @param[in] t  the current time
      * @param[in] gamma  the current factor to use in the jacobian computation
-     * @param[in] ycur  is the current $y$ vector for the current ARKode internal step
-     * @param[in] fcur  is the current value of the implicit right-hand side at ycur,
-     *        $f_I (t_n, ypred)$.
+     * @param[in] ycur  is the current $y$ vector for the current ARKode
+     * internal step
+     * @param[in] fcur  is the current value of the implicit right-hand side at
+     * ycur, $f_I (t_n, ypred)$.
      *
      *
      * This function should return:
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an assertion
-     *       will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an
+     * assertion will be thrown.
      */
-    std::function<int(const double t,
-                      const double gamma,
+    std::function<int(const double      t,
+                      const double      gamma,
                       const VectorType &ycur,
                       const VectorType &fcur,
                       const VectorType &rhs,
-                      VectorType &dst)> solve_jacobian_system;
+                      VectorType &      dst)>
+      solve_jacobian_system;
 
 
     /**
@@ -747,8 +760,8 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an assertion
-     *       will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an
+     * assertion will be thrown.
      */
     std::function<int(const double t)> setup_mass;
 
@@ -767,10 +780,11 @@ namespace SUNDIALS
      * - 0: Success
      * - >0: Recoverable error (ARKodeReinit will be called if this happens, and
      *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an assertion
-     *       will be thrown.
+     * - <0: Unrecoverable error the computation will be aborted and an
+     * assertion will be thrown.
      */
-    std::function<int(const VectorType &rhs, VectorType &dst)> solve_mass_system;
+    std::function<int(const VectorType &rhs, VectorType &dst)>
+      solve_mass_system;
 
     /**
      * A function object that users may supply and that is intended to
@@ -779,16 +793,17 @@ namespace SUNDIALS
      * polynomial interpolation of the solution, computed using the current ARK
      * order and the (internally stored) previously computed solution steps.
      *
-     * Notice that it is well possible that internally ARKode computes a time step
-     * which is much larger than the `output_period` step, and therefore calls
-     * this function consecutively several times by simply performing all
+     * Notice that it is well possible that internally ARKode computes a time
+     * step which is much larger than the `output_period` step, and therefore
+     * calls this function consecutively several times by simply performing all
      * intermediate interpolations. There is no relationship between how many
      * times this function is called and how many time steps have actually been
      * computed.
      */
-    std::function<void(const double t,
-                       const VectorType &sol,
-                       const unsigned int step_number)> output_step;
+    std::function<void(const double       t,
+                       const VectorType & sol,
+                       const unsigned int step_number)>
+      output_step;
 
     /**
      * A function object that users may supply and that is intended to evaluate
@@ -807,8 +822,7 @@ namespace SUNDIALS
      * The default implementation simply returns `false`, i.e., no restart is
      * performed during the evolution.
      */
-    std::function<bool (const double t,
-                        VectorType &sol)> solver_should_restart;
+    std::function<bool(const double t, VectorType &sol)> solver_should_restart;
 
     /**
      * A function object that users may supply and that is intended to return a
@@ -816,30 +830,35 @@ namespace SUNDIALS
      * vector norm. The implementation of this function is optional, and it is
      * used only if implemented.
      */
-    std::function<VectorType&()> get_local_tolerances;
+    std::function<VectorType &()> get_local_tolerances;
 
     /**
      * Handle ARKode exceptions.
      */
-    DeclException1(ExcARKodeError, int, << "One of the SUNDIALS ARKode internal functions "
-                   << " returned a negative error code: "
-                   << arg1 << ". Please consult SUNDIALS manual.");
+    DeclException1(ExcARKodeError,
+                   int,
+                   << "One of the SUNDIALS ARKode internal functions "
+                   << " returned a negative error code: " << arg1
+                   << ". Please consult SUNDIALS manual.");
 
 
   private:
-
     /**
-     * Throw an exception when a function with the given name is not implemented.
+     * Throw an exception when a function with the given name is not
+     * implemented.
      */
-    DeclException1(ExcFunctionNotProvided, std::string,
-                   << "Please provide an implementation for the function \"" << arg1 << "\"");
+    DeclException1(ExcFunctionNotProvided,
+                   std::string,
+                   << "Please provide an implementation for the function \""
+                   << arg1 << "\"");
 
     /**
      * This function is executed at construction time to set the
      * std::function above to trigger an assert if they are not
      * implemented.
      */
-    void set_functions_to_trigger_an_assert();
+    void
+    set_functions_to_trigger_an_assert();
 
     /**
      * ARKode configuration data.
@@ -873,20 +892,21 @@ namespace SUNDIALS
      */
     GrowingVectorMemory<VectorType> mem;
 
-#ifdef DEAL_II_WITH_PETSC
-#ifdef PETSC_USE_COMPLEX
+#  ifdef DEAL_II_WITH_PETSC
+#    ifdef PETSC_USE_COMPLEX
     static_assert(!std::is_same<VectorType, PETScWrappers::MPI::Vector>::value,
                   "Sundials does not support complex scalar types, "
                   "but PETSc is configured to use a complex scalar type!");
 
-    static_assert(!std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
-                  "Sundials does not support complex scalar types, "
-                  "but PETSc is configured to use a complex scalar type!");
-#endif // PETSC_USE_COMPLEX
-#endif // DEAL_II_WITH_PETSC
+    static_assert(
+      !std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
+      "Sundials does not support complex scalar types, "
+      "but PETSc is configured to use a complex scalar type!");
+#    endif // PETSC_USE_COMPLEX
+#  endif   // DEAL_II_WITH_PETSC
   };
 
-}
+} // namespace SUNDIALS
 
 DEAL_II_NAMESPACE_CLOSE
 #endif

@@ -19,43 +19,48 @@
 // function has since been removed, so we test for v=0 instead, although that
 // may be covered by one of the other tests
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
   // set some entries of the vector
-  for (unsigned int i=0; i<v.size(); ++i)
-    if (i%3 == 0)
-      v(i) = i+1.;
-  v.compress ();
+  for (unsigned int i = 0; i < v.size(); ++i)
+    if (i % 3 == 0)
+      v(i) = i + 1.;
+  v.compress();
 
   // then clear it again and make sure the
   // vector is really empty
   const unsigned int sz = v.size();
-  v = 0;
-  AssertThrow (v.size() == sz, ExcInternalError());
-  AssertThrow (v.l2_norm() == 0, ExcInternalError());
+  v                     = 0;
+  AssertThrow(v.size() == sz, ExcInternalError());
+  AssertThrow(v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -68,7 +73,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

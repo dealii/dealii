@@ -17,16 +17,18 @@
 #define dealii_fe_nedelec_h
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/polynomials_nedelec.h>
-#include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>
-#include <deal.II/base/geometry_info.h>
 #include <deal.II/base/thread_management.h>
+
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -117,22 +119,24 @@ public:
    * <code>order+1</code> (in each variable; the total polynomial degree
    * may be higher).
    */
-  FE_Nedelec (const unsigned int order);
+  FE_Nedelec(const unsigned int order);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_Nedelec<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -142,14 +146,16 @@ public:
    * of the degree of the element), as it implements the complete set of
    * functions necessary for hp capability.
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented() const override;
 
   /**
    * Return whether this element dominates the one, which is given as
    * argument.
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim> &fe_other) const override;
+  compare_for_face_domination(
+    const FiniteElement<dim> &fe_other) const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -166,22 +172,22 @@ public:
    * the vertex dofs of the present element, whereas the second is the
    * corresponding index of the other finite element.
    */
-  virtual std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on lines.
    */
-  virtual std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on lines.
    */
-  virtual std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -195,8 +201,8 @@ public:
    * <tt>FiniteElement<dim>::ExcInterpolationNotImplemented</tt>.
    */
   virtual void
-  get_face_interpolation_matrix (const FiniteElement<dim> &source,
-                                 FullMatrix<double> &matrix) const override;
+  get_face_interpolation_matrix(const FiniteElement<dim> &source,
+                                FullMatrix<double> &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -210,9 +216,9 @@ public:
    * <tt>ExcInterpolationNotImplemented</tt>.
    */
   virtual void
-  get_subface_interpolation_matrix (const FiniteElement<dim> &source,
-                                    const unsigned int subface,
-                                    FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(const FiniteElement<dim> &source,
+                                   const unsigned int        subface,
+                                   FullMatrix<double> &matrix) const override;
   /**
    * Projection from a fine grid space onto a coarse grid space. If this
    * projection operator is associated with a matrix @p P, then the
@@ -228,8 +234,10 @@ public:
    * respectively, consistent with the definition of the associated operator.
    */
   virtual const FullMatrix<double> &
-  get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const override;
+  get_restriction_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * Embedding matrix between grids.
@@ -252,25 +260,27 @@ public:
    * are discarded and will not fill up the transfer matrix.
    */
   virtual const FullMatrix<double> &
-  get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const override;
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
   // documentation inherited from the base class
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
   /**
    * Return a list of constant modes of the element.
    */
-  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const override;
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const override;
 
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,dim> >
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
 
 private:
@@ -285,21 +295,23 @@ private:
    * edges.
    */
   static std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree, bool dg=false);
+  get_dpo_vector(const unsigned int degree, bool dg = false);
 
   /**
    * Initialize the @p generalized_support_points field of the FiniteElement
    * class and fill the tables with interpolation weights (#boundary_weights
    * and interior_weights). Called from the constructor.
    */
-  void initialize_support_points (const unsigned int order);
+  void
+  initialize_support_points(const unsigned int order);
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
    * the father cell. According to the philosophy of the Nédélec element,
    * this restriction operator preserves the curl of a function weakly.
    */
-  void initialize_restriction ();
+  void
+  initialize_restriction();
 
   /**
    * These are the factors multiplied to a function in the
@@ -319,7 +331,8 @@ private:
   /**
    * Allow access from other dimensions.
    */
-  template <int dim1> friend class FE_Nedelec;
+  template <int dim1>
+  friend class FE_Nedelec;
 };
 
 /* -------------- declaration of explicit specializations ------------- */

@@ -19,111 +19,112 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim> constexpr unsigned int GeometryInfo<dim>::max_children_per_cell;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::faces_per_cell;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::max_children_per_face;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::vertices_per_cell;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::vertices_per_face;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::lines_per_face;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::quads_per_face;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::lines_per_cell;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::quads_per_cell;
-template <int dim> constexpr unsigned int GeometryInfo<dim>::hexes_per_cell;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::max_children_per_cell;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::faces_per_cell;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::max_children_per_face;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::vertices_per_cell;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::vertices_per_face;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::lines_per_face;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::quads_per_face;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::lines_per_cell;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::quads_per_cell;
+template <int dim>
+constexpr unsigned int GeometryInfo<dim>::hexes_per_cell;
 
 template <int dim>
 constexpr std::array<int, GeometryInfo<dim>::faces_per_cell>
-GeometryInfo<dim>::unit_normal_orientation;
+  GeometryInfo<dim>::unit_normal_orientation;
 
 template <int dim>
-constexpr std::array<std::array<unsigned int, dim>, GeometryInfo<dim>::vertices_per_cell>
-GeometryInfo<dim>::vertex_to_face;
-
-template <int dim>
-constexpr std::array<unsigned int, GeometryInfo<dim>::faces_per_cell>
-GeometryInfo<dim>::unit_normal_direction;
-
-template <int dim>
-constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
-GeometryInfo<dim>::dx_to_deal;
+constexpr std::array<std::array<unsigned int, dim>,
+                     GeometryInfo<dim>::vertices_per_cell>
+  GeometryInfo<dim>::vertex_to_face;
 
 template <int dim>
 constexpr std::array<unsigned int, GeometryInfo<dim>::faces_per_cell>
-GeometryInfo<dim>::opposite_face;
+  GeometryInfo<dim>::unit_normal_direction;
 
 template <int dim>
 constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
-GeometryInfo<dim>::ucd_to_deal;
+  GeometryInfo<dim>::dx_to_deal;
+
+template <int dim>
+constexpr std::array<unsigned int, GeometryInfo<dim>::faces_per_cell>
+  GeometryInfo<dim>::opposite_face;
+
+template <int dim>
+constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
+  GeometryInfo<dim>::ucd_to_deal;
 
 const std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
-GeometryInfo<0>::ucd_to_deal = {{0}};
+  GeometryInfo<0>::ucd_to_deal = {{0}};
 
 const std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
-GeometryInfo<0>::dx_to_deal = {{0}};
+  GeometryInfo<0>::dx_to_deal = {{0}};
 
 template struct GeometryInfo<1>;
 template struct GeometryInfo<2>;
 template struct GeometryInfo<3>;
 template struct GeometryInfo<4>;
 
-template
-void
-GeometryInfo<1>::
-alternating_form_at_vertices
+template void
+GeometryInfo<1>::alternating_form_at_vertices
 #ifndef DEAL_II_CONSTEXPR_BUG
-(const Point<1> (&)[vertices_per_cell],
- Tensor<1-1,1> (&)[vertices_per_cell])
+  (const Point<1> (&)[vertices_per_cell],
+   Tensor<1 - 1, 1> (&)[vertices_per_cell])
 #else
-(const Point<1> *, Tensor<1-1,1> *)
+  (const Point<1> *, Tensor<1 - 1, 1> *)
 #endif
-;
+    ;
 
-template
-void
-GeometryInfo<1>::
-alternating_form_at_vertices
+template void
+GeometryInfo<1>::alternating_form_at_vertices
 #ifndef DEAL_II_CONSTEXPR_BUG
-(const Point<2> (&)[vertices_per_cell],
- Tensor<2-1,2> (&)[vertices_per_cell])
+  (const Point<2> (&)[vertices_per_cell],
+   Tensor<2 - 1, 2> (&)[vertices_per_cell])
 #else
-(const Point<2> *, Tensor<2-1,2> *)
+  (const Point<2> *, Tensor<2 - 1, 2> *)
 #endif
-;
+    ;
 
-template
-void
-GeometryInfo<2>::
-alternating_form_at_vertices
+template void
+GeometryInfo<2>::alternating_form_at_vertices
 #ifndef DEAL_II_CONSTEXPR_BUG
-(const Point<2> (&vertices)[vertices_per_cell],
- Tensor<2-2,2> (&forms)[vertices_per_cell])
+  (const Point<2> (&vertices)[vertices_per_cell],
+   Tensor<2 - 2, 2> (&forms)[vertices_per_cell])
 #else
-(const Point<2> *, Tensor<2-2,2> *)
+  (const Point<2> *, Tensor<2 - 2, 2> *)
 #endif
-;
+    ;
 
-template
-void
-GeometryInfo<2>::
-alternating_form_at_vertices
+template void
+GeometryInfo<2>::alternating_form_at_vertices
 #ifndef DEAL_II_CONSTEXPR_BUG
-(const Point<3> (&vertices)[vertices_per_cell],
- Tensor<3-2,3> (&forms)[vertices_per_cell])
+  (const Point<3> (&vertices)[vertices_per_cell],
+   Tensor<3 - 2, 3> (&forms)[vertices_per_cell])
 #else
-(const Point<3> *, Tensor<3-2,3> *)
+  (const Point<3> *, Tensor<3 - 2, 3> *)
 #endif
-;
+    ;
 
 
-template
-void
-GeometryInfo<3>::
-alternating_form_at_vertices
+template void
+GeometryInfo<3>::alternating_form_at_vertices
 #ifndef DEAL_II_CONSTEXPR_BUG
-(const Point<3> (&vertices)[vertices_per_cell],
- Tensor<3-3,3> (&forms)[vertices_per_cell])
+  (const Point<3> (&vertices)[vertices_per_cell],
+   Tensor<3 - 3, 3> (&forms)[vertices_per_cell])
 #else
-(const Point<3> *, Tensor<3-3,3> *)
+  (const Point<3> *, Tensor<3 - 3, 3> *)
 #endif
-;
+    ;
 
 DEAL_II_NAMESPACE_CLOSE

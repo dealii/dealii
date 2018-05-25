@@ -16,36 +16,39 @@
 // Call VectorTools::interpolate for a function in FE_FaceQ. The purpose is
 // to check that all functions needed for interpolate to work exist.
 
-#include "../tests.h"
-
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/fe_face.h>
 #include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_face.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 using namespace dealii;
 
 template <int dim>
-void test()
+void
+test()
 {
-  Triangulation<dim>    triangulation;
-  FE_FaceQ<dim>         fe(2);
-  DoFHandler<dim>       dof_handler(triangulation);
+  Triangulation<dim> triangulation;
+  FE_FaceQ<dim>      fe(2);
+  DoFHandler<dim>    dof_handler(triangulation);
 
-  GridGenerator::hyper_cube (triangulation, 0, 1);
+  GridGenerator::hyper_cube(triangulation, 0, 1);
   triangulation.refine_global(6);
 
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
   Vector<double> solution(dof_handler.n_dofs());
 
-  VectorTools::interpolate(dof_handler,
-                           ZeroFunction<dim>(),
-                           solution);
+  VectorTools::interpolate(dof_handler, ZeroFunction<dim>(), solution);
   deallog << "Success, dim = " << dim << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

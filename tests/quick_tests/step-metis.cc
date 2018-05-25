@@ -15,14 +15,17 @@
  */
 
 #include <deal.II/distributed/shared_tria.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_q.h>
 
 #include <iostream>
 
@@ -30,32 +33,35 @@ using namespace dealii;
 
 static const unsigned int dim = 2;
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        parallel::shared::Triangulation<dim> triangulation(MPI_COMM_WORLD,
-                                                           ::Triangulation<dim>::none,
-                                                           false,
-                                                           parallel::shared::Triangulation<dim>::partition_metis);
-        FE_Q<dim> fe(1);
-        DoFHandler<dim> dof_handler (triangulation);
+        parallel::shared::Triangulation<dim> triangulation(
+          MPI_COMM_WORLD,
+          ::Triangulation<dim>::none,
+          false,
+          parallel::shared::Triangulation<dim>::partition_metis);
+        FE_Q<dim>       fe(1);
+        DoFHandler<dim> dof_handler(triangulation);
 
-        GridGenerator::hyper_cube (triangulation, -1, 1);
-        triangulation.refine_global (2);
-        dof_handler.distribute_dofs (fe);
+        GridGenerator::hyper_cube(triangulation, -1, 1);
+        triangulation.refine_global(2);
+        dof_handler.distribute_dofs(fe);
         IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
         deallog << locally_owned_dofs.n_elements() << std::endl;
-        dof_handler.clear ();
+        dof_handler.clear();
         deallog << "OK" << std::endl;
       }
     }
 
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -68,7 +74,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

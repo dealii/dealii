@@ -15,27 +15,29 @@
 // Test of basic functionality:
 //  - Taped doubles
 //  - Multiple dependent functions and Jacobian computations
-// Adapted from https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb
+// Adapted from
+// https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb
 
-#include "../tests.h"
 #include <adolc/adouble.h>
 #include <adolc/drivers/drivers.h>
 #include <adolc/taping.h>
-
 #include <math.h>
 
-int main(void)
+#include "../tests.h"
+
+int
+main(void)
 {
   initlog();
 
   const unsigned int m = 5;  // Dependents
   const unsigned int n = 10; // Independents
-  std::size_t tape_stats[STAT_SIZE];
+  std::size_t        tape_stats[STAT_SIZE];
 
-  double *xp = new double[n];
-  double *yp = new double[m];
-  adouble *x = new adouble[n];
-  adouble *y = new adouble[m];
+  double * xp = new double[n];
+  double * yp = new double[m];
+  adouble *x  = new adouble[n];
+  adouble *y  = new adouble[m];
 
   for (unsigned int i = 0; i < n; i++)
     xp[i] = (i + 1.0) / (2.0 + i);
@@ -48,7 +50,7 @@ int main(void)
     {
       x[i] <<= xp[i];
       for (unsigned int j = 0; j < m; ++j)
-        y[j] *= (j+1)*x[i];
+        y[j] *= (j + 1) * x[i];
     }
   for (unsigned int j = 0; j < m; ++j)
     y[j] >>= yp[j];
@@ -65,20 +67,16 @@ int main(void)
 
   deallog << "Evaluation points:" << std::endl;
   for (unsigned int i = 0; i < n; ++i)
-    deallog
-        << "  x[" << i << "]: " << xp[i]
-        << std::endl;
+    deallog << "  x[" << i << "]: " << xp[i] << std::endl;
 
   deallog << "Function values:" << std::endl;
   for (unsigned int j = 0; j < m; ++j)
-    deallog
-        << "  f[" << j << "]: " << f[j]
-        << "  y[" << j << "]: " << yp[j]
-        << std::endl;
+    deallog << "  f[" << j << "]: " << f[j] << "  y[" << j << "]: " << yp[j]
+            << std::endl;
 
   // --- Jacobian ---
 
-  double **J = new double*[m];
+  double **J = new double *[m];
   for (unsigned int j = 0; j < m; ++j)
     J[j] = new double[n];
 
@@ -88,7 +86,7 @@ int main(void)
   for (unsigned int j = 0; j < m; j++)
     {
       for (unsigned int i = 0; i < n; i++)
-        deallog << J[j][i] << (i<n-1?",":"");
+        deallog << J[j][i] << (i < n - 1 ? "," : "");
 
       deallog << std::endl;
     }

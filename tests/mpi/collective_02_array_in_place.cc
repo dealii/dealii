@@ -17,30 +17,32 @@
 
 // check Utilities::MPI::sum() for arrays, but with input=output
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
 
-void test()
+#include "../tests.h"
+
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  unsigned int sums[2] = { 1, 2 };
-  Utilities::MPI::sum (sums,
-                       MPI_COMM_WORLD,
-                       sums);
-  Assert (sums[0] == numprocs, ExcInternalError());
-  Assert (sums[1] == 2*numprocs, ExcInternalError());
+  unsigned int sums[2] = {1, 2};
+  Utilities::MPI::sum(sums, MPI_COMM_WORLD, sums);
+  Assert(sums[0] == numprocs, ExcInternalError());
+  Assert(sums[1] == 2 * numprocs, ExcInternalError());
 
-  if (myid==0)
+  if (myid == 0)
     deallog << sums[0] << ' ' << sums[1] << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;
@@ -48,7 +50,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
 

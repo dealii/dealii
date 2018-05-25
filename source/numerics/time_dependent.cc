@@ -13,47 +13,50 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/numerics/time_dependent.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/parallel.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/parallel.h>
+
+#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_refinement.h>
+
 #include <deal.II/lac/vector.h>
 
-#include <functional>
+#include <deal.II/numerics/time_dependent.h>
+
 #include <algorithm>
+#include <functional>
 #include <numeric>
 
 DEAL_II_NAMESPACE_OPEN
 
-TimeDependent::TimeSteppingData::TimeSteppingData (const unsigned int look_ahead,
-                                                   const unsigned int look_back)
-  :
-  look_ahead (look_ahead),
-  look_back (look_back)
+TimeDependent::TimeSteppingData::TimeSteppingData(
+  const unsigned int look_ahead,
+  const unsigned int look_back) :
+  look_ahead(look_ahead),
+  look_back(look_back)
 {}
 
 
-TimeDependent::TimeDependent (const TimeSteppingData &data_primal,
-                              const TimeSteppingData &data_dual,
-                              const TimeSteppingData &data_postprocess):
-  sweep_no (numbers::invalid_unsigned_int),
-  timestepping_data_primal (data_primal),
-  timestepping_data_dual (data_dual),
-  timestepping_data_postprocess (data_postprocess)
+TimeDependent::TimeDependent(const TimeSteppingData &data_primal,
+                             const TimeSteppingData &data_dual,
+                             const TimeSteppingData &data_postprocess) :
+  sweep_no(numbers::invalid_unsigned_int),
+  timestepping_data_primal(data_primal),
+  timestepping_data_dual(data_dual),
+  timestepping_data_postprocess(data_postprocess)
 {}
 
 
-TimeDependent::~TimeDependent ()
+TimeDependent::~TimeDependent()
 {
   try
     {
       while (timesteps.size() != 0)
-        delete_timestep (0);
+        delete_timestep(0);
     }
   catch (...)
     {}
@@ -61,85 +64,88 @@ TimeDependent::~TimeDependent ()
 
 
 void
-TimeDependent::insert_timestep (const TimeStepBase *position,
-                                TimeStepBase       *new_timestep)
+TimeDependent::insert_timestep(const TimeStepBase *position,
+                               TimeStepBase *      new_timestep)
 {
-  Assert ((std::find(timesteps.begin(), timesteps.end(), position) != timesteps.end()) ||
-          (position == nullptr),
-          ExcInvalidPosition());
+  Assert((std::find(timesteps.begin(), timesteps.end(), position) !=
+          timesteps.end()) ||
+           (position == nullptr),
+         ExcInvalidPosition());
   // first insert the new time step
   // into the doubly linked list
   // of timesteps
   if (position == nullptr)
     {
       // at the end
-      new_timestep->set_next_timestep (nullptr);
+      new_timestep->set_next_timestep(nullptr);
       if (timesteps.size() > 0)
         {
-          timesteps.back()->set_next_timestep (new_timestep);
-          new_timestep->set_previous_timestep (timesteps.back());
+          timesteps.back()->set_next_timestep(new_timestep);
+          new_timestep->set_previous_timestep(timesteps.back());
         }
       else
-        new_timestep->set_previous_timestep (nullptr);
+        new_timestep->set_previous_timestep(nullptr);
     }
   else if (position == timesteps[0])
     {
       // at the beginning
-      new_timestep->set_previous_timestep (nullptr);
+      new_timestep->set_previous_timestep(nullptr);
       if (timesteps.size() > 0)
         {
-          timesteps[0]->set_previous_timestep (new_timestep);
-          new_timestep->set_next_timestep (timesteps[0]);
+          timesteps[0]->set_previous_timestep(new_timestep);
+          new_timestep->set_next_timestep(timesteps[0]);
         }
       else
-        new_timestep->set_next_timestep (nullptr);
+        new_timestep->set_next_timestep(nullptr);
     }
   else
     {
       // inner time step
-      const std::vector<SmartPointer<TimeStepBase,TimeDependent> >::iterator insert_position
-        = std::find(timesteps.begin(), timesteps.end(), position);
+      const std::vector<SmartPointer<TimeStepBase, TimeDependent>>::iterator
+        insert_position =
+          std::find(timesteps.begin(), timesteps.end(), position);
       // check iterators again to satisfy coverity: both insert_position and
       // insert_position - 1 must be valid iterators
       Assert(insert_position != timesteps.begin() &&
-             insert_position != timesteps.end(), ExcInternalError());
+               insert_position != timesteps.end(),
+             ExcInternalError());
 
-      (*(insert_position-1))->set_next_timestep (new_timestep);
-      new_timestep->set_previous_timestep (*(insert_position-1));
-      new_timestep->set_next_timestep (*insert_position);
-      (*insert_position)->set_previous_timestep (new_timestep);
+      (*(insert_position - 1))->set_next_timestep(new_timestep);
+      new_timestep->set_previous_timestep(*(insert_position - 1));
+      new_timestep->set_next_timestep(*insert_position);
+      (*insert_position)->set_previous_timestep(new_timestep);
     }
 
   // finally enter it into the
   // array
-  timesteps.insert ((position == nullptr ?
-                     timesteps.end() :
-                     std::find(timesteps.begin(), timesteps.end(), position)),
-                    new_timestep);
+  timesteps.insert((position == nullptr ?
+                      timesteps.end() :
+                      std::find(timesteps.begin(), timesteps.end(), position)),
+                   new_timestep);
 }
 
 
 void
-TimeDependent::add_timestep (TimeStepBase *new_timestep)
+TimeDependent::add_timestep(TimeStepBase *new_timestep)
 {
-  insert_timestep (nullptr, new_timestep);
+  insert_timestep(nullptr, new_timestep);
 }
 
 
-void TimeDependent::delete_timestep (const unsigned int position)
+void
+TimeDependent::delete_timestep(const unsigned int position)
 {
-  Assert (position<timesteps.size(),
-          ExcInvalidPosition());
+  Assert(position < timesteps.size(), ExcInvalidPosition());
 
   // Remember time step object for
   // later deletion and unlock
   // SmartPointer
-  TimeStepBase *t = timesteps[position];
+  TimeStepBase *t     = timesteps[position];
   timesteps[position] = nullptr;
   // Now delete unsubscribed object
   delete t;
 
-  timesteps.erase (timesteps.begin() + position);
+  timesteps.erase(timesteps.begin() + position);
 
   // reset "next" pointer of previous
   // time step if possible
@@ -147,51 +153,56 @@ void TimeDependent::delete_timestep (const unsigned int position)
   // note that if now position==size,
   // then we deleted the last time step
   if (position != 0)
-    timesteps[position-1]->set_next_timestep ((position<timesteps.size()) ?
-                                              timesteps[position] :
-                                              /*null*/SmartPointer<TimeStepBase,TimeDependent>());
+    timesteps[position - 1]->set_next_timestep(
+      (position < timesteps.size()) ?
+        timesteps[position] :
+        /*null*/ SmartPointer<TimeStepBase, TimeDependent>());
 
   // same for "previous" pointer of next
   // time step
-  if (position<timesteps.size())
-    timesteps[position]->set_previous_timestep ((position!=0) ?
-                                                timesteps[position-1] :
-                                                /*null*/SmartPointer<TimeStepBase,TimeDependent>());
+  if (position < timesteps.size())
+    timesteps[position]->set_previous_timestep(
+      (position != 0) ? timesteps[position - 1] :
+                        /*null*/ SmartPointer<TimeStepBase, TimeDependent>());
 }
 
 
 void
-TimeDependent::solve_primal_problem ()
+TimeDependent::solve_primal_problem()
 {
-  do_loop (std::bind(&TimeStepBase::init_for_primal_problem, std::placeholders::_1),
-           std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
-           timestepping_data_primal,
-           forward);
+  do_loop(
+    std::bind(&TimeStepBase::init_for_primal_problem, std::placeholders::_1),
+    std::bind(&TimeStepBase::solve_primal_problem, std::placeholders::_1),
+    timestepping_data_primal,
+    forward);
 }
 
 
 void
-TimeDependent::solve_dual_problem ()
+TimeDependent::solve_dual_problem()
 {
-  do_loop (std::bind(&TimeStepBase::init_for_dual_problem, std::placeholders::_1),
-           std::bind(&TimeStepBase::solve_dual_problem, std::placeholders::_1),
-           timestepping_data_dual,
-           backward);
+  do_loop(
+    std::bind(&TimeStepBase::init_for_dual_problem, std::placeholders::_1),
+    std::bind(&TimeStepBase::solve_dual_problem, std::placeholders::_1),
+    timestepping_data_dual,
+    backward);
 }
 
 
 void
-TimeDependent::postprocess ()
+TimeDependent::postprocess()
 {
-  do_loop (std::bind(&TimeStepBase::init_for_postprocessing, std::placeholders::_1),
-           std::bind(&TimeStepBase::postprocess_timestep, std::placeholders::_1),
-           timestepping_data_postprocess,
-           forward);
+  do_loop(
+    std::bind(&TimeStepBase::init_for_postprocessing, std::placeholders::_1),
+    std::bind(&TimeStepBase::postprocess_timestep, std::placeholders::_1),
+    timestepping_data_postprocess,
+    forward);
 }
 
 
 
-void TimeDependent::start_sweep (const unsigned int s)
+void
+TimeDependent::start_sweep(const unsigned int s)
 {
   sweep_no = s;
 
@@ -202,48 +213,51 @@ void TimeDependent::start_sweep (const unsigned int s)
   //
   // also set the sweep we will
   // process in the sequel
-  for (unsigned int step=0; step<timesteps.size(); ++step)
+  for (unsigned int step = 0; step < timesteps.size(); ++step)
     {
-      timesteps[step]->set_timestep_no (step);
-      timesteps[step]->set_sweep_no (sweep_no);
+      timesteps[step]->set_timestep_no(step);
+      timesteps[step]->set_sweep_no(sweep_no);
     };
 
-  for (unsigned int step=0; step<timesteps.size(); ++step)
-    timesteps[step]->start_sweep ();
+  for (unsigned int step = 0; step < timesteps.size(); ++step)
+    timesteps[step]->start_sweep();
 }
 
 
 
-void TimeDependent::end_sweep ()
+void
+TimeDependent::end_sweep()
 {
-  void (TimeDependent::*p) (const unsigned int, const unsigned int)
-    = &TimeDependent::end_sweep;
-  parallel::apply_to_subranges (0U, timesteps.size(),
-                                std::bind (p, this, std::placeholders::_1, std::placeholders::_2),
-                                1);
+  void (TimeDependent::*p)(const unsigned int, const unsigned int) =
+    &TimeDependent::end_sweep;
+  parallel::apply_to_subranges(
+    0U,
+    timesteps.size(),
+    std::bind(p, this, std::placeholders::_1, std::placeholders::_2),
+    1);
 }
 
 
 
-void TimeDependent::end_sweep (const unsigned int begin,
-                               const unsigned int end)
+void
+TimeDependent::end_sweep(const unsigned int begin, const unsigned int end)
 {
-  for (unsigned int step=begin; step<end; ++step)
-    timesteps[step]->end_sweep ();
+  for (unsigned int step = begin; step < end; ++step)
+    timesteps[step]->end_sweep();
 }
 
 
 
 std::size_t
-TimeDependent::memory_consumption () const
+TimeDependent::memory_consumption() const
 {
-  std::size_t mem = (MemoryConsumption::memory_consumption (timesteps) +
-                     MemoryConsumption::memory_consumption (sweep_no) +
-                     sizeof(timestepping_data_primal) +
-                     sizeof(timestepping_data_dual) +
-                     sizeof(timestepping_data_postprocess));
-  for (unsigned int i=0; i<timesteps.size(); ++i)
-    mem += MemoryConsumption::memory_consumption (*timesteps[i]);
+  std::size_t mem =
+    (MemoryConsumption::memory_consumption(timesteps) +
+     MemoryConsumption::memory_consumption(sweep_no) +
+     sizeof(timestepping_data_primal) + sizeof(timestepping_data_dual) +
+     sizeof(timestepping_data_postprocess));
+  for (unsigned int i = 0; i < timesteps.size(); ++i)
+    mem += MemoryConsumption::memory_consumption(*timesteps[i]);
 
   return mem;
 }
@@ -253,43 +267,43 @@ TimeDependent::memory_consumption () const
 /* --------------------------------------------------------------------- */
 
 
-TimeStepBase::TimeStepBase (const double time) :
+TimeStepBase::TimeStepBase(const double time) :
   previous_timestep(nullptr),
-  next_timestep (nullptr),
-  sweep_no (numbers::invalid_unsigned_int),
-  timestep_no (numbers::invalid_unsigned_int),
-  time (time),
+  next_timestep(nullptr),
+  sweep_no(numbers::invalid_unsigned_int),
+  timestep_no(numbers::invalid_unsigned_int),
+  time(time),
   next_action(numbers::invalid_unsigned_int)
 {}
 
 
 
 void
-TimeStepBase::wake_up (const unsigned int )
+TimeStepBase::wake_up(const unsigned int)
 {}
 
 
 
 void
-TimeStepBase::sleep (const unsigned)
+TimeStepBase::sleep(const unsigned)
 {}
 
 
 
 void
-TimeStepBase::start_sweep ()
+TimeStepBase::start_sweep()
 {}
 
 
 
 void
-TimeStepBase::end_sweep ()
+TimeStepBase::end_sweep()
 {}
 
 
 
 void
-TimeStepBase::init_for_primal_problem ()
+TimeStepBase::init_for_primal_problem()
 {
   next_action = primal_problem;
 }
@@ -297,7 +311,7 @@ TimeStepBase::init_for_primal_problem ()
 
 
 void
-TimeStepBase::init_for_dual_problem ()
+TimeStepBase::init_for_dual_problem()
 {
   next_action = dual_problem;
 }
@@ -305,7 +319,7 @@ TimeStepBase::init_for_dual_problem ()
 
 
 void
-TimeStepBase::init_for_postprocessing ()
+TimeStepBase::init_for_postprocessing()
 {
   next_action = postprocess;
 }
@@ -313,23 +327,23 @@ TimeStepBase::init_for_postprocessing ()
 
 
 void
-TimeStepBase::solve_dual_problem ()
+TimeStepBase::solve_dual_problem()
 {
-  Assert (false, ExcPureFunctionCalled());
+  Assert(false, ExcPureFunctionCalled());
 }
 
 
 
 void
-TimeStepBase::postprocess_timestep ()
+TimeStepBase::postprocess_timestep()
 {
-  Assert (false, ExcPureFunctionCalled());
+  Assert(false, ExcPureFunctionCalled());
 }
 
 
 
 double
-TimeStepBase::get_time () const
+TimeStepBase::get_time() const
 {
   return time;
 }
@@ -337,7 +351,7 @@ TimeStepBase::get_time () const
 
 
 unsigned int
-TimeStepBase::get_timestep_no () const
+TimeStepBase::get_timestep_no() const
 {
   return timestep_no;
 }
@@ -345,29 +359,29 @@ TimeStepBase::get_timestep_no () const
 
 
 double
-TimeStepBase::get_backward_timestep () const
+TimeStepBase::get_backward_timestep() const
 {
-  Assert (previous_timestep != nullptr,
-          ExcMessage("The backward time step cannot be computed because "
-                     "there is no previous time step."));
+  Assert(previous_timestep != nullptr,
+         ExcMessage("The backward time step cannot be computed because "
+                    "there is no previous time step."));
   return time - previous_timestep->time;
 }
 
 
 
 double
-TimeStepBase::get_forward_timestep () const
+TimeStepBase::get_forward_timestep() const
 {
-  Assert (next_timestep != nullptr,
-          ExcMessage("The forward time step cannot be computed because "
-                     "there is no next time step."));
+  Assert(next_timestep != nullptr,
+         ExcMessage("The forward time step cannot be computed because "
+                    "there is no next time step."));
   return next_timestep->time - time;
 }
 
 
 
 void
-TimeStepBase::set_previous_timestep (const TimeStepBase *previous)
+TimeStepBase::set_previous_timestep(const TimeStepBase *previous)
 {
   previous_timestep = previous;
 }
@@ -375,15 +389,15 @@ TimeStepBase::set_previous_timestep (const TimeStepBase *previous)
 
 
 void
-TimeStepBase::set_next_timestep (const TimeStepBase *next)
+TimeStepBase::set_next_timestep(const TimeStepBase *next)
 {
-  next_timestep     = next;
+  next_timestep = next;
 }
 
 
 
 void
-TimeStepBase::set_timestep_no (const unsigned int step_no)
+TimeStepBase::set_timestep_no(const unsigned int step_no)
 {
   timestep_no = step_no;
 }
@@ -391,7 +405,7 @@ TimeStepBase::set_timestep_no (const unsigned int step_no)
 
 
 void
-TimeStepBase::set_sweep_no (const unsigned int sweep)
+TimeStepBase::set_sweep_no(const unsigned int sweep)
 {
   sweep_no = sweep;
 }
@@ -399,7 +413,7 @@ TimeStepBase::set_sweep_no (const unsigned int sweep)
 
 
 std::size_t
-TimeStepBase::memory_consumption () const
+TimeStepBase::memory_consumption() const
 {
   // only simple data types
   return sizeof(*this);
@@ -409,42 +423,43 @@ TimeStepBase::memory_consumption () const
 
 template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
-  TimeStepBase (0),
-  tria (nullptr, typeid(*this).name()),
-  coarse_grid (nullptr, typeid(*this).name()),
-  flags (),
+  TimeStepBase(0),
+  tria(nullptr, typeid(*this).name()),
+  coarse_grid(nullptr, typeid(*this).name()),
+  flags(),
   refinement_flags(0)
 {
-  Assert (false, ExcPureFunctionCalled());
+  Assert(false, ExcPureFunctionCalled());
 }
 
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
-                                           const Triangulation<dim> &coarse_grid,
-                                           const Flags              &flags,
-                                           const RefinementFlags    &refinement_flags) :
-  TimeStepBase (time),
+TimeStepBase_Tria<dim>::TimeStepBase_Tria(
+  const double              time,
+  const Triangulation<dim> &coarse_grid,
+  const Flags &             flags,
+  const RefinementFlags &   refinement_flags) :
+  TimeStepBase(time),
   tria(nullptr, typeid(*this).name()),
-  coarse_grid (&coarse_grid, typeid(*this).name()),
-  flags (flags),
-  refinement_flags (refinement_flags)
+  coarse_grid(&coarse_grid, typeid(*this).name()),
+  flags(flags),
+  refinement_flags(refinement_flags)
 {}
 
 
 
 template <int dim>
-TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
+TimeStepBase_Tria<dim>::~TimeStepBase_Tria()
 {
   if (!flags.delete_and_rebuild_tria)
     {
       Triangulation<dim> *t = tria;
-      tria = nullptr;
+      tria                  = nullptr;
       delete t;
     }
   else
-    AssertNothrow (tria==nullptr, ExcInternalError());
+    AssertNothrow(tria == nullptr, ExcInternalError());
 
   coarse_grid = nullptr;
 }
@@ -453,86 +468,87 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
 
 template <int dim>
 void
-TimeStepBase_Tria<dim>::wake_up (const unsigned int wakeup_level)
+TimeStepBase_Tria<dim>::wake_up(const unsigned int wakeup_level)
 {
-  TimeStepBase::wake_up (wakeup_level);
+  TimeStepBase::wake_up(wakeup_level);
 
   if (wakeup_level == flags.wakeup_level_to_build_grid)
     if (flags.delete_and_rebuild_tria || !tria)
-      restore_grid ();
+      restore_grid();
 }
 
 
 
 template <int dim>
 void
-TimeStepBase_Tria<dim>::sleep (const unsigned int sleep_level)
+TimeStepBase_Tria<dim>::sleep(const unsigned int sleep_level)
 {
   if (sleep_level == flags.sleep_level_to_delete_grid)
     {
-      Assert (tria!=nullptr, ExcInternalError());
+      Assert(tria != nullptr, ExcInternalError());
 
       if (flags.delete_and_rebuild_tria)
         {
           Triangulation<dim> *t = tria;
-          tria = nullptr;
+          tria                  = nullptr;
           delete t;
         }
     }
 
-  TimeStepBase::sleep (sleep_level);
+  TimeStepBase::sleep(sleep_level);
 }
 
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::save_refine_flags ()
+void
+TimeStepBase_Tria<dim>::save_refine_flags()
 {
   // for any of the non-initial grids
   // store the refinement flags
-  refine_flags.emplace_back ();
-  coarsen_flags.emplace_back ();
-  tria->save_refine_flags (refine_flags.back());
-  tria->save_coarsen_flags (coarsen_flags.back());
+  refine_flags.emplace_back();
+  coarsen_flags.emplace_back();
+  tria->save_refine_flags(refine_flags.back());
+  tria->save_coarsen_flags(coarsen_flags.back());
 }
 
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::restore_grid ()
+void
+TimeStepBase_Tria<dim>::restore_grid()
 {
-  Assert (tria == nullptr, ExcGridNotDeleted());
-  Assert (refine_flags.size() == coarsen_flags.size(),
-          ExcInternalError());
+  Assert(tria == nullptr, ExcGridNotDeleted());
+  Assert(refine_flags.size() == coarsen_flags.size(), ExcInternalError());
 
   // create a virgin triangulation and
   // set it to a copy of the coarse grid
-  tria = new Triangulation<dim> ();
-  tria->copy_triangulation (*coarse_grid);
+  tria = new Triangulation<dim>();
+  tria->copy_triangulation(*coarse_grid);
 
   // for each of the previous refinement
   // sweeps
-  for (unsigned int previous_sweep=0; previous_sweep<refine_flags.size();
+  for (unsigned int previous_sweep = 0; previous_sweep < refine_flags.size();
        ++previous_sweep)
     {
       // get flags
-      tria->load_refine_flags  (refine_flags[previous_sweep]);
-      tria->load_coarsen_flags (coarsen_flags[previous_sweep]);
+      tria->load_refine_flags(refine_flags[previous_sweep]);
+      tria->load_coarsen_flags(coarsen_flags[previous_sweep]);
 
       // limit refinement depth if the user
       // desired so
-//       if (flags.max_refinement_level != 0)
-//      {
-//        typename Triangulation<dim>::active_cell_iterator cell, endc;
-//        for (cell = tria->begin_active(),
-//             endc = tria->end();
-//             cell!=endc; ++cell)
-//          if (static_cast<unsigned int>(cell->level()) >=
-//              flags.max_refinement_level)
-//            cell->clear_refine_flag();
-//      };
+      //       if (flags.max_refinement_level != 0)
+      //      {
+      //        typename Triangulation<dim>::active_cell_iterator cell, endc;
+      //        for (cell = tria->begin_active(),
+      //             endc = tria->end();
+      //             cell!=endc; ++cell)
+      //          if (static_cast<unsigned int>(cell->level()) >=
+      //              flags.max_refinement_level)
+      //            cell->clear_refine_flag();
+      //      };
 
-      tria->execute_coarsening_and_refinement ();
+      tria->execute_coarsening_and_refinement();
     };
 }
 
@@ -543,8 +559,9 @@ namespace
 {
   template <int dim>
   void
-  mirror_refinement_flags (const typename Triangulation<dim>::cell_iterator &new_cell,
-                           const typename Triangulation<dim>::cell_iterator &old_cell)
+  mirror_refinement_flags(
+    const typename Triangulation<dim>::cell_iterator &new_cell,
+    const typename Triangulation<dim>::cell_iterator &old_cell)
   {
     // mirror the refinement
     // flags from the present time level to
@@ -583,9 +600,11 @@ namespace
 
     if (old_cell->has_children() && new_cell->has_children())
       {
-        Assert(old_cell->n_children()==new_cell->n_children(), ExcNotImplemented());
-        for (unsigned int c=0; c<new_cell->n_children(); ++c)
-          dealii::mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
+        Assert(old_cell->n_children() == new_cell->n_children(),
+               ExcNotImplemented());
+        for (unsigned int c = 0; c < new_cell->n_children(); ++c)
+          dealii::mirror_refinement_flags<dim>(new_cell->child(c),
+                                               old_cell->child(c));
       }
   }
 
@@ -593,18 +612,17 @@ namespace
 
   template <int dim>
   bool
-  adapt_grid_cells (const typename Triangulation<dim>::cell_iterator &cell1,
-                    const typename Triangulation<dim>::cell_iterator &cell2)
+  adapt_grid_cells(const typename Triangulation<dim>::cell_iterator &cell1,
+                   const typename Triangulation<dim>::cell_iterator &cell2)
   {
-
     if (cell2->has_children() && cell1->has_children())
       {
         bool grids_changed = false;
 
-        Assert(cell2->n_children()==cell1->n_children(), ExcNotImplemented());
-        for (unsigned int c=0; c<cell1->n_children(); ++c)
-          grids_changed |= dealii::adapt_grid_cells<dim> (cell1->child(c),
-                                                          cell2->child(c));
+        Assert(cell2->n_children() == cell1->n_children(), ExcNotImplemented());
+        for (unsigned int c = 0; c < cell1->n_children(); ++c)
+          grids_changed |=
+            dealii::adapt_grid_cells<dim>(cell1->child(c), cell2->child(c));
         return grids_changed;
       };
 
@@ -657,7 +675,7 @@ namespace
           };
 
         if (!cell2->refine_flag_set())
-          for (unsigned int c=0; c<cell1->n_children(); ++c)
+          for (unsigned int c = 0; c < cell1->n_children(); ++c)
             if (cell1->child(c)->refine_flag_set() ||
                 cell1->child(c)->has_children())
               {
@@ -679,7 +697,7 @@ namespace
           };
 
         if (!cell1->refine_flag_set())
-          for (unsigned int c=0; c<cell2->n_children(); ++c)
+          for (unsigned int c = 0; c < cell2->n_children(); ++c)
             if (cell2->child(c)->refine_flag_set() ||
                 cell2->child(c)->has_children())
               {
@@ -690,7 +708,7 @@ namespace
         return changed_grid;
       };
 
-    Assert (false, ExcInternalError());
+    Assert(false, ExcInternalError());
     return false;
   }
 
@@ -698,8 +716,7 @@ namespace
 
   template <int dim>
   bool
-  adapt_grids (Triangulation<dim> &tria1,
-               Triangulation<dim> &tria2)
+  adapt_grids(Triangulation<dim> &tria1, Triangulation<dim> &tria2)
   {
     bool grids_changed = false;
 
@@ -707,21 +724,22 @@ namespace
                                                cell2 = tria2.begin();
     typename Triangulation<dim>::cell_iterator endc;
     endc = (tria1.n_levels() == 1 ?
-            typename Triangulation<dim>::cell_iterator(tria1.end()) :
-            tria1.begin(1));
-    for (; cell1!=endc; ++cell1, ++cell2)
-      grids_changed |= dealii::adapt_grid_cells<dim> (cell1, cell2);
+              typename Triangulation<dim>::cell_iterator(tria1.end()) :
+              tria1.begin(1));
+    for (; cell1 != endc; ++cell1, ++cell2)
+      grids_changed |= dealii::adapt_grid_cells<dim>(cell1, cell2);
 
     return grids_changed;
   }
-}
+} // namespace
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
+void
+TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
 {
   Vector<float> criteria;
-  get_tria_refinement_criteria (criteria);
+  get_tria_refinement_criteria(criteria);
 
   // copy the following two values since
   // we may need modified values in the
@@ -740,8 +758,8 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
   // two pointers into this array denoting
   // the position where the two thresholds
   // are assumed
-  Vector<float>::const_iterator p_refinement_threshold=nullptr,
-                                p_coarsening_threshold=nullptr;
+  Vector<float>::const_iterator p_refinement_threshold = nullptr,
+                                p_coarsening_threshold = nullptr;
 
 
   // if we are to do some cell number
@@ -759,29 +777,30 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
   // number of cells flagged for refinement
   // or coarsening would be changed by one
   if ((timestep_no != 0) &&
-      (sweep_no>=refinement_flags.first_sweep_with_correction) &&
+      (sweep_no >= refinement_flags.first_sweep_with_correction) &&
       (refinement_flags.cell_number_correction_steps > 0))
     {
       sorted_criteria = criteria;
-      std::sort (sorted_criteria.begin(),
-                 sorted_criteria.end());
-      p_refinement_threshold = Utilities::lower_bound (sorted_criteria.begin(),
-                                                       sorted_criteria.end(),
-                                                       static_cast<float>(refinement_threshold));
-      p_coarsening_threshold = std::upper_bound (sorted_criteria.begin(),
-                                                 sorted_criteria.end(),
-                                                 static_cast<float>(coarsening_threshold));
+      std::sort(sorted_criteria.begin(), sorted_criteria.end());
+      p_refinement_threshold =
+        Utilities::lower_bound(sorted_criteria.begin(),
+                               sorted_criteria.end(),
+                               static_cast<float>(refinement_threshold));
+      p_coarsening_threshold =
+        std::upper_bound(sorted_criteria.begin(),
+                         sorted_criteria.end(),
+                         static_cast<float>(coarsening_threshold));
     };
 
 
   // actually flag cells the first time
-  GridRefinement::refine (*tria, criteria, refinement_threshold);
-  GridRefinement::coarsen (*tria, criteria, coarsening_threshold);
+  GridRefinement::refine(*tria, criteria, refinement_threshold);
+  GridRefinement::coarsen(*tria, criteria, coarsening_threshold);
 
   // store this number for the following
   // since its computation is rather
   // expensive and since it doesn't change
-  const unsigned int n_active_cells = tria->n_active_cells ();
+  const unsigned int n_active_cells = tria->n_active_cells();
 
   // if not on first time level: try to
   // adjust the number of resulting
@@ -822,24 +841,26 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
   // repeat this loop several times since
   // the first estimate may not be totally
   // correct
-  if ((timestep_no != 0) && (sweep_no>=refinement_flags.first_sweep_with_correction))
-    for (unsigned int loop=0;
-         loop<refinement_flags.cell_number_correction_steps; ++loop)
+  if ((timestep_no != 0) &&
+      (sweep_no >= refinement_flags.first_sweep_with_correction))
+    for (unsigned int loop = 0;
+         loop < refinement_flags.cell_number_correction_steps;
+         ++loop)
       {
-        Triangulation<dim> *previous_tria
-          = dynamic_cast<const TimeStepBase_Tria<dim>*>(previous_timestep)->tria;
+        Triangulation<dim> *previous_tria =
+          dynamic_cast<const TimeStepBase_Tria<dim> *>(previous_timestep)->tria;
 
         // do one adaption step if desired
         // (there are more coming below then
         // also)
         if (refinement_flags.adapt_grids)
-          dealii::adapt_grids<dim> (*previous_tria, *tria);
+          dealii::adapt_grids<dim>(*previous_tria, *tria);
 
         // perform flagging of cells
         // needed to regularize the
         // triangulation
-        tria->prepare_coarsening_and_refinement ();
-        previous_tria->prepare_coarsening_and_refinement ();
+        tria->prepare_coarsening_and_refinement();
+        previous_tria->prepare_coarsening_and_refinement();
 
 
         // now count the number of elements
@@ -858,17 +879,19 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
         // cells, we have to subtract 3/4 of
         // a cell for each flagged cell
         Assert(!tria->get_anisotropic_refinement_flag(), ExcNotImplemented());
-        Assert(!previous_tria->get_anisotropic_refinement_flag(), ExcNotImplemented());
+        Assert(!previous_tria->get_anisotropic_refinement_flag(),
+               ExcNotImplemented());
         double previous_cells = previous_tria->n_active_cells();
         typename Triangulation<dim>::active_cell_iterator cell, endc;
         cell = previous_tria->begin_active();
         endc = previous_tria->end();
-        for (; cell!=endc; ++cell)
+        for (; cell != endc; ++cell)
           if (cell->refine_flag_set())
-            previous_cells += (GeometryInfo<dim>::max_children_per_cell-1);
+            previous_cells += (GeometryInfo<dim>::max_children_per_cell - 1);
           else if (cell->coarsen_flag_set())
-            previous_cells -= (double)(GeometryInfo<dim>::max_children_per_cell-1) /
-                              GeometryInfo<dim>::max_children_per_cell;
+            previous_cells -=
+              (double)(GeometryInfo<dim>::max_children_per_cell - 1) /
+              GeometryInfo<dim>::max_children_per_cell;
 
         // @p{previous_cells} now gives the
         // number of cells which would result
@@ -887,29 +910,30 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
         // now estimate the number of cells which
         // will result on this level
         double estimated_cells = n_active_cells;
-        cell = tria->begin_active();
-        endc = tria->end();
-        for (; cell!=endc; ++cell)
+        cell                   = tria->begin_active();
+        endc                   = tria->end();
+        for (; cell != endc; ++cell)
           if (cell->refine_flag_set())
-            estimated_cells += (GeometryInfo<dim>::max_children_per_cell-1);
+            estimated_cells += (GeometryInfo<dim>::max_children_per_cell - 1);
           else if (cell->coarsen_flag_set())
-            estimated_cells -= (double)(GeometryInfo<dim>::max_children_per_cell-1) /
-                               GeometryInfo<dim>::max_children_per_cell;
+            estimated_cells -=
+              (double)(GeometryInfo<dim>::max_children_per_cell - 1) /
+              GeometryInfo<dim>::max_children_per_cell;
 
         // calculate the allowed delta in
         // cell numbers; be more lenient
         // if there are few cells
-        double delta_up = refinement_flags.cell_number_corridor_top,
+        double delta_up   = refinement_flags.cell_number_corridor_top,
                delta_down = refinement_flags.cell_number_corridor_bottom;
 
-        const std::vector<std::pair<unsigned int,double> > &relaxations
-          = (sweep_no >= refinement_flags.correction_relaxations.size() ?
+        const std::vector<std::pair<unsigned int, double>> &relaxations =
+          (sweep_no >= refinement_flags.correction_relaxations.size() ?
              refinement_flags.correction_relaxations.back() :
              refinement_flags.correction_relaxations[sweep_no]);
-        for (unsigned int r=0; r!=relaxations.size(); ++r)
+        for (unsigned int r = 0; r != relaxations.size(); ++r)
           if (n_active_cells < relaxations[r].first)
             {
-              delta_up   *= relaxations[r].second;
+              delta_up *= relaxations[r].second;
               delta_down *= relaxations[r].second;
               break;
             };
@@ -923,7 +947,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
         // we unflag we have to diminish the
         // estimated number of cells by
         // @p{children_per_cell}.
-        if (estimated_cells > previous_cells*(1.+delta_up))
+        if (estimated_cells > previous_cells * (1. + delta_up))
           {
             // only limit the cell number
             // if there will not be less
@@ -941,12 +965,12 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
             // flags, the initial level
             // will be passively refined
             // later on.
-            if (estimated_cells>refinement_flags.min_cells_for_correction)
+            if (estimated_cells > refinement_flags.min_cells_for_correction)
               {
                 // number of cells by which the
                 // new grid is to be diminished
-                double delta_cells = estimated_cells -
-                                     previous_cells*(1.+delta_up);
+                double delta_cells =
+                  estimated_cells - previous_cells * (1. + delta_up);
 
                 // if we need to reduce the
                 // number of cells, we need
@@ -957,8 +981,8 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
                 // order. do so by removing
                 // cells tagged for refinement
 
-                for (unsigned int i=0; i<delta_cells;
-                     i += GeometryInfo<dim>::max_children_per_cell-1)
+                for (unsigned int i = 0; i < delta_cells;
+                     i += GeometryInfo<dim>::max_children_per_cell - 1)
                   if (p_refinement_threshold != sorted_criteria.end())
                     ++p_refinement_threshold;
                   else
@@ -979,88 +1003,89 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
           // run into the area of cells
           // which are to be coarsened, we
           // raise the limit for these too
-          if (estimated_cells < previous_cells*(1.-delta_down))
-            {
-              // number of cells by which the
-              // new grid is to be enlarged
-              double delta_cells = previous_cells*(1.-delta_down)-estimated_cells;
-              // heuristics: usually, if we
-              // add @p{delta_cells} to the
-              // present state, we end up
-              // with much more than only
-              // (1-delta_down)*prev_cells
-              // because of the effect of
-              // regularization and because
-              // of adaption to the
-              // following grid. Therefore,
-              // if we are not in the last
-              // correction loop, we try not
-              // to add as many cells as seem
-              // necessary at first and hope
-              // to get closer to the limit
-              // this way. Only in the last
-              // loop do we have to take the
-              // full number to guarantee the
-              // wanted result.
-              //
-              // The value 0.9 is taken from
-              // practice, as the additional
-              // number of cells introduced
-              // by regularization is
-              // approximately 10 per cent
-              // of the flagged cells.
-              if (loop != refinement_flags.cell_number_correction_steps-1)
-                delta_cells *= 0.9;
+          if (estimated_cells < previous_cells * (1. - delta_down))
+          {
+            // number of cells by which the
+            // new grid is to be enlarged
+            double delta_cells =
+              previous_cells * (1. - delta_down) - estimated_cells;
+            // heuristics: usually, if we
+            // add @p{delta_cells} to the
+            // present state, we end up
+            // with much more than only
+            // (1-delta_down)*prev_cells
+            // because of the effect of
+            // regularization and because
+            // of adaption to the
+            // following grid. Therefore,
+            // if we are not in the last
+            // correction loop, we try not
+            // to add as many cells as seem
+            // necessary at first and hope
+            // to get closer to the limit
+            // this way. Only in the last
+            // loop do we have to take the
+            // full number to guarantee the
+            // wanted result.
+            //
+            // The value 0.9 is taken from
+            // practice, as the additional
+            // number of cells introduced
+            // by regularization is
+            // approximately 10 per cent
+            // of the flagged cells.
+            if (loop != refinement_flags.cell_number_correction_steps - 1)
+              delta_cells *= 0.9;
 
-              // if more cells need to be
-              // refined, we need to lower
-              // the thresholds, i.e. to
-              // move to the beginning
-              // of sorted_criteria, which is
-              // sorted in ascending order
-              for (unsigned int i=0; i<delta_cells;
-                   i += (GeometryInfo<dim>::max_children_per_cell-1))
-                if (p_refinement_threshold != p_coarsening_threshold)
-                  --refinement_threshold;
-                else if (p_coarsening_threshold != sorted_criteria.begin())
-                  --p_coarsening_threshold, --p_refinement_threshold;
-                else
-                  break;
-            }
-          else
-            // estimated cell number is ok,
-            // stop correction steps
-            break;
+            // if more cells need to be
+            // refined, we need to lower
+            // the thresholds, i.e. to
+            // move to the beginning
+            // of sorted_criteria, which is
+            // sorted in ascending order
+            for (unsigned int i = 0; i < delta_cells;
+                 i += (GeometryInfo<dim>::max_children_per_cell - 1))
+              if (p_refinement_threshold != p_coarsening_threshold)
+                --refinement_threshold;
+              else if (p_coarsening_threshold != sorted_criteria.begin())
+                --p_coarsening_threshold, --p_refinement_threshold;
+              else
+                break;
+          }
+        else
+          // estimated cell number is ok,
+          // stop correction steps
+          break;
 
         if (p_refinement_threshold == sorted_criteria.end())
           {
-            Assert (p_coarsening_threshold != p_refinement_threshold,
-                    ExcInternalError());
+            Assert(p_coarsening_threshold != p_refinement_threshold,
+                   ExcInternalError());
             --p_refinement_threshold;
           };
 
         coarsening_threshold = *p_coarsening_threshold;
         refinement_threshold = *p_refinement_threshold;
 
-        if (coarsening_threshold>=refinement_threshold)
-          coarsening_threshold = 0.999*refinement_threshold;
+        if (coarsening_threshold >= refinement_threshold)
+          coarsening_threshold = 0.999 * refinement_threshold;
 
         // now that we have re-adjusted
         // thresholds: clear all refine and
         // coarsening flags and do it all
         // over again
         cell = tria->begin_active();
-        endc  = tria->end();
-        for (; cell!=endc; ++cell)
+        endc = tria->end();
+        for (; cell != endc; ++cell)
           {
-            cell->clear_refine_flag ();
-            cell->clear_coarsen_flag ();
+            cell->clear_refine_flag();
+            cell->clear_coarsen_flag();
           };
 
 
         // flag cells finally
-        GridRefinement::refine (*tria, criteria, refinement_threshold);
-        GridRefinement::coarsen (*tria, criteria, coarsening_threshold);
+        GridRefinement::refine(*tria, criteria, refinement_threshold);
+        GridRefinement::coarsen(*tria, criteria, coarsening_threshold);
       };
 
   // if step number is greater than
@@ -1072,8 +1097,8 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
   // treatment of its own.
   if ((timestep_no >= 1) && (refinement_flags.adapt_grids))
     {
-      Triangulation<dim> *previous_tria
-        = dynamic_cast<const TimeStepBase_Tria<dim>*>(previous_timestep)->tria;
+      Triangulation<dim> *previous_tria =
+        dynamic_cast<const TimeStepBase_Tria<dim> *>(previous_timestep)->tria;
       Assert(previous_tria != nullptr, ExcInternalError());
 
       // if we used the dual estimator, we
@@ -1089,32 +1114,33 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
       // strange things may happen
       if (refinement_flags.mirror_flags_to_previous_grid)
         {
-          dealii::adapt_grids<dim> (*previous_tria, *tria);
+          dealii::adapt_grids<dim>(*previous_tria, *tria);
 
           typename Triangulation<dim>::cell_iterator old_cell, new_cell, endc;
           old_cell = previous_tria->begin(0);
           new_cell = tria->begin(0);
           endc     = tria->end(0);
-          for (; new_cell!=endc; ++new_cell, ++old_cell)
-            dealii::mirror_refinement_flags<dim> (new_cell, old_cell);
+          for (; new_cell != endc; ++new_cell, ++old_cell)
+            dealii::mirror_refinement_flags<dim>(new_cell, old_cell);
         };
 
-      tria->prepare_coarsening_and_refinement ();
-      previous_tria->prepare_coarsening_and_refinement ();
+      tria->prepare_coarsening_and_refinement();
+      previous_tria->prepare_coarsening_and_refinement();
 
       // adapt present and previous grids
       // to each other: flag additional
       // cells to avoid the previous grid
       // to have cells refined twice more
       // than the present one and vica versa.
-      dealii::adapt_grids<dim> (*previous_tria, *tria);
+      dealii::adapt_grids<dim>(*previous_tria, *tria);
     };
 }
 
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::init_for_refinement ()
+void
+TimeStepBase_Tria<dim>::init_for_refinement()
 {
   next_action = grid_refinement;
 }
@@ -1123,88 +1149,90 @@ void TimeStepBase_Tria<dim>::init_for_refinement ()
 
 template <int dim>
 std::size_t
-TimeStepBase_Tria<dim>::memory_consumption () const
+TimeStepBase_Tria<dim>::memory_consumption() const
 {
-  return (TimeStepBase::memory_consumption () +
-          sizeof(tria) +
-          MemoryConsumption::memory_consumption (coarse_grid) +
-          sizeof(flags) + sizeof(refinement_flags) +
-          MemoryConsumption::memory_consumption (refine_flags) +
-          MemoryConsumption::memory_consumption (coarsen_flags));
+  return (TimeStepBase::memory_consumption() + sizeof(tria) +
+          MemoryConsumption::memory_consumption(coarse_grid) + sizeof(flags) +
+          sizeof(refinement_flags) +
+          MemoryConsumption::memory_consumption(refine_flags) +
+          MemoryConsumption::memory_consumption(coarsen_flags));
 }
 
 
 
 template <int dim>
-TimeStepBase_Tria_Flags::Flags<dim>::Flags ()
-  :
-  delete_and_rebuild_tria (false),
-  wakeup_level_to_build_grid (0),
-  sleep_level_to_delete_grid (0)
+TimeStepBase_Tria_Flags::Flags<dim>::Flags() :
+  delete_and_rebuild_tria(false),
+  wakeup_level_to_build_grid(0),
+  sleep_level_to_delete_grid(0)
 {
-  Assert (false, ExcInternalError());
+  Assert(false, ExcInternalError());
 }
 
 
 
 template <int dim>
-TimeStepBase_Tria_Flags::Flags<dim>::Flags (const bool delete_and_rebuild_tria,
-                                            const unsigned int wakeup_level_to_build_grid,
-                                            const unsigned int sleep_level_to_delete_grid):
-  delete_and_rebuild_tria (delete_and_rebuild_tria),
-  wakeup_level_to_build_grid (wakeup_level_to_build_grid),
-  sleep_level_to_delete_grid (sleep_level_to_delete_grid)
+TimeStepBase_Tria_Flags::Flags<dim>::Flags(
+  const bool         delete_and_rebuild_tria,
+  const unsigned int wakeup_level_to_build_grid,
+  const unsigned int sleep_level_to_delete_grid) :
+  delete_and_rebuild_tria(delete_and_rebuild_tria),
+  wakeup_level_to_build_grid(wakeup_level_to_build_grid),
+  sleep_level_to_delete_grid(sleep_level_to_delete_grid)
 {
-//   Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
-//        ExcInvalidParameter(wakeup_level_to_build_grid));
-//   Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
-//        ExcInvalidParameter(sleep_level_to_delete_grid));
+  //   Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
+  //        ExcInvalidParameter(wakeup_level_to_build_grid));
+  //   Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
+  //        ExcInvalidParameter(sleep_level_to_delete_grid));
 }
 
 
 template <int dim>
 typename TimeStepBase_Tria_Flags::RefinementFlags<dim>::CorrectionRelaxations
-TimeStepBase_Tria_Flags::RefinementFlags<dim>::default_correction_relaxations
-(1,    // one element, denoting the first and all subsequent sweeps
- std::vector<std::pair<unsigned int,double> >(1,    // one element, denoting the upper bound
-                                              // for the following
-                                              // relaxation
-                                              std::make_pair (0U, 0.)));
+  TimeStepBase_Tria_Flags::RefinementFlags<dim>::default_correction_relaxations(
+    1, // one element, denoting the first and all subsequent sweeps
+    std::vector<std::pair<unsigned int, double>>(1, // one element, denoting the
+                                                    // upper bound for the
+                                                    // following relaxation
+                                                 std::make_pair(0U, 0.)));
 
 
 template <int dim>
-TimeStepBase_Tria_Flags::RefinementFlags<dim>::
-RefinementFlags (const unsigned int max_refinement_level,
-                 const unsigned int first_sweep_with_correction,
-                 const unsigned int min_cells_for_correction,
-                 const double       cell_number_corridor_top,
-                 const double       cell_number_corridor_bottom,
-                 const CorrectionRelaxations &correction_relaxations,
-                 const unsigned int cell_number_correction_steps,
-                 const bool         mirror_flags_to_previous_grid,
-                 const bool         adapt_grids) :
+TimeStepBase_Tria_Flags::RefinementFlags<dim>::RefinementFlags(
+  const unsigned int           max_refinement_level,
+  const unsigned int           first_sweep_with_correction,
+  const unsigned int           min_cells_for_correction,
+  const double                 cell_number_corridor_top,
+  const double                 cell_number_corridor_bottom,
+  const CorrectionRelaxations &correction_relaxations,
+  const unsigned int           cell_number_correction_steps,
+  const bool                   mirror_flags_to_previous_grid,
+  const bool                   adapt_grids) :
   max_refinement_level(max_refinement_level),
-  first_sweep_with_correction (first_sweep_with_correction),
+  first_sweep_with_correction(first_sweep_with_correction),
   min_cells_for_correction(min_cells_for_correction),
   cell_number_corridor_top(cell_number_corridor_top),
   cell_number_corridor_bottom(cell_number_corridor_bottom),
-  correction_relaxations (correction_relaxations.size() != 0 ?
-                          correction_relaxations :
-                          default_correction_relaxations),
+  correction_relaxations(correction_relaxations.size() != 0 ?
+                           correction_relaxations :
+                           default_correction_relaxations),
   cell_number_correction_steps(cell_number_correction_steps),
   mirror_flags_to_previous_grid(mirror_flags_to_previous_grid),
   adapt_grids(adapt_grids)
 {
-  Assert (cell_number_corridor_top>=0, ExcInvalidValue (cell_number_corridor_top));
-  Assert (cell_number_corridor_bottom>=0, ExcInvalidValue (cell_number_corridor_bottom));
-  Assert (cell_number_corridor_bottom<=1, ExcInvalidValue (cell_number_corridor_bottom));
+  Assert(cell_number_corridor_top >= 0,
+         ExcInvalidValue(cell_number_corridor_top));
+  Assert(cell_number_corridor_bottom >= 0,
+         ExcInvalidValue(cell_number_corridor_bottom));
+  Assert(cell_number_corridor_bottom <= 1,
+         ExcInvalidValue(cell_number_corridor_bottom));
 }
 
 
 template <int dim>
-TimeStepBase_Tria_Flags::RefinementData<dim>::
-RefinementData (const double         _refinement_threshold,
-                const double         _coarsening_threshold) :
+TimeStepBase_Tria_Flags::RefinementData<dim>::RefinementData(
+  const double _refinement_threshold,
+  const double _coarsening_threshold) :
   refinement_threshold(_refinement_threshold),
   // in some rare cases it may happen that
   // both thresholds are the same (e.g. if
@@ -1225,17 +1253,17 @@ RefinementData (const double         _refinement_threshold,
   // bottom threshold by one permille below
   // the top threshold
   coarsening_threshold((_coarsening_threshold == _refinement_threshold ?
-                        _coarsening_threshold :
-                        0.999*_coarsening_threshold))
+                          _coarsening_threshold :
+                          0.999 * _coarsening_threshold))
 {
-  Assert (refinement_threshold >= 0, ExcInvalidValue(refinement_threshold));
-  Assert (coarsening_threshold >= 0, ExcInvalidValue(coarsening_threshold));
+  Assert(refinement_threshold >= 0, ExcInvalidValue(refinement_threshold));
+  Assert(coarsening_threshold >= 0, ExcInvalidValue(coarsening_threshold));
   // allow both thresholds to be zero,
   // since this is needed in case all indicators
   // are zero
-  Assert ((coarsening_threshold < refinement_threshold) ||
-          ((coarsening_threshold == 0) && (refinement_threshold == 0)),
-          ExcInvalidValue (coarsening_threshold));
+  Assert((coarsening_threshold < refinement_threshold) ||
+           ((coarsening_threshold == 0) && (refinement_threshold == 0)),
+         ExcInvalidValue(coarsening_threshold));
 }
 
 

@@ -16,16 +16,18 @@
 
 // verify that mutexes work correctly in MT context
 
-#include "../tests.h"
+#include <deal.II/base/thread_management.h>
+
 #include <unistd.h>
 
-#include <deal.II/base/thread_management.h>
+#include "../tests.h"
 
 
 Threads::Mutex mutex;
 
 
-void test ()
+void
+test()
 {
   // get the mutex, but note that it is first
   // held by main() which will therefore
@@ -35,26 +37,27 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
 #ifdef DEAL_II_WITH_THREADS
 
-  mutex.acquire ();
+  mutex.acquire();
 
-  Threads::Thread<> t = Threads::new_thread (&test);
+  Threads::Thread<> t = Threads::new_thread(&test);
 
-  sleep (2);
+  sleep(2);
   deallog << "1" << std::endl;
 
-  mutex.release ();
-  t.join ();
+  mutex.release();
+  t.join();
 
   // the other thread should now have acquired the mutex, so release it
   // again (destroying an acquired lock invokes undefined behavior in
   // pthread_mutex_destroy)
-  mutex.release ();
+  mutex.release();
 
 #else
 

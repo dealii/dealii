@@ -14,19 +14,24 @@
 // ---------------------------------------------------------------------
 
 
-// Test DoFTools::locally_owned_dofs_per_subdomain (for a standard Triangulation)
+// Test DoFTools::locally_owned_dofs_per_subdomain (for a standard
+// Triangulation)
+
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
 #include "../tests.h"
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/grid/grid_tools.h>
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, -1.0, 1.0);
@@ -34,25 +39,27 @@ void test ()
 
   const unsigned int nproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  GridTools::partition_triangulation (nproc,
-                                      triangulation);
+  GridTools::partition_triangulation(nproc, triangulation);
 
-  FE_Q<dim> fe(1);
-  DoFHandler<dim> dof_handler (triangulation);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  std::vector<IndexSet> locally_owned_dofs_per_proc = DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
+  std::vector<IndexSet> locally_owned_dofs_per_proc =
+    DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
 
-  for (unsigned int p=0; p<nproc; ++p)
+  for (unsigned int p = 0; p < nproc; ++p)
     {
       deallog << "proc " << p << ": " << std::endl;
       locally_owned_dofs_per_proc[p].print(deallog.get_file_stream());
     }
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   MPILogInitAll all;
 

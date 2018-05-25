@@ -15,29 +15,39 @@
 
 // Test FE_Nedelec<3> for meshes with faces with non-standard orientation.
 
-#include "../tests.h"
-#include<deal.II/base/quadrature_lib.h>
-#include<deal.II/dofs/dof_handler.h>
-#include<deal.II/fe/fe_nedelec.h>
-#include<deal.II/fe/fe_values.h>
-#include<deal.II/grid/grid_generator.h>
-#include<deal.II/grid/tria.h>
-#include<deal.II/lac/constraint_matrix.h>
-#include<deal.II/lac/vector.h>
-#include<deal.II/numerics/fe_field_function.h>
-#include<deal.II/numerics/vector_tools.h>
+#include <deal.II/base/quadrature_lib.h>
 
-void create_reference_triangulation (Triangulation<3> &tria)
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_values.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
+
+void create_reference_triangulation(Triangulation<3> &tria)
 {
-  std::vector<unsigned int> repetitions (3, 1);
+  std::vector<unsigned int> repetitions(3, 1);
 
   repetitions[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle (tria, repetitions, Point<3> (-1.0, 0.0, 0.0), Point<3> (1.0, 1.0, 1.0));
+  GridGenerator::subdivided_hyper_rectangle(
+    tria, repetitions, Point<3>(-1.0, 0.0, 0.0), Point<3>(1.0, 1.0, 1.0));
 }
 
-void create_triangulation (Triangulation<3> &tria, const bool face_orientation, const bool face_flip, const bool face_rotation)
+void create_triangulation(Triangulation<3> &tria,
+                          const bool        face_orientation,
+                          const bool        face_flip,
+                          const bool        face_rotation)
 {
-  std::vector<CellData<3> > cells (2);
+  std::vector<CellData<3>> cells(2);
 
   cells[0].vertices[0] = 0;
   cells[0].vertices[1] = 1;
@@ -156,91 +166,108 @@ void create_triangulation (Triangulation<3> &tria, const bool face_orientation, 
 
   cells[1].material_id = 0;
 
-  std::vector<Point<3> > vertices (12);
+  std::vector<Point<3>> vertices(12);
 
-  vertices[0] = Point<3> (-1.0, 0.0, 0.0);
-  vertices[1] = Point<3> ();
-  vertices[2] = Point<3> (1.0, 0.0, 0.0);
-  vertices[3] = Point<3> (-1.0, 0.0, 1.0);
-  vertices[4] = Point<3> (0.0, 0.0, 1.0);
-  vertices[5] = Point<3> (1.0, 0.0, 1.0);
-  vertices[6] = Point<3> (-1.0, 1.0, 0.0);
-  vertices[7] = Point<3> (0.0, 1.0, 0.0);
-  vertices[8] = Point<3> (1.0, 1.0, 0.0);
-  vertices[9] = Point<3> (-1.0, 1.0, 1.0);
-  vertices[10] = Point<3> (0.0, 1.0, 1.0);
-  vertices[11] = Point<3> (1.0, 1.0, 1.0);
-  tria.create_triangulation (vertices, cells, SubCellData ());
+  vertices[0]  = Point<3>(-1.0, 0.0, 0.0);
+  vertices[1]  = Point<3>();
+  vertices[2]  = Point<3>(1.0, 0.0, 0.0);
+  vertices[3]  = Point<3>(-1.0, 0.0, 1.0);
+  vertices[4]  = Point<3>(0.0, 0.0, 1.0);
+  vertices[5]  = Point<3>(1.0, 0.0, 1.0);
+  vertices[6]  = Point<3>(-1.0, 1.0, 0.0);
+  vertices[7]  = Point<3>(0.0, 1.0, 0.0);
+  vertices[8]  = Point<3>(1.0, 1.0, 0.0);
+  vertices[9]  = Point<3>(-1.0, 1.0, 1.0);
+  vertices[10] = Point<3>(0.0, 1.0, 1.0);
+  vertices[11] = Point<3>(1.0, 1.0, 1.0);
+  tria.create_triangulation(vertices, cells, SubCellData());
 }
 
-void evaluate (const FE_Nedelec<3> &fe, const DoFHandler<3> &dof_handler_ref, const Vector<double> &u_ref, const DoFHandler<3> &dof_handler, const Vector<double> &u)
+void
+evaluate(const FE_Nedelec<3> & fe,
+         const DoFHandler<3> & dof_handler_ref,
+         const Vector<double> &u_ref,
+         const DoFHandler<3> & dof_handler,
+         const Vector<double> &u)
 {
-  const FEValuesExtractors::Vector component (0);
-  const QGauss<3> quadrature (2);
-  const unsigned int n_q_points = quadrature.size ();
-  Functions::FEFieldFunction<3> fe_field_function (dof_handler, u);
-  FEValues<3> fe_values (fe, quadrature, update_quadrature_points | update_values);
-  std::vector<Vector<double> > values (n_q_points, Vector<double> (3));
-  std::vector<Tensor<1, 3> > values_ref (n_q_points);
+  const FEValuesExtractors::Vector component(0);
+  const QGauss<3>                  quadrature(2);
+  const unsigned int               n_q_points = quadrature.size();
+  Functions::FEFieldFunction<3>    fe_field_function(dof_handler, u);
+  FEValues<3>                      fe_values(
+    fe, quadrature, update_quadrature_points | update_values);
+  std::vector<Vector<double>> values(n_q_points, Vector<double>(3));
+  std::vector<Tensor<1, 3>>   values_ref(n_q_points);
 
-  for (DoFHandler<3>::active_cell_iterator cell = dof_handler_ref.begin_active (); cell != dof_handler_ref.end (); ++cell)
+  for (DoFHandler<3>::active_cell_iterator cell =
+         dof_handler_ref.begin_active();
+       cell != dof_handler_ref.end();
+       ++cell)
     {
-      fe_values.reinit (cell);
-      fe_values[component].get_function_values (u_ref, values_ref);
-      fe_field_function.vector_value_list (fe_values.get_quadrature_points (), values);
+      fe_values.reinit(cell);
+      fe_values[component].get_function_values(u_ref, values_ref);
+      fe_field_function.vector_value_list(fe_values.get_quadrature_points(),
+                                          values);
 
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         {
           for (unsigned int d = 0; d < 3; ++d)
-            deallog << values_ref[q_point][d] - values[q_point] (d) << "  ";
+            deallog << values_ref[q_point][d] - values[q_point](d) << "  ";
 
           deallog << std::endl;
         }
     }
 }
 
-void set_reference_solution (Vector<double> &vector)
+void
+set_reference_solution(Vector<double> &vector)
 {
-  for (unsigned int i = 0; i < vector.size (); ++i)
-    vector (i) = 1.0;
+  for (unsigned int i = 0; i < vector.size(); ++i)
+    vector(i) = 1.0;
 }
 
-void set_solution (Vector<double> &vector, const DoFHandler<3> &dof_handler, const DoFHandler<3> &dof_handler_ref, const Vector<double> &u_ref)
+void
+set_solution(Vector<double> &      vector,
+             const DoFHandler<3> & dof_handler,
+             const DoFHandler<3> & dof_handler_ref,
+             const Vector<double> &u_ref)
 {
   ConstraintMatrix constraints;
 
-  constraints.close ();
+  constraints.close();
 
-  Functions::FEFieldFunction<3> fe_field_function (dof_handler_ref, u_ref);
+  Functions::FEFieldFunction<3> fe_field_function(dof_handler_ref, u_ref);
 
-  VectorTools::project (dof_handler, constraints, QGauss<3> (2), fe_field_function, vector);
+  VectorTools::project(
+    dof_handler, constraints, QGauss<3>(2), fe_field_function, vector);
 }
 
-void run (const bool face_orientation, const bool face_flip, const bool face_rotation)
+void
+run(const bool face_orientation, const bool face_flip, const bool face_rotation)
 {
   Triangulation<3> tria_ref;
 
-  create_reference_triangulation (tria_ref);
+  create_reference_triangulation(tria_ref);
 
-  FE_Nedelec<3> fe (0);
-  DoFHandler<3> dof_handler_ref (tria_ref);
+  FE_Nedelec<3> fe(0);
+  DoFHandler<3> dof_handler_ref(tria_ref);
 
-  dof_handler_ref.distribute_dofs (fe);
+  dof_handler_ref.distribute_dofs(fe);
 
-  Vector<double> u_ref (dof_handler_ref.n_dofs ());
+  Vector<double> u_ref(dof_handler_ref.n_dofs());
 
-  set_reference_solution (u_ref);
+  set_reference_solution(u_ref);
 
   Triangulation<3> tria;
 
-  create_triangulation (tria, face_orientation, face_flip, face_rotation);
+  create_triangulation(tria, face_orientation, face_flip, face_rotation);
 
-  DoFHandler<3> dof_handler (tria);
+  DoFHandler<3> dof_handler(tria);
 
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
-  Vector<double> u (dof_handler.n_dofs ());
+  Vector<double> u(dof_handler.n_dofs());
 
-  set_solution (u, dof_handler, dof_handler_ref, u_ref);
-  evaluate (fe, dof_handler_ref, u_ref, dof_handler, u);
+  set_solution(u, dof_handler, dof_handler_ref, u_ref);
+  evaluate(fe, dof_handler_ref, u_ref, dof_handler, u);
 }
