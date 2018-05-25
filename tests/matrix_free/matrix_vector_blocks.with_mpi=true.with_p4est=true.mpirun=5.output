@@ -1,0 +1,15 @@
+
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Norm of difference with 5 blocks: 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+DEAL:2d::Norm of difference with 10 blocks: 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+DEAL:2d::Norm of difference with 20 blocks: 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+DEAL:2d::Norm of difference with 40 blocks: 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16
+DEAL:2d::Norm of difference with 80 blocks: 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16 4.441e-16
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Norm of difference with 5 blocks: 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+DEAL:3d::Norm of difference with 10 blocks: 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+DEAL:3d::Norm of difference with 20 blocks: 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+DEAL:3d::Norm of difference with 40 blocks: 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17
+DEAL:3d::Norm of difference with 80 blocks: 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17 5.551e-17
+DEAL:3d::
