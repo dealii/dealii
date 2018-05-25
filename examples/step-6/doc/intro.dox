@@ -101,6 +101,53 @@ that a cell can be only refined once more than its neighbors), but that we end
 up with these &ldquo;hanging nodes&rdquo; if we do this.
 
 
+<h3> Why adapatively refined meshes? </h3>
+
+Now that you have seen how these adaptively refined meshes look like,
+you should ask <i>why</i> we would want to do this. After all, we know from
+theory that if we refine the mesh globally, the error will go down to zero
+as
+@f{align*}{
+  \|\nabla(u-u_h)\|_{\Omega} \le C h_\text{max}^p \| \nabla^{p+1} u \|_{\Omega},
+@f}
+where $C$ is some constant independent of $h$ and $u$,
+$p$ is the polynomial degree of the finite element in use, and
+$h_\text{max}$ is the diameter of the largest cell. So if the
+<i>largest</i> cell is important, then why would we want to make
+the mesh fine in some parts of the domain but not all?
+
+The answer lies in the observation that the formula above is not
+optimal. In fact, some more work shows that the following
+is a better estimate (which you should compare to the square of
+the estimate above):
+@f{align*}{
+  \|\nabla(u-u_h)\|_{\Omega}^2 \le C \sum_K h_K^{2p} \| \nabla^{p+1} u \|^2_K.
+@f}
+(Because $h_K\le h_\text{max}$, this formula immediately implies the
+previous one if you just pull the mesh size out of the sum.)
+What this formula suggests is that it is not necessary to make
+the <i>largest</i> cell small, but that the cells really only
+need to be small <i>where $\| \nabla^{p+1} u \|_K$ is large</i>!
+In other words: The mesh really only has to be fine where the
+solution has large variations, as indicated by the $p+1$st derivative.
+This makes intuitive sense: if, for example, we use a linear element
+$p=1$, then places where the solution is nearly linear (as indicated
+by $\nabla^2 u$ being small) will be well resolved even if the mesh
+is coarse. Only those places where the second derivative is large
+will be poorly resolved by large elements, and consequently
+that's where we should make the mesh small.
+
+Of course, this <i>a priori estimate</i> is not very useful
+in practice since we don't know the exact solution $u$ of the
+problem, and consequently, we cannot compute $\nabla^{p+1}u$.
+But, and that is the approach commonly taken, we can compute
+numerical approximations of $\nabla^{p+1}u$ based only on
+the discrete solution $u_h$ that we have computed before. We
+will discuss this in slightly more detail below. This will then
+help us determine which cells have a large $p+1$st derivative,
+and these are then candidates for refining the mesh.
+
+
 <h3> How to deal with hanging nodes in theory </h3>
 
 The methods using triangular meshes mentioned above go to great
@@ -218,43 +265,53 @@ code is entirely immaterial to this: In user code, there are really
 only four additional steps.
 
 
-<h3> Indicators for mesh refinement and coarsening </h3>
+<h3> How we obtain locally refined meshes </h3>
 
-The locally refined grids are produced using an error estimator class
-which estimates the energy error with respect to the Laplace
-operator. This error estimator, although developed for Laplace's
-equation has proven to be a suitable tool to generate locally refined
-meshes for a wide range of equations, not restricted to elliptic
-problems. Although it will create non-optimal meshes for other
-equations, it is often a good way to quickly produce meshes that are
-well adapted to the features of solutions, such as regions of great
-variation or discontinuities. Since it was developed by Kelly and
+The next question, now that we know how to <i>deal</i> with meshes that
+have these hanging nodes is how we <i>obtain</i> them.
+
+A simple way has already been shown in step-1: If you <i>know</i> where
+it is necessary to refine the mesh, then you can create one by hand. But
+in reality, we don't know this: We don't know the solution of the PDE
+up front (because, if we did, we wouldn't have to use the finite element
+method), and consequently we do not know where it is necessary to
+add local mesh refinement to better resolve areas where the solution
+has strong variations. But the discussion above shows that maybe we
+can get away with using the discrete solution $u_h$ on one mesh to
+estimate the derivatives $\nabla^{p+1} u$, and then use this to determine
+which cells are too large and which already small enough. We can then
+generate a new mesh from the current one using local mesh refinement.
+If necessary, this step is then repeated until we are happy with our
+numerical solution -- or, more commonly, until we run out of computational
+resources or patience.
+
+So that's exactly what we will do.
+The locally refined grids are produced using an <i>error estimator</i>
+which estimates the energy error for numerical solutions of the Laplace
+operator. Since it was developed by Kelly and
 co-workers, we often refer to it as the &ldquo;Kelly refinement
 indicator&rdquo; in the library, documentation, and mailing list. The
 class that implements it is called
-KellyErrorEstimator. Although the error estimator (and
-its
-implementation in the deal.II library) is capable of handling variable
-coefficients in the equation, we will not use this feature since we
-are only interested in a quick and simple way to generate locally
-refined grids.
+KellyErrorEstimator, and there is a great deal of information to
+be found in the documentation of that class that need not be repeated
+here. The summary, however, is that the class computes a vector with
+as many entries as there are @ref GlossActive "active cells", and
+where each entry contains an estimate of the error on that cell.
+This estimate is then used to refine the cells of the mesh: those
+cells that have a large error will be marked for refinement, those
+that have a particularly small estimate will be marked for
+coarsening. We don't have to do this by hand: The functions in
+namespace GridRefinement will do all of this for us once we have
+obtained the vector of error estimates.
 
+It is worth noting that while the Kelly error estimator was developed
+for Laplace's equation, it has proven to be a suitable tool to generate
+locally refined meshes for a wide range of equations, not even restricted
+to elliptic only problems. Although it will create non-optimal meshes for other
+equations, it is often a good way to quickly produce meshes that are
+well adapted to the features of solutions, such as regions of great
+variation or discontinuities. 
 
-
-Since the concepts used for locally refined grids are so important,
-we do not show much additional new stuff in this example. The most
-important exception is that we show how to use biquadratic elements
-instead of the bilinear ones which we have used in all previous
-examples. In fact, The use of higher order elements is accomplished by
-only replacing three lines of the program, namely the declaration of
-the <code>fe</code> variable, and the use of an appropriate quadrature formula
-in two places. The rest of the program is unchanged.
-
-
-
-The only other new thing is a method to catch exceptions in the
-<code>main</code> function in order to output some information in case the
-program crashes for some reason.
 
 
 <h3> Boundary conditions </h3>
@@ -275,3 +332,20 @@ VectorTools::interpolate_boundary_values() that returns its information
 in a ConstraintMatrix object, rather than the `std::map` we have used
 in previous tutorial programs.
  
+
+ <h3> Other things this program shows </h3>
+ 
+ 
+Since the concepts used for locally refined grids are so important,
+we do not show much other material in this example. The most
+important exception is that we show how to use biquadratic elements
+instead of the bilinear ones which we have used in all previous
+examples. In fact, the use of higher order elements is accomplished by
+only replacing three lines of the program, namely the initialization of
+the <code>fe</code> member variable in the constructor of the main
+class of this program, and the use of an appropriate quadrature formula
+in two places. The rest of the program is unchanged.
+
+The only other new thing is a method to catch exceptions in the
+<code>main</code> function in order to output some information in case the
+program crashes for some reason. This is discussed below in more detail.
