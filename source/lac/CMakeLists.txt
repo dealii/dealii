@@ -24,7 +24,6 @@ SET(_unity_include_src
   block_vector.cc
   chunk_sparse_matrix.cc
   chunk_sparsity_pattern.cc
-  constraint_matrix.cc
   dynamic_sparsity_pattern.cc
   exceptions.cc
   full_matrix.cc
@@ -67,7 +66,6 @@ SET(_inst
   block_sparse_matrix.inst.in
   block_vector.inst.in
   chunk_sparse_matrix.inst.in
-  constraint_matrix.inst.in
   full_matrix.inst.in
   lapack_full_matrix.inst.in
   la_vector.inst.in
