@@ -311,6 +311,14 @@ MGTransferPrebuilt<VectorType>::build_matrices(
         mg_dof);
       dsp.reinit(0, 0);
 
+      // In the end, the entries in this object will only be real valued.
+      // Nevertheless, we have to take the underlying scalar type of the
+      // vector we want to use this class with. The global matrix the entries
+      // of this matrix are copied into has to be able to perform a
+      // matrix-vector multiplication and this is in general only implemented if
+      // the scalar type for matrix and vector is the same. Furthermore,
+      // copying entries between this local object and the global matrix is only
+      // implemented if the objects have the same scalar type.
       FullMatrix<typename VectorType::value_type> prolongation;
 
       // now actually build the matrices
