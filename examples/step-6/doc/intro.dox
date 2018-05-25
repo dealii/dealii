@@ -123,7 +123,29 @@ cannot be bilinear because then it needs to be linear along each edge
 of the large cell, and that means that it needs to be zero on the
 entire edge because it needs to be zero on the two vertices of the
 large cell on that edge. But it is not zero at the hanging node itself
-when seen from the small cells' side -- so it is not continuous.
+when seen from the small cells' side -- so it is not continuous. The
+following three figures show three of the shape functions along the
+edges in question that turn out to not be continuous when defined in
+the usual way simply based on the cells they are adjacent to:
+
+<div class="threecolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      @image html hanging_nodes_shape_functions_1.png "A discontinuous shape function adjacent to a hanging node"
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      @image html hanging_nodes_shape_functions_2.png "A discontinuous shape function at a hanging node"
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      @image html hanging_nodes_shape_functions_3.png "A discontinuous shape function adjacent to a hanging node"
+    </div>
+  </div>
+</div>
+
 
 But we do want the finite element solution to be continuous so that we
 have a &ldquo;conforming finite element method&rdquo; where the
