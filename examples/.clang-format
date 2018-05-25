@@ -1,6 +1,7 @@
 #
 # The clang-format (Clang 6) style file used by deal.II for the examples.
-# In contrast to the general one, header files are not sorted.
+# In contrast to the general one, header files are not sorted and we do
+# not require return types to be on a separate line.
 #
 
 AccessModifierOffset: -2
@@ -19,7 +20,7 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 
-AlwaysBreakAfterReturnType: All
+AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: true
 
