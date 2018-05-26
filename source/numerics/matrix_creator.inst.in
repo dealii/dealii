@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2017 by the deal.II authors
+// Copyright (C) 2010 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,14 +29,14 @@ for (scalar : REAL_SCALARS; deal_II_dimension : DIMENSIONS;
         const Quadrature<deal_II_dimension> &                         q,
         SparseMatrix<scalar> &                                        matrix,
         const Function<deal_II_space_dimension, scalar> *const coefficient,
-        const ConstraintMatrix &                               constraints);
+        const AffineConstraints<scalar> &                      constraints);
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof,
         const Quadrature<deal_II_dimension> &                         q,
         SparseMatrix<scalar> &                                        matrix,
         const Function<deal_II_space_dimension, scalar> *const coefficient,
-        const ConstraintMatrix &                               constraints);
+        const AffineConstraints<scalar> &                      constraints);
 
     // hp versions of functions
     template void MatrixCreator::
@@ -47,7 +47,7 @@ for (scalar : REAL_SCALARS; deal_II_dimension : DIMENSIONS;
         const hp::QCollection<deal_II_dimension> &                        q,
         SparseMatrix<scalar> &                                 matrix,
         const Function<deal_II_space_dimension, scalar> *const coefficient,
-        const ConstraintMatrix &                               constraints);
+        const AffineConstraints<scalar> &                      constraints);
 
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
@@ -55,7 +55,7 @@ for (scalar : REAL_SCALARS; deal_II_dimension : DIMENSIONS;
         const hp::QCollection<deal_II_dimension> &                        q,
         SparseMatrix<scalar> &                                 matrix,
         const Function<deal_II_space_dimension, scalar> *const coefficient,
-        const ConstraintMatrix &                               constraints);
+        const AffineConstraints<scalar> &                      constraints);
 #endif
   }
 
@@ -72,24 +72,20 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
         const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof,
         const Quadrature<deal_II_dimension> &                         q,
-        SparseMatrix<numbers::NumberTraits<scalar>::real_type> &      matrix,
+        SparseMatrix<scalar> &                                        matrix,
         const Function<deal_II_space_dimension, scalar> &             rhs,
-        Vector<scalar> &rhs_vector,
-        const Function<deal_II_space_dimension,
-                       numbers::NumberTraits<scalar>::real_type>
-          *const                coefficient,
-        const ConstraintMatrix &constraints);
+        Vector<scalar> &                                       rhs_vector,
+        const Function<deal_II_space_dimension, scalar> *const coefficient,
+        const AffineConstraints<scalar> &                      constraints);
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof,
         const Quadrature<deal_II_dimension> &                         q,
-        SparseMatrix<numbers::NumberTraits<scalar>::real_type> &      matrix,
+        SparseMatrix<scalar> &                                        matrix,
         const Function<deal_II_space_dimension, scalar> &             rhs,
-        Vector<scalar> &rhs_vector,
-        const Function<deal_II_space_dimension,
-                       numbers::NumberTraits<scalar>::real_type>
-          *const                coefficient,
-        const ConstraintMatrix &constraints);
+        Vector<scalar> &                                       rhs_vector,
+        const Function<deal_II_space_dimension, scalar> *const coefficient,
+        const AffineConstraints<scalar> &                      constraints);
 
     // hp version
     template void MatrixCreator::
@@ -98,25 +94,21 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
           &mapping,
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof,
         const hp::QCollection<deal_II_dimension> &                        q,
-        SparseMatrix<numbers::NumberTraits<scalar>::real_type> &matrix,
-        const Function<deal_II_space_dimension, scalar> &       rhs,
-        Vector<scalar> &                                        rhs_vector,
-        const Function<deal_II_space_dimension,
-                       numbers::NumberTraits<scalar>::real_type>
-          *const                coefficient,
-        const ConstraintMatrix &constraints);
+        SparseMatrix<scalar> &                                 matrix,
+        const Function<deal_II_space_dimension, scalar> &      rhs,
+        Vector<scalar> &                                       rhs_vector,
+        const Function<deal_II_space_dimension, scalar> *const coefficient,
+        const AffineConstraints<scalar> &                      constraints);
 
     template void MatrixCreator::
       create_mass_matrix<deal_II_dimension, deal_II_space_dimension, scalar>(
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof,
         const hp::QCollection<deal_II_dimension> &                        q,
-        SparseMatrix<numbers::NumberTraits<scalar>::real_type> &matrix,
-        const Function<deal_II_space_dimension, scalar> &       rhs,
-        Vector<scalar> &                                        rhs_vector,
-        const Function<deal_II_space_dimension,
-                       numbers::NumberTraits<scalar>::real_type>
-          *const                coefficient,
-        const ConstraintMatrix &constraints);
+        SparseMatrix<scalar> &                                 matrix,
+        const Function<deal_II_space_dimension, scalar> &      rhs,
+        Vector<scalar> &                                       rhs_vector,
+        const Function<deal_II_space_dimension, scalar> *const coefficient,
+        const AffineConstraints<scalar> &                      constraints);
 #endif
   }
 
@@ -131,13 +123,12 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
                                                scalar>(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &     dof,
       const Quadrature<deal_II_dimension - 1> &                          q,
-      SparseMatrix<numbers::NumberTraits<scalar>::real_type> &           matrix,
+      SparseMatrix<scalar> &                                             matrix,
       const std::map<types::boundary_id,
                      const Function<deal_II_space_dimension, scalar> *> &rhs,
       Vector<scalar> &                      rhs_vector,
       std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-      const Function<deal_II_space_dimension,
-                     numbers::NumberTraits<scalar>::real_type> *const a,
+      const Function<deal_II_space_dimension, scalar> *const a,
       std::vector<unsigned int>);
 
     template void
@@ -147,13 +138,12 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
       const Mapping<deal_II_dimension, deal_II_space_dimension> &,
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &     dof,
       const Quadrature<deal_II_dimension - 1> &                          q,
-      SparseMatrix<numbers::NumberTraits<scalar>::real_type> &           matrix,
+      SparseMatrix<scalar> &                                             matrix,
       const std::map<types::boundary_id,
                      const Function<deal_II_space_dimension, scalar> *> &rhs,
       Vector<scalar> &                      rhs_vector,
       std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-      const Function<deal_II_space_dimension,
-                     numbers::NumberTraits<scalar>::real_type> *const a,
+      const Function<deal_II_space_dimension, scalar> *const a,
       std::vector<unsigned int>);
 
     template void
@@ -163,13 +153,12 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
       const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension> &,
       const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
       const hp::QCollection<deal_II_dimension - 1> &,
-      SparseMatrix<numbers::NumberTraits<scalar>::real_type> &,
+      SparseMatrix<scalar> &,
       const std::map<types::boundary_id,
                      const Function<deal_II_space_dimension, scalar> *> &,
       Vector<scalar> &,
       std::vector<types::global_dof_index> &,
-      const Function<deal_II_space_dimension,
-                     numbers::NumberTraits<scalar>::real_type> *const,
+      const Function<deal_II_space_dimension, scalar> *const,
       std::vector<unsigned int>);
 
     template void
@@ -178,13 +167,12 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
                                                scalar>(
       const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
       const hp::QCollection<deal_II_dimension - 1> &,
-      SparseMatrix<numbers::NumberTraits<scalar>::real_type> &,
+      SparseMatrix<scalar> &,
       const std::map<types::boundary_id,
                      const Function<deal_II_space_dimension, scalar> *> &,
       Vector<scalar> &,
       std::vector<types::global_dof_index> &,
-      const Function<deal_II_space_dimension,
-                     numbers::NumberTraits<scalar>::real_type> *const,
+      const Function<deal_II_space_dimension, scalar> *const,
       std::vector<unsigned int>);
 #endif
   }
@@ -201,14 +189,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Quadrature<deal_II_dimension> &    q,
       SparseMatrix<double> &                   matrix,
       const Function<deal_II_dimension> *const coefficient,
-      const ConstraintMatrix &                 constraints);
+      const AffineConstraints<double> &        constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const Mapping<deal_II_dimension> &       mapping,
       const DoFHandler<deal_II_dimension> &    dof,
       const Quadrature<deal_II_dimension> &    q,
       SparseMatrix<double> &                   matrix,
       const Function<deal_II_dimension> *const coefficient,
-      const ConstraintMatrix &                 constraints);
+      const AffineConstraints<double> &        constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const Mapping<deal_II_dimension> &       mapping,
       const DoFHandler<deal_II_dimension> &    dof,
@@ -217,7 +205,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Function<deal_II_dimension> &      rhs,
       Vector<double> &                         rhs_vector,
       const Function<deal_II_dimension> *const coefficient,
-      const ConstraintMatrix &                 constraints);
+      const AffineConstraints<double> &        constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &    dof,
       const Quadrature<deal_II_dimension> &    q,
@@ -225,7 +213,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Function<deal_II_dimension> &      rhs,
       Vector<double> &                         rhs_vector,
       const Function<deal_II_dimension> *const coefficient,
-      const ConstraintMatrix &                 constraints);
+      const AffineConstraints<double> &        constraints);
 
     // hp versions of create_laplace_matrix
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
@@ -233,14 +221,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const hp::QCollection<deal_II_dimension> &q,
       SparseMatrix<double> &                    matrix,
       const Function<deal_II_dimension> *const  coefficient,
-      const ConstraintMatrix &                  constraints);
+      const AffineConstraints<double> &         constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const hp::MappingCollection<deal_II_dimension> &mapping,
       const hp::DoFHandler<deal_II_dimension> &       dof,
       const hp::QCollection<deal_II_dimension> &      q,
       SparseMatrix<double> &                          matrix,
       const Function<deal_II_dimension> *const        coefficient,
-      const ConstraintMatrix &                        constraints);
+      const AffineConstraints<double> &               constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const hp::MappingCollection<deal_II_dimension> &mapping,
       const hp::DoFHandler<deal_II_dimension> &       dof,
@@ -249,7 +237,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Function<deal_II_dimension> &             rhs,
       Vector<double> &                                rhs_vector,
       const Function<deal_II_dimension> *const        coefficient,
-      const ConstraintMatrix &                        constraints);
+      const AffineConstraints<double> &               constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension>(
       const hp::DoFHandler<deal_II_dimension> & dof,
       const hp::QCollection<deal_II_dimension> &q,
@@ -257,7 +245,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Function<deal_II_dimension> &       rhs,
       Vector<double> &                          rhs_vector,
       const Function<deal_II_dimension> *const  coefficient,
-      const ConstraintMatrix &                  constraints);
+      const AffineConstraints<double> &         constraints);
 
 #endif
   }
@@ -273,14 +261,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Quadrature<deal_II_dimension> &                         q,
       SparseMatrix<double> &                                        matrix,
       const Function<deal_II_space_dimension, double> *const        coefficient,
-      const ConstraintMatrix &constraints);
+      const AffineConstraints<double> &constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension,
                                                        deal_II_space_dimension>(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof,
       const Quadrature<deal_II_dimension> &                         q,
       SparseMatrix<double> &                                        matrix,
       const Function<deal_II_space_dimension, double> *const        coefficient,
-      const ConstraintMatrix &constraints);
+      const AffineConstraints<double> &constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension,
                                                        deal_II_space_dimension>(
       const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
@@ -290,7 +278,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Function<deal_II_space_dimension, double> &             rhs,
       Vector<double> &                                              rhs_vector,
       const Function<deal_II_space_dimension, double> *const        coefficient,
-      const ConstraintMatrix &constraints);
+      const AffineConstraints<double> &constraints);
     template void MatrixCreator::create_laplace_matrix<deal_II_dimension,
                                                        deal_II_space_dimension>(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof,
@@ -299,6 +287,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const Function<deal_II_space_dimension, double> &             rhs,
       Vector<double> &                                              rhs_vector,
       const Function<deal_II_space_dimension, double> *const        coefficient,
-      const ConstraintMatrix &constraints);
+      const AffineConstraints<double> &constraints);
 #endif
   }
