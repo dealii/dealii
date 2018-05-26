@@ -3760,14 +3760,10 @@ namespace internal
                       // compute offset of quadrature points within set of
                       // projected points
                       const unsigned int offset = face_no * n_points;
-                      // we don't need to transform the vertices: they are
-                      // already in physical space.
-                      line_points.push_back(face->vertex(0));
-                      for (unsigned int i = 1; i < n_points - 1; ++i)
+                      for (unsigned int i = 0; i < n_points; ++i)
                         line_points.push_back(
                           mapping->transform_unit_to_real_cell(
                             cell, q_projector->point(offset + i)));
-                      line_points.push_back(face->vertex(1));
                       internal::remove_colinear_points(line_points);
 
                       for (const Point<spacedim> &point : line_points)
@@ -3987,16 +3983,12 @@ namespace internal
                                                                           v1);
 
                               const Point<spacedim> center;
-                              // we don't need to transform the vertices: they
-                              // are already in physical space.
-                              line_points.push_back(v0);
-                              for (unsigned int i = 1; i < n_points - 1; ++i)
+                              for (unsigned int i = 0; i < n_points; ++i)
                                 line_points.push_back(
                                   mapping->transform_unit_to_real_cell(
                                     cell,
                                     (1 - boundary_points[i][0]) * u0 +
                                       boundary_points[i][0] * u1));
-                              line_points.push_back(v1);
                               internal::remove_colinear_points(line_points);
                               for (const Point<spacedim> &point : line_points)
                                 out << point << ' ' << cell->level() << ' '
