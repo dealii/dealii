@@ -627,7 +627,7 @@ namespace DoFTools
    */
   template <typename DoFHandlerType,
             typename SparsityPatternType,
-            typename number>
+            typename number = double>
   void
   make_sparsity_pattern(
     const DoFHandlerType &           dof_handler,
@@ -1570,7 +1570,7 @@ namespace DoFTools
    * DoFs that are associated with the locally owned or ghost cells, but are not
    * owned by the current MPI core.
    */
-  template <typename DoFHandlerType, typename number>
+  template <typename DoFHandlerType, typename number = double>
   IndexSet
   extract_dofs_with_support_contained_within(
     const DoFHandlerType &dof_handler,
