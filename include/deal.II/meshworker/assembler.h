@@ -111,7 +111,6 @@ namespace MeshWorker
     class ResidualLocalBlocksToGlobalBlocks
     {
     public:
-
       /**
        * Copy the BlockInfo and the matrix pointers into local variables.
        */
@@ -122,7 +121,8 @@ namespace MeshWorker
        * Initialize the constraints.
        */
       void
-      initialize(const AffineConstraints<typename VectorType::value_type> &constraints);
+      initialize(
+        const AffineConstraints<typename VectorType::value_type> &constraints);
 
       /**
        * Initialize the local data in the DoFInfo object used later for

@@ -1135,7 +1135,7 @@ namespace VectorTools
 
   /**
    * Insert the (algebraic) constraints due to Dirichlet boundary conditions
-   * into a ConstraintMatrix @p constraints. This function identifies the
+   * into a AffineConstraints @p constraints. This function identifies the
    * degrees of freedom subject to Dirichlet boundary conditions, adds them to
    * the list of constrained DoFs in @p constraints and sets the respective
    * inhomogeneity to the value interpolated around the boundary. If this
@@ -1464,7 +1464,7 @@ namespace VectorTools
    * $\vec{n}\times\vec{u}=\vec{n}\times\vec{f}$, i.e. the tangential
    * components of $u$ and $f$ shall coincide.
    *
-   * If the ConstraintMatrix @p constraints contained values or other
+   * If the AffineConstraints @p constraints contained values or other
    * constraints before, the new ones are added or the old ones overwritten,
    * if a node of the boundary part to be used was already in the list of
    * constraints. This is handled by using inhomogeneous constraints. Please
@@ -1593,7 +1593,7 @@ namespace VectorTools
    *
    * The resulting constraints are then given in the solutions $x$ and $y$.
    *
-   * If the ConstraintMatrix @p constraints contained values or other
+   * If the AffineConstraints @p constraints contained values or other
    * constraints before, the new ones are added or the old ones overwritten,
    * if a node of the boundary part to be used was already in the list of
    * constraints. This is handled by using inhomogeneous constraints. Please
@@ -1748,16 +1748,17 @@ namespace VectorTools
    * i.e., normal flux constraints where $\vec u$ is a vector-valued solution
    * variable and $\vec u_\Gamma$ is a prescribed vector field whose normal
    * component we want to be equal to the normal component of the solution.
-   * These conditions have exactly the form handled by the ConstraintMatrix
-   * class, in that they relate a <i>linear combination</i> of boundary degrees
-   * of freedom to a corresponding value (the inhomogeneity of the constraint).
-   * Consequently, the current function creates a list of constraints that are
-   * written into a ConstraintMatrix. This object may already have some
+   * These conditions have exactly the form handled by the
+   * AffineConstraints class, in that they relate a <i>linear
+   * combination</i> of boundary degrees of freedom to a corresponding
+   * value (the inhomogeneity of the constraint). Consequently, the current
+   * function creates a list of constraints that are written into an
+   * AffineConstraints container. This object may already have some
    * content, for example from hanging node constraints, that remains
-   * untouched. These constraints have to be applied to the linear system like
-   * any other such constraints, i.e., you have to condense the linear system
-   * with the constraints before solving, and you have to distribute the
-   * solution vector afterwards.
+   * untouched. These constraints have to be applied to the linear system
+   * like any other such constraints, i.e., you have to condense the linear
+   * system with the constraints before solving, and you have to distribute
+   * the solution vector afterwards.
    *
    * This function treats a more general case than
    * VectorTools::compute_no_normal_flux_constraints() (which can only handle
@@ -1814,7 +1815,7 @@ namespace VectorTools
    *
    * @note When combining adaptively refined meshes with hanging node
    * constraints and boundary conditions like from the current function within
-   * one ConstraintMatrix object, the hanging node constraints should always
+   * one AffineConstraints object, the hanging node constraints should always
    * be set first, and then the boundary conditions since boundary conditions
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains

@@ -35,7 +35,7 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
@@ -96,10 +96,9 @@ namespace DoFRenumbering
                      &graph_degree)
       {
         {
-          // create intermediate sparsity pattern
-          // (faster than directly submitting
-          // indices)
-          ConstraintMatrix constraints;
+          // create intermediate sparsity pattern (faster than directly
+          // submitting indices)
+          AffineConstraints<double> constraints;
           if (use_constraints)
             DoFTools::make_hanging_node_constraints(dof_handler, constraints);
           constraints.close();
@@ -403,7 +402,7 @@ namespace DoFRenumbering
     IndexSet locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
     if (use_constraints)
       {
         constraints.reinit(locally_relevant_dofs);
