@@ -122,7 +122,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ConstraintMatrix &,
+        const AffineConstraints<VEC::value_type> &,
         VEC &);
 
       template void
@@ -130,7 +130,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const InterGridMap<
           DoFHandler<deal_II_dimension, deal_II_space_dimension>> &,
         const VEC &,
-        const ConstraintMatrix &,
+        const AffineConstraints<VEC::value_type> &,
         VEC &);
     \}
 #endif

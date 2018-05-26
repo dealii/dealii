@@ -25,7 +25,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
       project<deal_II_dimension, VEC, deal_II_space_dimension>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ConstraintMatrix &,
+        const AffineConstraints<VEC::value_type> &,
         const Quadrature<deal_II_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,
@@ -36,7 +36,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
       template void
       project<deal_II_dimension, VEC, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ConstraintMatrix &,
+        const AffineConstraints<VEC::value_type> &,
         const Quadrature<deal_II_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,
