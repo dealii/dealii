@@ -42,6 +42,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 
 // IndexSet is used to set the size of each PETScWrappers::MPI::Vector:
