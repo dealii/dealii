@@ -241,8 +241,14 @@ TridiagonalMatrix<number>::compute_eigenvalues()
 
   const types::blas_int nn = n();
   types::blas_int       info;
-  //   stev(&N, &nn, diagonal.data(), right.data(), nullptr, &one, nullptr,
-  //   &info);
+  stev(&N,
+       &nn,
+       diagonal.data(),
+       right.data(),
+       static_cast<number *>(nullptr),
+       &one,
+       static_cast<number *>(nullptr),
+       &info);
   Assert(info == 0, ExcInternalError());
 
   state = LAPACKSupport::eigenvalues;
