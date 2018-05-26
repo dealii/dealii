@@ -186,7 +186,7 @@ public:
   /**
    * Constructor with constraint matrices.
    */
-  MGTransferSelect(const ConstraintMatrix &constraints);
+  MGTransferSelect(const AffineConstraints<double> &constraints);
 
   /**
    * Destructor.
@@ -373,7 +373,7 @@ private:
    * The constraints of the global system.
    */
 public:
-  SmartPointer<const ConstraintMatrix> constraints;
+  SmartPointer<const AffineConstraints<double>> constraints;
 };
 
 /*@}*/

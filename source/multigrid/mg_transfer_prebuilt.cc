@@ -56,7 +56,7 @@ MGTransferPrebuilt<VectorType>::MGTransferPrebuilt(
 
 template <typename VectorType>
 MGTransferPrebuilt<VectorType>::MGTransferPrebuilt(
-  const ConstraintMatrix & /*c*/,
+  const AffineConstraints<double> & /*c*/,
   const MGConstrainedDoFs &mg_c)
 {
   this->mg_constrained_dofs = &mg_c;
@@ -77,7 +77,7 @@ MGTransferPrebuilt<VectorType>::initialize_constraints(
 template <typename VectorType>
 void
 MGTransferPrebuilt<VectorType>::initialize_constraints(
-  const ConstraintMatrix & /*c*/,
+  const AffineConstraints<double> & /*c*/,
   const MGConstrainedDoFs &mg_c)
 {
   initialize_constraints(mg_c);

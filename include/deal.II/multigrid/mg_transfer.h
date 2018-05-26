@@ -22,9 +22,9 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
@@ -646,8 +646,8 @@ public:
    * @deprecated @p constraints is unused.
    */
   DEAL_II_DEPRECATED
-  MGTransferPrebuilt(const ConstraintMatrix & constraints,
-                     const MGConstrainedDoFs &mg_constrained_dofs);
+  MGTransferPrebuilt(const AffineConstraints<double> &constraints,
+                     const MGConstrainedDoFs &        mg_constrained_dofs);
 
   /**
    * Destructor.
@@ -667,8 +667,8 @@ public:
    */
   DEAL_II_DEPRECATED
   void
-  initialize_constraints(const ConstraintMatrix & constraints,
-                         const MGConstrainedDoFs &mg_constrained_dofs);
+  initialize_constraints(const AffineConstraints<double> &constraints,
+                         const MGConstrainedDoFs &        mg_constrained_dofs);
 
   /**
    * Reset the object to the state it had right after the default constructor.

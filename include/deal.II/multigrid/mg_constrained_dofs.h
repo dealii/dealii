@@ -20,6 +20,8 @@
 
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/lac/affine_constraints.h>
+
 #include <deal.II/multigrid/mg_tools.h>
 
 #include <set>
@@ -53,14 +55,14 @@ public:
    * freedom at the boundary of the domain untouched assuming that no
    * Dirichlet boundary conditions for them exist.
    *
-   * Furthermore, this call sets up a ConstraintMatrix on each level that
-   * contains possible periodicity constraints in case those have been added to
-   * the underlying triangulation. The constraint matrix can be queried by
-   * get_level_constraint_matrix(level). Note that the current implementation of
-   * periodicity constraints in this class does not support rotation matrices in
-   * the periodicity definition, i.e., the respective argument in the
-   * GridTools::collect_periodic_faces() may not be different from the identity
-   * matrix.
+   * Furthermore, this call sets up an AffineConstraints object on each
+   * level that contains possible periodicity constraints in case those
+   * have been added to the underlying triangulation. The constraint matrix
+   * can be queried by get_level_constraint_matrix(level). Note that the
+   * current implementation of periodicity constraints in this class does
+   * not support rotation matrices in the periodicity definition, i.e., the
+   * respective argument in the GridTools::collect_periodic_faces() may not
+   * be different from the identity matrix.
    */
   template <int dim, int spacedim>
   void
@@ -160,7 +162,7 @@ public:
    * Return the level constraint matrix for a given level, containing
    * periodicity constraints (if enabled on the triangulation).
    */
-  const ConstraintMatrix &
+  const AffineConstraints<double> &
   get_level_constraint_matrix(const unsigned int level) const;
 
 private:
@@ -179,7 +181,7 @@ private:
    * Constraint matrices containing information regarding potential
    * periodic boundary conditions for each level .
    */
-  std::vector<ConstraintMatrix> level_constraints;
+  std::vector<AffineConstraints<double>> level_constraints;
 };
 
 
@@ -376,7 +378,7 @@ MGConstrainedDoFs::have_boundary_indices() const
 
 
 
-inline const ConstraintMatrix &
+inline const AffineConstraints<double> &
 MGConstrainedDoFs::get_level_constraint_matrix(const unsigned int level) const
 {
   AssertIndexRange(level, level_constraints.size());

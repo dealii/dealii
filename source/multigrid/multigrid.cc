@@ -48,8 +48,9 @@ MGTransferBlockBase::MGTransferBlockBase(const MGConstrainedDoFs &mg_c) :
 
 
 
-MGTransferBlockBase::MGTransferBlockBase(const ConstraintMatrix & /*c*/,
-                                         const MGConstrainedDoFs &mg_c) :
+MGTransferBlockBase::MGTransferBlockBase(
+  const AffineConstraints<double> & /*c*/,
+  const MGConstrainedDoFs &mg_c) :
   n_mg_blocks(0),
   mg_constrained_dofs(&mg_c)
 {}
@@ -200,7 +201,7 @@ MGTransferSelect<number>::MGTransferSelect() :
 
 
 template <typename number>
-MGTransferSelect<number>::MGTransferSelect(const ConstraintMatrix &c) :
+MGTransferSelect<number>::MGTransferSelect(const AffineConstraints<double> &c) :
   selected_component(0),
   mg_selected_component(0),
   constraints(&c)
@@ -260,7 +261,7 @@ MGTransferBlockSelect<number>::MGTransferBlockSelect(
 
 template <typename number>
 MGTransferBlockSelect<number>::MGTransferBlockSelect(
-  const ConstraintMatrix & /*c*/,
+  const AffineConstraints<double> & /*c*/,
   const MGConstrainedDoFs &mg_c) :
   MGTransferBlockBase(mg_c),
   selected_block(0)
