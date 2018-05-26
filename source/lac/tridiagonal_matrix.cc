@@ -18,6 +18,8 @@
 #include <deal.II/lac/tridiagonal_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 using namespace LAPACKSupport;
@@ -57,17 +59,17 @@ TridiagonalMatrix<number>::all_zero() const
 
   e = diagonal.end();
   for (i = diagonal.begin(); i != e; ++i)
-    if (*i != 0.)
+    if (std::abs(*i) != 0.)
       return false;
 
   e = left.end();
   for (i = left.begin(); i != e; ++i)
-    if (*i != 0.)
+    if (std::abs(*i) != 0.)
       return false;
 
   e = right.end();
   for (i = right.begin(); i != e; ++i)
-    if (*i != 0.)
+    if (std::abs(*i) != 0.)
       return false;
   return true;
 }
@@ -239,7 +241,8 @@ TridiagonalMatrix<number>::compute_eigenvalues()
 
   const types::blas_int nn = n();
   types::blas_int       info;
-  stev(&N, &nn, diagonal.data(), right.data(), nullptr, &one, nullptr, &info);
+  //   stev(&N, &nn, diagonal.data(), right.data(), nullptr, &one, nullptr,
+  //   &info);
   Assert(info == 0, ExcInternalError());
 
   state = LAPACKSupport::eigenvalues;
@@ -271,5 +274,7 @@ TridiagonalMatrix<number>::
 
 template class TridiagonalMatrix<float>;
 template class TridiagonalMatrix<double>;
+template class TridiagonalMatrix<std::complex<float>>;
+template class TridiagonalMatrix<std::complex<double>>;
 
 DEAL_II_NAMESPACE_CLOSE
