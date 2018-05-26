@@ -52,6 +52,19 @@ namespace internals
   class GlobalRowsFromLocal;
 }
 
+
+template <typename number>
+class AffineConstraints;
+
+/**
+ * ConstraintMatrix has been renamed to AffineConstraints. Provide a
+ * compatibility typedef that defaults to AffineConstraints<double>.
+ *
+ * @deprecated Use AffineConstraints
+ */
+using ConstraintMatrix = AffineConstraints<double>;
+
+
 // TODO[WB]: We should have a function of the kind
 //   AffineConstraints::add_constraint (const size_type constrained_dof,
 //     const std::vector<std::pair<size_type, number> > &entries,

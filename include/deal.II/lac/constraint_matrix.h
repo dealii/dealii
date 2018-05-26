@@ -19,16 +19,4 @@
 
 #include <deal.II/lac/affine_constraints.h>
 
-DEAL_II_NAMESPACE_OPEN
-
-/**
- * ConstraintMatrix has been renamed to AffineConstraints. Provide a
- * compatibility typedef that defaults to AffineConstraints<double>.
- *
- * @deprecated Use AffineConstraints
- */
-using ConstraintMatrix = AffineConstraints<double>;
-
-DEAL_II_NAMESPACE_CLOSE
-
 #endif
