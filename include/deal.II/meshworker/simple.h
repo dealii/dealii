@@ -71,7 +71,8 @@ namespace MeshWorker
        * Initialize the constraints.
        */
       void
-      initialize(const ConstraintMatrix &constraints);
+      initialize(
+        const AffineConstraints<typename VectorType::value_type> &constraints);
 
       /**
        * @deprecated This function is of no effect. Only the block info
@@ -104,7 +105,7 @@ namespace MeshWorker
        * Assemble the local residuals into the global residuals.
        *
        * Values are added to the previous contents. If constraints are active,
-       * ConstraintMatrix::distribute_local_to_global() is used.
+       * AffineConstraints::distribute_local_to_global() is used.
        */
       template <class DOFINFO>
       void
@@ -126,7 +127,8 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix, ResidualSimple<VectorType>>
+      SmartPointer<const AffineConstraints<typename VectorType::value_type>,
+                   ResidualSimple<VectorType>>
         constraints;
     };
 
@@ -142,8 +144,8 @@ namespace MeshWorker
      * such, this class can be used in a MeshWorker::loop() to assemble the
      * cell and face matrices into the global matrix.
      *
-     * If a ConstraintMatrix has been provided during initialization, this
-     * matrix will be used (ConstraintMatrix::distribute_local_to_global(), to
+     * If a AffineConstraints has been provided during initialization, this
+     * matrix will be used (AffineConstraints::distribute_local_to_global(), to
      * be precise) to enter the local matrix into the global sparse matrix.
      *
      * The assembler can handle two different types of local data. First, by
@@ -186,13 +188,14 @@ namespace MeshWorker
 
       /**
        * Initialize the constraints. After this function has been called with
-       * a valid ConstraintMatrix, the function
-       * ConstraintMatrix::distribute_local_to_global() will be used by
+       * a valid AffineConstraints object, the function
+       * AffineConstraints::distribute_local_to_global() will be used by
        * assemble() to distribute the cell and face matrices into a global
        * sparse matrix.
        */
       void
-      initialize(const ConstraintMatrix &constraints);
+      initialize(
+        const AffineConstraints<typename MatrixType::value_type> &constraints);
 
       /**
        * Initialize the local data in the DoFInfo object used later for
@@ -248,7 +251,8 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix, MatrixSimple<MatrixType>>
+      SmartPointer<const AffineConstraints<typename MatrixType::value_type>,
+                   MatrixSimple<MatrixType>>
         constraints;
     };
 
@@ -465,13 +469,14 @@ namespace MeshWorker
 
       /**
        * Initialize the constraints. After this function has been called with
-       * a valid ConstraintMatrix, the function
-       * ConstraintMatrix::distribute_local_to_global() will be used by
+       * a valid AffineConstraints object, the function
+       * AffineConstraints::distribute_local_to_global() will be used by
        * assemble() to distribute the cell and face matrices into a global
        * sparse matrix.
        */
       void
-      initialize(const ConstraintMatrix &constraints);
+      initialize(
+        const AffineConstraints<typename VectorType::value_type> &constraints);
 
       /**
        * Initialize the local data in the DoFInfo object used later for
@@ -530,7 +535,8 @@ namespace MeshWorker
 
     template <typename VectorType>
     inline void
-    ResidualSimple<VectorType>::initialize(const ConstraintMatrix &c)
+    ResidualSimple<VectorType>::initialize(
+      const AffineConstraints<typename VectorType::value_type> &c)
     {
       constraints = &c;
     }
@@ -614,7 +620,8 @@ namespace MeshWorker
 
     template <typename MatrixType>
     inline void
-    MatrixSimple<MatrixType>::initialize(const ConstraintMatrix &c)
+    MatrixSimple<MatrixType>::initialize(
+      const AffineConstraints<typename MatrixType::value_type> &c)
     {
       constraints = &c;
     }
@@ -1232,7 +1239,8 @@ namespace MeshWorker
 
     template <typename MatrixType, typename VectorType>
     inline void
-    SystemSimple<MatrixType, VectorType>::initialize(const ConstraintMatrix &c)
+    SystemSimple<MatrixType, VectorType>::initialize(
+      const AffineConstraints<typename VectorType::value_type> &c)
     {
       ResidualSimple<VectorType>::initialize(c);
     }
