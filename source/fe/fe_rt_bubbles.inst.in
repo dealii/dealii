@@ -16,7 +16,6 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class FE_RT_Bubbles<deal_II_dimension>;
-}
-
+  }

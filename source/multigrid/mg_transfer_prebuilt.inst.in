@@ -16,13 +16,12 @@
 
 
 for (V1 : VECTORS_WITH_MATRIX)
-{
-    template class MGTransferPrebuilt< V1 >;
-}
+  {
+    template class MGTransferPrebuilt<V1>;
+  }
 
 for (deal_II_dimension : DIMENSIONS; V1 : VECTORS_WITH_MATRIX)
-{
-    template
-    void MGTransferPrebuilt< V1 >::build_matrices<deal_II_dimension>(
-        const DoFHandler<deal_II_dimension> &mg_dof);
-}
+  {
+    template void MGTransferPrebuilt<V1>::build_matrices<deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &mg_dof);
+  }

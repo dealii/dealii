@@ -16,74 +16,57 @@
 
 
 for (S : REAL_SCALARS)
-{
+  {
     template class PreconditionBlockBase<S>;
-}
+  }
 
 
 for (S1, S2 : REAL_SCALARS)
-{
+  {
     template class PreconditionBlock<SparseMatrix<S1>, S2>;
     template class PreconditionBlockJacobi<SparseMatrix<S1>, S2>;
     template class PreconditionBlockSOR<SparseMatrix<S1>, S2>;
     template class PreconditionBlockSSOR<SparseMatrix<S1>, S2>;
-}
+  }
 
 
 for (S1, S2, S3 : REAL_SCALARS)
-{
-// ------------ PreconditionBlockJacobi -----------------
-    template
-    void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult_add<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult_add<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::step<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tstep<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
+  {
+    // ------------ PreconditionBlockJacobi -----------------
+    template void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::vmult_add<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tvmult_add<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::step<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockJacobi<SparseMatrix<S1>, S2>::Tstep<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
 
-// ------------ PreconditionBlockSOR -----------------
-    template
-    void PreconditionBlockSOR<SparseMatrix<S1>, S2>::vmult<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSOR<SparseMatrix<S1>, S2>::vmult_add<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult_add<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSOR<SparseMatrix<S1>, S2>::step<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tstep<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
+    // ------------ PreconditionBlockSOR -----------------
+    template void PreconditionBlockSOR<SparseMatrix<S1>, S2>::vmult<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSOR<SparseMatrix<S1>, S2>::vmult_add<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tvmult_add<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSOR<SparseMatrix<S1>, S2>::step<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSOR<SparseMatrix<S1>, S2>::Tstep<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
 
-// ------------ PreconditionBlockSSOR -----------------
-    template
-    void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::vmult<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tvmult<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::step<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-    template
-    void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tstep<S3>
-    (Vector<S3> &, const Vector<S3> &) const;
-}
-
+    // ------------ PreconditionBlockSSOR -----------------
+    template void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::vmult<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tvmult<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::step<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+    template void PreconditionBlockSSOR<SparseMatrix<S1>, S2>::Tstep<S3>(
+      Vector<S3> &, const Vector<S3> &) const;
+  }

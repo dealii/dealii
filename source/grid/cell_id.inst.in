@@ -15,14 +15,18 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    template Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator CellId::to_cell(const Triangulation<deal_II_dimension,deal_II_space_dimension> &tria) const;
+    template Triangulation<deal_II_dimension,
+                           deal_II_space_dimension>::cell_iterator
+    CellId::to_cell(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria)
+      const;
 #endif
-}
+  }
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template CellId::binary_type CellId::to_binary<deal_II_dimension>() const;
-}
+  }

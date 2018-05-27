@@ -16,25 +16,29 @@
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
-{
-    namespace internal \{
-    namespace DataOutImplementation \{
+  {
+    namespace internal
+    \{
+      namespace DataOutImplementation
+      \{
 #if deal_II_dimension <= deal_II_space_dimension
-    template struct ParallelData<deal_II_dimension,deal_II_space_dimension>;
+        template struct ParallelData<deal_II_dimension,
+                                     deal_II_space_dimension>;
 #endif
+      \}
     \}
-    \}
-}
+  }
 
 
 for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
-{
-    template class DataOut<deal_II_dimension, DH<deal_II_dimension> >;
+  {
+    template class DataOut<deal_II_dimension, DH<deal_II_dimension>>;
 #if deal_II_dimension < 3
-    template class DataOut<deal_II_dimension, DH<deal_II_dimension,deal_II_dimension+1> >;
+    template class DataOut<deal_II_dimension,
+                           DH<deal_II_dimension, deal_II_dimension + 1>>;
 #endif
 
 #if deal_II_dimension == 3
-    template class DataOut<1, DH<1,3> >;
+    template class DataOut<1, DH<1, 3>>;
 #endif
-}
+  }

@@ -13,288 +13,324 @@
 //
 // ---------------------------------------------------------------------
 
-for (scalar: REAL_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-{
-    template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP,scalar>
-    (const DoFHandler<deal_II_dimension>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+for (scalar : REAL_SCALARS; SP : SPARSITY_PATTERNS;
+     deal_II_dimension : DIMENSIONS)
+  {
+    template void DoFTools::
+      make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>, SP, scalar>(
+        const DoFHandler<deal_II_dimension> &dof,
+        const std::map<types::boundary_id,
+                       const Function<deal_II_dimension, scalar> *>
+          &                                         boundary_ids,
+        const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+        SP &                                        sparsity);
 
     template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP,scalar>
-    (const hp::DoFHandler<deal_II_dimension>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+                                             SP,
+                                             scalar>(
+      const hp::DoFHandler<deal_II_dimension> &                    dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension, scalar> *> &boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 
 #if deal_II_dimension < 3
-    template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*>  &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP,
+      scalar>(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension + 1, scalar> *>
+        &                                         boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 
-    template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*> &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP,
+      scalar>(
+      const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension + 1, scalar> *>
+        &                                         boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 
-    //template void
-    //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
+    // template void
+    // DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
     //(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-    // const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*> &boundary_ids,
-    // const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-    // SP    &sparsity);
+    // const std::map<types::boundary_id, const
+    // Function<deal_II_dimension+1,scalar>*> &boundary_ids, const
+    // std::vector<types::global_dof_index>  &dof_to_boundary_mapping, SP
+    // &sparsity);
 
 #endif
 
 #if deal_II_dimension == 1
-    template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+2>,SP,scalar>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+2>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension+2,scalar>*>  &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 2>,
+      SP,
+      scalar>(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 2> &dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension + 2, scalar> *>
+        &                                         boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 
-    template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+2>,SP,scalar>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+2>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension+2,scalar>*> &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 2>,
+      SP,
+      scalar>(
+      const DoFHandler<deal_II_dimension, deal_II_dimension + 2> &dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension + 2, scalar> *>
+        &                                         boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 #endif
+  }
 
-}
+for (scalar : COMPLEX_SCALARS; SP : SPARSITY_PATTERNS;
+     deal_II_dimension : DIMENSIONS)
+  {
+    template void DoFTools::
+      make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>, SP, scalar>(
+        const DoFHandler<deal_II_dimension> &dof,
+        const std::map<types::boundary_id,
+                       const Function<deal_II_dimension, scalar> *>
+          &                                         boundary_ids,
+        const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+        SP &                                        sparsity);
 
-for (scalar: COMPLEX_SCALARS; SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-{
     template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP,scalar>
-    (const DoFHandler<deal_II_dimension>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
-
-    template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP,scalar>
-    (const hp::DoFHandler<deal_II_dimension>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension,scalar>*> &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+                                             SP,
+                                             scalar>(
+      const hp::DoFHandler<deal_II_dimension> &                    dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension, scalar> *> &boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 
 #if deal_II_dimension < 3
-    template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*>  &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP,
+      scalar>(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension + 1, scalar> *>
+        &                                         boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 
-    template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-     const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*> &boundary_ids,
-     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-     SP    &sparsity);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP,
+      scalar>(
+      const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_dimension + 1, scalar> *>
+        &                                         boundary_ids,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
+      SP &                                        sparsity);
 
-    //template void
-    //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
+    // template void
+    // DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP,scalar>
     //(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-    // const std::map<types::boundary_id, const Function<deal_II_dimension+1,scalar>*> &boundary_ids,
-    // const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-    // SP    &sparsity);
+    // const std::map<types::boundary_id, const
+    // Function<deal_II_dimension+1,scalar>*> &boundary_ids, const
+    // std::vector<types::global_dof_index>  &dof_to_boundary_mapping, SP
+    // &sparsity);
 
 #endif
-
-}
+  }
 
 for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-{
-    template void
-    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+  {
+    template void DoFTools::make_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension>,
+      SP>(const DoFHandler<deal_II_dimension, deal_II_dimension> &dof,
+          SP &                                                    sparsity,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension>,
+      SP>(const hp::DoFHandler<deal_II_dimension, deal_II_dimension> &dof,
+          SP &                                                        sparsity,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension>,
+      SP>(const DoFHandler<deal_II_dimension, deal_II_dimension> &,
+          const Table<2, Coupling> &,
+          SP &,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension>,
+      SP>(const hp::DoFHandler<deal_II_dimension, deal_II_dimension> &,
+          const Table<2, Coupling> &,
+          SP &,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension>,
+      SP>(const DoFHandler<deal_II_dimension, deal_II_dimension> &dof_row,
+          const DoFHandler<deal_II_dimension, deal_II_dimension> &dof_col,
+          SP &                                                    sparsity);
+
+    template void DoFTools::make_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension>,
+      SP>(const hp::DoFHandler<deal_II_dimension, deal_II_dimension> &dof_row,
+          const hp::DoFHandler<deal_II_dimension, deal_II_dimension> &dof_col,
+          SP &                                                        sparsity);
 
     template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>, SP>(
+      const DoFHandler<deal_II_dimension> &dof,
+      const std::vector<types::global_dof_index> &,
+      SP &);
 
     template void
-    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension>&,
-     const Table<2,Coupling>&,
-     SP &,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+                                             SP>(
+      const hp::DoFHandler<deal_II_dimension> &dof,
+      const std::vector<types::global_dof_index> &,
+      SP &);
 
     template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension>&,
-     const Table<2,Coupling>&,
-     SP &,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>, SP>(
+      const DoFHandler<deal_II_dimension> &dof, SP &sparsity);
 
     template void
-    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension> &dof_row,
-     const DoFHandler<deal_II_dimension,deal_II_dimension> &dof_col,
-     SP    &sparsity);
+    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>, SP>(
+      const hp::DoFHandler<deal_II_dimension> &dof, SP &sparsity);
 
     template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_row,
-     const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_col,
-     SP    &sparsity);
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>, SP>(
+      const DoFHandler<deal_II_dimension> &dof,
+      SP &                                 sparsity,
+      const Table<2, Coupling> &,
+      const Table<2, Coupling> &,
+      const types::subdomain_id);
 
     template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
-    (const DoFHandler<deal_II_dimension>& dof,
-     const std::vector<types::global_dof_index>  &,
-     SP    &);
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>, SP>(
+      const DoFHandler<deal_II_dimension> &dof,
+      SP &                                 sparsity,
+      const ConstraintMatrix &             constraints,
+      const bool,
+      const Table<2, Coupling> &,
+      const Table<2, Coupling> &,
+      const types::subdomain_id);
 
     template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
-    (const hp::DoFHandler<deal_II_dimension>& dof,
-     const std::vector<types::global_dof_index>  &,
-     SP    &);
+    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>, SP>(
+      const DoFHandler<deal_II_dimension> &dof,
+      SP &                                 sparsity,
+      const ConstraintMatrix &             constraints,
+      const bool,
+      const types::subdomain_id);
 
     template void
-    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
-    (const DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity);
-
-    template void
-    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
-    (const hp::DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity);
-
-    template void
-    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
-    (const DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity,
-     const Table<2,Coupling>&,
-     const Table<2,Coupling>&,
-     const types::subdomain_id);
-
-    template void
-    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
-    (const DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &constraints,
-     const bool,
-     const Table<2,Coupling>&,
-     const Table<2,Coupling>&,
-     const types::subdomain_id);
-
-    template void
-    DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
-    (const DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &constraints,
-     const bool,
-     const types::subdomain_id);
-
-    template void
-    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
-    (const hp::DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &constraints,
-     const bool,
-     const types::subdomain_id);
+    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>, SP>(
+      const hp::DoFHandler<deal_II_dimension> &dof,
+      SP &                                     sparsity,
+      const ConstraintMatrix &                 constraints,
+      const bool,
+      const types::subdomain_id);
 
 #if deal_II_dimension > 1
 
     template void
-    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
-    (const hp::DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity,
-     const Table<2,Coupling>&,
-     const Table<2,Coupling>&,
-     const types::subdomain_id);
+    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>, SP>(
+      const hp::DoFHandler<deal_II_dimension> &dof,
+      SP &                                     sparsity,
+      const Table<2, Coupling> &,
+      const Table<2, Coupling> &,
+      const types::subdomain_id);
 
     template void
-    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
-    (const hp::DoFHandler<deal_II_dimension> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &constraints,
-     const bool,
-     const Table<2,Coupling>&,
-     const Table<2,Coupling>&,
-     const types::subdomain_id);
+    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>, SP>(
+      const hp::DoFHandler<deal_II_dimension> &dof,
+      SP &                                     sparsity,
+      const ConstraintMatrix &                 constraints,
+      const bool,
+      const Table<2, Coupling> &,
+      const Table<2, Coupling> &,
+      const types::subdomain_id);
 
 #endif
 
 #if deal_II_dimension < 3
 
-    template void
-    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    template void DoFTools::make_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP>(const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+          SP &                                                        sparsity,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
 
-    template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    template void DoFTools::make_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP>(const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+          SP &sparsity,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
 
-    template void
-    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-     const Table<2,Coupling>&,
-     SP &,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    template void DoFTools::make_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP>(const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
+          const Table<2, Coupling> &,
+          SP &,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
 
-    template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-     const Table<2,Coupling>&,
-     SP &,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    template void DoFTools::make_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP>(const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
+          const Table<2, Coupling> &,
+          SP &,
+          const ConstraintMatrix &,
+          const bool,
+          const types::subdomain_id);
 
-    template void
-    DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
-     const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
-     SP    &sparsity);
+    template void DoFTools::make_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP>(const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_row,
+          const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_col,
+          SP &                                                        sparsity);
 
-    template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, SP>
-    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
-     const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
-     SP    &sparsity);
+    template void DoFTools::make_sparsity_pattern<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP>(
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_row,
+      const hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_col,
+      SP &                                                            sparsity);
 
-    template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
-    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-     const std::vector<types::global_dof_index>  &,
-     SP    &);
+    template void DoFTools::make_boundary_sparsity_pattern<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      SP>(const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
+          const std::vector<types::global_dof_index> &,
+          SP &);
 
-    //template void
-    //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
+    // template void
+    // DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
     //(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
     // const std::vector<types::global_dof_index>  &,
     // SP    &);
@@ -304,80 +340,71 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 
 #if deal_II_dimension == 3
 
-    template void
-    DoFTools::make_sparsity_pattern<DoFHandler<1,3>, SP>
-    (const DoFHandler<1,3> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    template void DoFTools::make_sparsity_pattern<DoFHandler<1, 3>, SP>(
+      const DoFHandler<1, 3> &dof,
+      SP &                    sparsity,
+      const ConstraintMatrix &,
+      const bool,
+      const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<hp::DoFHandler<1, 3>, SP>(
+      const hp::DoFHandler<1, 3> &dof,
+      SP &                        sparsity,
+      const ConstraintMatrix &,
+      const bool,
+      const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<DoFHandler<1, 3>, SP>(
+      const DoFHandler<1, 3> &,
+      const Table<2, Coupling> &,
+      SP &,
+      const ConstraintMatrix &,
+      const bool,
+      const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<hp::DoFHandler<1, 3>, SP>(
+      const hp::DoFHandler<1, 3> &,
+      const Table<2, Coupling> &,
+      SP &,
+      const ConstraintMatrix &,
+      const bool,
+      const types::subdomain_id);
+
+    template void DoFTools::make_sparsity_pattern<DoFHandler<1, 3>, SP>(
+      const DoFHandler<1, 3> &dof_row,
+      const DoFHandler<1, 3> &dof_col,
+      SP &                    sparsity);
+
+    template void DoFTools::make_sparsity_pattern<hp::DoFHandler<1, 3>, SP>(
+      const hp::DoFHandler<1, 3> &dof_row,
+      const hp::DoFHandler<1, 3> &dof_col,
+      SP &                        sparsity);
 
     template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<1,3>, SP>
-    (const hp::DoFHandler<1,3> &dof,
-     SP    &sparsity,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
+    DoFTools::make_boundary_sparsity_pattern<DoFHandler<1, 3>, SP>(
+      const DoFHandler<1, 3> &dof,
+      const std::vector<types::global_dof_index> &,
+      SP &);
 
     template void
-    DoFTools::make_sparsity_pattern<DoFHandler<1,3>, SP>
-    (const DoFHandler<1,3>&,
-     const Table<2,Coupling>&,
-     SP &,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
-
-    template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<1,3>, SP>
-    (const hp::DoFHandler<1,3>&,
-     const Table<2,Coupling>&,
-     SP &,
-     const ConstraintMatrix &,
-     const bool,
-     const types::subdomain_id);
-
-    template void
-    DoFTools::make_sparsity_pattern<DoFHandler<1,3>, SP>
-    (const DoFHandler<1,3> &dof_row,
-     const DoFHandler<1,3> &dof_col,
-     SP    &sparsity);
-
-    template void
-    DoFTools::make_sparsity_pattern<hp::DoFHandler<1,3>, SP>
-    (const hp::DoFHandler<1,3> &dof_row,
-     const hp::DoFHandler<1,3> &dof_col,
-     SP    &sparsity);
-
-    template void
-    DoFTools::make_boundary_sparsity_pattern<DoFHandler<1,3>,SP>
-    (const DoFHandler<1,3>& dof,
-     const std::vector<types::global_dof_index>  &,
-     SP    &);
-
-    template void
-    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1,3>,SP>
-    (const hp::DoFHandler<1,3>& dof,
-     const std::vector<types::global_dof_index>  &,
-     SP    &);
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1, 3>, SP>(
+      const hp::DoFHandler<1, 3> &dof,
+      const std::vector<types::global_dof_index> &,
+      SP &);
 
 #endif
-
-}
+  }
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
-    template
-    Table<2,DoFTools::Coupling>
-    DoFTools::dof_couplings_from_component_couplings
-    (const FiniteElement<deal_II_dimension> &fe,
-     const Table<2,DoFTools::Coupling> &component_couplings);
+  {
+    template Table<2, DoFTools::Coupling>
+    DoFTools::dof_couplings_from_component_couplings(
+      const FiniteElement<deal_II_dimension> &fe,
+      const Table<2, DoFTools::Coupling> &    component_couplings);
 
-    template
-    std::vector<Table<2,DoFTools::Coupling> >
-    DoFTools::dof_couplings_from_component_couplings
-    (const hp::FECollection<deal_II_dimension> &fe,
-     const Table<2,DoFTools::Coupling> &component_couplings);
-}
+    template std::vector<Table<2, DoFTools::Coupling>>
+    DoFTools::dof_couplings_from_component_couplings(
+      const hp::FECollection<deal_II_dimension> &fe,
+      const Table<2, DoFTools::Coupling> &       component_couplings);
+  }

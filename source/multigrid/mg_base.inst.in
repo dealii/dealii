@@ -15,9 +15,9 @@
 
 
 for (VEC : VECTOR_TYPES)
-{
-    template class MGTransferBase< VEC >;
-    template class MGMatrixBase< VEC >;
-    template class MGSmootherBase< VEC >;
-    template class MGCoarseGridBase< VEC >;
-}
+  {
+    template class MGTransferBase<VEC>;
+    template class MGMatrixBase<VEC>;
+    template class MGSmootherBase<VEC>;
+    template class MGCoarseGridBase<VEC>;
+  }

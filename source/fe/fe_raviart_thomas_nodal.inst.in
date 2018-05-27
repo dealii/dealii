@@ -16,7 +16,6 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class FE_RaviartThomasNodal<deal_II_dimension>;
-}
-
+  }

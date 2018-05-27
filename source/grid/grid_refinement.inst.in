@@ -15,111 +15,90 @@
 
 
 
-
 for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
-{
-    template
-    void
-    GridRefinement::
-    refine<deal_II_dimension,S,deal_II_dimension>
-    (Triangulation<deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double,
-     const unsigned int);
+  {
+    template void
+    GridRefinement::refine<deal_II_dimension, S, deal_II_dimension>(
+      Triangulation<deal_II_dimension> &,
+      const dealii::Vector<S> &,
+      const double,
+      const unsigned int);
 
-    template
-    void
-    GridRefinement::
-    coarsen<deal_II_dimension,S,deal_II_dimension>
-    (Triangulation<deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double);
+    template void
+    GridRefinement::coarsen<deal_II_dimension, S, deal_II_dimension>(
+      Triangulation<deal_II_dimension> &,
+      const dealii::Vector<S> &,
+      const double);
 
-    template
-    void
-    GridRefinement::
-    refine_and_coarsen_fixed_number<deal_II_dimension,S,deal_II_dimension>
-    (Triangulation<deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double,
-     const unsigned int);
+    template void GridRefinement::
+      refine_and_coarsen_fixed_number<deal_II_dimension, S, deal_II_dimension>(
+        Triangulation<deal_II_dimension> &,
+        const dealii::Vector<S> &,
+        const double,
+        const double,
+        const unsigned int);
 
-    template
-    void
-    GridRefinement::
-    refine_and_coarsen_fixed_fraction<deal_II_dimension,S,deal_II_dimension>
-    (Triangulation<deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double,
-     const unsigned int);
+    template void
+    GridRefinement::refine_and_coarsen_fixed_fraction<deal_II_dimension,
+                                                      S,
+                                                      deal_II_dimension>(
+      Triangulation<deal_II_dimension> &,
+      const dealii::Vector<S> &,
+      const double,
+      const double,
+      const unsigned int);
 
-    template
-    void
-    GridRefinement::
-    refine_and_coarsen_optimize<deal_II_dimension,S,deal_II_dimension>
-    (Triangulation<deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const unsigned int);
+    template void GridRefinement::
+      refine_and_coarsen_optimize<deal_II_dimension, S, deal_II_dimension>(
+        Triangulation<deal_II_dimension> &,
+        const dealii::Vector<S> &,
+        const unsigned int);
 
 #if deal_II_dimension < 3
-    template
-    void
-    GridRefinement::
-    refine<deal_II_dimension,S,deal_II_dimension+1>
-    (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-     const dealii::Vector<S> &,
-     const double,
-     const unsigned int);
+    template void
+      GridRefinement::refine<deal_II_dimension, S, deal_II_dimension + 1>(
+        Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
+        const dealii::Vector<S> &,
+        const double,
+        const unsigned int);
 
-    template
-    void
-    GridRefinement::
-    coarsen<deal_II_dimension,S,deal_II_dimension+1>
-    (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-     const dealii::Vector<S> &,
-     const double);
+    template void
+      GridRefinement::coarsen<deal_II_dimension, S, deal_II_dimension + 1>(
+        Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
+        const dealii::Vector<S> &,
+        const double);
 
-    template
-    void
-    GridRefinement::
-    refine_and_coarsen_fixed_number<deal_II_dimension,S,deal_II_dimension+1>
-    (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double,
-     const unsigned int);
+    template void
+      GridRefinement::refine_and_coarsen_fixed_number<deal_II_dimension,
+                                                      S,
+                                                      deal_II_dimension + 1>(
+        Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
+        const dealii::Vector<S> &,
+        const double,
+        const double,
+        const unsigned int);
 
-    template
-    void
-    GridRefinement::
-    refine_and_coarsen_fixed_fraction<deal_II_dimension,S,deal_II_dimension+1>
-    (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double,
-     const unsigned int);
+    template void
+      GridRefinement::refine_and_coarsen_fixed_fraction<deal_II_dimension,
+                                                        S,
+                                                        deal_II_dimension + 1>(
+        Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
+        const dealii::Vector<S> &,
+        const double,
+        const double,
+        const unsigned int);
 
-    template
-    void
-    GridRefinement::
-    refine_and_coarsen_optimize<deal_II_dimension,S,deal_II_dimension+1>
-    (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-     const dealii::Vector<S> &,
-     const unsigned int);
+    template void GridRefinement::
+      refine_and_coarsen_optimize<deal_II_dimension, S, deal_II_dimension + 1>(
+        Triangulation<deal_II_dimension, deal_II_dimension + 1> &,
+        const dealii::Vector<S> &,
+        const unsigned int);
 #endif
-}
+  }
 
 for (deal_II_dimension : DIMENSIONS)
-{
-    template
-    std::pair<double, double>
-    GridRefinement::
-    adjust_refine_and_coarsen_number_fraction <deal_II_dimension>
-    (const unsigned int,
-     const unsigned int,
-     const double,
-     const double);
-}
-
+  {
+    template std::pair<double, double> GridRefinement::
+      adjust_refine_and_coarsen_number_fraction<deal_II_dimension>(
+        const unsigned int, const unsigned int, const double, const double);
+  }

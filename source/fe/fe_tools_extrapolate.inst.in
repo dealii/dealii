@@ -15,21 +15,24 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; VEC : VECTOR_TYPES)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     VEC : VECTOR_TYPES)
+  {
     namespace FETools
     \{
 #if deal_II_dimension == deal_II_space_dimension
-    template
-    void extrapolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const DoFHandler<deal_II_dimension> &, VEC &);
+      template void
+      extrapolate<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                                     const VEC &,
+                                     const DoFHandler<deal_II_dimension> &,
+                                     VEC &);
 
-    template
-    void extrapolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     VEC &);
+      template void
+      extrapolate<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                                     const VEC &,
+                                     const DoFHandler<deal_II_dimension> &,
+                                     const ConstraintMatrix &,
+                                     VEC &);
 #endif
     \}
-}
+  }

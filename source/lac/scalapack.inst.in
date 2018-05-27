@@ -15,22 +15,21 @@
 
 
 for (Number : REAL_SCALARS)
-{
+  {
     template class ScaLAPACKMatrix<Number>;
 
-    template
-    void ScaLAPACKMatrix<Number>::scale_columns<Vector<Number>> (const Vector<Number>&);
+    template void ScaLAPACKMatrix<Number>::scale_columns<Vector<Number>>(
+      const Vector<Number> &);
 
-    template
-    void ScaLAPACKMatrix<Number>::scale_rows<Vector<Number>> (const Vector<Number>&);
-}
+    template void ScaLAPACKMatrix<Number>::scale_rows<Vector<Number>>(
+      const Vector<Number> &);
+  }
 
-for (VEC : GENERAL_CONTAINER_TYPES;
-        Number : REAL_SCALARS)
-{
-    template
-    void ScaLAPACKMatrix<Number>::scale_columns<VEC<Number>> (const VEC<Number>&);
+for (VEC : GENERAL_CONTAINER_TYPES; Number : REAL_SCALARS)
+  {
+    template void ScaLAPACKMatrix<Number>::scale_columns<VEC<Number>>(
+      const VEC<Number> &);
 
-    template
-    void ScaLAPACKMatrix<Number>::scale_rows<VEC<Number>> (const VEC<Number>&);
-}
+    template void ScaLAPACKMatrix<Number>::scale_rows<VEC<Number>>(
+      const VEC<Number> &);
+  }

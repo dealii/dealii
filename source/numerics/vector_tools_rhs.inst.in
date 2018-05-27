@@ -14,97 +14,109 @@
 // ---------------------------------------------------------------------
 
 
-for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    namespace VectorTools \{
-    template
-    void create_right_hand_side<deal_II_dimension,deal_II_space_dimension,VEC >
-    (const Mapping<deal_II_dimension,deal_II_space_dimension>          &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension>       &,
-     const Quadrature<deal_II_dimension>                               &,
-     const Function<deal_II_space_dimension, VEC::value_type>          &,
-     VEC                                                               &,
-     const ConstraintMatrix                                            &);
+    namespace VectorTools
+    \{
+      template void
+      create_right_hand_side<deal_II_dimension, deal_II_space_dimension, VEC>(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Quadrature<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const ConstraintMatrix &);
 
-    template
-    void create_right_hand_side<deal_II_dimension,deal_II_space_dimension,VEC >
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension>       &,
-     const Quadrature<deal_II_dimension>                               &,
-     const Function<deal_II_space_dimension, VEC::value_type>          &,
-     VEC                                                               &,
-     const ConstraintMatrix                                            &);
+      template void
+      create_right_hand_side<deal_II_dimension, deal_II_space_dimension, VEC>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Quadrature<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const ConstraintMatrix &);
     \}
 #endif
-}
+  }
 
-//TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension, deal_II_space_dimension>
+// TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension,
+// deal_II_space_dimension>
 // where applicable and move to codimension cases above also when applicable
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
-    namespace VectorTools \{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace VectorTools
+    \{
 
 #if deal_II_dimension == deal_II_space_dimension
-    template
-    void create_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
-    (const hp::MappingCollection<deal_II_dimension> &,
-     const hp::DoFHandler<deal_II_dimension>        &,
-     const hp::QCollection<deal_II_dimension>       &,
-     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-     Vector<double>                                 &,
-     const ConstraintMatrix                         &);
+      template void
+      create_right_hand_side<deal_II_dimension,
+                             deal_II_space_dimension,
+                             Vector<double>>(
+        const hp::MappingCollection<deal_II_dimension> &,
+        const hp::DoFHandler<deal_II_dimension> &,
+        const hp::QCollection<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
+        Vector<double> &,
+        const ConstraintMatrix &);
 
-    template
-    void create_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
-    (const hp::DoFHandler<deal_II_dimension>  &,
-     const hp::QCollection<deal_II_dimension> &,
-     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-     Vector<double>                           &,
-     const ConstraintMatrix                   &);
+      template void
+      create_right_hand_side<deal_II_dimension,
+                             deal_II_space_dimension,
+                             Vector<double>>(
+        const hp::DoFHandler<deal_II_dimension> &,
+        const hp::QCollection<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
+        Vector<double> &,
+        const ConstraintMatrix &);
 
-#if deal_II_dimension > 1
-    template
-    void
-    create_boundary_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
-    (const Mapping<deal_II_dimension>      &,
-     const DoFHandler<deal_II_dimension>   &,
-     const Quadrature<deal_II_dimension-1> &,
-     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-     Vector<double>                        &,
-     const std::set<types::boundary_id>    &);
-#endif
+#  if deal_II_dimension > 1
+      template void
+      create_boundary_right_hand_side<deal_II_dimension,
+                                      deal_II_space_dimension,
+                                      Vector<double>>(
+        const Mapping<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
+        const Quadrature<deal_II_dimension - 1> &,
+        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
+        Vector<double> &,
+        const std::set<types::boundary_id> &);
+#  endif
 
-    template
-    void
-    create_boundary_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
-    (const DoFHandler<deal_II_dimension>   &,
-     const Quadrature<deal_II_dimension-1> &,
-     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-     Vector<double>                        &,
-     const std::set<types::boundary_id>    &);
+      template void
+      create_boundary_right_hand_side<deal_II_dimension,
+                                      deal_II_space_dimension,
+                                      Vector<double>>(
+        const DoFHandler<deal_II_dimension> &,
+        const Quadrature<deal_II_dimension - 1> &,
+        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
+        Vector<double> &,
+        const std::set<types::boundary_id> &);
 
-#if deal_II_dimension > 1
-    template
-    void
-    create_boundary_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
-    (const hp::MappingCollection<deal_II_dimension> &,
-     const hp::DoFHandler<deal_II_dimension>        &,
-     const hp::QCollection<deal_II_dimension-1>     &,
-     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-     Vector<double>                                 &,
-     const std::set<types::boundary_id>             &);
-#endif
+#  if deal_II_dimension > 1
+      template void
+      create_boundary_right_hand_side<deal_II_dimension,
+                                      deal_II_space_dimension,
+                                      Vector<double>>(
+        const hp::MappingCollection<deal_II_dimension> &,
+        const hp::DoFHandler<deal_II_dimension> &,
+        const hp::QCollection<deal_II_dimension - 1> &,
+        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
+        Vector<double> &,
+        const std::set<types::boundary_id> &);
+#  endif
 
-    template
-    void
-    create_boundary_right_hand_side<deal_II_dimension, deal_II_space_dimension, Vector<double> >
-    (const hp::DoFHandler<deal_II_dimension>    &,
-     const hp::QCollection<deal_II_dimension-1> &,
-     const Function<deal_II_space_dimension, Vector<double>::value_type> &,
-     Vector<double>                             &,
-     const std::set<types::boundary_id>         &);
+      template void
+      create_boundary_right_hand_side<deal_II_dimension,
+                                      deal_II_space_dimension,
+                                      Vector<double>>(
+        const hp::DoFHandler<deal_II_dimension> &,
+        const hp::QCollection<deal_II_dimension - 1> &,
+        const Function<deal_II_space_dimension, Vector<double>::value_type> &,
+        Vector<double> &,
+        const std::set<types::boundary_id> &);
 
 
 #endif
     \}
-}
+  }

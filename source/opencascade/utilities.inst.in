@@ -14,49 +14,50 @@
 // ---------------------------------------------------------------------
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
 #if deal_II_dimension > 1
     // Explicit instantiations for dim = 2 and 3
-    template
-    std::vector<TopoDS_Edge> create_curves_from_triangulation_boundary
-    (const Triangulation<2, deal_II_dimension> &triangulation,
-     const Mapping<2, deal_II_dimension> &mapping);
+    template std::vector<TopoDS_Edge> create_curves_from_triangulation_boundary(
+      const Triangulation<2, deal_II_dimension> &triangulation,
+      const Mapping<2, deal_II_dimension> &      mapping);
 
-    template bool point_compare(const Point<deal_II_dimension>& p1,
-                                const Point<deal_II_dimension>& p2,
-                                const Tensor<1,deal_II_dimension>& direction,
-                                const double       tolerance );
+    template bool point_compare(const Point<deal_II_dimension> &    p1,
+                                const Point<deal_II_dimension> &    p2,
+                                const Tensor<1, deal_II_dimension> &direction,
+                                const double                        tolerance);
 
-    template Point<deal_II_dimension> point(const gp_Pnt &p, const double &tolerance);
+    template Point<deal_II_dimension> point(const gp_Pnt &p,
+                                            const double &tolerance);
 
-    template  gp_Pnt point(const Point<deal_II_dimension> &p);
+    template gp_Pnt point(const Point<deal_II_dimension> &p);
 
-    template
-    TopoDS_Edge interpolation_curve(std::vector<Point<deal_II_dimension> >& curve_points,
-                                    const Tensor<1, deal_II_dimension>& direction,
-                                    const bool closed,
-                                    const double tolerance);
+    template TopoDS_Edge interpolation_curve(
+      std::vector<Point<deal_II_dimension>> & curve_points,
+      const Tensor<1, deal_II_dimension> &direction,
+      const bool                          closed,
+      const double                        tolerance);
 
-    template Point<deal_II_dimension> push_forward(const TopoDS_Shape &in_shape,
-            const double u,
-            const double v);
+    template Point<deal_II_dimension> push_forward(
+      const TopoDS_Shape &in_shape, const double u, const double v);
 
-    template Point<deal_II_dimension> line_intersection(const TopoDS_Shape &in_shape,
-            const Point<deal_II_dimension> &origin,
-            const Tensor<1,deal_II_dimension> &direction,
-            const double tolerance);
+    template Point<deal_II_dimension> line_intersection(
+      const TopoDS_Shape &                in_shape,
+      const Point<deal_II_dimension> &    origin,
+      const Tensor<1, deal_II_dimension> &direction,
+      const double                        tolerance);
 
-    template void create_triangulation(const TopoDS_Face &face,
-                                       Triangulation<2,deal_II_dimension> &tria);
+    template void create_triangulation(
+      const TopoDS_Face &face, Triangulation<2, deal_II_dimension> &tria);
 
     template std::tuple<Point<deal_II_dimension>, TopoDS_Shape, double, double>
-    project_point_and_pull_back(const TopoDS_Shape &in_shape,
-                                const Point<deal_II_dimension>& origin,
-                                const double tolerance);
+    project_point_and_pull_back(const TopoDS_Shape &            in_shape,
+                                const Point<deal_II_dimension> &origin,
+                                const double                    tolerance);
 
-    template Point<deal_II_dimension> closest_point(const TopoDS_Shape &in_shape,
-            const Point<deal_II_dimension> &origin,
-            const double tolerance);
+    template Point<deal_II_dimension> closest_point(
+      const TopoDS_Shape &            in_shape,
+      const Point<deal_II_dimension> &origin,
+      const double                    tolerance);
 
 #endif
-}
+  }

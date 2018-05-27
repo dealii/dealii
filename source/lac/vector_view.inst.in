@@ -16,11 +16,11 @@
 
 
 for (SCALAR : REAL_SCALARS)
-{
+  {
     template class VectorView<SCALAR>;
-}
+  }
 
 for (SCALAR : COMPLEX_SCALARS)
-{
+  {
     template class VectorView<SCALAR>;
-}
+  }

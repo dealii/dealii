@@ -15,12 +15,13 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
     template class FE_DGQ<deal_II_dimension, deal_II_space_dimension>;
-    template class FE_DGQArbitraryNodes<deal_II_dimension, deal_II_space_dimension>;
+    template class FE_DGQArbitraryNodes<deal_II_dimension,
+                                        deal_II_space_dimension>;
     template class FE_DGQLegendre<deal_II_dimension, deal_II_space_dimension>;
     template class FE_DGQHermite<deal_II_dimension, deal_II_space_dimension>;
 #endif
-}
+  }

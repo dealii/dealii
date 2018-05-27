@@ -16,69 +16,58 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class DoFObjects<deal_II_dimension>;
-}
+  }
 
 
 for (deal_II_dimension, structdim : DIMENSIONS)
-{
-    template
-    types::global_dof_index
-    DoFObjects<structdim>::
-    get_dof_index (const dealii::DoFHandler<deal_II_dimension> &dof_handler,
-                   const unsigned int       obj_index,
-                   const unsigned int       fe_index,
-                   const unsigned int       local_index) const;
+  {
+    template types::global_dof_index DoFObjects<structdim>::get_dof_index(
+      const dealii::DoFHandler<deal_II_dimension> &dof_handler,
+      const unsigned int                           obj_index,
+      const unsigned int                           fe_index,
+      const unsigned int                           local_index) const;
 
-    template
-    void
-    DoFObjects<structdim>::
-    set_dof_index (const dealii::DoFHandler<deal_II_dimension> &dof_handler,
-                   const unsigned int       obj_index,
-                   const unsigned int       fe_index,
-                   const unsigned int       local_index,
-                   const types::global_dof_index       global_index);
+    template void DoFObjects<structdim>::set_dof_index(
+      const dealii::DoFHandler<deal_II_dimension> &dof_handler,
+      const unsigned int                           obj_index,
+      const unsigned int                           fe_index,
+      const unsigned int                           local_index,
+      const types::global_dof_index                global_index);
 
 #if (deal_II_dimension < 3) && (structdim < 3)
 
-    template
-    types::global_dof_index
-    DoFObjects<structdim>::
-    get_dof_index (const dealii::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
-                   const unsigned int       obj_index,
-                   const unsigned int       fe_index,
-                   const unsigned int       local_index) const;
+    template types::global_dof_index DoFObjects<structdim>::get_dof_index(
+      const dealii::DoFHandler<deal_II_dimension, deal_II_dimension + 1>
+        &                dof_handler,
+      const unsigned int obj_index,
+      const unsigned int fe_index,
+      const unsigned int local_index) const;
 
-    template
-    void
-    DoFObjects<structdim>::
-    set_dof_index (const dealii::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
-                   const unsigned int       obj_index,
-                   const unsigned int       fe_index,
-                   const unsigned int       local_index,
-                   const types::global_dof_index global_index);
+    template void DoFObjects<structdim>::set_dof_index(
+      const dealii::DoFHandler<deal_II_dimension, deal_II_dimension + 1>
+        &                           dof_handler,
+      const unsigned int            obj_index,
+      const unsigned int            fe_index,
+      const unsigned int            local_index,
+      const types::global_dof_index global_index);
 #endif
 
 
 #if (deal_II_dimension == 3) && (structdim < 3)
 
-    template
-    types::global_dof_index
-    DoFObjects<structdim>::
-    get_dof_index (const dealii::DoFHandler<1,3> &dof_handler,
-                   const unsigned int       obj_index,
-                   const unsigned int       fe_index,
-                   const unsigned int       local_index) const;
+    template types::global_dof_index DoFObjects<structdim>::get_dof_index(
+      const dealii::DoFHandler<1, 3> &dof_handler,
+      const unsigned int              obj_index,
+      const unsigned int              fe_index,
+      const unsigned int              local_index) const;
 
-    template
-    void
-    DoFObjects<structdim>::
-    set_dof_index (const dealii::DoFHandler<1,3> &dof_handler,
-                   const unsigned int       obj_index,
-                   const unsigned int       fe_index,
-                   const unsigned int       local_index,
-                   const types::global_dof_index       global_index);
+    template void DoFObjects<structdim>::set_dof_index(
+      const dealii::DoFHandler<1, 3> &dof_handler,
+      const unsigned int              obj_index,
+      const unsigned int              fe_index,
+      const unsigned int              local_index,
+      const types::global_dof_index   global_index);
 #endif
-}
-
+  }

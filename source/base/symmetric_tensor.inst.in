@@ -15,86 +15,73 @@
 
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
-{
-    template
-    class SymmetricTensor<2,deal_II_dimension,number>;
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
 
-    template
-    class SymmetricTensor<4,deal_II_dimension,number>;
+    template class SymmetricTensor<4, deal_II_dimension, number>;
 
-    template
-    std::array<number,deal_II_dimension>
-    eigenvalues (const SymmetricTensor<2,deal_II_dimension,number> &);
+    template std::array<number, deal_II_dimension> eigenvalues(
+      const SymmetricTensor<2, deal_II_dimension, number> &);
 
-    template
-    std::array<std::pair<number,Tensor<1,deal_II_dimension,number> >,std::integral_constant<int, deal_II_dimension>::value>
-    eigenvectors (const SymmetricTensor<2,deal_II_dimension,number> &,
-                  const SymmetricTensorEigenvectorMethod);
-}
+    template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
+                        std::integral_constant<int, deal_II_dimension>::value>
+    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
+                 const SymmetricTensorEigenvectorMethod);
+  }
 
 for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
-{
-    template
-    class SymmetricTensor<2,deal_II_dimension,number>;
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
 
-    template
-    class SymmetricTensor<4,deal_II_dimension,number>;
+    template class SymmetricTensor<4, deal_II_dimension, number>;
 
-    template
-    std::array<number,deal_II_dimension>
-    eigenvalues (const SymmetricTensor<2,deal_II_dimension,number> &);
+    template std::array<number, deal_II_dimension> eigenvalues(
+      const SymmetricTensor<2, deal_II_dimension, number> &);
 
-    template
-    std::array<std::pair<number,Tensor<1,deal_II_dimension,number> >,std::integral_constant<int, deal_II_dimension>::value>
-    eigenvectors (const SymmetricTensor<2,deal_II_dimension,number> &,
-                  const SymmetricTensorEigenvectorMethod);
-}
+    template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
+                        std::integral_constant<int, deal_II_dimension>::value>
+    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
+                 const SymmetricTensorEigenvectorMethod);
+  }
 
-for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
-{
-    template
-    class SymmetricTensor<2,deal_II_dimension,number>;
+for (deal_II_dimension : DIMENSIONS;
+     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
 
-    template
-    class SymmetricTensor<4,deal_II_dimension,number>;
+    template class SymmetricTensor<4, deal_II_dimension, number>;
 
-    template
-    std::array<number,deal_II_dimension>
-    eigenvalues (const SymmetricTensor<2,deal_II_dimension,number> &);
+    template std::array<number, deal_II_dimension> eigenvalues(
+      const SymmetricTensor<2, deal_II_dimension, number> &);
 
-    template
-    std::array<std::pair<number,Tensor<1,deal_II_dimension,number> >,std::integral_constant<int, deal_II_dimension>::value>
-    eigenvectors (const SymmetricTensor<2,deal_II_dimension,number> &,
-                  const SymmetricTensorEigenvectorMethod);
-}
+    template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
+                        std::integral_constant<int, deal_II_dimension>::value>
+    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
+                 const SymmetricTensorEigenvectorMethod);
+  }
 
 for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
-{
-    template
-    class SymmetricTensor<2,deal_II_dimension,number>;
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
 
-    template
-    class SymmetricTensor<4,deal_II_dimension,number>;
-}
+    template class SymmetricTensor<4, deal_II_dimension, number>;
+  }
 
 
 for (number : REAL_SCALARS)
-{
-    template
-    SymmetricTensor<4,3,number>
-    invert (const SymmetricTensor<4,3,number> &t);
-}
+  {
+    template SymmetricTensor<4, 3, number> invert(
+      const SymmetricTensor<4, 3, number> &t);
+  }
 
 for (number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
-{
-    template
-    SymmetricTensor<4,3,number>
-    invert (const SymmetricTensor<4,3,number> &t);
-}
+  {
+    template SymmetricTensor<4, 3, number> invert(
+      const SymmetricTensor<4, 3, number> &t);
+  }
 
 for (number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
-{
-    template
-    SymmetricTensor<4,3,number>
-    invert (const SymmetricTensor<4,3,number> &t);
-}
+  {
+    template SymmetricTensor<4, 3, number> invert(
+      const SymmetricTensor<4, 3, number> &t);
+  }

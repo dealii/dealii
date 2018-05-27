@@ -14,16 +14,16 @@
 // ---------------------------------------------------------------------
 
 
-for (S : REAL_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
-{
+for (S : REAL_SCALARS; rank : RANKS; dim : SPACE_DIMENSIONS)
+  {
     template class TensorFunction<rank, dim, S>;
     template class ConstantTensorFunction<rank, dim, S>;
     template class ZeroTensorFunction<rank, dim, S>;
-}
+  }
 
-for (S : COMPLEX_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
-{
+for (S : COMPLEX_SCALARS; rank : RANKS; dim : SPACE_DIMENSIONS)
+  {
     template class TensorFunction<rank, dim, S>;
     template class ConstantTensorFunction<rank, dim, S>;
     template class ZeroTensorFunction<rank, dim, S>;
-}
+  }

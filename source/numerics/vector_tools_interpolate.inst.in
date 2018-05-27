@@ -15,113 +15,123 @@
 
 
 
-for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    namespace VectorTools \{
+    namespace VectorTools
+    \{
 
-    template
-    void interpolate
-    (const Mapping<deal_II_dimension,deal_II_space_dimension> &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-     const Function<deal_II_space_dimension, VEC::value_type>&,
-     VEC&,
-     const ComponentMask&);
+      template void
+      interpolate(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const ComponentMask &);
 
-    template
-    void interpolate
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-     const Function<deal_II_space_dimension, VEC::value_type>&,
-     VEC&,
-     const ComponentMask&);
+      template void
+      interpolate(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const ComponentMask &);
 
-    template
-    void interpolate
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-     const FullMatrix<double>&,
-     const VEC&,
-     VEC&);
+      template void
+      interpolate(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const FullMatrix<double> &,
+        const VEC &,
+        VEC &);
 
-    template
-    void get_position_vector
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-     VEC&,
-     const ComponentMask&);
+      template void
+      get_position_vector(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        VEC &,
+        const ComponentMask &);
 
     \}
 #endif
-}
+  }
 
 
 
-//TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension, deal_II_space_dimension>
+// TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension,
+// deal_II_space_dimension>
 // where applicable and move to codimension cases above also when applicable
-for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension == deal_II_space_dimension
 
-    namespace VectorTools \{
+    namespace VectorTools
+    \{
 
-    template
-    void interpolate
-    (const Mapping<deal_II_dimension>&,
-     const hp::DoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension, VEC::value_type>&,
-     VEC&,
-     const ComponentMask&);
-    template
-    void interpolate
-    (const hp::DoFHandler<deal_II_dimension>&,
-     const Function<deal_II_dimension, VEC::value_type>&,
-     VEC&,
-     const ComponentMask&);
+      template void
+      interpolate(const Mapping<deal_II_dimension> &,
+                  const hp::DoFHandler<deal_II_dimension> &,
+                  const Function<deal_II_dimension, VEC::value_type> &,
+                  VEC &,
+                  const ComponentMask &);
+      template void
+      interpolate(const hp::DoFHandler<deal_II_dimension> &,
+                  const Function<deal_II_dimension, VEC::value_type> &,
+                  VEC &,
+                  const ComponentMask &);
 
-    template
-    void interpolate_based_on_material_id(const Mapping<deal_II_dimension, deal_II_space_dimension>&,
-                                          const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
-                                          const std::map< types::material_id, const Function<deal_II_space_dimension, VEC::value_type>* >&,
-                                          VEC&,
-                                          const ComponentMask&);
+      template void
+      interpolate_based_on_material_id(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const std::map<
+          types::material_id,
+          const Function<deal_II_space_dimension, VEC::value_type> *> &,
+        VEC &,
+        const ComponentMask &);
 
-    template
-    void interpolate_based_on_material_id(const Mapping<deal_II_dimension>&,
-                                          const hp::DoFHandler<deal_II_dimension>&,
-                                          const std::map< types::material_id, const Function<deal_II_dimension, VEC::value_type>* >&,
-                                          VEC&,
-                                          const ComponentMask&);
+      template void
+      interpolate_based_on_material_id(
+        const Mapping<deal_II_dimension> &,
+        const hp::DoFHandler<deal_II_dimension> &,
+        const std::map<types::material_id,
+                       const Function<deal_II_dimension, VEC::value_type> *> &,
+        VEC &,
+        const ComponentMask &);
 
     \}
 #endif
-}
+  }
 
 
-for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    namespace VectorTools \{
-    template
-    void interpolate_to_different_mesh
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const VEC                           &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     VEC                                 &);
+    namespace VectorTools
+    \{
+      template void
+      interpolate_to_different_mesh(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const VEC &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        VEC &);
 
-    template
-    void interpolate_to_different_mesh
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const VEC                           &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
-     const ConstraintMatrix              &,
-     VEC                                 &);
+      template void
+      interpolate_to_different_mesh(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const VEC &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const ConstraintMatrix &,
+        VEC &);
 
-    template
-    void interpolate_to_different_mesh
-    (const InterGridMap<DoFHandler<deal_II_dimension,deal_II_space_dimension> > &,
-     const VEC                                          &,
-     const ConstraintMatrix                             &,
-     VEC                                                &);
+      template void
+      interpolate_to_different_mesh(
+        const InterGridMap<
+          DoFHandler<deal_II_dimension, deal_II_space_dimension>> &,
+        const VEC &,
+        const ConstraintMatrix &,
+        VEC &);
     \}
 #endif
-
-}
+  }

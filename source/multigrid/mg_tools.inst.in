@@ -16,140 +16,150 @@
 
 
 for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
-        deal_II_space_dimension: SPACE_DIMENSIONS)
-{
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
     namespace MGTools
     \{
 
 #if deal_II_dimension <= deal_II_space_dimension
-    template void
-    make_sparsity_pattern<DoFHandler<deal_II_dimension, deal_II_space_dimension>, PATTERN> (
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        PATTERN &,
-        const unsigned int);
+      template void
+      make_sparsity_pattern<
+        DoFHandler<deal_II_dimension, deal_II_space_dimension>,
+        PATTERN>(const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+                 PATTERN &,
+                 const unsigned int);
 
-    template void
-    make_interface_sparsity_pattern<DoFHandler<deal_II_dimension, deal_II_space_dimension>, PATTERN> (
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const MGConstrainedDoFs &,
-        PATTERN &,
-        const unsigned int);
+      template void
+      make_interface_sparsity_pattern<
+        DoFHandler<deal_II_dimension, deal_II_space_dimension>,
+        PATTERN>(const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+                 const MGConstrainedDoFs &,
+                 PATTERN &,
+                 const unsigned int);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
-    template void
-    make_flux_sparsity_pattern<deal_II_dimension> (
+      template void
+      make_flux_sparsity_pattern<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
         PATTERN &,
         const unsigned int);
 
-    template void
-    make_flux_sparsity_pattern_edge<deal_II_dimension> (
+      template void
+      make_flux_sparsity_pattern_edge<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
         PATTERN &,
         const unsigned int);
 
-#if deal_II_dimension > 1
+#  if deal_II_dimension > 1
 
-    template void
-    make_flux_sparsity_pattern<deal_II_dimension> (
+      template void
+      make_flux_sparsity_pattern<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
         PATTERN &,
         const unsigned int,
-        const Table<2,DoFTools::Coupling>&,
-        const Table<2,DoFTools::Coupling>&);
+        const Table<2, DoFTools::Coupling> &,
+        const Table<2, DoFTools::Coupling> &);
 
-    template void
-    make_flux_sparsity_pattern_edge<deal_II_dimension> (
+      template void
+      make_flux_sparsity_pattern_edge<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
         PATTERN &,
         const unsigned int,
-        const Table<2,DoFTools::Coupling>&);
-#endif
+        const Table<2, DoFTools::Coupling> &);
+#  endif
 #endif
     \}
-}
+  }
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     namespace MGTools
     \{
 
 #if deal_II_dimension > 1
-    template void
-    compute_row_length_vector(
-        const DoFHandler<deal_II_dimension>&, unsigned int,
-        std::vector<unsigned int>&, const DoFTools::Coupling);
-    template void
-    compute_row_length_vector(
-        const DoFHandler<deal_II_dimension>&, unsigned int,
-        std::vector<unsigned int>&,
-        const Table<2,DoFTools::Coupling>&, const Table<2,DoFTools::Coupling>&);
+      template void
+      compute_row_length_vector(const DoFHandler<deal_II_dimension> &,
+                                unsigned int,
+                                std::vector<unsigned int> &,
+                                const DoFTools::Coupling);
+      template void
+      compute_row_length_vector(const DoFHandler<deal_II_dimension> &,
+                                unsigned int,
+                                std::vector<unsigned int> &,
+                                const Table<2, DoFTools::Coupling> &,
+                                const Table<2, DoFTools::Coupling> &);
 #endif
 
-    template void count_dofs_per_component (
-        const DoFHandler<deal_II_dimension>&, std::vector<std::vector<types::global_dof_index> >&,
-        bool, std::vector<unsigned int>);
-    template void count_dofs_per_block (
-        const DoFHandler<deal_II_dimension>&, std::vector<std::vector<types::global_dof_index> >&,
+      template void
+      count_dofs_per_component(
+        const DoFHandler<deal_II_dimension> &,
+        std::vector<std::vector<types::global_dof_index>> &,
+        bool,
         std::vector<unsigned int>);
+      template void
+      count_dofs_per_block(const DoFHandler<deal_II_dimension> &,
+                           std::vector<std::vector<types::global_dof_index>> &,
+                           std::vector<unsigned int>);
 
 #if deal_II_dimension > 1
-    template void make_boundary_list(
-        const DoFHandler<deal_II_dimension>&,
-        const FunctionMap<deal_II_dimension>::type&,
-        std::vector<std::set<types::global_dof_index> >&,
-        const ComponentMask &);
+      template void
+      make_boundary_list(const DoFHandler<deal_II_dimension> &,
+                         const FunctionMap<deal_II_dimension>::type &,
+                         std::vector<std::set<types::global_dof_index>> &,
+                         const ComponentMask &);
 #endif
 
-    template void make_boundary_list(
-        const DoFHandler<deal_II_dimension>&,
-        const FunctionMap<deal_II_dimension>::type&,
-        std::vector<IndexSet>&,
-        const ComponentMask &);
+      template void
+      make_boundary_list(const DoFHandler<deal_II_dimension> &,
+                         const FunctionMap<deal_II_dimension>::type &,
+                         std::vector<IndexSet> &,
+                         const ComponentMask &);
 
-    template void  make_boundary_list(
-        const DoFHandler<deal_II_dimension> &,
-        const std::set<types::boundary_id> &,
-        std::vector<IndexSet> &,
-        const ComponentMask &);
+      template void
+      make_boundary_list(const DoFHandler<deal_II_dimension> &,
+                         const std::set<types::boundary_id> &,
+                         std::vector<IndexSet> &,
+                         const ComponentMask &);
 
 
-    template
-    void
-    extract_inner_interface_dofs (const DoFHandler<deal_II_dimension> &mg_dof_handler,
-                                  std::vector<IndexSet>  &interface_dofs);
+      template void
+      extract_inner_interface_dofs(
+        const DoFHandler<deal_II_dimension> &mg_dof_handler,
+        std::vector<IndexSet> &              interface_dofs);
 
-    template
-    void
-    extract_non_interface_dofs (const DoFHandler<deal_II_dimension> & mg_dof_handler,
-                                std::vector<std::set<types::global_dof_index> > &non_interface_dofs);
+      template void
+      extract_non_interface_dofs(
+        const DoFHandler<deal_II_dimension> &           mg_dof_handler,
+        std::vector<std::set<types::global_dof_index>> &non_interface_dofs);
 
 
 #if deal_II_dimension < 3
-    template void count_dofs_per_block (
-        const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-        std::vector<std::vector<types::global_dof_index> >&, std::vector<unsigned int>);
+      template void
+      count_dofs_per_block(
+        const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &,
+        std::vector<std::vector<types::global_dof_index>> &,
+        std::vector<unsigned int>);
 #endif
 
 #if deal_II_dimension == 3
-    template void count_dofs_per_block (
-        const DoFHandler<1,3>&,
-        std::vector<std::vector<types::global_dof_index> >&, std::vector<unsigned int>);
+      template void
+      count_dofs_per_block(const DoFHandler<1, 3> &,
+                           std::vector<std::vector<types::global_dof_index>> &,
+                           std::vector<unsigned int>);
 #endif
     \}
-}
+  }
 
-for (deal_II_dimension : DIMENSIONS;
-        deal_II_space_dimension: SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
     namespace MGTools
     \{
 #if deal_II_dimension <= deal_II_space_dimension
-    template
-    unsigned int
-    max_level_for_coarse_mesh (const Triangulation<deal_II_dimension, deal_II_space_dimension> & tria);
+      template unsigned int
+      max_level_for_coarse_mesh(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
 #endif
     \}
-}
+  }

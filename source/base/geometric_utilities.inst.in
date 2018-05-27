@@ -15,7 +15,7 @@
 
 
 for (dim : SPACE_DIMENSIONS)
-{
-    template Point<dim> from_spherical<dim>(const std::array<double,dim> &);
-    template std::array<double,dim> to_spherical<dim>(const Point<dim> &);
-}
+  {
+    template Point<dim> from_spherical<dim>(const std::array<double, dim> &);
+    template std::array<double, dim> to_spherical<dim>(const Point<dim> &);
+  }

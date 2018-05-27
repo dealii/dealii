@@ -15,54 +15,49 @@
 
 
 for (rank : RANKS; deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
-{
-    template
-    class Tensor<rank,deal_II_dimension,number>;
-}
+  {
+    template class Tensor<rank, deal_II_dimension, number>;
+  }
 
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
-{
-    template
-    class Tensor<0,deal_II_dimension,number>;
-}
+  {
+    template class Tensor<0, deal_II_dimension, number>;
+  }
 
 
 for (rank : RANKS; deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
-{
-    template
-    class Tensor<rank,deal_II_dimension,number>;
-}
+  {
+    template class Tensor<rank, deal_II_dimension, number>;
+  }
 
 
 for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
-{
-    template
-    class Tensor<0,deal_II_dimension,number>;
-}
+  {
+    template class Tensor<0, deal_II_dimension, number>;
+  }
 
 
-for (rank : RANKS; deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
-{
-    template
-    class Tensor<rank,deal_II_dimension,number>;
-}
+for (rank : RANKS; deal_II_dimension : DIMENSIONS;
+     number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
+  {
+    template class Tensor<rank, deal_II_dimension, number>;
+  }
 
 
 for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
-{
-    template
-    class Tensor<0,deal_II_dimension,number>;
-}
+  {
+    template class Tensor<0, deal_II_dimension, number>;
+  }
 
-for (rank : RANKS; deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
-{
-    template
-    class Tensor<rank,deal_II_dimension,number>;
-}
+for (rank : RANKS; deal_II_dimension : DIMENSIONS;
+     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+  {
+    template class Tensor<rank, deal_II_dimension, number>;
+  }
 
-for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
-{
-    template
-    class Tensor<0,deal_II_dimension,number>;
-}
+for (deal_II_dimension : DIMENSIONS;
+     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+  {
+    template class Tensor<0, deal_II_dimension, number>;
+  }

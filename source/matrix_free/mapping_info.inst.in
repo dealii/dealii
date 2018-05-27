@@ -15,25 +15,39 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
-    template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>;
-    template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>;
+  {
+    template struct internal::MatrixFreeFunctions::
+      MappingInfo<deal_II_dimension, double>;
+    template struct internal::MatrixFreeFunctions::
+      MappingInfo<deal_II_dimension, float>;
 
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension,deal_II_dimension,double>;
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension,deal_II_dimension,float>;
+    template struct internal::MatrixFreeFunctions::
+      MappingInfoStorage<deal_II_dimension, deal_II_dimension, double>;
+    template struct internal::MatrixFreeFunctions::
+      MappingInfoStorage<deal_II_dimension, deal_II_dimension, float>;
 #if deal_II_dimension > 1
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension-1,deal_II_dimension,double>;
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension-1,deal_II_dimension,float>;
+    template struct internal::MatrixFreeFunctions::
+      MappingInfoStorage<deal_II_dimension - 1, deal_II_dimension, double>;
+    template struct internal::MatrixFreeFunctions::
+      MappingInfoStorage<deal_II_dimension - 1, deal_II_dimension, float>;
 #endif
 
-    template void internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>::
-    print_memory_consumption<std::ostream> (std::ostream &, const TaskInfo&) const;
-    template void internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>::
-    print_memory_consumption<ConditionalOStream> (ConditionalOStream &,const TaskInfo&) const;
+    template void internal::MatrixFreeFunctions::MappingInfo<
+      deal_II_dimension,
+      double>::print_memory_consumption<std::ostream>(std::ostream &,
+                                                      const TaskInfo &) const;
+    template void
+    internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension, double>::
+      print_memory_consumption<ConditionalOStream>(ConditionalOStream &,
+                                                   const TaskInfo &) const;
 
-    template void internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>::
-    print_memory_consumption<std::ostream> (std::ostream &, const TaskInfo&) const;
-    template void internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>::
-    print_memory_consumption<ConditionalOStream> (ConditionalOStream &, const TaskInfo&) const;
-
-}
+    template void internal::MatrixFreeFunctions::MappingInfo<
+      deal_II_dimension,
+      float>::print_memory_consumption<std::ostream>(std::ostream &,
+                                                     const TaskInfo &) const;
+    template void internal::MatrixFreeFunctions::MappingInfo<
+      deal_II_dimension,
+      float>::print_memory_consumption<ConditionalOStream>(ConditionalOStream &,
+                                                           const TaskInfo &)
+      const;
+  }

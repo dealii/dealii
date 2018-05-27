@@ -14,22 +14,36 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; components : SPACE_DIMENSIONS; scalar_type : REAL_SCALARS)
-{
-    template
-    void
-    SelectEvaluator<deal_II_dimension, -1, 0, components, VectorizedArray<scalar_type> >::integrate
-    (const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<scalar_type> > &shape_info,
-     VectorizedArray<scalar_type> *, VectorizedArray<scalar_type> *,
-     VectorizedArray<scalar_type> *, VectorizedArray<scalar_type> *,
-     const bool, const bool);
+for (deal_II_dimension : DIMENSIONS; components : SPACE_DIMENSIONS;
+     scalar_type : REAL_SCALARS)
+  {
+    template void SelectEvaluator<deal_II_dimension,
+                                  -1,
+                                  0,
+                                  components,
+                                  VectorizedArray<scalar_type>>::
+      integrate(const internal::MatrixFreeFunctions::ShapeInfo<
+                  VectorizedArray<scalar_type>> &shape_info,
+                VectorizedArray<scalar_type> *,
+                VectorizedArray<scalar_type> *,
+                VectorizedArray<scalar_type> *,
+                VectorizedArray<scalar_type> *,
+                const bool,
+                const bool);
 
-    template
-    void
-    SelectEvaluator<deal_II_dimension, -1, 0, components, VectorizedArray<scalar_type> >::evaluate
-    (const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<scalar_type> > &shape_info,
-     VectorizedArray<scalar_type> *, VectorizedArray<scalar_type> *,
-     VectorizedArray<scalar_type> *,
-     VectorizedArray<scalar_type> *,
-     VectorizedArray<scalar_type> *, const bool, const bool, const bool);
-}
+    template void SelectEvaluator<deal_II_dimension,
+                                  -1,
+                                  0,
+                                  components,
+                                  VectorizedArray<scalar_type>>::
+      evaluate(const internal::MatrixFreeFunctions::ShapeInfo<
+                 VectorizedArray<scalar_type>> &shape_info,
+               VectorizedArray<scalar_type> *,
+               VectorizedArray<scalar_type> *,
+               VectorizedArray<scalar_type> *,
+               VectorizedArray<scalar_type> *,
+               VectorizedArray<scalar_type> *,
+               const bool,
+               const bool,
+               const bool);
+  }

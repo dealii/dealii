@@ -16,7 +16,7 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class NormalProjectionManifold<deal_II_dimension, 3>;
     template class DirectionalProjectionManifold<deal_II_dimension, 3>;
     template class NormalToMeshProjectionManifold<deal_II_dimension, 3>;
@@ -27,4 +27,4 @@ for (deal_II_dimension : DIMENSIONS)
     template class ArclengthProjectionLineManifold<deal_II_dimension, 2>;
     template class NURBSPatchManifold<deal_II_dimension, 2>;
 #endif
-}
+  }

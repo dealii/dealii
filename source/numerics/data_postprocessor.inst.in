@@ -15,9 +15,9 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class DataPostprocessor<deal_II_dimension>;
     template class DataPostprocessorScalar<deal_II_dimension>;
     template class DataPostprocessorVector<deal_II_dimension>;
     template class DataPostprocessorTensor<deal_II_dimension>;
-}
+  }
