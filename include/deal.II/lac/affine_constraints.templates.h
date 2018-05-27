@@ -458,7 +458,7 @@ AffineConstraints<number>::close()
 
                     // replace first entry, then tack the rest to the end
                     // of the list
-                    line->entries[entry] = std::make_pair(
+                    line->entries[entry] = std::pair<size_type, number>(
                       constrained_line->entries[0].first,
                       constrained_line->entries[0].second * weight);
 

@@ -81,6 +81,11 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-literal-suffix")
 
+#
+# Disable warning about ABI changes
+#
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-psabi")
+
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
   # Silence Clang warnings about unused compiler parameters (works around a
