@@ -15,39 +15,38 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     namespace Physics
     \{
-    namespace Elasticity
-    \{
-    template
-    class StandardTensors<deal_II_dimension>;
+      namespace Elasticity
+      \{
+        template class StandardTensors<deal_II_dimension>;
+      \}
     \}
-    \}
-}
+  }
 
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
-{
+  {
     namespace Physics
     \{
-    namespace Elasticity
-    \{
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    StandardTensors<deal_II_dimension>::Dev_P<number>(const Tensor<2,deal_II_dimension,number> &);
+      namespace Elasticity
+      \{
+        template SymmetricTensor<4, deal_II_dimension, number>
+        StandardTensors<deal_II_dimension>::Dev_P<number>(
+          const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    StandardTensors<deal_II_dimension>::Dev_P_T<number>(const Tensor<2,deal_II_dimension,number> &);
+        template SymmetricTensor<4, deal_II_dimension, number>
+        StandardTensors<deal_II_dimension>::Dev_P_T<number>(
+          const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    StandardTensors<deal_II_dimension>::ddet_F_dC<number>(const Tensor<2,deal_II_dimension,number> &);
+        template SymmetricTensor<2, deal_II_dimension, number>
+        StandardTensors<deal_II_dimension>::ddet_F_dC<number>(
+          const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    StandardTensors<deal_II_dimension>::dC_inv_dC<number>(const Tensor<2,deal_II_dimension,number> &);
+        template SymmetricTensor<4, deal_II_dimension, number>
+        StandardTensors<deal_II_dimension>::dC_inv_dC<number>(
+          const Tensor<2, deal_II_dimension, number> &);
+      \}
     \}
-    \}
-}
+  }

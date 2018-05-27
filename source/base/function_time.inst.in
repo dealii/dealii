@@ -14,11 +14,11 @@
 // ---------------------------------------------------------------------
 
 for (S : REAL_SCALARS)
-{
+  {
     template class FunctionTime<S>;
-}
+  }
 
 for (S : COMPLEX_SCALARS)
-{
+  {
     template class FunctionTime<S>;
-}
+  }

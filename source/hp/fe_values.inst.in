@@ -15,25 +15,28 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     namespace internal
     \{
-    namespace hp
-    \{
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension,
-                                dealii::FEValues<deal_II_dimension> >;
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FEFaceValues<deal_II_dimension> >;
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FESubfaceValues<deal_II_dimension> >;
-    \}
+      namespace hp
+      \{
+        template class FEValuesBase<deal_II_dimension,
+                                    deal_II_dimension,
+                                    dealii::FEValues<deal_II_dimension>>;
+        template class FEValuesBase<deal_II_dimension,
+                                    deal_II_dimension - 1,
+                                    dealii::FEFaceValues<deal_II_dimension>>;
+        template class FEValuesBase<deal_II_dimension,
+                                    deal_II_dimension - 1,
+                                    dealii::FESubfaceValues<deal_II_dimension>>;
+      \}
     \}
 
     namespace hp
     \{
-    template class FEValues<deal_II_dimension>;
-    template class FEFaceValues<deal_II_dimension, deal_II_dimension>;
-    template class FESubfaceValues<deal_II_dimension, deal_II_dimension>;
+      template class FEValues<deal_II_dimension>;
+      template class FEFaceValues<deal_II_dimension, deal_II_dimension>;
+      template class FESubfaceValues<deal_II_dimension, deal_II_dimension>;
     \}
 
 
@@ -42,22 +45,28 @@ for (deal_II_dimension : DIMENSIONS)
 
     namespace internal
     \{
-    namespace hp
-    \{
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension,
-                                dealii::FEValues<deal_II_dimension,deal_II_dimension+1> >;
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FEFaceValues<deal_II_dimension,deal_II_dimension+1> >;
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FESubfaceValues<deal_II_dimension,deal_II_dimension+1> >;
-    \}
+      namespace hp
+      \{
+        template class FEValuesBase<
+          deal_II_dimension,
+          deal_II_dimension,
+          dealii::FEValues<deal_II_dimension, deal_II_dimension + 1>>;
+        template class FEValuesBase<
+          deal_II_dimension,
+          deal_II_dimension - 1,
+          dealii::FEFaceValues<deal_II_dimension, deal_II_dimension + 1>>;
+        template class FEValuesBase<
+          deal_II_dimension,
+          deal_II_dimension - 1,
+          dealii::FESubfaceValues<deal_II_dimension, deal_II_dimension + 1>>;
+      \}
     \}
 
     namespace hp
     \{
-    template class FEValues<deal_II_dimension, deal_II_dimension+1>;
-    template class FEFaceValues<deal_II_dimension, deal_II_dimension+1>;
-    template class FESubfaceValues<deal_II_dimension, deal_II_dimension+1>;
+      template class FEValues<deal_II_dimension, deal_II_dimension + 1>;
+      template class FEFaceValues<deal_II_dimension, deal_II_dimension + 1>;
+      template class FESubfaceValues<deal_II_dimension, deal_II_dimension + 1>;
     \}
 #endif
 
@@ -65,38 +74,58 @@ for (deal_II_dimension : DIMENSIONS)
 
     namespace internal
     \{
-    namespace hp
-    \{
-    template class FEValuesBase<1,1,
-                                dealii::FEValues<1,3> >;
-    template class FEValuesBase<1,1-1,
-                                dealii::FEFaceValues<1,3> >;
-    template class FEValuesBase<1,1-1,
-                                dealii::FESubfaceValues<1,3> >;
-    \}
+      namespace hp
+      \{
+        template class FEValuesBase<1, 1, dealii::FEValues<1, 3>>;
+        template class FEValuesBase<1, 1 - 1, dealii::FEFaceValues<1, 3>>;
+        template class FEValuesBase<1, 1 - 1, dealii::FESubfaceValues<1, 3>>;
+      \}
     \}
 
     namespace hp
     \{
-    template class FEValues<1, 3>;
-    template class FEFaceValues<1, 3>;
-    template class FESubfaceValues<1, 3>;
+      template class FEValues<1, 3>;
+      template class FEFaceValues<1, 3>;
+      template class FESubfaceValues<1, 3>;
     \}
 #endif
-}
+  }
 
-for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; lda : BOOL)
-{
+for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS;
+     lda : BOOL)
+  {
     namespace hp
     \{
 #if deal_II_dimension <= deal_II_space_dimension
 
-    template void FEValues<deal_II_dimension,deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<dealii::dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >, unsigned int, unsigned int, unsigned int);
-    template void FEFaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<dealii::dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >, unsigned int, unsigned int, unsigned int, unsigned int);
-    template void FESubfaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<dealii::dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+      template void
+      FEValues<deal_II_dimension, deal_II_space_dimension>::reinit(
+        TriaIterator<DoFCellAccessor<
+          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
+          lda>>,
+        unsigned int,
+        unsigned int,
+        unsigned int);
+      template void
+      FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
+        TriaIterator<DoFCellAccessor<
+          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
+          lda>>,
+        unsigned int,
+        unsigned int,
+        unsigned int,
+        unsigned int);
+      template void
+      FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
+        TriaIterator<DoFCellAccessor<
+          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
+          lda>>,
+        unsigned int,
+        unsigned int,
+        unsigned int,
+        unsigned int,
+        unsigned int);
 #endif
     \}
-}
+  }

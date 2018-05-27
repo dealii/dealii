@@ -14,13 +14,17 @@
 // ---------------------------------------------------------------------
 
 
-for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    template class SolutionTransfer<deal_II_dimension, VEC, DoFHandler<deal_II_dimension, deal_II_space_dimension> >;
-    template class SolutionTransfer<deal_II_dimension, VEC, hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> >;
+    template class SolutionTransfer<
+      deal_II_dimension,
+      VEC,
+      DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+    template class SolutionTransfer<
+      deal_II_dimension,
+      VEC,
+      hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
 #endif
-}
-
-
-
+  }

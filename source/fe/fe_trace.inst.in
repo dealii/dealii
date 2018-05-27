@@ -14,6 +14,6 @@
 // ---------------------------------------------------------------------
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class FE_TraceQ<deal_II_dimension>;
-}
+  }

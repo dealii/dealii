@@ -15,12 +15,14 @@
 
 
 
-
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; VEC : REAL_VECTOR_TYPES)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     VEC : REAL_VECTOR_TYPES)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    template class MappingFEField<deal_II_dimension, deal_II_space_dimension,  VEC,
-                                  dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension> >;
+    template class MappingFEField<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC,
+      dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
 #endif
-}
-
+  }

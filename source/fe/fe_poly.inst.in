@@ -15,16 +15,31 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    template class FE_Poly<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Poly<TensorProductPolynomialsConst<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Poly<TensorProductPolynomialsBubbles<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Poly<TensorProductPolynomials<deal_II_dimension,Polynomials::PiecewisePolynomial<double> >, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Poly<PolynomialSpace<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Poly<PolynomialsP<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Poly<PolynomialsRannacherTurek<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
+    template class FE_Poly<TensorProductPolynomials<deal_II_dimension>,
+                           deal_II_dimension,
+                           deal_II_space_dimension>;
+    template class FE_Poly<TensorProductPolynomialsConst<deal_II_dimension>,
+                           deal_II_dimension,
+                           deal_II_space_dimension>;
+    template class FE_Poly<TensorProductPolynomialsBubbles<deal_II_dimension>,
+                           deal_II_dimension,
+                           deal_II_space_dimension>;
+    template class FE_Poly<
+      TensorProductPolynomials<deal_II_dimension,
+                               Polynomials::PiecewisePolynomial<double>>,
+      deal_II_dimension,
+      deal_II_space_dimension>;
+    template class FE_Poly<PolynomialSpace<deal_II_dimension>,
+                           deal_II_dimension,
+                           deal_II_space_dimension>;
+    template class FE_Poly<PolynomialsP<deal_II_dimension>,
+                           deal_II_dimension,
+                           deal_II_space_dimension>;
+    template class FE_Poly<PolynomialsRannacherTurek<deal_II_dimension>,
+                           deal_II_dimension,
+                           deal_II_space_dimension>;
 #endif
-}
-
+  }

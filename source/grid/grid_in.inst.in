@@ -15,9 +15,8 @@
 
 
 for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
-{
+  {
 #if deal_II_dimension <= deal_II_space_dimension
     template class GridIn<deal_II_dimension, deal_II_space_dimension>;
 #endif
-}
-
+  }

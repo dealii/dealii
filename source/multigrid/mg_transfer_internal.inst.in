@@ -15,76 +15,78 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS;
-        deal_II_space_dimension: SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
     namespace internal
     \{
-    namespace MGTransfer
-    \{
+      namespace MGTransfer
+      \{
 
 #if deal_II_dimension <= deal_II_space_dimension
-    template
-    void fill_copy_indices<deal_II_dimension, deal_II_space_dimension>(
-        const dealii::DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-        const MGConstrainedDoFs*,
-        std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &,
-        std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &,
-        std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &,
-        const bool);
+        template void
+        fill_copy_indices<deal_II_dimension, deal_II_space_dimension>(
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
+          const MGConstrainedDoFs *,
+          std::vector<std::vector<
+            std::pair<types::global_dof_index, types::global_dof_index>>> &,
+          std::vector<std::vector<
+            std::pair<types::global_dof_index, types::global_dof_index>>> &,
+          std::vector<std::vector<
+            std::pair<types::global_dof_index, types::global_dof_index>>> &,
+          const bool);
 #endif
+      \}
     \}
-    \}
-}
+  }
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     namespace internal
     \{
-    namespace MGTransfer
-    \{
+      namespace MGTransfer
+      \{
 
-    template
-    unsigned int
-    compute_shift_within_children<deal_II_dimension>(const unsigned int,
-            const unsigned int,
-            const unsigned int);
+        template unsigned int
+        compute_shift_within_children<deal_II_dimension>(const unsigned int,
+                                                         const unsigned int,
+                                                         const unsigned int);
+      \}
     \}
-    \}
-}
+  }
 
 for (S : REAL_SCALARS)
-{
+  {
     namespace internal
     \{
-    namespace MGTransfer
-    \{
+      namespace MGTransfer
+      \{
 
-    template
-    struct ElementInfo<S>;
+        template struct ElementInfo<S>;
+      \}
     \}
-    \}
-}
+  }
 
 for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS)
-{
+  {
     namespace internal
     \{
-    namespace MGTransfer
-    \{
+      namespace MGTransfer
+      \{
 
-    template
-    void setup_transfer<deal_II_dimension>(const dealii::DoFHandler<deal_II_dimension>&,
-                                           const MGConstrainedDoFs*,
-                                           ElementInfo<S>&,
-                                           std::vector<std::vector<unsigned int> >&,
-                                           std::vector<std::vector<std::pair<unsigned int,unsigned int> > >&,
-                                           std::vector<unsigned int>&,
-                                           std::vector<std::vector<std::vector<unsigned short> > >&,
-                                           std::vector<std::vector<S> >&,
-                                           std::vector<std::vector<std::pair<unsigned int, unsigned int> > >&,
-                                           MGLevelObject<LinearAlgebra::distributed::Vector<S> >&);
+        template void
+        setup_transfer<deal_II_dimension>(
+          const dealii::DoFHandler<deal_II_dimension> &,
+          const MGConstrainedDoFs *,
+          ElementInfo<S> &,
+          std::vector<std::vector<unsigned int>> &,
+          std::vector<std::vector<std::pair<unsigned int, unsigned int>>> &,
+          std::vector<unsigned int> &,
+          std::vector<std::vector<std::vector<unsigned short>>> &,
+          std::vector<std::vector<S>> &,
+          std::vector<std::vector<std::pair<unsigned int, unsigned int>>> &,
+          MGLevelObject<LinearAlgebra::distributed::Vector<S>> &);
+      \}
     \}
-    \}
-}
+  }

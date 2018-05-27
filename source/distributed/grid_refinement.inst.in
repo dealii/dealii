@@ -15,33 +15,34 @@
 
 
 
-
 for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
-{
+  {
     namespace parallel
     \{
-    namespace distributed
-    \{
-    namespace GridRefinement
-    \{
-    template
-    void
-    refine_and_coarsen_fixed_number<deal_II_dimension,S,deal_II_dimension>
-    (parallel::distributed::Triangulation<deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double,
-     const unsigned int);
+      namespace distributed
+      \{
+        namespace GridRefinement
+        \{
+          template void
+          refine_and_coarsen_fixed_number<deal_II_dimension,
+                                          S,
+                                          deal_II_dimension>(
+            parallel::distributed::Triangulation<deal_II_dimension> &,
+            const dealii::Vector<S> &,
+            const double,
+            const double,
+            const unsigned int);
 
-    template
-    void
-    refine_and_coarsen_fixed_fraction<deal_II_dimension,S,deal_II_dimension>
-    (parallel::distributed::Triangulation<deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double);
-    \}
-    \}
+          template void
+          refine_and_coarsen_fixed_fraction<deal_II_dimension,
+                                            S,
+                                            deal_II_dimension>(
+            parallel::distributed::Triangulation<deal_II_dimension> &,
+            const dealii::Vector<S> &,
+            const double,
+            const double);
+        \}
+      \}
     \}
 
 
@@ -49,29 +50,31 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
 
     namespace parallel
     \{
-    namespace distributed
-    \{
-    namespace GridRefinement
-    \{
-    template
-    void
-    refine_and_coarsen_fixed_number<deal_II_dimension-1,S,deal_II_dimension>
-    (parallel::distributed::Triangulation<deal_II_dimension-1,deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double,
-     const unsigned int);
+      namespace distributed
+      \{
+        namespace GridRefinement
+        \{
+          template void refine_and_coarsen_fixed_number<deal_II_dimension - 1,
+                                                        S,
+                                                        deal_II_dimension>(
+            parallel::distributed::Triangulation<deal_II_dimension - 1,
+                                                 deal_II_dimension> &,
+            const dealii::Vector<S> &,
+            const double,
+            const double,
+            const unsigned int);
 
-    template
-    void
-    refine_and_coarsen_fixed_fraction<deal_II_dimension-1,S,deal_II_dimension>
-    (parallel::distributed::Triangulation<deal_II_dimension-1,deal_II_dimension> &,
-     const dealii::Vector<S> &,
-     const double,
-     const double);
-    \}
-    \}
+          template void refine_and_coarsen_fixed_fraction<deal_II_dimension - 1,
+                                                          S,
+                                                          deal_II_dimension>(
+            parallel::distributed::Triangulation<deal_II_dimension - 1,
+                                                 deal_II_dimension> &,
+            const dealii::Vector<S> &,
+            const double,
+            const double);
+        \}
+      \}
     \}
 
 #endif
-}
+  }

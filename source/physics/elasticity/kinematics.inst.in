@@ -15,64 +15,60 @@
 
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
-{
-
+  {
     namespace Physics
     \{
-    namespace Elasticity
-    \{
-    namespace Kinematics
-    \{
-    template
-    Tensor<2,deal_II_dimension,number>
-    F<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+      namespace Elasticity
+      \{
+        namespace Kinematics
+        \{
+          template Tensor<2, deal_II_dimension, number>
+          F<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<2,deal_II_dimension,number>
-    F_iso<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+          template Tensor<2, deal_II_dimension, number>
+          F_iso<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    F_vol<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          F_vol<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    C<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          C<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    b<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          b<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    E<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          E<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    epsilon<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          epsilon<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    e<deal_II_dimension,number>(const Tensor<2,deal_II_dimension,number>&);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          e<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<2,deal_II_dimension,number>
-    l<deal_II_dimension,number>(
-        const Tensor<2,deal_II_dimension,number>&,
-        const Tensor<2,deal_II_dimension,number>&);
+          template Tensor<2, deal_II_dimension, number>
+          l<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &,
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    d<deal_II_dimension,number>(
-        const Tensor<2,deal_II_dimension,number>&,
-        const Tensor<2,deal_II_dimension,number>&);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          d<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &,
+            const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<2,deal_II_dimension,number>
-    w<deal_II_dimension,number>(
-        const Tensor<2,deal_II_dimension,number>&,
-        const Tensor<2,deal_II_dimension,number>&);
+          template Tensor<2, deal_II_dimension, number>
+          w<deal_II_dimension, number>(
+            const Tensor<2, deal_II_dimension, number> &,
+            const Tensor<2, deal_II_dimension, number> &);
+        \}
+      \}
     \}
-    \}
-    \}
-}
+  }

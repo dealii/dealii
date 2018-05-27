@@ -15,93 +15,113 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; Vector : VECTOR_TYPES)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     Vector : VECTOR_TYPES)
+  {
     namespace FETools
     \{
 #if deal_II_dimension <= deal_II_space_dimension
-    template
-    void interpolate<deal_II_dimension,deal_II_space_dimension>
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &, const Vector &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &, Vector &);
+      template void
+      interpolate<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Vector &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        Vector &);
 
-    template
-    void interpolate<deal_II_dimension,deal_II_space_dimension>
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> &, const Vector &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension> &, const ConstraintMatrix &,
-     Vector &);
+      template void
+      interpolate<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Vector &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const ConstraintMatrix &,
+        Vector &);
 #endif
     \}
-}
+  }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
     namespace FETools
     \{
 #if deal_II_dimension == deal_II_space_dimension
-    template
-    void interpolate<deal_II_dimension>
-    (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
-     const hp::DoFHandler<deal_II_dimension> &, Vector<double> &);
+      template void
+      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
+                                     const Vector<double> &,
+                                     const hp::DoFHandler<deal_II_dimension> &,
+                                     Vector<double> &);
 
-    template
-    void interpolate<deal_II_dimension>
-    (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
-     const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     Vector<double> &);
+      template void
+      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
+                                     const Vector<double> &,
+                                     const hp::DoFHandler<deal_II_dimension> &,
+                                     const ConstraintMatrix &,
+                                     Vector<double> &);
 
-    template
-    void interpolate<deal_II_dimension>
-    (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
-     const hp::DoFHandler<deal_II_dimension> &, Vector<float> &);
+      template void
+      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
+                                     const Vector<float> &,
+                                     const hp::DoFHandler<deal_II_dimension> &,
+                                     Vector<float> &);
 
-    template
-    void interpolate<deal_II_dimension>
-    (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
-     const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     Vector<float> &);
+      template void
+      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
+                                     const Vector<float> &,
+                                     const hp::DoFHandler<deal_II_dimension> &,
+                                     const ConstraintMatrix &,
+                                     Vector<float> &);
 #endif
     \}
-}
+  }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; VEC : VECTOR_TYPES)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     VEC : VECTOR_TYPES)
+  {
     namespace FETools
     \{
 #if deal_II_dimension == deal_II_space_dimension
-    template
-    void back_interpolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const FiniteElement<deal_II_dimension> &, VEC &);
+      template void
+      back_interpolate<deal_II_dimension>(
+        const DoFHandler<deal_II_dimension> &,
+        const VEC &,
+        const FiniteElement<deal_II_dimension> &,
+        VEC &);
 
-    template
-    void back_interpolate<deal_II_dimension>
-    (const hp::DoFHandler<deal_II_dimension> &, const VEC &,
-     const FiniteElement<deal_II_dimension> &, VEC &);
+      template void
+      back_interpolate<deal_II_dimension>(
+        const hp::DoFHandler<deal_II_dimension> &,
+        const VEC &,
+        const FiniteElement<deal_II_dimension> &,
+        VEC &);
 
-    template
-    void back_interpolate<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     const VEC &,
-     const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     VEC &);
+      template void
+      back_interpolate<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                                          const ConstraintMatrix &,
+                                          const VEC &,
+                                          const DoFHandler<deal_II_dimension> &,
+                                          const ConstraintMatrix &,
+                                          VEC &);
 
-    template
-    void interpolation_difference<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const FiniteElement<deal_II_dimension> &, VEC &);
+      template void
+      interpolation_difference<deal_II_dimension>(
+        const DoFHandler<deal_II_dimension> &,
+        const VEC &,
+        const FiniteElement<deal_II_dimension> &,
+        VEC &);
 
-    template
-    void interpolation_difference<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     const VEC &,
-     const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-     VEC &);
+      template void
+      interpolation_difference<deal_II_dimension>(
+        const DoFHandler<deal_II_dimension> &,
+        const ConstraintMatrix &,
+        const VEC &,
+        const DoFHandler<deal_II_dimension> &,
+        const ConstraintMatrix &,
+        VEC &);
 
-    template
-    void project_dg<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const VEC &,
-     const DoFHandler<deal_II_dimension> &, VEC &);
+      template void
+      project_dg<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                                    const VEC &,
+                                    const DoFHandler<deal_II_dimension> &,
+                                    VEC &);
 #endif
     \}
-}
+  }

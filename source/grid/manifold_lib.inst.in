@@ -13,24 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
     template class PolarManifold<deal_II_dimension, deal_II_space_dimension>;
-    template class SphericalManifold<deal_II_dimension, deal_II_space_dimension>;
-    template class TransfiniteInterpolationManifold<deal_II_dimension, deal_II_space_dimension>;
-    template class CylindricalManifold<deal_II_dimension, deal_II_space_dimension>;
+    template class SphericalManifold<deal_II_dimension,
+                                     deal_II_space_dimension>;
+    template class TransfiniteInterpolationManifold<deal_II_dimension,
+                                                    deal_II_space_dimension>;
+    template class CylindricalManifold<deal_II_dimension,
+                                       deal_II_space_dimension>;
 #endif
 #if deal_II_dimension == deal_II_space_dimension
     template class TorusManifold<deal_II_dimension>;
 #endif
-}
+  }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; deal_II_chart_dimension :  DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     deal_II_chart_dimension : DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-#if deal_II_chart_dimension <= deal_II_space_dimension
-    template class FunctionManifold<deal_II_dimension, deal_II_space_dimension, deal_II_chart_dimension>;
+#  if deal_II_chart_dimension <= deal_II_space_dimension
+    template class FunctionManifold<deal_II_dimension,
+                                    deal_II_space_dimension,
+                                    deal_II_chart_dimension>;
+#  endif
 #endif
-#endif
-}
+  }

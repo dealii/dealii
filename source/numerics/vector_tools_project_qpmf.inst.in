@@ -15,27 +15,31 @@
 
 
 
-for (VEC: REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
-{
-    namespace VectorTools \{
+for (VEC : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
+  {
+    namespace VectorTools
+    \{
 
-    template
-    void project<deal_II_dimension, VEC>(
-        std::shared_ptr<const MatrixFree<deal_II_dimension,VEC::value_type> > matrix_free,
+      template void
+      project<deal_II_dimension, VEC>(
+        std::shared_ptr<const MatrixFree<deal_II_dimension, VEC::value_type>>
+                                matrix_free,
         const ConstraintMatrix &constraints,
-        const std::function< VectorizedArray<VEC::value_type> (const unsigned int, const unsigned int)> &,
+        const std::function<VectorizedArray<
+          VEC::value_type>(const unsigned int, const unsigned int)> &,
         VEC &,
         const unsigned int);
 
-    template
-    void project<deal_II_dimension, VEC>(
-        std::shared_ptr<const MatrixFree<deal_II_dimension,VEC::value_type> > matrix_free,
+      template void
+      project<deal_II_dimension, VEC>(
+        std::shared_ptr<const MatrixFree<deal_II_dimension, VEC::value_type>>
+                                matrix_free,
         const ConstraintMatrix &constraints,
         const unsigned int,
-        const std::function< VectorizedArray<VEC::value_type> (const unsigned int, const unsigned int)> &,
+        const std::function<VectorizedArray<
+          VEC::value_type>(const unsigned int, const unsigned int)> &,
         VEC &,
         const unsigned int);
 
     \}
-
-}
+  }

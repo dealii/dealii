@@ -16,6 +16,6 @@
 
 
 for (VECTOR : VECTOR_TYPES)
-{
+  {
     dealii::GrowingVectorMemory<dealii::VECTOR>::release_unused_memory();
-}
+  }

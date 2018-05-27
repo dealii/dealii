@@ -16,60 +16,74 @@
 
 
 for (SCALAR : REAL_AND_COMPLEX_SCALARS)
-{
+  {
     namespace LinearAlgebra
     \{
-    namespace distributed
-    \{
-    template class BlockVector<SCALAR>;
-    template
-    void
-    BlockVector<SCALAR>::multivector_inner_product(FullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
-    template
-    void
-    BlockVector<SCALAR>::multivector_inner_product(LAPACKFullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
-    template
-    SCALAR
-    BlockVector<SCALAR>::multivector_inner_product_with_metric(const FullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
-    template
-    SCALAR
-    BlockVector<SCALAR>::multivector_inner_product_with_metric(const LAPACKFullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
-    template
-    void
-    BlockVector<SCALAR>::mmult(BlockVector<SCALAR> &V,const FullMatrix<SCALAR> &, const SCALAR, const SCALAR) const;
-    template
-    void
-    BlockVector<SCALAR>::mmult(BlockVector<SCALAR> &V,const LAPACKFullMatrix<SCALAR> &, const SCALAR, const SCALAR) const;
+      namespace distributed
+      \{
+        template class BlockVector<SCALAR>;
+        template void
+        BlockVector<SCALAR>::multivector_inner_product(
+          FullMatrix<SCALAR> &,
+          const BlockVector<SCALAR> &V,
+          const bool) const;
+        template void
+        BlockVector<SCALAR>::multivector_inner_product(
+          LAPACKFullMatrix<SCALAR> &,
+          const BlockVector<SCALAR> &V,
+          const bool) const;
+        template SCALAR
+        BlockVector<SCALAR>::multivector_inner_product_with_metric(
+          const FullMatrix<SCALAR> &,
+          const BlockVector<SCALAR> &V,
+          const bool) const;
+        template SCALAR
+        BlockVector<SCALAR>::multivector_inner_product_with_metric(
+          const LAPACKFullMatrix<SCALAR> &,
+          const BlockVector<SCALAR> &V,
+          const bool) const;
+        template void
+        BlockVector<SCALAR>::mmult(BlockVector<SCALAR> &V,
+                                   const FullMatrix<SCALAR> &,
+                                   const SCALAR,
+                                   const SCALAR) const;
+        template void
+        BlockVector<SCALAR>::mmult(BlockVector<SCALAR> &V,
+                                   const LAPACKFullMatrix<SCALAR> &,
+                                   const SCALAR,
+                                   const SCALAR) const;
+      \}
     \}
-    \}
-}
+  }
 
 for (S1 : REAL_AND_COMPLEX_SCALARS; S2 : REAL_SCALARS)
-{
+  {
     namespace LinearAlgebra
     \{
-    namespace distributed
-    \{
-    template void BlockVector<S1>::reinit<S2> (const BlockVector<S2>&,
-            const bool);
-    template void BlockVector<S1>::add<S2> (const std::vector<size_type> &,
-                                            const ::dealii::Vector<S2>&);
+      namespace distributed
+      \{
+        template void
+        BlockVector<S1>::reinit<S2>(const BlockVector<S2> &, const bool);
+        template void
+        BlockVector<S1>::add<S2>(const std::vector<size_type> &,
+                                 const ::dealii::Vector<S2> &);
+      \}
     \}
-    \}
-}
+  }
 
 
 
 for (S1, S2 : COMPLEX_SCALARS)
-{
+  {
     namespace LinearAlgebra
     \{
-    namespace distributed
-    \{
-    template void BlockVector<S1>::reinit<S2> (const BlockVector<S2>&,
-            const bool);
-    template void BlockVector<S1>::add<S2> (const std::vector<size_type> &,
-                                            const ::dealii::Vector<S2>&);
+      namespace distributed
+      \{
+        template void
+        BlockVector<S1>::reinit<S2>(const BlockVector<S2> &, const bool);
+        template void
+        BlockVector<S1>::add<S2>(const std::vector<size_type> &,
+                                 const ::dealii::Vector<S2> &);
+      \}
     \}
-    \}
-}
+  }

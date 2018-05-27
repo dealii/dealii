@@ -14,36 +14,39 @@
 // ---------------------------------------------------------------------
 
 
-for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    namespace VectorTools \{
+    namespace VectorTools
+    \{
 
-    template
-    VEC::value_type compute_mean_value<deal_II_dimension>
-    (const Mapping<deal_II_dimension,deal_II_space_dimension>&,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-     const Quadrature<deal_II_dimension>&,
-     const VEC&,
-     const unsigned int);
+      template VEC::value_type
+      compute_mean_value<deal_II_dimension>(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Quadrature<deal_II_dimension> &,
+        const VEC &,
+        const unsigned int);
 
-    template
-    VEC::value_type compute_mean_value<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
-     const Quadrature<deal_II_dimension>&,
-     const VEC&,
-     const unsigned int);
+      template VEC::value_type
+      compute_mean_value<deal_II_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Quadrature<deal_II_dimension> &,
+        const VEC &,
+        const unsigned int);
 
     \}
 #endif
-}
+  }
 
 
 
 for (VEC : VECTOR_TYPES)
-{
-    namespace VectorTools \{
-    template
-    void subtract_mean_value(VEC &, const std::vector<bool> &);
+  {
+    namespace VectorTools
+    \{
+      template void
+      subtract_mean_value(VEC &, const std::vector<bool> &);
     \}
-}
+  }

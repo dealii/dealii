@@ -13,102 +13,111 @@
 //
 // ---------------------------------------------------------------------
 
-for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
-{
-    template void ConstraintMatrix::condense<T<S> >(const T<S> &, T<S> &) const;
-    template void ConstraintMatrix::condense<T<S> >(T<S> &vec) const;
-    template void ConstraintMatrix::distribute_local_to_global<T<S> > (
-        const Vector<S>&, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<S>&) const;
-    template void ConstraintMatrix::distribute_local_to_global<T<S> > (
-        const Vector<S>&, const std::vector<types::global_dof_index> &, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<S>&, bool) const;
-    template void ConstraintMatrix::set_zero<T<S> >(T<S> &) const;
-}
+for (S : REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void ConstraintMatrix::condense<T<S>>(const T<S> &, T<S> &) const;
+    template void ConstraintMatrix::condense<T<S>>(T<S> & vec) const;
+    template void ConstraintMatrix::distribute_local_to_global<T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      T<S> &,
+      const FullMatrix<S> &) const;
+    template void ConstraintMatrix::distribute_local_to_global<T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      const std::vector<types::global_dof_index> &,
+      T<S> &,
+      const FullMatrix<S> &,
+      bool) const;
+    template void ConstraintMatrix::set_zero<T<S>>(T<S> &) const;
+  }
 
 
-for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
-{
-    template void ConstraintMatrix::condense<LinearAlgebra::distributed::T<S> >(const LinearAlgebra::distributed::T<S> &, LinearAlgebra::distributed::T<S> &) const;
-    template void ConstraintMatrix::condense<LinearAlgebra::distributed::T<S> >(LinearAlgebra::distributed::T<S> &vec) const;
+for (S : REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void ConstraintMatrix::condense<LinearAlgebra::distributed::T<S>>(
+      const LinearAlgebra::distributed::T<S> &,
+      LinearAlgebra::distributed::T<S> &) const;
+    template void ConstraintMatrix::condense<LinearAlgebra::distributed::T<S>>(
+      LinearAlgebra::distributed::T<S> & vec) const;
 
-    template
-    void
-    ConstraintMatrix::distribute_local_to_global<LinearAlgebra::distributed::T<S> >
-    (const Vector<S>&,
-     const std::vector<types::global_dof_index> &,
-     LinearAlgebra::distributed::T<S> &,
-     const FullMatrix<S>&) const;
+    template void ConstraintMatrix::distribute_local_to_global<
+      LinearAlgebra::distributed::T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      LinearAlgebra::distributed::T<S> &,
+      const FullMatrix<S> &) const;
 
-    template
-    void
-    ConstraintMatrix::distribute_local_to_global<LinearAlgebra::distributed::T<S> >
-    (const Vector<S>&,
-     const std::vector<types::global_dof_index> &,
-     const std::vector<types::global_dof_index> &,
-     LinearAlgebra::distributed::T<S> &,
-     const FullMatrix<S>&,
-     bool) const;
+    template void ConstraintMatrix::distribute_local_to_global<
+      LinearAlgebra::distributed::T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      const std::vector<types::global_dof_index> &,
+      LinearAlgebra::distributed::T<S> &,
+      const FullMatrix<S> &,
+      bool) const;
 
-    template
-    void
-    ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> > >
-    (const FullMatrix<S> &,
-     const std::vector< size_type > &,
-     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &) const;
+    template void ConstraintMatrix::distribute_local_to_global<
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>>>(
+      const FullMatrix<S> &,
+      const std::vector<size_type> &,
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>> &) const;
 
-    template
-    void
-    ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, LinearAlgebra::distributed::T<S> >
-    (const FullMatrix<S> &,
-     const Vector<S>&,
-     const std::vector< size_type > &,
-     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &,
-     LinearAlgebra::distributed::T<S>&,
-     bool,
-     std::integral_constant<bool, false>) const;
+    template void ConstraintMatrix::distribute_local_to_global<
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>>,
+      LinearAlgebra::distributed::T<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<size_type> &,
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>> &,
+      LinearAlgebra::distributed::T<S> &,
+      bool,
+      std::integral_constant<bool, false>) const;
 
-    template
-    void
-    ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, T<S> >
-    (const FullMatrix<S> &,
-     const Vector<S>&,
-     const std::vector< size_type > &,
-     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &,
-     T<S>&,
-     bool,
-     std::integral_constant<bool, false>) const;
+    template void ConstraintMatrix::distribute_local_to_global<
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>>,
+      T<S>>(const FullMatrix<S> &,
+            const Vector<S> &,
+            const std::vector<size_type> &,
+            DiagonalMatrix<LinearAlgebra::distributed::T<S>> &,
+            T<S> &,
+            bool,
+            std::integral_constant<bool, false>) const;
 
-    template
-    void
-    ConstraintMatrix::set_zero<LinearAlgebra::distributed::T<S> >(LinearAlgebra::distributed::T<S> &) const;
-}
+    template void ConstraintMatrix::set_zero<LinearAlgebra::distributed::T<S>>(
+      LinearAlgebra::distributed::T<S> &) const;
+  }
 
 
-for (V: EXTERNAL_PARALLEL_VECTORS)
-{
-    template void ConstraintMatrix::set_zero<V >(V&) const;
-}
+for (V : EXTERNAL_PARALLEL_VECTORS)
+  {
+    template void ConstraintMatrix::set_zero<V>(V &) const;
+  }
 
 
 for (S : REAL_SCALARS)
-{
-    template void ConstraintMatrix::condense<S>(SparseMatrix<S>&) const;
-    template void ConstraintMatrix::condense<S>(BlockSparseMatrix<S>&) const;
-}
+  {
+    template void ConstraintMatrix::condense<S>(SparseMatrix<S> &) const;
+    template void ConstraintMatrix::condense<S>(BlockSparseMatrix<S> &) const;
+  }
 
 
 for (S1 : REAL_SCALARS; S2 : REAL_SCALARS)
-{
-    template void ConstraintMatrix::condense<S1,Vector<S2> >(SparseMatrix<S1>&, Vector<S2>&) const;
-    template void ConstraintMatrix::condense<S1,BlockVector<S2> >(BlockSparseMatrix<S1>&, BlockVector<S2>&) const;
-}
+  {
+    template void ConstraintMatrix::condense<S1, Vector<S2>>(
+      SparseMatrix<S1> &, Vector<S2> &) const;
+    template void ConstraintMatrix::condense<S1, BlockVector<S2>>(
+      BlockSparseMatrix<S1> &, BlockVector<S2> &) const;
+  }
 
 for (S1 : COMPLEX_SCALARS)
-{
-    template void ConstraintMatrix::condense<S1,Vector<S1> >(SparseMatrix<S1>&, Vector<S1>&) const;
-}
+  {
+    template void ConstraintMatrix::condense<S1, Vector<S1>>(
+      SparseMatrix<S1> &, Vector<S1> &) const;
+  }
 
 
 for (Vec : VECTOR_TYPES)
-{
+  {
     template void ConstraintMatrix::distribute<Vec>(Vec &) const;
-}
+  }

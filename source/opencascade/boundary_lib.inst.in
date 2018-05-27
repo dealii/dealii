@@ -16,11 +16,11 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class NormalProjectionBoundary<deal_II_dimension, 3>;
     template class DirectionalProjectionBoundary<deal_II_dimension, 3>;
     template class NormalToMeshProjectionBoundary<deal_II_dimension, 3>;
 #if deal_II_dimension <= 2
     template class DirectionalProjectionBoundary<deal_II_dimension, 2>;
 #endif
-}
+  }

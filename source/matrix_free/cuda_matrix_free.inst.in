@@ -15,7 +15,7 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
-    template class MatrixFree<deal_II_dimension,double>;
-    template class MatrixFree<deal_II_dimension,float>;
-}
+  {
+    template class MatrixFree<deal_II_dimension, double>;
+    template class MatrixFree<deal_II_dimension, float>;
+  }

@@ -14,27 +14,33 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace internal
     \{
-    namespace DoFHandlerImplementation
-    \{
-    namespace Policy
-    \{
-    template class PolicyBase<deal_II_dimension,deal_II_space_dimension>;
+      namespace DoFHandlerImplementation
+      \{
+        namespace Policy
+        \{
+          template class PolicyBase<deal_II_dimension, deal_II_space_dimension>;
 
-    template class Sequential<dealii::DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    template class Sequential<dealii::hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
+          template class Sequential<
+            dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+          template class Sequential<
+            dealii::hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
 
-    template class ParallelShared<dealii::DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    template class ParallelShared<dealii::hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
+          template class ParallelShared<
+            dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+          template class ParallelShared<
+            dealii::hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
 
-    template class ParallelDistributed<dealii::DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    template class ParallelDistributed<dealii::hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> >;
-    \}
-    \}
+          template class ParallelDistributed<
+            dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+          template class ParallelDistributed<
+            dealii::hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+        \}
+      \}
     \}
 #endif
-}
+  }

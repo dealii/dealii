@@ -16,7 +16,7 @@
 
 
 for (VECTOR : VECTOR_TYPES)
-{
+  {
     template class VectorMemory<VECTOR>;
     template class GrowingVectorMemory<VECTOR>;
-}
+  }

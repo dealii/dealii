@@ -15,207 +15,144 @@
 
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
-{
-
+  {
     namespace Physics
     \{
-    namespace Transformations
-    \{
-    template
-    Tensor<1,deal_II_dimension,number>
-    nansons_formula (
-        const Tensor<1,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+      namespace Transformations
+      \{
+        template Tensor<1, deal_II_dimension, number>
+        nansons_formula(const Tensor<1, deal_II_dimension, number> &,
+                        const Tensor<2, deal_II_dimension, number> &);
 
-    namespace Contravariant
-    \{
-    template
-    Tensor<1,deal_II_dimension,number>
-    push_forward (
-        const Tensor<1,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+        namespace Contravariant
+        \{
+          template Tensor<1, deal_II_dimension, number>
+          push_forward(const Tensor<1, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<2,deal_II_dimension,number>
-    push_forward (
-        const Tensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template Tensor<2, deal_II_dimension, number>
+          push_forward(const Tensor<2, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    push_forward (
-        const SymmetricTensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          push_forward(const SymmetricTensor<2, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<4,deal_II_dimension,number>
-    push_forward (
-        const Tensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template Tensor<4, deal_II_dimension, number>
+          push_forward(const Tensor<4, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    push_forward (
-        const SymmetricTensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template SymmetricTensor<4, deal_II_dimension, number>
+          push_forward(const SymmetricTensor<4, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<1,deal_II_dimension,number>
-    pull_back (
-        const Tensor<1,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template Tensor<1, deal_II_dimension, number>
+          pull_back(const Tensor<1, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<2,deal_II_dimension,number>
-    pull_back (
-        const Tensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template Tensor<2, deal_II_dimension, number>
+          pull_back(const Tensor<2, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    pull_back (
-        const SymmetricTensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template SymmetricTensor<2, deal_II_dimension, number>
+          pull_back(const SymmetricTensor<2, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    Tensor<4,deal_II_dimension,number>
-    pull_back (
-        const Tensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template Tensor<4, deal_II_dimension, number>
+          pull_back(const Tensor<4, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
 
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    pull_back (
-        const SymmetricTensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
+          template SymmetricTensor<4, deal_II_dimension, number>
+          pull_back(const SymmetricTensor<4, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+        \}
+
+        namespace Covariant
+        \{
+          template Tensor<1, deal_II_dimension, number>
+          push_forward(const Tensor<1, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<2, deal_II_dimension, number>
+          push_forward(const Tensor<2, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<2, deal_II_dimension, number>
+          push_forward(const SymmetricTensor<2, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<4, deal_II_dimension, number>
+          push_forward(const Tensor<4, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<4, deal_II_dimension, number>
+          push_forward(const SymmetricTensor<4, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<1, deal_II_dimension, number>
+          pull_back(const Tensor<1, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<2, deal_II_dimension, number>
+          pull_back(const Tensor<2, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<2, deal_II_dimension, number>
+          pull_back(const SymmetricTensor<2, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<4, deal_II_dimension, number>
+          pull_back(const Tensor<4, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<4, deal_II_dimension, number>
+          pull_back(const SymmetricTensor<4, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+        \}
+
+        namespace Piola
+        \{
+          template Tensor<1, deal_II_dimension, number>
+          push_forward(const Tensor<1, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<2, deal_II_dimension, number>
+          push_forward(const Tensor<2, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<2, deal_II_dimension, number>
+          push_forward(const SymmetricTensor<2, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<4, deal_II_dimension, number>
+          push_forward(const Tensor<4, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<4, deal_II_dimension, number>
+          push_forward(const SymmetricTensor<4, deal_II_dimension, number> &,
+                       const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<1, deal_II_dimension, number>
+          pull_back(const Tensor<1, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<2, deal_II_dimension, number>
+          pull_back(const Tensor<2, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<2, deal_II_dimension, number>
+          pull_back(const SymmetricTensor<2, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template Tensor<4, deal_II_dimension, number>
+          pull_back(const Tensor<4, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+
+          template SymmetricTensor<4, deal_II_dimension, number>
+          pull_back(const SymmetricTensor<4, deal_II_dimension, number> &,
+                    const Tensor<2, deal_II_dimension, number> &);
+        \}
+
+      \}
     \}
-
-    namespace Covariant
-    \{
-    template
-    Tensor<1,deal_II_dimension,number>
-    push_forward (
-        const Tensor<1,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<2,deal_II_dimension,number>
-    push_forward (
-        const Tensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    push_forward (
-        const SymmetricTensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<4,deal_II_dimension,number>
-    push_forward (
-        const Tensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    push_forward (
-        const SymmetricTensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<1,deal_II_dimension,number>
-    pull_back (
-        const Tensor<1,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<2,deal_II_dimension,number>
-    pull_back (
-        const Tensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    pull_back (
-        const SymmetricTensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<4,deal_II_dimension,number>
-    pull_back (
-        const Tensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    pull_back (
-        const SymmetricTensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-    \}
-
-    namespace Piola
-    \{
-    template
-    Tensor<1,deal_II_dimension,number>
-    push_forward (
-        const Tensor<1,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<2,deal_II_dimension,number>
-    push_forward (
-        const Tensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    push_forward (
-        const SymmetricTensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<4,deal_II_dimension,number>
-    push_forward (
-        const Tensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    push_forward (
-        const SymmetricTensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<1,deal_II_dimension,number>
-    pull_back (
-        const Tensor<1,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<2,deal_II_dimension,number>
-    pull_back (
-        const Tensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<2,deal_II_dimension,number>
-    pull_back (
-        const SymmetricTensor<2,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    Tensor<4,deal_II_dimension,number>
-    pull_back (
-        const Tensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-
-    template
-    SymmetricTensor<4,deal_II_dimension,number>
-    pull_back (
-        const SymmetricTensor<4,deal_II_dimension,number> &,
-        const Tensor<2,deal_II_dimension,number> &);
-    \}
-
-    \}
-    \}
-}
+  }

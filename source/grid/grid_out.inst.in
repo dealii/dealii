@@ -16,93 +16,90 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
 #if deal_II_dimension > 1
-    template void GridOut::write_dx
-    (const Triangulation<deal_II_dimension>&,
-     std::ostream&) const;
-    template void GridOut::write_mathgl
-    (const Triangulation<deal_II_dimension>&,
-     std::ostream&) const;
+    template void GridOut::write_dx(const Triangulation<deal_II_dimension> &,
+                                    std::ostream &) const;
+    template void GridOut::write_mathgl(
+      const Triangulation<deal_II_dimension> &, std::ostream &) const;
 #endif
 
-    template void GridOut::write_msh
-    (const Triangulation<deal_II_dimension>&,
-     std::ostream&) const;
+    template void GridOut::write_msh(const Triangulation<deal_II_dimension> &,
+                                     std::ostream &) const;
 
 #if deal_II_dimension != 2
-    template void GridOut::write_xfig
-    (const Triangulation<deal_II_dimension>&,
-     std::ostream&,
-     const Mapping<deal_II_dimension,deal_II_dimension>*) const;
+    template void GridOut::write_xfig(
+      const Triangulation<deal_II_dimension> &,
+      std::ostream &,
+      const Mapping<deal_II_dimension, deal_II_dimension> *) const;
 #endif
 
-    template void GridOut::write_gnuplot
-    (const Triangulation<deal_II_dimension>&,
-     std::ostream&,
-     const Mapping<deal_II_dimension,deal_II_dimension>*) const;
-    template void GridOut::write_ucd<deal_II_dimension>
-    (const Triangulation<deal_II_dimension> &,
-     std::ostream &) const;
-    template void GridOut::write_eps<deal_II_dimension>
-    (const Triangulation<deal_II_dimension> &,
-     std::ostream &,
-     const Mapping<deal_II_dimension,deal_II_dimension> *) const;
-    template void GridOut::write_vtk
-    (const Triangulation<deal_II_dimension>&,
-     std::ostream&) const;
-    template void GridOut::write_vtu
-    (const Triangulation<deal_II_dimension>&,
-     std::ostream&) const;
-    template void GridOut::write_mesh_per_processor_as_vtu
-    (const Triangulation<deal_II_dimension>&,
-     const std::string&,
-     const bool,
-     const bool) const;
+    template void GridOut::write_gnuplot(
+      const Triangulation<deal_II_dimension> &,
+      std::ostream &,
+      const Mapping<deal_II_dimension, deal_II_dimension> *) const;
+    template void GridOut::write_ucd<deal_II_dimension>(
+      const Triangulation<deal_II_dimension> &, std::ostream &) const;
+    template void GridOut::write_eps<deal_II_dimension>(
+      const Triangulation<deal_II_dimension> &,
+      std::ostream &,
+      const Mapping<deal_II_dimension, deal_II_dimension> *) const;
+    template void GridOut::write_vtk(const Triangulation<deal_II_dimension> &,
+                                     std::ostream &) const;
+    template void GridOut::write_vtu(const Triangulation<deal_II_dimension> &,
+                                     std::ostream &) const;
+    template void GridOut::write_mesh_per_processor_as_vtu(
+      const Triangulation<deal_II_dimension> &,
+      const std::string &,
+      const bool,
+      const bool) const;
 
-    template void GridOut::write<deal_II_dimension>
-    (const Triangulation<deal_II_dimension> &,
-     std::ostream &, const OutputFormat,
-     const Mapping<deal_II_dimension,deal_II_dimension> *) const;
-    template void GridOut::write<deal_II_dimension>
-    (const Triangulation<deal_II_dimension> &,
-     std::ostream &, const Mapping<deal_II_dimension,deal_II_dimension> *) const;
-}
+    template void GridOut::write<deal_II_dimension>(
+      const Triangulation<deal_II_dimension> &,
+      std::ostream &,
+      const OutputFormat,
+      const Mapping<deal_II_dimension, deal_II_dimension> *) const;
+    template void GridOut::write<deal_II_dimension>(
+      const Triangulation<deal_II_dimension> &,
+      std::ostream &,
+      const Mapping<deal_II_dimension, deal_II_dimension> *) const;
+  }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension < deal_II_space_dimension
-    template void GridOut::write_msh
-    (const Triangulation<deal_II_dimension, deal_II_space_dimension>&,
-     std::ostream&) const;
-    template void GridOut::write_ucd
-    (const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-     std::ostream &) const;
-    template void GridOut::write_gnuplot
-    (const Triangulation<deal_II_dimension,deal_II_space_dimension>&,
-     std::ostream&,
-     const Mapping<deal_II_dimension,deal_II_space_dimension>*) const;
-    template void GridOut::write_vtk
-    (const Triangulation<deal_II_dimension,deal_II_space_dimension>&,
-     std::ostream&) const;
-    template void GridOut::write_vtu
-    (const Triangulation<deal_II_dimension,deal_II_space_dimension>&,
-     std::ostream&) const;
-    template void GridOut::write_mesh_per_processor_as_vtu
-    (const Triangulation<deal_II_dimension,deal_II_space_dimension>&,
-     const std::string&,
-     const bool,
-     const bool) const;
+    template void GridOut::write_msh(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &) const;
+    template void GridOut::write_ucd(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &) const;
+    template void GridOut::write_gnuplot(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &,
+      const Mapping<deal_II_dimension, deal_II_space_dimension> *) const;
+    template void GridOut::write_vtk(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &) const;
+    template void GridOut::write_vtu(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &) const;
+    template void GridOut::write_mesh_per_processor_as_vtu(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      const std::string &,
+      const bool,
+      const bool) const;
 
 
-    template void GridOut::write<deal_II_dimension,deal_II_space_dimension>
-    (const Triangulation<deal_II_dimension,deal_II_space_dimension> &,
-     std::ostream &, const OutputFormat,
-     const Mapping<deal_II_dimension,deal_II_space_dimension> *) const;
-    template void GridOut::write<deal_II_dimension,deal_II_space_dimension>
-    (const Triangulation<deal_II_dimension,deal_II_space_dimension> &,
-     std::ostream &, const Mapping<deal_II_dimension,deal_II_space_dimension> *) const;
+    template void GridOut::write<deal_II_dimension, deal_II_space_dimension>(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &,
+      const OutputFormat,
+      const Mapping<deal_II_dimension, deal_II_space_dimension> *) const;
+    template void GridOut::write<deal_II_dimension, deal_II_space_dimension>(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      std::ostream &,
+      const Mapping<deal_II_dimension, deal_II_space_dimension> *) const;
 
 #endif
-}
-
+  }

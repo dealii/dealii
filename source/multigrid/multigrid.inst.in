@@ -15,6 +15,6 @@
 
 
 for (VEC : VECTOR_TYPES)
-{
-    template class Multigrid< VEC >;
-}
+  {
+    template class Multigrid<VEC>;
+  }

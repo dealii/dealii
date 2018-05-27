@@ -15,14 +15,22 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    template class FE_Q_Base<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Q_Base<TensorProductPolynomialsConst<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Q_Base<TensorProductPolynomialsBubbles<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
-    template class FE_Q_Base<TensorProductPolynomials<deal_II_dimension,Polynomials::PiecewisePolynomial<double> >, deal_II_dimension, deal_II_space_dimension>;
+    template class FE_Q_Base<TensorProductPolynomials<deal_II_dimension>,
+                             deal_II_dimension,
+                             deal_II_space_dimension>;
+    template class FE_Q_Base<TensorProductPolynomialsConst<deal_II_dimension>,
+                             deal_II_dimension,
+                             deal_II_space_dimension>;
+    template class FE_Q_Base<TensorProductPolynomialsBubbles<deal_II_dimension>,
+                             deal_II_dimension,
+                             deal_II_space_dimension>;
+    template class FE_Q_Base<
+      TensorProductPolynomials<deal_II_dimension,
+                               Polynomials::PiecewisePolynomial<double>>,
+      deal_II_dimension,
+      deal_II_space_dimension>;
 #endif
-}
-
-
+  }

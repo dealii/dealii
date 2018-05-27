@@ -16,7 +16,6 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
     template class MappingCartesian<deal_II_dimension>;
-}
-
+  }

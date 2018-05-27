@@ -15,9 +15,10 @@
 
 
 
-for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
-{
+for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
     template class InterGridMap<X>;
 #endif
-}
+  }

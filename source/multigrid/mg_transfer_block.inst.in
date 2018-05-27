@@ -16,119 +16,102 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
-    template
-    void MGTransferBlock<float>::build_matrices<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&, const DoFHandler<deal_II_dimension>&,
-     const std::vector<bool>&);
+  {
+    template void MGTransferBlock<float>::build_matrices<deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const std::vector<bool> &);
 
-    template
-    void MGTransferBlock<double>::build_matrices<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&, const DoFHandler<deal_II_dimension>&,
-     const std::vector<bool>&);
-
-    template
-    void MGTransferBlockSelect<float>::build_matrices<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&, const DoFHandler<deal_II_dimension>&,
-     const unsigned int);
-
-    template
-    void MGTransferBlockSelect<double>::build_matrices<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension>&, const DoFHandler<deal_II_dimension>&,
-     const unsigned int);
+    template void MGTransferBlock<double>::build_matrices<deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const std::vector<bool> &);
 
     template void
-    MGTransferBlock<float>::copy_to_mg (
-        const DoFHandler<deal_II_dimension>&,
-        MGLevelObject<BlockVector<float> >&,
-        const BlockVector<double>&) const;
-    template void
-    MGTransferBlock<float>::copy_from_mg (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<BlockVector<float> >&) const;
-    template void
-    MGTransferBlock<float>::copy_from_mg_add (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<BlockVector<float> >&) const;
+    MGTransferBlockSelect<float>::build_matrices<deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const unsigned int);
 
     template void
-    MGTransferBlock<double>::copy_to_mg (
-        const DoFHandler<deal_II_dimension>&,
-        MGLevelObject<BlockVector<double> >&,
-        const BlockVector<double>&) const;
-    template void
-    MGTransferBlock<double>::copy_from_mg (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<BlockVector<double> >&) const;
-    template void
-    MGTransferBlock<double>::copy_from_mg_add (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<BlockVector<double> >&) const;
+    MGTransferBlockSelect<double>::build_matrices<deal_II_dimension>(
+      const DoFHandler<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const unsigned int);
 
-    template void
-    MGTransferBlockSelect<float>::copy_to_mg (
-        const DoFHandler<deal_II_dimension>&,
-        MGLevelObject<Vector<float> >&,
-        const Vector<double>&) const;
-    template void
-    MGTransferBlockSelect<float>::copy_to_mg (
-        const DoFHandler<deal_II_dimension>&,
-        MGLevelObject<Vector<float> >&,
-        const BlockVector<double>&) const;
-    template void
-    MGTransferBlockSelect<float>::copy_from_mg (
-        const DoFHandler<deal_II_dimension>&,
-        Vector<double>&,
-        const MGLevelObject<Vector<float> >&) const;
-    template void
-    MGTransferBlockSelect<float>::copy_from_mg (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<Vector<float> >&) const;
-    template void
-    MGTransferBlockSelect<float>::copy_from_mg_add (
-        const DoFHandler<deal_II_dimension>&,
-        Vector<double>&,
-        const MGLevelObject<Vector<float> >&) const;
-    template void
-    MGTransferBlockSelect<float>::copy_from_mg_add (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<Vector<float> >&) const;
+    template void MGTransferBlock<float>::copy_to_mg(
+      const DoFHandler<deal_II_dimension> &,
+      MGLevelObject<BlockVector<float>> &,
+      const BlockVector<double> &) const;
+    template void MGTransferBlock<float>::copy_from_mg(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<BlockVector<float>> &) const;
+    template void MGTransferBlock<float>::copy_from_mg_add(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<BlockVector<float>> &) const;
 
-    template void
-    MGTransferBlockSelect<double>::copy_to_mg (
-        const DoFHandler<deal_II_dimension>&,
-        MGLevelObject<Vector<double> >&,
-        const Vector<double>&) const;
-    template void
-    MGTransferBlockSelect<double>::copy_to_mg (
-        const DoFHandler<deal_II_dimension>&,
-        MGLevelObject<Vector<double> >&,
-        const BlockVector<double>&) const;
-    template void
-    MGTransferBlockSelect<double>::copy_from_mg (
-        const DoFHandler<deal_II_dimension>&,
-        Vector<double>&,
-        const MGLevelObject<Vector<double> >&) const;
-    template void
-    MGTransferBlockSelect<double>::copy_from_mg (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<Vector<double> >&) const;
-    template void
-    MGTransferBlockSelect<double>::copy_from_mg_add (
-        const DoFHandler<deal_II_dimension>&,
-        Vector<double>&,
-        const MGLevelObject<Vector<double> >&) const;
-    template void
-    MGTransferBlockSelect<double>::copy_from_mg_add (
-        const DoFHandler<deal_II_dimension>&,
-        BlockVector<double>&,
-        const MGLevelObject<Vector<double> >&) const;
-}
+    template void MGTransferBlock<double>::copy_to_mg(
+      const DoFHandler<deal_II_dimension> &,
+      MGLevelObject<BlockVector<double>> &,
+      const BlockVector<double> &) const;
+    template void MGTransferBlock<double>::copy_from_mg(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<BlockVector<double>> &) const;
+    template void MGTransferBlock<double>::copy_from_mg_add(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<BlockVector<double>> &) const;
 
+    template void MGTransferBlockSelect<float>::copy_to_mg(
+      const DoFHandler<deal_II_dimension> &,
+      MGLevelObject<Vector<float>> &,
+      const Vector<double> &) const;
+    template void MGTransferBlockSelect<float>::copy_to_mg(
+      const DoFHandler<deal_II_dimension> &,
+      MGLevelObject<Vector<float>> &,
+      const BlockVector<double> &) const;
+    template void MGTransferBlockSelect<float>::copy_from_mg(
+      const DoFHandler<deal_II_dimension> &,
+      Vector<double> &,
+      const MGLevelObject<Vector<float>> &) const;
+    template void MGTransferBlockSelect<float>::copy_from_mg(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<Vector<float>> &) const;
+    template void MGTransferBlockSelect<float>::copy_from_mg_add(
+      const DoFHandler<deal_II_dimension> &,
+      Vector<double> &,
+      const MGLevelObject<Vector<float>> &) const;
+    template void MGTransferBlockSelect<float>::copy_from_mg_add(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<Vector<float>> &) const;
+
+    template void MGTransferBlockSelect<double>::copy_to_mg(
+      const DoFHandler<deal_II_dimension> &,
+      MGLevelObject<Vector<double>> &,
+      const Vector<double> &) const;
+    template void MGTransferBlockSelect<double>::copy_to_mg(
+      const DoFHandler<deal_II_dimension> &,
+      MGLevelObject<Vector<double>> &,
+      const BlockVector<double> &) const;
+    template void MGTransferBlockSelect<double>::copy_from_mg(
+      const DoFHandler<deal_II_dimension> &,
+      Vector<double> &,
+      const MGLevelObject<Vector<double>> &) const;
+    template void MGTransferBlockSelect<double>::copy_from_mg(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<Vector<double>> &) const;
+    template void MGTransferBlockSelect<double>::copy_from_mg_add(
+      const DoFHandler<deal_II_dimension> &,
+      Vector<double> &,
+      const MGLevelObject<Vector<double>> &) const;
+    template void MGTransferBlockSelect<double>::copy_from_mg_add(
+      const DoFHandler<deal_II_dimension> &,
+      BlockVector<double> &,
+      const MGLevelObject<Vector<double>> &) const;
+  }

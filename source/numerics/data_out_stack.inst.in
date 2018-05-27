@@ -15,39 +15,55 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
 #if deal_II_dimension < 3
-    template class DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >;
+    template class DataOutStack<deal_II_dimension,
+                                deal_II_dimension,
+                                DoFHandler<deal_II_dimension>>;
 
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >::
-    add_data_vector<double> (const Vector<double> &,
-                             const std::string    &);
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >::
-    add_data_vector<float> (const Vector<float>  &,
-                            const std::string    &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               DoFHandler<deal_II_dimension>>::
+      add_data_vector<double>(const Vector<double> &, const std::string &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               DoFHandler<deal_II_dimension>>::
+      add_data_vector<float>(const Vector<float> &, const std::string &);
 
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >::
-    add_data_vector<double> (const Vector<double> &,
-                             const std::vector<std::string>    &);
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >::
-    add_data_vector<float> (const Vector<float>  &,
-                            const std::vector<std::string>    &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               DoFHandler<deal_II_dimension>>::
+      add_data_vector<double>(const Vector<double> &,
+                              const std::vector<std::string> &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               DoFHandler<deal_II_dimension>>::
+      add_data_vector<float>(const Vector<float> &,
+                             const std::vector<std::string> &);
 
 
-    template class DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >;
+    template class DataOutStack<deal_II_dimension,
+                                deal_II_dimension,
+                                hp::DoFHandler<deal_II_dimension>>;
 
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
-    add_data_vector<double> (const Vector<double> &,
-                             const std::string    &);
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
-    add_data_vector<float> (const Vector<float>  &,
-                            const std::string    &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               hp::DoFHandler<deal_II_dimension>>::
+      add_data_vector<double>(const Vector<double> &, const std::string &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               hp::DoFHandler<deal_II_dimension>>::
+      add_data_vector<float>(const Vector<float> &, const std::string &);
 
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
-    add_data_vector<double> (const Vector<double> &,
-                             const std::vector<std::string>    &);
-    template void DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
-    add_data_vector<float> (const Vector<float>  &,
-                            const std::vector<std::string>    &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               hp::DoFHandler<deal_II_dimension>>::
+      add_data_vector<double>(const Vector<double> &,
+                              const std::vector<std::string> &);
+    template void DataOutStack<deal_II_dimension,
+                               deal_II_dimension,
+                               hp::DoFHandler<deal_II_dimension>>::
+      add_data_vector<float>(const Vector<float> &,
+                             const std::vector<std::string> &);
 #endif
-}
+  }

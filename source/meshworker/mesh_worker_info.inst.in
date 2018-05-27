@@ -14,27 +14,39 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
     namespace MeshWorker
     \{
 #if deal_II_dimension <= deal_II_space_dimension
-    template class IntegrationInfo<deal_II_dimension, deal_II_space_dimension>;
-    template class IntegrationInfoBox<deal_II_dimension, deal_II_space_dimension>;
+      template class IntegrationInfo<deal_II_dimension,
+                                     deal_II_space_dimension>;
+      template class IntegrationInfoBox<deal_II_dimension,
+                                        deal_II_space_dimension>;
 
-    template class DoFInfo<deal_II_dimension, deal_II_space_dimension,float>;
-    template class DoFInfoBox<deal_II_dimension,
-                              DoFInfo<deal_II_dimension, deal_II_space_dimension,float> >;
+      template class DoFInfo<deal_II_dimension, deal_II_space_dimension, float>;
+      template class DoFInfoBox<
+        deal_II_dimension,
+        DoFInfo<deal_II_dimension, deal_II_space_dimension, float>>;
 
-    template void IntegrationInfo<deal_II_dimension, deal_II_space_dimension>::fill_local_data(
-        const DoFInfo<deal_II_dimension, deal_II_space_dimension, float>&, bool);
+      template void
+      IntegrationInfo<deal_II_dimension, deal_II_space_dimension>::
+        fill_local_data(
+          const DoFInfo<deal_II_dimension, deal_II_space_dimension, float> &,
+          bool);
 
-    template class DoFInfo<deal_II_dimension, deal_II_space_dimension,double>;
-    template class DoFInfoBox<deal_II_dimension,
-                              DoFInfo<deal_II_dimension, deal_II_space_dimension,double> >;
+      template class DoFInfo<deal_II_dimension,
+                             deal_II_space_dimension,
+                             double>;
+      template class DoFInfoBox<
+        deal_II_dimension,
+        DoFInfo<deal_II_dimension, deal_II_space_dimension, double>>;
 
-    template void IntegrationInfo<deal_II_dimension, deal_II_space_dimension>::fill_local_data(
-        const DoFInfo<deal_II_dimension, deal_II_space_dimension, double>&, bool);
+      template void
+      IntegrationInfo<deal_II_dimension, deal_II_space_dimension>::
+        fill_local_data(
+          const DoFInfo<deal_II_dimension, deal_II_space_dimension, double> &,
+          bool);
 #endif
     \}
-}
+  }

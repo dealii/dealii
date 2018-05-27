@@ -16,21 +16,28 @@
 
 
 for (S1, S2, S3 : REAL_SCALARS)
-{
-    template class RelaxationBlock<SparseMatrix<S1>, S2, Vector<S3> >;
-    template class RelaxationBlockJacobi<SparseMatrix<S1>, S2, Vector<S3> >;
-    template class RelaxationBlockSOR<SparseMatrix<S1>, S2, Vector<S3> >;
-    template class RelaxationBlockSSOR<SparseMatrix<S1>, S2, Vector<S3> >;
-}
+  {
+    template class RelaxationBlock<SparseMatrix<S1>, S2, Vector<S3>>;
+    template class RelaxationBlockJacobi<SparseMatrix<S1>, S2, Vector<S3>>;
+    template class RelaxationBlockSOR<SparseMatrix<S1>, S2, Vector<S3>>;
+    template class RelaxationBlockSSOR<SparseMatrix<S1>, S2, Vector<S3>>;
+  }
 
 
 for (S1 : REAL_SCALARS)
-{
+  {
 #ifdef DEAL_II_WITH_TRILINOS
-    template class RelaxationBlock<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
-    template class RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
-    template class RelaxationBlockSOR<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
-    template class RelaxationBlockSSOR<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlock<TrilinosWrappers::SparseMatrix,
+                                   S1,
+                                   TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix,
+                                         S1,
+                                         TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlockSOR<TrilinosWrappers::SparseMatrix,
+                                      S1,
+                                      TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlockSSOR<TrilinosWrappers::SparseMatrix,
+                                       S1,
+                                       TrilinosWrappers::MPI::Vector>;
 #endif
-}
-
+  }

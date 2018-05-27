@@ -15,58 +15,58 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
-    template class MatrixFree<deal_II_dimension,double>;
-    template class MatrixFree<deal_II_dimension,float>;
+  {
+    template class MatrixFree<deal_II_dimension, double>;
+    template class MatrixFree<deal_II_dimension, float>;
 
-    template void MatrixFree<deal_II_dimension,double>::
-    print_memory_consumption<std::ostream> (std::ostream &) const;
-    template void MatrixFree<deal_II_dimension,double>::
-    print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
+    template void
+    MatrixFree<deal_II_dimension,
+               double>::print_memory_consumption<std::ostream>(std::ostream &)
+      const;
+    template void MatrixFree<deal_II_dimension, double>::
+      print_memory_consumption<ConditionalOStream>(ConditionalOStream &) const;
 
-    template void MatrixFree<deal_II_dimension,float>::
-    print_memory_consumption<std::ostream> (std::ostream &) const;
-    template void MatrixFree<deal_II_dimension,float>::
-    print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
+    template void
+    MatrixFree<deal_II_dimension,
+               float>::print_memory_consumption<std::ostream>(std::ostream &)
+      const;
+    template void MatrixFree<deal_II_dimension, float>::
+      print_memory_consumption<ConditionalOStream>(ConditionalOStream &) const;
 
 #ifndef DEAL_II_MSVC
-    template
-    void
-    internal::MatrixFreeFunctions::ShapeInfo<double>::
-    reinit<deal_II_dimension>(const Quadrature<1> &,
-                              const FiniteElement<deal_II_dimension,deal_II_dimension> &,
-                              const unsigned int);
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<double>::reinit<deal_II_dimension>(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
 
-    template
-    void
-    internal::MatrixFreeFunctions::ShapeInfo<float>::
-    reinit<deal_II_dimension>(const Quadrature<1> &,
-                              const FiniteElement<deal_II_dimension,deal_II_dimension> &,
-                              const unsigned int);
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<float>::reinit<deal_II_dimension>(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
 
-    template
-    void
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double> >::
-    reinit<deal_II_dimension>(const Quadrature<1> &,
-                              const FiniteElement<deal_II_dimension,deal_II_dimension> &,
-                              const unsigned int);
+    template void internal::MatrixFreeFunctions::
+      ShapeInfo<VectorizedArray<double>>::reinit<deal_II_dimension>(
+        const Quadrature<1> &,
+        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+        const unsigned int);
 
-    template
-    void
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<float > >::
-    reinit<deal_II_dimension>(const Quadrature<1> &,
-                              const FiniteElement<deal_II_dimension,deal_II_dimension> &,
-                              const unsigned int);
+    template void internal::MatrixFreeFunctions::
+      ShapeInfo<VectorizedArray<float>>::reinit<deal_II_dimension>(
+        const Quadrature<1> &,
+        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+        const unsigned int);
 #endif
-}
+  }
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension <= deal_II_space_dimension
-    template bool MatrixFree<deal_II_dimension, double>::
-    is_supported(const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+    template bool MatrixFree<deal_II_dimension, double>::is_supported(
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 
-    template bool MatrixFree<deal_II_dimension, float>::
-    is_supported(const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+    template bool MatrixFree<deal_II_dimension, float>::is_supported(
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
-}
+  }

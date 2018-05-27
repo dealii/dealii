@@ -15,8 +15,9 @@
 
 
 for (deal_II_dimension : DIMENSIONS)
-{
+  {
 #if deal_II_dimension < 3
-    template class DataOutRotation<deal_II_dimension, DoFHandler<deal_II_dimension> >;
+    template class DataOutRotation<deal_II_dimension,
+                                   DoFHandler<deal_II_dimension>>;
 #endif
-}
+  }

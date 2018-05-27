@@ -14,81 +14,83 @@
 // ---------------------------------------------------------------------
 
 
-//TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension, deal_II_space_dimension>
+// TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension,
+// deal_II_space_dimension>
 // where applicable and move to codimension cases above also when applicable
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
-    namespace VectorTools \{
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace VectorTools
+    \{
 
 #if deal_II_dimension == deal_II_space_dimension
-#if deal_II_dimension != 1
-    template
-    void
-    compute_nonzero_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
-            const unsigned int     first_vector_component,
-            const std::set<types::boundary_id> &boundary_ids,
-            FunctionMap<deal_II_dimension>::type &function_map,
-            ConstraintMatrix      &constraints,
-            const Mapping<deal_II_dimension>    &mapping);
+#  if deal_II_dimension != 1
+      template void
+      compute_nonzero_normal_flux_constraints(
+        const DoFHandler<deal_II_dimension> & dof_handler,
+        const unsigned int                    first_vector_component,
+        const std::set<types::boundary_id> &  boundary_ids,
+        FunctionMap<deal_II_dimension>::type &function_map,
+        ConstraintMatrix &                    constraints,
+        const Mapping<deal_II_dimension> &    mapping);
 
-    template
-    void
-    compute_nonzero_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
-            const unsigned int     first_vector_component,
-            const std::set<types::boundary_id> &boundary_ids,
-            FunctionMap<deal_II_dimension>::type &function_map,
-            ConstraintMatrix      &constraints,
-            const Mapping<deal_II_dimension>    &mapping);
+      template void
+      compute_nonzero_normal_flux_constraints(
+        const hp::DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                       first_vector_component,
+        const std::set<types::boundary_id> &     boundary_ids,
+        FunctionMap<deal_II_dimension>::type &   function_map,
+        ConstraintMatrix &                       constraints,
+        const Mapping<deal_II_dimension> &       mapping);
 
-    template
-    void
-    compute_nonzero_tangential_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
-            const unsigned int     first_vector_component,
-            const std::set<types::boundary_id> &boundary_ids,
-            FunctionMap<deal_II_dimension>::type &function_map,
-            ConstraintMatrix      &constraints,
-            const Mapping<deal_II_dimension>    &mapping);
-    template
-    void
-    compute_nonzero_tangential_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
-            const unsigned int     first_vector_component,
-            const std::set<types::boundary_id> &boundary_ids,
-            FunctionMap<deal_II_dimension>::type &function_map,
-            ConstraintMatrix      &constraints,
-            const Mapping<deal_II_dimension>    &mapping);
+      template void
+      compute_nonzero_tangential_flux_constraints(
+        const DoFHandler<deal_II_dimension> & dof_handler,
+        const unsigned int                    first_vector_component,
+        const std::set<types::boundary_id> &  boundary_ids,
+        FunctionMap<deal_II_dimension>::type &function_map,
+        ConstraintMatrix &                    constraints,
+        const Mapping<deal_II_dimension> &    mapping);
+      template void
+      compute_nonzero_tangential_flux_constraints(
+        const hp::DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                       first_vector_component,
+        const std::set<types::boundary_id> &     boundary_ids,
+        FunctionMap<deal_II_dimension>::type &   function_map,
+        ConstraintMatrix &                       constraints,
+        const Mapping<deal_II_dimension> &       mapping);
 
-    template
-    void
-    compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
-                                        const unsigned int     first_vector_component,
-                                        const std::set<types::boundary_id> &boundary_ids,
-                                        ConstraintMatrix      &constraints,
-                                        const Mapping<deal_II_dimension>    &mapping);
+      template void
+      compute_no_normal_flux_constraints(
+        const DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                   first_vector_component,
+        const std::set<types::boundary_id> & boundary_ids,
+        ConstraintMatrix &                   constraints,
+        const Mapping<deal_II_dimension> &   mapping);
 
-    template
-    void
-    compute_no_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
-                                        const unsigned int     first_vector_component,
-                                        const std::set<types::boundary_id> &boundary_ids,
-                                        ConstraintMatrix      &constraints,
-                                        const Mapping<deal_II_dimension>    &mapping);
+      template void
+      compute_no_normal_flux_constraints(
+        const hp::DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                       first_vector_component,
+        const std::set<types::boundary_id> &     boundary_ids,
+        ConstraintMatrix &                       constraints,
+        const Mapping<deal_II_dimension> &       mapping);
 
-    template
-    void
-    compute_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
-                                     const unsigned int     first_vector_component,
-                                     const std::set<types::boundary_id> &boundary_ids,
-                                     ConstraintMatrix      &constraints,
-                                     const Mapping<deal_II_dimension>    &mapping);
+      template void
+      compute_normal_flux_constraints(
+        const DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                   first_vector_component,
+        const std::set<types::boundary_id> & boundary_ids,
+        ConstraintMatrix &                   constraints,
+        const Mapping<deal_II_dimension> &   mapping);
 
-    template
-    void
-    compute_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
-                                     const unsigned int     first_vector_component,
-                                     const std::set<types::boundary_id> &boundary_ids,
-                                     ConstraintMatrix      &constraints,
-                                     const Mapping<deal_II_dimension>    &mapping);
-#endif
+      template void
+      compute_normal_flux_constraints(
+        const hp::DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                       first_vector_component,
+        const std::set<types::boundary_id> &     boundary_ids,
+        ConstraintMatrix &                       constraints,
+        const Mapping<deal_II_dimension> &       mapping);
+#  endif
 #endif
     \}
-}
+  }

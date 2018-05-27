@@ -14,38 +14,38 @@
 // ---------------------------------------------------------------------
 
 for (Number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
-{
+  {
     namespace Differentiation
     \{
-    namespace AD
-    \{
-    template struct ADNumberTraits<Number>;
+      namespace AD
+      \{
+        template struct ADNumberTraits<Number>;
+      \}
     \}
-    \}
-}
+  }
 
 
 for (Number : REAL_SCALARS)
-{
+  {
     namespace Differentiation
     \{
-    namespace AD
-    \{
-    template struct NumberTraits<Number,NumberTypes::adolc_taped>;
-    template struct NumberTraits<Number,NumberTypes::adolc_tapeless>;
+      namespace AD
+      \{
+        template struct NumberTraits<Number, NumberTypes::adolc_taped>;
+        template struct NumberTraits<Number, NumberTypes::adolc_tapeless>;
+      \}
     \}
-    \}
-}
+  }
 
 
 for (Number : COMPLEX_SCALARS)
-{
+  {
     namespace Differentiation
     \{
-    namespace AD
-    \{
-    template struct NumberTraits<Number,NumberTypes::adolc_taped>;
-    template struct NumberTraits<Number,NumberTypes::adolc_tapeless>;
+      namespace AD
+      \{
+        template struct NumberTraits<Number, NumberTypes::adolc_taped>;
+        template struct NumberTraits<Number, NumberTypes::adolc_tapeless>;
+      \}
     \}
-    \}
-}
+  }

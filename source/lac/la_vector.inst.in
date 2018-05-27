@@ -16,14 +16,13 @@
 
 
 for (SCALAR : REAL_SCALARS)
-{
+  {
     template class Vector<SCALAR>;
-}
+  }
 
 
 
 for (SCALAR : COMPLEX_SCALARS)
-{
+  {
     template class Vector<SCALAR>;
-}
-
+  }

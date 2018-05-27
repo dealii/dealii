@@ -15,8 +15,8 @@
 
 
 
-for (VECTOR : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS)
-{
+for (VECTOR : VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
+  {
     template class FEFieldFunction<deal_II_dimension,
                                    DoFHandler<deal_II_dimension>,
                                    VECTOR>;
@@ -24,4 +24,4 @@ for (VECTOR : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS)
     template class FEFieldFunction<deal_II_dimension,
                                    hp::DoFHandler<deal_II_dimension>,
                                    VECTOR>;
-}
+  }

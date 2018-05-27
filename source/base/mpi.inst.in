@@ -15,42 +15,39 @@
 
 
 for (S : REAL_SCALARS)
-{
-    template
-    void sum<S> (const SparseMatrix<S> &, const MPI_Comm &, SparseMatrix<S> &);
-}
+  {
+    template void sum<S>(
+      const SparseMatrix<S> &, const MPI_Comm &, SparseMatrix<S> &);
+  }
 
 for (S : MPI_SCALARS)
-{
-    template
-    void sum<LAPACKFullMatrix<S> > (const LAPACKFullMatrix<S> &, const MPI_Comm &, LAPACKFullMatrix<S> &);
+  {
+    template void sum<LAPACKFullMatrix<S>>(
+      const LAPACKFullMatrix<S> &, const MPI_Comm &, LAPACKFullMatrix<S> &);
 
-    template
-    void sum<Vector<S> > (const Vector<S> &, const MPI_Comm &, Vector<S> &);
+    template void sum<Vector<S>>(
+      const Vector<S> &, const MPI_Comm &, Vector<S> &);
 
-    template
-    void sum<FullMatrix<S> > (const FullMatrix<S> &, const MPI_Comm &, FullMatrix<S> &);
+    template void sum<FullMatrix<S>>(
+      const FullMatrix<S> &, const MPI_Comm &, FullMatrix<S> &);
 
-    template
-    void sum<S> (const ArrayView<const S> &, const MPI_Comm &, const ArrayView<S> &);
+    template void sum<S>(
+      const ArrayView<const S> &, const MPI_Comm &, const ArrayView<S> &);
 
-    template
-    S sum<S> (const S &, const MPI_Comm &);
+    template S sum<S>(const S &, const MPI_Comm &);
 
-    template
-    void sum<std::vector<S> > (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+    template void sum<std::vector<S>>(
+      const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
 
-    template
-    S max<S> (const S &, const MPI_Comm &);
+    template S max<S>(const S &, const MPI_Comm &);
 
-    template
-    void max<std::vector<S> > (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+    template void max<std::vector<S>>(
+      const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
 
-    template
-    S min<S> (const S &, const MPI_Comm &);
+    template S min<S>(const S &, const MPI_Comm &);
 
-    template
-    void min<std::vector<S> > (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+    template void min<std::vector<S>>(
+      const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
 
     // The fixed-length array (i.e., things declared like T(&values)[N])
     // versions of the functions above live in the header file mpi.h since the
@@ -66,30 +63,27 @@ for (S : MPI_SCALARS)
     // inline it (so this instantiation is not necessary) but clang 3.8 does (so
     // this instantiation is necessary). Some versions of GCC (5.3 but not 4.8)
     // seem to inline it with the '-march=native' flag.
-    template
-    void Utilities::MPI::internal::all_reduce<S> (const MPI_Op    &,
-            const ArrayView<const S> &,
-            const MPI_Comm  &,
-            const ArrayView<S>    &);
-}
+    template void Utilities::MPI::internal::all_reduce<S>(
+      const MPI_Op &,
+      const ArrayView<const S> &,
+      const MPI_Comm &,
+      const ArrayView<S> &);
+  }
 
 
-for (S : REAL_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
-{
-    template
-    Tensor<rank,dim,S>
-    sum<rank,dim,S> (const Tensor<rank,dim,S> &, const MPI_Comm &);
-}
+for (S : REAL_SCALARS; rank : RANKS; dim : SPACE_DIMENSIONS)
+  {
+    template Tensor<rank, dim, S> sum<rank, dim, S>(
+      const Tensor<rank, dim, S> &, const MPI_Comm &);
+  }
 
 
 // Recall that SymmetricTensor only makes sense for rank 2 and 4
 for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
-{
-    template
-    SymmetricTensor<2,dim,S>
-    sum<2,dim,S> (const SymmetricTensor<2,dim,S> &, const MPI_Comm &);
+  {
+    template SymmetricTensor<2, dim, S> sum<2, dim, S>(
+      const SymmetricTensor<2, dim, S> &, const MPI_Comm &);
 
-    template
-    SymmetricTensor<4,dim,S>
-    sum<4,dim,S> (const SymmetricTensor<4,dim,S> &, const MPI_Comm &);
-}
+    template SymmetricTensor<4, dim, S> sum<4, dim, S>(
+      const SymmetricTensor<4, dim, S> &, const MPI_Comm &);
+  }

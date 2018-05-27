@@ -16,62 +16,56 @@
 
 
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; lda : BOOL)
-{
-    template
-    void
-    DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>::set_dof_values_by_interpolation
-    (const Vector<VEC::value_type>&, VEC&,
-     const unsigned int fe_index) const;
+  {
+    template void DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>::
+      set_dof_values_by_interpolation(
+        const Vector<VEC::value_type> &, VEC &, const unsigned int fe_index)
+        const;
 
 #if deal_II_dimension != 3
 
-    template
-    void
-    DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::set_dof_values_by_interpolation
-    (const Vector<VEC::value_type>&, VEC&,
-     const unsigned int fe_index) const;
+    template void DoFCellAccessor<
+      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      lda>::set_dof_values_by_interpolation(const Vector<VEC::value_type> &,
+                                            VEC &,
+                                            const unsigned int fe_index) const;
 
 #endif
 
 #if deal_II_dimension == 3
 
-    template
-    void
-    DoFCellAccessor<DoFHandler<1,3>, lda>::set_dof_values_by_interpolation
-    (const Vector<VEC::value_type>&, VEC&,
-     const unsigned int fe_index) const;
+    template void
+    DoFCellAccessor<DoFHandler<1, 3>, lda>::set_dof_values_by_interpolation(
+      const Vector<VEC::value_type> &, VEC &, const unsigned int fe_index)
+      const;
 
 #endif
-
-}
+  }
 
 
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; lda : BOOL)
-{
-    template
-    void
-    DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>::set_dof_values_by_interpolation
-    (const Vector<VEC::value_type>&, VEC&,
-     const unsigned int fe_index) const;
+  {
+    template void DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>::
+      set_dof_values_by_interpolation(
+        const Vector<VEC::value_type> &, VEC &, const unsigned int fe_index)
+        const;
 
 #if deal_II_dimension != 3
 
-    template
-    void
-    DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::set_dof_values_by_interpolation
-    (const Vector<VEC::value_type>&, VEC&,
-     const unsigned int fe_index) const;
+    template void DoFCellAccessor<
+      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
+      lda>::set_dof_values_by_interpolation(const Vector<VEC::value_type> &,
+                                            VEC &,
+                                            const unsigned int fe_index) const;
 
 #endif
 
 #if deal_II_dimension == 3
 
-    template
-    void
-    DoFCellAccessor<hp::DoFHandler<1,3>, lda>::set_dof_values_by_interpolation
-    (const Vector<VEC::value_type>&, VEC&,
-     const unsigned int fe_index) const;
+    template void
+    DoFCellAccessor<hp::DoFHandler<1, 3>, lda>::set_dof_values_by_interpolation(
+      const Vector<VEC::value_type> &, VEC &, const unsigned int fe_index)
+      const;
 
 #endif
-}
-
+  }
