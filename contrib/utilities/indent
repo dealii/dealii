@@ -60,29 +60,46 @@ if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 6 ] || [ "${CLANG_FORMAT_MINOR_VERSION}
   exit 1
 fi
 
+#
+# collect all header and source files and process them in batches of 50
+# files with up to 10 in parallel
+#
 
+find tests include source examples \
+  \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
+  xargs -0 -n 50 -P 10 clang-format -i
 
-# collect all header and source files and process them in batches of 50 files
-# with up to 10 in parallel
-find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 | xargs -0 -n 50 -P 10 clang-format -i
-
+#
 # use the same process to set file permissions for all source files
-find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 | xargs -0 -n 50 -P 10 chmod 644
+#
 
+find tests include source examples \
+  \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
+  xargs -0 -n 50 -P 10 chmod 644
+
+#
 # convert dos formatted files to unix file format by stripping out
 # carriage returns (15=0x0D):
+#
+
 dos_to_unix()
 {
-    f=$1
-    tr -d '\015' <"$f" >"$f.tmp"
-    diff -q "$f" "$f.tmp" >/dev/null || mv "$f.tmp" "$f"
-    rm -f "$f.tmp"
+  f=$1
+  tr -d '\015' <"$f" >"$f.tmp"
+  diff -q "$f" "$f.tmp" >/dev/null || mv "$f.tmp" "$f"
+  rm -f "$f.tmp"
 }
 export -f dos_to_unix
-find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 | xargs -0 -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {}
 
+find tests include source examples \
+  \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
+  xargs -0 -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {}
+
+#
 # format .inst.in files. We need to replace \{ and \} because it confuses
 # clang-format
+#
+
 format_inst()
 {
     f=$1
@@ -100,4 +117,5 @@ format_inst()
 }
 export -f format_inst
 
-find source -name '*.inst.in' -exec bash -c 'format_inst "$@"' bash {} +
+find source -name '*.inst.in' -print0 |
+  xargs -0 -n 1 -P 10 -I {} bash -c 'format_inst "$@"' _ {}
