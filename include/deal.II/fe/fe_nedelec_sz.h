@@ -31,13 +31,13 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class represents an implementation of the
- * H<sup>curl</sup>-conforming Nedelec element described in the PhD
+ * H<sup>curl</sup>-conforming N&eacute;d&eacute;lec element described in the PhD
  * thesis of S. Zaglmayr, <b>High Order Finite Element Methods
  * for Electromagnetic Field Computation</b>, Johannes Kepler
- * Univeritaet Linz, 2006.
+ * Univerit&auml;t Linz, 2006.
  *
  * This element overcomes the sign conflict issues present in
- * traditional Nedelec elements which arise from the edge and face
+ * traditional N&eacute;d&eacute;lec elements which arise from the edge and face
  * parameterizations used in the basis functions. Therefore, this
  * element should provide consistent results for general quadrilateral
  * and hexahedral elements.
@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Further details on this element, including some benchmarking, can be
  * in the paper R. Kynch, P. Ledger: <b>Resolving the sign conflict
- * problem for hp-hexahedral Nedelec elements with application to eddy
+ * problem for hp-hexahedral N&eacute;d&eacute;lec elements with application to eddy
  * current problems</b>, Computers & Structures 181, 41-54, 2017 (see
  * https://doi.org/10.1016/j.compstruc.2016.05.021).
  *
