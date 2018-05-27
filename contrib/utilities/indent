@@ -96,19 +96,22 @@ find tests include source examples \
   xargs -0 -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {}
 
 #
-# format .inst.in files. We need to replace \{ and \} because it confuses
-# clang-format
+# format .inst.in files. We need to replace \{ and \} by a sentinel because
+# clang-format happily strips away the backslash. Further, there is a minor
+# caveat: clang-format automatically renames a comment after a closing
+# bracket for a namespace to "} // namespace FooBar". Thus use "namespace"
+# as keyword:
 #
 
 format_inst()
 {
     f=$1
     cp "$f" "$f.tmp"
-    sed -i.orig 's#\\{#{ //#g' "$f.tmp"
-    sed -i.orig 's#\\}#} //#g' "$f.tmp"
+    sed -i.orig 's#\\{#{ // namespace#g' "$f.tmp"
+    sed -i.orig 's#\\}#} // namespace#g' "$f.tmp"
     clang-format -i "$f.tmp"
-    sed -i.orig 's#{ //#\\{#g' "$f.tmp"
-    sed -i.orig 's#} //#\\}#g' "$f.tmp"
+    sed -i.orig 's#{ // namespace#\\{#g' "$f.tmp"
+    sed -i.orig 's#}[ ]*// namespace.*#\\}#g' "$f.tmp"
     if ! diff -q "$f" "$f.tmp" >/dev/null
     then
       cp "$f.tmp" "$f"
