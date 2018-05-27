@@ -170,11 +170,12 @@ namespace internal
 
 
 
+    template <typename number>
     void
     DoFInfo ::read_dof_indices(
       const std::vector<types::global_dof_index> &local_indices,
       const std::vector<unsigned int> &           lexicographic_inv,
-      const ConstraintMatrix &                    constraints,
+      const AffineConstraints<number> &           constraints,
       const unsigned int                          cell_number,
       ConstraintValues<double> &                  constraint_values,
       bool &                                      cell_at_subdomain_boundary)
