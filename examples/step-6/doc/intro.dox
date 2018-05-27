@@ -103,7 +103,7 @@ up with these &ldquo;hanging nodes&rdquo; if we do this.
 
 <h3> Why adapatively refined meshes? </h3>
 
-Now that you have seen how these adaptively refined meshes look like,
+Now that you have seen what these adaptively refined meshes look like,
 you should ask <i>why</i> we would want to do this. After all, we know from
 theory that if we refine the mesh globally, the error will go down to zero
 as
@@ -208,7 +208,7 @@ can be continuous <i>if the coefficients $U_j$ satisfy certain relationships</i>
 In other words, the coefficients $U_j$ can not be chosen arbitrarily
 but have to satisfy certain constraints so that the function $u_h$ is in fact
 continuous.
-How these constraints have to look is relatively easy to
+What these constraints have to look is relatively easy to
 understand conceptually, but the implementation in software is
 complicated and takes several thousand lines of code. On the other
 hand, in user code, it is only about half a dozen lines you have to
@@ -229,18 +229,22 @@ theory we have outlined above. In reality, you will really only have to
 add about half a dozen lines of additional code to a program like step-4
 to make it work with adaptive meshes that have hanging nodes. The
 interesting part about this is that it is entirely independent of the
-equation you are solving: How the constraints look like has nothing
-to do with the equation and only with the finite element in use.
+equation you are solving: The algebraic nature of these constraints has nothing
+to do with the equation and only depends on the choice of finite element.
 As a consequence, the code to deal with these constraints is entirely
 contained in the deal.II library itself, and you do not need to worry
 about the details.
 
-The steps you have to do to make this work are essentially like this:
-- You have to have a ConstraintMatrix object that stores the
-  constraints due our desire to keep the solution space continuous
-  even in the presence of hanging nodes.
+The steps you need to make this work are essentially like this:
+- You have to create a ConstraintMatrix object, which (as the name
+  suggests) will store all constraints on the finite element space. In
+  the current context, these are the constraints due to our desire to
+  keep the solution space continuous even in the presence of hanging
+  nodes. (Below we will also briefly mention that we will also put
+  boundary values into this same object, but that is a separate matter.)
 - You have to fill this object using the function
-  DoFTools::make_hanging_node_constraints().
+  DoFTools::make_hanging_node_constraints() to ensure continuity of
+  the elements of the finite element space.
 - You have to use this object when you copy the local contributions to
   the matrix and right hand side into the global objects, by using
   ConstraintMatrix::distribute_local_to_global(). Up until
@@ -251,6 +255,9 @@ The steps you have to do to make this work are essentially like this:
   really free. Rather, they are factually eliminated from the
   linear system by setting their rows and columns to zero and putting
   something on the diagonal to ensure the matrix remains invertible.
+  The matrix resulting from this process remains symmetric and
+  positive definite for the Laplace equation we solve here, so we can
+  continue to use the Conjugate Gradient method for it.
 - You then solve the linear system as usual, but at the end of this
   step, you need to make sure that the degrees of "freedom" located
   on hanging nodes get their correct (constrained) value so that the
