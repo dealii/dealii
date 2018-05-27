@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
  * This class represents an implementation of the
  * H<sup>curl</sup>-conforming N&eacute;d&eacute;lec element described in the
  * PhD thesis of S. Zaglmayr, <b>High Order Finite Element Methods for
- * Electromagnetic Field Computation</b>, Johannes Kepler Univerit&auml;t Linz,
+ * Electromagnetic Field Computation</b>, Johannes Kepler Universit&auml;t Linz,
  * 2006.
  *
  * This element overcomes the sign conflict issues present in
