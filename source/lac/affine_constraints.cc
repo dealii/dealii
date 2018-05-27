@@ -22,6 +22,17 @@ DEAL_II_NAMESPACE_OPEN
 #include "affine_constraints.inst"
 
 /*
+ * FIXME: This mixed variant is needed by the multigrid - it currently only
+ * supports AffineConstraints<double>. If someone has the patience to
+ * templateify the 10 custom wrapper classes around AffineConstraints,
+ * please go ahead, fix the multigrid classes and remove this
+ * instantiation:
+ */
+template void
+dealii::AffineConstraints<double>::condense<dealii::BlockVector<float>>(
+  dealii::BlockVector<float> &) const;
+
+/*
  * Note: You probably do not want to add your custom instantiation down
  * here but use affine_constraints.inst.in instead. We use the following
  * three macros for PETSc and Trilinos types because we lack a mechanism
@@ -30,6 +41,12 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 #define INSTANTIATE_DLTG_VECTOR(VectorType)                                    \
+  template void                                                                \
+  AffineConstraints<VectorType::value_type>::condense<VectorType>(             \
+    const VectorType &, VectorType &) const;                                   \
+  template void                                                                \
+  AffineConstraints<VectorType::value_type>::condense<VectorType>(             \
+    VectorType &) const;                                                       \
   template void                                                                \
   AffineConstraints<VectorType::value_type>::distribute_local_to_global<       \
     VectorType>(                                                               \
