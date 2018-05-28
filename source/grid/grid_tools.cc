@@ -1693,8 +1693,13 @@ namespace GridTools
       std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
                 Point<dim>>>
       cells_and_points;
-    cells_and_points.push_back(find_active_cell_around_point_tolerance(
-      mapping, mesh, p, marked_vertices, tolerance));
+    try
+      {
+        cells_and_points.push_back(find_active_cell_around_point_tolerance(
+          mapping, mesh, p, marked_vertices, tolerance));
+      }
+    catch (ExcPointNotFound<spacedim> &)
+      {}
 
     if (!cells_and_points.empty())
       {

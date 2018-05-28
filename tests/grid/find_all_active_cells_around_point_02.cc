@@ -82,6 +82,7 @@ test(unsigned int n_ref)
         if (dim == 3)
           p[2] = std::cos(theta) * r;
         print_result(mapping, tria, p, 1e-8);
+        print_result(mapping, tria, p, 1e-12);
       }
   }
   {
