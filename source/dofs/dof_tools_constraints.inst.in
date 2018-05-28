@@ -20,6 +20,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
     template void DoFTools::make_hanging_node_constraints(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
       AffineConstraints<double> &);
+
+    template void DoFTools::make_hanging_node_constraints(
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+      AffineConstraints<std::complex<double>> &);
 #endif
   }
 
@@ -28,6 +32,10 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
     template void DoFTools::make_hanging_node_constraints(
       const DH<deal_II_dimension, deal_II_dimension> &,
       AffineConstraints<double> &);
+
+    template void DoFTools::make_hanging_node_constraints(
+      const DH<deal_II_dimension, deal_II_dimension> &,
+      AffineConstraints<std::complex<double>> &);
 
 #if deal_II_dimension != 1
     template void DoFTools::make_periodicity_constraints(

@@ -480,13 +480,13 @@ namespace DoFTools
        * It also suppresses very small entries in the constraint matrix to
        * avoid making the sparsity pattern fuller than necessary.
        */
-      template <typename number>
+      template <typename number1, typename number2>
       void
       filter_constraints(
         const std::vector<types::global_dof_index> &master_dofs,
         const std::vector<types::global_dof_index> &slave_dofs,
-        const FullMatrix<number> &                  face_constraints,
-        AffineConstraints<number> &                 constraints)
+        const FullMatrix<number1> &                 face_constraints,
+        AffineConstraints<number2> &                constraints)
       {
         Assert(face_constraints.n() == master_dofs.size(),
                ExcDimensionMismatch(master_dofs.size(), face_constraints.n()));
@@ -526,7 +526,7 @@ namespace DoFTools
                 {
                   // add up the absolute values of all constraints in this
                   // line to get a measure of their absolute size
-                  number abs_sum = 0;
+                  number1 abs_sum = 0;
                   for (unsigned int i = 0; i < n_master_dofs; ++i)
                     abs_sum += std::abs(face_constraints(row, i));
 
@@ -1050,7 +1050,7 @@ namespace DoFTools
       // a matrix to be used for constraints below. declared here and
       // simply resized down below to avoid permanent re-allocation of
       // memory
-      FullMatrix<number> constraint_matrix;
+      FullMatrix<double> constraint_matrix;
 
       // similarly have arrays that will hold master and slave dof numbers,
       // as well as a scratch array needed for the complicated case below
@@ -1062,9 +1062,9 @@ namespace DoFTools
       // different (or the same) finite elements. we compute them only
       // once, namely the first time they are needed, and then just reuse
       // them
-      Table<2, std::unique_ptr<FullMatrix<number>>> face_interpolation_matrices(
+      Table<2, std::unique_ptr<FullMatrix<double>>> face_interpolation_matrices(
         n_finite_elements(dof_handler), n_finite_elements(dof_handler));
-      Table<3, std::unique_ptr<FullMatrix<number>>>
+      Table<3, std::unique_ptr<FullMatrix<double>>>
         subface_interpolation_matrices(
           n_finite_elements(dof_handler),
           n_finite_elements(dof_handler),
@@ -1075,7 +1075,7 @@ namespace DoFTools
       // these two matrices are derived from the face interpolation matrix
       // as described in the @ref hp_paper "hp paper"
       Table<2,
-            std::unique_ptr<std::pair<FullMatrix<number>, FullMatrix<number>>>>
+            std::unique_ptr<std::pair<FullMatrix<double>, FullMatrix<double>>>>
         split_face_interpolation_matrices(n_finite_elements(dof_handler),
                                           n_finite_elements(dof_handler));
 
@@ -1349,13 +1349,13 @@ namespace DoFTools
                           split_face_interpolation_matrices
                             [dominating_fe_index][cell->active_fe_index()]);
 
-                        const FullMatrix<number>
+                        const FullMatrix<double>
                           &restrict_mother_to_virtual_master_inv =
                             (split_face_interpolation_matrices
                                [dominating_fe_index][cell->active_fe_index()]
                                  ->first);
 
-                        const FullMatrix<number>
+                        const FullMatrix<double>
                           &restrict_mother_to_virtual_slave =
                             (split_face_interpolation_matrices
                                [dominating_fe_index][cell->active_fe_index()]
@@ -1440,7 +1440,7 @@ namespace DoFTools
                               subface_interpolation_matrices
                                 [dominating_fe_index][subface_fe_index][sf]);
 
-                            const FullMatrix<number>
+                            const FullMatrix<double>
                               &restrict_subface_to_virtual = *(
                                 subface_interpolation_matrices
                                   [dominating_fe_index][subface_fe_index][sf]);
@@ -1659,13 +1659,13 @@ namespace DoFTools
                                 [dominating_fe_index][cell->active_fe_index()]);
 
                             const FullMatrix<
-                              number> &restrict_mother_to_virtual_master_inv =
+                              double> &restrict_mother_to_virtual_master_inv =
                               (split_face_interpolation_matrices
                                  [dominating_fe_index][cell->active_fe_index()]
                                    ->first);
 
                             const FullMatrix<
-                              number> &restrict_mother_to_virtual_slave =
+                              double> &restrict_mother_to_virtual_slave =
                               (split_face_interpolation_matrices
                                  [dominating_fe_index][cell->active_fe_index()]
                                    ->second);
@@ -1724,7 +1724,7 @@ namespace DoFTools
                                 [dominating_fe_index]
                                 [neighbor->active_fe_index()]);
 
-                            const FullMatrix<number>
+                            const FullMatrix<double>
                               &restrict_secondface_to_virtual =
                                 *(face_interpolation_matrices
                                     [dominating_fe_index]
