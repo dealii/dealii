@@ -61,16 +61,26 @@ if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 6 ] || [ "${CLANG_FORMAT_MINOR_VERSION}
 fi
 
 #
-# collect all header and source files and process them in batches of 50
+# Collect all header and source files and process them in batches of 50
 # files with up to 10 in parallel
 #
-
+# The command line is a bit complicated, so let's discuss the more
+# complicated arguments:
+# - For 'find', -print0 makes sure that file names are separated by \0
+#   characters, as opposed to the default \n. That's because, surprisingly,
+#   \n is a valid character in a file name, whereas \0 is not -- so it
+#   serves as a good candidate to separate individual file names.
+# - For 'xargs', -0 does the opposite: it separates filenames that are
+#   delimited by \0
+# - -n 50 calls the following script with up to 50 file names at a time
+# - -P 10 calls the following script up to 10 times in parallel
+#
 find tests include source examples \
   \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
   xargs -0 -n 50 -P 10 clang-format -i
 
 #
-# use the same process to set file permissions for all source files
+# Use the same process to set file permissions for all source files.
 #
 
 find tests include source examples \
@@ -78,7 +88,7 @@ find tests include source examples \
   xargs -0 -n 50 -P 10 chmod 644
 
 #
-# convert dos formatted files to unix file format by stripping out
+# Convert DOS formatted files to unix file format by stripping out
 # carriage returns (15=0x0D):
 #
 
@@ -96,7 +106,7 @@ find tests include source examples \
   xargs -0 -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {}
 
 #
-# format .inst.in files. We need to replace \{ and \} by a sentinel because
+# Format .inst.in files. We need to replace \{ and \} by a sentinel because
 # clang-format happily strips away the backslash. Further, there is a minor
 # caveat: clang-format automatically renames a comment after a closing
 # bracket for a namespace to "} // namespace FooBar". Thus use "namespace"
@@ -120,5 +130,22 @@ format_inst()
 }
 export -f format_inst
 
+#
+# Now do the formatting. The arguments are as discussed above, plus the
+# following:
+# - '-n 1' implies that the following script is called for each file
+#  individually
+# - '-I {}' tells 'xargs' to substitute '{}' in the following by the
+#   one file name we process at a time
+# - 'bash -c' executes the command that follows. Here, this is
+#   'format_inst "$@"' where 'format_inst' is the macro exported
+#   above, and '$@' expands to the list of arguments passed on the
+#   command line, starting at $1. Because we execute a command with
+#   -c, there is no $0 for this bash invokation, and if we just had
+#   {} following the argument of -c, then the first element of that
+#   list would be ignored. To avoid this, we need a dummy argument
+#   to take the role of $0 so that {} can be expanded into $1. We
+#   simply use '_' here, but any other string would do fine as well.
+#
 find source -name '*.inst.in' -print0 |
   xargs -0 -n 1 -P 10 -I {} bash -c 'format_inst "$@"' _ {}
