@@ -336,3 +336,16 @@ for (V : EXTERNAL_PARALLEL_VECTORS)
 
     template void AffineConstraints<V::value_type>::set_zero<V>(V &) const;
   }
+
+
+//
+// FIXME: These mixed variants are needed for multigrid and matrix free.
+//
+
+for (T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void dealii::AffineConstraints<double>::condense<T<float>>(
+      T<float> &) const;
+    template void dealii::AffineConstraints<double>::distribute<T<float>>(
+      T<float> &) const;
+  }
