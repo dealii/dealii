@@ -1640,7 +1640,7 @@ AffineConstraints<number>::add_entry(const size_type line,
   for (const auto &p : line_ptr->entries)
     if (p.first == column)
       {
-        Assert(std::fabs(p.second - value) < 1.e-14,
+        Assert(std::abs(p.second - value) < 1.e-14,
                ExcEntryAlreadyExists(line, column, p.second, value));
         return;
       }

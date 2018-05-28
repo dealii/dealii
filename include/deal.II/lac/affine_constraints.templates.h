@@ -1737,7 +1737,7 @@ AffineConstraints<number>::condense(BlockSparseMatrix<number> &uncondensed,
   number average_diagonal = 0.;
   for (size_type b = 0; b < uncondensed.n_block_rows(); ++b)
     for (size_type i = 0; i < uncondensed.block(b, b).m(); ++i)
-      average_diagonal += std::fabs(uncondensed.block(b, b).diag_element(i));
+      average_diagonal += std::abs(uncondensed.block(b, b).diag_element(i));
   average_diagonal /= uncondensed.m();
 
   const BlockIndices &index_mapping = sparsity.get_column_indices();
