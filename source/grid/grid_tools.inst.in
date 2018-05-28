@@ -92,6 +92,17 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           deal_II_space_dimension>::active_cell_iterator &,
         const std::vector<bool> &);
 
+      template std::vector<std::pair<
+        typename Triangulation<deal_II_dimension,
+                               deal_II_space_dimension>::active_cell_iterator,
+        Point<deal_II_dimension>>>
+      find_all_active_cells_around_point(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        const Point<deal_II_space_dimension> &,
+        const double,
+        const std::vector<bool> &);
+
       template std::tuple<std::vector<typename Triangulation<
                             deal_II_dimension,
                             deal_II_space_dimension>::active_cell_iterator>,
@@ -145,7 +156,22 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     find_active_cell_around_point(
       const Mapping<deal_II_space_dimension> &,
       const parallel::distributed::Triangulation<deal_II_space_dimension> &,
-      const Point<deal_II_space_dimension> &);
+      const Point<deal_II_space_dimension> &,
+      const std::vector<bool> &);
+
+    std::vector<std::pair<
+      dealii::internal::ActiveCellIterator<
+        deal_II_space_dimension,
+        deal_II_space_dimension,
+        parallel::distributed::Triangulation<deal_II_space_dimension,
+                                             deal_II_space_dimension>>::type,
+      Point<deal_II_space_dimension>>>
+    find_all_active_cells_around_point(
+      const Mapping<deal_II_space_dimension> &,
+      const parallel::distributed::Triangulation<deal_II_space_dimension> &,
+      const Point<deal_II_space_dimension> &,
+      const double,
+      const std::vector<bool> &);
 
     template unsigned int GridTools::find_closest_vertex(
       const std::map<unsigned int, Point<deal_II_space_dimension>> &vertices,
