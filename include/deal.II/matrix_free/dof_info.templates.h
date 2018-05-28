@@ -61,9 +61,11 @@ namespace internal
        * new_indices, and returns the storage position the double array for
        * access later on.
        */
+      template <typename number2>
       unsigned short
       insert_entries(
-        const std::vector<std::pair<types::global_dof_index, double>> &entries);
+        const std::vector<std::pair<types::global_dof_index, number2>>
+          &entries);
 
       std::vector<std::pair<types::global_dof_index, double>>
                                            constraint_entries;
@@ -83,15 +85,18 @@ namespace internal
     {}
 
     template <typename Number>
+    template <typename number2>
     unsigned short
     ConstraintValues<Number>::insert_entries(
-      const std::vector<std::pair<types::global_dof_index, double>> &entries)
+      const std::vector<std::pair<types::global_dof_index, number2>> &entries)
     {
       next_constraint.first.resize(entries.size());
       if (entries.size() > 0)
         {
           constraint_indices.resize(entries.size());
-          constraint_entries = entries;
+          // Use assign so that values for nonmatching Number / number2 are
+          // converted:
+          constraint_entries.assign(entries.begin(), entries.end());
           std::sort(constraint_entries.begin(),
                     constraint_entries.end(),
                     ConstraintComparator());
@@ -208,8 +213,8 @@ namespace internal
             {
               types::global_dof_index current_dof =
                 local_indices[lexicographic_inv[i]];
-              const std::vector<std::pair<types::global_dof_index, double>>
-                *entries_ptr = constraints.get_constraint_entries(current_dof);
+              const auto *entries_ptr =
+                constraints.get_constraint_entries(current_dof);
 
               // dof is constrained
               if (entries_ptr != nullptr)
@@ -226,8 +231,7 @@ namespace internal
                   // check whether this dof is identity constrained to another
                   // dof. then we can simply insert that dof and there is no
                   // need to actually resolve the constraint entries
-                  const std::vector<std::pair<types::global_dof_index, double>>
-                    &                           entries   = *entries_ptr;
+                  const auto &                  entries   = *entries_ptr;
                   const types::global_dof_index n_entries = entries.size();
                   if (n_entries == 1 &&
                       std::abs(entries[0].second - 1.) <
