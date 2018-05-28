@@ -3,7 +3,7 @@
 
 @dealiiVideoLecture{10}
 
-<h3>The basic functioning of finite elements</h3>
+<h3>The basic set up of finite element methods</h3>
 
 This is the first example where we actually use finite elements to compute
 something. We
@@ -81,8 +81,8 @@ we need the following:
   have to worry about this step.
 
 Through these steps, we now have a set of functions $\varphi_i$, and we can
-define the weak form of the discrete problem: Find a function $u_h$, i.e. find
-the expansion coefficients $U_i$ mentioned above, so that
+define the weak form of the discrete problem: Find a function $u_h$, i.e., find
+the expansion coefficients $U_j$ mentioned above, so that
 @f{align*}
   (\nabla\varphi_i, \nabla u_h)
    = (\varphi_i, f),
@@ -91,9 +91,18 @@ the expansion coefficients $U_i$ mentioned above, so that
 @f}
 Note that we here follow the convention that everything is counted starting at
 zero, as common in C and C++. This equation can be rewritten as a linear
-system by inserting the representation $u_h(\mathbf x)=\sum_j U_j
-\varphi_j(\mathbf x)$: Find a vector $U$ so that
-@f{align*}
+system if you insert the representation $u_h(\mathbf x)=\sum_j U_j
+\varphi_j(\mathbf x)$ and then observe that
+@f{align*}{
+  (\nabla\varphi_i, \nabla u_h)
+  &= \left(\nabla\varphi_i, \nabla \Bigl[\sum_j U_j \varphi_j\Bigr]\right)
+\\
+  &= \sum_j \left(\nabla\varphi_i, \nabla \left[U_j \varphi_j\right]\right)
+\\
+  &= \sum_j \left(\nabla\varphi_i, \nabla \varphi_j \right) U_j.
+@f}
+With this, the problem reads: Find a vector $U$ so that
+@f{align*}{
   A U = F,
 @f}
 where the matrix $A$ and the right hand side $F$ are defined as
@@ -102,19 +111,24 @@ where the matrix $A$ and the right hand side $F$ are defined as
   \\
   F_i &= (\varphi_i, f).
 @f}
+
+
+<h3> Should we multiply by a test function from the left or from the right? </h3>
+
 Before we move on with describing how these quantities can be computed, note
 that if we had multiplied the original equation from the <i>right</i> by a
 test function rather than from the left, then we would have obtained a linear
 system of the form
 @f{align*}
-  U^T A = F
+  U^T A = F^T
 @f}
-with a row vector $F$. By transposing this system, this is of course
+with a row vector $F^T$. By transposing this system, this is of course
 equivalent to solving
 @f{align*}
   A^T U = F
 @f}
-which here is the same as above since $A=A^T$ but in general is not. To avoid
+which here is the same as above since $A=A^T$. But in general is not,
+and in order to avoid
 any sort of confusion, experience has shown that simply getting into the habit
 of multiplying the equation from the left rather than from the right (as is
 often done in the mathematical literature) avoids a common class of errors as
@@ -123,7 +137,10 @@ comparing theory and implementation. See step-9 for the first example in this
 tutorial where we have a non-symmetric bilinear form for which it makes a
 difference whether we multiply from the right or from the left.
 
-Now we know what we need (namely objects that hold the matrix and
+
+<h3> Computing the matrix and right hand side vector </h3>
+
+Now we know what we need (namely: objects that hold the matrix and
 vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
 takes to make that happen:
 
