@@ -975,6 +975,30 @@ namespace GridGenerator
    * mesh building blocks are GridTools::transform, GridTools::rotate, and
    * GridTools::scale).
    *
+   * Vertices that are less than @p duplicated_vertex_tolerance apart will be merged
+   * together. It is usually necessary to set this value to something that
+   * depends on the input triangulations in some way. One reasonable choice is
+   * to use the minimum distance between all adjacent vertices of the input
+   * mesh divided by some constant:
+   *
+   * @code
+   * auto min_line_length = [](const Triangulation<dim> &tria) -> double
+   * {
+   *   double length = std::numeric_limits<double>::max();
+   *   for (const auto cell : tria.active_cell_iterators())
+   *     for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
+   *       length = std::min(length, (cell->line(n)->vertex(0) -
+   *                                  cell->line(n)->vertex(1)).norm());
+   *   return length;
+   * };
+   *
+   * const double tolerance = std::min(min_line_length(triangulation_1),
+   *                                   min_line_length(triangulation_2)) / 2.0;
+   * @endcode
+   *
+   * This will merge any vertices that are closer than any pair of vertices on
+   * the input meshes.
+   *
    * @note The two input triangulations must be coarse meshes that have no
    * refined cells.
    *
@@ -996,7 +1020,8 @@ namespace GridGenerator
   void
   merge_triangulations(const Triangulation<dim, spacedim> &triangulation_1,
                        const Triangulation<dim, spacedim> &triangulation_2,
-                       Triangulation<dim, spacedim> &      result);
+                       Triangulation<dim, spacedim> &      result,
+                       const double duplicated_vertex_tolerance = 1.0e-12);
 
   /**
    * Given the two triangulations specified as the first two arguments, create
