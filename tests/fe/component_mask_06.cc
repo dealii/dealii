@@ -30,10 +30,8 @@ void
 test()
 {
   // test for an initialized mask
-  Assert(ComponentMask(12, true).n_selected_components() == 12,
-         ExcInternalError());
-  Assert(ComponentMask(12, true).n_selected_components(12) == 12,
-         ExcInternalError());
+  Assert(ComponentMask(12, true).n_selected_components() == 12, ExcInternalError());
+  Assert(ComponentMask(12, true).n_selected_components(12) == 12, ExcInternalError());
   // test for an empty mask
   Assert(ComponentMask().n_selected_components(12) == 12, ExcInternalError());
   Assert(ComponentMask().n_selected_components(13) == 13, ExcInternalError());
@@ -45,8 +43,7 @@ test()
   // though:
   try
     {
-      Assert(ComponentMask(12, true).n_selected_components(13) == 12,
-             ExcInternalError());
+      Assert(ComponentMask(12, true).n_selected_components(13) == 12, ExcInternalError());
     }
   catch (ExceptionBase &e)
     {

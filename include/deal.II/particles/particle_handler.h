@@ -77,10 +77,9 @@ namespace Particles
      * This constructor is equivalent to calling the default constructor and
      * the initialize function.
      */
-    ParticleHandler(
-      const parallel::distributed::Triangulation<dim, spacedim> &tria,
-      const Mapping<dim, spacedim> &                             mapping,
-      const unsigned int n_properties = 0);
+    ParticleHandler(const parallel::distributed::Triangulation<dim, spacedim> &tria,
+                    const Mapping<dim, spacedim> &                             mapping,
+                    const unsigned int                                         n_properties = 0);
 
     /**
      * Destructor.
@@ -94,8 +93,8 @@ namespace Particles
      */
     void
     initialize(const parallel::distributed::Triangulation<dim, spacedim> &tria,
-               const Mapping<dim, spacedim> &mapping,
-               const unsigned int            n_properties = 0);
+               const Mapping<dim, spacedim> &                             mapping,
+               const unsigned int                                         n_properties = 0);
 
     /**
      * Clear all particle related data.
@@ -176,8 +175,7 @@ namespace Particles
      * particle that is no longer in the cell.
      */
     particle_iterator_range
-    particles_in_cell(
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
+    particles_in_cell(const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
 
 
     /**
@@ -187,8 +185,7 @@ namespace Particles
      */
     particle_iterator_range
     particles_in_cell(
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
-      const;
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell) const;
 
     /**
      * Remove a particle pointed to by the iterator.
@@ -203,9 +200,8 @@ namespace Particles
      * N)$ complexity for $N$ particles.
      */
     particle_iterator
-    insert_particle(
-      const Particle<dim, spacedim> &particle,
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
+    insert_particle(const Particle<dim, spacedim> &                                    particle,
+                    const typename Triangulation<dim, spacedim>::active_cell_iterator &cell);
 
     /**
      * Insert a number of particles into the collection of particles.
@@ -215,9 +211,8 @@ namespace Particles
      */
     void
     insert_particles(
-      const std::multimap<
-        typename Triangulation<dim, spacedim>::active_cell_iterator,
-        Particle<dim, spacedim>> &particles);
+      const std::multimap<typename Triangulation<dim, spacedim>::active_cell_iterator,
+                          Particle<dim, spacedim>> &particles);
 
     /**
      * Create and insert a number of particles into the collection of particles.
@@ -259,11 +254,9 @@ namespace Particles
      */
     void
     register_additional_store_load_functions(
-      const std::function<std::size_t()> &size_callback,
-      const std::function<void *(const particle_iterator &, void *)>
-        &store_callback,
-      const std::function<const void *(const particle_iterator &, const void *)>
-        &load_callback);
+      const std::function<std::size_t()> &                                        size_callback,
+      const std::function<void *(const particle_iterator &, void *)> &            store_callback,
+      const std::function<const void *(const particle_iterator &, const void *)> &load_callback);
 
     /**
      * Return the total number of particles that were managed by this class
@@ -318,8 +311,7 @@ namespace Particles
      */
     unsigned int
     n_particles_in_cell(
-      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
-      const;
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell) const;
 
     /**
      * Find and update the cells containing each particle for all locally owned
@@ -374,8 +366,7 @@ namespace Particles
     /**
      * Address of the mapping to work on.
      */
-    SmartPointer<const Mapping<dim, spacedim>, ParticleHandler<dim, spacedim>>
-      mapping;
+    SmartPointer<const Mapping<dim, spacedim>, ParticleHandler<dim, spacedim>> mapping;
 
     /**
      * Set of particles currently living in the local domain, organized by
@@ -453,8 +444,7 @@ namespace Particles
      * is expected to return a void pointer pointing to a position right
      * after its data block.
      */
-    std::function<const void *(const particle_iterator &, const void *)>
-      load_callback;
+    std::function<const void *(const particle_iterator &, const void *)> load_callback;
 
     /**
      * This variable is set by the register_store_callback_function()
@@ -488,18 +478,13 @@ namespace Particles
      */
     void
     send_recv_particles(
-      const std::map<types::subdomain_id, std::vector<particle_iterator>>
-        &particles_to_send,
-      std::multimap<internal::LevelInd, Particle<dim, spacedim>>
-        &received_particles,
-      const std::map<
-        types::subdomain_id,
-        std::vector<
-          typename Triangulation<dim, spacedim>::active_cell_iterator>>
-        &new_cells_for_particles = std::map<
-          types::subdomain_id,
-          std::vector<
-            typename Triangulation<dim, spacedim>::active_cell_iterator>>());
+      const std::map<types::subdomain_id, std::vector<particle_iterator>> &particles_to_send,
+      std::multimap<internal::LevelInd, Particle<dim, spacedim>> &         received_particles,
+      const std::map<types::subdomain_id,
+                     std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>>
+        &new_cells_for_particles =
+          std::map<types::subdomain_id,
+                   std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>>());
 #  endif
 
     /**
@@ -508,20 +493,18 @@ namespace Particles
      * cell to be sent around to the new processes.
      */
     void
-    store_particles(
-      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      const typename Triangulation<dim, spacedim>::CellStatus     status,
-      void *                                                      data) const;
+    store_particles(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+                    const typename Triangulation<dim, spacedim>::CellStatus     status,
+                    void *                                                      data) const;
 
     /**
      * Called by listener functions after a refinement step. The local map
      * of particles has to be read from the triangulation user_pointer.
      */
     void
-    load_particles(
-      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      const typename Triangulation<dim, spacedim>::CellStatus     status,
-      const void *                                                data);
+    load_particles(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+                   const typename Triangulation<dim, spacedim>::CellStatus     status,
+                   const void *                                                data);
   };
 
   /* ---------------------- inline and template functions ------------------ */
@@ -536,8 +519,7 @@ namespace Particles
     // this guarantees that data is immediately shipped to new processes if
     // the domain is distributed differently after resuming from a checkpoint.
     ar //&particles
-      &global_number_of_particles &global_max_particles_per_cell
-        &                          next_free_particle_index;
+      &global_number_of_particles &global_max_particles_per_cell &next_free_particle_index;
   }
 } // namespace Particles
 

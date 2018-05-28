@@ -61,8 +61,7 @@ test()
   triangulation.execute_coarsening_and_refinement();
 
   if (myid == 0)
-    deallog << "n_global_active_cells=" << triangulation.n_global_active_cells()
-            << std::endl;
+    deallog << "n_global_active_cells=" << triangulation.n_global_active_cells() << std::endl;
 
   if (myid == 0)
     deallog << "OK" << std::endl;

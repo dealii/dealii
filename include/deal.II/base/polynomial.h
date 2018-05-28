@@ -128,9 +128,7 @@ namespace Polynomials
      * terms involving the roots if that representation is used.
      */
     void
-    value(const number       x,
-          const unsigned int n_derivatives,
-          number *           values) const;
+    value(const number x, const unsigned int n_derivatives, number *values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
@@ -543,8 +541,7 @@ namespace Polynomials
      * unique_ptr in order to correctly free the memory of the vectors when
      * the global destructor is called.
      */
-    static std::vector<std::unique_ptr<const std::vector<double>>>
-      recursive_coefficients;
+    static std::vector<std::unique_ptr<const std::vector<double>>> recursive_coefficients;
   };
 
 
@@ -707,8 +704,7 @@ namespace Polynomials
      * Constructor for the polynomial with index <tt>index</tt> within the set
      * up polynomials of degree @p degree.
      */
-    HermiteLikeInterpolation(const unsigned int degree,
-                             const unsigned int index);
+    HermiteLikeInterpolation(const unsigned int degree, const unsigned int index);
 
     /**
      * Return the polynomials with index <tt>0</tt> up to <tt>degree+1</tt> in
@@ -751,9 +747,7 @@ namespace Polynomials
    */
   template <typename Number>
   std::vector<Number>
-  jacobi_polynomial_roots(const unsigned int degree,
-                          const int          alpha,
-                          const int          beta);
+  jacobi_polynomial_roots(const unsigned int degree, const int alpha, const int beta);
 } // namespace Polynomials
 
 
@@ -764,9 +758,7 @@ namespace Polynomials
 namespace Polynomials
 {
   template <typename number>
-  inline Polynomial<number>::Polynomial() :
-    in_lagrange_product_form(false),
-    lagrange_weight(1.)
+  inline Polynomial<number>::Polynomial() : in_lagrange_product_form(false), lagrange_weight(1.)
   {}
 
 
@@ -875,9 +867,7 @@ namespace Polynomials
 
   template <typename Number>
   std::vector<Number>
-  jacobi_polynomial_roots(const unsigned int degree,
-                          const int          alpha,
-                          const int          beta)
+  jacobi_polynomial_roots(const unsigned int degree, const int alpha, const int beta)
   {
     std::vector<Number> x(degree, 0.5);
 
@@ -905,8 +895,8 @@ namespace Polynomials
       {
         // we take the zeros of the Chebyshev polynomial (alpha=beta=-0.5) as
         // initial values, corrected by the initial value
-        Number r = 0.5 - 0.5 * std::cos(static_cast<Number>(2 * k + 1) /
-                                        (2 * degree) * numbers::PI);
+        Number r =
+          0.5 - 0.5 * std::cos(static_cast<Number>(2 * k + 1) / (2 * degree) * numbers::PI);
         if (k > 0)
           r = (r + x[k - 1]) / 2;
 
@@ -918,16 +908,14 @@ namespace Polynomials
               s += 1. / (r - x[i]);
 
             // derivative of P_n^{alpha,beta}, rescaled to [0, 1]
-            const Number J_x =
-              (alpha + beta + degree + 1) *
-              jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, r);
+            const Number J_x = (alpha + beta + degree + 1) *
+                               jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, r);
 
             // value of P_n^{alpha,beta}
-            const Number f = jacobi_polynomial_value(degree, alpha, beta, r);
+            const Number f     = jacobi_polynomial_value(degree, alpha, beta, r);
             const Number delta = f / (f * s - J_x);
             r += delta;
-            if (converged == numbers::invalid_unsigned_int &&
-                std::abs(delta) < tolerance)
+            if (converged == numbers::invalid_unsigned_int && std::abs(delta) < tolerance)
               converged = it;
 
             // do one more iteration to ensure accuracy also for tighter

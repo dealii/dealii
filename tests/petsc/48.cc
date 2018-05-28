@@ -26,9 +26,7 @@
 
 
 void
-test(PETScWrappers::MPI::Vector &v,
-     PETScWrappers::MPI::Vector &w,
-     PETScWrappers::MPI::Vector &x)
+test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w, PETScWrappers::MPI::Vector &x)
 {
   for (unsigned int i = 0; i < v.size(); ++i)
     {
@@ -49,8 +47,7 @@ test(PETScWrappers::MPI::Vector &v,
     {
       AssertThrow(w(i) == i + 1., ExcInternalError());
       AssertThrow(x(i) == i + 2., ExcInternalError());
-      AssertThrow(std::fabs(v(i) - (i + 1.) / (i + 2.)) < eps * v(i),
-                  ExcInternalError());
+      AssertThrow(std::fabs(v(i) - (i + 1.) / (i + 2.)) < eps * v(i), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -79,13 +76,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -93,12 +88,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

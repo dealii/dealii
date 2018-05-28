@@ -40,20 +40,16 @@ namespace numbers
       // the list of implemented comparative operations can be easily extended.
       bool
       adouble_boolean_comparator(
-        const adouble &value_1,
-        const adouble &value_2,
-        const std::function<adouble(const adouble &, const adouble &)>
-          &comparator)
+        const adouble &                                                 value_1,
+        const adouble &                                                 value_2,
+        const std::function<adouble(const adouble &, const adouble &)> &comparator)
       {
-        typedef typename Differentiation::AD::NumberTraits<
-          double,
-          Differentiation::AD::NumberTypes::adolc_taped>::ad_type ad_type;
-        static_assert(
-          std::is_same<adouble, ad_type>::value,
-          "The type of the AD number is not that which was expected.");
+        typedef typename Differentiation::AD::
+          NumberTraits<double, Differentiation::AD::NumberTypes::adolc_taped>::ad_type ad_type;
+        static_assert(std::is_same<adouble, ad_type>::value,
+                      "The type of the AD number is not that which was expected.");
         const ad_type result = comparator(value_1, value_2);
-        return !(Differentiation::AD::ADNumberTraits<ad_type>::get_scalar_value(
-                   result) == 0.0);
+        return !(Differentiation::AD::ADNumberTraits<ad_type>::get_scalar_value(result) == 0.0);
       }
     } // namespace
   }   // namespace internal

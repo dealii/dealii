@@ -33,8 +33,7 @@ do_test(const Triangulation<dim, spacedim> &tria, const Point<spacedim> &p)
 {
   MappingQ<dim, spacedim> mapping(1);
 
-  for (typename Triangulation<dim, spacedim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
+  for (typename Triangulation<dim, spacedim>::cell_iterator cell = tria.begin(); cell != tria.end();
        ++cell)
     {
       deallog << "Point p=(" << p << ") on cell with id " << cell->id() << ": "
@@ -51,8 +50,7 @@ do_test(const Triangulation<dim, spacedim> &tria, const Point<spacedim> &p)
         }
       catch (typename Mapping<dim, spacedim>::ExcTransformationFailed)
         {
-          deallog << "No MappingQ transform possible for this cell and point."
-                  << std::endl;
+          deallog << "No MappingQ transform possible for this cell and point." << std::endl;
         }
     }
 }

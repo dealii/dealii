@@ -85,14 +85,9 @@ test()
 
   TestIntegrator<dim, spacedim> integrator;
 
-  MeshWorker::integration_loop<dim, spacedim>(dof_handler.begin_active(),
-                                              dof_handler.end(),
-                                              dof_info,
-                                              info_box,
-                                              integrator,
-                                              assembler);
-  deallog << "dim = " << dim << ", spacedim = " << spacedim << ": OK"
-          << std::endl;
+  MeshWorker::integration_loop<dim, spacedim>(
+    dof_handler.begin_active(), dof_handler.end(), dof_info, info_box, integrator, assembler);
+  deallog << "dim = " << dim << ", spacedim = " << spacedim << ": OK" << std::endl;
 }
 
 

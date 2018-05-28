@@ -42,10 +42,8 @@ main()
       table_2.add_value("key", i);
     }
 
-  table.evaluate_convergence_rates(
-    "error", "key", ConvergenceTable::reduction_rate);
-  table_2.evaluate_convergence_rates(
-    "error", "key", ConvergenceTable::reduction_rate_log2);
+  table.evaluate_convergence_rates("error", "key", ConvergenceTable::reduction_rate);
+  table_2.evaluate_convergence_rates("error", "key", ConvergenceTable::reduction_rate_log2);
 
   // output
   table.write_text(deallog.get_file_stream());

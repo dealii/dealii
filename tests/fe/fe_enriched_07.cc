@@ -71,8 +71,7 @@ public:
   gradient(const Point<dim> &point, const unsigned int component = 0) const
   {
     Tensor<1, dim> res = point;
-    Assert(point.norm() > 0,
-           dealii::ExcMessage("gradient is not defined at zero"));
+    Assert(point.norm() > 0, dealii::ExcMessage("gradient is not defined at zero"));
     res *= -value(point) / point.norm();
     return res;
   }
@@ -81,9 +80,7 @@ public:
 
 template <int dim>
 void
-test6(const bool         do_href,
-      const unsigned int p_feq  = 1,
-      const unsigned int p_feen = 2)
+test6(const bool do_href, const unsigned int p_feq = 1, const unsigned int p_feen = 2)
 {
   deallog << "hp: " << do_href << " " << p_feq << " " << p_feen << std::endl;
 
@@ -94,8 +91,7 @@ test6(const bool         do_href,
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feq)));
-  fe_collection.push_back(
-    FE_Enriched<dim>(FE_Q<dim>(p_feen), FE_Q<dim>(1), &function));
+  fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feen), FE_Q<dim>(1), &function));
   // push back to be able to resolve hp constrains:
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feen)));
 
@@ -113,8 +109,7 @@ test6(const bool         do_href,
   // |------|------|
   triangulation.refine_global();
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
-      dof_handler.begin_active();
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
     cell->set_active_fe_index(1); // POU
     cell++;
     cell->set_active_fe_index(1); // POU
@@ -150,13 +145,11 @@ test6(const bool         do_href,
       // if the dof is constrained, first output unconstrained vector
       if (constraints.is_constrained(s))
         {
-          names.push_back(std::string("UN_") +
-                          dealii::Utilities::int_to_string(s, 2));
+          names.push_back(std::string("UN_") + dealii::Utilities::int_to_string(s, 2));
           shape_functions.push_back(shape_function);
         }
 
-      names.push_back(std::string("N_") +
-                      dealii::Utilities::int_to_string(s, 2));
+      names.push_back(std::string("N_") + dealii::Utilities::int_to_string(s, 2));
 
       // make continuous/constrain:
       constraints.distribute(shape_function);
@@ -167,9 +160,8 @@ test6(const bool         do_href,
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
-  Vector<float> fe_index(triangulation.n_active_cells());
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  Vector<float>                                      fe_index(triangulation.n_active_cells());
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
@@ -183,9 +175,8 @@ test6(const bool         do_href,
   data_out.build_patches(patches);
 
   std::string filename = "hp-shape_functions_ref=" + std::to_string(do_href) +
-                         "_p_feq=" + std::to_string(p_feq) +
-                         "_p_feenr=" + std::to_string(p_feen) + "_" +
-                         dealii::Utilities::int_to_string(dim) + "D.vtu";
+                         "_p_feq=" + std::to_string(p_feq) + "_p_feenr=" + std::to_string(p_feen) +
+                         "_" + dealii::Utilities::int_to_string(dim) + "D.vtu";
   std::ofstream output(filename.c_str());
   data_out.write_vtu(output);
 #endif
@@ -212,13 +203,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -226,12 +215,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -44,17 +44,16 @@ main()
 
   Triangulation<2>::active_cell_iterator cell = tria.begin_active();
   for (; cell != tria.end(); ++cell)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<2>::faces_per_cell;
-         ++face_no)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<2>::faces_per_cell; ++face_no)
       if (cell->at_boundary(face_no))
         {
           Triangulation<2>::face_iterator face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
           for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_face; ++v)
-            AssertThrow((boundary.normal_vector(face, face->vertex(v)) -
-                         normals[v] / normals[v].norm())
-                            .norm() < 1e-12,
-                        ExcInternalError());
+            AssertThrow(
+              (boundary.normal_vector(face, face->vertex(v)) - normals[v] / normals[v].norm())
+                  .norm() < 1e-12,
+              ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

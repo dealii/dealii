@@ -30,29 +30,24 @@ PolynomialsRannacherTurek<dim>::PolynomialsRannacherTurek()
 
 template <int dim>
 double
-PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
-                                              const Point<dim> & p) const
+PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i, const Point<dim> &p) const
 {
   Assert(dim == 2, ExcNotImplemented());
   if (i == 0)
     {
-      return (0.75 - 2.5 * p(0) + 1.5 * p(1) +
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (0.75 - 2.5 * p(0) + 1.5 * p(1) + 1.5 * (p(0) * p(0) - p(1) * p(1)));
     }
   else if (i == 1)
     {
-      return (-0.25 - 0.5 * p(0) + 1.5 * p(1) +
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (-0.25 - 0.5 * p(0) + 1.5 * p(1) + 1.5 * (p(0) * p(0) - p(1) * p(1)));
     }
   else if (i == 2)
     {
-      return (0.75 + 1.5 * p(0) - 2.5 * p(1) -
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (0.75 + 1.5 * p(0) - 2.5 * p(1) - 1.5 * (p(0) * p(0) - p(1) * p(1)));
     }
   else if (i == 3)
     {
-      return (-0.25 + 1.5 * p(0) - 0.5 * p(1) -
-              1.5 * (p(0) * p(0) - p(1) * p(1)));
+      return (-0.25 + 1.5 * p(0) - 0.5 * p(1) - 1.5 * (p(0) * p(0) - p(1) * p(1)));
     }
 
   Assert(false, ExcNotImplemented());
@@ -63,8 +58,7 @@ PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
 
 template <int dim>
 Tensor<1, dim>
-PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
-                                             const Point<dim> & p) const
+PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i, const Point<dim> &p) const
 {
   Assert(dim == 2, ExcNotImplemented());
   Tensor<1, dim> grad;
@@ -100,9 +94,8 @@ PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
 
 template <int dim>
 Tensor<2, dim>
-PolynomialsRannacherTurek<dim>::compute_grad_grad(
-  const unsigned int i,
-  const Point<dim> & /*p*/) const
+PolynomialsRannacherTurek<dim>::compute_grad_grad(const unsigned int i,
+                                                  const Point<dim> & /*p*/) const
 {
   Assert(dim == 2, ExcNotImplemented());
   Tensor<2, dim> grad_grad;
@@ -141,19 +134,17 @@ PolynomialsRannacherTurek<dim>::compute_grad_grad(
 
 template <int dim>
 void
-PolynomialsRannacherTurek<dim>::compute(
-  const Point<dim> &           unit_point,
-  std::vector<double> &        values,
-  std::vector<Tensor<1, dim>> &grads,
-  std::vector<Tensor<2, dim>> &grad_grads,
-  std::vector<Tensor<3, dim>> &third_derivatives,
-  std::vector<Tensor<4, dim>> &fourth_derivatives) const
+PolynomialsRannacherTurek<dim>::compute(const Point<dim> &           unit_point,
+                                        std::vector<double> &        values,
+                                        std::vector<Tensor<1, dim>> &grads,
+                                        std::vector<Tensor<2, dim>> &grad_grads,
+                                        std::vector<Tensor<3, dim>> &third_derivatives,
+                                        std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
   const unsigned int n_pols = dealii::GeometryInfo<dim>::faces_per_cell;
   Assert(values.size() == n_pols || values.size() == 0,
          ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
+  Assert(grads.size() == n_pols || grads.size() == 0, ExcDimensionMismatch(grads.size(), n_pols));
   Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
          ExcDimensionMismatch(grad_grads.size(), n_pols));
   Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,

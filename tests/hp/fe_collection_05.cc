@@ -80,14 +80,10 @@ test()
   // {0x0, 0x0, Q1x0, 0xQ1}
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(), 1, FE_Nothing<dim>(), 1));
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(), 1, FE_Nothing<dim>(), 1));
-    fe_collection.push_back(
-      FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1));
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(), 1, FE_Q<dim>(1), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 1, FE_Nothing<dim>(), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 1, FE_Nothing<dim>(), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 1, FE_Q<dim>(1), 1));
     const unsigned int ind = fe_collection.find_least_face_dominating_fe(fes);
     if (ind == numbers::invalid_unsigned_int)
       deallog << "numbers::invalid_unsigned_int" << std::endl;
@@ -103,10 +99,8 @@ test()
       FESystem<dim>(FE_Nothing<dim>(1, true), 1, FE_Nothing<dim>(1, true), 1));
     fe_collection.push_back(
       FESystem<dim>(FE_Nothing<dim>(1, true), 1, FE_Nothing<dim>(1, true), 1));
-    fe_collection.push_back(
-      FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(1, true), 1));
-    fe_collection.push_back(
-      FESystem<dim>(FE_Nothing<dim>(1, true), 1, FE_Q<dim>(1), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(1, true), 1));
+    fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(1, true), 1, FE_Q<dim>(1), 1));
     deallog << fe_collection.find_least_face_dominating_fe(fes) << std::endl;
   }
 

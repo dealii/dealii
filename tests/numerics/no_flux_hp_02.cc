@@ -73,12 +73,8 @@ test_hyper_cube()
 
   for (unsigned int degree = 1; degree < 4; ++degree)
     {
-      hp::FECollection<dim> fe(FESystem<dim>(FE_Q<dim>(degree + 1),
-                                             1,
-                                             FE_Q<dim>(degree),
-                                             dim,
-                                             FE_Q<dim>(degree + 1),
-                                             1));
+      hp::FECollection<dim> fe(
+        FESystem<dim>(FE_Q<dim>(degree + 1), 1, FE_Q<dim>(degree), dim, FE_Q<dim>(degree + 1), 1));
       test(tr, fe);
     }
 }

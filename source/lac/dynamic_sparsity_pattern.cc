@@ -97,8 +97,7 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
       Assert(pos1 <= entries.size(), ExcInternalError());
       entries.insert(it, my_it, end);
       it = entries.begin() + pos1;
-      Assert(entries.size() >= (size_type)(it - entries.begin()),
-             ExcInternalError());
+      Assert(entries.size() >= (size_type)(it - entries.begin()), ExcInternalError());
 
       // now merge the two lists.
       std::vector<size_type>::iterator it2 = it + (end - my_it);
@@ -217,17 +216,12 @@ DynamicSparsityPattern::Line::memory_consumption() const
 }
 
 
-DynamicSparsityPattern::DynamicSparsityPattern() :
-  have_entries(false),
-  rows(0),
-  cols(0),
-  rowset(0)
+DynamicSparsityPattern::DynamicSparsityPattern() : have_entries(false), rows(0), cols(0), rowset(0)
 {}
 
 
 
-DynamicSparsityPattern::DynamicSparsityPattern(
-  const DynamicSparsityPattern &s) :
+DynamicSparsityPattern::DynamicSparsityPattern(const DynamicSparsityPattern &s) :
   Subscriptor(),
   have_entries(false),
   rows(0),
@@ -236,10 +230,9 @@ DynamicSparsityPattern::DynamicSparsityPattern(
 {
   (void)s;
   Assert(s.rows == 0 && s.cols == 0,
-         ExcMessage(
-           "This constructor can only be called if the provided argument "
-           "is the sparsity pattern for an empty matrix. This constructor can "
-           "not be used to copy-construct a non-empty sparsity pattern."));
+         ExcMessage("This constructor can only be called if the provided argument "
+                    "is the sparsity pattern for an empty matrix. This constructor can "
+                    "not be used to copy-construct a non-empty sparsity pattern."));
 }
 
 
@@ -281,11 +274,10 @@ DynamicSparsityPattern &
 DynamicSparsityPattern::operator=(const DynamicSparsityPattern &s)
 {
   (void)s;
-  Assert(
-    s.rows == 0 && s.cols == 0,
-    ExcMessage("This operator can only be called if the provided argument "
-               "is the sparsity pattern for an empty matrix. This operator can "
-               "not be used to copy a non-empty sparsity pattern."));
+  Assert(s.rows == 0 && s.cols == 0,
+         ExcMessage("This operator can only be called if the provided argument "
+                    "is the sparsity pattern for an empty matrix. This operator can "
+                    "not be used to copy a non-empty sparsity pattern."));
 
   Assert(rows == 0 && cols == 0,
          ExcMessage("This operator can only be called if the current object is"
@@ -297,23 +289,20 @@ DynamicSparsityPattern::operator=(const DynamicSparsityPattern &s)
 
 
 void
-DynamicSparsityPattern::reinit(const size_type m,
-                               const size_type n,
-                               const IndexSet &rowset_)
+DynamicSparsityPattern::reinit(const size_type m, const size_type n, const IndexSet &rowset_)
 {
   have_entries = false;
   rows         = m;
   cols         = n;
   rowset       = rowset_;
 
-  Assert(
-    rowset.size() == 0 || rowset.size() == m,
-    ExcMessage("The IndexSet argument to this function needs to either "
-               "be empty (indicating the complete set of rows), or have size "
-               "equal to the desired number of rows as specified by the "
-               "first argument to this function. (Of course, the number "
-               "of indices in this IndexSet may be less than the number "
-               "of rows, but the *size* of the IndexSet must be equal.)"));
+  Assert(rowset.size() == 0 || rowset.size() == m,
+         ExcMessage("The IndexSet argument to this function needs to either "
+                    "be empty (indicating the complete set of rows), or have size "
+                    "equal to the desired number of rows as specified by the "
+                    "first argument to this function. (Of course, the number "
+                    "of indices in this IndexSet may be less than the number "
+                    "of rows, but the *size* of the IndexSet must be equal.)"));
 
   std::vector<Line> new_lines(rowset.size() == 0 ? rows : rowset.n_elements());
   lines.swap(new_lines);
@@ -362,11 +351,9 @@ DynamicSparsityPattern::exists(const size_type i, const size_type j) const
   if (!have_entries)
     return false;
 
-  const size_type rowindex =
-    rowset.size() == 0 ? i : rowset.index_within_set(i);
+  const size_type rowindex = rowset.size() == 0 ? i : rowset.index_within_set(i);
 
-  return std::binary_search(
-    lines[rowindex].entries.begin(), lines[rowindex].entries.end(), j);
+  return std::binary_search(lines[rowindex].entries.begin(), lines[rowindex].entries.end(), j);
 }
 
 
@@ -389,11 +376,9 @@ DynamicSparsityPattern::symmetrize()
   // already exist without any harm
   for (size_type row = 0; row < lines.size(); ++row)
     {
-      const size_type rowindex =
-        rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
+      const size_type rowindex = rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
+      for (std::vector<size_type>::const_iterator j = lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
         // add the transpose entry if
@@ -407,17 +392,14 @@ DynamicSparsityPattern::symmetrize()
 
 template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
 void
-DynamicSparsityPattern::compute_mmult_pattern(
-  const SparsityPatternTypeLeft & left,
-  const SparsityPatternTypeRight &right)
+DynamicSparsityPattern::compute_mmult_pattern(const SparsityPatternTypeLeft & left,
+                                              const SparsityPatternTypeRight &right)
 {
-  Assert(left.n_cols() == right.n_rows(),
-         ExcDimensionMismatch(left.n_cols(), right.n_rows()));
+  Assert(left.n_cols() == right.n_rows(), ExcDimensionMismatch(left.n_cols(), right.n_rows()));
 
   this->reinit(left.n_rows(), right.n_cols());
 
-  typename SparsityPatternTypeLeft::iterator it_left  = left.begin(),
-                                             end_left = left.end();
+  typename SparsityPatternTypeLeft::iterator it_left = left.begin(), end_left = left.end();
   for (; it_left != end_left; ++it_left)
     {
       const unsigned int j = it_left->column();
@@ -442,8 +424,7 @@ DynamicSparsityPattern::print(std::ostream &out) const
     {
       out << '[' << (rowset.size() == 0 ? row : rowset.nth_index_in_set(row));
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
+      for (std::vector<size_type>::const_iterator j = lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
         out << ',' << *j;
@@ -461,11 +442,9 @@ DynamicSparsityPattern::print_gnuplot(std::ostream &out) const
 {
   for (size_type row = 0; row < lines.size(); ++row)
     {
-      const size_type rowindex =
-        rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
+      const size_type rowindex = rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
+      for (std::vector<size_type>::const_iterator j = lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
         // while matrix entries are usually
@@ -488,15 +467,12 @@ DynamicSparsityPattern::bandwidth() const
   size_type b = 0;
   for (size_type row = 0; row < lines.size(); ++row)
     {
-      const size_type rowindex =
-        rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
+      const size_type rowindex = rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
+      for (std::vector<size_type>::const_iterator j = lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
-        if (static_cast<size_type>(std::abs(static_cast<int>(rowindex - *j))) >
-            b)
+        if (static_cast<size_type>(std::abs(static_cast<int>(rowindex - *j))) > b)
           b = std::abs(static_cast<signed int>(rowindex - *j));
     }
 
@@ -524,9 +500,8 @@ DynamicSparsityPattern::n_nonzero_elements() const
 DynamicSparsityPattern::size_type
 DynamicSparsityPattern::memory_consumption() const
 {
-  size_type mem = sizeof(DynamicSparsityPattern) +
-                  MemoryConsumption::memory_consumption(rowset) -
-                  sizeof(rowset);
+  size_type mem =
+    sizeof(DynamicSparsityPattern) + MemoryConsumption::memory_consumption(rowset) - sizeof(rowset);
 
   for (size_type i = 0; i < lines.size(); ++i)
     mem += MemoryConsumption::memory_consumption(lines[i]);
@@ -539,9 +514,7 @@ DynamicSparsityPattern::memory_consumption() const
 template void
 DynamicSparsityPattern::Line::add_entries(size_type *, size_type *, const bool);
 template void
-DynamicSparsityPattern::Line::add_entries(const size_type *,
-                                          const size_type *,
-                                          const bool);
+DynamicSparsityPattern::Line::add_entries(const size_type *, const size_type *, const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void
 DynamicSparsityPattern::Line::add_entries(std::vector<size_type>::iterator,
@@ -559,7 +532,6 @@ template void
 DynamicSparsityPattern::compute_mmult_pattern(const SparsityPattern &,
                                               const DynamicSparsityPattern &);
 template void
-DynamicSparsityPattern::compute_mmult_pattern(const SparsityPattern &,
-                                              const SparsityPattern &);
+DynamicSparsityPattern::compute_mmult_pattern(const SparsityPattern &, const SparsityPattern &);
 
 DEAL_II_NAMESPACE_CLOSE

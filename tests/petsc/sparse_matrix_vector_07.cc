@@ -27,9 +27,7 @@
 
 
 void
-test(PETScWrappers::MPI::Vector &v,
-     PETScWrappers::MPI::Vector &w,
-     PETScWrappers::MPI::Vector &x)
+test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w, PETScWrappers::MPI::Vector &x)
 {
   PETScWrappers::SparseMatrix m(v.size(), v.size(), v.size());
   for (unsigned int i = 0; i < m.m(); ++i)
@@ -90,13 +88,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -104,12 +100,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

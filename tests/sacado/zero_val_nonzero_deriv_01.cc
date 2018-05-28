@@ -48,9 +48,8 @@ main()
   DoFHandler<dim>    dof_handler(triangulation);
   Vector<double>     zero_solution;
 
-  FEValues<dim> fe_values(fe,
-                          quadrature_formula,
-                          update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fe_values(
+    fe, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
   GridGenerator::hyper_cube(triangulation, -1, 1);
   dof_handler.distribute_dofs(fe);
@@ -73,15 +72,14 @@ main()
       // are the independent variables "x".
       std::vector<ad_type> local_ad_dof_values(fe.n_dofs_per_cell());
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-        local_ad_dof_values[i] =
-          ad_type(fe.n_dofs_per_cell(), i, local_dof_values[i]);
+        local_ad_dof_values[i] = ad_type(fe.n_dofs_per_cell(), i, local_dof_values[i]);
 
       // Get solution values while tracking the influence
       // that perturbing the DoF values may have on the
       // derivative of the dependent variable "f(x)".
       std::vector<ad_type> local_qp_soln_values_ad(fe.n_dofs_per_cell());
-      fe_values[extractor_sclr].get_function_values_from_local_dof_values(
-        local_ad_dof_values, local_qp_soln_values_ad);
+      fe_values[extractor_sclr].get_function_values_from_local_dof_values(local_ad_dof_values,
+                                                                          local_qp_soln_values_ad);
 
       // Compute the dependent variable "f(x)".
       ad_type f_x = 0.0;

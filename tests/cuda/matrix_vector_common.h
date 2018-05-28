@@ -59,22 +59,20 @@ do_test(const DoFHandler<dim> &dof, const ConstraintMatrix &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
-  MappingQGeneric<dim>                  mapping(fe_degree);
-  CUDAWrappers::MatrixFree<dim, Number> mf_data;
-  typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
-    additional_data;
-  additional_data.mapping_update_flags = update_values | update_gradients |
-                                         update_JxW_values |
-                                         update_quadrature_points;
+  MappingQGeneric<dim>                                           mapping(fe_degree);
+  CUDAWrappers::MatrixFree<dim, Number>                          mf_data;
+  typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData additional_data;
+  additional_data.mapping_update_flags =
+    update_values | update_gradients | update_JxW_values | update_quadrature_points;
   const QGauss<1> quad(n_q_points_1d);
   mf_data.reinit(mapping, dof, constraints, quad, additional_data);
 
   const unsigned int                                    n_dofs = dof.n_dofs();
   MatrixFreeTest<dim, fe_degree, Number, n_q_points_1d> mf(mf_data);
-  Vector<Number>                              in_host(n_dofs), out_host(n_dofs);
-  LinearAlgebra::ReadWriteVector<Number>      in(n_dofs), out(n_dofs);
-  LinearAlgebra::CUDAWrappers::Vector<Number> in_device(n_dofs);
-  LinearAlgebra::CUDAWrappers::Vector<Number> out_device(n_dofs);
+  Vector<Number>                                        in_host(n_dofs), out_host(n_dofs);
+  LinearAlgebra::ReadWriteVector<Number>                in(n_dofs), out(n_dofs);
+  LinearAlgebra::CUDAWrappers::Vector<Number>           in_device(n_dofs);
+  LinearAlgebra::CUDAWrappers::Vector<Number>           out_device(n_dofs);
 
   for (unsigned int i = 0; i < n_dofs; ++i)
     {
@@ -104,17 +102,15 @@ do_test(const DoFHandler<dim> &dof, const ConstraintMatrix &constraints)
     FEValues<dim> fe_values(mapping,
                             dof.get_fe(),
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_JxW_values);
+                            update_values | update_gradients | update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
@@ -124,16 +120,14 @@ do_test(const DoFHandler<dim> &dof, const ConstraintMatrix &constraints)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       10. * fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                    10. * fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                   fe_values.JxW(q_point));
             }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, sparse_matrix);
+        constraints.distribute_local_to_global(cell_matrix, local_dof_indices, sparse_matrix);
       }
   }
   for (unsigned i = 0; i < n_dofs; ++i)

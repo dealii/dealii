@@ -323,17 +323,13 @@ public:
    */
   template <typename number2>
   void
-  vmult(Vector<number2> &      w,
-        const Vector<number2> &v,
-        const bool             adding = false) const;
+  vmult(Vector<number2> &w, const Vector<number2> &v, const bool adding = false) const;
 
   /**
    * Specialization of above function for compatible Vector::value_type.
    */
   void
-  vmult(Vector<number> &      w,
-        const Vector<number> &v,
-        const bool            adding = false) const;
+  vmult(Vector<number> &w, const Vector<number> &v, const bool adding = false) const;
 
   /**
    * Adding Matrix-vector-multiplication $\mathbf w \mathrel{+}= \mathbf A \cdot
@@ -364,17 +360,13 @@ public:
    */
   template <typename number2>
   void
-  Tvmult(Vector<number2> &      w,
-         const Vector<number2> &v,
-         const bool             adding = false) const;
+  Tvmult(Vector<number2> &w, const Vector<number2> &v, const bool adding = false) const;
 
   /**
    * Specialization of above function for compatible Vector::value_type.
    */
   void
-  Tvmult(Vector<number> &      w,
-         const Vector<number> &v,
-         const bool            adding = false) const;
+  Tvmult(Vector<number> &w, const Vector<number> &v, const bool adding = false) const;
 
   /**
    * Adding transpose matrix-vector-multiplication $\mathbf w \mathrel{+}=
@@ -417,9 +409,7 @@ public:
    * LAPACKFullMatrix.
    */
   void
-  mmult(FullMatrix<number> &            C,
-        const LAPACKFullMatrix<number> &B,
-        const bool                      adding = false) const;
+  mmult(FullMatrix<number> &C, const LAPACKFullMatrix<number> &B, const bool adding = false) const;
 
   /**
    * Matrix-matrix-multiplication using transpose of <tt>this</tt>.
@@ -445,9 +435,7 @@ public:
    * LAPACKFullMatrix.
    */
   void
-  Tmmult(FullMatrix<number> &            C,
-         const LAPACKFullMatrix<number> &B,
-         const bool                      adding = false) const;
+  Tmmult(FullMatrix<number> &C, const LAPACKFullMatrix<number> &B, const bool adding = false) const;
 
   /**
    * Matrix-matrix-multiplication using transpose of <tt>this</tt> and a
@@ -495,9 +483,7 @@ public:
    * LAPACKFullMatrix.
    */
   void
-  mTmult(FullMatrix<number> &            C,
-         const LAPACKFullMatrix<number> &B,
-         const bool                      adding = false) const;
+  mTmult(FullMatrix<number> &C, const LAPACKFullMatrix<number> &B, const bool adding = false) const;
 
   /**
    * Matrix-matrix-multiplication using transpose of <tt>this</tt> and
@@ -670,8 +656,7 @@ public:
    */
   DEAL_II_DEPRECATED
   void
-  apply_lu_factorization(LAPACKFullMatrix<number> &B,
-                         const bool                transposed) const;
+  apply_lu_factorization(LAPACKFullMatrix<number> &B, const bool transposed) const;
 
   /**
    * Compute eigenvalues of the matrix. After this routine has been called,
@@ -692,8 +677,7 @@ public:
    * @note Calls the LAPACK function Xgeev.
    */
   void
-  compute_eigenvalues(const bool right_eigenvectors = false,
-                      const bool left_eigenvectors  = false);
+  compute_eigenvalues(const bool right_eigenvectors = false, const bool left_eigenvectors = false);
 
   /**
    * Compute eigenvalues and eigenvectors of a real symmetric matrix. Only
@@ -748,14 +732,13 @@ public:
    * @note Calls the LAPACK function Xsygvx.
    */
   void
-  compute_generalized_eigenvalues_symmetric(
-    LAPACKFullMatrix<number> &   B,
-    const number                 lower_bound,
-    const number                 upper_bound,
-    const number                 abs_accuracy,
-    Vector<number> &             eigenvalues,
-    std::vector<Vector<number>> &eigenvectors,
-    const types::blas_int        itype = 1);
+  compute_generalized_eigenvalues_symmetric(LAPACKFullMatrix<number> &   B,
+                                            const number                 lower_bound,
+                                            const number                 upper_bound,
+                                            const number                 abs_accuracy,
+                                            Vector<number> &             eigenvalues,
+                                            std::vector<Vector<number>> &eigenvectors,
+                                            const types::blas_int        itype = 1);
 
   /**
    * Same as the other compute_generalized_eigenvalues_symmetric function
@@ -773,10 +756,9 @@ public:
    * @note Calls the LAPACK function Xsygv.
    */
   void
-  compute_generalized_eigenvalues_symmetric(
-    LAPACKFullMatrix<number> &   B,
-    std::vector<Vector<number>> &eigenvectors,
-    const types::blas_int        itype = 1);
+  compute_generalized_eigenvalues_symmetric(LAPACKFullMatrix<number> &   B,
+                                            std::vector<Vector<number>> &eigenvectors,
+                                            const types::blas_int        itype = 1);
 
   /**
    * Compute the singular value decomposition of the matrix using LAPACK
@@ -981,9 +963,7 @@ private:
 
 template <typename number>
 inline void
-LAPACKFullMatrix<number>::set(const size_type i,
-                              const size_type j,
-                              const number    value)
+LAPACKFullMatrix<number>::set(const size_type i, const size_type j, const number value)
 {
   (*this)(i, j) = value;
 }
@@ -1016,9 +996,7 @@ LAPACKFullMatrix<number>::copy_from(const MatrixType &M)
   for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MatrixType::const_iterator end_row = M.end(row);
-      for (typename MatrixType::const_iterator entry = M.begin(row);
-           entry != end_row;
-           ++entry)
+      for (typename MatrixType::const_iterator entry = M.begin(row); entry != end_row; ++entry)
         this->el(row, entry->column()) = entry->value();
     }
 
@@ -1043,9 +1021,7 @@ LAPACKFullMatrix<number>::fill(const MatrixType &M,
   for (size_type row = src_offset_i; row < M.m(); ++row)
     {
       const typename MatrixType::const_iterator end_row = M.end(row);
-      for (typename MatrixType::const_iterator entry = M.begin(row);
-           entry != end_row;
-           ++entry)
+      for (typename MatrixType::const_iterator entry = M.begin(row); entry != end_row; ++entry)
         {
           const size_type i = transpose ? entry->column() : row;
           const size_type j = transpose ? row : entry->column();
@@ -1064,9 +1040,7 @@ LAPACKFullMatrix<number>::fill(const MatrixType &M,
 template <typename number>
 template <typename number2>
 void
-LAPACKFullMatrix<number>::vmult(Vector<number2> &,
-                                const Vector<number2> &,
-                                const bool) const
+LAPACKFullMatrix<number>::vmult(Vector<number2> &, const Vector<number2> &, const bool) const
 {
   Assert(false,
          ExcMessage("LAPACKFullMatrix<number>::vmult must be called with a "
@@ -1077,8 +1051,7 @@ LAPACKFullMatrix<number>::vmult(Vector<number2> &,
 template <typename number>
 template <typename number2>
 void
-LAPACKFullMatrix<number>::vmult_add(Vector<number2> &,
-                                    const Vector<number2> &) const
+LAPACKFullMatrix<number>::vmult_add(Vector<number2> &, const Vector<number2> &) const
 {
   Assert(false,
          ExcMessage("LAPACKFullMatrix<number>::vmult_add must be called with a "
@@ -1089,9 +1062,7 @@ LAPACKFullMatrix<number>::vmult_add(Vector<number2> &,
 template <typename number>
 template <typename number2>
 void
-LAPACKFullMatrix<number>::Tvmult(Vector<number2> &,
-                                 const Vector<number2> &,
-                                 const bool) const
+LAPACKFullMatrix<number>::Tvmult(Vector<number2> &, const Vector<number2> &, const bool) const
 {
   Assert(false,
          ExcMessage("LAPACKFullMatrix<number>::Tvmult must be called with a "
@@ -1102,13 +1073,11 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number2> &,
 template <typename number>
 template <typename number2>
 void
-LAPACKFullMatrix<number>::Tvmult_add(Vector<number2> &,
-                                     const Vector<number2> &) const
+LAPACKFullMatrix<number>::Tvmult_add(Vector<number2> &, const Vector<number2> &) const
 {
-  Assert(
-    false,
-    ExcMessage("LAPACKFullMatrix<number>::Tvmult_add must be called with a "
-               "matching Vector<double> vector type."));
+  Assert(false,
+         ExcMessage("LAPACKFullMatrix<number>::Tvmult_add must be called with a "
+                    "matching Vector<double> vector type."));
 }
 
 

@@ -81,8 +81,7 @@ namespace PETScWrappers
     // this ugly cast is necessary because the
     // type Mat and PETScObject are
     // unrelated.
-    PetscErrorCode ierr =
-      PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
+    PetscErrorCode ierr = PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = PCCreate(comm, &pc);
@@ -143,8 +142,7 @@ namespace PETScWrappers
   }
 
   void
-  PreconditionJacobi::initialize(const MatrixBase &    matrix_,
-                                 const AdditionalData &additional_data_)
+  PreconditionJacobi::initialize(const MatrixBase &matrix_, const AdditionalData &additional_data_)
   {
     clear();
 
@@ -160,9 +158,8 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionBlockJacobi -------------------- */
-  PreconditionBlockJacobi::PreconditionBlockJacobi(
-    const MPI_Comm        comm,
-    const AdditionalData &additional_data_)
+  PreconditionBlockJacobi::PreconditionBlockJacobi(const MPI_Comm        comm,
+                                                   const AdditionalData &additional_data_)
   {
     additional_data = additional_data_;
 
@@ -174,9 +171,8 @@ namespace PETScWrappers
 
 
 
-  PreconditionBlockJacobi::PreconditionBlockJacobi(
-    const MatrixBase &    matrix,
-    const AdditionalData &additional_data)
+  PreconditionBlockJacobi::PreconditionBlockJacobi(const MatrixBase &    matrix,
+                                                   const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
@@ -211,22 +207,19 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionSOR -------------------- */
 
-  PreconditionSOR::AdditionalData::AdditionalData(const double omega) :
-    omega(omega)
+  PreconditionSOR::AdditionalData::AdditionalData(const double omega) : omega(omega)
   {}
 
 
 
-  PreconditionSOR::PreconditionSOR(const MatrixBase &    matrix,
-                                   const AdditionalData &additional_data)
+  PreconditionSOR::PreconditionSOR(const MatrixBase &matrix, const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
 
 
   void
-  PreconditionSOR::initialize(const MatrixBase &    matrix_,
-                              const AdditionalData &additional_data_)
+  PreconditionSOR::initialize(const MatrixBase &matrix_, const AdditionalData &additional_data_)
   {
     clear();
 
@@ -252,8 +245,7 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionSSOR -------------------- */
 
-  PreconditionSSOR::AdditionalData::AdditionalData(const double omega) :
-    omega(omega)
+  PreconditionSSOR::AdditionalData::AdditionalData(const double omega) : omega(omega)
   {}
 
 
@@ -266,8 +258,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionSSOR::initialize(const MatrixBase &    matrix_,
-                               const AdditionalData &additional_data_)
+  PreconditionSSOR::initialize(const MatrixBase &matrix_, const AdditionalData &additional_data_)
   {
     clear();
 
@@ -297,15 +288,13 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionEisenstat -------------------- */
 
-  PreconditionEisenstat::AdditionalData::AdditionalData(const double omega) :
-    omega(omega)
+  PreconditionEisenstat::AdditionalData::AdditionalData(const double omega) : omega(omega)
   {}
 
 
 
-  PreconditionEisenstat::PreconditionEisenstat(
-    const MatrixBase &    matrix,
-    const AdditionalData &additional_data)
+  PreconditionEisenstat::PreconditionEisenstat(const MatrixBase &    matrix,
+                                               const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
@@ -340,22 +329,19 @@ namespace PETScWrappers
   /* ----------------- PreconditionICC -------------------- */
 
 
-  PreconditionICC::AdditionalData::AdditionalData(const unsigned int levels) :
-    levels(levels)
+  PreconditionICC::AdditionalData::AdditionalData(const unsigned int levels) : levels(levels)
   {}
 
 
 
-  PreconditionICC::PreconditionICC(const MatrixBase &    matrix,
-                                   const AdditionalData &additional_data)
+  PreconditionICC::PreconditionICC(const MatrixBase &matrix, const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
 
 
   void
-  PreconditionICC::initialize(const MatrixBase &    matrix_,
-                              const AdditionalData &additional_data_)
+  PreconditionICC::initialize(const MatrixBase &matrix_, const AdditionalData &additional_data_)
   {
     clear();
 
@@ -381,22 +367,19 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionILU -------------------- */
 
-  PreconditionILU::AdditionalData::AdditionalData(const unsigned int levels) :
-    levels(levels)
+  PreconditionILU::AdditionalData::AdditionalData(const unsigned int levels) : levels(levels)
   {}
 
 
 
-  PreconditionILU::PreconditionILU(const MatrixBase &    matrix,
-                                   const AdditionalData &additional_data)
+  PreconditionILU::PreconditionILU(const MatrixBase &matrix, const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
 
 
   void
-  PreconditionILU::initialize(const MatrixBase &    matrix_,
-                              const AdditionalData &additional_data_)
+  PreconditionILU::initialize(const MatrixBase &matrix_, const AdditionalData &additional_data_)
   {
     clear();
 
@@ -437,9 +420,8 @@ namespace PETScWrappers
 
 
 
-  PreconditionBoomerAMG::PreconditionBoomerAMG(
-    const MPI_Comm        comm,
-    const AdditionalData &additional_data_)
+  PreconditionBoomerAMG::PreconditionBoomerAMG(const MPI_Comm        comm,
+                                               const AdditionalData &additional_data_)
   {
     additional_data = additional_data_;
 
@@ -457,9 +439,8 @@ namespace PETScWrappers
   }
 
 
-  PreconditionBoomerAMG::PreconditionBoomerAMG(
-    const MatrixBase &    matrix,
-    const AdditionalData &additional_data)
+  PreconditionBoomerAMG::PreconditionBoomerAMG(const MatrixBase &    matrix,
+                                               const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
@@ -479,9 +460,8 @@ namespace PETScWrappers
         set_option_value("-pc_hypre_boomeramg_print_statistics", "1");
       }
 
-    set_option_value(
-      "-pc_hypre_boomeramg_agg_nl",
-      Utilities::to_string(additional_data.aggressive_coarsening_num_levels));
+    set_option_value("-pc_hypre_boomeramg_agg_nl",
+                     Utilities::to_string(additional_data.aggressive_coarsening_num_levels));
 
     std::stringstream ssStream;
     ssStream << additional_data.max_row_sum;
@@ -493,19 +473,15 @@ namespace PETScWrappers
 
     if (additional_data.symmetric_operator)
       {
-        set_option_value("-pc_hypre_boomeramg_relax_type_up",
-                         "symmetric-SOR/Jacobi");
-        set_option_value("-pc_hypre_boomeramg_relax_type_down",
-                         "symmetric-SOR/Jacobi");
-        set_option_value("-pc_hypre_boomeramg_relax_type_coarse",
-                         "Gaussian-elimination");
+        set_option_value("-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
+        set_option_value("-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
+        set_option_value("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
       }
     else
       {
         set_option_value("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
         set_option_value("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
-        set_option_value("-pc_hypre_boomeramg_relax_type_coarse",
-                         "Gaussian-elimination");
+        set_option_value("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
       }
 
     ierr = PCSetFromOptions(pc);
@@ -545,12 +521,11 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionParaSails -------------------- */
 
-  PreconditionParaSails::AdditionalData::AdditionalData(
-    const unsigned int symmetric,
-    const unsigned int n_levels,
-    const double       threshold,
-    const double       filter,
-    const bool         output_details) :
+  PreconditionParaSails::AdditionalData::AdditionalData(const unsigned int symmetric,
+                                                        const unsigned int n_levels,
+                                                        const double       threshold,
+                                                        const double       filter,
+                                                        const bool         output_details) :
     symmetric(symmetric),
     n_levels(n_levels),
     threshold(threshold),
@@ -560,9 +535,8 @@ namespace PETScWrappers
 
 
 
-  PreconditionParaSails::PreconditionParaSails(
-    const MatrixBase &    matrix,
-    const AdditionalData &additional_data)
+  PreconditionParaSails::PreconditionParaSails(const MatrixBase &    matrix,
+                                               const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
@@ -593,8 +567,7 @@ namespace PETScWrappers
 
     Assert((additional_data.symmetric == 0 || additional_data.symmetric == 1 ||
             additional_data.symmetric == 2),
-           ExcMessage(
-             "ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
+           ExcMessage("ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
 
     std::stringstream ssStream;
 
@@ -619,16 +592,12 @@ namespace PETScWrappers
           }
 
         default:
-          Assert(
-            false,
-            ExcMessage(
-              "ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
+          Assert(false, ExcMessage("ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
       };
 
     set_option_value("-pc_hypre_parasails_sym", ssStream.str());
 
-    set_option_value("-pc_hypre_parasails_nlevels",
-                     Utilities::to_string(additional_data.n_levels));
+    set_option_value("-pc_hypre_parasails_nlevels", Utilities::to_string(additional_data.n_levels));
 
     ssStream.str(""); // empty the stringstream
     ssStream << additional_data.threshold;
@@ -663,8 +632,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionNone::initialize(const MatrixBase &    matrix_,
-                               const AdditionalData &additional_data_)
+  PreconditionNone::initialize(const MatrixBase &matrix_, const AdditionalData &additional_data_)
   {
     clear();
 
@@ -696,16 +664,14 @@ namespace PETScWrappers
 
 
 
-  PreconditionLU::PreconditionLU(const MatrixBase &    matrix,
-                                 const AdditionalData &additional_data)
+  PreconditionLU::PreconditionLU(const MatrixBase &matrix, const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
 
 
   void
-  PreconditionLU::initialize(const MatrixBase &    matrix_,
-                             const AdditionalData &additional_data_)
+  PreconditionLU::initialize(const MatrixBase &matrix_, const AdditionalData &additional_data_)
   {
     clear();
 

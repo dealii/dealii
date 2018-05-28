@@ -32,12 +32,10 @@ main()
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  double a_double[3][3][2] = {{{1, -1}, {2, 0}, {3, 0}},
-                              {{3, 0}, {4, 0}, {5, 0}},
-                              {{6, 0}, {7, 0}, {8, 3}}};
-  double b_double[3][3][2] = {{{24, -2}, {31, -2}, {37, 6}},
-                              {{45, -3}, {57, 0}, {69, 15}},
-                              {{75, 12}, {96, 21}, {108, 48}}};
+  double a_double[3][3][2] = {
+    {{1, -1}, {2, 0}, {3, 0}}, {{3, 0}, {4, 0}, {5, 0}}, {{6, 0}, {7, 0}, {8, 3}}};
+  double b_double[3][3][2] = {
+    {{24, -2}, {31, -2}, {37, 6}}, {{45, -3}, {57, 0}, {69, 15}}, {{75, 12}, {96, 21}, {108, 48}}};
 
   const unsigned int   dim = 3;
   std::complex<double> a[dim][dim], b[dim][dim];
@@ -94,16 +92,13 @@ main()
       e2[1]                                     = 1.;
       e3[2]                                     = 1.;
       Tensor<1, 3, std::complex<double>> result = cross_product_3d(e1, e2);
-      deallog << '\t' << result[0] << '\t' << result[1] << '\t' << result[2]
-              << std::endl;
+      deallog << '\t' << result[0] << '\t' << result[1] << '\t' << result[2] << std::endl;
 
       result = cross_product_3d(e2, e3);
-      deallog << '\t' << result[0] << '\t' << result[1] << '\t' << result[2]
-              << std::endl;
+      deallog << '\t' << result[0] << '\t' << result[1] << '\t' << result[2] << std::endl;
 
       result = cross_product_3d(e3, e1);
-      deallog << '\t' << result[0] << '\t' << result[1] << '\t' << result[2]
-              << std::endl;
+      deallog << '\t' << result[0] << '\t' << result[1] << '\t' << result[2] << std::endl;
 
       deallog.pop();
     }

@@ -62,10 +62,8 @@ run(bool random_p, unsigned int *indx)
   hp::DoFHandler<dim>   dof_handler(triangulation);
   ConstraintMatrix      hanging_node_constraints;
 
-  FE_Q<dim> fe_1(QIterated<1>(QTrapez<1>(), indx[0])),
-    fe_2(QIterated<1>(QTrapez<1>(), indx[1])),
-    fe_3(QIterated<1>(QTrapez<1>(), indx[2])),
-    fe_4(QIterated<1>(QTrapez<1>(), indx[3]));
+  FE_Q<dim> fe_1(QIterated<1>(QTrapez<1>(), indx[0])), fe_2(QIterated<1>(QTrapez<1>(), indx[1])),
+    fe_3(QIterated<1>(QTrapez<1>(), indx[2])), fe_4(QIterated<1>(QTrapez<1>(), indx[3]));
 
   fe.push_back(fe_1);
   fe.push_back(fe_2);
@@ -74,15 +72,13 @@ run(bool random_p, unsigned int *indx)
 
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(5 - dim);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   // Now to the p-Method. Assign
   // random active_fe_indices to the
   // different cells.
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
   if (random_p)
     {
@@ -105,15 +101,13 @@ run(bool random_p, unsigned int *indx)
 
 
   dof_handler.distribute_dofs(fe);
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   // Create constraints which stem from
   // the different polynomial degrees on
   // the different elements.
   hanging_node_constraints.clear();
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          hanging_node_constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, hanging_node_constraints);
 
   hanging_node_constraints.print(deallog.get_file_stream());
 

@@ -55,10 +55,7 @@ monitor_mean(const unsigned int    iteration,
 
 
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType &        solver,
             const MatrixType &  A,
@@ -95,8 +92,7 @@ main()
   cg.connect(&monitor_norm);
   cg.connect(&monitor_mean);
 
-  SolverGMRES<> gmres(
-    control, mem, SolverGMRES<>::AdditionalData(/*max_vecs=*/8));
+  SolverGMRES<> gmres(control, mem, SolverGMRES<>::AdditionalData(/*max_vecs=*/8));
   gmres.connect(&monitor_norm);
   gmres.connect(&monitor_mean);
 

@@ -49,10 +49,7 @@ test(unsigned p1, unsigned p2)
   std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(
-    triangulation,
-    subdivisions,
-    Point<dim>(),
-    (dim == 3 ? Point<dim>(2, 1, 1) : Point<dim>(2, 1)));
+    triangulation, subdivisions, Point<dim>(), (dim == 3 ? Point<dim>(2, 1, 1) : Point<dim>(2, 1)));
   (++triangulation.begin_active())->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
@@ -60,8 +57,7 @@ test(unsigned p1, unsigned p2)
   fe.push_back(FE_Nedelec<dim>(p1));
   fe.push_back(FE_Nedelec<dim>(p2));
 
-  deallog << "Testing " << fe[0].get_name() << " vs. " << fe[1].get_name()
-          << std::endl;
+  deallog << "Testing " << fe[0].get_name() << " vs. " << fe[1].get_name() << std::endl;
 
   FullMatrix<double> face_int_matrix(fe[1].dofs_per_face, fe[0].dofs_per_face);
 
@@ -82,8 +78,7 @@ test(unsigned p1, unsigned p2)
 
       if (is_zero_column)
         {
-          deallog << "Column " << i << " has no non-zero elements."
-                  << std::endl;
+          deallog << "Column " << i << " has no non-zero elements." << std::endl;
         }
     }
 

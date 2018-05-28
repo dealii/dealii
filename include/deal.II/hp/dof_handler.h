@@ -167,12 +167,10 @@ namespace hp
   template <int dim, int spacedim = dim>
   class DoFHandler : public Subscriptor
   {
-    typedef dealii::internal::DoFHandlerImplementation::
-      Iterators<DoFHandler<dim, spacedim>, false>
-        ActiveSelector;
-    typedef dealii::internal::DoFHandlerImplementation::
-      Iterators<DoFHandler<dim, spacedim>, true>
-        LevelSelector;
+    typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim, spacedim>, false>
+      ActiveSelector;
+    typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim, spacedim>, true>
+      LevelSelector;
 
   public:
     typedef typename ActiveSelector::CellAccessor cell_accessor;
@@ -194,9 +192,8 @@ namespace hp
 #ifndef _MSC_VER
     typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
 #else
-    typedef TriaActiveIterator<
-      dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>>
-      active_cell_iterator;
+    typedef TriaActiveIterator<dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>>
+                                                                                    active_cell_iterator;
 #endif
 
     typedef typename LevelSelector::cell_iterator level_cell_iterator;
@@ -208,9 +205,7 @@ namespace hp
 #ifndef _MSC_VER
     typedef typename ActiveSelector::cell_iterator cell_iterator;
 #else
-    typedef TriaIterator<
-      dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>>
-      cell_iterator;
+    typedef TriaIterator<dealii::DoFCellAccessor<DoFHandler<dim, spacedim>, false>> cell_iterator;
 #endif
 
     /**
@@ -252,8 +247,7 @@ namespace hp
      * @deprecated Use numbers::invalid_dof_index instead.
      */
     DEAL_II_DEPRECATED
-    static const types::global_dof_index invalid_dof_index =
-      numbers::invalid_dof_index;
+    static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
 
     /**
      * The default index of the finite element to be used on a given cell. For
@@ -305,8 +299,7 @@ namespace hp
      * the distribution of degrees of freedom over the mesh.
      */
     void
-    initialize(const Triangulation<dim, spacedim> &   tria,
-               const hp::FECollection<dim, spacedim> &fe);
+    initialize(const Triangulation<dim, spacedim> &tria, const hp::FECollection<dim, spacedim> &fe);
 
     /**
      * Go through the triangulation and "distribute" the degrees of
@@ -657,8 +650,7 @@ namespace hp
     template <typename number>
     types::global_dof_index
     n_boundary_dofs(
-      const std::map<types::boundary_id, const Function<spacedim, number> *>
-        &boundary_ids) const;
+      const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_ids) const;
 
     /**
      * Return the number of degrees of freedom located on those parts of the
@@ -822,9 +814,7 @@ namespace hp
     /**
      * Exception
      */
-    DeclException1(ExcMatrixHasWrongSize,
-                   int,
-                   << "The matrix has the wrong dimension " << arg1);
+    DeclException1(ExcMatrixHasWrongSize, int, << "The matrix has the wrong dimension " << arg1);
     /**
      * Exception
      */
@@ -842,16 +832,14 @@ namespace hp
     DeclException2(ExcInvalidFEIndex,
                    int,
                    int,
-                   << "The mesh contains a cell with an active_fe_index of "
-                   << arg1 << ", but the finite element collection only has "
-                   << arg2 << " elements");
+                   << "The mesh contains a cell with an active_fe_index of " << arg1
+                   << ", but the finite element collection only has " << arg2 << " elements");
     /**
      * Exception
      */
     DeclException1(ExcInvalidLevel,
                    int,
-                   << "The given level " << arg1
-                   << " is not in the valid range!");
+                   << "The given level " << arg1 << " is not in the valid range!");
     /**
      * Exception
      */
@@ -868,8 +856,7 @@ namespace hp
     /**
      * Address of the triangulation to work on.
      */
-    SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
-      tria;
+    SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>> tria;
 
     /**
      * Store a copy of the finite element set given latest to distribute_dofs().
@@ -880,8 +867,7 @@ namespace hp
      * An object that describes how degrees of freedom should be distributed and
      * renumbered.
      */
-    std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::
-                      PolicyBase<dim, spacedim>>
+    std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim, spacedim>>
       policy;
 
 
@@ -960,8 +946,7 @@ namespace hp
      * degrees of freedom on multigrid levels. Since multigrid is not currently
      * supported, this table is not filled with valid entries.
      */
-    std::vector<dealii::internal::DoFHandlerImplementation::NumberCache>
-      mg_number_cache;
+    std::vector<dealii::internal::DoFHandlerImplementation::NumberCache> mg_number_cache;
 
     /**
      * Array to store the indices for degrees of freedom located at vertices.
@@ -1013,8 +998,7 @@ namespace hp
     template <class, bool>
     friend class dealii::DoFCellAccessor;
     friend struct dealii::internal::DoFAccessorImplementation::Implementation;
-    friend struct dealii::internal::DoFCellAccessorImplementation::
-      Implementation;
+    friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 
     /**
      * Likewise for DoFLevel objects since they need to access the vertex dofs
@@ -1022,10 +1006,8 @@ namespace hp
      */
     template <int>
     friend class dealii::internal::hp::DoFIndicesOnFacesOrEdges;
-    friend struct dealii::internal::hp::DoFHandlerImplementation::
-      Implementation;
-    friend struct dealii::internal::DoFHandlerImplementation::Policy::
-      Implementation;
+    friend struct dealii::internal::hp::DoFHandlerImplementation::Implementation;
+    friend struct dealii::internal::DoFHandlerImplementation::Policy::Implementation;
   };
 
 
@@ -1041,14 +1023,12 @@ namespace hp
   template <typename number>
   types::global_dof_index
   DoFHandler<dim, spacedim>::n_boundary_dofs(
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &boundary_ids) const
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_ids) const
   {
     // extract the set of boundary ids and forget about the function object
     // pointers
     std::set<types::boundary_id> boundary_ids_only;
-    for (typename std::map<types::boundary_id,
-                           const Function<spacedim, number> *>::const_iterator
+    for (typename std::map<types::boundary_id, const Function<spacedim, number> *>::const_iterator
            p = boundary_ids.begin();
          p != boundary_ids.end();
          ++p)
@@ -1071,8 +1051,8 @@ namespace internal
    */
   template <int dim, int spacedim>
   std::string
-  policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::
-                     PolicyBase<dim, spacedim> &policy);
+  policy_to_string(
+    const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim, spacedim> &policy);
 } // namespace internal
 
 
@@ -1113,8 +1093,8 @@ namespace hp
     // write out the number of triangulation cells and later check during
     // loading that this number is indeed correct; same with something that
     // identifies the policy
-    const unsigned int n_cells = tria->n_cells();
-    std::string policy_name    = dealii::internal::policy_to_string(*policy);
+    const unsigned int n_cells     = tria->n_cells();
+    std::string        policy_name = dealii::internal::policy_to_string(*policy);
 
     ar &n_cells &policy_name;
   }
@@ -1175,18 +1155,15 @@ namespace hp
 
     ar &n_cells &policy_name;
 
-    AssertThrow(
-      n_cells == tria->n_cells(),
-      ExcMessage(
-        "The object being loaded into does not match the triangulation "
-        "that has been stored previously."));
-    AssertThrow(
-      policy_name == dealii::internal::policy_to_string(*policy),
-      ExcMessage("The policy currently associated with this DoFHandler (" +
-                 dealii::internal::policy_to_string(*policy) +
-                 ") does not match the one that was associated with the "
-                 "DoFHandler previously stored (" +
-                 policy_name + ")."));
+    AssertThrow(n_cells == tria->n_cells(),
+                ExcMessage("The object being loaded into does not match the triangulation "
+                           "that has been stored previously."));
+    AssertThrow(policy_name == dealii::internal::policy_to_string(*policy),
+                ExcMessage("The policy currently associated with this DoFHandler (" +
+                           dealii::internal::policy_to_string(*policy) +
+                           ") does not match the one that was associated with the "
+                           "DoFHandler previously stored (" +
+                           policy_name + ")."));
   }
 
   template <int dim, int spacedim>
@@ -1246,8 +1223,7 @@ namespace hp
 
   template <int dim, int spacedim>
   const IndexSet &
-  DoFHandler<dim, spacedim>::locally_owned_mg_dofs(
-    const unsigned int level) const
+  DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
   {
     Assert(false, ExcNotImplemented());
     (void)level;
@@ -1259,8 +1235,7 @@ namespace hp
 
   template <int dim, int spacedim>
   const std::vector<IndexSet> &
-  DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
-    const unsigned int level) const
+  DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(const unsigned int level) const
   {
     Assert(false, ExcNotImplemented());
     (void)level;

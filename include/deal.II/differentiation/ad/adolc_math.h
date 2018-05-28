@@ -60,32 +60,30 @@ namespace std
   /**
    * Make a binary function with one name available under a different name
    */
-#    define DEAL_II_EXPOSE_ADOLC_BINARY_MATH_FUNCTION_COPY(func_to, func_from) \
-      inline adouble func_to(const adouble &x, const adouble &y)               \
-      {                                                                        \
-        return func_from(static_cast<const badouble &>(x),                     \
-                         static_cast<const badouble &>(y));                    \
-      }                                                                        \
-      inline adouble func_to(const double &x, const adouble &y)                \
-      {                                                                        \
-        return func_from(x, static_cast<const badouble &>(y));                 \
-      }                                                                        \
-      inline adouble func_to(const adouble &x, const double &y)                \
-      {                                                                        \
-        return func_from(static_cast<const badouble &>(x), y);                 \
-      }                                                                        \
-      inline adtl::adouble func_to(const adtl::adouble &x,                     \
-                                   const adtl::adouble &y)                     \
-      {                                                                        \
-        return adtl::func_from(x, y);                                          \
-      }                                                                        \
-      inline adtl::adouble func_to(const double &x, const adtl::adouble &y)    \
-      {                                                                        \
-        return adtl::func_from(x, y);                                          \
-      }                                                                        \
-      inline adtl::adouble func_to(const adtl::adouble &x, const double &y)    \
-      {                                                                        \
-        return adtl::func_from(x, y);                                          \
+#    define DEAL_II_EXPOSE_ADOLC_BINARY_MATH_FUNCTION_COPY(func_to, func_from)                \
+      inline adouble func_to(const adouble &x, const adouble &y)                              \
+      {                                                                                       \
+        return func_from(static_cast<const badouble &>(x), static_cast<const badouble &>(y)); \
+      }                                                                                       \
+      inline adouble func_to(const double &x, const adouble &y)                               \
+      {                                                                                       \
+        return func_from(x, static_cast<const badouble &>(y));                                \
+      }                                                                                       \
+      inline adouble func_to(const adouble &x, const double &y)                               \
+      {                                                                                       \
+        return func_from(static_cast<const badouble &>(x), y);                                \
+      }                                                                                       \
+      inline adtl::adouble func_to(const adtl::adouble &x, const adtl::adouble &y)            \
+      {                                                                                       \
+        return adtl::func_from(x, y);                                                         \
+      }                                                                                       \
+      inline adtl::adouble func_to(const double &x, const adtl::adouble &y)                   \
+      {                                                                                       \
+        return adtl::func_from(x, y);                                                         \
+      }                                                                                       \
+      inline adtl::adouble func_to(const adtl::adouble &x, const double &y)                   \
+      {                                                                                       \
+        return adtl::func_from(x, y);                                                         \
       }
 
   /**
@@ -97,16 +95,14 @@ namespace std
   /**
    * Expose a binary function
    */
-#    define DEAL_II_EXPOSE_ADOLC_BINARY_MATH_FUNCTION_2(func) \
-      inline adouble func(const adouble &x, const adouble &y) \
-      {                                                       \
-        return func(static_cast<const badouble &>(x),         \
-                    static_cast<const badouble &>(y));        \
-      }                                                       \
-      inline adtl::adouble func(const adtl::adouble &x,       \
-                                const adtl::adouble &y)       \
-      {                                                       \
-        return adtl::func(x, y);                              \
+#    define DEAL_II_EXPOSE_ADOLC_BINARY_MATH_FUNCTION_2(func)                            \
+      inline adouble func(const adouble &x, const adouble &y)                            \
+      {                                                                                  \
+        return func(static_cast<const badouble &>(x), static_cast<const badouble &>(y)); \
+      }                                                                                  \
+      inline adtl::adouble func(const adtl::adouble &x, const adtl::adouble &y)          \
+      {                                                                                  \
+        return adtl::func(x, y);                                                         \
       }
 
   // See

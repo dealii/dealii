@@ -119,8 +119,7 @@ namespace numbers
 
           // recursively initialize sub-tensors with invalid elements
           for (unsigned int i = 0; i < dim; ++i)
-            nan_tensor[i] =
-              NaNInitializer<Tensor<rank - 1, dim, T>>::invalid_element();
+            nan_tensor[i] = NaNInitializer<Tensor<rank - 1, dim, T>>::invalid_element();
 
           return nan_tensor;
         }
@@ -162,11 +161,8 @@ namespace numbers
         invalid_element()
         {
           // initialize symmetric tensors via the unrolled list of elements
-          T initializers
-            [SymmetricTensor<rank, dim, T>::n_independent_components];
-          for (unsigned int i = 0;
-               i < SymmetricTensor<rank, dim, T>::n_independent_components;
-               ++i)
+          T initializers[SymmetricTensor<rank, dim, T>::n_independent_components];
+          for (unsigned int i = 0; i < SymmetricTensor<rank, dim, T>::n_independent_components; ++i)
             initializers[i] = NaNInitializer<T>::invalid_element();
 
           return SymmetricTensor<rank, dim, T>(initializers);

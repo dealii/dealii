@@ -63,8 +63,7 @@ test(bool second_case = false)
   tria.create_triangulation_compatibility(vertices, cells, subcelldata);
 
   logfile << "---------------------------------------------" << std::endl
-          << "dim=" << dim << (second_case ? ", second case" : ", first case")
-          << std::endl
+          << "dim=" << dim << (second_case ? ", second case" : ", first case") << std::endl
           << std::endl;
 
   GridOut grid_out;

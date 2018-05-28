@@ -66,8 +66,7 @@ test(PETScWrappers::MatrixBase &m)
   deallog << m.frobenius_norm() << ' ' << std::sqrt(norm_sqr) << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;
 
-  Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) <
-           std::fabs(std::sqrt(norm_sqr)),
+  Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) < std::fabs(std::sqrt(norm_sqr)),
          ExcInternalError());
   Assert(m.n_nonzero_elements() - nnz == 0, ExcInternalError());
 
@@ -92,8 +91,7 @@ test(PETScWrappers::MatrixBase &m)
   deallog << m.frobenius_norm() << ' ' << std::sqrt(norm_sqr) << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;
 
-  Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) <
-           std::fabs(std::sqrt(norm_sqr)),
+  Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) < std::fabs(std::sqrt(norm_sqr)),
          ExcInternalError());
 
   // make sure that zeroing out rows does at
@@ -123,13 +121,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -137,12 +133,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

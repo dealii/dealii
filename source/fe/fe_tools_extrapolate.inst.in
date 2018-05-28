@@ -15,8 +15,7 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
-     VEC : VECTOR_TYPES)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; VEC : VECTOR_TYPES)
   {
     namespace FETools
     \{

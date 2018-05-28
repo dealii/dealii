@@ -42,14 +42,10 @@ main()
 
   prm.set("A map", "1:2.0, 3:4.0");
 
-  deallog << "After ParameterHandler::set =========================="
-          << std::endl
-          << std::endl;
+  deallog << "After ParameterHandler::set ==========================" << std::endl << std::endl;
   prm.log_parameters(deallog);
 
-  deallog << "Actual variables            =========================="
-          << std::endl
-          << std::endl;
+  deallog << "Actual variables            ==========================" << std::endl << std::endl;
 
   for (auto i : a)
     deallog << i.first << ":" << i.second << std::endl;

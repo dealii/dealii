@@ -17,8 +17,7 @@
 // TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension,
 // deal_II_space_dimension>
 // where applicable and move to codimension cases above also when applicable
-for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS)
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension == deal_II_space_dimension
 
@@ -37,36 +36,32 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                                      const Point<deal_II_dimension> &);
 
       template void
-      point_value<deal_II_dimension>(
-        const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
-        const VEC &,
-        const Point<deal_II_dimension> &,
-        Vector<VEC::value_type> &);
+      point_value<deal_II_dimension>(const hp::MappingCollection<deal_II_dimension> &,
+                                     const hp::DoFHandler<deal_II_dimension> &,
+                                     const VEC &,
+                                     const Point<deal_II_dimension> &,
+                                     Vector<VEC::value_type> &);
 
       template VEC::value_type
-      point_value<deal_II_dimension>(
-        const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
-        const VEC &,
-        const Point<deal_II_dimension> &);
+      point_value<deal_II_dimension>(const hp::MappingCollection<deal_II_dimension> &,
+                                     const hp::DoFHandler<deal_II_dimension> &,
+                                     const VEC &,
+                                     const Point<deal_II_dimension> &);
 
       template void
-      point_difference<deal_II_dimension>(
-        const DoFHandler<deal_II_dimension> &,
-        const VEC &,
-        const Function<deal_II_dimension, VEC::value_type> &,
-        Vector<VEC::value_type> &,
-        const Point<deal_II_dimension> &);
+      point_difference<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                                          const VEC &,
+                                          const Function<deal_II_dimension, VEC::value_type> &,
+                                          Vector<VEC::value_type> &,
+                                          const Point<deal_II_dimension> &);
 
       template void
-      point_difference<deal_II_dimension>(
-        const Mapping<deal_II_dimension> &,
-        const DoFHandler<deal_II_dimension> &,
-        const VEC &,
-        const Function<deal_II_dimension, VEC::value_type> &,
-        Vector<VEC::value_type> &,
-        const Point<deal_II_dimension> &);
+      point_difference<deal_II_dimension>(const Mapping<deal_II_dimension> &,
+                                          const DoFHandler<deal_II_dimension> &,
+                                          const VEC &,
+                                          const Function<deal_II_dimension, VEC::value_type> &,
+                                          Vector<VEC::value_type> &,
+                                          const Point<deal_II_dimension> &);
 
       template void
       point_value<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
@@ -109,16 +104,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension == deal_II_space_dimension
 
       template void
-      create_point_source_vector<deal_II_dimension>(
-        const Mapping<deal_II_dimension> &,
-        const DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
+      create_point_source_vector<deal_II_dimension>(const Mapping<deal_II_dimension> &,
+                                                    const DoFHandler<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    Vector<double> &);
       template void
-      create_point_source_vector<deal_II_dimension>(
-        const DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
+      create_point_source_vector<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    Vector<double> &);
 
       template void
       create_point_source_vector<deal_II_dimension>(
@@ -127,23 +120,20 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Point<deal_II_dimension> &,
         Vector<double> &);
       template void
-      create_point_source_vector<deal_II_dimension>(
-        const hp::DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
+      create_point_source_vector<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    Vector<double> &);
       template void
-      create_point_source_vector<deal_II_dimension>(
-        const Mapping<deal_II_dimension> &,
-        const DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
+      create_point_source_vector<deal_II_dimension>(const Mapping<deal_II_dimension> &,
+                                                    const DoFHandler<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    Vector<double> &);
       template void
-      create_point_source_vector<deal_II_dimension>(
-        const DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
+      create_point_source_vector<deal_II_dimension>(const DoFHandler<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    Vector<double> &);
 
       template void
       create_point_source_vector<deal_II_dimension>(
@@ -153,11 +143,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Point<deal_II_dimension> &,
         Vector<double> &);
       template void
-      create_point_source_vector<deal_II_dimension>(
-        const hp::DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
+      create_point_source_vector<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    const Point<deal_II_dimension> &,
+                                                    Vector<double> &);
 #endif
     \}
   }

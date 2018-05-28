@@ -134,17 +134,15 @@ my5(double const t)
 void
 test(TimeStepping::RungeKutta<Vector<double>> &                          solver,
      std::function<Vector<double>(double const, Vector<double> const &)> f,
-     std::function<Vector<double>(double const,
-                                  double const,
-                                  Vector<double> const &)> id_minus_tau_J_inv,
-     std::function<double(double const)>                   my)
+     std::function<Vector<double>(double const, double const, Vector<double> const &)>
+                                         id_minus_tau_J_inv,
+     std::function<double(double const)> my)
 {
-  unsigned int n_time_steps = 1;
-  unsigned int size         = 1;
-  double       initial_time = 0.0, final_time = 1.0;
-  double       time_step =
-    (final_time - initial_time) / static_cast<double>(n_time_steps);
-  double         time = initial_time;
+  unsigned int   n_time_steps = 1;
+  unsigned int   size         = 1;
+  double         initial_time = 0.0, final_time = 1.0;
+  double         time_step = (final_time - initial_time) / static_cast<double>(n_time_steps);
+  double         time      = initial_time;
   Vector<double> solution(size);
   Vector<double> exact_solution(size);
   for (unsigned int i = 0; i < size; ++i)
@@ -154,8 +152,7 @@ test(TimeStepping::RungeKutta<Vector<double>> &                          solver,
     }
 
   for (unsigned int i = 0; i < n_time_steps; ++i)
-    time = solver.evolve_one_time_step(
-      f, id_minus_tau_J_inv, time, time_step, solution);
+    time = solver.evolve_one_time_step(f, id_minus_tau_J_inv, time, time_step, solution);
 
   Vector<double> error(exact_solution);
   error.sadd(1.0, -1.0, solution);
@@ -164,12 +161,11 @@ test(TimeStepping::RungeKutta<Vector<double>> &                          solver,
 }
 
 void
-test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> &solver,
+test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> &          solver,
       std::function<Vector<double>(double const, Vector<double> const &)> f,
-      std::function<Vector<double>(double const,
-                                   double const,
-                                   Vector<double> const &)> id_minus_tau_J_inv,
-      std::function<double(double const)>                   my)
+      std::function<Vector<double>(double const, double const, Vector<double> const &)>
+                                          id_minus_tau_J_inv,
+      std::function<double(double const)> my)
 {
   double         initial_time = 0.0, final_time = 1.0;
   double         time_step    = 1.0;
@@ -189,8 +185,7 @@ test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> &solver,
     {
       if (time + time_step > final_time)
         time_step = final_time - time;
-      time = solver.evolve_one_time_step(
-        f, id_minus_tau_J_inv, time, time_step, solution);
+      time      = solver.evolve_one_time_step(f, id_minus_tau_J_inv, time, time_step, solution);
       time_step = solver.get_status().delta_t_guess;
     }
 
@@ -206,65 +201,53 @@ main()
   initlog();
 
   deallog << "Forward Euler" << std::endl;
-  TimeStepping::ExplicitRungeKutta<Vector<double>> fe(
-    TimeStepping::FORWARD_EULER);
+  TimeStepping::ExplicitRungeKutta<Vector<double>> fe(TimeStepping::FORWARD_EULER);
   test(fe, f1, id_minus_tau_J_inv1, my1);
 
   deallog << "Runge-Kutta third order" << std::endl;
-  TimeStepping::ExplicitRungeKutta<Vector<double>> rk3(
-    TimeStepping::RK_THIRD_ORDER);
+  TimeStepping::ExplicitRungeKutta<Vector<double>> rk3(TimeStepping::RK_THIRD_ORDER);
   test(rk3, f3, id_minus_tau_J_inv3, my3);
 
   deallog << "Runge-Kutta fourth order" << std::endl;
-  TimeStepping::ExplicitRungeKutta<Vector<double>> rk4(
-    TimeStepping::RK_CLASSIC_FOURTH_ORDER);
+  TimeStepping::ExplicitRungeKutta<Vector<double>> rk4(TimeStepping::RK_CLASSIC_FOURTH_ORDER);
   test(rk4, f4, id_minus_tau_J_inv4, my4);
 
   deallog << "Backward Euler" << std::endl;
-  TimeStepping::ImplicitRungeKutta<Vector<double>> be(
-    TimeStepping::BACKWARD_EULER);
+  TimeStepping::ImplicitRungeKutta<Vector<double>> be(TimeStepping::BACKWARD_EULER);
   test(be, f1, id_minus_tau_J_inv1, my1);
 
   deallog << "Implicit midpoint" << std::endl;
-  TimeStepping::ImplicitRungeKutta<Vector<double>> im(
-    TimeStepping::IMPLICIT_MIDPOINT);
+  TimeStepping::ImplicitRungeKutta<Vector<double>> im(TimeStepping::IMPLICIT_MIDPOINT);
   test(im, f2, id_minus_tau_J_inv2, my2);
 
   deallog << "Crank-Nicolson" << std::endl;
-  TimeStepping::ImplicitRungeKutta<Vector<double>> cn(
-    TimeStepping::CRANK_NICOLSON);
+  TimeStepping::ImplicitRungeKutta<Vector<double>> cn(TimeStepping::CRANK_NICOLSON);
   test(cn, f2, id_minus_tau_J_inv2, my2);
 
   deallog << "SDIRK" << std::endl;
-  TimeStepping::ImplicitRungeKutta<Vector<double>> sdirk(
-    TimeStepping::SDIRK_TWO_STAGES);
+  TimeStepping::ImplicitRungeKutta<Vector<double>> sdirk(TimeStepping::SDIRK_TWO_STAGES);
   test(sdirk, f2, id_minus_tau_J_inv2, my2);
 
   deallog << "Heun-Euler" << std::endl;
-  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> he(
-    TimeStepping::HEUN_EULER);
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> he(TimeStepping::HEUN_EULER);
   test2(he, f2, id_minus_tau_J_inv2, my2);
 
   deallog << "Bogacki-Shampine" << std::endl;
-  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> bs(
-    TimeStepping::BOGACKI_SHAMPINE);
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> bs(TimeStepping::BOGACKI_SHAMPINE);
   test2(bs, f3, id_minus_tau_J_inv3, my3);
   bs.free_memory();
 
   deallog << "DOPRI" << std::endl;
-  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> dopri(
-    TimeStepping::DOPRI);
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> dopri(TimeStepping::DOPRI);
   test2(dopri, f5, id_minus_tau_J_inv5, my5);
   dopri.free_memory();
 
   deallog << "Fehlberg" << std::endl;
-  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> fehlberg(
-    TimeStepping::FEHLBERG);
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> fehlberg(TimeStepping::FEHLBERG);
   test2(fehlberg, f5, id_minus_tau_J_inv5, my5);
 
   deallog << "Cash-Karp" << std::endl;
-  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> ck(
-    TimeStepping::CASH_KARP);
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> ck(TimeStepping::CASH_KARP);
   test2(ck, f5, id_minus_tau_J_inv5, my5);
 
   return 0;

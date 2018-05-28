@@ -38,15 +38,12 @@ main()
   GridGenerator::hyper_ball(tria2, Point<dim>(), 0.4);
   GridGenerator::merge_triangulations(tria1, tria2, tria);
   tria.set_all_manifold_ids(0);
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     {
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         {
           bool face_at_sphere_boundary = true;
-          for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell;
-               ++v)
+          for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell; ++v)
             if (std::abs(cell->face(f)->vertex(v).norm() - 0.4) > 1e-12)
               face_at_sphere_boundary = false;
           if (face_at_sphere_boundary)
@@ -61,14 +58,12 @@ main()
 
   const auto &transfinite = tria.get_manifold(0);
 
-  const std::array<Point<3>, 2> points(
-    {{Point<3>(0, 0.360566, 0), Point<3>(0, 0.321132, 0)}});
-  const std::array<double, 2> weights({{0.4, 0.6}});
-  deallog << "Interpolate between points " << points[0] << " and " << points[1]
-          << " with weights " << weights[0] << " and " << weights[1] << ": "
-          << transfinite.get_new_point(
-               make_array_view(points.begin(), points.end()),
-               make_array_view(weights.begin(), weights.end()))
+  const std::array<Point<3>, 2> points({{Point<3>(0, 0.360566, 0), Point<3>(0, 0.321132, 0)}});
+  const std::array<double, 2>   weights({{0.4, 0.6}});
+  deallog << "Interpolate between points " << points[0] << " and " << points[1] << " with weights "
+          << weights[0] << " and " << weights[1] << ": "
+          << transfinite.get_new_point(make_array_view(points.begin(), points.end()),
+                                       make_array_view(weights.begin(), weights.end()))
           << std::endl;
 
   return 0;

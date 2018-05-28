@@ -60,8 +60,7 @@ test()
   // FE_Nothing, while outside the
   // circle to be of type FE_Q(1)
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
 
   for (; cell != endc; cell++)
@@ -75,10 +74,8 @@ test()
 
   dof_handler.distribute_dofs(fe_collection);
 
-  deallog << "   Number of active cells:       "
-          << triangulation.n_active_cells() << std::endl
-          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
 
 
@@ -90,17 +87,15 @@ test()
 
   hp::FEValues<dim> hp_fe_values(fe_collection,
                                  quadrature_collection,
-                                 update_values | update_gradients |
-                                   update_quadrature_points |
+                                 update_values | update_gradients | update_quadrature_points |
                                    update_JxW_values);
 
   cell = dof_handler.begin_active();
 
   for (; cell != endc; cell++)
     {
-      deallog << "This is a "
-              << (cell->active_fe_index() == 1 ? "FE_Nothing" : "FE_Q")
-              << " cell" << std::endl;
+      deallog << "This is a " << (cell->active_fe_index() == 1 ? "FE_Nothing" : "FE_Q") << " cell"
+              << std::endl;
 
       if (cell->get_fe().dofs_per_cell == 0)
         continue;
@@ -111,8 +106,7 @@ test()
       const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
       const FEValues<dim> &fe_values     = hp_fe_values.get_present_fe_values();
 
-      for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-           ++q_point)
+      for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
         {
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {

@@ -71,8 +71,7 @@ main(void)
 
   deallog << "Function values:" << std::endl;
   for (unsigned int j = 0; j < m; ++j)
-    deallog << "  f[" << j << "]: " << f[j] << "  y[" << j << "]: " << yp[j]
-            << std::endl;
+    deallog << "  f[" << j << "]: " << f[j] << "  y[" << j << "]: " << yp[j] << std::endl;
 
   // --- Jacobian ---
 

@@ -48,8 +48,7 @@ main()
   table.add_column_to_supercolumn("key3", "very_long_supercolumn");
   table.add_column_to_supercolumn("key4", "very_long_supercolumn");
 
-  table.write_text(deallog.get_file_stream(),
-                   TableHandler::table_with_separate_column_description);
+  table.write_text(deallog.get_file_stream(), TableHandler::table_with_separate_column_description);
 
   deallog << std::endl;
 

@@ -97,37 +97,25 @@ test(VectorTools::NormType norm, double value)
 
   Vector<double> cellwise_errors(tria.n_active_cells());
 
-  const ComponentSelectFunction<dim> mask_2(std::make_pair(dim, 2 * dim),
-                                            2 * dim);
-  VectorTools::integrate_difference(dofh,
-                                    solution,
-                                    ZeroFunction<dim>(2 * dim),
-                                    cellwise_errors,
-                                    QGauss<dim>(5),
-                                    norm);
+  const ComponentSelectFunction<dim> mask_2(std::make_pair(dim, 2 * dim), 2 * dim);
+  VectorTools::integrate_difference(
+    dofh, solution, ZeroFunction<dim>(2 * dim), cellwise_errors, QGauss<dim>(5), norm);
 
   double error = cellwise_errors.l2_norm();
 
   const double difference_1 = std::abs(error - value);
-  deallog << "computed: " << error << " expected: " << value
-          << " difference: " << difference_1 << std::endl;
-  Assert(difference_1 < 1e-10,
-         ExcMessage("Error in integrate_difference, first components"));
+  deallog << "computed: " << error << " expected: " << value << " difference: " << difference_1
+          << std::endl;
+  Assert(difference_1 < 1e-10, ExcMessage("Error in integrate_difference, first components"));
 
-  VectorTools::integrate_difference(dofh,
-                                    solution,
-                                    ZeroFunction<dim>(2 * dim),
-                                    cellwise_errors,
-                                    QGauss<dim>(5),
-                                    norm,
-                                    &mask_2);
+  VectorTools::integrate_difference(
+    dofh, solution, ZeroFunction<dim>(2 * dim), cellwise_errors, QGauss<dim>(5), norm, &mask_2);
 
   error                     = cellwise_errors.l2_norm();
   const double difference_2 = std::abs(error - 2.0 * value);
   deallog << "computed: " << error << " expected: " << 2.0 * value
           << " difference: " << difference_2 << std::endl;
-  Assert(difference_2 < 1e-10,
-         ExcMessage("Error in integrate_difference, second components"));
+  Assert(difference_2 < 1e-10, ExcMessage("Error in integrate_difference, second components"));
 }
 
 

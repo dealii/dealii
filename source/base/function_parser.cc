@@ -65,10 +65,10 @@ FunctionParser<dim>::~FunctionParser() = default;
 
 template <int dim>
 void
-FunctionParser<dim>::initialize(const std::string &             variables,
-                                const std::vector<std::string> &expressions,
+FunctionParser<dim>::initialize(const std::string &                  variables,
+                                const std::vector<std::string> &     expressions,
                                 const std::map<std::string, double> &constants,
-                                const bool time_dependent)
+                                const bool                           time_dependent)
 {
   this->fp.clear(); // this will reset all thread-local objects
 
@@ -209,8 +209,7 @@ namespace internal
     static Threads::Mutex      rand_mutex;
     Threads::Mutex::ScopedLock lock(rand_mutex);
 
-    static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                           1);
+    static boost::random::uniform_real_distribution<> uniform_distribution(0, 1);
 
     // for each seed an unique random number generator is created,
     // which is initialized with the seed itself
@@ -228,10 +227,8 @@ namespace internal
   {
     static Threads::Mutex                             rand_mutex;
     Threads::Mutex::ScopedLock                        lock(rand_mutex);
-    static boost::random::uniform_real_distribution<> uniform_distribution(0,
-                                                                           1);
-    static boost::random::mt19937                     rng(
-                          static_cast<unsigned long>(std::time(nullptr)));
+    static boost::random::uniform_real_distribution<> uniform_distribution(0, 1);
+    static boost::random::mt19937 rng(static_cast<unsigned long>(std::time(nullptr)));
     return uniform_distribution(rng);
   }
 
@@ -256,13 +253,11 @@ FunctionParser<dim>::init_muparser() const
     {
       fp.get().emplace_back(new mu::Parser());
 
-      for (std::map<std::string, double>::const_iterator constant =
-             constants.begin();
+      for (std::map<std::string, double>::const_iterator constant = constants.begin();
            constant != constants.end();
            ++constant)
         {
-          fp.get()[component]->DefineConst(constant->first.c_str(),
-                                           constant->second);
+          fp.get()[component]->DefineConst(constant->first.c_str(), constant->second);
         }
 
       for (unsigned int iv = 0; iv < var_names.size(); ++iv)
@@ -334,9 +329,7 @@ FunctionParser<dim>::init_muparser() const
                                           "erfc",
                                           "rand",
                                           "rand_seed"};
-          for (unsigned int f = 0;
-               f < sizeof(function_names) / sizeof(function_names[0]);
-               ++f)
+          for (unsigned int f = 0; f < sizeof(function_names) / sizeof(function_names[0]); ++f)
             {
               const std::string  function_name        = function_names[f];
               const unsigned int function_name_length = function_name.size();
@@ -350,15 +343,11 @@ FunctionParser<dim>::init_muparser() const
                     break;
 
                   // replace whitespace until there no longer is any
-                  while ((pos + function_name_length <
-                          transformed_expression.size()) &&
-                         ((transformed_expression[pos + function_name_length] ==
-                           ' ') ||
-                          (transformed_expression[pos + function_name_length] ==
-                           '\t')))
-                    transformed_expression.erase(
-                      transformed_expression.begin() + pos +
-                      function_name_length);
+                  while ((pos + function_name_length < transformed_expression.size()) &&
+                         ((transformed_expression[pos + function_name_length] == ' ') ||
+                          (transformed_expression[pos + function_name_length] == '\t')))
+                    transformed_expression.erase(transformed_expression.begin() + pos +
+                                                 function_name_length);
 
                   // move the current search position by the size of the
                   // actual function name
@@ -388,24 +377,19 @@ void
 FunctionParser<dim>::initialize(const std::string &                  vars,
                                 const std::string &                  expression,
                                 const std::map<std::string, double> &constants,
-                                const bool time_dependent)
+                                const bool                           time_dependent)
 {
-  initialize(vars,
-             Utilities::split_string_list(expression, ';'),
-             constants,
-             time_dependent);
+  initialize(vars, Utilities::split_string_list(expression, ';'), constants, time_dependent);
 }
 
 
 
 template <int dim>
 double
-FunctionParser<dim>::value(const Point<dim> & p,
-                           const unsigned int component) const
+FunctionParser<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   Assert(initialized == true, ExcNotInitialized());
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  Assert(component < this->n_components, ExcIndexRange(component, 0, this->n_components));
 
   // initialize the parser if that hasn't happened yet on the current thread
   if (fp.get().size() == 0)
@@ -436,8 +420,7 @@ FunctionParser<dim>::value(const Point<dim> & p,
 
 template <int dim>
 void
-FunctionParser<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+FunctionParser<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   Assert(initialized == true, ExcNotInitialized());
   Assert(values.size() == this->n_components,

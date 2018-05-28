@@ -347,9 +347,7 @@ public:
    * set.  Adding elements outside of this set has no effect. The default
    * argument keeps all entries.
    */
-  DynamicSparsityPattern(const size_type m,
-                         const size_type n,
-                         const IndexSet &rowset = IndexSet());
+  DynamicSparsityPattern(const size_type m, const size_type n, const IndexSet &rowset = IndexSet());
 
   /**
    * Create a square SparsityPattern using the given index set. The total size
@@ -378,9 +376,7 @@ public:
    * effect. The default argument keeps all entries.
    */
   void
-  reinit(const size_type m,
-         const size_type n,
-         const IndexSet &rowset = IndexSet());
+  reinit(const size_type m, const size_type n, const IndexSet &rowset = IndexSet());
 
   /**
    * Since this object is kept compressed at all times anyway, this function
@@ -443,8 +439,7 @@ public:
    */
   template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
   void
-  compute_mmult_pattern(const SparsityPatternTypeLeft & left,
-                        const SparsityPatternTypeRight &right);
+  compute_mmult_pattern(const SparsityPatternTypeLeft &left, const SparsityPatternTypeRight &right);
 
   /**
    * Print the sparsity pattern. The output consists of one line per row of
@@ -648,9 +643,7 @@ private:
      */
     template <typename ForwardIterator>
     void
-    add_entries(ForwardIterator begin,
-                ForwardIterator end,
-                const bool      indices_are_sorted);
+    add_entries(ForwardIterator begin, ForwardIterator end, const bool indices_are_sorted);
 
     /**
      * estimates memory consumption.
@@ -680,19 +673,15 @@ namespace DynamicSparsityPatternIterators
                             const unsigned int            index_within_row) :
     sparsity_pattern(sparsity_pattern),
     current_row(row),
-    current_entry(
-      ((sparsity_pattern->rowset.size() == 0) ?
-         sparsity_pattern->lines[current_row].entries.begin() :
-         sparsity_pattern
-           ->lines[sparsity_pattern->rowset.index_within_set(current_row)]
-           .entries.begin()) +
-      index_within_row),
-    end_of_row(
-      (sparsity_pattern->rowset.size() == 0) ?
-        sparsity_pattern->lines[current_row].entries.end() :
-        sparsity_pattern
-          ->lines[sparsity_pattern->rowset.index_within_set(current_row)]
-          .entries.end())
+    current_entry(((sparsity_pattern->rowset.size() == 0) ?
+                     sparsity_pattern->lines[current_row].entries.begin() :
+                     sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)]
+                       .entries.begin()) +
+                  index_within_row),
+    end_of_row((sparsity_pattern->rowset.size() == 0) ?
+                 sparsity_pattern->lines[current_row].entries.end() :
+                 sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)]
+                   .entries.end())
   {
     AssertIndexRange(current_row, sparsity_pattern->n_rows());
     Assert((sparsity_pattern->rowset.size() == 0) ||
@@ -705,8 +694,7 @@ namespace DynamicSparsityPatternIterators
       index_within_row,
       ((sparsity_pattern->rowset.size() == 0) ?
          sparsity_pattern->lines[current_row].entries.size() :
-         sparsity_pattern
-           ->lines[sparsity_pattern->rowset.index_within_set(current_row)]
+         sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)]
            .entries.size()));
   }
 
@@ -746,8 +734,7 @@ namespace DynamicSparsityPatternIterators
     return (current_entry -
             ((sparsity_pattern->rowset.size() == 0) ?
                sparsity_pattern->lines[current_row].entries.begin() :
-               sparsity_pattern
-                 ->lines[sparsity_pattern->rowset.index_within_set(current_row)]
+               sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)]
                  .entries.begin()));
   }
 
@@ -760,10 +747,9 @@ namespace DynamicSparsityPatternIterators
     // current row, and the location within this row. ignore the
     // latter if the row is past-the-end because in that case the
     // current_entry field may not point to a deterministic location
-    return (sparsity_pattern == other.sparsity_pattern &&
-            current_row == other.current_row &&
-            ((current_row == numbers::invalid_size_type) ||
-             (current_entry == other.current_entry)));
+    return (
+      sparsity_pattern == other.sparsity_pattern && current_row == other.current_row &&
+      ((current_row == numbers::invalid_size_type) || (current_entry == other.current_entry)));
   }
 
 
@@ -787,8 +773,7 @@ namespace DynamicSparsityPatternIterators
 
     // both iterators are not one-past-the-end
     return ((current_row < other.current_row) ||
-            ((current_row == other.current_row) &&
-             (current_entry < other.current_entry)));
+            ((current_row == other.current_row) && (current_entry < other.current_entry)));
   }
 
 
@@ -892,8 +877,7 @@ namespace DynamicSparsityPatternIterators
   Iterator::operator-(const Iterator &other) const
   {
     (void)other;
-    Assert(accessor.sparsity_pattern == other.accessor.sparsity_pattern,
-           ExcInternalError());
+    Assert(accessor.sparsity_pattern == other.accessor.sparsity_pattern, ExcInternalError());
     Assert(false, ExcNotImplemented());
 
     return 0;
@@ -912,8 +896,7 @@ DynamicSparsityPattern::Line::add(const size_type j)
     }
 
   // do a binary search to find the place where to insert:
-  std::vector<size_type>::iterator it =
-    Utilities::lower_bound(entries.begin(), entries.end(), j);
+  std::vector<size_type>::iterator it = Utilities::lower_bound(entries.begin(), entries.end(), j);
 
   // If this entry is a duplicate, exit immediately
   if (*it == j)
@@ -953,8 +936,7 @@ DynamicSparsityPattern::add(const size_type i, const size_type j)
 
   have_entries = true;
 
-  const size_type rowindex =
-    rowset.size() == 0 ? i : rowset.index_within_set(i);
+  const size_type rowindex = rowset.size() == 0 ? i : rowset.index_within_set(i);
   lines[rowindex].add(j);
 }
 
@@ -975,8 +957,7 @@ DynamicSparsityPattern::add_entries(const size_type row,
   if (!have_entries && begin < end)
     have_entries = true;
 
-  const size_type rowindex =
-    rowset.size() == 0 ? row : rowset.index_within_set(row);
+  const size_type rowindex = rowset.size() == 0 ? row : rowset.index_within_set(row);
   lines[rowindex].add_entries(begin, end, indices_are_sorted);
 }
 
@@ -993,25 +974,21 @@ DynamicSparsityPattern::row_length(const size_type row) const
   if (rowset.size() > 0 && !rowset.is_element(row))
     return 0;
 
-  const size_type rowindex =
-    rowset.size() == 0 ? row : rowset.index_within_set(row);
+  const size_type rowindex = rowset.size() == 0 ? row : rowset.index_within_set(row);
   return lines[rowindex].entries.size();
 }
 
 
 
 inline types::global_dof_index
-DynamicSparsityPattern::column_number(const size_type row,
-                                      const size_type index) const
+DynamicSparsityPattern::column_number(const size_type row, const size_type index) const
 {
   Assert(row < n_rows(), ExcIndexRangeType<size_type>(row, 0, n_rows()));
   Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
-  const size_type local_row =
-    rowset.size() ? rowset.index_within_set(row) : row;
-  Assert(
-    index < lines[local_row].entries.size(),
-    ExcIndexRangeType<size_type>(index, 0, lines[local_row].entries.size()));
+  const size_type local_row = rowset.size() ? rowset.index_within_set(row) : row;
+  Assert(index < lines[local_row].entries.size(),
+         ExcIndexRangeType<size_type>(index, 0, lines[local_row].entries.size()));
   return lines[local_row].entries[index];
 }
 

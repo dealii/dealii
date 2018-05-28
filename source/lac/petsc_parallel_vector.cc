@@ -38,9 +38,7 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const MPI_Comm &communicator,
-                   const size_type n,
-                   const size_type local_size) :
+    Vector::Vector(const MPI_Comm &communicator, const size_type n, const size_type local_size) :
       communicator(communicator)
     {
       Vector::create_vector(n, local_size);
@@ -48,9 +46,7 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const MPI_Comm &  communicator,
-                   const VectorBase &v,
-                   const size_type   local_size) :
+    Vector::Vector(const MPI_Comm &communicator, const VectorBase &v, const size_type local_size) :
       VectorBase(v),
       communicator(communicator)
     {
@@ -68,13 +64,10 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const IndexSet &local,
-                   const IndexSet &ghost,
-                   const MPI_Comm &communicator) :
+    Vector::Vector(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &communicator) :
       communicator(communicator)
     {
-      Assert(local.is_ascending_and_one_to_one(communicator),
-             ExcNotImplemented());
+      Assert(local.is_ascending_and_one_to_one(communicator), ExcNotImplemented());
 
       IndexSet ghost_set = ghost;
       ghost_set.subtract_set(local);
@@ -84,11 +77,9 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const IndexSet &local, const MPI_Comm &communicator) :
-      communicator(communicator)
+    Vector::Vector(const IndexSet &local, const MPI_Comm &communicator) : communicator(communicator)
     {
-      Assert(local.is_ascending_and_one_to_one(communicator),
-             ExcNotImplemented());
+      Assert(local.is_ascending_and_one_to_one(communicator), ExcNotImplemented());
       Vector::create_vector(local.size(), local.n_elements());
     }
 
@@ -100,11 +91,9 @@ namespace PETScWrappers
       // make sure left- and right-hand side of the assignment are
       // compress()'ed:
       Assert(v.last_action == VectorOperation::unknown,
-             internal::VectorReference::ExcWrongMode(VectorOperation::unknown,
-                                                     v.last_action));
+             internal::VectorReference::ExcWrongMode(VectorOperation::unknown, v.last_action));
       Assert(last_action == VectorOperation::unknown,
-             internal::VectorReference::ExcWrongMode(VectorOperation::unknown,
-                                                     last_action));
+             internal::VectorReference::ExcWrongMode(VectorOperation::unknown, last_action));
 
       // if the vectors have different sizes,
       // then first resize the present one
@@ -155,8 +144,7 @@ namespace PETScWrappers
 
       int k_global, k = ((size() != n) || (local_size() != local_sz));
       {
-        const int ierr =
-          MPI_Allreduce(&k, &k_global, 1, MPI_INT, MPI_LOR, communicator);
+        const int ierr = MPI_Allreduce(&k, &k_global, 1, MPI_INT, MPI_LOR, communicator);
         AssertThrowMPI(ierr);
       }
 
@@ -204,9 +192,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::reinit(const IndexSet &local,
-                   const IndexSet &ghost,
-                   const MPI_Comm &comm)
+    Vector::reinit(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &comm)
     {
       const PetscErrorCode ierr = VecDestroy(&vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -242,8 +228,7 @@ namespace PETScWrappers
       Assert(local_size <= n, ExcIndexRange(local_size, 0, n));
       ghosted = false;
 
-      const PetscErrorCode ierr =
-        VecCreateMPI(communicator, local_size, PETSC_DETERMINE, &vector);
+      const PetscErrorCode ierr = VecCreateMPI(communicator, local_size, PETSC_DETERMINE, &vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
@@ -252,9 +237,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::create_vector(const size_type n,
-                          const size_type local_size,
-                          const IndexSet &ghostnodes)
+    Vector::create_vector(const size_type n, const size_type local_size, const IndexSet &ghostnodes)
     {
       (void)n;
       Assert(local_size <= n, ExcIndexRange(local_size, 0, n));
@@ -265,15 +248,10 @@ namespace PETScWrappers
       ghostnodes.fill_index_vector(ghostindices);
 
       const PetscInt *ptr =
-        (ghostindices.size() > 0 ? (const PetscInt *)(&(ghostindices[0])) :
-                                   nullptr);
+        (ghostindices.size() > 0 ? (const PetscInt *)(&(ghostindices[0])) : nullptr);
 
-      PetscErrorCode ierr = VecCreateGhost(communicator,
-                                           local_size,
-                                           PETSC_DETERMINE,
-                                           ghostindices.size(),
-                                           ptr,
-                                           &vector);
+      PetscErrorCode ierr = VecCreateGhost(
+        communicator, local_size, PETSC_DETERMINE, ghostindices.size(), ptr, &vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
@@ -299,8 +277,7 @@ namespace PETScWrappers
         ierr = VecGhostRestoreLocalForm(vector, &l);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        Assert(lsize == end - begin + (PetscInt)ghost_indices.n_elements(),
-               ExcInternalError());
+        Assert(lsize == end - begin + (PetscInt)ghost_indices.n_elements(), ExcInternalError());
       }
 #  endif
 
@@ -371,9 +348,7 @@ namespace PETScWrappers
       // which is clearly slow, but nobody is going to print a whole
       // matrix this way on a regular basis for production runs, so
       // the slowness of the barrier doesn't matter
-      for (unsigned int i = 0;
-           i < Utilities::MPI::n_mpi_processes(communicator);
-           i++)
+      for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(communicator); i++)
         {
           const int mpi_ierr = MPI_Barrier(communicator);
           AssertThrowMPI(mpi_ierr);
@@ -382,15 +357,13 @@ namespace PETScWrappers
             {
               if (across)
                 {
-                  out << "[Proc" << i << " " << istart << "-" << iend - 1 << "]"
-                      << ' ';
+                  out << "[Proc" << i << " " << istart << "-" << iend - 1 << "]" << ' ';
                   for (PetscInt i = 0; i < nlocal; ++i)
                     out << val[i] << ' ';
                 }
               else
                 {
-                  out << "[Proc " << i << " " << istart << "-" << iend - 1
-                      << "]" << std::endl;
+                  out << "[Proc " << i << " " << istart << "-" << iend - 1 << "]" << std::endl;
                   for (PetscInt i = 0; i < nlocal; ++i)
                     out << val[i] << std::endl;
                 }

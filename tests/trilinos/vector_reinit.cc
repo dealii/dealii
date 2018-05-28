@@ -45,9 +45,8 @@ test()
 
   parallel::distributed::Triangulation<dim> tria(
     mpi_communicator,
-    typename Triangulation<dim>::MeshSmoothing(
-      Triangulation<dim>::smoothing_on_refinement |
-      Triangulation<dim>::smoothing_on_coarsening));
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening));
 
   GridGenerator::hyper_cube(tria, -1, 0);
   tria.refine_global(2);

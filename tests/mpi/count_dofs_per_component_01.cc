@@ -58,9 +58,8 @@ test()
   std::vector<types::global_dof_index> dofs_per_component(fe.n_components());
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
 
-  AssertThrow(std::accumulate(dofs_per_component.begin(),
-                              dofs_per_component.end(),
-                              0U) == dof_handler.n_dofs(),
+  AssertThrow(std::accumulate(dofs_per_component.begin(), dofs_per_component.end(), 0U) ==
+                dof_handler.n_dofs(),
               ExcInternalError());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -68,8 +67,8 @@ test()
     {
       deallog << "Total number of dofs: " << dof_handler.n_dofs() << std::endl;
       for (unsigned int i = 0; i < dofs_per_component.size(); ++i)
-        deallog << "Component " << i << " has " << dofs_per_component[i]
-                << " global dofs" << std::endl;
+        deallog << "Component " << i << " has " << dofs_per_component[i] << " global dofs"
+                << std::endl;
     }
 }
 

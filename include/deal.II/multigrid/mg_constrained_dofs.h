@@ -81,7 +81,7 @@ public:
   DEAL_II_DEPRECATED void
   initialize(const DoFHandler<dim, spacedim> &      dof,
              const typename FunctionMap<dim>::type &function_map,
-             const ComponentMask &component_mask = ComponentMask());
+             const ComponentMask &                  component_mask = ComponentMask());
 
   /**
    * Fill the internal data structures with information
@@ -95,10 +95,9 @@ public:
    */
   template <int dim, int spacedim>
   void
-  make_zero_boundary_constraints(
-    const DoFHandler<dim, spacedim> &   dof,
-    const std::set<types::boundary_id> &boundary_ids,
-    const ComponentMask &               component_mask = ComponentMask());
+  make_zero_boundary_constraints(const DoFHandler<dim, spacedim> &   dof,
+                                 const std::set<types::boundary_id> &boundary_ids,
+                                 const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Reset the data structures.
@@ -110,15 +109,13 @@ public:
    * Determine whether a dof index is subject to a boundary constraint.
    */
   bool
-  is_boundary_index(const unsigned int            level,
-                    const types::global_dof_index index) const;
+  is_boundary_index(const unsigned int level, const types::global_dof_index index) const;
 
   /**
    * Determine whether a dof index is at the refinement edge.
    */
   bool
-  at_refinement_edge(const unsigned int            level,
-                     const types::global_dof_index index) const;
+  at_refinement_edge(const unsigned int level, const types::global_dof_index index) const;
 
 
   /**
@@ -204,8 +201,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
 
       // Loop through relevant cells and faces finding those which are periodic
       // neighbors.
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(l),
-                                                        endc = dof.end(l);
+      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(l), endc = dof.end(l);
       for (; cell != endc; ++cell)
         if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
           {
@@ -225,13 +221,11 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                   else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
                            numbers::artificial_subdomain_id)
                     {
-                      Assert(cell->is_locally_owned_on_level() == false,
-                             ExcInternalError());
+                      Assert(cell->is_locally_owned_on_level() == false, ExcInternalError());
                       continue;
                     }
 
-                  const unsigned int dofs_per_face =
-                    cell->face(f)->get_fe(0).dofs_per_face;
+                  const unsigned int dofs_per_face = cell->face(f)->get_fe(0).dofs_per_face;
                   std::vector<types::global_dof_index> dofs_1(dofs_per_face);
                   std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
@@ -251,8 +245,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                         !level_constraints[l].is_constrained(dofs_1[i]))
                       {
                         level_constraints[l].add_line(dofs_2[i]);
-                        level_constraints[l].add_entry(
-                          dofs_2[i], dofs_1[i], 1.);
+                        level_constraints[l].add_entry(dofs_2[i], dofs_1[i], 1.);
                       }
                 }
           }
@@ -268,10 +261,9 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
 
 template <int dim, int spacedim>
 inline void
-MGConstrainedDoFs::initialize(
-  const DoFHandler<dim, spacedim> &      dof,
-  const typename FunctionMap<dim>::type &function_map,
-  const ComponentMask &                  component_mask)
+MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &      dof,
+                              const typename FunctionMap<dim>::type &function_map,
+                              const ComponentMask &                  component_mask)
 {
   initialize(dof);
 
@@ -281,27 +273,23 @@ MGConstrainedDoFs::initialize(
   // At this point boundary_indices is empty.
   boundary_indices.resize(n_levels);
 
-  MGTools::make_boundary_list(
-    dof, function_map, boundary_indices, component_mask);
+  MGTools::make_boundary_list(dof, function_map, boundary_indices, component_mask);
 }
 
 
 template <int dim, int spacedim>
 inline void
-MGConstrainedDoFs::make_zero_boundary_constraints(
-  const DoFHandler<dim, spacedim> &   dof,
-  const std::set<types::boundary_id> &boundary_ids,
-  const ComponentMask &               component_mask)
+MGConstrainedDoFs::make_zero_boundary_constraints(const DoFHandler<dim, spacedim> &   dof,
+                                                  const std::set<types::boundary_id> &boundary_ids,
+                                                  const ComponentMask &component_mask)
 {
   // allocate an IndexSet for each global level. Contents will be
   // overwritten inside make_boundary_list.
   const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  Assert(boundary_indices.size() == 0 || boundary_indices.size() == n_levels,
-         ExcInternalError());
+  Assert(boundary_indices.size() == 0 || boundary_indices.size() == n_levels, ExcInternalError());
   boundary_indices.resize(n_levels);
 
-  MGTools::make_boundary_list(
-    dof, boundary_ids, boundary_indices, component_mask);
+  MGTools::make_boundary_list(dof, boundary_ids, boundary_indices, component_mask);
 }
 
 
@@ -334,13 +322,11 @@ MGConstrainedDoFs::at_refinement_edge(const unsigned int            level,
 }
 
 inline bool
-MGConstrainedDoFs::is_interface_matrix_entry(
-  const unsigned int            level,
-  const types::global_dof_index i,
-  const types::global_dof_index j) const
+MGConstrainedDoFs::is_interface_matrix_entry(const unsigned int            level,
+                                             const types::global_dof_index i,
+                                             const types::global_dof_index j) const
 {
-  const IndexSet &interface_dofs_on_level =
-    this->get_refinement_edge_indices(level);
+  const IndexSet &interface_dofs_on_level = this->get_refinement_edge_indices(level);
 
   return interface_dofs_on_level.is_element(i)     // at_refinement_edge(i)
          && !interface_dofs_on_level.is_element(j) // !at_refinement_edge(j)

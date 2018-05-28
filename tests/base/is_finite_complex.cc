@@ -28,107 +28,70 @@ check()
 {
   using namespace numbers;
 
-  deallog << std::numeric_limits<
-               typename numbers::NumberTraits<T>::real_type>::quiet_NaN()
+  deallog << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::quiet_NaN()
           << "   -->   ";
   deallog << is_finite(
-               T(std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::quiet_NaN(),
+               T(std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::quiet_NaN(), 0))
+          << ' ';
+  deallog << is_finite(
+               T(0, std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::quiet_NaN()))
+          << std::endl;
+
+  deallog << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::signaling_NaN()
+          << "   -->   ";
+  deallog << is_finite(
+               T(std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::signaling_NaN(),
                  0))
-          << ' ';
-  deallog << is_finite(
-               T(0,
-                 std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::quiet_NaN()))
-          << std::endl;
-
-  deallog << std::numeric_limits<
-               typename numbers::NumberTraits<T>::real_type>::signaling_NaN()
-          << "   -->   ";
-  deallog << is_finite(T(
-               std::numeric_limits<
-                 typename numbers::NumberTraits<T>::real_type>::signaling_NaN(),
-               0))
-          << ' ';
-  deallog
-    << is_finite(
-         T(0,
-           std::numeric_limits<
-             typename numbers::NumberTraits<T>::real_type>::signaling_NaN()))
-    << std::endl;
-
-  deallog << std::numeric_limits<
-               typename numbers::NumberTraits<T>::real_type>::infinity()
-          << "   -->   ";
-  deallog << is_finite(
-               T(std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::infinity(),
-                 0))
-          << ' ';
-  deallog << is_finite(
-               T(0,
-                 std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::infinity()))
-          << std::endl;
-
-  deallog << -std::numeric_limits<
-               typename numbers::NumberTraits<T>::real_type>::infinity()
-          << "   -->   ";
-  deallog << is_finite(
-               T(-std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::infinity(),
-                 0))
-          << ' ';
-  deallog << is_finite(
-               T(0,
-                 -std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::infinity()))
-          << std::endl;
-
-  deallog
-    << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::min()
-    << "   -->   ";
-  deallog << is_finite(T(std::numeric_limits<
-                           typename numbers::NumberTraits<T>::real_type>::min(),
-                         0))
-          << ' ';
-  deallog << is_finite(
-               T(0,
-                 std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::min()))
-          << std::endl;
-
-  deallog
-    << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::max()
-    << "   -->   ";
-  deallog << is_finite(T(std::numeric_limits<
-                           typename numbers::NumberTraits<T>::real_type>::max(),
-                         0))
-          << ' ';
-  deallog << is_finite(
-               T(0,
-                 std::numeric_limits<
-                   typename numbers::NumberTraits<T>::real_type>::max()))
-          << std::endl;
-
-  deallog << static_cast<typename numbers::NumberTraits<T>::real_type>(1)
-          << "   -->   ";
-  deallog << is_finite(T(
-               static_cast<typename numbers::NumberTraits<T>::real_type>(1), 0))
           << ' ';
   deallog << is_finite(T(
-               0, static_cast<typename numbers::NumberTraits<T>::real_type>(1)))
+               0,
+               std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::signaling_NaN()))
           << std::endl;
 
-  deallog << static_cast<typename numbers::NumberTraits<T>::real_type>(-1)
+  deallog << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::infinity()
           << "   -->   ";
   deallog << is_finite(
-               T(static_cast<typename numbers::NumberTraits<T>::real_type>(-1),
-                 0))
+               T(std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::infinity(), 0))
           << ' ';
   deallog << is_finite(
-               T(0,
-                 static_cast<typename numbers::NumberTraits<T>::real_type>(-1)))
+               T(0, std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::infinity()))
+          << std::endl;
+
+  deallog << -std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::infinity()
+          << "   -->   ";
+  deallog << is_finite(
+               T(-std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::infinity(), 0))
+          << ' ';
+  deallog << is_finite(
+               T(0, -std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::infinity()))
+          << std::endl;
+
+  deallog << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::min()
+          << "   -->   ";
+  deallog << is_finite(
+               T(std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::min(), 0))
+          << ' ';
+  deallog << is_finite(
+               T(0, std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::min()))
+          << std::endl;
+
+  deallog << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::max()
+          << "   -->   ";
+  deallog << is_finite(
+               T(std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::max(), 0))
+          << ' ';
+  deallog << is_finite(
+               T(0, std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::max()))
+          << std::endl;
+
+  deallog << static_cast<typename numbers::NumberTraits<T>::real_type>(1) << "   -->   ";
+  deallog << is_finite(T(static_cast<typename numbers::NumberTraits<T>::real_type>(1), 0)) << ' ';
+  deallog << is_finite(T(0, static_cast<typename numbers::NumberTraits<T>::real_type>(1)))
+          << std::endl;
+
+  deallog << static_cast<typename numbers::NumberTraits<T>::real_type>(-1) << "   -->   ";
+  deallog << is_finite(T(static_cast<typename numbers::NumberTraits<T>::real_type>(-1), 0)) << ' ';
+  deallog << is_finite(T(0, static_cast<typename numbers::NumberTraits<T>::real_type>(-1)))
           << std::endl;
 }
 

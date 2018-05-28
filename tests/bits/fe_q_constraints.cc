@@ -82,8 +82,7 @@ TestFunction<dim>::TestFunction(const unsigned int p_order) : p_order(p_order)
 
 template <int dim>
 double
-TestFunction<dim>::value(const Point<dim> &p,
-                         const unsigned int /*component*/) const
+TestFunction<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
 {
   double val = base[0].value(p(0));
   for (unsigned int i = 1; i < dim; ++i)
@@ -119,8 +118,7 @@ private:
 };
 
 template <int dim>
-TestFEQConstraints<dim>::TestFEQConstraints(unsigned int p_order,
-                                            unsigned int refinements) :
+TestFEQConstraints<dim>::TestFEQConstraints(unsigned int p_order, unsigned int refinements) :
   refinements(refinements),
   p_order(p_order),
   fe(p_order),
@@ -159,15 +157,12 @@ TestFEQConstraints<dim>::make_grid_and_dofs()
 
   dof_handler.distribute_dofs(fe);
 
-  deallog << "---------------------------------------------------------"
-          << std::endl;
-  deallog << "P-Order: " << p_order
-          << "  Number of degrees of freedom: " << dof_handler.n_dofs()
+  deallog << "---------------------------------------------------------" << std::endl;
+  deallog << "P-Order: " << p_order << "  Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 
   hanging_node_constraints.clear();
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          hanging_node_constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, hanging_node_constraints);
   hanging_node_constraints.close();
 }
 
@@ -201,27 +196,18 @@ TestFEQConstraints<dim>::test()
 
   // First error check. Simply the interpolation error of the used FE-Space
   // on the given triangulation.
-  VectorTools::integrate_difference(dof_handler,
-                                    solution,
-                                    test_function,
-                                    norm_per_cell,
-                                    quadrature,
-                                    VectorTools::L2_norm);
+  VectorTools::integrate_difference(
+    dof_handler, solution, test_function, norm_per_cell, quadrature, VectorTools::L2_norm);
   l2norm1 = norm_per_cell.l2_norm() / l2test;
 
   // Second error check. Interpolation error, after redistribution of the
   // values onto the DoFs on the hanging nodes.
   hanging_node_constraints.distribute(solution);
-  VectorTools::integrate_difference(dof_handler,
-                                    solution,
-                                    test_function,
-                                    norm_per_cell,
-                                    quadrature,
-                                    VectorTools::L2_norm);
+  VectorTools::integrate_difference(
+    dof_handler, solution, test_function, norm_per_cell, quadrature, VectorTools::L2_norm);
   l2norm2 = norm_per_cell.l2_norm() / l2test;
   l2error = fabs(l2norm1 - l2norm2);
-  deallog << "Normed L2-Error 1: " << l2norm1
-          << "  Normed L2-Error 2: " << l2norm2 << std::endl
+  deallog << "Normed L2-Error 1: " << l2norm1 << "  Normed L2-Error 2: " << l2norm2 << std::endl
           << "Normed L2-Diff: " << l2error << "   ";
   if (l2error < 1.0e-16)
     deallog << "OK" << std::endl;

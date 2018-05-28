@@ -90,13 +90,12 @@ test()
   for (unsigned int case_no = 0; case_no < 2; ++case_no)
     {
       create_triangulation(case_no, tria);
-      deallog << "dim" << dim << ":case" << case_no
-              << ":measure=" << tria.begin_active()->measure() << std::endl;
-      deallog << "dim" << dim << ":case" << case_no
-              << ":center=" << tria.begin_active()->center() << std::endl;
-      deallog << "dim" << dim << ":case" << case_no
-              << ":barycenter=" << tria.begin_active()->barycenter()
+      deallog << "dim" << dim << ":case" << case_no << ":measure=" << tria.begin_active()->measure()
               << std::endl;
+      deallog << "dim" << dim << ":case" << case_no << ":center=" << tria.begin_active()->center()
+              << std::endl;
+      deallog << "dim" << dim << ":case" << case_no
+              << ":barycenter=" << tria.begin_active()->barycenter() << std::endl;
       tria.clear();
     }
 }

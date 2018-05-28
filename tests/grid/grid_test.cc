@@ -40,13 +40,11 @@ public:
   get_new_point(const ArrayView<const Point<dim>> &surrounding_points,
                 const ArrayView<const double> &    weights) const override
   {
-    Point<dim> middle =
-      FlatManifold<dim>::get_new_point(surrounding_points, weights);
+    Point<dim> middle = FlatManifold<dim>::get_new_point(surrounding_points, weights);
 
     for (int i = 0; i < dim; ++i)
       middle(i) -= .5;
-    middle *=
-      std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
+    middle *= std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
     for (int i = 0; i < dim; ++i)
       middle(i) += .5;
 
@@ -66,19 +64,16 @@ class CurvedLine : public FlatManifold<dim>
 {
 public:
   virtual Point<dim>
-  get_new_point_on_line(
-    const typename Triangulation<dim>::line_iterator &line) const;
+  get_new_point_on_line(const typename Triangulation<dim>::line_iterator &line) const;
 
   virtual Point<dim>
-  get_new_point_on_quad(
-    const typename Triangulation<dim>::quad_iterator &quad) const;
+  get_new_point_on_quad(const typename Triangulation<dim>::quad_iterator &quad) const;
 };
 
 
 template <int dim>
 Point<dim>
-CurvedLine<dim>::get_new_point_on_line(
-  const typename Triangulation<dim>::line_iterator &line) const
+CurvedLine<dim>::get_new_point_on_line(const typename Triangulation<dim>::line_iterator &line) const
 {
   Point<dim> middle = FlatManifold<dim>::get_new_point_on_line(line);
 
@@ -125,8 +120,7 @@ CurvedLine<dim>::get_new_point_on_line(
 
 template <int dim>
 Point<dim>
-CurvedLine<dim>::get_new_point_on_quad(
-  const typename Triangulation<dim>::quad_iterator &quad) const
+CurvedLine<dim>::get_new_point_on_quad(const typename Triangulation<dim>::quad_iterator &quad) const
 {
   Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad(quad);
 
@@ -228,7 +222,7 @@ test(const int test_case)
           tria.execute_coarsening_and_refinement();
 
           typename Triangulation<dim>::active_cell_iterator cell, endc;
-          const unsigned int steps[4] = {0, 2, 2, 2};
+          const unsigned int                                steps[4] = {0, 2, 2, 2};
           for (unsigned int i = 0; i < steps[dim]; ++i)
             {
               cell = tria.begin_active();
@@ -252,10 +246,8 @@ test(const int test_case)
   go.set_flags(GridOutFlags::Ucd(true));
   go.write_ucd(tria, logfile);
 
-  deallog << "     Total number of cells        = " << tria.n_cells()
-          << std::endl
-          << "     Total number of active cells = " << tria.n_active_cells()
-          << std::endl;
+  deallog << "     Total number of cells        = " << tria.n_cells() << std::endl
+          << "     Total number of active cells = " << tria.n_active_cells() << std::endl;
 
   deallog.pop();
 }

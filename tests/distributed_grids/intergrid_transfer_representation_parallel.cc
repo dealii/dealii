@@ -72,8 +72,7 @@ test(unsigned n_refinements)
       typename Triangulation<dim>::active_cell_iterator cell;
       for (cell = tria2.begin_active(); cell != tria2.end(); ++cell)
         {
-          if (cell->is_locally_owned() &&
-              (cell->center().distance(p0) < 0.71 / double(i + 1)))
+          if (cell->is_locally_owned() && (cell->center().distance(p0) < 0.71 / double(i + 1)))
             cell->set_refine_flag();
         }
 
@@ -92,7 +91,7 @@ test(unsigned n_refinements)
   grid_1_to_2_map.make_mapping(dof_handler1, dof_handler2);
 
   typedef std::vector<std::map<types::global_dof_index, float>> TransferRep;
-  TransferRep transfer_representation;
+  TransferRep                                                   transfer_representation;
   DoFTools::compute_intergrid_transfer_representation(
     dof_handler1, 0, dof_handler2, 0, grid_1_to_2_map, transfer_representation);
 
@@ -102,9 +101,7 @@ test(unsigned n_refinements)
   for (size_t i = 0; i < transfer_representation.size(); ++i)
     {
       TransferRep::value_type m = transfer_representation[i];
-      for (TransferRep::value_type::const_iterator it = m.begin();
-           it != m.end();
-           ++it)
+      for (TransferRep::value_type::const_iterator it = m.begin(); it != m.end(); ++it)
         local_sum += it->second;
     }
 

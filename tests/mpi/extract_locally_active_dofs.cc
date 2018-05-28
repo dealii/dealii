@@ -54,8 +54,8 @@ test()
   IndexSet locally_active;
   DoFTools::extract_locally_active_dofs(dofh, locally_active);
 
-  Assert(locally_active == DoFTools::dof_indices_with_subdomain_association(
-                             dofh, tr.locally_owned_subdomain()),
+  Assert(locally_active ==
+           DoFTools::dof_indices_with_subdomain_association(dofh, tr.locally_owned_subdomain()),
          ExcInternalError());
   // Assert (locally_active.n_elements() ==
   //    DoFTools::count_dofs_with_subdomain_association (dofh,
@@ -64,8 +64,7 @@ test()
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      deallog << locally_active.size() << ' ' << locally_active.n_elements()
-              << std::endl;
+      deallog << locally_active.size() << ' ' << locally_active.n_elements() << std::endl;
 
       for (unsigned int i = 0; i < locally_active.size(); ++i)
         if (locally_active.is_element(i))

@@ -47,10 +47,7 @@
 std::ofstream logfile("output");
 
 
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d = fe_degree + 1,
-          typename Number   = double>
+template <int dim, int fe_degree, int n_q_points_1d = fe_degree + 1, typename Number = double>
 class MatrixFreeTest
 {
 public:
@@ -75,12 +72,9 @@ public:
         fe_eval_plain.read_dof_values_plain(src);
 
         for (unsigned int i = 0; i < fe_eval.dofs_per_cell; ++i)
-          for (unsigned int j = 0;
-               j < VectorizedArray<Number>::n_array_elements;
-               ++j)
+          for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements; ++j)
             {
-              error += std::fabs(fe_eval.get_dof_value(i)[j] -
-                                 fe_eval_plain.get_dof_value(i)[j]);
+              error += std::fabs(fe_eval.get_dof_value(i)[j] - fe_eval_plain.get_dof_value(i)[j]);
               total += std::fabs(fe_eval.get_dof_value(i)[j]);
             }
       }
@@ -95,13 +89,9 @@ public:
     total = 0;
     Vector<Number> dst_dummy;
     data.cell_loop(
-      &MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::operator(),
-      this,
-      dst_dummy,
-      src);
+      &MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::operator(), this, dst_dummy, src);
 
-    deallog << "Error read_dof_values vs read_dof_values_plain: "
-            << error / total << std::endl
+    deallog << "Error read_dof_values vs read_dof_values_plain: " << error / total << std::endl
             << std::endl;
   };
 
@@ -162,8 +152,7 @@ test()
   // refine a few cells
   for (unsigned int i = 0; i < 11 - 3 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tria.begin_active(),
+      typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                         endc = tria.end();
       unsigned int counter                                   = 0;
       for (; cell != endc; ++cell, ++counter)
@@ -178,8 +167,7 @@ test()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 1, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 1, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double>(dof, constraints);

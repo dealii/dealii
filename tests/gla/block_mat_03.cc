@@ -75,24 +75,21 @@ test()
   sub_blocks[1] = 1;
   DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, sub_blocks);
 
-  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
-          << std::endl;
+  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1] << std::endl;
 
   std::vector<IndexSet> locally_relevant_partitioning;
   std::vector<IndexSet> locally_owned_partitioning;
 
   IndexSet locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  locally_relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, dofs_per_block[0]));
   locally_relevant_partitioning.push_back(
-    locally_relevant_dofs.get_view(0, dofs_per_block[0]));
-  locally_relevant_partitioning.push_back(locally_relevant_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+    locally_relevant_dofs.get_view(dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+  locally_owned_partitioning.push_back(locally_owned_dofs.get_view(0, dofs_per_block[0]));
   locally_owned_partitioning.push_back(
-    locally_owned_dofs.get_view(0, dofs_per_block[0]));
-  locally_owned_partitioning.push_back(locally_owned_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+    locally_owned_dofs.get_view(dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
 
   deallog << "owned: ";
   locally_owned_dofs.print(deallog);
@@ -106,10 +103,7 @@ test()
   BlockDynamicSparsityPattern bcsp(locally_relevant_partitioning);
   DoFTools::make_sparsity_pattern(dof_handler, bcsp, constraints, false);
   SparsityTools::distribute_sparsity_pattern(
-    bcsp,
-    dof_handler.locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    locally_relevant_dofs);
+    bcsp, dof_handler.locally_owned_dofs_per_processor(), MPI_COMM_WORLD, locally_relevant_dofs);
 
   typedef typename LA::MPI::BlockSparseMatrix::value_type number;
   typename LA::MPI::BlockSparseMatrix                     A;
@@ -119,7 +113,7 @@ test()
   FEValues<3> fe_values(fe, quadrature, update_values);
 
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
-  FullMatrix<number> local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
+  FullMatrix<number>                   local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
 
   for (DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
@@ -129,20 +123,18 @@ test()
         fe_values.reinit(cell);
         local_matrix = number();
 
-        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-             ++q_point)
+        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
           {
             for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-                  local_matrix(i, j) += fe_values.shape_value(i, q_point) *
-                                        fe_values.shape_value(j, q_point);
+                  local_matrix(i, j) +=
+                    fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point);
               }
           }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, A);
+        constraints.distribute_local_to_global(local_matrix, local_dof_indices, A);
       }
 
   A.compress(VectorOperation::add);
@@ -158,7 +150,7 @@ void
 test_alt()
 {
   typedef LA_Trilinos LA;
-  unsigned int        myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int        myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   unsigned int        numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (myid == 0)
@@ -178,24 +170,21 @@ test_alt()
   sub_blocks[1] = 1;
   DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, sub_blocks);
 
-  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
-          << std::endl;
+  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1] << std::endl;
 
   std::vector<IndexSet> locally_relevant_partitioning;
   std::vector<IndexSet> locally_owned_partitioning;
 
   IndexSet locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  locally_relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, dofs_per_block[0]));
   locally_relevant_partitioning.push_back(
-    locally_relevant_dofs.get_view(0, dofs_per_block[0]));
-  locally_relevant_partitioning.push_back(locally_relevant_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+    locally_relevant_dofs.get_view(dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+  locally_owned_partitioning.push_back(locally_owned_dofs.get_view(0, dofs_per_block[0]));
   locally_owned_partitioning.push_back(
-    locally_owned_dofs.get_view(0, dofs_per_block[0]));
-  locally_owned_partitioning.push_back(locally_owned_dofs.get_view(
-    dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
+    locally_owned_dofs.get_view(dofs_per_block[0], dofs_per_block[0] + dofs_per_block[1]));
 
   deallog << "owned: ";
   locally_owned_dofs.print(deallog);
@@ -206,14 +195,9 @@ test_alt()
   ConstraintMatrix constraints(locally_relevant_dofs);
   constraints.close();
 
-  TrilinosWrappers::BlockSparsityPattern sp(locally_owned_partitioning,
-                                            MPI_COMM_WORLD);
+  TrilinosWrappers::BlockSparsityPattern sp(locally_owned_partitioning, MPI_COMM_WORLD);
   DoFTools::make_sparsity_pattern(
-    dof_handler,
-    sp,
-    constraints,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    dof_handler, sp, constraints, false, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
   sp.compress();
   typename LA::MPI::BlockSparseMatrix A;
   A.reinit(sp);
@@ -222,7 +206,7 @@ test_alt()
   FEValues<3> fe_values(fe, quadrature, update_values);
 
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
-  FullMatrix<double> local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
+  FullMatrix<double>                   local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
 
   for (DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
@@ -232,20 +216,18 @@ test_alt()
         fe_values.reinit(cell);
         local_matrix = 0.0;
 
-        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-             ++q_point)
+        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
           {
             for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-                  local_matrix(i, j) += fe_values.shape_value(i, q_point) *
-                                        fe_values.shape_value(j, q_point);
+                  local_matrix(i, j) +=
+                    fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point);
               }
           }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, A);
+        constraints.distribute_local_to_global(local_matrix, local_dof_indices, A);
       }
 
   A.compress(VectorOperation::add);

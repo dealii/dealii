@@ -45,9 +45,8 @@ namespace
   inline number
   max_element(const dealii::Vector<number> &criteria)
   {
-    return (criteria.size() > 0) ?
-             (*std::max_element(criteria.begin(), criteria.end())) :
-             std::numeric_limits<number>::min();
+    return (criteria.size() > 0) ? (*std::max_element(criteria.begin(), criteria.end())) :
+                                   std::numeric_limits<number>::min();
   }
 
 
@@ -56,9 +55,8 @@ namespace
   inline number
   min_element(const dealii::Vector<number> &criteria)
   {
-    return (criteria.size() > 0) ?
-             (*std::min_element(criteria.begin(), criteria.end())) :
-             std::numeric_limits<number>::max();
+    return (criteria.size() > 0) ? (*std::min_element(criteria.begin(), criteria.end())) :
+                                   std::numeric_limits<number>::max();
   }
 
 
@@ -69,20 +67,18 @@ namespace
   template <typename number>
   std::pair<number, number>
   compute_global_min_and_max_at_root(const dealii::Vector<number> &criteria,
-                                     MPI_Comm mpi_communicator)
+                                     MPI_Comm                      mpi_communicator)
   {
     // we'd like to compute the global max and min from the local ones in one
     // MPI communication. we can do that by taking the elementwise minimum of
     // the local min and the negative maximum over all processors
 
-    const double local_min = min_element(criteria),
-                 local_max = max_element(criteria);
-    double comp[2]         = {local_min, -local_max};
-    double result[2]       = {0, 0};
+    const double local_min = min_element(criteria), local_max = max_element(criteria);
+    double       comp[2]   = {local_min, -local_max};
+    double       result[2] = {0, 0};
 
     // compute the minimum on processor zero
-    const int ierr =
-      MPI_Reduce(comp, result, 2, MPI_DOUBLE, MPI_MIN, 0, mpi_communicator);
+    const int ierr = MPI_Reduce(comp, result, 2, MPI_DOUBLE, MPI_MIN, 0, mpi_communicator);
     AssertThrowMPI(ierr);
 
     // make sure only processor zero got something
@@ -101,19 +97,16 @@ namespace
    */
   template <typename number>
   double
-  compute_global_sum(const dealii::Vector<number> &criteria,
-                     MPI_Comm                      mpi_communicator)
+  compute_global_sum(const dealii::Vector<number> &criteria, MPI_Comm mpi_communicator)
   {
-    double my_sum =
-      std::accumulate(criteria.begin(),
-                      criteria.end(),
-                      /* do accumulation in the correct data type: */
-                      number());
+    double my_sum = std::accumulate(criteria.begin(),
+                                    criteria.end(),
+                                    /* do accumulation in the correct data type: */
+                                    number());
 
     double result = 0;
     // compute the minimum on processor zero
-    const int ierr =
-      MPI_Reduce(&my_sum, &result, 1, MPI_DOUBLE, MPI_SUM, 0, mpi_communicator);
+    const int ierr = MPI_Reduce(&my_sum, &result, 1, MPI_DOUBLE, MPI_SUM, 0, mpi_communicator);
     AssertThrowMPI(ierr);
 
     // make sure only processor zero got something
@@ -131,28 +124,23 @@ namespace
    */
   template <int dim, int spacedim, typename Number>
   void
-  get_locally_owned_indicators(
-    const parallel::distributed::Triangulation<dim, spacedim> &tria,
-    const dealii::Vector<Number> &                             criteria,
-    Vector<Number> &locally_owned_indicators)
+  get_locally_owned_indicators(const parallel::distributed::Triangulation<dim, spacedim> &tria,
+                               const dealii::Vector<Number> &                             criteria,
+                               Vector<Number> &locally_owned_indicators)
   {
-    Assert(locally_owned_indicators.size() ==
-             tria.n_locally_owned_active_cells(),
+    Assert(locally_owned_indicators.size() == tria.n_locally_owned_active_cells(),
            ExcInternalError());
 
     unsigned int owned_index = 0;
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           tria.begin_active();
+    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
          cell != tria.end();
          ++cell)
       if (cell->subdomain_id() == tria.locally_owned_subdomain())
         {
-          locally_owned_indicators(owned_index) =
-            criteria(cell->active_cell_index());
+          locally_owned_indicators(owned_index) = criteria(cell->active_cell_index());
           ++owned_index;
         }
-    Assert(owned_index == tria.n_locally_owned_active_cells(),
-           ExcInternalError());
+    Assert(owned_index == tria.n_locally_owned_active_cells(), ExcInternalError());
   }
 
 
@@ -178,8 +166,7 @@ namespace
     if (interesting_range[1] > 0)
       interesting_range[1] *= 1.01;
     else
-      interesting_range[1] +=
-        0.01 * (interesting_range[1] - interesting_range[0]);
+      interesting_range[1] += 0.01 * (interesting_range[1] - interesting_range[0]);
   }
 
 
@@ -194,15 +181,14 @@ namespace
   mark_cells(parallel::distributed::Triangulation<dim, spacedim> &tria,
              const dealii::Vector<Number> &                       criteria,
              const double                                         top_threshold,
-             const double bottom_threshold)
+             const double                                         bottom_threshold)
   {
     dealii::GridRefinement::refine(tria, criteria, top_threshold);
     dealii::GridRefinement::coarsen(tria, criteria, bottom_threshold);
 
     // as a final good measure, delete all flags again from cells that we don't
     // locally own
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-           tria.begin_active();
+    for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
          cell != tria.end();
          ++cell)
       if (cell->subdomain_id() != tria.locally_owned_subdomain())
@@ -227,8 +213,7 @@ namespace
                       const unsigned int               n_target_cells,
                       MPI_Comm                         mpi_communicator)
     {
-      double interesting_range[2] = {global_min_and_max.first,
-                                     global_min_and_max.second};
+      double interesting_range[2] = {global_min_and_max.first, global_min_and_max.second};
       adjust_interesting_range(interesting_range);
 
       const unsigned int master_mpi_rank = 0;
@@ -236,36 +221,26 @@ namespace
 
       do
         {
-          int ierr = MPI_Bcast(interesting_range,
-                               2,
-                               MPI_DOUBLE,
-                               master_mpi_rank,
-                               mpi_communicator);
+          int ierr = MPI_Bcast(interesting_range, 2, MPI_DOUBLE, master_mpi_rank, mpi_communicator);
           AssertThrowMPI(ierr);
 
           if (interesting_range[0] == interesting_range[1])
             return interesting_range[0];
 
           const double test_threshold =
-            (interesting_range[0] > 0 ?
-               std::sqrt(interesting_range[0] * interesting_range[1]) :
-               (interesting_range[0] + interesting_range[1]) / 2);
+            (interesting_range[0] > 0 ? std::sqrt(interesting_range[0] * interesting_range[1]) :
+                                        (interesting_range[0] + interesting_range[1]) / 2);
 
           // count how many of our own elements would be above this threshold
           // and then add to it the number for all the others
-          unsigned int my_count = std::count_if(
-            criteria.begin(), criteria.end(), [test_threshold](const double c) {
+          unsigned int my_count =
+            std::count_if(criteria.begin(), criteria.end(), [test_threshold](const double c) {
               return c > test_threshold;
             });
 
           unsigned int total_count;
-          ierr = MPI_Reduce(&my_count,
-                            &total_count,
-                            1,
-                            MPI_UNSIGNED,
-                            MPI_SUM,
-                            master_mpi_rank,
-                            mpi_communicator);
+          ierr = MPI_Reduce(
+            &my_count, &total_count, 1, MPI_UNSIGNED, MPI_SUM, master_mpi_rank, mpi_communicator);
           AssertThrowMPI(ierr);
 
           // now adjust the range. if we have to many cells, we take the upper
@@ -318,8 +293,7 @@ namespace
                       const double                     target_error,
                       MPI_Comm                         mpi_communicator)
     {
-      double interesting_range[2] = {global_min_and_max.first,
-                                     global_min_and_max.second};
+      double interesting_range[2] = {global_min_and_max.first, global_min_and_max.second};
       adjust_interesting_range(interesting_range);
 
       const unsigned int master_mpi_rank = 0;
@@ -327,11 +301,7 @@ namespace
 
       do
         {
-          int ierr = MPI_Bcast(interesting_range,
-                               2,
-                               MPI_DOUBLE,
-                               master_mpi_rank,
-                               mpi_communicator);
+          int ierr = MPI_Bcast(interesting_range, 2, MPI_DOUBLE, master_mpi_rank, mpi_communicator);
           AssertThrowMPI(ierr);
 
           if (interesting_range[0] == interesting_range[1])
@@ -343,22 +313,16 @@ namespace
               // the maximal refinement indicator. in such cases, we get no
               // refinement at all. thus, cap the threshold by the actual
               // largest value
-              double final_threshold =
-                std::min(interesting_range[0], global_min_and_max.second);
-              ierr = MPI_Bcast(&final_threshold,
-                               1,
-                               MPI_DOUBLE,
-                               master_mpi_rank,
-                               mpi_communicator);
+              double final_threshold = std::min(interesting_range[0], global_min_and_max.second);
+              ierr = MPI_Bcast(&final_threshold, 1, MPI_DOUBLE, master_mpi_rank, mpi_communicator);
               AssertThrowMPI(ierr);
 
               return final_threshold;
             }
 
           const double test_threshold =
-            (interesting_range[0] > 0 ?
-               std::sqrt(interesting_range[0] * interesting_range[1]) :
-               (interesting_range[0] + interesting_range[1]) / 2);
+            (interesting_range[0] > 0 ? std::sqrt(interesting_range[0] * interesting_range[1]) :
+                                        (interesting_range[0] + interesting_range[1]) / 2);
 
           // accumulate the error of those our own elements above this threshold
           // and then add to it the number for all the others
@@ -368,13 +332,8 @@ namespace
               my_error += criteria(i);
 
           double total_error;
-          ierr = MPI_Reduce(&my_error,
-                            &total_error,
-                            1,
-                            MPI_DOUBLE,
-                            MPI_SUM,
-                            master_mpi_rank,
-                            mpi_communicator);
+          ierr = MPI_Reduce(
+            &my_error, &total_error, 1, MPI_DOUBLE, MPI_SUM, master_mpi_rank, mpi_communicator);
           AssertThrowMPI(ierr);
 
           // now adjust the range. if we have to many cells, we take the upper
@@ -422,36 +381,32 @@ namespace parallel
     {
       template <int dim, typename Number, int spacedim>
       void
-      refine_and_coarsen_fixed_number(
-        parallel::distributed::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &                       criteria,
-        const double       top_fraction_of_cells,
-        const double       bottom_fraction_of_cells,
-        const unsigned int max_n_cells)
+      refine_and_coarsen_fixed_number(parallel::distributed::Triangulation<dim, spacedim> &tria,
+                                      const dealii::Vector<Number> &                       criteria,
+                                      const double       top_fraction_of_cells,
+                                      const double       bottom_fraction_of_cells,
+                                      const unsigned int max_n_cells)
       {
         Assert(criteria.size() == tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
         Assert((top_fraction_of_cells >= 0) && (top_fraction_of_cells <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert((bottom_fraction_of_cells >= 0) &&
-                 (bottom_fraction_of_cells <= 1),
+        Assert((bottom_fraction_of_cells >= 0) && (bottom_fraction_of_cells <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
         Assert(top_fraction_of_cells + bottom_fraction_of_cells <= 1,
                dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert(criteria.is_non_negative(),
-               dealii::GridRefinement::ExcNegativeCriteria());
+        Assert(criteria.is_non_negative(), dealii::GridRefinement::ExcNegativeCriteria());
 
         const std::pair<double, double> adjusted_fractions =
-          dealii::GridRefinement::adjust_refine_and_coarsen_number_fraction<
-            dim>(tria.n_global_active_cells(),
-                 max_n_cells,
-                 top_fraction_of_cells,
-                 bottom_fraction_of_cells);
+          dealii::GridRefinement::adjust_refine_and_coarsen_number_fraction<dim>(
+            tria.n_global_active_cells(),
+            max_n_cells,
+            top_fraction_of_cells,
+            bottom_fraction_of_cells);
 
         // first extract from the vector of indicators the ones that correspond
         // to cells that we locally own
-        Vector<Number> locally_owned_indicators(
-          tria.n_locally_owned_active_cells());
+        Vector<Number> locally_owned_indicators(tria.n_locally_owned_active_cells());
         get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
         MPI_Comm mpi_communicator = tria.get_communicator();
@@ -459,16 +414,14 @@ namespace parallel
         // figure out the global max and min of the indicators. we don't need it
         // here, but it's a collective communication call
         const std::pair<Number, Number> global_min_and_max =
-          compute_global_min_and_max_at_root(locally_owned_indicators,
-                                             mpi_communicator);
+          compute_global_min_and_max_at_root(locally_owned_indicators, mpi_communicator);
 
 
         double top_threshold, bottom_threshold;
         top_threshold = RefineAndCoarsenFixedNumber::compute_threshold(
           locally_owned_indicators,
           global_min_and_max,
-          static_cast<unsigned int>(adjusted_fractions.first *
-                                    tria.n_global_active_cells()),
+          static_cast<unsigned int>(adjusted_fractions.first * tria.n_global_active_cells()),
           mpi_communicator);
 
         // compute bottom threshold only if necessary. otherwise use a threshold
@@ -482,8 +435,7 @@ namespace parallel
             mpi_communicator);
         else
           {
-            bottom_threshold =
-              *std::min_element(criteria.begin(), criteria.end());
+            bottom_threshold = *std::min_element(criteria.begin(), criteria.end());
             bottom_threshold -= std::fabs(bottom_threshold);
           }
 
@@ -494,28 +446,24 @@ namespace parallel
 
       template <int dim, typename Number, int spacedim>
       void
-      refine_and_coarsen_fixed_fraction(
-        parallel::distributed::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &                       criteria,
-        const double top_fraction_of_error,
-        const double bottom_fraction_of_error)
+      refine_and_coarsen_fixed_fraction(parallel::distributed::Triangulation<dim, spacedim> &tria,
+                                        const dealii::Vector<Number> &criteria,
+                                        const double                  top_fraction_of_error,
+                                        const double                  bottom_fraction_of_error)
       {
         Assert(criteria.size() == tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
         Assert((top_fraction_of_error >= 0) && (top_fraction_of_error <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert((bottom_fraction_of_error >= 0) &&
-                 (bottom_fraction_of_error <= 1),
+        Assert((bottom_fraction_of_error >= 0) && (bottom_fraction_of_error <= 1),
                dealii::GridRefinement::ExcInvalidParameterValue());
         Assert(top_fraction_of_error + bottom_fraction_of_error <= 1,
                dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert(criteria.is_non_negative(),
-               dealii::GridRefinement::ExcNegativeCriteria());
+        Assert(criteria.is_non_negative(), dealii::GridRefinement::ExcNegativeCriteria());
 
         // first extract from the vector of indicators the ones that correspond
         // to cells that we locally own
-        Vector<Number> locally_owned_indicators(
-          tria.n_locally_owned_active_cells());
+        Vector<Number> locally_owned_indicators(tria.n_locally_owned_active_cells());
         get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
         MPI_Comm mpi_communicator = tria.get_communicator();
@@ -523,17 +471,15 @@ namespace parallel
         // figure out the global max and min of the indicators. we don't need it
         // here, but it's a collective communication call
         const std::pair<double, double> global_min_and_max =
-          compute_global_min_and_max_at_root(locally_owned_indicators,
-                                             mpi_communicator);
+          compute_global_min_and_max_at_root(locally_owned_indicators, mpi_communicator);
 
-        const double total_error =
-          compute_global_sum(locally_owned_indicators, mpi_communicator);
-        double top_threshold, bottom_threshold;
-        top_threshold = RefineAndCoarsenFixedFraction::compute_threshold(
-          locally_owned_indicators,
-          global_min_and_max,
-          top_fraction_of_error * total_error,
-          mpi_communicator);
+        const double total_error = compute_global_sum(locally_owned_indicators, mpi_communicator);
+        double       top_threshold, bottom_threshold;
+        top_threshold =
+          RefineAndCoarsenFixedFraction::compute_threshold(locally_owned_indicators,
+                                                           global_min_and_max,
+                                                           top_fraction_of_error * total_error,
+                                                           mpi_communicator);
         // compute bottom threshold only if necessary. otherwise use a threshold
         // lower than the smallest value we have locally
         if (bottom_fraction_of_error > 0)
@@ -544,8 +490,7 @@ namespace parallel
             mpi_communicator);
         else
           {
-            bottom_threshold =
-              *std::min_element(criteria.begin(), criteria.end());
+            bottom_threshold = *std::min_element(criteria.begin(), criteria.end());
             bottom_threshold -= std::fabs(bottom_threshold);
           }
 

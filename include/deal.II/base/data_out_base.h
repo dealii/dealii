@@ -356,13 +356,12 @@ namespace DataOutBase
     /**
      * Exception
      */
-    DeclException2(
-      ExcInvalidCombinationOfDimensions,
-      int,
-      int,
-      << "It is not possible to have a structural dimension of " << arg1
-      << " to be larger than the space dimension of the surrounding"
-      << " space " << arg2);
+    DeclException2(ExcInvalidCombinationOfDimensions,
+                   int,
+                   int,
+                   << "It is not possible to have a structural dimension of " << arg1
+                   << " to be larger than the space dimension of the surrounding"
+                   << " space " << arg2);
     //@}
   };
 
@@ -502,13 +501,12 @@ namespace DataOutBase
     /**
      * Exception
      */
-    DeclException2(
-      ExcInvalidCombinationOfDimensions,
-      int,
-      int,
-      << "It is not possible to have a structural dimension of " << arg1
-      << " to be larger than the space dimension of the surrounding"
-      << " space " << arg2);
+    DeclException2(ExcInvalidCombinationOfDimensions,
+                   int,
+                   int,
+                   << "It is not possible to have a structural dimension of " << arg1
+                   << " to be larger than the space dimension of the surrounding"
+                   << " space " << arg2);
     //@}
   };
 
@@ -961,9 +959,7 @@ namespace DataOutBase
      * This function was originally written by Stefan Nauber.
      */
     static RgbValues
-    default_color_function(const double value,
-                           const double min_value,
-                           const double max_value);
+    default_color_function(const double value, const double min_value, const double max_value);
 
     /**
      * This is an alternative color function producing a grey scale between
@@ -971,9 +967,7 @@ namespace DataOutBase
      * setting the #color_function variable to the address of this function.
      */
     static RgbValues
-    grey_scale_color_function(const double value,
-                              const double min_value,
-                              const double max_value);
+    grey_scale_color_function(const double value, const double min_value, const double max_value);
 
     /**
      * This is one more alternative color function producing a grey scale
@@ -1147,11 +1141,10 @@ namespace DataOutBase
     /**
      * Constructor.
      */
-    VtkFlags(
-      const double       time  = std::numeric_limits<double>::min(),
-      const unsigned int cycle = std::numeric_limits<unsigned int>::min(),
-      const bool         print_date_and_time       = true,
-      const ZlibCompressionLevel compression_level = best_compression);
+    VtkFlags(const double               time  = std::numeric_limits<double>::min(),
+             const unsigned int         cycle = std::numeric_limits<unsigned int>::min(),
+             const bool                 print_date_and_time = true,
+             const ZlibCompressionLevel compression_level   = best_compression);
   };
 
 
@@ -1216,8 +1209,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct Deal_II_IntermediateFlags
-    : public OutputFlagsBase<Deal_II_IntermediateFlags>
+  struct Deal_II_IntermediateFlags : public OutputFlagsBase<Deal_II_IntermediateFlags>
   {
     /**
      * An indicator of the current file format version used to write
@@ -1439,9 +1431,8 @@ namespace DataOutBase
          * return false;
          */
 
-        return (one(0) < two(0) ||
-                (!(two(0) < one(0)) &&
-                 (one(1) < two(1) || (!(two(1) < one(1)) && one(2) < two(2)))));
+        return (one(0) < two(0) || (!(two(0) < one(0)) &&
+                                    (one(1) < two(1) || (!(two(1) < one(1)) && one(2) < two(2)))));
       }
     };
 
@@ -1502,8 +1493,7 @@ namespace DataOutBase
      * Record a cell vertex index based on the internal reordering.
      */
     void
-    internal_add_cell(const unsigned int cell_index,
-                      const unsigned int pt_index);
+    internal_add_cell(const unsigned int cell_index, const unsigned int pt_index);
   };
 
 
@@ -1588,12 +1578,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_dx(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            vector_data_ranges,
-    const DXFlags &flags,
-    std::ostream & out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const DXFlags &                                                         flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream in eps format.
@@ -1642,12 +1631,11 @@ namespace DataOutBase
   template <int spacedim>
   void
   write_eps(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<2, spacedim>> &                                 patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const EpsFlags &                                                        flags,
+    std::ostream &                                                          out);
 
   /**
    * This is the same function as above except for domains that are not two-
@@ -1657,12 +1645,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_eps(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const EpsFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const EpsFlags &                                                        flags,
+    std::ostream &                                                          out);
 
 
   /**
@@ -1677,12 +1664,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_gmv(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const GmvFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const GmvFlags &                                                        flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream in gnuplot format.
@@ -1743,12 +1729,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_gnuplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 vector_data_ranges,
-    const GnuplotFlags &flags,
-    std::ostream &      out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const GnuplotFlags &                                                    flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream for the Povray
@@ -1798,12 +1783,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_povray(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                vector_data_ranges,
-    const PovrayFlags &flags,
-    std::ostream &     out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const PovrayFlags &                                                     flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream in Tecplot ASCII
@@ -1814,12 +1798,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_tecplot(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 vector_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const TecplotFlags &                                                    flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream in Tecplot binary
@@ -1843,12 +1826,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_tecplot_binary(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                 vector_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const TecplotFlags &                                                    flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream in UCD format
@@ -1867,12 +1849,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_ucd(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const UcdFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const UcdFlags &                                                        flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream in VTK format. The
@@ -1896,12 +1877,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_vtk(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const VtkFlags &                                                        flags,
+    std::ostream &                                                          out);
 
 
   /**
@@ -1930,12 +1910,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_vtu(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const VtkFlags &                                                        flags,
+    std::ostream &                                                          out);
 
   /**
    * This writes the header for the xml based vtu file format. This routine is
@@ -1963,12 +1942,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_vtu_main(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const VtkFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const VtkFlags &                                                        flags,
+    std::ostream &                                                          out);
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
@@ -2013,11 +1991,10 @@ namespace DataOutBase
    */
   void
   write_pvtu_record(
-    std::ostream &                  out,
-    const std::vector<std::string> &piece_names,
-    const std::vector<std::string> &data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &vector_data_ranges);
+    std::ostream &                                                          out,
+    const std::vector<std::string> &                                        piece_names,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges);
 
   /**
    * In ParaView it is possible to visualize time-dependent data tagged with
@@ -2071,9 +2048,8 @@ namespace DataOutBase
    * @author Marco Engelhard, 2012
    */
   void
-  write_pvd_record(
-    std::ostream &                                     out,
-    const std::vector<std::pair<double, std::string>> &times_and_names);
+  write_pvd_record(std::ostream &                                     out,
+                   const std::vector<std::pair<double, std::string>> &times_and_names);
 
   /**
    * This function is the exact equivalent of the write_pvtu_record() function
@@ -2087,8 +2063,7 @@ namespace DataOutBase
    * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
    */
   void
-  write_visit_record(std::ostream &                  out,
-                     const std::vector<std::string> &piece_names);
+  write_visit_record(std::ostream &out, const std::vector<std::string> &piece_names);
 
   /**
    * This function is equivalent to the write_visit_record() above but for
@@ -2118,8 +2093,7 @@ namespace DataOutBase
    * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
    */
   void
-  write_visit_record(std::ostream &                               out,
-                     const std::vector<std::vector<std::string>> &piece_names);
+  write_visit_record(std::ostream &out, const std::vector<std::vector<std::string>> &piece_names);
 
   /**
    * This function is equivalent to the write_visit_record() above but for
@@ -2155,9 +2129,8 @@ namespace DataOutBase
    */
   void
   write_visit_record(
-    std::ostream &out,
-    const std::vector<std::pair<double, std::vector<std::string>>>
-      &times_and_piece_names);
+    std::ostream &                                                  out,
+    const std::vector<std::pair<double, std::vector<std::string>>> &times_and_piece_names);
 
   /**
    * Write the given list of patches to the output stream in SVG format.
@@ -2182,12 +2155,11 @@ namespace DataOutBase
   template <int spacedim>
   void
   write_svg(
-    const std::vector<Patch<2, spacedim>> &patches,
-    const std::vector<std::string> &       data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &             vector_data_ranges,
-    const SvgFlags &flags,
-    std::ostream &  out);
+    const std::vector<Patch<2, spacedim>> &                                 patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const SvgFlags &                                                        flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the given list of patches to the output stream in deal.II
@@ -2229,12 +2201,11 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_deal_II_intermediate(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &                              vector_data_ranges,
-    const Deal_II_IntermediateFlags &flags,
-    std::ostream &                   out);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    const Deal_II_IntermediateFlags &                                       flags,
+    std::ostream &                                                          out);
 
   /**
    * Write the data in data_filter to a single HDF5 file containing both the
@@ -2260,8 +2231,8 @@ namespace DataOutBase
                       const DataOutFilter &                    data_filter,
                       const bool                               write_mesh_file,
                       const std::string &                      mesh_filename,
-                      const std::string &solution_filename,
-                      MPI_Comm           comm);
+                      const std::string &                      solution_filename,
+                      MPI_Comm                                 comm);
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -2272,11 +2243,10 @@ namespace DataOutBase
   template <int dim, int spacedim>
   void
   write_filtered_data(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-      &            vector_data_ranges,
-    DataOutFilter &filtered_data);
+    const std::vector<Patch<dim, spacedim>> &                               patches,
+    const std::vector<std::string> &                                        data_names,
+    const std::vector<std::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+    DataOutFilter &                                                         filtered_data);
 
   /**
    * Given an input stream that contains data written by
@@ -2346,9 +2316,8 @@ namespace DataOutBase
   DeclException2(ExcInvalidDatasetSize,
                  int,
                  int,
-                 << "The number of points in this data set is " << arg1
-                 << ", but we expected " << arg2
-                 << " in each space direction.");
+                 << "The number of points in this data set is " << arg1 << ", but we expected "
+                 << arg2 << " in each space direction.");
   /**
    * An output function did not receive any patches for writing.
    */
@@ -2368,8 +2337,7 @@ namespace DataOutBase
    */
   DeclException1(ExcErrorOpeningTecplotFile,
                  char *,
-                 << "There was an error opening Tecplot file " << arg1
-                 << " for output.");
+                 << "There was an error opening Tecplot file " << arg1 << " for output.");
 
   //@}
 } // namespace DataOutBase
@@ -2635,8 +2603,7 @@ public:
    * by the write_visit_record() function.
    */
   void
-  write_pvtu_record(std::ostream &                  out,
-                    const std::vector<std::string> &piece_names) const;
+  write_pvtu_record(std::ostream &out, const std::vector<std::string> &piece_names) const;
 
   /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
@@ -2761,8 +2728,7 @@ public:
    */
   void
   write(std::ostream &                  out,
-        const DataOutBase::OutputFormat output_format =
-          DataOutBase::default_format) const;
+        const DataOutBase::OutputFormat output_format = DataOutBase::default_format) const;
 
   /**
    * Set the default format. The value set here is used anytime, output for
@@ -2789,8 +2755,7 @@ public:
    * set_default_format() or parse_parameters() before calling this function.
    */
   std::string
-  default_suffix(const DataOutBase::OutputFormat output_format =
-                   DataOutBase::default_format) const;
+  default_suffix(const DataOutBase::OutputFormat output_format = DataOutBase::default_format) const;
 
   /**
    * Declare parameters for all output formats by declaring subsections within
@@ -3119,8 +3084,7 @@ private:
    * Information about whether certain components of the output field are to
    * be considered vectors.
    */
-  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
-    vector_data_ranges;
+  std::vector<std::tuple<unsigned int, unsigned int, std::string>> vector_data_ranges;
 };
 
 
@@ -3186,8 +3150,8 @@ public:
   void
   serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes
-      &num_cells &dimension &attribute_dims;
+    ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes &num_cells &dimension
+      &                                                                             attribute_dims;
   }
 
   /**

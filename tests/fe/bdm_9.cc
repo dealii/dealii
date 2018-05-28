@@ -83,11 +83,10 @@ test(const unsigned int degree)
     tmp1(i) = random_value<double>();
 
   deallog << "solving degree = " << degree << std::endl;
-  check_solver_within_range(
-    solver.solve(mass_matrix, tmp2, tmp1, PreconditionIdentity()),
-    solver_control.last_step(),
-    3,
-    45);
+  check_solver_within_range(solver.solve(mass_matrix, tmp2, tmp1, PreconditionIdentity()),
+                            solver_control.last_step(),
+                            3,
+                            45);
 }
 
 

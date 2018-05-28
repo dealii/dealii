@@ -74,9 +74,7 @@ test(std::ostream & /*out*/)
 
   parallel::distributed::SolutionTransfer<dim, Vector<double>> soltrans(dofh);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tr.begin_active();
-       cell != tr.end();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
        ++cell)
     {
       cell->set_refine_flag();
@@ -99,13 +97,8 @@ test(std::ostream & /*out*/)
   deallog << "norm: " << interpolated_solution.l2_norm() << std::endl;
   Vector<double> difference(tr.n_global_active_cells());
 
-  VectorTools::integrate_difference(mapping,
-                                    dofh,
-                                    interpolated_solution,
-                                    func,
-                                    difference,
-                                    QGauss<dim>(2),
-                                    VectorTools::L2_norm);
+  VectorTools::integrate_difference(
+    mapping, dofh, interpolated_solution, func, difference, QGauss<dim>(2), VectorTools::L2_norm);
   deallog << "error: " << difference.l2_norm() << std::endl;
 }
 

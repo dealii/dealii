@@ -45,8 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 
-#  if defined(__linux__) || defined(__sun__) || defined(__osf__) || \
-    defined(_AIX)
+#  if defined(__linux__) || defined(__sun__) || defined(__osf__) || defined(_AIX)
 
 unsigned int
 MultithreadInfo::get_n_cpus()
@@ -132,19 +131,16 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
           {
             AssertThrow(
               false,
-              ExcMessage(
-                std::string(
-                  "When specifying the <DEAL_II_NUM_THREADS> environment "
-                  "variable, it needs to be something that can be interpreted "
-                  "as an integer. The text you have in the environment "
-                  "variable is <") +
-                penv + ">"));
+              ExcMessage(std::string("When specifying the <DEAL_II_NUM_THREADS> environment "
+                                     "variable, it needs to be something that can be interpreted "
+                                     "as an integer. The text you have in the environment "
+                                     "variable is <") +
+                         penv + ">"));
           }
 
-        AssertThrow(
-          max_threads_env > 0,
-          ExcMessage("When specifying the <DEAL_II_NUM_THREADS> environment "
-                     "variable, it needs to be a positive number."));
+        AssertThrow(max_threads_env > 0,
+                    ExcMessage("When specifying the <DEAL_II_NUM_THREADS> environment "
+                               "variable, it needs to be a positive number."));
 
         if (n_max_threads != numbers::invalid_unsigned_int)
           n_max_threads = std::min(n_max_threads, max_threads_env);
@@ -229,8 +225,8 @@ MultithreadInfo::initialize_multithreading()
 
 
 
-const unsigned int MultithreadInfo::n_cpus  = MultithreadInfo::get_n_cpus();
-unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
+const unsigned int MultithreadInfo::n_cpus        = MultithreadInfo::get_n_cpus();
+unsigned int       MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 
 namespace
 {

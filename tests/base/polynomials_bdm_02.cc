@@ -62,8 +62,7 @@ plot(const PolynomialsBDM<dim> &poly)
 
       unsigned int start = dim * n_sub;
 
-      deallog << "BDM" << poly.degree() << '<' << dim << '>' << points[k]
-              << std::endl;
+      deallog << "BDM" << poly.degree() << '<' << dim << '>' << points[k] << std::endl;
       poly.compute(points[k], values, grads, grads2, thirds, fourths);
 
       for (unsigned int i = 0; i < poly.degree() + 1; ++i, start += dim)

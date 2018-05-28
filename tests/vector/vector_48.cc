@@ -45,8 +45,7 @@ test(Vector<double> &v, Vector<double> &w, Vector<double> &x)
     {
       Assert(w(i) == i + 1., ExcInternalError());
       Assert(x(i) == i + 2., ExcInternalError());
-      Assert(std::fabs(v(i) - (i + 1.) / (i + 2.)) < 1e-14 * v(i),
-             ExcInternalError());
+      Assert(std::fabs(v(i) - (i + 1.) / (i + 2.)) < 1e-14 * v(i), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -70,13 +69,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -84,12 +81,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

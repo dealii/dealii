@@ -42,8 +42,7 @@
 
 
 void
-partition(const SparsityPattern &sparsity_pattern,
-          const unsigned int     n_partitions)
+partition(const SparsityPattern &sparsity_pattern, const unsigned int n_partitions)
 {
   // generate the data structures for
   // METIS. Note that this is particularly
@@ -51,9 +50,9 @@ partition(const SparsityPattern &sparsity_pattern,
   // compressed row storage format. we only
   // have to set up a few auxiliary arrays
   idx_t n    = static_cast<signed int>(sparsity_pattern.n_rows()),
-        ncon = 1, // number of balancing constraints (should be >0)
+        ncon = 1,                              // number of balancing constraints (should be >0)
     nparts   = static_cast<int>(n_partitions), // number of subdomains to create
-    dummy; // the numbers of edges cut by the
+    dummy;                                     // the numbers of edges cut by the
   // resulting partition
 
   // use default options for METIS
@@ -67,8 +66,7 @@ partition(const SparsityPattern &sparsity_pattern,
   int_rowstart.reserve(sparsity_pattern.n_rows() + 1);
   std::vector<idx_t> int_colnums;
   int_colnums.reserve(sparsity_pattern.n_nonzero_elements());
-  for (SparsityPattern::size_type row = 0; row < sparsity_pattern.n_rows();
-       ++row)
+  for (SparsityPattern::size_type row = 0; row < sparsity_pattern.n_rows(); ++row)
     {
       for (SparsityPattern::iterator col = sparsity_pattern.begin(row);
            col < sparsity_pattern.end(row);
@@ -154,13 +152,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -168,12 +164,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

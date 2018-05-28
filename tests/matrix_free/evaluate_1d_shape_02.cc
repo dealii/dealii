@@ -55,10 +55,8 @@ test()
   for (unsigned int i = 0; i < M / 2; ++i)
     for (unsigned int q = 0; q < (N + 1) / 2; ++q)
       {
-        shape_sym[i * ((N + 1) / 2) + q] =
-          0.5 * (shape[i][q] + shape[i][N - 1 - q]);
-        shape_sym[(M - 1 - i) * ((N + 1) / 2) + q] =
-          0.5 * (shape[i][q] - shape[i][N - 1 - q]);
+        shape_sym[i * ((N + 1) / 2) + q]           = 0.5 * (shape[i][q] + shape[i][N - 1 - q]);
+        shape_sym[(M - 1 - i) * ((N + 1) / 2) + q] = 0.5 * (shape[i][q] - shape[i][N - 1 - q]);
       }
   if (M % 2 == 1)
     for (unsigned int q = 0; q < (N + 1) / 2; ++q)
@@ -78,8 +76,8 @@ test()
     }
 
   // apply function for tensor product
-  internal::EvaluatorTensorProduct<internal::evaluate_evenodd, 1, M, N, double>
-    evaluator(shape_sym, shape_sym, shape_sym);
+  internal::EvaluatorTensorProduct<internal::evaluate_evenodd, 1, M, N, double> evaluator(
+    shape_sym, shape_sym, shape_sym);
   if (type == 0)
     evaluator.template values<0, false, add>(x, y);
   if (type == 1)

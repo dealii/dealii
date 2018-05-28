@@ -39,20 +39,17 @@ check_this(const DoFHandler<dim> &dof_handler,
            const Vector<double> & v_cell)
 {
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(
-      dof_handler.get_fe().n_components(),
-      DataComponentInterpretation::component_is_scalar);
+    data_component_interpretation(dof_handler.get_fe().n_components(),
+                                  DataComponentInterpretation::component_is_scalar);
   // if possible, declare the last
   // dim components as vectors
   if (dof_handler.get_fe().n_components() >= dim)
     for (unsigned int i = dof_handler.get_fe().n_components() - dim;
          i < dof_handler.get_fe().n_components();
          ++i)
-      data_component_interpretation[i] =
-        DataComponentInterpretation::component_is_part_of_vector;
+      data_component_interpretation[i] = DataComponentInterpretation::component_is_part_of_vector;
 
-  deallog << "Checking " << dof_handler.get_fe().get_name() << std::endl
-          << "Component mask: ";
+  deallog << "Checking " << dof_handler.get_fe().get_name() << std::endl << "Component mask: ";
   for (unsigned int i = 0; i < dof_handler.get_fe().n_components(); ++i)
     deallog << (data_component_interpretation[i] ==
                     DataComponentInterpretation::component_is_scalar ?
@@ -64,14 +61,12 @@ check_this(const DoFHandler<dim> &dof_handler,
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(
     v_node,
-    std::vector<std::string>(dof_handler.get_fe().n_components(),
-                             "node_data_1"),
+    std::vector<std::string>(dof_handler.get_fe().n_components(), "node_data_1"),
     DataOut<dim>::type_dof_data,
     data_component_interpretation);
   data_out.add_data_vector(
     v_node,
-    std::vector<std::string>(dof_handler.get_fe().n_components(),
-                             "node_data_2"),
+    std::vector<std::string>(dof_handler.get_fe().n_components(), "node_data_2"),
     DataOut<dim>::type_dof_data,
     data_component_interpretation);
   data_out.add_data_vector(v_cell, "cell_data", DataOut<dim>::type_cell_data);

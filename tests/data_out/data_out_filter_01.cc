@@ -57,19 +57,16 @@ test()
   data_out.add_data_vector(dof1, v1, "linear");
   data_out.build_patches();
 
-  DataOutBase::DataOutFilter data_filter(
-    DataOutBase::DataOutFilterFlags(true, false));
+  DataOutBase::DataOutFilter data_filter(DataOutBase::DataOutFilterFlags(true, false));
 
   data_out.write_filtered_data(data_filter);
 
   deallog << "Number of filtered nodes: " << data_filter.n_nodes() << std::endl;
 
-  DataOutBase::DataOutFilter data_filter2(
-    DataOutBase::DataOutFilterFlags(false, false));
+  DataOutBase::DataOutFilter data_filter2(DataOutBase::DataOutFilterFlags(false, false));
   data_out.write_filtered_data(data_filter2);
 
-  deallog << "Number of unfiltered nodes: " << data_filter2.n_nodes()
-          << std::endl;
+  deallog << "Number of unfiltered nodes: " << data_filter2.n_nodes() << std::endl;
 
   deallog << "ok" << std::endl;
 }

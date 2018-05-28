@@ -33,13 +33,10 @@ main()
       for (unsigned int degree = 0; degree < 40; ++degree)
         {
           deallog << "Jacobi_" << degree << "^(" << alpha << "," << beta
-                  << ") at 0.3: "
-                  << jacobi_polynomial_value(degree, alpha, beta, 0.3)
-                  << std::endl;
+                  << ") at 0.3: " << jacobi_polynomial_value(degree, alpha, beta, 0.3) << std::endl;
 
           deallog << "Roots: ";
-          std::vector<double> roots =
-            jacobi_polynomial_roots<double>(degree, alpha, beta);
+          std::vector<double> roots = jacobi_polynomial_roots<double>(degree, alpha, beta);
 
           // assert that roots are increasing
           for (unsigned int i = 1; i < roots.size(); ++i)

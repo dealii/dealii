@@ -125,8 +125,7 @@ ScalingMatrix<number>::Tvmult_add(VectorType &dst, const VectorType &src) const
 
 template <typename MatrixType, class RELAX>
 void
-check_smoother(const MGLevelObject<MatrixType> &m,
-               const MGLevelObject<RELAX> &     r)
+check_smoother(const MGLevelObject<MatrixType> &m, const MGLevelObject<RELAX> &r)
 {
   GrowingVectorMemory<BlockVector<double>>   mem;
   MGSmootherBlock<MatrixType, RELAX, double> smoother;

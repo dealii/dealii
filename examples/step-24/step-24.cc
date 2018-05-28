@@ -142,8 +142,7 @@ namespace Step24
     InitialValuesP() : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
   private:
     struct Source
@@ -158,8 +157,7 @@ namespace Step24
 
 
   template <int dim>
-  double InitialValuesP<dim>::value(const Point<dim> &p,
-                                    const unsigned int /*component*/) const
+  double InitialValuesP<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
   {
     static const Source       sources[] = {Source(Point<dim>(0, 0), 0.025),
                                      Source(Point<dim>(-0.135, 0), 0.05),
@@ -216,9 +214,8 @@ namespace Step24
 
     for (double detector_angle = 2 * numbers::PI; detector_angle >= 0;
          detector_angle -= detector_step_angle / 360 * 2 * numbers::PI)
-      detector_locations.push_back(
-        Point<dim>(std::cos(detector_angle), std::sin(detector_angle)) *
-        detector_radius);
+      detector_locations.push_back(Point<dim>(std::cos(detector_angle), std::sin(detector_angle)) *
+                                   detector_radius);
   }
 
 
@@ -266,17 +263,13 @@ namespace Step24
     GridGenerator::hyper_ball(triangulation, center, 1.);
     triangulation.refine_global(7);
 
-    time_step = GridTools::minimal_cell_diameter(triangulation) / wave_speed /
-                std::sqrt(1. * dim);
+    time_step = GridTools::minimal_cell_diameter(triangulation) / wave_speed / std::sqrt(1. * dim);
 
-    std::cout << "Number of active cells: " << triangulation.n_active_cells()
-              << std::endl;
+    std::cout << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
 
     dof_handler.distribute_dofs(fe);
 
-    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl
-              << std::endl;
+    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, dsp);
@@ -287,8 +280,7 @@ namespace Step24
     laplace_matrix.reinit(sparsity_pattern);
 
     MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler, QGauss<dim>(3), laplace_matrix);
+    MatrixCreator::create_laplace_matrix(dof_handler, QGauss<dim>(3), laplace_matrix);
 
     // The second difference, as mentioned, to step-23 is that we need to
     // build the boundary mass matrix that grew out of the absorbing boundary
@@ -333,8 +325,7 @@ namespace Step24
     // domain. Like this:
     {
       const QGauss<dim - 1> quadrature_formula(3);
-      FEFaceValues<dim>     fe_values(
-        fe, quadrature_formula, update_values | update_JxW_values);
+      FEFaceValues<dim>     fe_values(fe, quadrature_formula, update_values | update_JxW_values);
 
       const unsigned int dofs_per_cell = fe.dofs_per_cell;
       const unsigned int n_q_points    = quadrature_formula.size();
@@ -345,8 +336,7 @@ namespace Step24
 
 
 
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
       for (; cell != endc; ++cell)
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -359,22 +349,20 @@ namespace Step24
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    cell_matrix(i, j) += (fe_values.shape_value(i, q_point) *
-                                          fe_values.shape_value(j, q_point) *
-                                          fe_values.JxW(q_point));
+                    cell_matrix(i, j) +=
+                      (fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point) *
+                       fe_values.JxW(q_point));
 
               cell->get_dof_indices(local_dof_indices);
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  boundary_matrix.add(local_dof_indices[i],
-                                      local_dof_indices[j],
-                                      cell_matrix(i, j));
+                  boundary_matrix.add(
+                    local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
             }
     }
 
     system_matrix.copy_from(mass_matrix);
-    system_matrix.add(time_step * time_step * theta * theta * wave_speed *
-                        wave_speed,
+    system_matrix.add(time_step * time_step * theta * theta * wave_speed * wave_speed,
                       laplace_matrix);
     system_matrix.add(wave_speed * theta * time_step, boundary_matrix);
 
@@ -405,8 +393,7 @@ namespace Step24
 
     cg.solve(system_matrix, solution_p, system_rhs_p, PreconditionIdentity());
 
-    std::cout << "   p-equation: " << solver_control.last_step()
-              << " CG iterations." << std::endl;
+    std::cout << "   p-equation: " << solver_control.last_step() << " CG iterations." << std::endl;
   }
 
 
@@ -418,8 +405,7 @@ namespace Step24
 
     cg.solve(mass_matrix, solution_v, system_rhs_v, PreconditionIdentity());
 
-    std::cout << "   v-equation: " << solver_control.last_step()
-              << " CG iterations." << std::endl;
+    std::cout << "   v-equation: " << solver_control.last_step() << " CG iterations." << std::endl;
   }
 
 
@@ -465,11 +451,8 @@ namespace Step24
   {
     setup_system();
 
-    VectorTools::project(dof_handler,
-                         constraints,
-                         QGauss<dim>(3),
-                         InitialValuesP<dim>(),
-                         old_solution_p);
+    VectorTools::project(
+      dof_handler, constraints, QGauss<dim>(3), InitialValuesP<dim>(), old_solution_p);
     old_solution_v = 0;
 
 
@@ -480,12 +463,10 @@ namespace Step24
     Vector<double> G2(solution_v.size());
 
     const double end_time = 0.7;
-    for (time = time_step; time <= end_time;
-         time += time_step, ++timestep_number)
+    for (time = time_step; time <= end_time; time += time_step, ++timestep_number)
       {
         std::cout << std::endl;
-        std::cout << "time_step " << timestep_number << " @ t=" << time
-                  << std::endl;
+        std::cout << "time_step " << timestep_number << " @ t=" << time << std::endl;
 
         mass_matrix.vmult(G1, old_solution_p);
         mass_matrix.vmult(tmp, old_solution_v);
@@ -519,8 +500,7 @@ namespace Step24
         detector_data << time;
         for (unsigned int i = 0; i < detector_locations.size(); ++i)
           detector_data << " "
-                        << VectorTools::point_value(
-                             dof_handler, solution_p, detector_locations[i])
+                        << VectorTools::point_value(dof_handler, solution_p, detector_locations[i])
                         << " ";
         detector_data << std::endl;
 
@@ -551,13 +531,11 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -565,12 +543,10 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

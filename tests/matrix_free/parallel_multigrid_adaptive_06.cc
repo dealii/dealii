@@ -74,9 +74,8 @@ using namespace dealii::MatrixFreeOperators;
  */
 template <int dim,
           int fe_degree,
-          int n_q_points_1d = fe_degree + 1,
-          typename BlockVectorType =
-            LinearAlgebra::distributed::BlockVector<double>>
+          int n_q_points_1d        = fe_degree + 1,
+          typename BlockVectorType = LinearAlgebra::distributed::BlockVector<double>>
 class BlockLaplace : public Subscriptor
 {
 public:
@@ -94,8 +93,8 @@ public:
 
   void
   initialize(std::shared_ptr<const MatrixFree<dim, value_type>> data,
-             const MGConstrainedDoFs &mg_constrained_dofs,
-             const unsigned int       level)
+             const MGConstrainedDoFs &                          mg_constrained_dofs,
+             const unsigned int                                 level)
   {
     laplace.initialize(data, mg_constrained_dofs, level);
   }
@@ -165,19 +164,15 @@ public:
   }
 
 private:
-  MatrixFreeOperators::LaplaceOperator<dim,
-                                       fe_degree,
-                                       n_q_points_1d,
-                                       1,
-                                       typename BlockVectorType::BlockType>
-    laplace;
+  MatrixFreeOperators::
+    LaplaceOperator<dim, fe_degree, n_q_points_1d, 1, typename BlockVectorType::BlockType>
+      laplace;
 };
 
 
 
 template <typename MatrixType, typename Number>
-class MGCoarseIterative
-  : public MGCoarseGridBase<LinearAlgebra::distributed::BlockVector<Number>>
+class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::BlockVector<Number>>
 {
 public:
   MGCoarseIterative()
@@ -194,9 +189,8 @@ public:
              LinearAlgebra::distributed::BlockVector<Number> &      dst,
              const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
-    ReductionControl solver_control(1e4, 1e-50, 1e-10);
-    SolverCG<LinearAlgebra::distributed::BlockVector<Number>> solver_coarse(
-      solver_control);
+    ReductionControl                                          solver_control(1e4, 1e-50, 1e-10);
+    SolverCG<LinearAlgebra::distributed::BlockVector<Number>> solver_coarse(solver_control);
     solver_coarse.solve(*coarse_matrix, dst, src, PreconditionIdentity());
   }
 
@@ -232,8 +226,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   ConstraintMatrix constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, dirichlet_boundary, constraints);
+  VectorTools::interpolate_boundary_values(dof, dirichlet_boundary, constraints);
   constraints.close();
 
   // level constraints:
@@ -242,23 +235,15 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
 
   MappingQ<dim> mapping(fe_degree + 1);
 
-  BlockLaplace<dim,
-               fe_degree,
-               n_q_points_1d,
-               LinearAlgebra::distributed::BlockVector<number>>
+  BlockLaplace<dim, fe_degree, n_q_points_1d, LinearAlgebra::distributed::BlockVector<number>>
                                            fine_matrix;
-  std::shared_ptr<MatrixFree<dim, number>> fine_level_data(
-    new MatrixFree<dim, number>());
+  std::shared_ptr<MatrixFree<dim, number>> fine_level_data(new MatrixFree<dim, number>());
 
   typename MatrixFree<dim, number>::AdditionalData fine_level_additional_data;
-  fine_level_additional_data.tasks_parallel_scheme =
-    MatrixFree<dim, number>::AdditionalData::none;
-  fine_level_additional_data.tasks_block_size = 3;
-  fine_level_data->reinit(mapping,
-                          dof,
-                          constraints,
-                          QGauss<1>(n_q_points_1d),
-                          fine_level_additional_data);
+  fine_level_additional_data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
+  fine_level_additional_data.tasks_block_size      = 3;
+  fine_level_data->reinit(
+    mapping, dof, constraints, QGauss<1>(n_q_points_1d), fine_level_additional_data);
 
   fine_matrix.initialize(fine_level_data);
   fine_matrix.compute_diagonal();
@@ -301,42 +286,31 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   MGLevelObject<MatrixFree<dim, number>> mg_level_data;
   mg_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
   mg_level_data.resize(0, dof.get_triangulation().n_global_levels() - 1);
-  for (unsigned int level = 0;
-       level < dof.get_triangulation().n_global_levels();
-       ++level)
+  for (unsigned int level = 0; level < dof.get_triangulation().n_global_levels(); ++level)
     {
       typename MatrixFree<dim, number>::AdditionalData mg_additional_data;
-      mg_additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, number>::AdditionalData::none;
-      mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
+      mg_additional_data.tasks_block_size      = 3;
+      mg_additional_data.level_mg_handler      = level;
 
       ConstraintMatrix level_constraints;
       IndexSet         relevant_dofs;
       DoFTools::extract_locally_relevant_level_dofs(dof, level, relevant_dofs);
       level_constraints.reinit(relevant_dofs);
-      level_constraints.add_lines(
-        mg_constrained_dofs.get_boundary_indices(level));
+      level_constraints.add_lines(mg_constrained_dofs.get_boundary_indices(level));
       level_constraints.close();
 
-      mg_level_data[level].reinit(mapping,
-                                  dof,
-                                  level_constraints,
-                                  QGauss<1>(n_q_points_1d),
-                                  mg_additional_data);
-      mg_matrices[level].initialize(
-        std::make_shared<MatrixFree<dim, number>>(mg_level_data[level]),
-        mg_constrained_dofs,
-        level);
+      mg_level_data[level].reinit(
+        mapping, dof, level_constraints, QGauss<1>(n_q_points_1d), mg_additional_data);
+      mg_matrices[level].initialize(std::make_shared<MatrixFree<dim, number>>(mg_level_data[level]),
+                                    mg_constrained_dofs,
+                                    level);
       mg_matrices[level].compute_diagonal();
     }
 
   MGLevelObject<MGInterfaceOperator<LevelMatrixType>> mg_interface_matrices;
-  mg_interface_matrices.resize(0,
-                               dof.get_triangulation().n_global_levels() - 1);
-  for (unsigned int level = 0;
-       level < dof.get_triangulation().n_global_levels();
-       ++level)
+  mg_interface_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
+  for (unsigned int level = 0; level < dof.get_triangulation().n_global_levels(); ++level)
     mg_interface_matrices[level].initialize(mg_matrices[level]);
 
   MGTransferBlockMatrixFree<dim, number> mg_transfer(mg_constrained_dofs);
@@ -346,17 +320,13 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   mg_coarse.initialize(mg_matrices[0]);
 
   typedef PreconditionJacobi<LevelMatrixType> SMOOTHER;
-  MGSmootherPrecondition<LevelMatrixType,
-                         SMOOTHER,
-                         LinearAlgebra::distributed::BlockVector<number>>
+  MGSmootherPrecondition<LevelMatrixType, SMOOTHER, LinearAlgebra::distributed::BlockVector<number>>
     mg_smoother;
 
   mg_smoother.initialize(mg_matrices, typename SMOOTHER::AdditionalData(0.8));
 
-  mg::Matrix<LinearAlgebra::distributed::BlockVector<number>> mg_matrix(
-    mg_matrices);
-  mg::Matrix<LinearAlgebra::distributed::BlockVector<number>> mg_interface(
-    mg_interface_matrices);
+  mg::Matrix<LinearAlgebra::distributed::BlockVector<number>> mg_matrix(mg_matrices);
+  mg::Matrix<LinearAlgebra::distributed::BlockVector<number>> mg_interface(mg_interface_matrices);
 
   Multigrid<LinearAlgebra::distributed::BlockVector<number>> mg(
     mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
@@ -370,7 +340,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
     // avoid output from inner (coarse-level) solver
     deallog.depth_file(3);
 
-    ReductionControl control(30, 1e-20, 1e-7);
+    ReductionControl                                          control(30, 1e-20, 1e-7);
     SolverCG<LinearAlgebra::distributed::BlockVector<number>> solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
@@ -379,9 +349,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
     deallog.pop();
 
   fine_matrix.clear();
-  for (unsigned int level = 0;
-       level < dof.get_triangulation().n_global_levels();
-       ++level)
+  for (unsigned int level = 0; level < dof.get_triangulation().n_global_levels(); ++level)
     mg_matrices[level].clear();
 }
 
@@ -400,13 +368,11 @@ test(const unsigned int nbands = 1)
   const unsigned int n_runs = fe_degree == 1 ? 6 - dim : 5 - dim;
   for (unsigned int i = 0; i < n_runs; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             tria.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
            cell != tria.end();
            ++cell)
         if (cell->is_locally_owned() &&
-            ((cell->center().norm() < 0.5 &&
-              (cell->level() < 5 || cell->center().norm() > 0.45)) ||
+            ((cell->center().norm() < 0.5 && (cell->level() < 5 || cell->center().norm() > 0.45)) ||
              (dim == 2 && cell->center().norm() > 1.2)))
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();

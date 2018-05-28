@@ -56,10 +56,7 @@
 std::ofstream logfile("output");
 
 
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d = fe_degree + 1,
-          typename number   = double>
+template <int dim, int fe_degree, int n_q_points_1d = fe_degree + 1, typename number = double>
 class LaplaceOperator : public Subscriptor
 {
 public:
@@ -74,14 +71,11 @@ public:
   {
     const QGauss<1>                                  quad(n_q_points_1d);
     typename MatrixFree<dim, number>::AdditionalData addit_data;
-    addit_data.tasks_parallel_scheme =
-      MatrixFree<dim, number>::AdditionalData::none;
-    addit_data.tasks_block_size = 3;
-    addit_data.level_mg_handler = level;
-    addit_data.mapping_update_flags_inner_faces =
-      (update_gradients | update_JxW_values);
-    addit_data.mapping_update_flags_boundary_faces =
-      (update_gradients | update_JxW_values);
+    addit_data.tasks_parallel_scheme               = MatrixFree<dim, number>::AdditionalData::none;
+    addit_data.tasks_block_size                    = 3;
+    addit_data.level_mg_handler                    = level;
+    addit_data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+    addit_data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
     ConstraintMatrix constraints;
     constraints.close();
 
@@ -117,11 +111,9 @@ public:
   vmult_add(parallel::distributed::Vector<number> &      dst,
             const parallel::distributed::Vector<number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
+    Assert(src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner),
            ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
+    Assert(dst.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner),
            ExcInternalError());
     data.loop(&LaplaceOperator::local_apply,
               &LaplaceOperator::local_apply_face,
@@ -146,16 +138,14 @@ public:
   number
   el(const unsigned int row, const unsigned int col) const
   {
-    AssertThrow(false,
-                ExcMessage("Matrix-free does not allow for entry access"));
+    AssertThrow(false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
   }
 
   void
   initialize_dof_vector(parallel::distributed::Vector<number> &vector) const
   {
-    if (!vector.partitioners_are_compatible(
-          *data.get_dof_info(0).vector_partitioner))
+    if (!vector.partitioners_are_compatible(*data.get_dof_info(0).vector_partitioner))
       data.initialize_dof_vector(vector);
   }
 
@@ -188,16 +178,13 @@ private:
   }
 
   void
-  local_apply_face(
-    const MatrixFree<dim, number> &              data,
-    parallel::distributed::Vector<number> &      dst,
-    const parallel::distributed::Vector<number> &src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_face(const MatrixFree<dim, number> &              data,
+                   parallel::distributed::Vector<number> &      dst,
+                   const parallel::distributed::Vector<number> &src,
+                   const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval(data,
-                                                                       true);
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval_neighbor(
-      data, false);
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval(data, true);
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval_neighbor(data, false);
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -209,10 +196,9 @@ private:
         fe_eval_neighbor.read_dof_values(src);
         fe_eval_neighbor.evaluate(true, true);
         VectorizedArray<number> sigmaF =
-          (std::abs((fe_eval.get_normal_vector(0) *
-                     fe_eval.inverse_jacobian(0))[dim - 1]) +
-           std::abs((fe_eval.get_normal_vector(0) *
-                     fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
+          (std::abs((fe_eval.get_normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) +
+           std::abs(
+             (fe_eval.get_normal_vector(0) * fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
           (number)(std::max(fe_degree, 1) * (fe_degree + 1.0));
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
@@ -220,10 +206,8 @@ private:
             VectorizedArray<number> average_value =
               (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) * 0.5;
             VectorizedArray<number> average_valgrad =
-              fe_eval.get_normal_derivative(q) +
-              fe_eval_neighbor.get_normal_derivative(q);
-            average_valgrad =
-              average_value * 2. * sigmaF - average_valgrad * 0.5;
+              fe_eval.get_normal_derivative(q) + fe_eval_neighbor.get_normal_derivative(q);
+            average_valgrad = average_value * 2. * sigmaF - average_valgrad * 0.5;
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval_neighbor.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -237,29 +221,25 @@ private:
   }
 
   void
-  local_apply_boundary(
-    const MatrixFree<dim, number> &              data,
-    parallel::distributed::Vector<number> &      dst,
-    const parallel::distributed::Vector<number> &src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_boundary(const MatrixFree<dim, number> &              data,
+                       parallel::distributed::Vector<number> &      dst,
+                       const parallel::distributed::Vector<number> &src,
+                       const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval(data,
-                                                                       true);
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> fe_eval(data, true);
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
         fe_eval.evaluate(true, true);
         VectorizedArray<number> sigmaF =
-          std::abs((fe_eval.get_normal_vector(0) *
-                    fe_eval.inverse_jacobian(0))[dim - 1]) *
+          std::abs((fe_eval.get_normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) *
           (number)(std::max(1, fe_degree) * (fe_degree + 1.0)) * 2.;
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
-            VectorizedArray<number> average_value = fe_eval.get_value(q);
-            VectorizedArray<number> average_valgrad =
-              -fe_eval.get_normal_derivative(q);
+            VectorizedArray<number> average_value   = fe_eval.get_value(q);
+            VectorizedArray<number> average_valgrad = -fe_eval.get_normal_derivative(q);
             average_valgrad += average_value * sigmaF * 2.0;
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -284,18 +264,16 @@ private:
 
     for (unsigned int i = 0; i < inverse_diagonal_entries.local_size(); ++i)
       if (std::abs(inverse_diagonal_entries.local_element(i)) > 1e-10)
-        inverse_diagonal_entries.local_element(i) =
-          1. / inverse_diagonal_entries.local_element(i);
+        inverse_diagonal_entries.local_element(i) = 1. / inverse_diagonal_entries.local_element(i);
       else
         inverse_diagonal_entries.local_element(i) = 1.;
   }
 
   void
-  local_diagonal_cell(
-    const MatrixFree<dim, number> &        data,
-    parallel::distributed::Vector<number> &dst,
-    const unsigned int &,
-    const std::pair<unsigned int, unsigned int> &cell_range) const
+  local_diagonal_cell(const MatrixFree<dim, number> &        data,
+                      parallel::distributed::Vector<number> &dst,
+                      const unsigned int &,
+                      const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi(data);
 
@@ -322,15 +300,13 @@ private:
   }
 
   void
-  local_diagonal_face(
-    const MatrixFree<dim, number> &        data,
-    parallel::distributed::Vector<number> &dst,
-    const unsigned int &,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_diagonal_face(const MatrixFree<dim, number> &        data,
+                      parallel::distributed::Vector<number> &dst,
+                      const unsigned int &,
+                      const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi(data, true);
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi_outer(data,
-                                                                         false);
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi_outer(data, false);
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -339,10 +315,8 @@ private:
 
         VectorizedArray<number> local_diagonal_vector[phi.static_dofs_per_cell];
         VectorizedArray<number> sigmaF =
-          (std::abs(
-             (phi.get_normal_vector(0) * phi.inverse_jacobian(0))[dim - 1]) +
-           std::abs((phi.get_normal_vector(0) *
-                     phi_outer.inverse_jacobian(0))[dim - 1])) *
+          (std::abs((phi.get_normal_vector(0) * phi.inverse_jacobian(0))[dim - 1]) +
+           std::abs((phi.get_normal_vector(0) * phi_outer.inverse_jacobian(0))[dim - 1])) *
           (number)(std::max(fe_degree, 1) * (fe_degree + 1.0));
 
         // Compute phi part
@@ -361,10 +335,8 @@ private:
                 VectorizedArray<number> average_value =
                   (phi.get_value(q) - phi_outer.get_value(q)) * 0.5;
                 VectorizedArray<number> average_valgrad =
-                  phi.get_normal_derivative(q) +
-                  phi_outer.get_normal_derivative(q);
-                average_valgrad =
-                  average_value * 2. * sigmaF - average_valgrad * 0.5;
+                  phi.get_normal_derivative(q) + phi_outer.get_normal_derivative(q);
+                average_valgrad = average_value * 2. * sigmaF - average_valgrad * 0.5;
                 phi.submit_normal_derivative(-average_value, q);
                 phi.submit_value(average_valgrad, q);
               }
@@ -391,10 +363,8 @@ private:
                 VectorizedArray<number> average_value =
                   (phi.get_value(q) - phi_outer.get_value(q)) * 0.5;
                 VectorizedArray<number> average_valgrad =
-                  phi.get_normal_derivative(q) +
-                  phi_outer.get_normal_derivative(q);
-                average_valgrad =
-                  average_value * 2. * sigmaF - average_valgrad * 0.5;
+                  phi.get_normal_derivative(q) + phi_outer.get_normal_derivative(q);
+                average_valgrad = average_value * 2. * sigmaF - average_valgrad * 0.5;
                 phi_outer.submit_normal_derivative(-average_value, q);
                 phi_outer.submit_value(-average_valgrad, q);
               }
@@ -408,11 +378,10 @@ private:
   }
 
   void
-  local_diagonal_boundary(
-    const MatrixFree<dim, number> &        data,
-    parallel::distributed::Vector<number> &dst,
-    const unsigned int &,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_diagonal_boundary(const MatrixFree<dim, number> &        data,
+                          parallel::distributed::Vector<number> &dst,
+                          const unsigned int &,
+                          const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi(data);
 
@@ -422,8 +391,7 @@ private:
 
         VectorizedArray<number> local_diagonal_vector[phi.static_dofs_per_cell];
         VectorizedArray<number> sigmaF =
-          std::abs(
-            (phi.get_normal_vector(0) * phi.inverse_jacobian(0))[dim - 1]) *
+          std::abs((phi.get_normal_vector(0) * phi.inverse_jacobian(0))[dim - 1]) *
           (number)(std::max(1, fe_degree) * (fe_degree + 1.0)) * 2.;
 
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -435,9 +403,8 @@ private:
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
-                VectorizedArray<number> average_value = phi.get_value(q);
-                VectorizedArray<number> average_valgrad =
-                  -phi.get_normal_derivative(q);
+                VectorizedArray<number> average_value   = phi.get_value(q);
+                VectorizedArray<number> average_valgrad = -phi.get_normal_derivative(q);
                 average_valgrad += average_value * sigmaF * 2.0;
                 phi.submit_normal_derivative(-average_value, q);
                 phi.submit_value(average_valgrad, q);
@@ -460,8 +427,7 @@ private:
 
 
 template <typename MATRIX, typename Number>
-class MGCoarseIterative
-  : public MGCoarseGridBase<parallel::distributed::Vector<Number>>
+class MGCoarseIterative : public MGCoarseGridBase<parallel::distributed::Vector<Number>>
 {
 public:
   MGCoarseIterative()
@@ -478,9 +444,8 @@ public:
              parallel::distributed::Vector<double> &      dst,
              const parallel::distributed::Vector<double> &src) const
   {
-    ReductionControl solver_control(1e4, 1e-50, 1e-7, false, false);
-    SolverCG<parallel::distributed::Vector<double>> solver_coarse(
-      solver_control);
+    ReductionControl                                solver_control(1e4, 1e-50, 1e-7, false, false);
+    SolverCG<parallel::distributed::Vector<double>> solver_coarse(solver_control);
     solver_coarse.solve(*coarse_matrix, dst, src, PreconditionIdentity());
   }
 
@@ -491,12 +456,10 @@ public:
 
 template <typename LAPLACEOPERATOR>
 class MGTransferMF
-  : public MGTransferPrebuilt<
-      parallel::distributed::Vector<typename LAPLACEOPERATOR::value_type>>
+  : public MGTransferPrebuilt<parallel::distributed::Vector<typename LAPLACEOPERATOR::value_type>>
 {
 public:
-  MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace) :
-    laplace_operator(laplace){};
+  MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace) : laplace_operator(laplace){};
 
   /**
    * Overload copy_to_mg from MGTransferPrebuilt
@@ -504,16 +467,16 @@ public:
   template <int dim, class InVector, int spacedim>
   void
   copy_to_mg(
-    const DoFHandler<dim, spacedim> &mg_dof,
-    MGLevelObject<
-      parallel::distributed::Vector<typename LAPLACEOPERATOR::value_type>> &dst,
-    const InVector &src) const
+    const DoFHandler<dim, spacedim> &                                                   mg_dof,
+    MGLevelObject<parallel::distributed::Vector<typename LAPLACEOPERATOR::value_type>> &dst,
+    const InVector &                                                                    src) const
   {
-    for (unsigned int level = dst.min_level(); level <= dst.max_level();
-         ++level)
+    for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
       laplace_operator[level].initialize_dof_vector(dst[level]);
-    MGTransferPrebuilt<parallel::distributed::Vector<
-      typename LAPLACEOPERATOR::value_type>>::copy_to_mg(mg_dof, dst, src);
+    MGTransferPrebuilt<
+      parallel::distributed::Vector<typename LAPLACEOPERATOR::value_type>>::copy_to_mg(mg_dof,
+                                                                                       dst,
+                                                                                       src);
   }
 
 private:
@@ -541,33 +504,24 @@ do_test(const DoFHandler<dim> &dof)
   in = 1.;
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim, fe_degree, n_q_points_1d, number>
-    LevelMatrixType;
+  typedef LaplaceOperator<dim, fe_degree, n_q_points_1d, number> LevelMatrixType;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   mg_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
-  for (unsigned int level = 0;
-       level < dof.get_triangulation().n_global_levels();
-       ++level)
+  for (unsigned int level = 0; level < dof.get_triangulation().n_global_levels(); ++level)
     mg_matrices[level].initialize(mapping, dof, level);
 
 
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                parallel::distributed::Vector<number>>
-    SMOOTHER;
-  MGSmootherPrecondition<LevelMatrixType,
-                         SMOOTHER,
-                         parallel::distributed::Vector<number>>
+  typedef PreconditionChebyshev<LevelMatrixType, parallel::distributed::Vector<number>> SMOOTHER;
+  MGSmootherPrecondition<LevelMatrixType, SMOOTHER, parallel::distributed::Vector<number>>
     mg_smoother;
 
   MGLevelObject<typename SMOOTHER::AdditionalData> smoother_data;
   smoother_data.resize(0, dof.get_triangulation().n_global_levels() - 1);
-  for (unsigned int level = 0;
-       level < dof.get_triangulation().n_global_levels();
-       ++level)
+  for (unsigned int level = 0; level < dof.get_triangulation().n_global_levels(); ++level)
     {
       smoother_data[level].smoothing_range     = 20.;
       smoother_data[level].degree              = 5;
@@ -584,9 +538,7 @@ do_test(const DoFHandler<dim> &dof)
 
   Multigrid<parallel::distributed::Vector<double>> mg(
     dof, mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
-  PreconditionMG<dim,
-                 parallel::distributed::Vector<double>,
-                 MGTransferMF<LevelMatrixType>>
+  PreconditionMG<dim, parallel::distributed::Vector<double>, MGTransferMF<LevelMatrixType>>
     preconditioner(dof, mg, mg_transfer);
 
   {
@@ -607,20 +559,16 @@ test()
       parallel::distributed::Triangulation<dim> tria(
         MPI_COMM_WORLD,
         dealii::Triangulation<dim>::none,
-        parallel::distributed::Triangulation<
-          dim>::construct_multigrid_hierarchy);
+        parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
       GridGenerator::hyper_cube(tria);
       // set boundary ids on boundaries to the number of the face
-      for (unsigned int face = 2; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 2; face < GeometryInfo<dim>::faces_per_cell; ++face)
         tria.begin()->face(face)->set_all_boundary_ids(face);
 
-      std::vector<
-        GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+      std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
         periodic_faces;
       for (unsigned int d = 1; d < dim; ++d)
-        GridTools::collect_periodic_faces(
-          tria, 2 * d, 2 * d + 1, d, periodic_faces);
+        GridTools::collect_periodic_faces(tria, 2 * d, 2 * d + 1, d, periodic_faces);
       tria.add_periodicity(periodic_faces);
 
       tria.refine_global(i - dim);

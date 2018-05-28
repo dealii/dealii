@@ -89,8 +89,7 @@ public:
    * right size, i.e.  the same size as the <tt>points</tt> array.
    */
   virtual void
-  value_list(const std::vector<Point<dim>> &points,
-             std::vector<value_type> &      values) const;
+  value_list(const std::vector<Point<dim>> &points, std::vector<value_type> &values) const;
 
   /**
    * Return the gradient of the function at the given point.
@@ -104,8 +103,7 @@ public:
    * right size, i.e.  the same size as the <tt>points</tt> array.
    */
   virtual void
-  gradient_list(const std::vector<Point<dim>> &points,
-                std::vector<gradient_type> &   gradients) const;
+  gradient_list(const std::vector<Point<dim>> &points, std::vector<gradient_type> &gradients) const;
 };
 
 
@@ -129,7 +127,7 @@ public:
    * defaults to zero.
    */
   ConstantTensorFunction(const dealii::Tensor<rank, dim, Number> &value,
-                         const Number initial_time = 0.0);
+                         const Number                             initial_time = 0.0);
 
   virtual ~ConstantTensorFunction() override = default;
 
@@ -137,20 +135,17 @@ public:
   value(const Point<dim> &p) const override;
 
   virtual void
-  value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<typename dealii::TensorFunction<rank, dim, Number>::value_type>
-      &values) const override;
+  value_list(const std::vector<Point<dim>> &                                              points,
+             std::vector<typename dealii::TensorFunction<rank, dim, Number>::value_type> &values)
+    const override;
 
   virtual typename dealii::TensorFunction<rank, dim, Number>::gradient_type
   gradient(const Point<dim> &p) const override;
 
   virtual void
-  gradient_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<
-      typename dealii::TensorFunction<rank, dim, Number>::gradient_type>
-      &gradients) const override;
+  gradient_list(const std::vector<Point<dim>> &points,
+                std::vector<typename dealii::TensorFunction<rank, dim, Number>::gradient_type>
+                  &gradients) const override;
 
 private:
   const dealii::Tensor<rank, dim, Number> _value;

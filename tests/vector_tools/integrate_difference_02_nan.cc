@@ -90,17 +90,10 @@ test(VectorTools::NormType norm, double exp = 2.0)
   QIterated<dim> quadrature(QTrapez<1>(), 2);
 
   const ComponentSelectFunction<dim> component_mask(1, 2);
-  VectorTools::integrate_difference(dofh,
-                                    solution,
-                                    ZeroFunction<dim>(2),
-                                    cellwise_errors,
-                                    quadrature,
-                                    norm,
-                                    &component_mask,
-                                    exp);
+  VectorTools::integrate_difference(
+    dofh, solution, ZeroFunction<dim>(2), cellwise_errors, quadrature, norm, &component_mask, exp);
 
-  const double error =
-    VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
+  const double error = VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
 
   deallog << "computed: " << error << std::endl;
 }

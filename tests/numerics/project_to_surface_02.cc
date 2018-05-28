@@ -91,9 +91,8 @@ test()
       deallog << "  Case " << case_no << std::endl;
       create_triangulation((case_no == 1), tria);
 
-      const typename Triangulation<dim>::active_cell_iterator cell =
-        tria.begin_active();
-      Point<dim> trial_point;
+      const typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+      Point<dim>                                              trial_point;
       for (unsigned int i = 0; i < dim; ++i)
         trial_point[i] = 1.5;
 
@@ -102,8 +101,7 @@ test()
           const typename Triangulation<dim>::quad_iterator quad =
             (dim > 2 ?
                cell->quad(e) :
-               *reinterpret_cast<
-                 const typename Triangulation<dim>::quad_iterator *>(&cell));
+               *reinterpret_cast<const typename Triangulation<dim>::quad_iterator *>(&cell));
 
           deallog << "    Quad " << e << ", projected point=";
 
@@ -124,8 +122,7 @@ test()
           // trial_point than any of
           // the vertices of the quad
           for (unsigned int v = 0; v < 4; ++v)
-            AssertThrow(p.distance(trial_point) <=
-                          quad->vertex(v).distance(trial_point),
+            AssertThrow(p.distance(trial_point) <= quad->vertex(v).distance(trial_point),
                         ExcInternalError());
         }
       tria.clear();

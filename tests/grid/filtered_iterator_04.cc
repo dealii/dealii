@@ -60,17 +60,14 @@ test()
 
 
   unsigned int n_filtered_cells = 0;
-  for (auto filtered_cell :
-       filter_iterators(tria.active_cell_iterators(),
-                        IteratorFilters::AtBoundary(),
-                        IteratorFilters::SubdomainEqualTo(0)))
+  for (auto filtered_cell : filter_iterators(tria.active_cell_iterators(),
+                                             IteratorFilters::AtBoundary(),
+                                             IteratorFilters::SubdomainEqualTo(0)))
     {
-      AssertThrow(cell_set.count(filtered_cell) == 1,
-                  ExcMessage("Wrong cell filtered."));
+      AssertThrow(cell_set.count(filtered_cell) == 1, ExcMessage("Wrong cell filtered."));
       ++n_filtered_cells;
     }
-  AssertThrow(n_filtered_cells == cell_set.size(),
-              ExcMessage("Filtered cells missing."));
+  AssertThrow(n_filtered_cells == cell_set.size(), ExcMessage("Filtered cells missing."));
 }
 
 int

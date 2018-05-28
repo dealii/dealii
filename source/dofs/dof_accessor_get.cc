@@ -53,14 +53,12 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
     // cell unless the finite element we need to interpolate to is different
     // than the one we have on the current cell
     {
-      if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension> *>(
+      if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension, DoFHandlerType::space_dimension> *>(
              this->dof_handler) != nullptr) ||
           // for hp-DoFHandlers, we need to require that on
           // active cells, you either don't specify an fe_index,
           // or that you specify the correct one
-          (fe_index == this->active_fe_index()) ||
-          (fe_index == DoFHandlerType::default_fe_index))
+          (fe_index == this->active_fe_index()) || (fe_index == DoFHandlerType::default_fe_index))
         this->get_dof_values(values, interpolated_values);
       else
         {
@@ -70,11 +68,10 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
           Vector<number> tmp(this->get_fe().dofs_per_cell);
           this->get_dof_values(values, tmp);
 
-          FullMatrix<double> interpolation(
-            this->dof_handler->get_fe(fe_index).dofs_per_cell,
-            this->get_fe().dofs_per_cell);
-          this->dof_handler->get_fe(fe_index).get_interpolation_matrix(
-            this->get_fe(), interpolation);
+          FullMatrix<double> interpolation(this->dof_handler->get_fe(fe_index).dofs_per_cell,
+                                           this->get_fe().dofs_per_cell);
+          this->dof_handler->get_fe(fe_index).get_interpolation_matrix(this->get_fe(),
+                                                                       interpolation);
           interpolation.vmult(interpolated_values, tmp);
         }
     }
@@ -89,8 +86,7 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
       Assert(
-        (dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                 DoFHandlerType::space_dimension> *>(
+        (dynamic_cast<DoFHandler<DoFHandlerType::dimension, DoFHandlerType::space_dimension> *>(
            this->dof_handler) != nullptr) ||
           (fe_index != DoFHandlerType::default_fe_index),
         ExcMessage("You cannot call this function on non-active cells "
@@ -100,12 +96,10 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
                    "of freedom are only distributed on active cells for which "
                    "the active_fe_index has been set."));
 
-      const FiniteElement<dim, spacedim> &fe =
-        this->get_dof_handler().get_fe(fe_index);
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const FiniteElement<dim, spacedim> &fe            = this->get_dof_handler().get_fe(fe_index);
+      const unsigned int                  dofs_per_cell = fe.dofs_per_cell;
 
-      Assert(this->dof_handler != nullptr,
-             typename BaseClass::ExcInvalidObject());
+      Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
       Assert(interpolated_values.size() == dofs_per_cell,
              typename BaseClass::ExcVectorDoesNotMatch());
       Assert(values.size() == this->dof_handler->n_dofs(),
@@ -155,11 +149,9 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
               // interpolation itself either from its own children or
               // by interpolating from the finite element on an active
               // child to the finite element space requested here
-              this->child(child)->get_interpolated_dof_values(
-                values, tmp1, fe_index);
+              this->child(child)->get_interpolated_dof_values(values, tmp1, fe_index);
               // interpolate these to the mother cell
-              fe.get_restriction_matrix(child, this->refinement_case())
-                .vmult(tmp2, tmp1);
+              fe.get_restriction_matrix(child, this->refinement_case()).vmult(tmp2, tmp1);
 
               // and add up or set them in the output vector
               for (unsigned int i = 0; i < dofs_per_cell; ++i)

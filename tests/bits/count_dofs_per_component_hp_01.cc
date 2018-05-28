@@ -68,15 +68,12 @@ test()
 
   for (unsigned int i = 0; i < 3; i++)
     {
-      deallog << "DoFs in the " << i
-              << ". component for classical FE: " << dofs_per_component.at(i)
+      deallog << "DoFs in the " << i << ". component for classical FE: " << dofs_per_component.at(i)
               << std::endl;
-      deallog << "DoFs in the " << i
-              << ". component for hp FE: " << dofs_per_component_hp.at(i)
+      deallog << "DoFs in the " << i << ". component for hp FE: " << dofs_per_component_hp.at(i)
               << std::endl;
 
-      Assert(dofs_per_component.at(i) == dofs_per_component_hp.at(i),
-             ExcInternalError());
+      Assert(dofs_per_component.at(i) == dofs_per_component_hp.at(i), ExcInternalError());
     }
 }
 

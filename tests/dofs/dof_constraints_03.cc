@@ -66,14 +66,12 @@ test()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
-  deallog << "Number of constraints: " << constraints.n_constraints()
-          << std::endl;
+  deallog << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   // then set up a sparsity pattern and a
   // matrix on top of it
-  SparsityPattern sparsity(dof_handler.n_dofs(),
-                           dof_handler.n_dofs(),
-                           dof_handler.max_couplings_between_dofs());
+  SparsityPattern sparsity(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, sparsity);
   constraints.condense(sparsity);
   SparseMatrix<double> A(sparsity);
@@ -81,9 +79,8 @@ test()
   // then fill the matrix by setting up
   // bogus matrix entries
   std::vector<types::global_dof_index> local_dofs(fe.dofs_per_cell);
-  FullMatrix<double> local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
-  for (typename DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  FullMatrix<double>                   local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
@@ -91,8 +88,7 @@ test()
       local_matrix = 0;
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-          local_matrix(i, j) =
-            (i + 1.) * (j + 1.) * (local_dofs[i] + 1.) * (local_dofs[j] + 1.);
+          local_matrix(i, j) = (i + 1.) * (j + 1.) * (local_dofs[i] + 1.) * (local_dofs[j] + 1.);
 
       // copy local to global
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
@@ -125,13 +121,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -139,12 +133,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

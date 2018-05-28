@@ -79,8 +79,7 @@ check()
         testpoint(2) = testcoord[i][2];
 
       bool res = cell->point_inside(testpoint);
-      deallog << testpoint << "  \t inside " << res << " expected "
-              << expected[i] << std::endl;
+      deallog << testpoint << "  \t inside " << res << " expected " << expected[i] << std::endl;
       Assert(res == expected[i], ExcInternalError());
     }
 }

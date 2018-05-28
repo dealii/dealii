@@ -88,8 +88,7 @@ private:
 
 
 template <typename VectorType, class Matrix, class Sparsity>
-LaplaceProblem<VectorType, Matrix, Sparsity>::LaplaceProblem(
-  const unsigned int n_blocks) :
+LaplaceProblem<VectorType, Matrix, Sparsity>::LaplaceProblem(const unsigned int n_blocks) :
   n_blocks(n_blocks),
   fe(1),
   dof_handler(triangulation)
@@ -100,8 +99,8 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::LaplaceProblem(
 
 
 template <>
-LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::
-  LaplaceProblem(const unsigned int n_blocks) :
+LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::LaplaceProblem(
+  const unsigned int n_blocks) :
   n_blocks(n_blocks),
   fe(1),
   dof_handler(triangulation)
@@ -110,8 +109,8 @@ LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::
 
 
 template <>
-LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::
-  LaplaceProblem(const unsigned int n_blocks) :
+LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::LaplaceProblem(
+  const unsigned int n_blocks) :
   n_blocks(n_blocks),
   fe(1),
   dof_handler(triangulation)
@@ -125,14 +124,12 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::make_grid_and_dofs()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(3);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   reinit_sparsity();
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
@@ -145,20 +142,17 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::make_grid_and_dofs()
 
 template <>
 void
-LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::
-  reinit_sparsity()
+LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::reinit_sparsity()
 {
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
 }
 
 
 
 template <>
 void
-LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::
-  reinit_vectors()
+LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::reinit_vectors()
 {
   solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
@@ -168,20 +162,17 @@ LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>::
 
 template <>
 void
-LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::
-  reinit_sparsity()
+LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::reinit_sparsity()
 {
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
 }
 
 
 
 template <>
 void
-LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::
-  reinit_vectors()
+LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::reinit_vectors()
 {
   solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
@@ -191,24 +182,20 @@ LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>::
 
 template <>
 void
-LaplaceProblem<BlockVector<double>,
-               BlockSparseMatrix<double>,
-               BlockSparsityPattern>::reinit_sparsity()
+LaplaceProblem<BlockVector<double>, BlockSparseMatrix<double>, BlockSparsityPattern>::
+  reinit_sparsity()
 {
   switch (n_blocks)
     {
       case 2:
         {
           const types::global_dof_index n_dofs        = dof_handler.n_dofs();
-          const types::global_dof_index block_size[2] = {n_dofs / 3,
-                                                         n_dofs - n_dofs / 3};
+          const types::global_dof_index block_size[2] = {n_dofs / 3, n_dofs - n_dofs / 3};
 
           for (unsigned int i = 0; i < 2; ++i)
             for (unsigned int j = 0; j < 2; ++j)
               sparsity_pattern.block(i, j).reinit(
-                block_size[i],
-                block_size[j],
-                dof_handler.max_couplings_between_dofs());
+                block_size[i], block_size[j], dof_handler.max_couplings_between_dofs());
           sparsity_pattern.collect_sizes();
 
           break;
@@ -223,9 +210,7 @@ LaplaceProblem<BlockVector<double>,
           for (unsigned int i = 0; i < 3; ++i)
             for (unsigned int j = 0; j < 3; ++j)
               sparsity_pattern.block(i, j).reinit(
-                block_size[i],
-                block_size[j],
-                dof_handler.max_couplings_between_dofs());
+                block_size[i], block_size[j], dof_handler.max_couplings_between_dofs());
           sparsity_pattern.collect_sizes();
 
           break;
@@ -240,19 +225,16 @@ LaplaceProblem<BlockVector<double>,
 
 template <>
 void
-LaplaceProblem<BlockVector<double>,
-               BlockSparseMatrix<double>,
-               BlockSparsityPattern>::reinit_vectors()
+LaplaceProblem<BlockVector<double>, BlockSparseMatrix<double>, BlockSparsityPattern>::
+  reinit_vectors()
 {
   switch (n_blocks)
     {
       case 2:
         {
           const types::global_dof_index n_dofs         = dof_handler.n_dofs();
-          const types::global_dof_index block_size_[2] = {n_dofs / 3,
-                                                          n_dofs - n_dofs / 3};
-          const std::vector<types::global_dof_index> block_size(
-            &block_size_[0], &block_size_[2]);
+          const types::global_dof_index block_size_[2] = {n_dofs / 3, n_dofs - n_dofs / 3};
+          const std::vector<types::global_dof_index> block_size(&block_size_[0], &block_size_[2]);
 
           solution.reinit(block_size);
           system_rhs.reinit(block_size);
@@ -265,8 +247,7 @@ LaplaceProblem<BlockVector<double>,
           const types::global_dof_index n_dofs         = dof_handler.n_dofs();
           const types::global_dof_index block_size_[3] = {
             n_dofs / 5, n_dofs / 7, n_dofs - n_dofs / 5 - n_dofs / 7};
-          const std::vector<types::global_dof_index> block_size(
-            &block_size_[0], &block_size_[3]);
+          const std::vector<types::global_dof_index> block_size(&block_size_[0], &block_size_[3]);
 
           solution.reinit(block_size);
           system_rhs.reinit(block_size);
@@ -287,9 +268,7 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::assemble_system()
 {
   QGauss<2>   quadrature_formula(2);
   FEValues<2> fe_values(
-    fe,
-    quadrature_formula,
-    UpdateFlags(update_values | update_gradients | update_JxW_values));
+    fe, quadrature_formula, UpdateFlags(update_values | update_gradients | update_JxW_values));
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -299,8 +278,7 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::assemble_system()
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
-                                      endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       fe_values.reinit(cell);
@@ -311,36 +289,28 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-            cell_matrix(i, j) +=
-              (fe_values.shape_grad(i, q_point) *
-               fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+            cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                  fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          cell_rhs(i) +=
-            (fe_values.shape_value(i, q_point) * 1 * fe_values.JxW(q_point));
+          cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1 * fe_values.JxW(q_point));
 
       cell->get_dof_indices(local_dof_indices);
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
     };
 
 
-  std::map<types::global_dof_index, typename VectorType::value_type>
-    boundary_values;
+  std::map<types::global_dof_index, typename VectorType::value_type> boundary_values;
   VectorTools::interpolate_boundary_values(
-    dof_handler,
-    0,
-    Functions::ZeroFunction<2, typename VectorType::value_type>(),
-    boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+    dof_handler, 0, Functions::ZeroFunction<2, typename VectorType::value_type>(), boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 }
 
 
@@ -392,7 +362,29 @@ main()
 
   if (true)
     {
-      LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern>
+      LaplaceProblem<Vector<double>, SparseMatrix<double>, SparsityPattern> laplace_problem(2);
+      laplace_problem.run();
+
+      solutions.push_back(std::vector<double>());
+      solutions.back().resize(laplace_problem.solution.size());
+      for (unsigned int i = 0; i < laplace_problem.solution.size(); ++i)
+        solutions.back()[i] = laplace_problem.solution(i);
+    };
+
+  if (true)
+    {
+      LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern> laplace_problem(3);
+      laplace_problem.run();
+
+      solutions.push_back(std::vector<double>());
+      solutions.back().resize(laplace_problem.solution.size());
+      for (unsigned int i = 0; i < laplace_problem.solution.size(); ++i)
+        solutions.back()[i] = laplace_problem.solution(i);
+    };
+
+  if (true)
+    {
+      LaplaceProblem<BlockVector<double>, BlockSparseMatrix<double>, BlockSparsityPattern>
         laplace_problem(2);
       laplace_problem.run();
 
@@ -404,35 +396,7 @@ main()
 
   if (true)
     {
-      LaplaceProblem<Vector<float>, SparseMatrix<float>, SparsityPattern>
-        laplace_problem(3);
-      laplace_problem.run();
-
-      solutions.push_back(std::vector<double>());
-      solutions.back().resize(laplace_problem.solution.size());
-      for (unsigned int i = 0; i < laplace_problem.solution.size(); ++i)
-        solutions.back()[i] = laplace_problem.solution(i);
-    };
-
-  if (true)
-    {
-      LaplaceProblem<BlockVector<double>,
-                     BlockSparseMatrix<double>,
-                     BlockSparsityPattern>
-        laplace_problem(2);
-      laplace_problem.run();
-
-      solutions.push_back(std::vector<double>());
-      solutions.back().resize(laplace_problem.solution.size());
-      for (unsigned int i = 0; i < laplace_problem.solution.size(); ++i)
-        solutions.back()[i] = laplace_problem.solution(i);
-    };
-
-  if (true)
-    {
-      LaplaceProblem<BlockVector<double>,
-                     BlockSparseMatrix<double>,
-                     BlockSparsityPattern>
+      LaplaceProblem<BlockVector<double>, BlockSparseMatrix<double>, BlockSparsityPattern>
         laplace_problem(3);
       laplace_problem.run();
 
@@ -461,8 +425,7 @@ main()
         if (std::fabs(solutions[i][j] - solutions[0][j]) >
             accuracy * std::fabs(solutions[i][j] + solutions[0][j]))
           {
-            deallog << "Discrepancy: i=" << i << ", j=" << j
-                    << ", sol[i][j]=" << solutions[i][j]
+            deallog << "Discrepancy: i=" << i << ", j=" << j << ", sol[i][j]=" << solutions[i][j]
                     << ", sol[0][j]=" << solutions[0][j] << std::endl;
             deallog << std::flush;
             Assert(false, ExcInternalError());

@@ -340,8 +340,7 @@ private:
    */
   template <typename OtherNumber>
   void
-  unroll_recursion(Vector<OtherNumber> &result,
-                   unsigned int &       start_index) const;
+  unroll_recursion(Vector<OtherNumber> &result, unsigned int &start_index) const;
 
   /**
    * Allow an arbitrary Tensor to access the underlying values.
@@ -430,8 +429,7 @@ public:
    * Declare an array type which can be used to initialize an object of this
    * type statically.
    */
-  typedef typename Tensor<rank_ - 1, dim, Number>::array_type
-    array_type[(dim != 0) ? dim : 1];
+  typedef typename Tensor<rank_ - 1, dim, Number>::array_type array_type[(dim != 0) ? dim : 1];
   // ... avoid a compiler warning in case of dim == 0 and ensure that the
   // array always has positive size.
 
@@ -460,8 +458,7 @@ public:
    * Constructor that converts from a "tensor of tensors".
    */
   template <typename OtherNumber>
-  Tensor(
-    const Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> &initializer);
+  Tensor(const Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> &initializer);
 
   /**
    * Conversion operator to tensor of tensors.
@@ -481,8 +478,7 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV const value_type &
-                              operator[](const unsigned int i) const;
+  DEAL_II_CUDA_HOST_DEV const value_type &operator[](const unsigned int i) const;
 
   /**
    * Read access using TableIndices <tt>indices</tt>
@@ -679,8 +675,7 @@ private:
    */
   template <typename OtherNumber>
   void
-  unroll_recursion(Vector<OtherNumber> &result,
-                   unsigned int &       start_index) const;
+  unroll_recursion(Vector<OtherNumber> &result, unsigned int &start_index) const;
 
   /**
    * Allow an arbitrary Tensor to access the underlying values.
@@ -830,21 +825,18 @@ inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::operator Number &()
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
 #endif
   return value;
 }
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::
-                             operator const Number &() const
+inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::operator const Number &() const
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
 #endif
   return value;
 }
@@ -887,11 +879,9 @@ inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
 #ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
-  Assert(!(std::is_same<Number, adouble>::value ||
-           std::is_same<OtherNumber, adouble>::value),
-         ExcMessage(
-           "The Tensor equality operator for Adol-C taped numbers has not yet "
-           "been extended to support advanced branching."));
+  Assert(!(std::is_same<Number, adouble>::value || std::is_same<OtherNumber, adouble>::value),
+         ExcMessage("The Tensor equality operator for Adol-C taped numbers has not yet "
+                    "been extended to support advanced branching."));
 #endif
 
   return numbers::values_are_equal(value, p.value);
@@ -959,8 +949,7 @@ template <int dim, typename Number>
 inline typename Tensor<0, dim, Number>::real_type
 Tensor<0, dim, Number>::norm() const
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return numbers::NumberTraits<Number>::abs(value);
 }
 
@@ -971,8 +960,7 @@ inline typename Tensor<0, dim, Number>::real_type DEAL_II_CUDA_HOST_DEV
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
 #endif
   return numbers::NumberTraits<Number>::abs_square(value);
 }
@@ -981,11 +969,9 @@ inline typename Tensor<0, dim, Number>::real_type DEAL_II_CUDA_HOST_DEV
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline void
-Tensor<0, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
-                                         unsigned int &       index) const
+Tensor<0, dim, Number>::unroll_recursion(Vector<OtherNumber> &result, unsigned int &index) const
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
+  Assert(dim != 0, ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
   result[index] = value;
   ++index;
 }
@@ -1034,8 +1020,7 @@ Tensor<rank_, dim, Number>::Tensor(const array_type &initializer)
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE
-Tensor<rank_, dim, Number>::Tensor(
-  const Tensor<rank_, dim, OtherNumber> &initializer)
+Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, OtherNumber> &initializer)
 {
   for (unsigned int i = 0; i != dim; ++i)
     values[i] = Tensor<rank_ - 1, dim, Number>(initializer[i]);
@@ -1069,9 +1054,7 @@ namespace internal
   {
     template <typename ArrayElementType, int dim>
     inline DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV ArrayElementType &
-                                                       subscript(ArrayElementType * values,
-                                                                 const unsigned int i,
-                                                                 std::integral_constant<int, dim>)
+                                                       subscript(ArrayElementType *values, const unsigned int i, std::integral_constant<int, dim>)
     {
       // We cannot use Assert in a CUDA kernel
 #ifndef __CUDA_ARCH__
@@ -1083,16 +1066,12 @@ namespace internal
 
     template <typename ArrayElementType>
     DEAL_II_CUDA_HOST_DEV ArrayElementType &
-                          subscript(ArrayElementType *,
-                                    const unsigned int,
-                                    std::integral_constant<int, 0>)
+                          subscript(ArrayElementType *, const unsigned int, std::integral_constant<int, 0>)
     {
       // We cannot use Assert in a CUDA kernel
 #ifndef __CUDA_ARCH__
-      Assert(
-        false,
-        ExcMessage(
-          "Cannot access elements of an object of type Tensor<rank,0,Number>."));
+      Assert(false,
+             ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
 #endif
       static ArrayElementType t;
       return t;
@@ -1102,9 +1081,8 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline DEAL_II_ALWAYS_INLINE                       DEAL_II_CUDA_HOST_DEV
-  typename Tensor<rank_, dim, Number>::value_type &Tensor<rank_, dim, Number>::
-                                                   operator[](const unsigned int i)
+inline DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV typename Tensor<rank_, dim, Number>::value_type &
+  Tensor<rank_, dim, Number>::operator[](const unsigned int i)
 {
   return dealii::internal::TensorSubscriptor::subscript(
     values, i, std::integral_constant<int, dim>());
@@ -1125,8 +1103,7 @@ template <int rank_, int dim, typename Number>
 inline const Number &Tensor<rank_, dim, Number>::
                      operator[](const TableIndices<rank_> &indices) const
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1134,11 +1111,9 @@ inline const Number &Tensor<rank_, dim, Number>::
 
 
 template <int rank_, int dim, typename Number>
-inline Number &Tensor<rank_, dim, Number>::
-               operator[](const TableIndices<rank_> &indices)
+inline Number &Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices)
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+  Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1149,8 +1124,7 @@ template <int rank_, int dim, typename Number>
 inline Number *
 Tensor<rank_, dim, Number>::begin_raw()
 {
-  return std::addressof(
-    this->operator[](this->unrolled_to_component_indices(0)));
+  return std::addressof(this->operator[](this->unrolled_to_component_indices(0)));
 }
 
 
@@ -1159,8 +1133,7 @@ template <int rank_, int dim, typename Number>
 inline const Number *
 Tensor<rank_, dim, Number>::begin_raw() const
 {
-  return std::addressof(
-    this->operator[](this->unrolled_to_component_indices(0)));
+  return std::addressof(this->operator[](this->unrolled_to_component_indices(0)));
 }
 
 
@@ -1198,8 +1171,7 @@ template <int rank_, int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator=(const Number &d)
 {
-  Assert(numbers::value_is_zero(d),
-         ExcMessage("Only assignment with zero is allowed"));
+  Assert(numbers::value_is_zero(d), ExcMessage("Only assignment with zero is allowed"));
   (void)d;
 
   for (unsigned int i = 0; i < dim; ++i)
@@ -1211,8 +1183,7 @@ Tensor<rank_, dim, Number>::operator=(const Number &d)
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline bool
-Tensor<rank_, dim, Number>::
-operator==(const Tensor<rank_, dim, OtherNumber> &p) const
+Tensor<rank_, dim, Number>::operator==(const Tensor<rank_, dim, OtherNumber> &p) const
 {
   for (unsigned int i = 0; i < dim; ++i)
     if (values[i] != p.values[i])
@@ -1238,8 +1209,7 @@ Tensor<1, 0, double>::operator==(const Tensor<1, 0, double> &) const
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline bool
-Tensor<rank_, dim, Number>::
-operator!=(const Tensor<rank_, dim, OtherNumber> &p) const
+Tensor<rank_, dim, Number>::operator!=(const Tensor<rank_, dim, OtherNumber> &p) const
 {
   return !((*this) == p);
 }
@@ -1314,8 +1284,8 @@ template <int rank_, int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_, dim, Number>::norm_square() const
 {
-  typename numbers::NumberTraits<Number>::real_type s = internal::NumberType<
-    typename numbers::NumberTraits<Number>::real_type>::value(0.0);
+  typename numbers::NumberTraits<Number>::real_type s =
+    internal::NumberType<typename numbers::NumberTraits<Number>::real_type>::value(0.0);
   for (unsigned int i = 0; i < dim; ++i)
     s += values[i].norm_square();
 
@@ -1328,8 +1298,7 @@ template <typename OtherNumber>
 inline void
 Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
 {
-  AssertDimension(result.size(),
-                  (Utilities::fixed_power<rank_, unsigned int>(dim)));
+  AssertDimension(result.size(), (Utilities::fixed_power<rank_, unsigned int>(dim)));
 
   unsigned int index = 0;
   unroll_recursion(result, index);
@@ -1339,8 +1308,7 @@ Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline void
-Tensor<rank_, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
-                                             unsigned int &       index) const
+Tensor<rank_, dim, Number>::unroll_recursion(Vector<OtherNumber> &result, unsigned int &index) const
 {
   for (unsigned int i = 0; i < dim; ++i)
     values[i].unroll_recursion(result, index);
@@ -1349,8 +1317,7 @@ Tensor<rank_, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
 
 template <int rank_, int dim, typename Number>
 inline unsigned int
-Tensor<rank_, dim, Number>::component_to_unrolled_index(
-  const TableIndices<rank_> &indices)
+Tensor<rank_, dim, Number>::component_to_unrolled_index(const TableIndices<rank_> &indices)
 {
   unsigned int index = 0;
   for (int r = 0; r < rank_; ++r)
@@ -1364,8 +1331,7 @@ template <int rank_, int dim, typename Number>
 inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 {
-  Assert(i < n_independent_components,
-         ExcIndexRange(i, 0, n_independent_components));
+  Assert(i < n_independent_components, ExcIndexRange(i, 0, n_independent_components));
 
   TableIndices<rank_> indices;
 
@@ -1502,11 +1468,9 @@ operator*(const Tensor<0, dim, Number> &t, const Other &object)
  */
 template <int dim, typename Number, typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
-operator*(const Tensor<0, dim, Number> &     src1,
-          const Tensor<0, dim, OtherNumber> &src2)
+operator*(const Tensor<0, dim, Number> &src1, const Tensor<0, dim, OtherNumber> &src2)
 {
-  return static_cast<const Number &>(src1) *
-         static_cast<const OtherNumber &>(src2);
+  return static_cast<const Number &>(src1) * static_cast<const OtherNumber &>(src2);
 }
 
 
@@ -1517,10 +1481,7 @@ operator*(const Tensor<0, dim, Number> &     src1,
  */
 template <int dim, typename Number, typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE
-  Tensor<0,
-         dim,
-         typename ProductType<Number,
-                              typename EnableIfScalar<OtherNumber>::type>::type>
+  Tensor<0, dim, typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
   operator/(const Tensor<0, dim, Number> &t, const OtherNumber &factor)
 {
   return static_cast<const Number &>(t) / factor;
@@ -1533,10 +1494,8 @@ inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
-  Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const Tensor<0, dim, Number> &     p,
-            const Tensor<0, dim, OtherNumber> &q)
+inline DEAL_II_ALWAYS_INLINE Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+                             operator+(const Tensor<0, dim, Number> &p, const Tensor<0, dim, OtherNumber> &q)
 {
   return static_cast<const Number &>(p) + static_cast<const OtherNumber &>(q);
 }
@@ -1548,10 +1507,8 @@ inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
-  Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const Tensor<0, dim, Number> &     p,
-            const Tensor<0, dim, OtherNumber> &q)
+inline DEAL_II_ALWAYS_INLINE Tensor<0, dim, typename ProductType<Number, OtherNumber>::type>
+                             operator-(const Tensor<0, dim, Number> &p, const Tensor<0, dim, OtherNumber> &q)
 {
   return static_cast<const Number &>(p) - static_cast<const OtherNumber &>(q);
 }
@@ -1569,10 +1526,7 @@ inline DEAL_II_ALWAYS_INLINE
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank,
-         dim,
-         typename ProductType<Number,
-                              typename EnableIfScalar<OtherNumber>::type>::type>
+  Tensor<rank, dim, typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
   operator*(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
   // recurse over the base objects
@@ -1595,10 +1549,7 @@ inline DEAL_II_ALWAYS_INLINE
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank,
-         dim,
-         typename ProductType<typename EnableIfScalar<Number>::type,
-                              OtherNumber>::type>
+  Tensor<rank, dim, typename ProductType<typename EnableIfScalar<Number>::type, OtherNumber>::type>
   operator*(const Number &factor, const Tensor<rank, dim, OtherNumber> &t)
 {
   // simply forward to the operator above
@@ -1614,11 +1565,9 @@ inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-inline Tensor<
-  rank,
-  dim,
-  typename ProductType<Number,
-                       typename EnableIfScalar<OtherNumber>::type>::type>
+inline Tensor<rank,
+              dim,
+              typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
   // recurse over the base objects
@@ -1637,10 +1586,8 @@ operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const Tensor<rank, dim, Number> &     p,
-            const Tensor<rank, dim, OtherNumber> &q)
+inline DEAL_II_ALWAYS_INLINE Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+                             operator+(const Tensor<rank, dim, Number> &p, const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
 
@@ -1659,10 +1606,8 @@ inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const Tensor<rank, dim, Number> &     p,
-            const Tensor<rank, dim, OtherNumber> &q)
+inline DEAL_II_ALWAYS_INLINE Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+                             operator-(const Tensor<rank, dim, Number> &p, const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
 
@@ -1703,26 +1648,17 @@ inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  * @author Matthias Maier, 2015
  */
-template <int rank_1,
-          int rank_2,
-          int dim,
-          typename Number,
-          typename OtherNumber>
+template <int rank_1, int rank_2, int dim, typename Number, typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE
-  typename Tensor<rank_1 + rank_2 - 2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-  operator*(const Tensor<rank_1, dim, Number> &     src1,
-            const Tensor<rank_2, dim, OtherNumber> &src2)
+  typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::
+    tensor_type
+    operator*(const Tensor<rank_1, dim, Number> &src1, const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  typename Tensor<rank_1 + rank_2 - 2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+  typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::
+    tensor_type result;
 
-  TensorAccessors::internal::
-    ReorderedIndexView<0, rank_2, const Tensor<rank_2, dim, OtherNumber>>
-      reordered = TensorAccessors::reordered_index_view<0, rank_2>(src2);
+  TensorAccessors::internal::ReorderedIndexView<0, rank_2, const Tensor<rank_2, dim, OtherNumber>>
+    reordered = TensorAccessors::reordered_index_view<0, rank_2>(src2);
   TensorAccessors::contract<1, rank_1, rank_2, dim>(result, src1, reordered);
 
   return result;
@@ -1766,34 +1702,28 @@ template <int index_1,
           typename Number,
           typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE
-  typename Tensor<rank_1 + rank_2 - 2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-  contract(const Tensor<rank_1, dim, Number> &     src1,
-           const Tensor<rank_2, dim, OtherNumber> &src2)
+  typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::
+    tensor_type
+    contract(const Tensor<rank_1, dim, Number> &src1, const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(
-    0 <= index_1 && index_1 < rank_1,
-    ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(
-    0 <= index_2 && index_2 < rank_2,
-    ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
+  Assert(0 <= index_1 && index_1 < rank_1,
+         ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
+  Assert(0 <= index_2 && index_2 < rank_2,
+         ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
 
   using namespace TensorAccessors;
   using namespace TensorAccessors::internal;
 
   // Reorder index_1 to the end of src1:
-  ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number>>
-    reord_01 = reordered_index_view<index_1, rank_1>(src1);
+  ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number>> reord_01 =
+    reordered_index_view<index_1, rank_1>(src1);
 
   // Reorder index_2 to the end of src2:
-  ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber>>
-    reord_02 = reordered_index_view<index_2, rank_2>(src2);
+  ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber>> reord_02 =
+    reordered_index_view<index_2, rank_2>(src2);
 
-  typename Tensor<rank_1 + rank_2 - 2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+  typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::
+    tensor_type result;
   TensorAccessors::contract<1, rank_1, rank_2, dim>(result, reord_01, reord_02);
   return result;
 }
@@ -1839,69 +1769,53 @@ template <int index_1,
           int dim,
           typename Number,
           typename OtherNumber>
-inline
-  typename Tensor<rank_1 + rank_2 - 4,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
+inline typename Tensor<rank_1 + rank_2 - 4, dim, typename ProductType<Number, OtherNumber>::type>::
+  tensor_type
   double_contract(const Tensor<rank_1, dim, Number> &     src1,
                   const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(
-    0 <= index_1 && index_1 < rank_1,
-    ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(
-    0 <= index_3 && index_3 < rank_1,
-    ExcMessage("The specified index_3 must lie within the range [0,rank_1)"));
-  Assert(index_1 != index_3,
-         ExcMessage("index_1 and index_3 must not be the same"));
-  Assert(
-    0 <= index_2 && index_2 < rank_2,
-    ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
-  Assert(
-    0 <= index_4 && index_4 < rank_2,
-    ExcMessage("The specified index_4 must lie within the range [0,rank_2)"));
-  Assert(index_2 != index_4,
-         ExcMessage("index_2 and index_4 must not be the same"));
+  Assert(0 <= index_1 && index_1 < rank_1,
+         ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
+  Assert(0 <= index_3 && index_3 < rank_1,
+         ExcMessage("The specified index_3 must lie within the range [0,rank_1)"));
+  Assert(index_1 != index_3, ExcMessage("index_1 and index_3 must not be the same"));
+  Assert(0 <= index_2 && index_2 < rank_2,
+         ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
+  Assert(0 <= index_4 && index_4 < rank_2,
+         ExcMessage("The specified index_4 must lie within the range [0,rank_2)"));
+  Assert(index_2 != index_4, ExcMessage("index_2 and index_4 must not be the same"));
 
   using namespace TensorAccessors;
   using namespace TensorAccessors::internal;
 
   // Reorder index_1 to the end of src1:
-  ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number>>
-    reord_1 = TensorAccessors::reordered_index_view<index_1, rank_1>(src1);
+  ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number>> reord_1 =
+    TensorAccessors::reordered_index_view<index_1, rank_1>(src1);
 
   // Reorder index_2 to the end of src2:
-  ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber>>
-    reord_2 = TensorAccessors::reordered_index_view<index_2, rank_2>(src2);
+  ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber>> reord_2 =
+    TensorAccessors::reordered_index_view<index_2, rank_2>(src2);
 
   // Now, reorder index_3 to the end of src1. We have to make sure to
   // preserve the orginial ordering: index_1 has been removed. If
   // index_3 > index_1, we have to use (index_3 - 1) instead:
-  ReorderedIndexView<
-    (index_3 < index_1 ? index_3 : index_3 - 1),
-    rank_1,
-    ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number>>>
-    reord_3 =
-      TensorAccessors::reordered_index_view < index_3 < index_1 ? index_3 :
-                                                                  index_3 - 1,
+  ReorderedIndexView<(index_3 < index_1 ? index_3 : index_3 - 1),
+                     rank_1,
+                     ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number>>>
+    reord_3 = TensorAccessors::reordered_index_view < index_3 < index_1 ? index_3 : index_3 - 1,
     rank_1 > (reord_1);
 
   // Now, reorder index_4 to the end of src2. We have to make sure to
   // preserve the orginial ordering: index_2 has been removed. If
   // index_4 > index_2, we have to use (index_4 - 1) instead:
-  ReorderedIndexView<
-    (index_4 < index_2 ? index_4 : index_4 - 1),
-    rank_2,
-    ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber>>>
-    reord_4 =
-      TensorAccessors::reordered_index_view < index_4 < index_2 ? index_4 :
-                                                                  index_4 - 1,
+  ReorderedIndexView<(index_4 < index_2 ? index_4 : index_4 - 1),
+                     rank_2,
+                     ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber>>>
+    reord_4 = TensorAccessors::reordered_index_view < index_4 < index_2 ? index_4 : index_4 - 1,
     rank_2 > (reord_2);
 
-  typename Tensor<rank_1 + rank_2 - 4,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+  typename Tensor<rank_1 + rank_2 - 4, dim, typename ProductType<Number, OtherNumber>::type>::
+    tensor_type result;
   TensorAccessors::contract<2, rank_1, rank_2, dim>(result, reord_3, reord_4);
   return result;
 }
@@ -1922,8 +1836,7 @@ inline
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
-scalar_product(const Tensor<rank, dim, Number> &     left,
-               const Tensor<rank, dim, OtherNumber> &right)
+scalar_product(const Tensor<rank, dim, Number> &left, const Tensor<rank, dim, OtherNumber> &right)
 {
   typename ProductType<Number, OtherNumber>::type result;
   TensorAccessors::contract<rank, rank, rank, dim>(result, left, right);
@@ -1963,10 +1876,8 @@ contract3(const TensorT1<rank_1, dim, T1> &         left,
           const TensorT2<rank_1 + rank_2, dim, T2> &middle,
           const TensorT3<rank_2, dim, T3> &         right)
 {
-  typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type
-    return_type;
-  return TensorAccessors::contract3<rank_1, rank_2, dim, return_type>(
-    left, middle, right);
+  typedef typename ProductType<T1, typename ProductType<T2, T3>::type>::type return_type;
+  return TensorAccessors::contract3<rank_1, rank_2, dim, return_type>(left, middle, right);
 }
 
 
@@ -1981,20 +1892,14 @@ contract3(const TensorT1<rank_1, dim, T1> &         left,
  * @relatesalso Tensor
  * @author Matthias Maier, 2015
  */
-template <int rank_1,
-          int rank_2,
-          int dim,
-          typename Number,
-          typename OtherNumber>
+template <int rank_1, int rank_2, int dim, typename Number, typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE
   Tensor<rank_1 + rank_2, dim, typename ProductType<Number, OtherNumber>::type>
   outer_product(const Tensor<rank_1, dim, Number> &     src1,
                 const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  typename Tensor<rank_1 + rank_2,
-                  dim,
-                  typename ProductType<Number, OtherNumber>::type>::tensor_type
-    result;
+  typename Tensor<rank_1 + rank_2, dim, typename ProductType<Number, OtherNumber>::type>::
+    tensor_type result;
   TensorAccessors::contract<0, rank_1, rank_2, dim>(result, src1, src2);
   return result;
 }
@@ -2045,8 +1950,7 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
  */
 template <int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
-                             cross_product_3d(const Tensor<1, dim, Number> &src1,
-                                              const Tensor<1, dim, Number> &src2)
+                             cross_product_3d(const Tensor<1, dim, Number> &src1, const Tensor<1, dim, Number> &src2)
 {
   Assert(dim == 3, ExcInternalError());
 
@@ -2173,8 +2077,8 @@ invert(const Tensor<2, 2, Number> &t)
 
   // this is Maple output,
   // thus a bit unstructured
-  const Number inv_det_t = internal::NumberType<Number>::value(
-    1.0 / (t[0][0] * t[1][1] - t[1][0] * t[0][1]));
+  const Number inv_det_t =
+    internal::NumberType<Number>::value(1.0 / (t[0][0] * t[1][1] - t[1][0] * t[0][1]));
   return_tensor[0][0] = t[1][1];
   return_tensor[0][1] = -t[0][1];
   return_tensor[1][0] = -t[1][0];
@@ -2191,15 +2095,15 @@ invert(const Tensor<2, 3, Number> &t)
 {
   Tensor<2, 3, Number> return_tensor;
 
-  const Number t4  = internal::NumberType<Number>::value(t[0][0] * t[1][1]),
-               t6  = internal::NumberType<Number>::value(t[0][0] * t[1][2]),
-               t8  = internal::NumberType<Number>::value(t[0][1] * t[1][0]),
-               t00 = internal::NumberType<Number>::value(t[0][2] * t[1][0]),
-               t01 = internal::NumberType<Number>::value(t[0][1] * t[2][0]),
-               t04 = internal::NumberType<Number>::value(t[0][2] * t[2][0]),
+  const Number t4        = internal::NumberType<Number>::value(t[0][0] * t[1][1]),
+               t6        = internal::NumberType<Number>::value(t[0][0] * t[1][2]),
+               t8        = internal::NumberType<Number>::value(t[0][1] * t[1][0]),
+               t00       = internal::NumberType<Number>::value(t[0][2] * t[1][0]),
+               t01       = internal::NumberType<Number>::value(t[0][1] * t[2][0]),
+               t04       = internal::NumberType<Number>::value(t[0][2] * t[2][0]),
                inv_det_t = internal::NumberType<Number>::value(
-                 1.0 / (t4 * t[2][2] - t6 * t[2][1] - t8 * t[2][2] +
-                        t00 * t[2][1] + t01 * t[1][2] - t04 * t[1][1]));
+                 1.0 / (t4 * t[2][2] - t6 * t[2][1] - t8 * t[2][2] + t00 * t[2][1] + t01 * t[1][2] -
+                        t04 * t[1][1]));
   return_tensor[0][0] = internal::NumberType<Number>::value(t[1][1] * t[2][2]) -
                         internal::NumberType<Number>::value(t[1][2] * t[2][1]);
   return_tensor[0][1] = internal::NumberType<Number>::value(t[0][2] * t[2][1]) -
@@ -2208,13 +2112,11 @@ invert(const Tensor<2, 3, Number> &t)
                         internal::NumberType<Number>::value(t[0][2] * t[1][1]);
   return_tensor[1][0] = internal::NumberType<Number>::value(t[1][2] * t[2][0]) -
                         internal::NumberType<Number>::value(t[1][0] * t[2][2]);
-  return_tensor[1][1] =
-    internal::NumberType<Number>::value(t[0][0] * t[2][2]) - t04;
+  return_tensor[1][1] = internal::NumberType<Number>::value(t[0][0] * t[2][2]) - t04;
   return_tensor[1][2] = t00 - t6;
   return_tensor[2][0] = internal::NumberType<Number>::value(t[1][0] * t[2][1]) -
                         internal::NumberType<Number>::value(t[1][1] * t[2][0]);
-  return_tensor[2][1] =
-    t01 - internal::NumberType<Number>::value(t[0][0] * t[2][1]);
+  return_tensor[2][1] = t01 - internal::NumberType<Number>::value(t[0][0] * t[2][1]);
   return_tensor[2][2] = internal::NumberType<Number>::value(t4 - t8);
   return_tensor *= inv_det_t;
 

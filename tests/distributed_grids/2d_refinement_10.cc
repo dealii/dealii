@@ -59,11 +59,10 @@ private:
   typedef typename parallel::distributed::Triangulation<dim> TypeTria;
 
 public:
-  TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing
-             smoothing_option = dealii::Triangulation<dim>::none);
+  TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing smoothing_option =
+             dealii::Triangulation<dim>::none);
   void
-  run(std::vector<unsigned int> &n_cell,
-      std::set<Location<dim>> &  position_list);
+  run(std::vector<unsigned int> &n_cell, std::set<Location<dim>> &position_list);
 
 private:
   void
@@ -103,16 +102,13 @@ public:
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, /* int max_num_threads */ 1);
-  const bool I_am_host =
-    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, /* int max_num_threads */ 1);
+  const bool I_am_host = (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0);
   // Although most part of this test is designed to run in parallel, there is
   // still one place that doesn't work perfectly in parallel. Now the sorting of
   // final cell centers is just a local operation and won't produce any
   // reasonable result in parallel.
-  AssertThrow(I_am_host,
-              ExcMessage("Current code works properly only with one process."));
+  AssertThrow(I_am_host, ExcMessage("Current code works properly only with one process."));
 
   const unsigned int dim = 2;
   std::ofstream      logfile;
@@ -133,8 +129,7 @@ main(int argc, char *argv[])
       deallog << "Flag limit_level_difference_at_vertices set:" << std::endl;
     }
   {
-    TriaTest<dim> tria_test(
-      dealii::Triangulation<dim>::limit_level_difference_at_vertices);
+    TriaTest<dim> tria_test(dealii::Triangulation<dim>::limit_level_difference_at_vertices);
     tria_test.run(n_cell_smooth, final_cell_center_loactions_smooth);
   }
   if (I_am_host)
@@ -152,11 +147,9 @@ main(int argc, char *argv[])
   {
     bool n_cells_are_same = (n_cell_smooth.size() == n_cell_no_smooth.size());
 
-    for (unsigned int i = 0; n_cells_are_same && (i < n_cell_smooth.size());
-         ++i)
+    for (unsigned int i = 0; n_cells_are_same && (i < n_cell_smooth.size()); ++i)
       {
-        n_cells_are_same =
-          n_cells_are_same && (n_cell_smooth[i] == n_cell_no_smooth[i]);
+        n_cells_are_same = n_cells_are_same && (n_cell_smooth[i] == n_cell_no_smooth[i]);
       }
     if (I_am_host)
       {
@@ -165,25 +158,20 @@ main(int argc, char *argv[])
   }
   {
     bool cell_center_loactions_are_same =
-      (final_cell_center_loactions_smooth.size() ==
-       final_cell_center_loactions_no_smooth.size());
+      (final_cell_center_loactions_smooth.size() == final_cell_center_loactions_no_smooth.size());
 
-    std::set<Location<dim>>::const_iterator it1 =
-      final_cell_center_loactions_smooth.begin();
-    std::set<Location<dim>>::const_iterator it2 =
-      final_cell_center_loactions_no_smooth.begin();
+    std::set<Location<dim>>::const_iterator it1 = final_cell_center_loactions_smooth.begin();
+    std::set<Location<dim>>::const_iterator it2 = final_cell_center_loactions_no_smooth.begin();
 
-    for (; cell_center_loactions_are_same &&
-           (it1 != final_cell_center_loactions_smooth.end());
+    for (; cell_center_loactions_are_same && (it1 != final_cell_center_loactions_smooth.end());
          ++it1, ++it2)
       {
-        cell_center_loactions_are_same =
-          cell_center_loactions_are_same && (*it1 == *it2);
+        cell_center_loactions_are_same = cell_center_loactions_are_same && (*it1 == *it2);
       }
     if (I_am_host)
       {
-        deallog << "cell_center_loactions_are_same = "
-                << cell_center_loactions_are_same << std::endl;
+        deallog << "cell_center_loactions_are_same = " << cell_center_loactions_are_same
+                << std::endl;
       }
   }
 
@@ -193,8 +181,7 @@ main(int argc, char *argv[])
 }
 
 template <int dim>
-TriaTest<dim>::TriaTest(
-  const typename dealii::Triangulation<dim>::MeshSmoothing smoothing_option) :
+TriaTest<dim>::TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing smoothing_option) :
   mpi_communicator(MPI_COMM_WORLD),
   triangulation(mpi_communicator, smoothing_option),
   myid(Utilities::MPI::this_mpi_process(mpi_communicator)),
@@ -219,8 +206,7 @@ TriaTest<dim>::TriaTest(
 
 template <int dim>
 void
-TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
-                   std::set<Location<dim>> &  position_list)
+TriaTest<dim>::run(std::vector<unsigned int> &n_cell, std::set<Location<dim>> &position_list)
 {
   n_cell.clear();
   position_list.clear();
@@ -229,8 +215,7 @@ TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
   if (I_am_host)
     {
       deallog << "n_loop  n_cell" << std::endl;
-      deallog << counter << "       " << triangulation.n_global_active_cells()
-              << std::endl;
+      deallog << counter << "       " << triangulation.n_global_active_cells() << std::endl;
     }
   ++counter;
 
@@ -242,8 +227,7 @@ TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
           {
             p[d] = 0.5 - std::pow(0.5, 1.0 + counter);
           }
-        typename TypeTria::active_cell_iterator cell =
-          triangulation.begin_active();
+        typename TypeTria::active_cell_iterator cell = triangulation.begin_active();
         for (; cell != triangulation.end(); ++cell)
           if (cell->is_locally_owned() && ((cell->center()).distance(p) < 1e-4))
             {
@@ -257,8 +241,7 @@ TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
 
       if (I_am_host)
         {
-          deallog << counter << "       "
-                  << triangulation.n_global_active_cells() << std::endl;
+          deallog << counter << "       " << triangulation.n_global_active_cells() << std::endl;
         }
       n_cell.push_back(triangulation.n_global_active_cells());
     }
@@ -270,8 +253,7 @@ TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
   {
     deallog << " position of cell centers:" << std::endl;
 
-    for (typename TypeTria::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename TypeTria::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       if (cell->is_locally_owned())
@@ -280,8 +262,7 @@ TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
           position_list.insert(loc);
         }
 
-    for (typename std::set<Location<dim>>::const_iterator it =
-           position_list.begin();
+    for (typename std::set<Location<dim>>::const_iterator it = position_list.begin();
          it != position_list.end();
          ++it)
       {
@@ -302,7 +283,7 @@ TriaTest<dim>::write_vtu(const unsigned int counter) const
   {
     refine_mark.reinit(triangulation.n_active_cells());
 
-    typename TypeTria::active_cell_iterator cell = triangulation.begin_active();
+    typename TypeTria::active_cell_iterator       cell = triangulation.begin_active();
     const typename TypeTria::active_cell_iterator endc = triangulation.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -315,15 +296,13 @@ TriaTest<dim>::write_vtu(const unsigned int counter) const
   data_out.attach_triangulation(triangulation);
   {
     const std::string data_name("refine_flag");
-    data_out.add_data_vector(
-      refine_mark, data_name, DataOut<dim>::type_cell_data);
+    data_out.add_data_vector(refine_mark, data_name, DataOut<dim>::type_cell_data);
   }
 
   data_out.build_patches();
 
-  const std::string output_tag =
-    case_name + Utilities::int_to_string(counter, 4);
-  const std::string slot_itag = ".slot-" + Utilities::int_to_string(myid, 4);
+  const std::string output_tag = case_name + Utilities::int_to_string(counter, 4);
+  const std::string slot_itag  = ".slot-" + Utilities::int_to_string(myid, 4);
 
   std::ofstream output((output_tag + slot_itag + ".vtu").c_str());
   data_out.write_vtu(output);
@@ -331,12 +310,9 @@ TriaTest<dim>::write_vtu(const unsigned int counter) const
   if (I_am_host)
     {
       std::vector<std::string> filenames;
-      for (unsigned int i = 0;
-           i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-           ++i)
+      for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
         {
-          filenames.push_back(output_tag + ".slot-" +
-                              Utilities::int_to_string(i, 4) + ".vtu");
+          filenames.push_back(output_tag + ".slot-" + Utilities::int_to_string(i, 4) + ".vtu");
         }
       std::ofstream master_output((output_tag + ".pvtu").c_str());
       data_out.write_pvtu_record(master_output, filenames);

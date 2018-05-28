@@ -37,8 +37,8 @@ void check(Triangulation<2> &tria)
       std::vector<Triangulation<2>::active_cell_iterator> cells =
         GridTools::find_cells_adjacent_to_vertex(tria, i);
 
-      deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": "
-              << cells.size() << " cells" << std::endl;
+      deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": " << cells.size()
+              << " cells" << std::endl;
 
       for (unsigned c = 0; c < cells.size(); c++)
         deallog << "   " << cells[c] << std::endl;
@@ -62,8 +62,8 @@ main()
       vertices.push_back(Point<dim>());
 
       for (unsigned int i = 0; i < 16; ++i)
-        vertices.push_back(Point<dim>(std::cos(i * 2 * numbers::PI / 16),
-                                      std::sin(i * 2 * numbers::PI / 16)));
+        vertices.push_back(
+          Point<dim>(std::cos(i * 2 * numbers::PI / 16), std::sin(i * 2 * numbers::PI / 16)));
 
       // now create the 8 cells
       std::vector<CellData<dim>> cells;

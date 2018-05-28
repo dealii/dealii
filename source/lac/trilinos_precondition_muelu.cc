@@ -65,9 +65,7 @@ namespace TrilinosWrappers
   PreconditionAMGMueLu::PreconditionAMGMueLu()
   {
 #    ifdef DEAL_II_WITH_64BIT_INDICES
-    AssertThrow(
-      false,
-      ExcMessage("PreconditionAMGMueLu does not support 64bit-indices!"));
+    AssertThrow(false, ExcMessage("PreconditionAMGMueLu does not support 64bit-indices!"));
 #    endif
   }
 
@@ -112,10 +110,8 @@ namespace TrilinosWrappers
     parameter_list.set("smoother: type", additional_data.smoother_type);
     parameter_list.set("coarse: type", additional_data.coarse_type);
 
-    parameter_list.set("smoother: sweeps",
-                       static_cast<int>(additional_data.smoother_sweeps));
-    parameter_list.set("cycle applications",
-                       static_cast<int>(additional_data.n_cycles));
+    parameter_list.set("smoother: sweeps", static_cast<int>(additional_data.smoother_sweeps));
+    parameter_list.set("cycle applications", static_cast<int>(additional_data.n_cycles));
     if (additional_data.w_cycle == true)
       parameter_list.set("prec type", "MGW");
     else
@@ -124,8 +120,7 @@ namespace TrilinosWrappers
     parameter_list.set("smoother: Chebyshev alpha", 10.);
     parameter_list.set("smoother: ifpack overlap",
                        static_cast<int>(additional_data.smoother_overlap));
-    parameter_list.set("aggregation: threshold",
-                       additional_data.aggregation_threshold);
+    parameter_list.set("aggregation: threshold", additional_data.aggregation_threshold);
     parameter_list.set("coarse: max size", 2000);
 
     if (additional_data.output_details)
@@ -135,29 +130,24 @@ namespace TrilinosWrappers
 
     const Epetra_Map &domain_map = matrix.OperatorDomainMap();
 
-    const size_type constant_modes_dimension =
-      additional_data.constant_modes.size();
+    const size_type    constant_modes_dimension = additional_data.constant_modes.size();
     Epetra_MultiVector distributed_constant_modes(
       domain_map, constant_modes_dimension > 0 ? constant_modes_dimension : 1);
     std::vector<double> dummy(constant_modes_dimension);
 
     if (constant_modes_dimension > 0)
       {
-        const size_type n_rows = TrilinosWrappers::n_global_rows(matrix);
-        const bool      constant_modes_are_global =
-          additional_data.constant_modes[0].size() == n_rows;
+        const size_type n_rows               = TrilinosWrappers::n_global_rows(matrix);
+        const bool constant_modes_are_global = additional_data.constant_modes[0].size() == n_rows;
         const size_type n_relevant_rows =
-          constant_modes_are_global ? n_rows :
-                                      additional_data.constant_modes[0].size();
+          constant_modes_are_global ? n_rows : additional_data.constant_modes[0].size();
         const size_type my_size = domain_map.NumMyElements();
         if (constant_modes_are_global == false)
-          Assert(n_relevant_rows == my_size,
-                 ExcDimensionMismatch(n_relevant_rows, my_size));
-        Assert(n_rows == static_cast<size_type>(TrilinosWrappers::global_length(
-                           distributed_constant_modes)),
-               ExcDimensionMismatch(
-                 n_rows,
-                 TrilinosWrappers::global_length(distributed_constant_modes)));
+          Assert(n_relevant_rows == my_size, ExcDimensionMismatch(n_relevant_rows, my_size));
+        Assert(n_rows == static_cast<size_type>(
+                           TrilinosWrappers::global_length(distributed_constant_modes)),
+               ExcDimensionMismatch(n_rows,
+                                    TrilinosWrappers::global_length(distributed_constant_modes)));
 
         (void)n_relevant_rows;
         (void)global_length;
@@ -168,19 +158,14 @@ namespace TrilinosWrappers
           for (size_type row = 0; row < my_size; ++row)
             {
               TrilinosWrappers::types::int_type global_row_id =
-                constant_modes_are_global ?
-                  TrilinosWrappers::global_index(domain_map, row) :
-                  row;
-              distributed_constant_modes[d][row] =
-                additional_data.constant_modes[d][global_row_id];
+                constant_modes_are_global ? TrilinosWrappers::global_index(domain_map, row) : row;
+              distributed_constant_modes[d][row] = additional_data.constant_modes[d][global_row_id];
             }
 
         parameter_list.set("null space: type", "pre-computed");
-        parameter_list.set("null space: dimension",
-                           distributed_constant_modes.NumVectors());
+        parameter_list.set("null space: dimension", distributed_constant_modes.NumVectors());
         if (my_size > 0)
-          parameter_list.set("null space: vectors",
-                             distributed_constant_modes.Values());
+          parameter_list.set("null space: vectors", distributed_constant_modes.Values());
         // We need to set a valid pointer to data even if there is no data on
         // the current processor. Therefore, pass a dummy in that case
         else
@@ -220,15 +205,12 @@ namespace TrilinosWrappers
     Teuchos::RCP<Xpetra::CrsMatrix<double, int, int, node>> muelu_crs_matrix =
       Teuchos::rcp(new Xpetra::EpetraCrsMatrix(rcp_matrix));
     Teuchos::RCP<Xpetra::Matrix<double, int, int, node>> muelu_matrix =
-      Teuchos::rcp(
-        new Xpetra::CrsMatrixWrap<double, int, int, node>(muelu_crs_matrix));
+      Teuchos::rcp(new Xpetra::CrsMatrixWrap<double, int, int, node>(muelu_crs_matrix));
 
     // Create the multigrid hierarchy using ML parameters.
-    Teuchos::RCP<MueLu::HierarchyManager<double, int, int, node>>
-      hierarchy_factory;
-    hierarchy_factory = Teuchos::rcp(
-      new MueLu::MLParameterListInterpreter<double, int, int, node>(
-        muelu_parameters));
+    Teuchos::RCP<MueLu::HierarchyManager<double, int, int, node>> hierarchy_factory;
+    hierarchy_factory =
+      Teuchos::rcp(new MueLu::MLParameterListInterpreter<double, int, int, node>(muelu_parameters));
     Teuchos::RCP<MueLu::Hierarchy<double, int, int, node>> hierarchy =
       hierarchy_factory->CreateHierarchy();
     hierarchy->GetLevel(0)->Set("A", muelu_matrix);
@@ -243,11 +225,10 @@ namespace TrilinosWrappers
 
   template <typename number>
   void
-  PreconditionAMGMueLu::initialize(
-    const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
-    const AdditionalData &                additional_data,
-    const double                          drop_tolerance,
-    const ::dealii::SparsityPattern *     use_this_sparsity)
+  PreconditionAMGMueLu::initialize(const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
+                                   const AdditionalData &                additional_data,
+                                   const double                          drop_tolerance,
+                                   const ::dealii::SparsityPattern *     use_this_sparsity)
   {
     preconditioner.reset();
     const size_type n_rows = deal_ii_sparse_matrix.m();

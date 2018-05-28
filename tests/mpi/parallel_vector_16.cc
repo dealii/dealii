@@ -42,8 +42,7 @@ test()
   types::global_dof_index min_index  = 0xffffffffU - 39;
   types::global_dof_index local_size = 42;
   IndexSet                local_owned(min_index + numproc * local_size);
-  local_owned.add_range(min_index + myid * local_size,
-                        min_index + (myid + 1) * local_size);
+  local_owned.add_range(min_index + myid * local_size, min_index + (myid + 1) * local_size);
 
   // all processors ghost some entries around invalid_unsigned_int and on the
   // border between two processors
@@ -52,11 +51,10 @@ test()
   local_relevant.add_range(min_index + 38, min_index + 40);
   local_relevant.add_range(min_index + 41, min_index + 43);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
-  deallog << "Local range of proc 0: " << v.local_range().first << " "
-          << v.local_range().second << std::endl;
+  deallog << "Local range of proc 0: " << v.local_range().first << " " << v.local_range().second
+          << std::endl;
 
   // set local values
   for (types::global_dof_index i = min_index + myid * local_size;
@@ -94,8 +92,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

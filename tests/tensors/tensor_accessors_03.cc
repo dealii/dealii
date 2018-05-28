@@ -93,16 +93,13 @@ main()
   // corresponds to a contraction of the last index of left2 with the first
   // index of right2:
   {
-    dealii::TensorAccessors::internal::
-      ReorderedIndexView<0, 2, dealii::Tensor<2, 5, int>>
-        reordered = TensorAccessors::reordered_index_view<0, 2>(right2);
+    dealii::TensorAccessors::internal::ReorderedIndexView<0, 2, dealii::Tensor<2, 5, int>>
+      reordered = TensorAccessors::reordered_index_view<0, 2>(right2);
 
     Tensor<2, 5, int> result;
     TensorAccessors::contract<1, 2, 2, 5>(result, left2, reordered);
 
-    deallog
-      << "Contract the last index of left2 with the first index of right2:"
-      << std::endl;
+    deallog << "Contract the last index of left2 with the first index of right2:" << std::endl;
     deallog << result << std::endl;
     // Verified to be the same as the old implementation
     // deallog << contract(left2, right2) << std::endl;

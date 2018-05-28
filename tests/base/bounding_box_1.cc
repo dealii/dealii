@@ -44,8 +44,8 @@ test_bounding_box()
   deallog << b.get_boundary_points().first << std::endl;
   deallog << b.get_boundary_points().second << std::endl;
 
-  deallog << "Boundary points are inside: " << b.point_inside(boundaries.first)
-          << " " << b.point_inside(boundaries.second) << std::endl;
+  deallog << "Boundary points are inside: " << b.point_inside(boundaries.first) << " "
+          << b.point_inside(boundaries.second) << std::endl;
 
   std::vector<Point<spacedim>> test_points;
 
@@ -63,8 +63,7 @@ test_bounding_box()
 
   deallog << "Points inside: " << std::endl;
   for (unsigned int i = 0; i < test_points.size(); ++i)
-    deallog << test_points[i]
-            << " is inside: " << b.point_inside(test_points[i]) << std::endl;
+    deallog << test_points[i] << " is inside: " << b.point_inside(test_points[i]) << std::endl;
 
   deallog << std::endl;
   test_points.clear();
@@ -84,8 +83,7 @@ test_bounding_box()
 
   deallog << "Points outside:" << std::endl;
   for (unsigned int i = 0; i < test_points.size(); ++i)
-    deallog << test_points[i]
-            << " is inside: " << b.point_inside(test_points[i]) << std::endl;
+    deallog << test_points[i] << " is inside: " << b.point_inside(test_points[i]) << std::endl;
   deallog << std::endl;
 }
 
@@ -108,14 +106,12 @@ test_unitary()
   Point<3> p2(0, 1.0, 0);
   Point<3> p3(0, 0, 1.0);
 
-  deallog << "Checking if all vertices are inside: "
-          << b.point_inside(boundaries.first) << " "
+  deallog << "Checking if all vertices are inside: " << b.point_inside(boundaries.first) << " "
           << b.point_inside(boundaries.second) << std::endl;
 
-  deallog << b.point_inside(p1) << " " << b.point_inside(p2) << " "
-          << b.point_inside(p3) << " " << b.point_inside(p1 + p2) << " "
-          << b.point_inside(p2 + p3) << " " << b.point_inside(p1 + p3) << " "
-          << std::endl;
+  deallog << b.point_inside(p1) << " " << b.point_inside(p2) << " " << b.point_inside(p3) << " "
+          << b.point_inside(p1 + p2) << " " << b.point_inside(p2 + p3) << " "
+          << b.point_inside(p1 + p3) << " " << std::endl;
 }
 
 int

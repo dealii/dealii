@@ -121,8 +121,7 @@ main()
   // with it). note that there is
   // only one such line so we can
   // quit the loop once we find it
-  for (hp::DoFHandler<3>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (hp::DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
@@ -132,12 +131,10 @@ main()
           for (unsigned int i = 0; i < 3; ++i)
             {
               deallog << "DoF indices for fe_index=" << i << ": ";
-              std::vector<types::global_dof_index> line_dofs(
-                fe[i].dofs_per_line + 2 * fe[i].dofs_per_vertex);
+              std::vector<types::global_dof_index> line_dofs(fe[i].dofs_per_line +
+                                                             2 * fe[i].dofs_per_vertex);
               cell->line(l)->get_dof_indices(line_dofs, i);
-              for (unsigned int j = 0;
-                   j < fe[i].dofs_per_line + 2 * fe[i].dofs_per_vertex;
-                   ++j)
+              for (unsigned int j = 0; j < fe[i].dofs_per_line + 2 * fe[i].dofs_per_vertex; ++j)
                 deallog << line_dofs[j] << ' ';
               deallog << std::endl;
             }

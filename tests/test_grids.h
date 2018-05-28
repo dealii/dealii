@@ -62,9 +62,7 @@ namespace TestGrids
    */
   template <int dim>
   void
-  hypercube(Triangulation<dim> &tr,
-            unsigned int        refinement = 0,
-            bool                local      = false)
+  hypercube(Triangulation<dim> &tr, unsigned int refinement = 0, bool local = false)
   {
     GridGenerator::hyper_cube(tr, -1., 1.);
     if (refinement && !local)
@@ -74,8 +72,7 @@ namespace TestGrids
         tr.refine_global(1);
         for (unsigned int i = 1; i < refinement; ++i)
           {
-            for (typename Triangulation<dim>::active_cell_iterator cell =
-                   tr.begin_active();
+            for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
                  cell != tr.end();
                  ++cell)
               {
@@ -90,12 +87,11 @@ namespace TestGrids
             tr.execute_coarsening_and_refinement();
           }
       }
-    deallog << "Triangulation hypercube " << dim << "D refinement "
-            << refinement;
+    deallog << "Triangulation hypercube " << dim << "D refinement " << refinement;
     if (local)
       deallog << " local ";
-    deallog << " steps " << tr.n_active_cells() << " active cells "
-            << tr.n_cells() << " total cells " << std::endl;
+    deallog << " steps " << tr.n_active_cells() << " active cells " << tr.n_cells()
+            << " total cells " << std::endl;
   }
 
   /**
@@ -114,9 +110,7 @@ namespace TestGrids
    */
   template <int dim>
   void
-  star_shaped(Triangulation<dim> &tr,
-              unsigned int        refinement = 0,
-              bool                local      = false);
+  star_shaped(Triangulation<dim> &tr, unsigned int refinement = 0, bool local = false);
   /**
    * Local refinement of every other
    * cell in a checkerboard fashion.

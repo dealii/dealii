@@ -225,8 +225,7 @@ namespace FEValuesExtractors
 
 
 
-  inline Vector::Vector() :
-    first_vector_component(numbers::invalid_unsigned_int)
+  inline Vector::Vector() : first_vector_component(numbers::invalid_unsigned_int)
   {}
 
 
@@ -242,15 +241,13 @@ namespace FEValuesExtractors
 
 
   template <int rank>
-  inline SymmetricTensor<rank>::SymmetricTensor(
-    const unsigned int first_tensor_component) :
+  inline SymmetricTensor<rank>::SymmetricTensor(const unsigned int first_tensor_component) :
     first_tensor_component(first_tensor_component)
   {}
 
 
   template <int rank>
-  inline Tensor<rank>::Tensor() :
-    first_tensor_component(numbers::invalid_unsigned_int)
+  inline Tensor<rank>::Tensor() : first_tensor_component(numbers::invalid_unsigned_int)
   {}
 
 

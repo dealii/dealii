@@ -177,8 +177,7 @@ namespace Algorithms
   {
     if (all_true)
       return true;
-    for (std::vector<bool>::const_iterator i = flags.begin(); i != flags.end();
-         ++i)
+    for (std::vector<bool>::const_iterator i = flags.begin(); i != flags.end(); ++i)
       if (*i)
         return true;
     return false;
@@ -209,9 +208,7 @@ namespace Algorithms
         // Test all flags separately
         // and return false if one is
         // not set
-        for (std::vector<bool>::const_iterator i = flags.begin();
-             i != flags.end();
-             ++i)
+        for (std::vector<bool>::const_iterator i = flags.begin(); i != flags.end(); ++i)
           if (!*i)
             return false;
         // All flags are set
@@ -256,8 +253,7 @@ namespace Algorithms
     all_true = false;
     if (event.all_true)
       {
-        for (std::vector<bool>::iterator i = flags.begin(); i != flags.end();
-             ++i)
+        for (std::vector<bool>::iterator i = flags.begin(); i != flags.end(); ++i)
           *i = false;
         return *this;
       }

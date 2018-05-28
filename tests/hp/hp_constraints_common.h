@@ -64,14 +64,12 @@ test();
 
 template <int dim>
 void
-do_check(const Triangulation<dim> &   triangulation,
-         const hp::FECollection<dim> &fe)
+do_check(const Triangulation<dim> &triangulation, const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim> dof_handler(triangulation);
 
   // distribute fe_indices randomly
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % fe.size());
@@ -130,8 +128,7 @@ test_with_hanging_nodes_random(const hp::FECollection<dim> &fe)
 
   for (unsigned int i = 0; i < 7 - dim; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         if (Testing::rand() % 4 == 0)
@@ -154,13 +151,12 @@ test_with_hanging_nodes_random_aniso(const hp::FECollection<dim> &fe)
 
   for (unsigned int i = 0; i < 7 - dim; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         if (Testing::rand() % 4 == 0)
-          cell->set_refine_flag(RefinementCase<dim>(
-            Testing::rand() % RefinementCase<dim>::isotropic_refinement + 1));
+          cell->set_refine_flag(
+            RefinementCase<dim>(Testing::rand() % RefinementCase<dim>::isotropic_refinement + 1));
       triangulation.execute_coarsening_and_refinement();
     }
 
@@ -190,8 +186,7 @@ test_with_wrong_face_orientation(const hp::FECollection<dim> &fe)
     {
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball(triangulation);
-      typename Triangulation<dim>::active_cell_iterator cell =
-        triangulation.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
       std::advance(cell, i);
       cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
@@ -344,8 +339,7 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
     triangulation,
     subdivisions,
     Point<dim>(),
-    (dim == 3 ? Point<dim>(2, 1, 1) :
-                (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2.))));
+    (dim == 3 ? Point<dim>(2, 1, 1) : (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2.))));
 
   if (do_refine)
     {
@@ -366,13 +360,11 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
         if (!(fe[fe1].has_support_points() && fe[fe2].has_support_points()))
           continue;
 
-        deallog << "Testing " << fe[fe1].get_name() << " vs. "
-                << fe[fe2].get_name() << std::endl;
+        deallog << "Testing " << fe[fe1].get_name() << " vs. " << fe[fe2].get_name() << std::endl;
 
         // set fe on coarse cell to 'i', on
         // all fine cells to 'j'
-        typename hp::DoFHandler<dim>::active_cell_iterator cell =
-          dof_handler.begin_active();
+        typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
         cell->set_active_fe_index(fe1);
         ++cell;
 
@@ -404,8 +396,7 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
         // they have no support points and
         // therefore can't use
         // VectorTools::interpolate...)
-        const unsigned int min_degree =
-          std::min(polynomial_degrees[fe1], polynomial_degrees[fe2]);
+        const unsigned int min_degree = std::min(polynomial_degrees[fe1], polynomial_degrees[fe2]);
         for (unsigned int test = 0; test < dim + 1; ++test)
           {
             Tensor<1, dim> exponents;
@@ -417,22 +408,19 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
                   exponents[i] = min_degree;
               }
 
-            const Functions::Monomial<dim> test_function(exponents,
-                                                         fe.n_components());
+            const Functions::Monomial<dim> test_function(exponents, fe.n_components());
 
             // interpolate the function
             VectorTools::interpolate(dof_handler, test_function, interpolant_1);
 
             // then compute the interpolation error
-            VectorTools::integrate_difference(
-              dof_handler,
-              interpolant_1,
-              test_function,
-              error,
-              hp::QCollection<dim>(QGauss<dim>(min_degree + 2)),
-              VectorTools::L2_norm);
-            Assert(error.l2_norm() < 1e-12 * interpolant_1.l2_norm(),
-                   ExcInternalError());
+            VectorTools::integrate_difference(dof_handler,
+                                              interpolant_1,
+                                              test_function,
+                                              error,
+                                              hp::QCollection<dim>(QGauss<dim>(min_degree + 2)),
+                                              VectorTools::L2_norm);
+            Assert(error.l2_norm() < 1e-12 * interpolant_1.l2_norm(), ExcInternalError());
             deallog << "  Relative interpolation error before constraints: "
                     << error.l2_norm() / interpolant_1.l2_norm() << std::endl;
 
@@ -447,12 +435,10 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
 
             interpolant_2 -= interpolant_1;
 
-            Assert(interpolant_2.l2_norm() < 1e-12 * interpolant_1.l2_norm(),
-                   ExcInternalError());
+            Assert(interpolant_2.l2_norm() < 1e-12 * interpolant_1.l2_norm(), ExcInternalError());
 
             deallog << "  Relative difference after constraints: "
-                    << interpolant_2.l2_norm() / interpolant_1.l2_norm()
-                    << std::endl;
+                    << interpolant_2.l2_norm() / interpolant_1.l2_norm() << std::endl;
           }
       }
 }

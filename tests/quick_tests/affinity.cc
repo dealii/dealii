@@ -93,35 +93,30 @@ main()
   unsigned int nprocs   = dealii::MultithreadInfo::n_cores();
   unsigned int tbbprocs = dealii::MultithreadInfo::n_threads();
   int          env      = get_num_thread_env();
-  printf(
-    "aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d, DEAL_II_NUM_THREADS=%d\n",
-    bits_set,
-    mask,
-    nprocs,
-    tbbprocs,
-    env);
+  printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d, DEAL_II_NUM_THREADS=%d\n",
+         bits_set,
+         mask,
+         nprocs,
+         tbbprocs,
+         env);
 
   if (bits_set != 0 && bits_set != nprocs)
     {
-      printf(
-        "Warning: sched_getaffinity() returns that we can only use %d out of %d CPUs.\n",
-        bits_set,
-        nprocs);
+      printf("Warning: sched_getaffinity() returns that we can only use %d out of %d CPUs.\n",
+             bits_set,
+             nprocs);
       return 2;
     }
   if (env != -1 && nprocs != tbbprocs)
     {
-      printf(
-        "Warning: number of threads is set to %d in environment using DEAL_II_NUM_THREADS.\n",
-        env);
+      printf("Warning: number of threads is set to %d in environment using DEAL_II_NUM_THREADS.\n",
+             env);
       return 0; // do not return an error!
     }
   if (nprocs != tbbprocs)
     {
       printf(
-        "Warning: for some reason TBB only wants to use %d out of %d CPUs.\n",
-        tbbprocs,
-        nprocs);
+        "Warning: for some reason TBB only wants to use %d out of %d CPUs.\n", tbbprocs, nprocs);
       return 3;
     }
 

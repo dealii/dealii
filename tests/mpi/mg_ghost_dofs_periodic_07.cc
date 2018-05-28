@@ -51,27 +51,20 @@ test()
   GridGenerator::hyper_cube(tria, 0, 1);
 
   // set periodic boundary conditions in all directions
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         cell->face(f)->set_all_boundary_ids(f);
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   for (unsigned int d = 0; d < dim; ++d)
-    GridTools::collect_periodic_faces(
-      tria, 2 * d, 2 * d + 1, d, periodic_faces);
+    GridTools::collect_periodic_faces(tria, 2 * d, 2 * d + 1, d, periodic_faces);
   tria.add_periodicity(periodic_faces);
   tria.refine_global(3);
 
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
-    deallog << cell->id().to_string() << " " << cell->level_subdomain_id()
-            << std::endl;
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
+    deallog << cell->id().to_string() << " " << cell->level_subdomain_id() << std::endl;
 
   FE_DGQ<dim>     fe1(1);
   FE_Q<dim>       fe2(1);

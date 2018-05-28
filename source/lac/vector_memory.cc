@@ -47,10 +47,10 @@ namespace internal
 #include "vector_memory_release.inst"
 
 #ifdef DEAL_II_WITH_CUDA
-      dealii::GrowingVectorMemory<dealii::LinearAlgebra::CUDAWrappers::Vector<
-        float>>::release_unused_memory();
-      dealii::GrowingVectorMemory<dealii::LinearAlgebra::CUDAWrappers::Vector<
-        double>>::release_unused_memory();
+      dealii::GrowingVectorMemory<
+        dealii::LinearAlgebra::CUDAWrappers::Vector<float>>::release_unused_memory();
+      dealii::GrowingVectorMemory<
+        dealii::LinearAlgebra::CUDAWrappers::Vector<double>>::release_unused_memory();
 #endif
     }
   } // namespace GrowingVectorMemoryImplementation

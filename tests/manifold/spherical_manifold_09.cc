@@ -51,13 +51,11 @@ main()
               // second face vertex as well as the center.
               deallog << "Outer normal correctness (should be 0): "
                       << (1.0 - cell->face(f)->vertex(1) *
-                                  spherical.normal_vector(
-                                    cell->face(f), cell->face(f)->vertex(1)))
+                                  spherical.normal_vector(cell->face(f), cell->face(f)->vertex(1)))
                       << " "
                       << (1.0 -
                           cell->face(f)->center(/*respect_manifold=*/true) *
-                            spherical.normal_vector(
-                              cell->face(f), cell->face(f)->center(true)))
+                            spherical.normal_vector(cell->face(f), cell->face(f)->center(true)))
                       << std::endl;
             }
           else if (std::abs(cell->face(f)->vertex(1).norm() - 0.5) < 1e-1)
@@ -67,13 +65,11 @@ main()
               // second face vertex as well as the center.
               deallog << "Inner normal correctness (should be 0): "
                       << (0.5 - cell->face(f)->vertex(1) *
-                                  spherical.normal_vector(
-                                    cell->face(f), cell->face(f)->vertex(1)))
+                                  spherical.normal_vector(cell->face(f), cell->face(f)->vertex(1)))
                       << " "
                       << (0.5 -
                           cell->face(f)->center(/*respect_manifold=*/true) *
-                            spherical.normal_vector(
-                              cell->face(f), cell->face(f)->center(true)))
+                            spherical.normal_vector(cell->face(f), cell->face(f)->center(true)))
                       << std::endl;
             }
         }
@@ -87,16 +83,13 @@ main()
           // adjust the point to lie on the same radius as the vertex points
           // by a weighting where the normal should again be perfectly aligned
           // with the point itself.
-          deallog << "Approximate normal in " << cell->face(f)->center(false)
-                  << ":  "
-                  << spherical.normal_vector(cell->face(f),
-                                             cell->face(f)->center(false))
+          deallog << "Approximate normal in " << cell->face(f)->center(false) << ":  "
+                  << spherical.normal_vector(cell->face(f), cell->face(f)->center(false))
                   << ", adjusted: "
-                  << spherical.normal_vector(
-                       cell->face(f),
-                       cell->face(f)->center(false) /
-                         cell->face(f)->center(false).norm() *
-                         cell->face(f)->vertex(1).norm())
+                  << spherical.normal_vector(cell->face(f),
+                                             cell->face(f)->center(false) /
+                                               cell->face(f)->center(false).norm() *
+                                               cell->face(f)->vertex(1).norm())
                   << std::endl;
         }
 

@@ -38,9 +38,8 @@ unsigned int current_cell_weight;
 
 template <int dim>
 unsigned int
-cell_weight_1(
-  const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-  const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+cell_weight_1(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+              const typename parallel::distributed::Triangulation<dim>::CellStatus     status)
 {
   return current_cell_weight++;
 }
@@ -64,8 +63,8 @@ test()
 
   // repartition the mesh as described above, first in some arbitrary
   // way, and then with no weights
-  tr.signals.cell_weight.connect(std::bind(
-    &cell_weight_1<dim>, std::placeholders::_1, std::placeholders::_2));
+  tr.signals.cell_weight.connect(
+    std::bind(&cell_weight_1<dim>, std::placeholders::_1, std::placeholders::_2));
   tr.repartition();
 
   tr.signals.cell_weight.disconnect_all_slots();
@@ -74,8 +73,7 @@ test()
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     for (unsigned int p = 0; p < numproc; ++p)
-      deallog << "processor " << p << ": "
-              << tr.n_locally_owned_active_cells_per_processor()[p]
+      deallog << "processor " << p << ": " << tr.n_locally_owned_active_cells_per_processor()[p]
               << " locally owned active cells" << std::endl;
 }
 

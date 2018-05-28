@@ -24,8 +24,7 @@ namespace GraphColoring
   color_sparsity_pattern(const SparsityPattern &    sparsity_pattern,
                          std::vector<unsigned int> &color_indices)
   {
-    return SparsityTools::color_sparsity_pattern(sparsity_pattern,
-                                                 color_indices);
+    return SparsityTools::color_sparsity_pattern(sparsity_pattern, color_indices);
   }
 } // namespace GraphColoring
 

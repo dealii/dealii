@@ -73,13 +73,11 @@ main()
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
-  GridGenerator::extract_boundary_mesh(
-    volume_mesh, triangulation, boundary_ids);
+  GridGenerator::extract_boundary_mesh(volume_mesh, triangulation, boundary_ids);
   triangulation.reset_manifold(0);
   GridTools::transform(&warp<3>, triangulation);
 
-  deallog << "Surface mesh has " << triangulation.n_active_cells() << " cells."
-          << std::endl;
+  deallog << "Surface mesh has " << triangulation.n_active_cells() << " cells." << std::endl;
   save_mesh(triangulation);
 
   return 0;

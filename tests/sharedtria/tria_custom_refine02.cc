@@ -34,25 +34,18 @@ template <int dim>
 void
 mypartition(parallel::shared::Triangulation<dim> &tria)
 {
-  std::vector<unsigned int> assignment = {
-    0, 0, 1, 2, 0, 0, 2, 1, 0, 2, 2, 1, 2, 2, 0, 0};
+  std::vector<unsigned int> assignment = {0, 0, 1, 2, 0, 0, 2, 1, 0, 2, 2, 1, 2, 2, 0, 0};
   {
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
-    unsigned int index                                     = 0;
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+    unsigned int                                      index = 0;
     for (; cell != endc; ++cell, ++index)
       cell->set_subdomain_id(assignment[index % 16]);
   }
 
   for (int lvl = tria.n_levels() - 1; lvl >= 0; --lvl)
     {
-      typename parallel::shared::Triangulation<dim>::cell_iterator cell =
-                                                                     tria.begin(
-                                                                       lvl),
-                                                                   endc =
-                                                                     tria.end(
-                                                                       lvl);
+      typename parallel::shared::Triangulation<dim>::cell_iterator cell = tria.begin(lvl),
+                                                                   endc = tria.end(lvl);
       for (; cell != endc; ++cell)
         {
           if (cell->active())
@@ -75,8 +68,7 @@ test()
     typename parallel::shared::Triangulation<dim>::Settings(
       parallel::shared::Triangulation<dim>::partition_custom_signal |
       parallel::shared::Triangulation<dim>::construct_multigrid_hierarchy));
-  shared_tria.signals.post_refinement.connect(
-    std::bind(&mypartition<dim>, std::ref(shared_tria)));
+  shared_tria.signals.post_refinement.connect(std::bind(&mypartition<dim>, std::ref(shared_tria)));
 
 
   GridGenerator::hyper_cube(shared_tria);
@@ -84,23 +76,20 @@ test()
 
   {
     deallog << "(CellId,subdomain_id) for each active cell:" << std::endl;
-    typename Triangulation<dim>::active_cell_iterator cell = shared_tria
-                                                               .begin_active(),
+    typename Triangulation<dim>::active_cell_iterator cell = shared_tria.begin_active(),
                                                       endc = shared_tria.end();
     for (; cell != endc; ++cell)
       if (cell->subdomain_id() != numbers::artificial_subdomain_id)
-        deallog << "(" << cell->id().to_string() << "," << cell->subdomain_id()
-                << ")" << std::endl;
+        deallog << "(" << cell->id().to_string() << "," << cell->subdomain_id() << ")" << std::endl;
   }
 
   {
     deallog << "(CellId,level_subdomain_id) for each cell:" << std::endl;
-    typename Triangulation<dim>::cell_iterator cell = shared_tria.begin(),
-                                               endc = shared_tria.end();
+    typename Triangulation<dim>::cell_iterator cell = shared_tria.begin(), endc = shared_tria.end();
     for (; cell != endc; ++cell)
       if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
-        deallog << "(" << cell->id().to_string() << ","
-                << cell->level_subdomain_id() << ")" << std::endl;
+        deallog << "(" << cell->id().to_string() << "," << cell->level_subdomain_id() << ")"
+                << std::endl;
   }
 }
 

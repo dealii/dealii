@@ -94,8 +94,7 @@ namespace MeshWorker
     /**
      * Combination of flags to determine if any work is done on faces.
      */
-    work_on_faces = assemble_own_interior_faces_once |
-                    assemble_own_interior_faces_both |
+    work_on_faces = assemble_own_interior_faces_once | assemble_own_interior_faces_both |
                     assemble_ghost_faces_once | assemble_ghost_faces_both,
 
     /**

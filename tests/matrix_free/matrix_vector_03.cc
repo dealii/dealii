@@ -34,8 +34,7 @@ test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     if (cell->center().norm() < 1e-8)
       cell->set_refine_flag();
@@ -68,8 +67,7 @@ test()
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   do_test<dim, fe_degree, double, fe_degree + 1>(dof, constraints);

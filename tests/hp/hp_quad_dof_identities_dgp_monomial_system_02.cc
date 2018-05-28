@@ -39,10 +39,8 @@ test()
       // different numbers of base elements
       // and multiplicities
       fe_collection.push_back(FESystem<dim>(FE_DGPMonomial<dim>(i), 3));
-      fe_collection.push_back(
-        FESystem<dim>(FE_DGPMonomial<dim>(i), 2, FE_DGPMonomial<dim>(i), 1));
-      fe_collection.push_back(
-        FESystem<dim>(FE_DGPMonomial<dim>(i), 1, FE_DGPMonomial<dim>(i), 2));
+      fe_collection.push_back(FESystem<dim>(FE_DGPMonomial<dim>(i), 2, FE_DGPMonomial<dim>(i), 1));
+      fe_collection.push_back(FESystem<dim>(FE_DGPMonomial<dim>(i), 1, FE_DGPMonomial<dim>(i), 2));
     }
 
   for (unsigned int i = 0; i < fe_collection.size(); ++i)
@@ -52,18 +50,14 @@ test()
           fe_collection[i].hp_quad_dof_identities(fe_collection[j]);
 
         deallog << "Identities for " << fe_collection[i].get_name() << " and "
-                << fe_collection[j].get_name() << ": " << identities.size()
-                << std::endl;
+                << fe_collection[j].get_name() << ": " << identities.size() << std::endl;
 
         for (unsigned int k = 0; k < identities.size(); ++k)
           {
-            Assert(identities[k].first < fe_collection[i].dofs_per_quad,
-                   ExcInternalError());
-            Assert(identities[k].second < fe_collection[j].dofs_per_quad,
-                   ExcInternalError());
+            Assert(identities[k].first < fe_collection[i].dofs_per_quad, ExcInternalError());
+            Assert(identities[k].second < fe_collection[j].dofs_per_quad, ExcInternalError());
 
-            deallog << identities[k].first << ' ' << identities[k].second
-                    << std::endl;
+            deallog << identities[k].first << ' ' << identities[k].second << std::endl;
           }
       }
 }

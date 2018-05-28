@@ -46,15 +46,13 @@ void check(Triangulation<2> &tria)
 
       // find the closes vertex to (1.,1.)
       // (default call to find_closest_vertex() without passing marked_vertices)
-      unsigned int closest_vertex =
-        GridTools::find_closest_vertex(tria, Point<2>(1., 1.));
+      unsigned int closest_vertex = GridTools::find_closest_vertex(tria, Point<2>(1., 1.));
 
       // mark the vertex closest to (1.,1.)
       marked_vertices[closest_vertex] = true;
 
       auto vertices = tria.get_vertices();
-      deallog << vertices[closest_vertex] << " is the closest vertex"
-              << std::endl;
+      deallog << vertices[closest_vertex] << " is the closest vertex" << std::endl;
 
       GridTools::find_active_cell_around_point(tria, p, marked_vertices);
 
@@ -66,9 +64,8 @@ void check(Triangulation<2> &tria)
     }
   catch (GridTools::ExcPointNotFound<2>)
     {
-      deallog
-        << "The first call to the function find_closest_vertex() has thrown "
-        << "an exception. It is supposed to throw.";
+      deallog << "The first call to the function find_closest_vertex() has thrown "
+              << "an exception. It is supposed to throw.";
       deallog << std::endl;
 
       // The default function call doesn't throw exceptions
@@ -77,8 +74,7 @@ void check(Triangulation<2> &tria)
         GridTools::find_active_cell_around_point(tria, p);
 
       // check if the below function call actually finds appropriate cell
-      Assert(p.distance(cell->center()) < cell->diameter() / 2,
-             ExcInternalError());
+      Assert(p.distance(cell->center()) < cell->diameter() / 2, ExcInternalError());
       deallog << "Test passed!";
       deallog << std::endl;
     }

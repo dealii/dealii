@@ -43,8 +43,7 @@ InterGridMap<MeshType>::InterGridMap() :
 
 template <class MeshType>
 void
-InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
-                                     const MeshType &destination_grid)
+InterGridMap<MeshType>::make_mapping(const MeshType &source_grid, const MeshType &destination_grid)
 {
   // first delete all contents
   clear();
@@ -67,8 +66,7 @@ InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
       // for this and we would like to
       // avoid such knowledge here
       unsigned int  n_cells = 0;
-      cell_iterator cell    = source_grid.begin(level),
-                    endc    = source_grid.end(level);
+      cell_iterator cell = source_grid.begin(level), endc = source_grid.end(level);
       for (; cell != endc; ++cell)
         if (static_cast<unsigned int>(cell->index()) > n_cells)
           n_cells = cell->index();
@@ -85,8 +83,8 @@ InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
   // the two arrays. note that the function
   // takes a *reference* to the int and
   // this may change it
-  cell_iterator src_cell = source_grid.begin(0),
-                dst_cell = destination_grid.begin(0), endc = source_grid.end(0);
+  cell_iterator src_cell = source_grid.begin(0), dst_cell = destination_grid.begin(0),
+                endc = source_grid.end(0);
   for (; src_cell != endc; ++src_cell, ++dst_cell)
     set_mapping(src_cell, dst_cell);
 
@@ -99,8 +97,7 @@ InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
 
 template <class MeshType>
 void
-InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
-                                    const cell_iterator &dst_cell)
+InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell, const cell_iterator &dst_cell)
 {
   // first set the map for this cell
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
@@ -109,17 +106,12 @@ InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
   // recurse further into the hierarchy
   if (src_cell->has_children() && dst_cell->has_children())
     {
-      Assert(src_cell->n_children() ==
-               GeometryInfo<MeshType::dimension>::max_children_per_cell,
+      Assert(src_cell->n_children() == GeometryInfo<MeshType::dimension>::max_children_per_cell,
              ExcNotImplemented());
-      Assert(dst_cell->n_children() ==
-               GeometryInfo<MeshType::dimension>::max_children_per_cell,
+      Assert(dst_cell->n_children() == GeometryInfo<MeshType::dimension>::max_children_per_cell,
              ExcNotImplemented());
-      Assert(src_cell->refinement_case() == dst_cell->refinement_case(),
-             ExcNotImplemented());
-      for (unsigned int c = 0;
-           c < GeometryInfo<MeshType::dimension>::max_children_per_cell;
-           ++c)
+      Assert(src_cell->refinement_case() == dst_cell->refinement_case(), ExcNotImplemented());
+      for (unsigned int c = 0; c < GeometryInfo<MeshType::dimension>::max_children_per_cell; ++c)
         set_mapping(src_cell->child(c), dst_cell->child(c));
     }
   else if (src_cell->has_children() && !dst_cell->has_children())
@@ -156,12 +148,9 @@ template <class MeshType>
 typename InterGridMap<MeshType>::cell_iterator InterGridMap<MeshType>::
                                                operator[](const cell_iterator &source_cell) const
 {
-  Assert(source_cell.state() == IteratorState::valid,
-         ExcInvalidKey(source_cell));
-  Assert(source_cell->level() <= static_cast<int>(mapping.size()),
-         ExcInvalidKey(source_cell));
-  Assert(source_cell->index() <=
-           static_cast<int>(mapping[source_cell->level()].size()),
+  Assert(source_cell.state() == IteratorState::valid, ExcInvalidKey(source_cell));
+  Assert(source_cell->level() <= static_cast<int>(mapping.size()), ExcInvalidKey(source_cell));
+  Assert(source_cell->index() <= static_cast<int>(mapping[source_cell->level()].size()),
          ExcInvalidKey(source_cell));
 
   return mapping[source_cell->level()][source_cell->index()];

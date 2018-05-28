@@ -56,8 +56,7 @@ LaplaceProblem<dim>::run()
 
   DynamicSparsityPattern cell_connectivity;
   GridTools::get_face_connectivity_of_cells(triangulation, cell_connectivity);
-  std::vector<types::global_dof_index> permutation(
-    triangulation.n_active_cells());
+  std::vector<types::global_dof_index> permutation(triangulation.n_active_cells());
   SparsityTools::reorder_Cuthill_McKee(cell_connectivity, permutation);
 
   for (unsigned int i = 0; i < permutation.size(); ++i)
@@ -79,25 +78,21 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 

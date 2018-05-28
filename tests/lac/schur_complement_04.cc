@@ -36,16 +36,14 @@
 // Have to remove the control commands returned from
 // Vector::print in order for the deallog to print properly
 // http://www.cplusplus.com/forum/general/76900/
-#define PRINTME(name, var)                                         \
-  {                                                                \
-    std::ostringstream stream;                                     \
-    var.print(stream);                                             \
-    std::string str = stream.str();                                \
-    str.resize(remove_if(str.begin(),                              \
-                         str.end(),                                \
-                         [](char x) { return std::iscntrl(x); }) - \
-               str.begin());                                       \
-    deallog << "RHS vector: " << name << ": " << str << std::endl; \
+#define PRINTME(name, var)                                                                 \
+  {                                                                                        \
+    std::ostringstream stream;                                                             \
+    var.print(stream);                                                                     \
+    std::string str = stream.str();                                                        \
+    str.resize(remove_if(str.begin(), str.end(), [](char x) { return std::iscntrl(x); }) - \
+               str.begin());                                                               \
+    deallog << "RHS vector: " << name << ": " << str << std::endl;                         \
   }
 
 using namespace dealii;
@@ -58,8 +56,7 @@ main(int argc, char **argv)
   deallog.depth_console(0);
   deallog << std::setprecision(10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   // deal.II SparseMatrix
   {

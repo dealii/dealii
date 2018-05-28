@@ -54,17 +54,13 @@ test()
     particle_handler.insert_particles(points);
     particle_handler.update_cached_numbers();
 
-    deallog << "Particle number: " << particle_handler.n_global_particles()
-            << std::endl;
+    deallog << "Particle number: " << particle_handler.n_global_particles() << std::endl;
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
+    for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
       deallog << "Particle id " << particle->get_id() << " is in cell "
               << particle->get_surrounding_cell(tr) << std::endl
               << "     at location " << particle->get_location() << std::endl
-              << "     at reference location "
-              << particle->get_reference_location() << std::endl;
+              << "     at reference location " << particle->get_reference_location() << std::endl;
   }
 
   deallog << "OK" << std::endl;

@@ -37,13 +37,10 @@ check(const T (&object)[N])
   Utilities::unpack(buffer, unpacked);
 
   const bool equal_sizes = (buffer.size() == sizeof(T) * N);
-  deallog << "Buffer size check: " << (equal_sizes ? "OK" : "Failed")
-          << std::endl;
+  deallog << "Buffer size check: " << (equal_sizes ? "OK" : "Failed") << std::endl;
   if (equal_sizes)
     deallog << "memcmp check: "
-            << (std::memcmp(buffer.data(), &object, buffer.size()) == 0 ?
-                  "OK" :
-                  "Failed")
+            << (std::memcmp(buffer.data(), &object, buffer.size()) == 0 ? "OK" : "Failed")
             << std::endl;
 
   bool equal = true;

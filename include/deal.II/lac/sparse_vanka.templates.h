@@ -55,8 +55,7 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
   _n(M.n())
 {
   Assert(M.m() == M.n(), ExcNotQuadratic());
-  Assert(M.m() == selected->size(),
-         ExcDimensionMismatch(M.m(), selected->size()));
+  Assert(M.m() == selected->size(), ExcDimensionMismatch(M.m(), selected->size()));
 
   if (conserve_mem == false)
     compute_inverses();
@@ -66,8 +65,7 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 template <typename number>
 SparseVanka<number>::~SparseVanka()
 {
-  typename std::vector<
-    SmartPointer<FullMatrix<float>, SparseVanka<number>>>::iterator i;
+  typename std::vector<SmartPointer<FullMatrix<float>, SparseVanka<number>>>::iterator i;
   for (i = inverses.begin(); i != inverses.end(); ++i)
     {
       FullMatrix<float> *p = *i;
@@ -92,8 +90,7 @@ SparseVanka<number>::initialize(const SparseMatrix<number> &M,
   _n = M.n();
 
   Assert(M.m() == M.n(), ExcNotQuadratic());
-  Assert(M.m() == selected->size(),
-         ExcDimensionMismatch(M.m(), selected->size()));
+  Assert(M.m() == selected->size(), ExcDimensionMismatch(M.m(), selected->size()));
 
   if (conserve_mem == false)
     compute_inverses();
@@ -109,8 +106,7 @@ SparseVanka<number>::compute_inverses()
 #ifndef DEAL_II_WITH_THREADS
   compute_inverses(0, matrix->m());
 #else
-  const size_type n_inverses =
-    std::count(selected->begin(), selected->end(), true);
+  const size_type n_inverses = std::count(selected->begin(), selected->end(), true);
 
   const size_type n_inverses_per_thread =
     std::max(n_inverses / n_threads, static_cast<size_type>(1U));
@@ -158,8 +154,7 @@ SparseVanka<number>::compute_inverses()
   // Now spawn the threads
   Threads::ThreadGroup<> threads;
   for (unsigned int i = 0; i < n_threads; ++i)
-    threads += Threads::new_thread(
-      fun_ptr, *this, blocking[i].first, blocking[i].second);
+    threads += Threads::new_thread(fun_ptr, *this, blocking[i].first, blocking[i].second);
   threads.join_all();
 #endif
 }
@@ -167,8 +162,7 @@ SparseVanka<number>::compute_inverses()
 
 template <typename number>
 void
-SparseVanka<number>::compute_inverses(const size_type begin,
-                                      const size_type end)
+SparseVanka<number>::compute_inverses(const size_type begin, const size_type end)
 {
   // set-up the vector that will be used
   // by the functions which we call
@@ -186,8 +180,7 @@ SparseVanka<number>::compute_inverses(const size_type begin,
 
 template <typename number>
 void
-SparseVanka<number>::compute_inverse(const size_type         row,
-                                     std::vector<size_type> &local_indices)
+SparseVanka<number>::compute_inverse(const size_type row, std::vector<size_type> &local_indices)
 {
   Assert(matrix != nullptr, ExcNotInitialized());
   Assert(selected != nullptr, ExcNotInitialized());
@@ -218,8 +211,7 @@ SparseVanka<number>::compute_inverse(const size_type         row,
 template <typename number>
 template <typename number2>
 void
-SparseVanka<number>::vmult(Vector<number2> &      dst,
-                           const Vector<number2> &src) const
+SparseVanka<number>::vmult(Vector<number2> &dst, const Vector<number2> &src) const
 {
   Assert(matrix != nullptr, ExcNotInitialized());
   Assert(selected != nullptr, ExcNotInitialized());
@@ -235,15 +227,12 @@ SparseVanka<number>::vmult(Vector<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-SparseVanka<number>::apply_preconditioner(
-  Vector<number2> &              dst,
-  const Vector<number2> &        src,
-  const std::vector<bool> *const dof_mask) const
+SparseVanka<number>::apply_preconditioner(Vector<number2> &              dst,
+                                          const Vector<number2> &        src,
+                                          const std::vector<bool> *const dof_mask) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
-  Assert(dst.size() == matrix->m(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == matrix->m(), ExcDimensionMismatch(dst.size(), src.size()));
 
   // first define an alias to the sparsity
   // pattern of the matrix, since this
@@ -264,8 +253,7 @@ SparseVanka<number>::apply_preconditioner(
   // eliminates the need to
   // re-allocate memory inside the
   // loop.
-  FullMatrix<float> local_matrix(structure.max_entries_per_row(),
-                                 structure.max_entries_per_row());
+  FullMatrix<float> local_matrix(structure.max_entries_per_row(), structure.max_entries_per_row());
   Vector<float>     b(structure.max_entries_per_row());
   Vector<float>     x(structure.max_entries_per_row());
 
@@ -308,12 +296,10 @@ SparseVanka<number>::apply_preconditioner(
         // couple with @p row.
         local_index.clear();
         for (size_type i = 0; i < row_length; ++i)
-          local_index.insert(std::pair<size_type, size_type>(
-            structure.column_number(row, i), i));
+          local_index.insert(std::pair<size_type, size_type>(structure.column_number(row, i), i));
 
         // Build local matrix and rhs
-        for (std::map<size_type, size_type>::const_iterator is =
-               local_index.begin();
+        for (std::map<size_type, size_type>::const_iterator is = local_index.begin();
              is != local_index.end();
              ++is)
           {
@@ -332,8 +318,7 @@ SparseVanka<number>::apply_preconditioner(
             // couples with
             // number of DoFs coupling to
             // irow (including irow itself)
-            for (typename SparseMatrix<number>::const_iterator p =
-                   matrix->begin(irow);
+            for (typename SparseMatrix<number>::const_iterator p = matrix->begin(irow);
                  p != matrix->end(irow);
                  ++p)
               {
@@ -351,8 +336,7 @@ SparseVanka<number>::apply_preconditioner(
                 // have copied the entry above
                 if (js == local_index.end())
                   {
-                    if (!range_is_restricted ||
-                        ((*dof_mask)[p->column()] == true))
+                    if (!range_is_restricted || ((*dof_mask)[p->column()] == true))
                       b(i) -= p->value() * dst(p->column());
                   }
                 else
@@ -371,8 +355,7 @@ SparseVanka<number>::apply_preconditioner(
         inverses[row]->vmult(x, b);
 
         // Distribute new values
-        for (std::map<size_type, size_type>::const_iterator is =
-               local_index.begin();
+        for (std::map<size_type, size_type>::const_iterator is = local_index.begin();
              is != local_index.end();
              ++is)
           {
@@ -399,8 +382,7 @@ template <typename number>
 std::size_t
 SparseVanka<number>::memory_consumption() const
 {
-  std::size_t mem =
-    (sizeof(*this) + MemoryConsumption::memory_consumption(*selected));
+  std::size_t mem = (sizeof(*this) + MemoryConsumption::memory_consumption(*selected));
   for (size_type i = 0; i < inverses.size(); ++i)
     mem += MemoryConsumption::memory_consumption(*inverses[i]);
 
@@ -409,10 +391,9 @@ SparseVanka<number>::memory_consumption() const
 
 
 template <typename number>
-SparseVanka<number>::AdditionalData::AdditionalData(
-  const std::vector<bool> &selected,
-  const bool               conserve_mem,
-  const unsigned int       n_threads) :
+SparseVanka<number>::AdditionalData::AdditionalData(const std::vector<bool> &selected,
+                                                    const bool               conserve_mem,
+                                                    const unsigned int       n_threads) :
   selected(selected),
   conserve_mem(conserve_mem),
   n_threads(n_threads)
@@ -423,13 +404,12 @@ SparseVanka<number>::AdditionalData::AdditionalData(
 
 
 template <typename number>
-SparseBlockVanka<number>::SparseBlockVanka(
-  const SparseMatrix<number> &M,
-  const std::vector<bool> &   selected,
-  const unsigned int          n_blocks,
-  const BlockingStrategy      blocking_strategy,
-  const bool                  conserve_memory,
-  const unsigned int          n_threads) :
+SparseBlockVanka<number>::SparseBlockVanka(const SparseMatrix<number> &M,
+                                           const std::vector<bool> &   selected,
+                                           const unsigned int          n_blocks,
+                                           const BlockingStrategy      blocking_strategy,
+                                           const bool                  conserve_memory,
+                                           const unsigned int          n_threads) :
   SparseVanka<number>(M, selected, conserve_memory, n_threads),
   n_blocks(n_blocks),
   dof_masks(n_blocks, std::vector<bool>(M.m(), false))
@@ -440,15 +420,13 @@ SparseBlockVanka<number>::SparseBlockVanka(
 
 template <typename number>
 void
-SparseBlockVanka<number>::compute_dof_masks(
-  const SparseMatrix<number> &M,
-  const std::vector<bool> &   selected,
-  const BlockingStrategy      blocking_strategy)
+SparseBlockVanka<number>::compute_dof_masks(const SparseMatrix<number> &M,
+                                            const std::vector<bool> &   selected,
+                                            const BlockingStrategy      blocking_strategy)
 {
   Assert(n_blocks > 0, ExcInternalError());
 
-  const size_type n_inverses =
-    std::count(selected.begin(), selected.end(), true);
+  const size_type n_inverses = std::count(selected.begin(), selected.end(), true);
 
   const size_type n_inverses_per_block =
     std::max(n_inverses / n_blocks, static_cast<size_type>(1U));
@@ -604,8 +582,7 @@ SparseBlockVanka<number>::compute_dof_masks(
 template <typename number>
 template <typename number2>
 void
-SparseBlockVanka<number>::vmult(Vector<number2> &      dst,
-                                const Vector<number2> &src) const
+SparseBlockVanka<number>::vmult(Vector<number2> &dst, const Vector<number2> &src) const
 {
   dst = 0;
 
@@ -631,19 +608,12 @@ SparseBlockVanka<number>::vmult(Vector<number2> &      dst,
       // by giving it the correct
       // type right away:
       typedef void (SparseVanka<number>::*mem_fun_p)(
-        Vector<number2> &,
-        const Vector<number2> &,
-        const std::vector<bool> *const) const;
-      const mem_fun_p comp =
-        &SparseVanka<number>::template apply_preconditioner<number2>;
+        Vector<number2> &, const Vector<number2> &, const std::vector<bool> *const) const;
+      const mem_fun_p        comp = &SparseVanka<number>::template apply_preconditioner<number2>;
       Threads::ThreadGroup<> threads;
       for (unsigned int block = 0; block < n_blocks; ++block)
-        threads +=
-          Threads::new_thread(comp,
-                              *static_cast<const SparseVanka<number> *>(this),
-                              dst,
-                              src,
-                              &dof_masks[block]);
+        threads += Threads::new_thread(
+          comp, *static_cast<const SparseVanka<number> *>(this), dst, src, &dof_masks[block]);
       threads.join_all();
 #else
       for (unsigned int block = 0; block < n_blocks; ++block)

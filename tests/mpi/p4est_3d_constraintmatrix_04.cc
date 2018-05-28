@@ -53,8 +53,7 @@ test()
 
   // refine all cells except the one located at
   // [0.25, 0.25, 0.25]
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     {
@@ -80,8 +79,7 @@ test()
 
   IndexSet locally_active(dof.n_dofs());
   DoFTools::extract_locally_active_dofs(dof, locally_active);
-  std::ofstream file(
-    (std::string("dat.") + Utilities::int_to_string(myid)).c_str());
+  std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
   file << "**** proc " << myid << ": \n\n";
   file << "Constraints:\n";
   constraints.print(file);
@@ -104,9 +102,8 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
+  const unsigned int               myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 

@@ -75,8 +75,7 @@ main()
 
   Triangulation<2, 3> tria;
 
-  std::map<Triangulation<2, 3>::cell_iterator,
-           Triangulation<3, 3>::face_iterator>
+  std::map<Triangulation<2, 3>::cell_iterator, Triangulation<3, 3>::face_iterator>
     surface_to_volume_mapping;
 
   SphericalManifold<3> boundary_description;
@@ -107,8 +106,7 @@ main()
   VectorTools::interpolate(mapping, dh_test, Identity<3>(), position);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(
-      3, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation(3, DataComponentInterpretation::component_is_part_of_vector);
 
   std::vector<std::string> solution_names(3, "position");
 

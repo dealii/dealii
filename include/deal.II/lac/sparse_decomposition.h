@@ -107,8 +107,7 @@ DEAL_II_NAMESPACE_OPEN
  * full compatibility with LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename number>
-class SparseLUDecomposition : protected SparseMatrix<number>,
-                              public virtual Subscriptor
+class SparseLUDecomposition : protected SparseMatrix<number>, public virtual Subscriptor
 {
 protected:
   /**
@@ -212,8 +211,7 @@ public:
    */
   template <typename somenumber>
   void
-  initialize(const SparseMatrix<somenumber> &matrix,
-             const AdditionalData            parameters);
+  initialize(const SparseMatrix<somenumber> &matrix, const AdditionalData parameters);
 
   /**
    * Return whether the object is empty. It calls the inherited
@@ -348,9 +346,8 @@ private:
 
 template <typename number>
 inline number
-SparseLUDecomposition<number>::get_strengthen_diagonal(
-  const number /*rowsum*/,
-  const size_type /*row*/) const
+SparseLUDecomposition<number>::get_strengthen_diagonal(const number /*rowsum*/,
+                                                       const size_type /*row*/) const
 {
   return strengthen_diagonal;
 }
@@ -387,8 +384,7 @@ SparseLUDecomposition<number>::n() const
 template <typename number>
 template <class OutVector, class InVector>
 inline void
-SparseLUDecomposition<number>::vmult_add(OutVector &     dst,
-                                         const InVector &src) const
+SparseLUDecomposition<number>::vmult_add(OutVector &dst, const InVector &src) const
 {
   OutVector tmp;
   tmp.reinit(dst);
@@ -403,8 +399,7 @@ SparseLUDecomposition<number>::vmult_add(OutVector &     dst,
 template <typename number>
 template <class OutVector, class InVector>
 inline void
-SparseLUDecomposition<number>::Tvmult_add(OutVector &     dst,
-                                          const InVector &src) const
+SparseLUDecomposition<number>::Tvmult_add(OutVector &dst, const InVector &src) const
 {
   OutVector tmp;
   tmp.reinit(dst);

@@ -90,8 +90,7 @@ public:
   gradient(const Point<dim> &p, const unsigned int component = 0) const;
 
   virtual void
-  vector_gradient(const Point<dim> &                    p,
-                  typename std::vector<Tensor<1, dim>> &gradients) const;
+  vector_gradient(const Point<dim> &p, typename std::vector<Tensor<1, dim>> &gradients) const;
 };
 
 
@@ -109,9 +108,8 @@ ExactSinExp<dim>::gradient(const Point<dim> &p, const unsigned int) const
 
 template <int dim>
 void
-ExactSinExp<dim>::vector_gradient(
-  const Point<dim> &                    p,
-  typename std::vector<Tensor<1, dim>> &gradients) const
+ExactSinExp<dim>::vector_gradient(const Point<dim> &                    p,
+                                  typename std::vector<Tensor<1, dim>> &gradients) const
 {
   Assert(gradients.size() == this->n_components,
          ExcDimensionMismatch(gradients.size(), this->n_components));
@@ -185,8 +183,7 @@ main()
           // Test of
           // vector_gradient_list
           // function
-          std::vector<std::vector<Tensor<1, dim>>> a_vgrads(
-            1, std::vector<Tensor<1, dim>>(2));
+          std::vector<std::vector<Tensor<1, dim>>> a_vgrads(1, std::vector<Tensor<1, dim>>(2));
           auto_function.vector_gradient_list(ps, a_vgrads);
           a_vgrads[0][1] -= u_grad;
           value = std::sqrt(a_vgrads[0][1] * a_vgrads[0][1]);

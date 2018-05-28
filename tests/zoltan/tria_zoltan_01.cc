@@ -39,8 +39,7 @@ test(const MPI_Comm &mpi_communicator)
 
   // Some dummy output.
   if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-    std::cout << "Number of vertices: " << triangulation.n_vertices()
-              << std::endl;
+    std::cout << "Number of vertices: " << triangulation.n_vertices() << std::endl;
 }
 
 int
@@ -59,25 +58,21 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       throw;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       throw;
     }
 

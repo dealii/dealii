@@ -72,16 +72,14 @@ main()
       create_triangulation(case_no, tria);
       const Triangulation<3>::active_cell_iterator cell = tria.begin_active();
       Triangulation<3>::face_iterator              face;
-      for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell;
-           ++face_no)
+      for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell; ++face_no)
         {
           deallog << " Face" << face_no << std::endl;
           face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
           for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_face; ++v)
             {
-              deallog << "  vertex=" << face->vertex(v)
-                      << ",  normal=" << normals[v] << std::endl;
+              deallog << "  vertex=" << face->vertex(v) << ",  normal=" << normals[v] << std::endl;
 
               // note that we can't check
               // here that the normal vector

@@ -58,8 +58,7 @@ check_solve(SolverControl &     solver_control,
       deallog << "Failure. " << std::endl;
     }
 
-  deallog << "Solver history data: " << solver_control.get_history_data()
-          << std::endl;
+  deallog << "Solver history data: " << solver_control.get_history_data() << std::endl;
   Assert(success == expected_result, ExcMessage("Incorrect result."));
 }
 

@@ -49,9 +49,7 @@ public:
    * Constructor. Create an iterator into the matrix <tt>matrix</tt> for the
    * given <tt>row</tt> and the <tt>index</tt> within it.
    */
-  MatrixIterator(MatrixType *    matrix,
-                 const size_type row   = 0,
-                 const size_type index = 0);
+  MatrixIterator(MatrixType *matrix, const size_type row = 0, const size_type index = 0);
 
   /**
    * Copy from another matrix iterator. Mostly implemented to allow
@@ -138,8 +136,7 @@ inline MatrixIterator<ACCESSOR>::MatrixIterator(MatrixType *    matrix,
 
 template <class ACCESSOR>
 template <class OtherAccessor>
-inline MatrixIterator<ACCESSOR>::MatrixIterator(
-  const MatrixIterator<OtherAccessor> &other) :
+inline MatrixIterator<ACCESSOR>::MatrixIterator(const MatrixIterator<OtherAccessor> &other) :
   accessor(other.accessor)
 {}
 
@@ -197,8 +194,7 @@ template <class ACCESSOR>
 inline bool
 MatrixIterator<ACCESSOR>::operator<(const MatrixIterator &other) const
 {
-  Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
-         ExcInternalError());
+  Assert(&accessor.get_matrix() == &other.accessor.get_matrix(), ExcInternalError());
 
   return (accessor < other.accessor);
 }

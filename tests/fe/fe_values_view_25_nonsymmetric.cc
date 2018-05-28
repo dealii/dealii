@@ -51,10 +51,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     fe_function(i) = i + 1;
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(fe,
-                          quadrature,
-                          update_values | update_gradients |
-                            update_quadrature_points);
+  FEValues<dim>     fe_values(
+    fe, quadrature, update_values | update_gradients | update_quadrature_points);
   fe_values.reinit(dof.begin_active());
 
   // let the FEValues object compute the
@@ -73,10 +71,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         deallog << "  q_point=" << fe_values.quadrature_point(q) << std::endl
-                << "    value= " << fe_values[extractor].value(i, q)
-                << std::endl
-                << "    div= " << fe_values[extractor].divergence(i, q)
-                << std::endl;
+                << "    value= " << fe_values[extractor].value(i, q) << std::endl
+                << "    div= " << fe_values[extractor].divergence(i, q) << std::endl;
     }
 }
 

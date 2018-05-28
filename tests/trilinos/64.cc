@@ -53,8 +53,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
 
   try
@@ -68,14 +67,13 @@ main(int argc, char **argv)
 
         // check
         // TrilinosWrappers::SparseMatrix
-        const unsigned int n_jobs = Utilities::Trilinos::get_n_mpi_processes(
-          Utilities::Trilinos::comm_world());
+        const unsigned int n_jobs =
+          Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
         Assert(n_dofs % n_jobs == 0, ExcInternalError());
-        const unsigned int n_local_dofs = n_dofs / n_jobs;
-        Epetra_Map         map(
-          static_cast<TrilinosWrappers::types::int_type>(n_dofs),
-          static_cast<TrilinosWrappers::types::int_type>(n_local_dofs),
-          Utilities::Trilinos::comm_world());
+        const unsigned int             n_local_dofs = n_dofs / n_jobs;
+        Epetra_Map                     map(static_cast<TrilinosWrappers::types::int_type>(n_dofs),
+                       static_cast<TrilinosWrappers::types::int_type>(n_local_dofs),
+                       Utilities::Trilinos::comm_world());
         TrilinosWrappers::SparseMatrix v2(map, 5);
         test(v2);
       }
@@ -84,13 +82,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -98,12 +94,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

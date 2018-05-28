@@ -72,9 +72,7 @@ test()
   tr.refine_global(1);
   for (unsigned int step = 0; step < 20; ++step)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tr.begin_active(),
-                                                        endc = tr.end();
+      typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(), endc = tr.end();
 
       for (; cell != endc; ++cell)
         if (Testing::rand() % 42 == 1)
@@ -117,8 +115,7 @@ test()
   no_normal_flux_boundaries.insert(1);
 
 
-  VectorTools::compute_no_normal_flux_constraints(
-    dofh, 0, no_normal_flux_boundaries, cm);
+  VectorTools::compute_no_normal_flux_constraints(dofh, 0, no_normal_flux_boundaries, cm);
 
   cm.close();
 

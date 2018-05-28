@@ -99,8 +99,7 @@ check()
 
   Vector<double> rhs(dof.n_dofs()), rhs_ref(dof.n_dofs());
 
-  MatrixTools::create_mass_matrix(
-    mapping, dof, quadrature, matrix_ref, rhs_function, rhs_ref);
+  MatrixTools::create_mass_matrix(mapping, dof, quadrature, matrix_ref, rhs_function, rhs_ref);
   constraints.condense(matrix_ref, rhs_ref);
 
   const Function<dim> *const dummy = nullptr;

@@ -52,8 +52,7 @@ main(int argc, char *argv[])
   if (my_id % 2 == 0)
     {
       MPI_Comm group_comm;
-      ierr =
-        Utilities::MPI::create_group(global_comm, even_group, 0, &group_comm);
+      ierr = Utilities::MPI::create_group(global_comm, even_group, 0, &group_comm);
       AssertThrowMPI(ierr);
     }
   deallog << "OK" << std::endl;

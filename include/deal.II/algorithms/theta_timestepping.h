@@ -334,8 +334,7 @@ namespace Algorithms
     /**
      * The operator writing the output in each time step
      */
-    SmartPointer<OutputOperator<VectorType>, ThetaTimestepping<VectorType>>
-      output;
+    SmartPointer<OutputOperator<VectorType>, ThetaTimestepping<VectorType>> output;
   };
 
 

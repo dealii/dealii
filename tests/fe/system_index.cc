@@ -57,8 +57,7 @@ check_fe(const FiniteElement<dim> &fe)
       if (fe.is_primitive(i))
         {
           p = fe.system_to_component_index(i);
-          Assert(fe.component_to_system_index(p.first, p.second) == i,
-                 ExcInternalError());
+          Assert(fe.component_to_system_index(p.first, p.second) == i, ExcInternalError());
         }
     }
 

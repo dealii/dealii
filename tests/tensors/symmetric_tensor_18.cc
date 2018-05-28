@@ -58,8 +58,7 @@ test()
               for (unsigned int b = 0; b < dim; ++b)
                 tmp += A[i][j][a][b] * B[a][b][k][l];
 
-            AssertThrow(std::fabs(T[i][j][k][l] - tmp) < 1e-14 * tmp,
-                        ExcInternalError());
+            AssertThrow(std::fabs(T[i][j][k][l] - tmp) < 1e-14 * tmp, ExcInternalError());
           }
 }
 

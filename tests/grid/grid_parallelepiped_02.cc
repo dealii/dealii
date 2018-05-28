@@ -82,16 +82,13 @@ check_nd_parallelepiped_by_comparison(bool log)
 
   if (log)
     {
-      logfile << "\ncheck " << dim
-              << "d parallelepiped (subdivided_parallelepiped): ";
-      if (GridTools::have_same_coarse_mesh(
-            triangulation_parallelepiped,
-            triangulation_subdivided_parallelepiped))
+      logfile << "\ncheck " << dim << "d parallelepiped (subdivided_parallelepiped): ";
+      if (GridTools::have_same_coarse_mesh(triangulation_parallelepiped,
+                                           triangulation_subdivided_parallelepiped))
         logfile << "OK";
 
       else
-        logfile
-          << "not OK... coarse grids are different but they should be the same";
+        logfile << "not OK... coarse grids are different but they should be the same";
     }
 }
 

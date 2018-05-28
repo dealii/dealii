@@ -131,9 +131,7 @@ main()
     deallog << "=================================" << std::endl;
     ;
     for (unsigned int i = 0; i < num_points; i++)
-      deallog << manifold.get_intermediate_point(
-                   P1, P2, (1.0 * i) / (num_points - 1))
-              << std::endl;
+      deallog << manifold.get_intermediate_point(P1, P2, (1.0 * i) / (num_points - 1)) << std::endl;
     deallog << "=================================" << std::endl;
   }
 
@@ -166,12 +164,9 @@ main()
     weights[1] = 1.0 / 3.0;
     weights[2] = 1.0 / 3.0;
 
-    Point<3> Q = manifold.get_new_point(make_array_view(points1),
-                                        make_array_view(weights));
-    Point<3> S = manifold.get_new_point(make_array_view(points2),
-                                        make_array_view(weights));
-    Point<3> T = manifold.get_new_point(make_array_view(points3),
-                                        make_array_view(weights));
+    Point<3> Q = manifold.get_new_point(make_array_view(points1), make_array_view(weights));
+    Point<3> S = manifold.get_new_point(make_array_view(points2), make_array_view(weights));
+    Point<3> T = manifold.get_new_point(make_array_view(points3), make_array_view(weights));
 
     Point<3> P5(0.707107, 0.707107, 0.0);
     Point<3> P4(0.0, 0.0, 1.0);

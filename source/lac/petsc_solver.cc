@@ -97,8 +97,7 @@ namespace PETScWrappers
 #  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
         // the last argument is irrelevant here,
         // since we use the solver only once anyway
-        ierr = KSPSetOperators(
-          solver_data->ksp, A, preconditioner, SAME_PRECONDITIONER);
+        ierr = KSPSetOperators(solver_data->ksp, A, preconditioner, SAME_PRECONDITIONER);
 #  else
         ierr = KSPSetOperators(solver_data->ksp, A, preconditioner);
 #  endif
@@ -109,16 +108,13 @@ namespace PETScWrappers
         // checks with the solver_control
         // object we have in this object for
         // convergence
-        ierr = KSPSetConvergenceTest(solver_data->ksp,
-                                     &convergence_test,
-                                     reinterpret_cast<void *>(&solver_control),
-                                     nullptr);
+        ierr = KSPSetConvergenceTest(
+          solver_data->ksp, &convergence_test, reinterpret_cast<void *>(&solver_control), nullptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
     // set the command line option prefix name
-    PetscErrorCode ierr =
-      KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
+    PetscErrorCode ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // set the command line options provided
@@ -141,9 +137,9 @@ namespace PETScWrappers
     // in case of failure: throw
     // exception
     if (solver_control.last_check() != SolverControl::success)
-      AssertThrow(false,
-                  SolverControl::NoConvergence(solver_control.last_step(),
-                                               solver_control.last_value()));
+      AssertThrow(
+        false,
+        SolverControl::NoConvergence(solver_control.last_step(), solver_control.last_value()));
     // otherwise exit as normal
   }
 
@@ -176,11 +172,9 @@ namespace PETScWrappers
                                KSPConvergedReason *reason,
                                void *              solver_control_x)
   {
-    SolverControl &solver_control =
-      *reinterpret_cast<SolverControl *>(solver_control_x);
+    SolverControl &solver_control = *reinterpret_cast<SolverControl *>(solver_control_x);
 
-    const SolverControl::State state =
-      solver_control.check(iteration, residual_norm);
+    const SolverControl::State state = solver_control.check(iteration, residual_norm);
 
     switch (state)
       {
@@ -231,10 +225,8 @@ namespace PETScWrappers
     // checks with the solver_control
     // object we have in this object for
     // convergence
-    ierr = KSPSetConvergenceTest(solver_data->ksp,
-                                 &convergence_test,
-                                 reinterpret_cast<void *>(&solver_control),
-                                 nullptr);
+    ierr = KSPSetConvergenceTest(
+      solver_data->ksp, &convergence_test, reinterpret_cast<void *>(&solver_control), nullptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // set the command line options provided
@@ -247,8 +239,7 @@ namespace PETScWrappers
 
   /* ---------------------- SolverRichardson ------------------------ */
 
-  SolverRichardson::AdditionalData::AdditionalData(const double omega) :
-    omega(omega)
+  SolverRichardson::AdditionalData::AdditionalData(const double omega) : omega(omega)
   {}
 
 
@@ -373,9 +364,8 @@ namespace PETScWrappers
 
   /* ---------------------- SolverGMRES ------------------------ */
 
-  SolverGMRES::AdditionalData::AdditionalData(
-    const unsigned int restart_parameter,
-    const bool         right_preconditioning) :
+  SolverGMRES::AdditionalData::AdditionalData(const unsigned int restart_parameter,
+                                              const bool         right_preconditioning) :
     restart_parameter(restart_parameter),
     right_preconditioning(right_preconditioning)
   {}
@@ -417,8 +407,8 @@ namespace PETScWrappers
     // and do some equally nasty stuff that at
     // least doesn't yield warnings...
     int (*fun_ptr)(KSP, int);
-    ierr = PetscObjectQueryFunction(
-      (PetscObject)(ksp), "KSPGMRESSetRestart_C", (void (**)()) & fun_ptr);
+    ierr =
+      PetscObjectQueryFunction((PetscObject)(ksp), "KSPGMRESSetRestart_C", (void (**)()) & fun_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = (*fun_ptr)(ksp, additional_data.restart_parameter);
@@ -665,9 +655,7 @@ namespace PETScWrappers
   }
 
   void
-  SparseDirectMUMPS::solve(const MatrixBase &A,
-                           VectorBase &      x,
-                           const VectorBase &b)
+  SparseDirectMUMPS::solve(const MatrixBase &A, VectorBase &x, const VectorBase &b)
   {
 #  ifdef DEAL_II_PETSC_WITH_MUMPS
     /**
@@ -709,8 +697,7 @@ namespace PETScWrappers
          * since we use the solver only once anyway
          */
 #    if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-        ierr =
-          KSPSetOperators(solver_data->ksp, A, A, DIFFERENT_NONZERO_PATTERN);
+        ierr = KSPSetOperators(solver_data->ksp, A, A, DIFFERENT_NONZERO_PATTERN);
 #    else
         ierr = KSPSetOperators(solver_data->ksp, A, A);
 #    endif
@@ -808,9 +795,9 @@ namespace PETScWrappers
      */
     if (solver_control.last_check() != SolverControl::success)
       {
-        AssertThrow(false,
-                    SolverControl::NoConvergence(solver_control.last_step(),
-                                                 solver_control.last_value()));
+        AssertThrow(
+          false,
+          SolverControl::NoConvergence(solver_control.last_step(), solver_control.last_value()));
       }
     else
       {
@@ -825,13 +812,11 @@ namespace PETScWrappers
       }
 
 #  else // DEAL_II_PETSC_WITH_MUMPS
-    Assert(
-      false,
-      ExcMessage(
-        "Your PETSc installation does not include a copy of "
-        "the MUMPS package necessary for this solver. You will need to configure "
-        "PETSc so that it includes MUMPS, recompile it, and then re-configure "
-        "and recompile deal.II as well."));
+    Assert(false,
+           ExcMessage("Your PETSc installation does not include a copy of "
+                      "the MUMPS package necessary for this solver. You will need to configure "
+                      "PETSc so that it includes MUMPS, recompile it, and then re-configure "
+                      "and recompile deal.II as well."));
 
     // Cast to void to silence compiler warnings
     (void)A;
@@ -847,11 +832,9 @@ namespace PETScWrappers
                                       KSPConvergedReason *reason,
                                       void *              solver_control_x)
   {
-    SolverControl &solver_control =
-      *reinterpret_cast<SolverControl *>(solver_control_x);
+    SolverControl &solver_control = *reinterpret_cast<SolverControl *>(solver_control_x);
 
-    const SolverControl::State state =
-      solver_control.check(iteration, residual_norm);
+    const SolverControl::State state = solver_control.check(iteration, residual_norm);
 
     switch (state)
       {

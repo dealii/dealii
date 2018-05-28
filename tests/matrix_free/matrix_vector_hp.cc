@@ -49,32 +49,25 @@ public:
     std::pair<unsigned int, unsigned int> subrange_deg =
       data.create_cell_subrange_hp(cell_range, 1);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 1, Vector<Number>, 2>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 1, Vector<Number>, 2>(data, dst, src, subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 2);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 2, Vector<Number>, 3>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 2, Vector<Number>, 3>(data, dst, src, subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 3);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 3, Vector<Number>, 4>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 3, Vector<Number>, 4>(data, dst, src, subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 4);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 4, Vector<Number>, 5>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 4, Vector<Number>, 5>(data, dst, src, subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 5);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 5, Vector<Number>, 6>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 5, Vector<Number>, 6>(data, dst, src, subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 6);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 6, Vector<Number>, 7>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 6, Vector<Number>, 7>(data, dst, src, subrange_deg);
     subrange_deg = data.create_cell_subrange_hp(cell_range, 7);
     if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 7, Vector<Number>, 8>(
-        data, dst, src, subrange_deg);
+      helmholtz_operator<dim, 7, Vector<Number>, 8>(data, dst, src, subrange_deg);
   }
 
   void
@@ -101,8 +94,7 @@ test()
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
@@ -113,8 +105,7 @@ test()
   // refine a few cells
   for (unsigned int i = 0; i < 11 - 3 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tria.begin_active(),
+      typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                         endc = tria.end();
       unsigned int counter                                   = 0;
       for (; cell != endc; ++cell, ++counter)
@@ -139,9 +130,7 @@ test()
   hp::DoFHandler<dim> dof(tria);
   // set the active FE index in a random order
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                         dof.begin_active(),
-                                                       endc = dof.end();
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int fe_index = Testing::rand() % max_degree;
@@ -153,8 +142,7 @@ test()
   dof.distribute_dofs(fe_collection);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
   DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
   DoFTools::make_sparsity_pattern(dof, csp, constraints, false);
@@ -177,16 +165,12 @@ test()
   // assemble sparse matrix with (\nabla v,
   // \nabla u) + (v, 10 * u)
   {
-    hp::FEValues<dim>                    hp_fe_values(fe_collection,
-                                   quadrature_collection,
-                                   update_values | update_gradients |
-                                     update_JxW_values);
+    hp::FEValues<dim> hp_fe_values(
+      fe_collection, quadrature_collection, update_values | update_gradients | update_JxW_values);
     FullMatrix<double>                   cell_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                         dof.begin_active(),
-                                                       endc = dof.end();
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -196,22 +180,19 @@ test()
         hp_fe_values.reinit(cell);
         const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
 
-        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-             ++q_point)
+        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       10. * fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                    10. * fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                   fe_values.JxW(q_point));
             }
         local_dof_indices.resize(dofs_per_cell);
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(cell_matrix, local_dof_indices, system_matrix);
       }
   }
 

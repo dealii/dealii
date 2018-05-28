@@ -68,8 +68,7 @@ test()
 
   hp::DoFHandler<dim> dof_handler(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % fe_collection.size());
@@ -90,12 +89,8 @@ test()
                                    VectorTools::W1p_seminorm};
   for (unsigned int i = 0; i < sizeof(norms) / sizeof(norms[0]); ++i)
     {
-      VectorTools::integrate_difference(dof_handler,
-                                        vec,
-                                        Functions::SquareFunction<dim>(),
-                                        diff,
-                                        q_collection,
-                                        norms[i]);
+      VectorTools::integrate_difference(
+        dof_handler, vec, Functions::SquareFunction<dim>(), diff, q_collection, norms[i]);
       deallog << "i=" << i << ", diff=" << diff.l2_norm() << std::endl;
     }
 }

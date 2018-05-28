@@ -60,8 +60,7 @@ test()
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     for (unsigned int i = 0; i < fe.n_blocks(); ++i)
-      deallog << "Block " << i << " has " << dofs_per_block[i] << " dofs"
-              << std::endl;
+      deallog << "Block " << i << " has " << dofs_per_block[i] << " dofs" << std::endl;
 }
 
 

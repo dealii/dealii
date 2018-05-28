@@ -37,9 +37,7 @@ check_user_pointers(Triangulation<dim> &tr)
 {
   // Check if values are the same as below
   Triangulation<dim> *p = &tr;
-  for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-       it != tr.end();
-       ++it)
+  for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
     {
       deallog << '.';
       if (it->user_pointer() != p++)
@@ -52,9 +50,7 @@ check_user_pointers(Triangulation<dim> &tr)
   // check only the first time around
   tr.clear_user_flags();
   if (dim > 1)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (it->face(f)->user_flag_set() == false)
           {
@@ -66,9 +62,7 @@ check_user_pointers(Triangulation<dim> &tr)
   deallog << "faces" << std::endl;
 
   if (dim > 2)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
         if (it->line(l)->user_flag_set() == false)
           {
@@ -89,9 +83,7 @@ check_user_indices(Triangulation<dim> &tr)
 {
   // Check if values are the same as below
   unsigned int p = 1;
-  for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-       it != tr.end();
-       ++it)
+  for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
     {
       deallog << '.';
       if (it->user_index() != p++)
@@ -104,9 +96,7 @@ check_user_indices(Triangulation<dim> &tr)
   // check only the first time around
   tr.clear_user_flags();
   if (dim > 1)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (it->face(f)->user_flag_set() == false)
           {
@@ -118,9 +108,7 @@ check_user_indices(Triangulation<dim> &tr)
   deallog << "faces" << std::endl;
 
   if (dim > 2)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
         if (it->line(l)->user_flag_set() == false)
           {
@@ -143,9 +131,7 @@ user_pointers(Triangulation<dim> &tr)
   // nonsense. clear them first
   Triangulation<dim> *p = &tr;
   tr.clear_user_data();
-  for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-       it != tr.end();
-       ++it)
+  for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
     it->set_user_pointer(p++);
 
   // we hit faces and lines more than
@@ -153,9 +139,7 @@ user_pointers(Triangulation<dim> &tr)
   // the first time around
   tr.clear_user_flags();
   if (dim > 1)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (it->face(f)->user_flag_set() == false)
           {
@@ -164,9 +148,7 @@ user_pointers(Triangulation<dim> &tr)
           }
 
   if (dim > 2)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
         if (it->line(l)->user_flag_set() == false)
           {
@@ -206,9 +188,7 @@ user_indices(Triangulation<dim> &tr)
   // Fill user indices with some
   // nonsense. clear them first
 
-  for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-       it != tr.end();
-       ++it)
+  for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
     {
       it->clear_user_index();
 
@@ -223,9 +203,7 @@ user_indices(Triangulation<dim> &tr)
 
 
   unsigned int p = 1;
-  for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-       it != tr.end();
-       ++it)
+  for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
     it->set_user_index(p++);
 
   // we hit faces and lines more than
@@ -233,9 +211,7 @@ user_indices(Triangulation<dim> &tr)
   // the first time around
   tr.clear_user_flags();
   if (dim > 1)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (it->face(f)->user_flag_set() == false)
           {
@@ -244,9 +220,7 @@ user_indices(Triangulation<dim> &tr)
           }
 
   if (dim > 2)
-    for (typename Triangulation<dim>::cell_iterator it = tr.begin();
-         it != tr.end();
-         ++it)
+    for (typename Triangulation<dim>::cell_iterator it = tr.begin(); it != tr.end(); ++it)
       for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
         if (it->line(l)->user_flag_set() == false)
           {

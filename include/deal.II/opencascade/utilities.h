@@ -233,8 +233,7 @@ namespace OpenCASCADE
    */
   template <int spacedim>
   void
-  create_triangulation(const TopoDS_Face &         face,
-                       Triangulation<2, spacedim> &tria);
+  create_triangulation(const TopoDS_Face &face, Triangulation<2, spacedim> &tria);
 
 
   /**
@@ -261,8 +260,7 @@ namespace OpenCASCADE
   std::vector<TopoDS_Edge>
   create_curves_from_triangulation_boundary(
     const Triangulation<2, spacedim> &triangulation,
-    const Mapping<2, spacedim> &      mapping =
-      StaticMappingQ1<2, spacedim>::mapping);
+    const Mapping<2, spacedim> &      mapping = StaticMappingQ1<2, spacedim>::mapping);
 
   /**
    * Extract all compound shapes from a TopoDS_Shape, and store the results
@@ -419,8 +417,7 @@ namespace OpenCASCADE
    */
   DeclException1(ExcOCCError,
                  IFSelect_ReturnStatus,
-                 << "An OpenCASCADE routine failed with return status "
-                 << arg1);
+                 << "An OpenCASCADE routine failed with return status " << arg1);
 
   /**
    * Trying to make curve operations on a degenerate edge.

@@ -119,11 +119,9 @@ BoundaryFunction<dim>::BoundaryFunction() : Function<dim>(dim + 1)
 
 template <int dim>
 inline void
-BoundaryFunction<dim>::vector_value(const Point<dim> &,
-                                    Vector<double> &values) const
+BoundaryFunction<dim>::vector_value(const Point<dim> &, Vector<double> &values) const
 {
-  Assert(values.size() == dim + 1,
-         ExcDimensionMismatch(values.size(), dim + 1));
+  Assert(values.size() == dim + 1, ExcDimensionMismatch(values.size(), dim + 1));
 
   values      = 0;
   values(dim) = 1.;
@@ -134,9 +132,7 @@ BoundaryFunction<dim>::vector_value(const Point<dim> &,
 // Construct FE with first component: Nedelec-Element,
 // second component: Q1_Element
 template <int dim>
-ImposeBC<dim>::ImposeBC() :
-  fe(FE_Nedelec<dim>(0), 1, FE_Q<dim>(1), 1),
-  dof_handler(triangulation)
+ImposeBC<dim>::ImposeBC() : fe(FE_Nedelec<dim>(0), 1, FE_Q<dim>(1), 1), dof_handler(triangulation)
 {}
 
 
@@ -205,11 +201,8 @@ ImposeBC<dim>::test_interpolate_BC()
   // on the scalar variable
   bc_component_select.back() = true;
 
-  VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
-                                           BoundaryFunction<dim>(),
-                                           boundary_values,
-                                           bc_component_select);
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, BoundaryFunction<dim>(), boundary_values, bc_component_select);
 
 
 
@@ -219,8 +212,7 @@ ImposeBC<dim>::test_interpolate_BC()
   std::vector<bool>            p_boundary_dofs(dof_handler.n_dofs());
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
-  DoFTools::extract_boundary_dofs(
-    dof_handler, bc_component_select, p_boundary_dofs, boundary_ids);
+  DoFTools::extract_boundary_dofs(dof_handler, bc_component_select, p_boundary_dofs, boundary_ids);
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     {
       // error: pressure boundary DoF
@@ -252,17 +244,14 @@ ImposeBC<dim>::run()
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
-  deallog << "   Number of active cells:       "
-          << triangulation.n_active_cells() << std::endl;
+  deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl;
 
   get_ready();
 
-  deallog << "  Total number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl
-          << "   Number of degrees of freedom for the field variable U: "
-          << n_u_dofs << std::endl
-          << "   Number of degrees of freedom for the pressure variable p: "
-          << n_p_dofs << std::endl;
+  deallog << "  Total number of degrees of freedom: " << dof_handler.n_dofs() << std::endl
+          << "   Number of degrees of freedom for the field variable U: " << n_u_dofs << std::endl
+          << "   Number of degrees of freedom for the pressure variable p: " << n_p_dofs
+          << std::endl;
 
   test_extract_boundary_DoFs();
   test_interpolate_BC();
@@ -285,13 +274,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -299,12 +286,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 

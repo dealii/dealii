@@ -125,9 +125,7 @@ namespace parallel
      * @ingroup distributed
      * @author Timo Heister, 2009-2011
      */
-    template <int dim,
-              typename VectorType,
-              typename DoFHandlerType = DoFHandler<dim>>
+    template <int dim, typename VectorType, typename DoFHandlerType = DoFHandler<dim>>
     class SolutionTransfer
     {
 #ifndef DEAL_II_MSVC
@@ -160,8 +158,7 @@ namespace parallel
        * (refined and/or coarsened) grid.
        */
       void
-      prepare_for_coarsening_and_refinement(
-        const std::vector<const VectorType *> &all_in);
+      prepare_for_coarsening_and_refinement(const std::vector<const VectorType *> &all_in);
 
       /**
        * Same as the previous function but for only one discrete function to be
@@ -237,8 +234,7 @@ namespace parallel
       /**
        * Pointer to the degree of freedom handler to work with.
        */
-      SmartPointer<const DoFHandlerType,
-                   SolutionTransfer<dim, VectorType, DoFHandlerType>>
+      SmartPointer<const DoFHandlerType, SolutionTransfer<dim, VectorType, DoFHandlerType>>
         dof_handler;
 
       /**
@@ -260,11 +256,9 @@ namespace parallel
        */
       void
       pack_callback(
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          cell_iterator &cell,
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus status,
-        void *       data);
+        const typename Triangulation<dim, DoFHandlerType::space_dimension>::cell_iterator &cell,
+        const typename Triangulation<dim, DoFHandlerType::space_dimension>::CellStatus     status,
+        void *                                                                             data);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -273,12 +267,10 @@ namespace parallel
        */
       void
       unpack_callback(
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          cell_iterator &cell,
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus               status,
-        const void *               data,
-        std::vector<VectorType *> &all_out);
+        const typename Triangulation<dim, DoFHandlerType::space_dimension>::cell_iterator &cell,
+        const typename Triangulation<dim, DoFHandlerType::space_dimension>::CellStatus     status,
+        const void *                                                                       data,
+        std::vector<VectorType *> &                                                        all_out);
 
 
       /**

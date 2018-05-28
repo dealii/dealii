@@ -42,7 +42,7 @@ template <int dim>
 void
 test()
 {
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int                        myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(triangulation, -0.5, 0.5);
 
@@ -57,15 +57,13 @@ test()
         cell->set_refine_flag ();
     }
   */
-  typename Triangulation<dim>::active_cell_iterator cell =
-    triangulation.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
   if (cell->is_locally_owned())
     cell->set_refine_flag();
 
   triangulation.execute_coarsening_and_refinement();
   if (myid == 0)
-    deallog << "#cells = " << triangulation.n_global_active_cells()
-            << std::endl;
+    deallog << "#cells = " << triangulation.n_global_active_cells() << std::endl;
 
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(triangulation);
@@ -80,8 +78,7 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   PETScWrappers::MPI::Vector vec(locally_owned_dofs, MPI_COMM_WORLD);
-  PETScWrappers::MPI::Vector vec_ghosted(
-    locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector vec_ghosted(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
   vec         = 1;
   vec_ghosted = vec;
   vec         = -1;

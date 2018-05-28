@@ -42,10 +42,8 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
-                  << std::endl;
-          Assert(GridTools::maximal_cell_diameter(tria) >=
-                   GridTools::minimal_cell_diameter(tria),
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria) << std::endl;
+          Assert(GridTools::maximal_cell_diameter(tria) >= GridTools::minimal_cell_diameter(tria),
                  ExcInternalError());
         };
     };
@@ -61,10 +59,8 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
-                  << std::endl;
-          Assert(GridTools::maximal_cell_diameter(tria) >=
-                   GridTools::minimal_cell_diameter(tria),
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria) << std::endl;
+          Assert(GridTools::maximal_cell_diameter(tria) >= GridTools::minimal_cell_diameter(tria),
                  ExcInternalError());
         };
     };

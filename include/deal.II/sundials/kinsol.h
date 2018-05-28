@@ -322,11 +322,10 @@ namespace SUNDIALS
       add_parameters(ParameterHandler &prm)
       {
         static std::string strategy_str("newton");
-        prm.add_parameter(
-          "Solution strategy",
-          strategy_str,
-          "Choose among newton|linesearch|fixed_point|picard",
-          Patterns::Selection("newton|linesearch|fixed_point|picard"));
+        prm.add_parameter("Solution strategy",
+                          strategy_str,
+                          "Choose among newton|linesearch|fixed_point|picard",
+                          Patterns::Selection("newton|linesearch|fixed_point|picard"));
         prm.add_action("Solution strategy", [&](const std::string &value) {
           if (value == "newton")
             strategy = newton;
@@ -339,31 +338,25 @@ namespace SUNDIALS
           else
             Assert(false, ExcInternalError());
         });
-        prm.add_parameter("Maximum number of nonlinear iterations",
-                          maximum_non_linear_iterations);
-        prm.add_parameter("Function norm stopping tolerance",
-                          function_tolerance);
+        prm.add_parameter("Maximum number of nonlinear iterations", maximum_non_linear_iterations);
+        prm.add_parameter("Function norm stopping tolerance", function_tolerance);
         prm.add_parameter("Scaled step stopping tolerance", step_tolerance);
 
         prm.enter_subsection("Newton parameters");
         prm.add_parameter("No initial matrix setup", no_init_setup);
-        prm.add_parameter("Maximum iterations without matrix setup",
-                          maximum_setup_calls);
+        prm.add_parameter("Maximum iterations without matrix setup", maximum_setup_calls);
         prm.add_parameter("Maximum allowable scaled length of the Newton step",
                           maximum_newton_step);
-        prm.add_parameter("Relative error for different quotient computation",
-                          dq_relative_error);
+        prm.add_parameter("Relative error for different quotient computation", dq_relative_error);
         prm.leave_subsection();
 
         prm.enter_subsection("Linesearch parameters");
-        prm.add_parameter("Maximum number of beta-condition failures",
-                          maximum_beta_failures);
+        prm.add_parameter("Maximum number of beta-condition failures", maximum_beta_failures);
         prm.leave_subsection();
 
 
         prm.enter_subsection("Fixed point and Picard parameters");
-        prm.add_parameter("Anderson acceleration subspace size",
-                          anderson_subspace_size);
+        prm.add_parameter("Anderson acceleration subspace size", anderson_subspace_size);
         prm.leave_subsection();
       }
 
@@ -455,8 +448,7 @@ namespace SUNDIALS
      * @param data KINSOL configuration data
      * @param mpi_comm MPI communicator
      */
-    KINSOL(const AdditionalData &data     = AdditionalData(),
-           const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
+    KINSOL(const AdditionalData &data = AdditionalData(), const MPI_Comm mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
@@ -504,8 +496,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &src, VectorType &dst)>
-      iteration_function;
+    std::function<int(const VectorType &src, VectorType &dst)> iteration_function;
 
 
     /**
@@ -548,8 +539,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &current_u, const VectorType &current_f)>
-      setup_jacobian;
+    std::function<int(const VectorType &current_u, const VectorType &current_f)> setup_jacobian;
 
     /**
      * A function object that users may supply and that is intended to solve
@@ -588,10 +578,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &ycur,
-                      const VectorType &fcur,
-                      const VectorType &rhs,
-                      VectorType &      dst)>
+    std::function<
+      int(const VectorType &ycur, const VectorType &fcur, const VectorType &rhs, VectorType &dst)>
       solve_jacobian_system;
 
     /**
@@ -628,8 +616,7 @@ namespace SUNDIALS
      */
     DeclException1(ExcFunctionNotProvided,
                    std::string,
-                   << "Please provide an implementation for the function \""
-                   << arg1 << "\"");
+                   << "Please provide an implementation for the function \"" << arg1 << "\"");
 
     /**
      * This function is executed at construction time to set the

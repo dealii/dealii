@@ -40,8 +40,7 @@ check_norms()
         vec[i] = i + 1;
 
       const number l1_norm = vec.l1_norm();
-      AssertThrow(std::abs(l1_norm - 0.5 * size * (size + 1)) <
-                    acc * 0.5 * size * (size + 1),
+      AssertThrow(std::abs(l1_norm - 0.5 * size * (size + 1)) < acc * 0.5 * size * (size + 1),
                   ExcInternalError());
 
       // test accuracy of summation
@@ -49,8 +48,7 @@ check_norms()
       for (unsigned int i = 0; i < size; ++i)
         vec[i] = (number)value;
       const number l1_norma = vec.l1_norm();
-      AssertThrow(std::abs(l1_norma - value * size) < acc * size * value,
-                  ExcInternalError());
+      AssertThrow(std::abs(l1_norma - value * size) < acc * size * value, ExcInternalError());
       const number l2_norma = vec.l2_norm();
       AssertThrow(std::abs(l2_norma - value * std::sqrt((number)size)) <
                     acc * std::sqrt(size) * value,
@@ -75,8 +73,7 @@ check_complex_norms()
       for (unsigned int i = 0; i < size; ++i)
         {
           vec(i) = std::complex<number>(i + 1, i + 2);
-          sum += std::sqrt((long double)(i + 1) * (i + 1) +
-                           (long double)(i + 2) * (i + 2));
+          sum += std::sqrt((long double)(i + 1) * (i + 1) + (long double)(i + 2) * (i + 2));
         }
 
       const number l1_norm = vec.l1_norm();
@@ -87,14 +84,12 @@ check_complex_norms()
       for (unsigned int i = 0; i < size; ++i)
         vec[i] = std::complex<number>(value);
       const number l1_norma = vec.l1_norm();
-      AssertThrow(std::abs(l1_norma - std::abs(value) * size) <
-                    acc * size * std::abs(value),
+      AssertThrow(std::abs(l1_norma - std::abs(value) * size) < acc * size * std::abs(value),
                   ExcInternalError());
       const number l2_norma = vec.l2_norm();
-      AssertThrow(
-        std::abs(l2_norma - std::abs(value) * std::sqrt((number)size)) <
-          acc * std::sqrt((number)size) * std::abs(value),
-        ExcInternalError());
+      AssertThrow(std::abs(l2_norma - std::abs(value) * std::sqrt((number)size)) <
+                    acc * std::sqrt((number)size) * std::abs(value),
+                  ExcInternalError());
     }
 }
 

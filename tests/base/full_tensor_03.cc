@@ -47,8 +47,7 @@ main()
         for (unsigned int l = 0; l < 2; ++l)
           norm_sqr += t[i][j][k][l] * t[i][j][k][l];
 
-  AssertThrow(std::fabs(t.norm() * t.norm() - norm_sqr) < 1e-14,
-              ExcInternalError());
+  AssertThrow(std::fabs(t.norm() * t.norm() - norm_sqr) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

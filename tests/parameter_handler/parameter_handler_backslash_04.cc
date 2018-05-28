@@ -34,9 +34,7 @@ main()
     {
       ParameterHandler prm;
       prm.enter_subsection("Testing");
-      prm.declare_entry("Function",
-                        "a",
-                        Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
+      prm.declare_entry("Function", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
       prm.leave_subsection();
 
       // We need a local path for the file to get consistent output messages.
@@ -52,8 +50,7 @@ main()
             }
           else
             {
-              std::ifstream input_stream(
-                "prm/parameter_handler_backslash_04.prm");
+              std::ifstream input_stream("prm/parameter_handler_backslash_04.prm");
               prm.parse_input(input_stream);
             }
 

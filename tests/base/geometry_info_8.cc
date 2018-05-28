@@ -41,13 +41,11 @@ test_vertices()
         {
           const std::bitset<3> orientation = o;
 
-          deallog << "orientation " << orientation[0] << ", flip "
-                  << orientation[1] << ", rotation " << orientation[2] << ":"
-                  << std::endl
+          deallog << "orientation " << orientation[0] << ", flip " << orientation[1]
+                  << ", rotation " << orientation[2] << ":" << std::endl
                   << "    ";
 
-          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face;
-               ++j)
+          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
             {
               deallog << " (" << j << " -> "
                       << GeometryInfo<dim>::face_to_cell_vertices(
@@ -74,9 +72,8 @@ test_lines()
         {
           const std::bitset<3> orientation = o;
 
-          deallog << "orientation " << orientation[0] << ", flip "
-                  << orientation[1] << ", rotation " << orientation[2] << ":"
-                  << std::endl
+          deallog << "orientation " << orientation[0] << ", flip " << orientation[1]
+                  << ", rotation " << orientation[2] << ":" << std::endl
                   << "    ";
 
           for (unsigned int j = 0; j < GeometryInfo<dim>::lines_per_face; ++j)
@@ -97,16 +94,13 @@ main()
 {
   initlog();
 
-  deallog << std::endl
-          << "GeometryInfo<dim>::face_to_cell_vertices:" << std::endl;
+  deallog << std::endl << "GeometryInfo<dim>::face_to_cell_vertices:" << std::endl;
 
   test_vertices<1>();
   test_vertices<2>();
   test_vertices<3>();
 
-  deallog << std::endl
-          << std::endl
-          << "GeometryInfo<dim>::face_to_cell_lines:" << std::endl;
+  deallog << std::endl << std::endl << "GeometryInfo<dim>::face_to_cell_lines:" << std::endl;
 
   test_lines<2>();
   test_lines<3>();

@@ -108,21 +108,17 @@ private:
   }
 
   void
-  local_apply_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_face(const MatrixFree<dim, number> &              data,
+                   VectorType &                                 dst,
+                   const VectorType &                           src,
+                   const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-      fe_eval(data, true);
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-                                                          fe_eval_neighbor(data, false);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> fe_eval(data, true);
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> fe_eval_neighbor(data,
+                                                                                           false);
+    typedef
+      typename FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>::value_type
+              value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
@@ -135,23 +131,19 @@ private:
         fe_eval_neighbor.read_dof_values(src);
         fe_eval_neighbor.evaluate(true, true);
         VectorizedArray<number> sigmaF =
-          (std::abs((fe_eval.get_normal_vector(0) *
-                     fe_eval.inverse_jacobian(0))[dim - 1]) +
-           std::abs((fe_eval.get_normal_vector(0) *
-                     fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
+          (std::abs((fe_eval.get_normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) +
+           std::abs(
+             (fe_eval.get_normal_vector(0) * fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
           (number)(std::max(actual_degree, 1) * (actual_degree + 1.0));
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
-            value_type average_value =
-              (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
-              make_vectorized_array<number>(0.5);
+            value_type average_value = (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
+                                       make_vectorized_array<number>(0.5);
             value_type average_valgrad =
-              fe_eval.get_normal_derivative(q) +
-              fe_eval_neighbor.get_normal_derivative(q);
+              fe_eval.get_normal_derivative(q) + fe_eval_neighbor.get_normal_derivative(q);
             average_valgrad =
-              average_value * sigmaF -
-              average_valgrad * make_vectorized_array<number>(0.5);
+              average_value * sigmaF - average_valgrad * make_vectorized_array<number>(0.5);
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval_neighbor.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -166,19 +158,15 @@ private:
 
 
   void
-  local_apply_boundary_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_boundary_face(const MatrixFree<dim, number> &              data,
+                            VectorType &                                 dst,
+                            const VectorType &                           src,
+                            const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-                                                          fe_eval(data, true);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> fe_eval(data, true);
+    typedef
+      typename FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>::value_type
+              value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -186,9 +174,7 @@ private:
         fe_eval.read_dof_values(src);
         fe_eval.evaluate(true, true);
         VectorizedArray<number> sigmaF =
-          2.0 *
-          std::abs((fe_eval.get_normal_vector(0) *
-                    fe_eval.inverse_jacobian(0))[dim - 1]) *
+          2.0 * std::abs((fe_eval.get_normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) *
           number(std::max(actual_degree, 1) * (actual_degree + 1.0));
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
@@ -222,7 +208,7 @@ class MatrixFreeVariant
 {
 public:
   MatrixFreeVariant(const MatrixFree<dim, number> &data,
-                    const bool                     zero_within_loop = true,
+                    const bool                     zero_within_loop       = true,
                     const unsigned int             start_vector_component = 0) :
     data(data),
     zero_within_loop(zero_within_loop),
@@ -280,21 +266,18 @@ private:
   }
 
   void
-  local_apply_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_face(const MatrixFree<dim, number> &              data,
+                   VectorType &                                 dst,
+                   const VectorType &                           src,
+                   const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-      fe_eval(data, true, 0, 0, start_vector_component);
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-                                                          fe_eval_neighbor(data, false, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> fe_eval(
+      data, true, 0, 0, start_vector_component);
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> fe_eval_neighbor(
+      data, false, 0, 0, start_vector_component);
+    typedef
+      typename FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>::value_type
+              value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
@@ -306,23 +289,19 @@ private:
         fe_eval_neighbor.gather_evaluate(src, true, true);
 
         VectorizedArray<number> sigmaF =
-          (std::abs((fe_eval.get_normal_vector(0) *
-                     fe_eval.inverse_jacobian(0))[dim - 1]) +
-           std::abs((fe_eval.get_normal_vector(0) *
-                     fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
+          (std::abs((fe_eval.get_normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) +
+           std::abs(
+             (fe_eval.get_normal_vector(0) * fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
           (number)(std::max(actual_degree, 1) * (actual_degree + 1.0));
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
-            value_type average_value =
-              (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
-              make_vectorized_array<number>(0.5);
+            value_type average_value = (fe_eval.get_value(q) - fe_eval_neighbor.get_value(q)) *
+                                       make_vectorized_array<number>(0.5);
             value_type average_valgrad =
-              fe_eval.get_normal_derivative(q) +
-              fe_eval_neighbor.get_normal_derivative(q);
+              fe_eval.get_normal_derivative(q) + fe_eval_neighbor.get_normal_derivative(q);
             average_valgrad =
-              average_value * sigmaF -
-              average_valgrad * make_vectorized_array<number>(0.5);
+              average_value * sigmaF - average_valgrad * make_vectorized_array<number>(0.5);
             fe_eval.submit_normal_derivative(-average_value, q);
             fe_eval_neighbor.submit_normal_derivative(-average_value, q);
             fe_eval.submit_value(average_valgrad, q);
@@ -334,27 +313,23 @@ private:
   }
 
   void
-  local_apply_boundary_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_boundary_face(const MatrixFree<dim, number> &              data,
+                            VectorType &                                 dst,
+                            const VectorType &                           src,
+                            const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-                                                          fe_eval(data, true, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> fe_eval(
+      data, true, 0, 0, start_vector_component);
+    typedef
+      typename FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>::value_type
+              value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
         fe_eval.reinit(face);
         fe_eval.gather_evaluate(src, true, true);
         VectorizedArray<number> sigmaF =
-          std::abs((fe_eval.get_normal_vector(0) *
-                    fe_eval.inverse_jacobian(0))[dim - 1]) *
+          std::abs((fe_eval.get_normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) *
           number(std::max(actual_degree, 1) * (actual_degree + 1.0)) * 2.0;
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
@@ -393,8 +368,7 @@ multiply_by_advection(const Tensor<1, dim, Number> &         advection,
 
 template <int dim, typename Number>
 Tensor<1, dim, Number>
-multiply_by_advection(const Tensor<1, dim, Number> &advection,
-                      const Number &                values)
+multiply_by_advection(const Tensor<1, dim, Number> &advection, const Number &values)
 {
   Tensor<1, dim, Number> out;
   for (unsigned int d = 0; d < dim; ++d)
@@ -415,8 +389,8 @@ class MatrixFreeAdvection
 {
 public:
   MatrixFreeAdvection(const MatrixFree<dim, number> &data,
-                      const bool                     zero_within_loop = true,
-                      const unsigned int start_vector_component       = 0) :
+                      const bool                     zero_within_loop       = true,
+                      const unsigned int             start_vector_component = 0) :
     data(data),
     zero_within_loop(zero_within_loop),
     start_vector_component(start_vector_component)
@@ -470,28 +444,24 @@ private:
         phi.reinit(cell);
         phi.gather_evaluate(src, true, false);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          phi.submit_gradient(
-            multiply_by_advection(advection, phi.get_value(q)), q);
+          phi.submit_gradient(multiply_by_advection(advection, phi.get_value(q)), q);
         phi.integrate_scatter(false, true, dst);
       }
   }
 
   void
-  local_apply_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_face(const MatrixFree<dim, number> &              data,
+                   VectorType &                                 dst,
+                   const VectorType &                           src,
+                   const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi_m(
       data, true, 0, 0, start_vector_component);
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi_p(
       data, false, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
+    typedef
+      typename FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>::value_type
+        value_type;
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
@@ -502,8 +472,7 @@ private:
 
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
-            value_type u_minus = phi_m.get_value(q),
-                       u_plus  = phi_p.get_value(q);
+            value_type                    u_minus = phi_m.get_value(q), u_plus = phi_p.get_value(q);
             const VectorizedArray<number> normal_times_advection =
               advection * phi_m.get_normal_vector(q);
             const value_type flux_times_normal =
@@ -520,20 +489,17 @@ private:
   }
 
   void
-  local_apply_boundary_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_boundary_face(const MatrixFree<dim, number> &              data,
+                            VectorType &                                 dst,
+                            const VectorType &                           src,
+                            const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
-                                                          fe_eval(data, true, 0, 0, start_vector_component);
-    typedef typename FEFaceEvaluation<dim,
-                                      fe_degree,
-                                      n_q_points_1d,
-                                      n_components,
-                                      number>::value_type value_type;
-    value_type                                            u_plus;
+    FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> fe_eval(
+      data, true, 0, 0, start_vector_component);
+    typedef
+      typename FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>::value_type
+               value_type;
+    value_type u_plus;
     u_plus = make_vectorized_array<number>(1.3);
 
     for (unsigned int face = face_range.first; face < face_range.second; face++)
@@ -571,11 +537,9 @@ class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   void
-  cell(MeshWorker::DoFInfo<dim> &                 dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
   face(MeshWorker::DoFInfo<dim> &                 dinfo1,
        MeshWorker::DoFInfo<dim> &                 dinfo2,
@@ -587,41 +551,35 @@ public:
 
 template <int dim>
 void
-MatrixIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+                            typename MeshWorker::IntegrationInfo<dim> &info) const
 {
-  LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
-                                         info.fe_values());
+  LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix, info.fe_values());
 }
 
 
 
 template <int dim>
 void
-MatrixIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim> &                 dinfo1,
-  MeshWorker::DoFInfo<dim> &                 dinfo2,
-  typename MeshWorker::IntegrationInfo<dim> &info1,
-  typename MeshWorker::IntegrationInfo<dim> &info2) const
+MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &                 dinfo1,
+                            MeshWorker::DoFInfo<dim> &                 dinfo2,
+                            typename MeshWorker::IntegrationInfo<dim> &info1,
+                            typename MeshWorker::IntegrationInfo<dim> &info2) const
 {
   const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
   // Manually compute penalty parameter instead of using the function
   // compute_penalty because we do it slightly differently on non-Cartesian
   // meshes.
-  Tensor<2, dim> inverse_jacobian =
-    transpose(info1.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction1 =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number]] *
+  Tensor<2, dim> inverse_jacobian = transpose(info1.fe_values(0).jacobian(0).covariant_form());
+  const double   normal_volume_fraction1 =
+    std::abs((inverse_jacobian[GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number]] *
               info1.fe_values(0).normal_vector(0)));
   inverse_jacobian = transpose(info2.fe_values(0).jacobian(0).covariant_form());
   const double normal_volume_fraction2 =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number]] *
+    std::abs((inverse_jacobian[GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number]] *
               info1.fe_values(0).normal_vector(0)));
-  double penalty = 0.5 * (normal_volume_fraction1 + normal_volume_fraction2) *
-                   std::max(1U, deg) * (deg + 1.0);
+  double penalty =
+    0.5 * (normal_volume_fraction1 + normal_volume_fraction2) * std::max(1U, deg) * (deg + 1.0);
   LocalIntegrators::Laplace ::ip_matrix(dinfo1.matrix(0, false).matrix,
                                         dinfo1.matrix(0, true).matrix,
                                         dinfo2.matrix(0, true).matrix,
@@ -635,16 +593,13 @@ MatrixIntegrator<dim>::face(
 
 template <int dim>
 void
-MatrixIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+MatrixIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+                                typename MeshWorker::IntegrationInfo<dim> &info) const
 {
-  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
-  Tensor<2, dim>     inverse_jacobian =
-    transpose(info.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
+  const unsigned int deg              = info.fe_values(0).get_fe().tensor_degree();
+  Tensor<2, dim>     inverse_jacobian = transpose(info.fe_values(0).jacobian(0).covariant_form());
+  const double       normal_volume_fraction =
+    std::abs((inverse_jacobian[GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
               info.fe_values(0).normal_vector(0)));
   double penalty = normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
   LocalIntegrators::Laplace ::nitsche_matrix(
@@ -694,11 +649,9 @@ do_test(const DoFHandler<dim> & dof,
   }
   matrix.reinit(sparsity);
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  UpdateFlags                         update_flags =
-    update_values | update_gradients | update_jacobians;
+  UpdateFlags update_flags = update_values | update_gradients | update_jacobians;
   info_box.add_update_flags_all(update_flags);
-  info_box.initialize_gauss_quadrature(
-    n_q_points_1d, n_q_points_1d, n_q_points_1d);
+  info_box.initialize_gauss_quadrature(n_q_points_1d, n_q_points_1d, n_q_points_1d);
   info_box.initialize(dof.get_fe(), mapping);
 
   MeshWorker::DoFInfo<dim> dof_info(dof);
@@ -713,15 +666,12 @@ do_test(const DoFHandler<dim> & dof,
   matrix.vmult(out, in);
 
   MatrixFree<dim, number> mf_data;
-  const QGauss<1>         quad(n_q_points_1d > 0 ? n_q_points_1d :
-                                           dof.get_fe().degree + 1);
+  const QGauss<1>         quad(n_q_points_1d > 0 ? n_q_points_1d : dof.get_fe().degree + 1);
   typename MatrixFree<dim, number>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
-  data.tasks_block_size      = 3;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
+  data.tasks_parallel_scheme               = MatrixFree<dim, number>::AdditionalData::none;
+  data.tasks_block_size                    = 3;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
 
   mf_data.reinit(mapping, dof, constraints, quad, data);
 
@@ -735,8 +685,7 @@ do_test(const DoFHandler<dim> & dof,
   if (also_test_parallel)
     {
       mf_data.clear();
-      data.tasks_parallel_scheme =
-        MatrixFree<dim, number>::AdditionalData::partition_partition;
+      data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_partition;
       mf_data.reinit(mapping, dof, constraints, quad, data);
 
       MatrixFreeTest<dim, fe_degree, n_q_points_1d, number> mf(mf_data);
@@ -758,8 +707,7 @@ do_test(const DoFHandler<dim> & dof,
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, testing_max_num_threads());
   mpi_initlog();
 #else
 int

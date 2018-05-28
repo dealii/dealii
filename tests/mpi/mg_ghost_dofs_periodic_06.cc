@@ -49,15 +49,12 @@ test()
   GridGenerator::subdivided_hyper_cube(tria, 3);
 
   // set periodic boundary conditions in all directions
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         cell->face(f)->set_all_boundary_ids(f + 10);
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   GridTools::collect_periodic_faces(tria, 0 + 10, 1 + 10, 0, periodic_faces);
   GridTools::collect_periodic_faces(tria, 2 + 10, 3 + 10, 1, periodic_faces);
@@ -66,30 +63,24 @@ test()
   // adaptively refine into the lower left corner
   for (unsigned int i = 0; i < 2; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             tria.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
            cell != tria.end();
            ++cell)
-        if (cell->at_boundary(0) && cell->at_boundary(2) &&
-            cell->is_locally_owned())
+        if (cell->at_boundary(0) && cell->at_boundary(2) && cell->is_locally_owned())
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
-    deallog << cell->id().to_string() << " " << cell->level_subdomain_id()
-            << std::endl;
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
+    deallog << cell->id().to_string() << " " << cell->level_subdomain_id() << std::endl;
 
   if (0)
     {
-      std::ofstream grid_output(
-        ("out" + Utilities::to_string(myid) + ".svg").c_str());
+      std::ofstream     grid_output(("out" + Utilities::to_string(myid) + ".svg").c_str());
       GridOut           grid_out;
       GridOutFlags::Svg flags;
-      flags.label_level_subdomain_id = true;
-      flags.coloring                 = GridOutFlags::Svg::level_subdomain_id;
+      flags.label_level_subdomain_id       = true;
+      flags.coloring                       = GridOutFlags::Svg::level_subdomain_id;
       flags.convert_level_number_to_height = true;
       grid_out.set_flags(flags);
 

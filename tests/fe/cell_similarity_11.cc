@@ -66,11 +66,9 @@ test(const Triangulation<dim> &tr)
     points[1][d] = 0.85;
 
   const Quadrature<dim> quadrature(points);
-  FEValues<dim>         fe_values(
-    mapping, fe, quadrature, update_gradients | update_jacobians);
+  FEValues<dim>         fe_values(mapping, fe, quadrature, update_gradients | update_jacobians);
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();
        ++cell)
     {
       fe_values.reinit(cell);
@@ -110,11 +108,9 @@ test()
   Triangulation<dim> tr;
   GridGenerator::subdivided_hyper_cube(tr, 3, -1, 1);
 
-  for (Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end();
-       ++cell)
+  for (Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->at_boundary() &&
-          std::abs(cell->face(f)->center()[0] + 1.) < 1e-12 &&
+      if (cell->face(f)->at_boundary() && std::abs(cell->face(f)->center()[0] + 1.) < 1e-12 &&
           std::abs(cell->face(f)->center()[1]) < 1e-12)
         cell->face(f)->set_manifold_id(1);
 

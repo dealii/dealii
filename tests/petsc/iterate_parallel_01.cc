@@ -78,8 +78,7 @@ test()
     {
       for (auto itr = mat.begin(r); itr != mat.end(r); ++itr)
         {
-          deallog << itr->row() << ' ' << itr->column() << ' ' << itr->value()
-                  << std::endl;
+          deallog << itr->row() << ' ' << itr->column() << ' ' << itr->value() << std::endl;
         }
     }
   /////////////////////////////////////////////

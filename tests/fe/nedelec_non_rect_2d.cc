@@ -89,13 +89,11 @@ namespace polytest
   };
   template <int dim>
   void
-  SimplePolynomial<dim>::vector_value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+  SimplePolynomial<dim>::vector_value_list(const std::vector<Point<dim>> &points,
+                                           std::vector<Vector<double>> &  values) const
   {
     Assert(dim == 2, ExcNotImplemented());
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p = points[i];
@@ -107,13 +105,11 @@ namespace polytest
 
   template <int dim>
   void
-  SimplePolynomial<dim>::rhs_value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+  SimplePolynomial<dim>::rhs_value_list(const std::vector<Point<dim>> &points,
+                                        std::vector<Vector<double>> &  values) const
   {
     Assert(dim == 2, ExcNotImplemented());
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -187,8 +183,7 @@ namespace polytest
       dof_handler, 0, boundary_function, 0, constraints);
     constraints.close();
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(
-      dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_sparsity_pattern(dof_handler, c_sparsity, constraints, false);
 
     sparsity_pattern.copy_from(c_sparsity);
     system_matrix.reinit(sparsity_pattern);
@@ -201,8 +196,7 @@ namespace polytest
     const QGauss<dim> test_quad(quad_order);
     FEValues<dim>     fe_values_test(fe,
                                  test_quad,
-                                 update_values | update_gradients |
-                                   update_quadrature_points |
+                                 update_values | update_gradients | update_quadrature_points |
                                    update_JxW_values);
 
     const QGauss<dim>  quadrature_formula(quad_order);
@@ -213,14 +207,13 @@ namespace polytest
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients | update_quadrature_points |
+                              update_JxW_values);
 
     FEFaceValues<dim> fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_quadrature_points |
-                                       update_normal_vectors |
-                                       update_JxW_values);
+                                       update_normal_vectors | update_JxW_values);
 
     const FEValuesExtractors::Vector vec(0);
 
@@ -233,8 +226,7 @@ namespace polytest
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     SimplePolynomial<dim>       right_hand_side;
-    std::vector<Vector<double>> rhs_value_list(
-      n_q_points, Vector<double>(fe.n_components()));
+    std::vector<Vector<double>> rhs_value_list(n_q_points, Vector<double>(fe.n_components()));
 
     typename DoFHandler<dim>::active_cell_iterator cell, endc;
     endc = dof_handler.end();
@@ -246,8 +238,7 @@ namespace polytest
         cell_matrix = 0;
         cell_rhs    = 0;
 
-        right_hand_side.rhs_value_list(fe_values.get_quadrature_points(),
-                                       rhs_value_list);
+        right_hand_side.rhs_value_list(fe_values.get_quadrature_points(), rhs_value_list);
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
             Tensor<1, dim> rhs_value;
@@ -259,14 +250,11 @@ namespace polytest
               {
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   {
-                    cell_matrix(i, j) +=
-                      (fe_values[vec].curl(i, q) * fe_values[vec].curl(j, q) +
-                       fe_values[vec].value(i, q) *
-                         fe_values[vec].value(j, q)) *
-                      fe_values.JxW(q);
+                    cell_matrix(i, j) += (fe_values[vec].curl(i, q) * fe_values[vec].curl(j, q) +
+                                          fe_values[vec].value(i, q) * fe_values[vec].value(j, q)) *
+                                         fe_values.JxW(q);
                   }
-                cell_rhs(j) +=
-                  rhs_value * fe_values[vec].value(j, q) * fe_values.JxW(q);
+                cell_rhs(j) += rhs_value * fe_values[vec].value(j, q) * fe_values.JxW(q);
               }
           }
         cell->get_dof_indices(local_dof_indices);

@@ -44,11 +44,7 @@ check()
 
   std::ostringstream old_data;
   DataOutBase::write_deal_II_intermediate(
-    patches,
-    names,
-    vectors,
-    DataOutBase::Deal_II_IntermediateFlags(),
-    old_data);
+    patches, names, vectors, DataOutBase::Deal_II_IntermediateFlags(), old_data);
 
   DataOutReader<dim, spacedim> data;
   {

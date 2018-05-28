@@ -317,9 +317,9 @@ namespace SUNDIALS
         const double &relative_tolerance                = 1e-5,
         const bool &  ignore_algebraic_terms_for_errors = true,
         // Initial conditions parameters
-        const InitialConditionCorrection &ic_type            = use_y_diff,
-        const InitialConditionCorrection &reset_type         = use_y_diff,
-        const unsigned int &maximum_non_linear_iterations_ic = 5) :
+        const InitialConditionCorrection &ic_type                          = use_y_diff,
+        const InitialConditionCorrection &reset_type                       = use_y_diff,
+        const unsigned int &              maximum_non_linear_iterations_ic = 5) :
         initial_time(initial_time),
         final_time(final_time),
         initial_step_size(initial_step_size),
@@ -388,70 +388,64 @@ namespace SUNDIALS
         prm.add_parameter("Initial step size", initial_step_size);
         prm.add_parameter("Minimum step size", minimum_step_size);
         prm.add_parameter("Maximum order of BDF", maximum_order);
-        prm.add_parameter("Maximum number of nonlinear iterations",
-                          maximum_non_linear_iterations);
+        prm.add_parameter("Maximum number of nonlinear iterations", maximum_non_linear_iterations);
         prm.leave_subsection();
 
         prm.enter_subsection("Error control");
         prm.add_parameter("Absolute error tolerance", absolute_tolerance);
         prm.add_parameter("Relative error tolerance", relative_tolerance);
-        prm.add_parameter(
-          "Ignore algebraic terms for error computations",
-          ignore_algebraic_terms_for_errors,
-          "Indicate whether or not to suppress algebraic variables "
-          "in the local error test.");
+        prm.add_parameter("Ignore algebraic terms for error computations",
+                          ignore_algebraic_terms_for_errors,
+                          "Indicate whether or not to suppress algebraic variables "
+                          "in the local error test.");
         prm.leave_subsection();
 
         prm.enter_subsection("Initial condition correction parameters");
         static std::string ic_type_str = "use_y_diff";
-        prm.add_parameter(
-          "Correction type at initial time",
-          ic_type_str,
-          "This is one of the following three options for the "
-          "initial condition calculation. \n"
-          " none: do not try to make initial conditions consistent. \n"
-          " use_y_diff: compute the algebraic components of y and differential\n"
-          "    components of y_dot, given the differential components of y. \n"
-          "    This option requires that the user specifies differential and \n"
-          "    algebraic components in the function get_differential_components.\n"
-          " use_y_dot: compute all components of y, given y_dot.",
-          Patterns::Selection("none|use_y_diff|use_y_dot"));
-        prm.add_action("Correction type at initial time",
-                       [&](const std::string &value) {
-                         if (value == "use_y_diff")
-                           ic_type = use_y_diff;
-                         else if (value == "use_y_dot")
-                           ic_type = use_y_dot;
-                         else if (value == "none")
-                           ic_type = none;
-                         else
-                           AssertThrow(false, ExcInternalError());
-                       });
+        prm.add_parameter("Correction type at initial time",
+                          ic_type_str,
+                          "This is one of the following three options for the "
+                          "initial condition calculation. \n"
+                          " none: do not try to make initial conditions consistent. \n"
+                          " use_y_diff: compute the algebraic components of y and differential\n"
+                          "    components of y_dot, given the differential components of y. \n"
+                          "    This option requires that the user specifies differential and \n"
+                          "    algebraic components in the function get_differential_components.\n"
+                          " use_y_dot: compute all components of y, given y_dot.",
+                          Patterns::Selection("none|use_y_diff|use_y_dot"));
+        prm.add_action("Correction type at initial time", [&](const std::string &value) {
+          if (value == "use_y_diff")
+            ic_type = use_y_diff;
+          else if (value == "use_y_dot")
+            ic_type = use_y_dot;
+          else if (value == "none")
+            ic_type = none;
+          else
+            AssertThrow(false, ExcInternalError());
+        });
 
         static std::string reset_type_str = "use_y_diff";
-        prm.add_parameter(
-          "Correction type after restart",
-          reset_type_str,
-          "This is one of the following three options for the "
-          "initial condition calculation. \n"
-          " none: do not try to make initial conditions consistent. \n"
-          " use_y_diff: compute the algebraic components of y and differential\n"
-          "    components of y_dot, given the differential components of y. \n"
-          "    This option requires that the user specifies differential and \n"
-          "    algebraic components in the function get_differential_components.\n"
-          " use_y_dot: compute all components of y, given y_dot.",
-          Patterns::Selection("none|use_y_diff|use_y_dot"));
-        prm.add_action("Correction type after restart",
-                       [&](const std::string &value) {
-                         if (value == "use_y_diff")
-                           reset_type = use_y_diff;
-                         else if (value == "use_y_dot")
-                           reset_type = use_y_dot;
-                         else if (value == "none")
-                           reset_type = none;
-                         else
-                           AssertThrow(false, ExcInternalError());
-                       });
+        prm.add_parameter("Correction type after restart",
+                          reset_type_str,
+                          "This is one of the following three options for the "
+                          "initial condition calculation. \n"
+                          " none: do not try to make initial conditions consistent. \n"
+                          " use_y_diff: compute the algebraic components of y and differential\n"
+                          "    components of y_dot, given the differential components of y. \n"
+                          "    This option requires that the user specifies differential and \n"
+                          "    algebraic components in the function get_differential_components.\n"
+                          " use_y_dot: compute all components of y, given y_dot.",
+                          Patterns::Selection("none|use_y_diff|use_y_dot"));
+        prm.add_action("Correction type after restart", [&](const std::string &value) {
+          if (value == "use_y_diff")
+            reset_type = use_y_diff;
+          else if (value == "use_y_dot")
+            reset_type = use_y_dot;
+          else if (value == "none")
+            reset_type = none;
+          else
+            AssertThrow(false, ExcInternalError());
+        });
         prm.add_parameter("Maximum number of nonlinear iterations",
                           maximum_non_linear_iterations_ic);
         prm.leave_subsection();
@@ -582,8 +576,7 @@ namespace SUNDIALS
      * @param data IDA configuration data
      * @param mpi_comm MPI communicator
      */
-    IDA(const AdditionalData &data     = AdditionalData(),
-        const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
+    IDA(const AdditionalData &data = AdditionalData(), const MPI_Comm mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
@@ -636,10 +629,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const double      t,
-                      const VectorType &y,
-                      const VectorType &y_dot,
-                      VectorType &      res)>
+    std::function<
+      int(const double t, const VectorType &y, const VectorType &y_dot, VectorType &res)>
       residual;
 
     /**
@@ -672,10 +663,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const double      t,
-                      const VectorType &y,
-                      const VectorType &y_dot,
-                      const double      alpha)>
+    std::function<
+      int(const double t, const VectorType &y, const VectorType &y_dot, const double alpha)>
       setup_jacobian;
 
     /**
@@ -706,8 +695,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &rhs, VectorType &dst)>
-      solve_jacobian_system;
+    std::function<int(const VectorType &rhs, VectorType &dst)> solve_jacobian_system;
 
     /**
      * Process solution. This function is called by IDA at fixed time steps,
@@ -745,8 +733,7 @@ namespace SUNDIALS
      * The default implementation simply returns `false`, i.e., no restart is
      * performed during the evolution.
      */
-    std::function<bool(const double t, VectorType &sol, VectorType &sol_dot)>
-      solver_should_restart;
+    std::function<bool(const double t, VectorType &sol, VectorType &sol_dot)> solver_should_restart;
 
     /**
      * Return an index set containing the differential components.
@@ -783,8 +770,7 @@ namespace SUNDIALS
      */
     DeclException1(ExcFunctionNotProvided,
                    std::string,
-                   << "Please provide an implementation for the function \""
-                   << arg1 << "\"");
+                   << "Please provide an implementation for the function \"" << arg1 << "\"");
 
     /**
      * This function is executed at construction time to set the
@@ -842,10 +828,9 @@ namespace SUNDIALS
                   "Sundials does not support complex scalar types, "
                   "but PETSc is configured to use a complex scalar type!");
 
-    static_assert(
-      !std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
-      "Sundials does not support complex scalar types, "
-      "but PETSc is configured to use a complex scalar type!");
+    static_assert(!std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
+                  "Sundials does not support complex scalar types, "
+                  "but PETSc is configured to use a complex scalar type!");
 #    endif // PETSC_USE_COMPLEX
 #  endif   // DEAL_II_WITH_PETSC
   };

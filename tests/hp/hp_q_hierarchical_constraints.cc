@@ -38,15 +38,12 @@ test(const bool apply_constrains, const unsigned int hp)
   {
     Triangulation<dim> triangulationL;
     Triangulation<dim> triangulationR;
-    GridGenerator::hyper_cube(
-      triangulationL, -1, 0); // create a square [-1,0]^d domain
-    GridGenerator::hyper_cube(
-      triangulationR, -1, 0); // create a square [-1,0]^d domain
+    GridGenerator::hyper_cube(triangulationL, -1, 0); // create a square [-1,0]^d domain
+    GridGenerator::hyper_cube(triangulationR, -1, 0); // create a square [-1,0]^d domain
     Point<dim> shift_vector;
     shift_vector[0] = 1.0;
     GridTools::shift(shift_vector, triangulationR);
-    GridGenerator::merge_triangulations(
-      triangulationL, triangulationR, triangulation);
+    GridGenerator::merge_triangulations(triangulationL, triangulationR, triangulation);
   }
 
   hp::FECollection<dim> fe;
@@ -59,8 +56,7 @@ test(const bool apply_constrains, const unsigned int hp)
   fe.push_back(FE_Q_Hierarchical<dim>(4));
 
   // set one cell to have different active_fe_index:
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
-    dof_handler.begin_active();
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
   cell->set_active_fe_index(1);
 
   // need to distribute dofs before refinement,
@@ -117,9 +113,8 @@ test(const bool apply_constrains, const unsigned int hp)
       data_out.build_patches(20);
 
       std::ostringstream filename;
-      filename << "shape_" << dim << "d"
-               << (apply_constrains ? "_constrained" : "") << hp_string << "_"
-               << i << ".vtk";
+      filename << "shape_" << dim << "d" << (apply_constrains ? "_constrained" : "") << hp_string
+               << "_" << i << ".vtk";
 
       std::ofstream output(filename.str().c_str());
       data_out.write_vtk(output);

@@ -38,10 +38,8 @@ main()
 
   Table<2, unsigned int> s = std::move(t);
 
-  deallog << "Sizes of moved-to table: " << s.size(0) << ", " << s.size(1)
-          << std::endl;
-  deallog << "Sizes of moved-from table: " << t.size(0) << ", " << t.size(1)
-          << std::endl;
+  deallog << "Sizes of moved-to table: " << s.size(0) << ", " << s.size(1) << std::endl;
+  deallog << "Sizes of moved-from table: " << t.size(0) << ", " << t.size(1) << std::endl;
 
   deallog << "Contents of moved-to table:" << std::endl;
   for (unsigned int i = 0; i < s.size(0); ++i)
@@ -56,8 +54,7 @@ main()
   const unsigned int new_entries[] = {1, 2, 3, 4, 5, 6, 7, 8};
   s.fill(new_entries, true);
 
-  deallog << "Sizes of new table: " << s.size(0) << ", " << s.size(1)
-          << std::endl;
+  deallog << "Sizes of new table: " << s.size(0) << ", " << s.size(1) << std::endl;
   deallog << "Contents of new table:" << std::endl;
   for (unsigned int i = 0; i < s.size(0); ++i)
     {
@@ -68,10 +65,8 @@ main()
 
   t = std::move(s);
 
-  deallog << "Sizes of moved-to table: " << t.size(0) << ", " << t.size(1)
-          << std::endl;
-  deallog << "Sizes of moved-from table: " << s.size(0) << ", " << s.size(1)
-          << std::endl;
+  deallog << "Sizes of moved-to table: " << t.size(0) << ", " << t.size(1) << std::endl;
+  deallog << "Sizes of moved-from table: " << s.size(0) << ", " << s.size(1) << std::endl;
 
   deallog << "Contents of moved-to table:" << std::endl;
   for (unsigned int i = 0; i < t.size(0); ++i)

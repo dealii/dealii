@@ -152,7 +152,7 @@ public:
   void
   solve(const std::function<double(VectorType &, const VectorType &)> &compute,
         VectorType &                                                   x,
-        const PreconditionerType &inverse_mass_matrix);
+        const PreconditionerType &                                     inverse_mass_matrix);
 
   /**
    * Solve for x that minimizes $E(\mathbf x)$ for the <EM>special case</EM>
@@ -192,16 +192,14 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
-SolverFIRE<VectorType>::AdditionalData::AdditionalData(
-  const double initial_timestep,
-  const double maximum_timestep,
-  const double maximum_linfty_norm) :
+SolverFIRE<VectorType>::AdditionalData::AdditionalData(const double initial_timestep,
+                                                       const double maximum_timestep,
+                                                       const double maximum_linfty_norm) :
   initial_timestep(initial_timestep),
   maximum_timestep(maximum_timestep),
   maximum_linfty_norm(maximum_linfty_norm)
 {
-  AssertThrow(initial_timestep > 0. && maximum_timestep > 0. &&
-                maximum_linfty_norm > 0.,
+  AssertThrow(initial_timestep > 0. && maximum_timestep > 0. && maximum_linfty_norm > 0.,
               ExcMessage("Expected positive values for initial_timestep, "
                          "maximum_timestep and maximum_linfty_norm but one "
                          "or more of the these values are not positive."));
@@ -220,8 +218,7 @@ SolverFIRE<VectorType>::SolverFIRE(SolverControl &           solver_control,
 
 
 template <typename VectorType>
-SolverFIRE<VectorType>::SolverFIRE(SolverControl &       solver_control,
-                                   const AdditionalData &data) :
+SolverFIRE<VectorType>::SolverFIRE(SolverControl &solver_control, const AdditionalData &data) :
   Solver<VectorType>(solver_control),
   additional_data(data)
 {}
@@ -240,7 +237,7 @@ void
 SolverFIRE<VectorType>::solve(
   const std::function<double(VectorType &, const VectorType &)> &compute,
   VectorType &                                                   x,
-  const PreconditionerType &inverse_mass_matrix)
+  const PreconditionerType &                                     inverse_mass_matrix)
 {
   LogStream::Prefix prefix("FIRE");
 
@@ -271,7 +268,7 @@ SolverFIRE<VectorType>::solve(
   unsigned int iter = 0;
 
   SolverControl::State conv = SolverControl::iterate;
-  conv = this->iteration_status(iter, gradients * gradients, x);
+  conv                      = this->iteration_status(iter, gradients * gradients, x);
   if (conv != SolverControl::iterate)
     return;
 
@@ -338,8 +335,7 @@ SolverFIRE<VectorType>::solve(
       // Change timestep if any dof would move more than maximum_linfty_norm.
       if (vmax > 0.)
         {
-          const double minimal_timestep =
-            additional_data.maximum_linfty_norm / vmax;
+          const double minimal_timestep = additional_data.maximum_linfty_norm / vmax;
           if (minimal_timestep < timestep)
             timestep = minimal_timestep;
         }
@@ -350,8 +346,7 @@ SolverFIRE<VectorType>::solve(
 
   // In the case of failure: throw exception.
   if (conv != SolverControl::success)
-    AssertThrow(false,
-                SolverControl::NoConvergence(iter, gradients * gradients));
+    AssertThrow(false, SolverControl::NoConvergence(iter, gradients * gradients));
 }
 
 

@@ -73,8 +73,7 @@ check()
 
   hp::DoFHandler<dim> dof(tr);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % element.size());
@@ -111,10 +110,8 @@ check()
   matrix.reinit(sparsity);
   matrix_ref.reinit(sparsity);
 
-  MatrixTools::create_mass_matrix(hp::MappingCollection<dim>(mapping),
-                                  dof,
-                                  hp::QCollection<dim>(quadrature),
-                                  matrix_ref);
+  MatrixTools::create_mass_matrix(
+    hp::MappingCollection<dim>(mapping), dof, hp::QCollection<dim>(quadrature), matrix_ref);
   constraints.condense(matrix_ref);
 
   const Function<dim> *const dummy = nullptr;

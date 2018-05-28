@@ -21,8 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 Quadrature<dim>
-QuadratureSelector<dim>::create_quadrature(const std::string &s,
-                                           const unsigned int order)
+QuadratureSelector<dim>::create_quadrature(const std::string &s, const unsigned int order)
 {
   if (s == "gauss")
     {
@@ -56,8 +55,7 @@ QuadratureSelector<dim>::create_quadrature(const std::string &s,
 
 
 template <int dim>
-QuadratureSelector<dim>::QuadratureSelector(const std::string &s,
-                                            const unsigned int order) :
+QuadratureSelector<dim>::QuadratureSelector(const std::string &s, const unsigned int order) :
   Quadrature<dim>(create_quadrature(s, order).get_points(),
                   create_quadrature(s, order).get_weights())
 {}

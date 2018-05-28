@@ -37,8 +37,8 @@ main()
   SparsityPattern    sp1((N - 1) * (N - 1), (N - 1) * (N - 1), 5);
   FDMatrix(N, N).five_point_structure(sp1);
   sp1.compress();
-  deallog << sp1.n_rows() << " " << sp1.n_cols() << " " << sp1.bandwidth()
-          << " " << sp1.n_nonzero_elements() << std::endl;
+  deallog << sp1.n_rows() << " " << sp1.n_cols() << " " << sp1.bandwidth() << " "
+          << sp1.n_nonzero_elements() << std::endl;
   for (unsigned int i = 0; i < sp1.n_rows(); ++i)
     deallog << sp1.row_length(i) << std::endl;
   sp1.print_gnuplot(deallog.get_file_stream());
@@ -47,8 +47,8 @@ main()
   // off-diagonals
   SparsityPattern sp2(sp1, 10, 2);
   sp2.compress();
-  deallog << sp2.n_rows() << " " << sp2.n_cols() << " " << sp2.bandwidth()
-          << " " << sp2.n_nonzero_elements() << std::endl;
+  deallog << sp2.n_rows() << " " << sp2.n_cols() << " " << sp2.bandwidth() << " "
+          << sp2.n_nonzero_elements() << std::endl;
   for (unsigned int i = 0; i < sp2.n_rows(); ++i)
     deallog << sp2.row_length(i) << std::endl;
   sp2.print_gnuplot(deallog.get_file_stream());
@@ -63,8 +63,8 @@ main()
     sp3.add(0, i);
   sp3.symmetrize();
   sp3.compress();
-  deallog << sp3.n_rows() << " " << sp3.n_cols() << " " << sp3.bandwidth()
-          << " " << sp3.n_nonzero_elements() << std::endl;
+  deallog << sp3.n_rows() << " " << sp3.n_cols() << " " << sp3.bandwidth() << " "
+          << sp3.n_nonzero_elements() << std::endl;
   for (unsigned int i = 0; i < sp3.n_rows(); ++i)
     deallog << sp3.row_length(i) << std::endl;
   sp3.print_gnuplot(deallog.get_file_stream());
@@ -79,14 +79,11 @@ main()
   for (unsigned int row = 0; row < sp3.n_rows(); ++row)
     {
       sparsity.push_back(std::set<unsigned int, std::greater<unsigned int>>());
-      for (SparsityPattern::const_iterator p = sp3.begin(row);
-           p != sp3.end(row);
-           ++p)
+      for (SparsityPattern::const_iterator p = sp3.begin(row); p != sp3.end(row); ++p)
         sparsity.back().insert(p->column());
     };
   SparsityPattern sp4;
-  sp4.copy_from(
-    (N - 1) * (N - 1), (N - 1) * (N - 1), sparsity.begin(), sparsity.end());
+  sp4.copy_from((N - 1) * (N - 1), (N - 1) * (N - 1), sparsity.begin(), sparsity.end());
 
   // now check for equivalence of sp3 and sp4
   for (unsigned int row = 0; row < sp3.n_rows(); ++row)
@@ -107,17 +104,14 @@ main()
   // forward, then backward
   for (unsigned int loop = 1; loop <= 4; ++loop)
     {
-      const SparsityPattern &sp =
-        (loop == 1 ? sp1 : (loop == 2 ? sp2 : (loop == 3 ? sp3 : sp4)));
+      const SparsityPattern &sp = (loop == 1 ? sp1 : (loop == 2 ? sp2 : (loop == 3 ? sp3 : sp4)));
       for (unsigned int i = 0; i < sp.n_nonzero_elements(); ++i)
-        AssertThrow(
-          sp(sp.matrix_position(i).first, sp.matrix_position(i).second) == i,
-          ExcInternalError());
+        AssertThrow(sp(sp.matrix_position(i).first, sp.matrix_position(i).second) == i,
+                    ExcInternalError());
       for (types::global_dof_index row = 0; row < sp.n_rows(); ++row)
         for (types::global_dof_index col = 0; col < sp.n_cols(); ++col)
           if (sp(row, col) != SparsityPattern::invalid_entry)
-            AssertThrow(sp.matrix_position(sp(row, col)) ==
-                          std::make_pair(row, col),
+            AssertThrow(sp.matrix_position(sp(row, col)) == std::make_pair(row, col),
                         ExcInternalError());
     };
 
@@ -140,8 +134,8 @@ main()
   std::remove("sparsity_pattern.tmp");
 
   // now check for equivalence of sp3 and sp5
-  deallog << sp3.n_rows() - sp5.n_rows() << ' ' << sp3.n_cols() - sp5.n_cols()
-          << ' ' << (sp3.is_compressed() ^ sp5.is_compressed()) << ' '
+  deallog << sp3.n_rows() - sp5.n_rows() << ' ' << sp3.n_cols() - sp5.n_cols() << ' '
+          << (sp3.is_compressed() ^ sp5.is_compressed()) << ' '
           << (sp3.is_compressed() ^ sp5.is_compressed()) << ' ' << std::endl;
 
   for (unsigned int row = 0; row < sp3.n_rows(); ++row)

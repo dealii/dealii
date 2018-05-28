@@ -28,8 +28,7 @@ using namespace dealii;
 
 
 void
-test_applies(std::string                                            description,
-             const PackagedOperation<Vector<std::complex<double>>> &expr)
+test_applies(std::string description, const PackagedOperation<Vector<std::complex<double>>> &expr)
 {
   // test apply
   Vector<std::complex<double>> tmp = expr;

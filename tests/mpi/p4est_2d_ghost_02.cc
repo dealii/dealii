@@ -73,24 +73,20 @@ test()
             {
               if (cell->subdomain_id() != (unsigned int)myid)
                 {
-                  AssertThrow(cell->is_ghost() || cell->is_artificial(),
-                              ExcInternalError());
+                  AssertThrow(cell->is_ghost() || cell->is_artificial(), ExcInternalError());
                   continue;
                 }
 
-              for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell;
-                   ++n)
+              for (unsigned int n = 0; n < GeometryInfo<dim>::faces_per_cell; ++n)
                 {
                   if (cell->at_boundary(n))
                     continue;
                   AssertThrow(cell->neighbor(n).state() == IteratorState::valid,
                               ExcInternalError());
 
-                  AssertThrow(cell->neighbor(n)->level() == cell->level(),
-                              ExcInternalError());
+                  AssertThrow(cell->neighbor(n)->level() == cell->level(), ExcInternalError());
 
-                  AssertThrow(!cell->neighbor(n)->has_children(),
-                              ExcInternalError());
+                  AssertThrow(!cell->neighbor(n)->has_children(), ExcInternalError());
                 }
             }
 
@@ -98,11 +94,10 @@ test()
           if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
             deallog << "Checksum: " << checksum << std::endl;
 
-          AssertThrow(
-            tr.n_global_active_cells() ==
-              static_cast<unsigned int>(
-                std::pow(1. * GeometryInfo<dim>::max_children_per_cell, i + 1)),
-            ExcInternalError());
+          AssertThrow(tr.n_global_active_cells() ==
+                        static_cast<unsigned int>(
+                          std::pow(1. * GeometryInfo<dim>::max_children_per_cell, i + 1)),
+                      ExcInternalError());
         }
     }
 

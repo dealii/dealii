@@ -57,8 +57,7 @@ void create_two_cubes(Triangulation<3> &coarse_grid)
   // finally generate a triangulation
   // out of this
   GridReordering<3>::reorder_cells(cells);
-  coarse_grid.create_triangulation_compatibility(
-    vertices, cells, SubCellData());
+  coarse_grid.create_triangulation_compatibility(vertices, cells, SubCellData());
 }
 
 
@@ -67,8 +66,7 @@ void create_two_cubes(Triangulation<3> &coarse_grid)
 // the edges are not all ok and the common face is rotated. we thus have
 // to store the face rotation (and face flip) in each cell
 
-void create_two_cubes_rotation(Triangulation<3> & coarse_grid,
-                               const unsigned int n_rotations)
+void create_two_cubes_rotation(Triangulation<3> &coarse_grid, const unsigned int n_rotations)
 {
   Assert(n_rotations < 4, ExcNotImplemented());
 
@@ -104,8 +102,7 @@ void create_two_cubes_rotation(Triangulation<3> & coarse_grid,
     }
   // finally generate a triangulation
   // out of this
-  coarse_grid.create_triangulation_compatibility(
-    vertices, cells, SubCellData());
+  coarse_grid.create_triangulation_compatibility(vertices, cells, SubCellData());
 }
 
 
@@ -138,8 +135,7 @@ void create_L_shape(Triangulation<3> &coarse_grid)
   const unsigned int n_vertices_per_surface = 8;
   Assert(vertices.size() == n_vertices_per_surface * 2, ExcInternalError());
 
-  const unsigned int connectivity[3][4] = {
-    {1, 2, 3, 0}, {3, 4, 5, 0}, {0, 5, 6, 7}};
+  const unsigned int connectivity[3][4] = {{1, 2, 3, 0}, {3, 4, 5, 0}, {0, 5, 6, 7}};
   for (unsigned int i = 0; i < 3; ++i)
     {
       CellData<3> cell;
@@ -154,16 +150,13 @@ void create_L_shape(Triangulation<3> &coarse_grid)
   // finally generate a triangulation
   // out of this
   GridReordering<3>::reorder_cells(cells);
-  coarse_grid.create_triangulation_compatibility(
-    vertices, cells, SubCellData());
+  coarse_grid.create_triangulation_compatibility(vertices, cells, SubCellData());
 }
 
 
 void coarsen_global(Triangulation<3> &grid)
 {
-  for (Triangulation<3>::active_cell_iterator c = grid.begin_active();
-       c != grid.end();
-       ++c)
+  for (Triangulation<3>::active_cell_iterator c = grid.begin_active(); c != grid.end(); ++c)
     c->set_coarsen_flag();
   grid.execute_coarsening_and_refinement();
 }

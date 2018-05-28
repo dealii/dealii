@@ -51,14 +51,12 @@ main()
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    Triangulation<spacedim>::active_cell_iterator cell =
-      volume_mesh.begin_active();
+    Triangulation<spacedim>::active_cell_iterator cell = volume_mesh.begin_active();
 
     cell->face(0)->set_all_boundary_ids(1);
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
-    GridGenerator::extract_boundary_mesh(
-      volume_mesh, boundary_mesh, boundary_ids);
+    GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh, boundary_ids);
   }
   boundary_mesh.begin_active()->set_refine_flag();
   boundary_mesh.execute_coarsening_and_refinement();

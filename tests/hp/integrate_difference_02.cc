@@ -68,8 +68,7 @@ test()
 
   hp::DoFHandler<dim> dof_handler(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % fe_collection.size());
@@ -80,9 +79,8 @@ test()
   Vector<double> vec(dof_handler.n_dofs());
   VectorTools::interpolate(
     dof_handler,
-    Functions::Monomial<dim>(
-      dim == 1 ? Point<dim>(1.) :
-                 (dim == 2 ? Point<dim>(1., 0.) : Point<dim>(1., 0., 0.))),
+    Functions::Monomial<dim>(dim == 1 ? Point<dim>(1.) :
+                                        (dim == 2 ? Point<dim>(1., 0.) : Point<dim>(1., 0., 0.))),
     vec);
 
   Vector<float> diff(tria.n_active_cells());
@@ -90,12 +88,8 @@ test()
   // L1 norm. the function is u(x)=x, so its
   // L1 norm should be equal to 1/2
   {
-    VectorTools::integrate_difference(dof_handler,
-                                      vec,
-                                      Functions::ZeroFunction<dim>(),
-                                      diff,
-                                      q_collection,
-                                      VectorTools::L1_norm);
+    VectorTools::integrate_difference(
+      dof_handler, vec, Functions::ZeroFunction<dim>(), diff, q_collection, VectorTools::L1_norm);
     deallog << "L1, diff=" << diff.l1_norm() << std::endl;
   }
 

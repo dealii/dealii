@@ -58,7 +58,7 @@ helmholtz_operator(const MatrixFree<dim, Number> &                   data,
                    const std::pair<unsigned int, unsigned int> &     cell_range)
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 2, Number> fe_eval(data);
-  const unsigned int n_q_points = fe_eval.n_q_points;
+  const unsigned int                                     n_q_points = fe_eval.n_q_points;
 
   for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
     {
@@ -68,8 +68,7 @@ helmholtz_operator(const MatrixFree<dim, Number> &                   data,
       fe_eval.evaluate(true, true, false);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
-          fe_eval.submit_value(
-            make_vectorized_array(Number(10)) * fe_eval.get_value(q), q);
+          fe_eval.submit_value(make_vectorized_array(Number(10)) * fe_eval.get_value(q), q);
           fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
         }
       fe_eval.integrate(true, true);
@@ -84,8 +83,7 @@ class MatrixFreeTest
 {
 public:
   typedef VectorizedArray<Number> vector_t;
-  static const std::size_t        n_vectors =
-    VectorizedArray<Number>::n_array_elements;
+  static const std::size_t        n_vectors = VectorizedArray<Number>::n_array_elements;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
 
@@ -118,9 +116,8 @@ test()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  cell                                                   = tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+  cell = tria.begin_active();
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm() < 0.2)
@@ -149,8 +146,7 @@ test()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -163,9 +159,8 @@ test()
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, number>::AdditionalData data;
-    data.tasks_parallel_scheme =
-      MatrixFree<dim, number>::AdditionalData::partition_color;
-    data.tasks_block_size = 7;
+    data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_color;
+    data.tasks_block_size      = 7;
     mf_data.reinit(dof, constraints, quad, data);
   }
 
@@ -183,8 +178,7 @@ test()
 
   for (unsigned int i = 0; i < in.block(0).local_size(); ++i)
     {
-      if (constraints.is_constrained(
-            dof.locally_owned_dofs().index_within_set(i)))
+      if (constraints.is_constrained(dof.locally_owned_dofs().index_within_set(i)))
         continue;
       in.block(0).local_element(i) = random_value<double>();
       in.block(1).local_element(i) = random_value<double>();
@@ -205,19 +199,16 @@ test()
   {
     QGauss<dim> quadrature_formula(fe_degree + 1);
 
-    FEValues<dim> fe_values(dof.get_fe(),
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_JxW_values);
+    FEValues<dim> fe_values(
+      dof.get_fe(), quadrature_formula, update_values | update_gradients | update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -229,16 +220,13 @@ test()
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   cell_matrix(i, j) +=
-                    ((fe_values.shape_grad(i, q_point) *
-                        fe_values.shape_grad(j, q_point) +
-                      10. * fe_values.shape_value(i, q_point) *
-                        fe_values.shape_value(j, q_point)) *
+                    ((fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                      10. * fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
                      fe_values.JxW(q_point));
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, sparse_matrix);
+          constraints.distribute_local_to_global(cell_matrix, local_dof_indices, sparse_matrix);
         }
   }
 

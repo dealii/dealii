@@ -29,8 +29,7 @@ check(const FiniteElement<dim> &fe)
   deallog << fe.get_name() << std::endl;
   deallog << "components: " << fe.n_components() << std::endl;
   deallog << "blocks: " << fe.n_blocks() << std::endl;
-  deallog << "conforms H1: " << fe.conforms(FiniteElementData<dim>::H1)
-          << std::endl;
+  deallog << "conforms H1: " << fe.conforms(FiniteElementData<dim>::H1) << std::endl;
   deallog << "n_base_elements: " << fe.n_base_elements() << std::endl;
   deallog << std::endl;
 }

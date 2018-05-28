@@ -70,19 +70,16 @@ locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
   DoFTools::get_subdomain_association(dof_handler, subdomain_association);
 
   const unsigned int n_subdomains =
-    1 +
-    (*max_element(subdomain_association.begin(), subdomain_association.end()));
+    1 + (*max_element(subdomain_association.begin(), subdomain_association.end()));
 
-  std::vector<IndexSet> index_sets(n_subdomains,
-                                   IndexSet(dof_handler.n_dofs()));
+  std::vector<IndexSet> index_sets(n_subdomains, IndexSet(dof_handler.n_dofs()));
 
   // loop over subdomain_association and populate IndexSet when a
   // change in subdomain ID is found
   types::global_dof_index i_min          = 0;
   types::global_dof_index this_subdomain = subdomain_association[0];
 
-  for (types::global_dof_index index = 1; index < subdomain_association.size();
-       ++index)
+  for (types::global_dof_index index = 1; index < subdomain_association.size(); ++index)
     {
       // found index different from the current one
       if (subdomain_association[index] != this_subdomain)
@@ -119,10 +116,8 @@ test()
   const unsigned int number_of_eigenvalues        = 5;
 
   MPI_Comm           mpi_communicator = MPI_COMM_WORLD;
-  const unsigned int n_mpi_processes =
-    Utilities::MPI::n_mpi_processes(mpi_communicator);
-  const unsigned int this_mpi_process =
-    Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int n_mpi_processes  = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const unsigned int this_mpi_process = Utilities::MPI::this_mpi_process(mpi_communicator);
 
 
   Triangulation<dim> triangulation;
@@ -147,8 +142,7 @@ test()
     const double x1 = 1.0;
     const double dL = (x1 - x0) / n_mpi_processes;
 
-    Triangulation<dim>::active_cell_iterator cell =
-                                               triangulation.begin_active(),
+    Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active(),
                                              endc = triangulation.end();
     for (; cell != endc; ++cell)
       {
@@ -190,11 +184,9 @@ test()
     csp, n_locally_owned_dofs, mpi_communicator, locally_relevant_dofs);
 
   // Initialise the stiffness and mass matrices
-  stiffness_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  stiffness_matrix.reinit(locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
 
-  mass_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+  mass_matrix.reinit(locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
 
   eigenfunctions.resize(5);
   for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
@@ -211,8 +203,8 @@ test()
   QGauss<dim>   quadrature_formula(2);
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -222,8 +214,7 @@ test()
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     if (cell->subdomain_id() == this_mpi_process)
@@ -237,21 +228,19 @@ test()
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
                 cell_stiffness_matrix(i, j) +=
-                  (fe_values.shape_grad(i, q_point) *
-                   fe_values.shape_grad(j, q_point)) *
+                  (fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point)) *
                   fe_values.JxW(q_point);
 
-                cell_mass_matrix(i, j) += (fe_values.shape_value(i, q_point) *
-                                           fe_values.shape_value(j, q_point)) *
-                                          fe_values.JxW(q_point);
+                cell_mass_matrix(i, j) +=
+                  (fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                  fe_values.JxW(q_point);
               }
 
         cell->get_dof_indices(local_dof_indices);
 
         constraints.distribute_local_to_global(
           cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-        constraints.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_mass_matrix, local_dof_indices, mass_matrix);
       }
 
   stiffness_matrix.compress(VectorOperation::add);
@@ -273,20 +262,15 @@ test()
     SolverCG<VectorType>                   solver_c(inner_control_c);
     TrilinosWrappers::PreconditionIdentity preconditioner;
 
-    const auto shifted_matrix =
-      linear_operator<VectorType>(stiffness_matrix) -
-      shift * linear_operator<VectorType>(mass_matrix);
+    const auto shifted_matrix = linear_operator<VectorType>(stiffness_matrix) -
+                                shift * linear_operator<VectorType>(mass_matrix);
 
-    const auto shift_and_invert =
-      inverse_operator(shifted_matrix, solver_c, preconditioner);
+    const auto shift_and_invert = inverse_operator(shifted_matrix, solver_c, preconditioner);
 
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
 
-    PArpackSolver<TrilinosWrappers::MPI::Vector>::AdditionalData
-      additional_data(
-        num_arnoldi_vectors,
-        PArpackSolver<TrilinosWrappers::MPI::Vector>::largest_magnitude,
-        true);
+    PArpackSolver<TrilinosWrappers::MPI::Vector>::AdditionalData additional_data(
+      num_arnoldi_vectors, PArpackSolver<TrilinosWrappers::MPI::Vector>::largest_magnitude, true);
 
     SolverControl solver_control(
       dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
@@ -299,12 +283,8 @@ test()
     eigensolver.set_initial_vector(eigenfunctions[0]);
     // avoid output of iterative solver:
     const unsigned int previous_depth = deallog.depth_file(0);
-    eigensolver.solve(stiffness_matrix,
-                      mass_matrix,
-                      shift_and_invert,
-                      lambda,
-                      eigenfunctions,
-                      eigenvalues.size());
+    eigensolver.solve(
+      stiffness_matrix, mass_matrix, shift_and_invert, lambda, eigenfunctions, eigenvalues.size());
     deallog.depth_file(previous_depth);
 
     for (unsigned int i = 0; i < lambda.size(); i++)
@@ -318,17 +298,15 @@ test()
     // b) x_j*B*x_i=\delta_{ij}
     {
       const double                  precision = 1e-7;
-      TrilinosWrappers::MPI::Vector Ax(eigenfunctions[0]),
-        Bx(eigenfunctions[0]);
+      TrilinosWrappers::MPI::Vector Ax(eigenfunctions[0]), Bx(eigenfunctions[0]);
       for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
         {
           mass_matrix.vmult(Bx, eigenfunctions[i]);
 
           for (unsigned int j = 0; j < eigenfunctions.size(); j++)
             Assert(std::abs(eigenfunctions[j] * Bx - (i == j)) < precision,
-                   ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
-                              " and " + Utilities::int_to_string(j) +
-                              " are not orthonormal!"));
+                   ExcMessage("Eigenvectors " + Utilities::int_to_string(i) + " and " +
+                              Utilities::int_to_string(j) + " are not orthonormal!"));
 
           stiffness_matrix.vmult(Ax, eigenfunctions[i]);
           Ax.add(-1.0 * std::real(lambda[i]), Bx);
@@ -362,13 +340,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -376,12 +352,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

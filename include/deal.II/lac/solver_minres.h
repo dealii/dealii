@@ -90,8 +90,7 @@ public:
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverMinRes(SolverControl &       cn,
-               const AdditionalData &data = AdditionalData());
+  SolverMinRes(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   /**
    * Virtual destructor.
@@ -162,8 +161,7 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl &           cn,
 
 
 template <class VectorType>
-SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
-                                       const AdditionalData &) :
+SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn, const AdditionalData &) :
   Solver<VectorType>(cn),
   res2(numbers::signaling_nan<double>())
 {}
@@ -354,8 +352,7 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(j, r_l2));
+  AssertThrow(conv == SolverControl::success, SolverControl::NoConvergence(j, r_l2));
 
   // otherwise exit as normal
 }

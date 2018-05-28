@@ -126,10 +126,7 @@ plot_shape_functions(const unsigned int degree)
       QTrapez<1>         q_trapez;
       const unsigned int div = 2;
       QIterated<dim>     q(q_trapez, div);
-      FEValues<dim>      fe(element,
-                       q,
-                       update_values | update_gradients |
-                         update_quadrature_points);
+      FEValues<dim> fe(element, q, update_values | update_gradients | update_quadrature_points);
       fe.reinit(c);
 
       for (unsigned int q_point = 0; q_point < q.size(); ++q_point)
@@ -137,8 +134,7 @@ plot_shape_functions(const unsigned int degree)
           // Output function in
           // gnuplot readable format,
           // namely x y z u0x u0y u0z u1x...
-          deallog << "value    " << q_point << '\t'
-                  << fe.quadrature_point(q_point);
+          deallog << "value    " << q_point << '\t' << fe.quadrature_point(q_point);
 
           for (unsigned int i = 0; i < element.dofs_per_cell; ++i)
             {
@@ -148,17 +144,14 @@ plot_shape_functions(const unsigned int degree)
 
           // Output the gradients in
           // similar fashion
-          deallog << std::endl
-                  << "gradient " << q_point << '\t'
-                  << fe.quadrature_point(q_point);
+          deallog << std::endl << "gradient " << q_point << '\t' << fe.quadrature_point(q_point);
 
           for (unsigned int i = 0; i < element.dofs_per_cell; ++i)
             {
               for (unsigned int c = 0; c < dim; ++c)
                 {
                   for (unsigned int d = 0; d < dim; ++d)
-                    deallog << '\t'
-                            << fe.shape_grad_component(i, q_point, c)[d];
+                    deallog << '\t' << fe.shape_grad_component(i, q_point, c)[d];
                 }
             }
           deallog << std::endl;

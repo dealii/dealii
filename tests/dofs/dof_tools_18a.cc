@@ -31,15 +31,12 @@
 // column (well, we had to invent
 // something)
 void
-make_masks(const unsigned int            n,
-           Table<2, DoFTools::Coupling> &m1,
-           Table<2, DoFTools::Coupling> &m2)
+make_masks(const unsigned int n, Table<2, DoFTools::Coupling> &m1, Table<2, DoFTools::Coupling> &m2)
 {
   m1.reinit(n, n);
   m2.reinit(n, n);
   for (unsigned int i = 0; i < n; ++i)
-    m1(i, 0) = m1(0, i) = m2(i, 0) = m2(0, i) = m1(i, i) = m2(i, i) =
-      DoFTools::nonzero;
+    m1(i, 0) = m1(0, i) = m2(i, 0) = m2(0, i) = m1(i, i) = m2(i, i) = DoFTools::nonzero;
 }
 
 
@@ -52,8 +49,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   make_masks(dof_handler.get_fe().n_components(), mask_int, mask_ext);
 
   // create sparsity pattern
-  SparsityPattern sp(dof_handler.n_dofs(),
-                     dof_handler.max_couplings_between_dofs() * 2);
+  SparsityPattern sp(dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs() * 2);
   DoFTools::make_flux_sparsity_pattern(dof_handler, sp, mask_int, mask_ext);
   sp.compress();
 
@@ -76,8 +72,7 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   unsigned int hash = 0;
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
-    hash +=
-      l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
-           (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
+    hash += l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
+                 (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
   deallog << hash << std::endl;
 }

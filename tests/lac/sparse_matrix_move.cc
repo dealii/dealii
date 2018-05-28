@@ -26,9 +26,7 @@ graph_laplacian(const SparsityPattern &sparsity, SparseMatrix<double> &matrix)
 {
   matrix = 0.0;
 
-  for (SparsityPattern::const_iterator it = sparsity.begin();
-       it != sparsity.end();
-       ++it)
+  for (SparsityPattern::const_iterator it = sparsity.begin(); it != sparsity.end(); ++it)
     {
       const auto i = (*it).row();
       const auto j = (*it).column();

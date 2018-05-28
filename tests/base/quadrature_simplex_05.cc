@@ -31,11 +31,8 @@ test(int n, const Point<dim> &split_point, stream_type &deallog)
   QSplit<dim> quad(QSimplex<dim>(QIterated<dim>(QTrapez<1>(), n)), split_point);
 
   deallog << std::endl
-          << "# dim = " << dim << ", quad size = " << quad.size()
-          << ", computed area = "
-          << std::accumulate(
-               quad.get_weights().begin(), quad.get_weights().end(), 0.0)
-          << std::endl
+          << "# dim = " << dim << ", quad size = " << quad.size() << ", computed area = "
+          << std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0) << std::endl
           << std::endl;
 
   for (auto p : quad.get_points())

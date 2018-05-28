@@ -94,21 +94,15 @@ test(std::string filename, unsigned int degree = 1)
   const QGauss<dim> quad(2 * fe.degree + 1);
   ConstraintMatrix  constraints;
   constraints.close();
-  VectorTools::project(
-    mapping, dof_handler, constraints, quad, the_function, projected_one);
+  VectorTools::project(mapping, dof_handler, constraints, quad, the_function, projected_one);
 
-  deallog << "L2 norm of projected vector: " << projected_one.l2_norm()
-          << std::endl;
+  deallog << "L2 norm of projected vector: " << projected_one.l2_norm() << std::endl;
 
 
   // compute the H1 difference
   Vector<float> difference_per_cell(triangulation.n_active_cells());
-  VectorTools::integrate_difference(dof_handler,
-                                    projected_one,
-                                    the_function,
-                                    difference_per_cell,
-                                    quad,
-                                    VectorTools::H1_norm);
+  VectorTools::integrate_difference(
+    dof_handler, projected_one, the_function, difference_per_cell, quad, VectorTools::H1_norm);
 
   deallog << "H1 error: " << difference_per_cell.l2_norm() << std::endl;
 }

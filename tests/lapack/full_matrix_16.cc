@@ -41,8 +41,7 @@ test(const unsigned int size)
 
   deallog << "l1:        " << (F.l1_norm() - M.l1_norm()) << std::endl
           << "linfty:    " << (F.linfty_norm() - M.linfty_norm()) << std::endl
-          << "frobenius: " << (F.frobenius_norm() - M.frobenius_norm())
-          << std::endl;
+          << "frobenius: " << (F.frobenius_norm() - M.frobenius_norm()) << std::endl;
 }
 
 

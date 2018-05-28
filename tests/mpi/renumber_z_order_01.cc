@@ -58,9 +58,7 @@ test()
   GridGenerator::hyper_cube(tr, -1.0, 1.0);
   tr.refine_global(3);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tr.begin_active();
-       cell != tr.end();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
        ++cell)
     if (!cell->is_ghost() && !cell->is_artificial())
       if (cell->center().norm() < 0.3)
@@ -77,26 +75,22 @@ test()
   DoFRenumbering::hierarchical(dofh);
 
   if (myid == 0)
-    deallog << "n_global_active_cells: " << tr.n_global_active_cells()
-            << std::endl;
+    deallog << "n_global_active_cells: " << tr.n_global_active_cells() << std::endl;
 
   TrilinosWrappers::MPI::Vector vector;
   vector.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   {
     ConstraintMatrix cm;
     cm.close();
-    QGauss<dim>                          quadrature_formula(2);
-    FEValues<dim>                        fe_values(fe,
-                            quadrature_formula,
-                            update_quadrature_points | update_JxW_values |
-                              update_values);
+    QGauss<dim>   quadrature_formula(2);
+    FEValues<dim> fe_values(
+      fe, quadrature_formula, update_quadrature_points | update_JxW_values | update_values);
     const unsigned int                   dofs_per_cell = fe.dofs_per_cell;
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     Vector<double>                       local_vector(dofs_per_cell);
     const unsigned int                   n_q_points = quadrature_formula.size();
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active(),
-                                                   endc = dofh.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active(), endc = dofh.end();
     for (; cell != endc; ++cell)
       if (cell->subdomain_id() == tr.locally_owned_subdomain())
         {
@@ -108,15 +102,13 @@ test()
             {
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  local_vector(i) += fe_values.shape_value(i, q) * 1.0 *
-                                     local_dof_indices[i] *
-                                     (fe_values.quadrature_point(q)[0] +
-                                      fe_values.quadrature_point(q).square()) *
-                                     fe_values.JxW(q);
+                  local_vector(i) +=
+                    fe_values.shape_value(i, q) * 1.0 * local_dof_indices[i] *
+                    (fe_values.quadrature_point(q)[0] + fe_values.quadrature_point(q).square()) *
+                    fe_values.JxW(q);
                 }
             }
-          cm.distribute_local_to_global(
-            local_vector, local_dof_indices, vector);
+          cm.distribute_local_to_global(local_vector, local_dof_indices, vector);
         }
     vector.compress(VectorOperation::add);
   }

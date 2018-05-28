@@ -29,8 +29,7 @@ test()
   // create a stream where we read from gzipped data
   boost::iostreams::filtering_istream in;
   in.push(boost::iostreams::basic_gzip_decompressor<>());
-  in.push(
-    boost::iostreams::file_source(SOURCE_DIR "/boost_iostreams_01.data.gz"));
+  in.push(boost::iostreams::file_source(SOURCE_DIR "/boost_iostreams_01.data.gz"));
   AssertThrow(in, ExcIO());
 
   // read the two numbers that are in this file

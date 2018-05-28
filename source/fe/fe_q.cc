@@ -56,10 +56,7 @@ FE_Q<dim, spacedim>::FE_Q(const unsigned int degree) :
   FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
     TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(
       internal::FE_Q::get_QGaussLobatto_points(degree))),
-    FiniteElementData<dim>(this->get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::H1),
+    FiniteElementData<dim>(this->get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::H1),
     std::vector<bool>(1, false))
 {
   this->initialize(internal::FE_Q::get_QGaussLobatto_points(degree));
@@ -96,8 +93,7 @@ FE_Q<dim, spacedim>::get_name() const
   std::vector<double> points(this->degree + 1);
 
   // Decode the support points in one coordinate direction.
-  std::vector<unsigned int> lexicographic =
-    this->poly_space.get_numbering_inverse();
+  std::vector<unsigned int> lexicographic = this->poly_space.get_numbering_inverse();
   for (unsigned int j = 0; j <= this->degree; j++)
     points[j] = this->unit_support_points[lexicographic[j]][0];
 
@@ -112,11 +108,10 @@ FE_Q<dim, spacedim>::get_name() const
   if (equidistant == true)
     {
       if (this->degree > 2)
-        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree << "))";
+        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">(QIterated(QTrapez(),"
+                << this->degree << "))";
       else
-        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">("
-                << this->degree << ")";
+        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">(" << this->degree << ")";
     }
   else
     {
@@ -130,11 +125,10 @@ FE_Q<dim, spacedim>::get_name() const
             break;
           }
       if (gauss_lobatto == true)
-        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">("
-                << this->degree << ")";
+        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">(" << this->degree << ")";
       else
-        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim)
-                << ">(QUnknownNodes(" << this->degree << "))";
+        namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">(QUnknownNodes("
+                << this->degree << "))";
     }
   return namebuf.str();
 }
@@ -147,8 +141,7 @@ FE_Q<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
+  AssertDimension(support_point_values.size(), this->get_unit_support_points().size());
   AssertDimension(support_point_values.size(), nodal_values.size());
   AssertDimension(this->dofs_per_cell, nodal_values.size());
 

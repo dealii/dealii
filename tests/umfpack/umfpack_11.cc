@@ -68,10 +68,8 @@ test()
   for (unsigned int i = 0; i < 3; ++i)
     for (unsigned int j = 0; j < 3; ++j)
       sparsity_pattern.block(i, j).reinit(
-        i != 2 ? dof_handler.n_dofs() / 3 :
-                 dof_handler.n_dofs() - 2 * (dof_handler.n_dofs() / 3),
-        j != 2 ? dof_handler.n_dofs() / 3 :
-                 dof_handler.n_dofs() - 2 * (dof_handler.n_dofs() / 3),
+        i != 2 ? dof_handler.n_dofs() / 3 : dof_handler.n_dofs() - 2 * (dof_handler.n_dofs() / 3),
+        j != 2 ? dof_handler.n_dofs() / 3 : dof_handler.n_dofs() - 2 * (dof_handler.n_dofs() / 3),
         dof_handler.max_couplings_between_dofs());
   sparsity_pattern.collect_sizes();
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
@@ -85,9 +83,8 @@ test()
     // create block matrices directly
     // in matrixtools...
     SparsityPattern xsparsity_pattern;
-    xsparsity_pattern.reinit(dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
+    xsparsity_pattern.reinit(
+      dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, xsparsity_pattern);
     xsparsity_pattern.compress();
 
@@ -109,12 +106,10 @@ test()
     // check that we've done it right
     for (SparseMatrix<double>::iterator p = xB.begin(); p != xB.end(); ++p)
       if (p->column() != p->row())
-        AssertThrow(xB(p->row(), p->column()) != xB(p->column(), p->row()),
-                    ExcInternalError());
+        AssertThrow(xB(p->row(), p->column()) != xB(p->column(), p->row()), ExcInternalError());
 
     // now copy stuff over
-    for (SparseMatrix<double>::const_iterator i = xB.begin(); i != xB.end();
-         ++i)
+    for (SparseMatrix<double>::const_iterator i = xB.begin(); i != xB.end(); ++i)
       B.set(i->row(), i->column(), i->value());
   }
 
@@ -127,8 +122,7 @@ test()
       BlockVector<double> solution(3);
       solution.block(0).reinit(dof_handler.n_dofs() / 3);
       solution.block(1).reinit(dof_handler.n_dofs() / 3);
-      solution.block(2).reinit(dof_handler.n_dofs() -
-                               2 * (dof_handler.n_dofs() / 3));
+      solution.block(2).reinit(dof_handler.n_dofs() - 2 * (dof_handler.n_dofs() / 3));
       solution.collect_sizes();
       BlockVector<double> x;
       x.reinit(solution);
@@ -143,10 +137,8 @@ test()
       SparseDirectUMFPACK().solve(B, x);
 
       x -= solution;
-      deallog << "relative norm distance = " << x.l2_norm() / solution.l2_norm()
-              << std::endl;
-      deallog << "absolute norms = " << x.l2_norm() << ' ' << solution.l2_norm()
-              << std::endl;
+      deallog << "relative norm distance = " << x.l2_norm() / solution.l2_norm() << std::endl;
+      deallog << "absolute norms = " << x.l2_norm() << ' ' << solution.l2_norm() << std::endl;
       Assert(x.l2_norm() / solution.l2_norm() < 1e-8, ExcInternalError());
     }
 }

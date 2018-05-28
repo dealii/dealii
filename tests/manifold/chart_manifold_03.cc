@@ -41,8 +41,7 @@ public:
   virtual std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override
   {
-    return std::unique_ptr<Manifold<dim, spacedim>>(
-      new MyFlatManifold(this->get_periodicity()));
+    return std::unique_ptr<Manifold<dim, spacedim>>(new MyFlatManifold(this->get_periodicity()));
   }
 
   virtual Point<spacedim>
@@ -83,8 +82,7 @@ test(unsigned int ref = 1)
   MyFlatManifold<dim, spacedim> manifold(periodicity);
 
   Quadrature<spacedim>                      quad;
-  std::vector<std::vector<Point<spacedim>>> ps(10,
-                                               std::vector<Point<spacedim>>(2));
+  std::vector<std::vector<Point<spacedim>>> ps(10, std::vector<Point<spacedim>>(2));
   Point<spacedim>                           middle;
   std::vector<double>                       ws(2, 0.5);
 
@@ -125,10 +123,9 @@ test(unsigned int ref = 1)
 
   for (unsigned int i = 0; i < ps.size(); ++i)
     {
-      middle =
-        manifold.get_new_point(make_array_view(ps[i]), make_array_view(ws));
-      deallog << "P0: " << ps[i][0] << " , P1: " << ps[i][1]
-              << " , Middle: " << middle << std::endl;
+      middle = manifold.get_new_point(make_array_view(ps[i]), make_array_view(ws));
+      deallog << "P0: " << ps[i][0] << " , P1: " << ps[i][1] << " , Middle: " << middle
+              << std::endl;
     }
 }
 

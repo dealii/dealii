@@ -62,8 +62,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
 
   try
@@ -71,10 +70,9 @@ main(int argc, char **argv)
       {
         std::vector<unsigned int> row_lengths(5, 3U);
         row_lengths.back() = 2;
-        TrilinosWrappers::SparseMatrix m(
-          static_cast<types::global_dof_index>(5U),
-          static_cast<types::global_dof_index>(5U),
-          row_lengths);
+        TrilinosWrappers::SparseMatrix m(static_cast<types::global_dof_index>(5U),
+                                         static_cast<types::global_dof_index>(5U),
+                                         row_lengths);
         test(m);
       }
     }
@@ -82,13 +80,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -96,12 +92,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

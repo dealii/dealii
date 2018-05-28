@@ -137,8 +137,7 @@ public:
   RightHandSide() : Function<dim>()
   {}
 
-  virtual double value(const Point<dim> & p,
-                       const unsigned int component = 0) const override;
+  virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 };
 
 
@@ -150,8 +149,7 @@ public:
   BoundaryValues() : Function<dim>()
   {}
 
-  virtual double value(const Point<dim> & p,
-                       const unsigned int component = 0) const override;
+  virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 };
 
 
@@ -177,8 +175,7 @@ public:
 // operator will work just as well) with indices starting at zero as usual in
 // C and C++.
 template <int dim>
-double RightHandSide<dim>::value(const Point<dim> &p,
-                                 const unsigned int /*component*/) const
+double RightHandSide<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
 {
   double return_value = 0.0;
   for (unsigned int i = 0; i < dim; ++i)
@@ -193,8 +190,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
 // point at which we would like to evaluate the function, irrespective of the
 // dimension. So that is what we return:
 template <int dim>
-double BoundaryValues<dim>::value(const Point<dim> &p,
-                                  const unsigned int /*component*/) const
+double BoundaryValues<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
 {
   return p.square();
 }
@@ -253,10 +249,8 @@ void Step4<dim>::make_grid()
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(4);
 
-  std::cout << "   Number of active cells: " << triangulation.n_active_cells()
-            << std::endl
-            << "   Total number of cells: " << triangulation.n_cells()
-            << std::endl;
+  std::cout << "   Number of active cells: " << triangulation.n_active_cells() << std::endl
+            << "   Total number of cells: " << triangulation.n_cells() << std::endl;
 }
 
 // @sect4{Step4::setup_system}
@@ -271,8 +265,7 @@ void Step4<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, dsp);
@@ -320,8 +313,8 @@ void Step4<dim>::assemble_system()
   // do for us by also giving it the #update_quadrature_points flag:
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   // We then again define a few abbreviations. The values of these variables
   // of course depend on the dimension which we are presently using. However,
@@ -362,14 +355,12 @@ void Step4<dim>::assemble_system()
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_grad(i, q_index) *
-                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+              cell_matrix(i, j) += (fe_values.shape_grad(i, q_index) *
+                                    fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
             cell_rhs(i) +=
               (fe_values.shape_value(i, q_index) *
-               right_hand_side.value(fe_values.quadrature_point(q_index)) *
-               fe_values.JxW(q_index));
+               right_hand_side.value(fe_values.quadrature_point(q_index)) * fe_values.JxW(q_index));
           }
       // As a final remark to these loops: when we assemble the local
       // contributions into <code>cell_matrix(i,j)</code>, we have to multiply
@@ -397,8 +388,7 @@ void Step4<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -411,10 +401,8 @@ void Step4<dim>::assemble_system()
   // object of the class which describes the boundary values we would like to
   // use (i.e. the <code>BoundaryValues</code> class declared above):
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler, 0, BoundaryValues<dim>(), boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 }
 
 
@@ -432,8 +420,8 @@ void Step4<dim>::solve()
 
   // We have made one addition, though: since we suppress output from the
   // linear solvers, we have to print the number of iterations by hand.
-  std::cout << "   " << solver_control.last_step()
-            << " CG iterations needed to obtain convergence." << std::endl;
+  std::cout << "   " << solver_control.last_step() << " CG iterations needed to obtain convergence."
+            << std::endl;
 }
 
 
@@ -479,8 +467,7 @@ void Step4<dim>::output_results() const
 template <int dim>
 void Step4<dim>::run()
 {
-  std::cout << "Solving problem in " << dim << " space dimensions."
-            << std::endl;
+  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
 
   make_grid();
   setup_system();

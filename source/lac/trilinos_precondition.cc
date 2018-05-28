@@ -76,8 +76,7 @@ namespace TrilinosWrappers
   Epetra_Operator &
   PreconditionBase::trilinos_operator() const
   {
-    AssertThrow(preconditioner,
-                ExcMessage("Trying to dereference a null pointer."));
+    AssertThrow(preconditioner, ExcMessage("Trying to dereference a null pointer."));
     return (*preconditioner);
   }
 
@@ -97,10 +96,9 @@ namespace TrilinosWrappers
 
   /* -------------------------- PreconditionJacobi -------------------------- */
 
-  PreconditionJacobi::AdditionalData::AdditionalData(
-    const double       omega,
-    const double       min_diagonal,
-    const unsigned int n_sweeps) :
+  PreconditionJacobi::AdditionalData::AdditionalData(const double       omega,
+                                                     const double       min_diagonal,
+                                                     const unsigned int n_sweeps) :
     omega(omega),
     min_diagonal(min_diagonal),
     n_sweeps(n_sweeps)
@@ -109,18 +107,14 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionJacobi::initialize(const SparseMatrix &  matrix,
-                                 const AdditionalData &additional_data)
+  PreconditionJacobi::initialize(const SparseMatrix &matrix, const AdditionalData &additional_data)
   {
     // release memory before reallocation
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("point relaxation",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      0));
+    preconditioner.reset(Ifpack().Create(
+      "point relaxation", const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()), 0));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -128,12 +122,10 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("relaxation: sweeps",
-                       static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set("relaxation: type", "Jacobi");
     parameter_list.set("relaxation: damping factor", additional_data.omega);
-    parameter_list.set("relaxation: min diagonal value",
-                       additional_data.min_diagonal);
+    parameter_list.set("relaxation: min diagonal value", additional_data.min_diagonal);
 
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
@@ -149,11 +141,10 @@ namespace TrilinosWrappers
 
   /* -------------------------- PreconditionSSOR -------------------------- */
 
-  PreconditionSSOR::AdditionalData::AdditionalData(
-    const double       omega,
-    const double       min_diagonal,
-    const unsigned int overlap,
-    const unsigned int n_sweeps) :
+  PreconditionSSOR::AdditionalData::AdditionalData(const double       omega,
+                                                   const double       min_diagonal,
+                                                   const unsigned int overlap,
+                                                   const unsigned int n_sweeps) :
     omega(omega),
     min_diagonal(min_diagonal),
     overlap(overlap),
@@ -163,17 +154,14 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionSSOR::initialize(const SparseMatrix &  matrix,
-                               const AdditionalData &additional_data)
+  PreconditionSSOR::initialize(const SparseMatrix &matrix, const AdditionalData &additional_data)
   {
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("point relaxation",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      additional_data.overlap));
+    preconditioner.reset(Ifpack().Create("point relaxation",
+                                         const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                                         additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -181,12 +169,10 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("relaxation: sweeps",
-                       static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set("relaxation: type", "symmetric Gauss-Seidel");
     parameter_list.set("relaxation: damping factor", additional_data.omega);
-    parameter_list.set("relaxation: min diagonal value",
-                       additional_data.min_diagonal);
+    parameter_list.set("relaxation: min diagonal value", additional_data.min_diagonal);
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
@@ -203,8 +189,8 @@ namespace TrilinosWrappers
 
   /* -------------------------- PreconditionSOR -------------------------- */
 
-  PreconditionSOR::AdditionalData::AdditionalData(const double omega,
-                                                  const double min_diagonal,
+  PreconditionSOR::AdditionalData::AdditionalData(const double       omega,
+                                                  const double       min_diagonal,
                                                   const unsigned int overlap,
                                                   const unsigned int n_sweeps) :
     omega(omega),
@@ -216,17 +202,14 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionSOR::initialize(const SparseMatrix &  matrix,
-                              const AdditionalData &additional_data)
+  PreconditionSOR::initialize(const SparseMatrix &matrix, const AdditionalData &additional_data)
   {
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("point relaxation",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      additional_data.overlap));
+    preconditioner.reset(Ifpack().Create("point relaxation",
+                                         const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                                         additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -234,12 +217,10 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("relaxation: sweeps",
-                       static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set("relaxation: type", "Gauss-Seidel");
     parameter_list.set("relaxation: damping factor", additional_data.omega);
-    parameter_list.set("relaxation: min diagonal value",
-                       additional_data.min_diagonal);
+    parameter_list.set("relaxation: min diagonal value", additional_data.min_diagonal);
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
@@ -256,12 +237,11 @@ namespace TrilinosWrappers
 
   /* ----------------------- PreconditionBlockJacobi ---------------------- */
 
-  PreconditionBlockJacobi::AdditionalData::AdditionalData(
-    const unsigned int block_size,
-    const std::string &block_creation_type,
-    const double       omega,
-    const double       min_diagonal,
-    const unsigned int n_sweeps) :
+  PreconditionBlockJacobi::AdditionalData::AdditionalData(const unsigned int block_size,
+                                                          const std::string &block_creation_type,
+                                                          const double       omega,
+                                                          const double       min_diagonal,
+                                                          const unsigned int n_sweeps) :
     block_size(block_size),
     block_creation_type(block_creation_type),
     omega(omega),
@@ -281,13 +261,11 @@ namespace TrilinosWrappers
     // Block relaxation setup fails if we have no locally owned rows. As a
     // work-around we just pretend to use point relaxation on those processors:
     preconditioner.reset(Ifpack().Create(
-      (matrix.trilinos_matrix().NumMyRows() == 0) ? "point relaxation" :
-                                                    "block relaxation",
+      (matrix.trilinos_matrix().NumMyRows() == 0) ? "point relaxation" : "block relaxation",
       const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
       0));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -295,17 +273,13 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("relaxation: sweeps",
-                       static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set("relaxation: type", "Jacobi");
     parameter_list.set("relaxation: damping factor", additional_data.omega);
-    parameter_list.set("relaxation: min diagonal value",
-                       additional_data.min_diagonal);
-    parameter_list.set("partitioner: type",
-                       additional_data.block_creation_type);
-    int n_local_parts =
-      (matrix.trilinos_matrix().NumMyRows() + additional_data.block_size - 1) /
-      additional_data.block_size;
+    parameter_list.set("relaxation: min diagonal value", additional_data.min_diagonal);
+    parameter_list.set("partitioner: type", additional_data.block_creation_type);
+    int n_local_parts = (matrix.trilinos_matrix().NumMyRows() + additional_data.block_size - 1) /
+                        additional_data.block_size;
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
@@ -322,13 +296,12 @@ namespace TrilinosWrappers
 
   /* ----------------------- PreconditionBlockSSOR ------------------------ */
 
-  PreconditionBlockSSOR::AdditionalData::AdditionalData(
-    const unsigned int block_size,
-    const std::string &block_creation_type,
-    const double       omega,
-    const double       min_diagonal,
-    const unsigned int overlap,
-    const unsigned int n_sweeps) :
+  PreconditionBlockSSOR::AdditionalData::AdditionalData(const unsigned int block_size,
+                                                        const std::string &block_creation_type,
+                                                        const double       omega,
+                                                        const double       min_diagonal,
+                                                        const unsigned int overlap,
+                                                        const unsigned int n_sweeps) :
     block_size(block_size),
     block_creation_type(block_creation_type),
     omega(omega),
@@ -348,13 +321,11 @@ namespace TrilinosWrappers
     // Block relaxation setup fails if we have no locally owned rows. As a
     // work-around we just pretend to use point relaxation on those processors:
     preconditioner.reset(Ifpack().Create(
-      (matrix.trilinos_matrix().NumMyRows() == 0) ? "point relaxation" :
-                                                    "block relaxation",
+      (matrix.trilinos_matrix().NumMyRows() == 0) ? "point relaxation" : "block relaxation",
       const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
       additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -362,18 +333,14 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("relaxation: sweeps",
-                       static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set("relaxation: type", "symmetric Gauss-Seidel");
     parameter_list.set("relaxation: damping factor", additional_data.omega);
-    parameter_list.set("relaxation: min diagonal value",
-                       additional_data.min_diagonal);
+    parameter_list.set("relaxation: min diagonal value", additional_data.min_diagonal);
     parameter_list.set("schwarz: combine mode", "Add");
-    parameter_list.set("partitioner: type",
-                       additional_data.block_creation_type);
-    int n_local_parts =
-      (matrix.trilinos_matrix().NumMyRows() + additional_data.block_size - 1) /
-      additional_data.block_size;
+    parameter_list.set("partitioner: type", additional_data.block_creation_type);
+    int n_local_parts = (matrix.trilinos_matrix().NumMyRows() + additional_data.block_size - 1) /
+                        additional_data.block_size;
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
@@ -390,13 +357,12 @@ namespace TrilinosWrappers
 
   /* ------------------------ PreconditionBlockSOR ------------------------ */
 
-  PreconditionBlockSOR::AdditionalData::AdditionalData(
-    const unsigned int block_size,
-    const std::string &block_creation_type,
-    const double       omega,
-    const double       min_diagonal,
-    const unsigned int overlap,
-    const unsigned int n_sweeps) :
+  PreconditionBlockSOR::AdditionalData::AdditionalData(const unsigned int block_size,
+                                                       const std::string &block_creation_type,
+                                                       const double       omega,
+                                                       const double       min_diagonal,
+                                                       const unsigned int overlap,
+                                                       const unsigned int n_sweeps) :
     block_size(block_size),
     block_creation_type(block_creation_type),
     omega(omega),
@@ -416,13 +382,11 @@ namespace TrilinosWrappers
     // Block relaxation setup fails if we have no locally owned rows. As a
     // work-around we just pretend to use point relaxation on those processors:
     preconditioner.reset(Ifpack().Create(
-      (matrix.trilinos_matrix().NumMyRows() == 0) ? "point relaxation" :
-                                                    "block relaxation",
+      (matrix.trilinos_matrix().NumMyRows() == 0) ? "point relaxation" : "block relaxation",
       const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
       additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -430,18 +394,14 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("relaxation: sweeps",
-                       static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set("relaxation: type", "Gauss-Seidel");
     parameter_list.set("relaxation: damping factor", additional_data.omega);
-    parameter_list.set("relaxation: min diagonal value",
-                       additional_data.min_diagonal);
+    parameter_list.set("relaxation: min diagonal value", additional_data.min_diagonal);
     parameter_list.set("schwarz: combine mode", "Add");
-    parameter_list.set("partitioner: type",
-                       additional_data.block_creation_type);
-    int n_local_parts =
-      (matrix.trilinos_matrix().NumMyRows() + additional_data.block_size - 1) /
-      additional_data.block_size;
+    parameter_list.set("partitioner: type", additional_data.block_creation_type);
+    int n_local_parts = (matrix.trilinos_matrix().NumMyRows() + additional_data.block_size - 1) /
+                        additional_data.block_size;
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
@@ -471,17 +431,13 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionIC::initialize(const SparseMatrix &  matrix,
-                             const AdditionalData &additional_data)
+  PreconditionIC::initialize(const SparseMatrix &matrix, const AdditionalData &additional_data)
   {
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("IC",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      additional_data.overlap));
+    preconditioner.reset(Ifpack().Create(
+      "IC", const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()), additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -521,17 +477,13 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionILU::initialize(const SparseMatrix &  matrix,
-                              const AdditionalData &additional_data)
+  PreconditionILU::initialize(const SparseMatrix &matrix, const AdditionalData &additional_data)
   {
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("ILU",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      additional_data.overlap));
+    preconditioner.reset(Ifpack().Create(
+      "ILU", const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()), additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -539,8 +491,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("fact: level-of-fill",
-                       static_cast<int>(additional_data.ilu_fill));
+    parameter_list.set("fact: level-of-fill", static_cast<int>(additional_data.ilu_fill));
     parameter_list.set("fact: absolute threshold", additional_data.ilu_atol);
     parameter_list.set("fact: relative threshold", additional_data.ilu_rtol);
     parameter_list.set("schwarz: combine mode", "Add");
@@ -574,17 +525,13 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionILUT::initialize(const SparseMatrix &  matrix,
-                               const AdditionalData &additional_data)
+  PreconditionILUT::initialize(const SparseMatrix &matrix, const AdditionalData &additional_data)
   {
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("ILUT",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      additional_data.overlap));
+    preconditioner.reset(Ifpack().Create(
+      "ILUT", const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()), additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -612,8 +559,7 @@ namespace TrilinosWrappers
 
   /* ---------------------- PreconditionBlockDirect --------------------- */
 
-  PreconditionBlockwiseDirect::AdditionalData::AdditionalData(
-    const unsigned int overlap) :
+  PreconditionBlockwiseDirect::AdditionalData::AdditionalData(const unsigned int overlap) :
     overlap(overlap)
   {}
 
@@ -624,13 +570,11 @@ namespace TrilinosWrappers
                                           const AdditionalData &additional_data)
   {
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("Amesos",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      additional_data.overlap));
+    preconditioner.reset(Ifpack().Create("Amesos",
+                                         const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                                         additional_data.overlap));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -654,13 +598,12 @@ namespace TrilinosWrappers
 
   /* ---------------------- PreconditionBlockDirect --------------------- */
 
-  PreconditionChebyshev::AdditionalData::AdditionalData(
-    const unsigned int degree,
-    const double       max_eigenvalue,
-    const double       eigenvalue_ratio,
-    const double       min_eigenvalue,
-    const double       min_diagonal,
-    const bool         nonzero_starting) :
+  PreconditionChebyshev::AdditionalData::AdditionalData(const unsigned int degree,
+                                                        const double       max_eigenvalue,
+                                                        const double       eigenvalue_ratio,
+                                                        const double       min_eigenvalue,
+                                                        const double       min_diagonal,
+                                                        const bool         nonzero_starting) :
     degree(degree),
     max_eigenvalue(max_eigenvalue),
     eigenvalue_ratio(eigenvalue_ratio),
@@ -676,11 +619,9 @@ namespace TrilinosWrappers
                                     const AdditionalData &additional_data)
   {
     preconditioner.reset();
-    preconditioner =
-      std::make_shared<Ifpack_Chebyshev>(&matrix.trilinos_matrix());
+    preconditioner = std::make_shared<Ifpack_Chebyshev>(&matrix.trilinos_matrix());
 
-    Ifpack_Chebyshev *ifpack =
-      static_cast<Ifpack_Chebyshev *>(preconditioner.get());
+    Ifpack_Chebyshev *ifpack = static_cast<Ifpack_Chebyshev *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -688,17 +629,12 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set("chebyshev: ratio eigenvalue",
-                       additional_data.eigenvalue_ratio);
-    parameter_list.set("chebyshev: min eigenvalue",
-                       additional_data.min_eigenvalue);
-    parameter_list.set("chebyshev: max eigenvalue",
-                       additional_data.max_eigenvalue);
+    parameter_list.set("chebyshev: ratio eigenvalue", additional_data.eigenvalue_ratio);
+    parameter_list.set("chebyshev: min eigenvalue", additional_data.min_eigenvalue);
+    parameter_list.set("chebyshev: max eigenvalue", additional_data.max_eigenvalue);
     parameter_list.set("chebyshev: degree", (int)additional_data.degree);
-    parameter_list.set("chebyshev: min diagonal value",
-                       additional_data.min_diagonal);
-    parameter_list.set("chebyshev: zero starting solution",
-                       !additional_data.nonzero_starting);
+    parameter_list.set("chebyshev: min diagonal value", additional_data.min_diagonal);
+    parameter_list.set("chebyshev: zero starting solution", !additional_data.nonzero_starting);
 
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
@@ -715,8 +651,7 @@ namespace TrilinosWrappers
   /* -------------------------- PreconditionIdentity --------------------- */
 
   void
-  PreconditionIdentity::initialize(const SparseMatrix &matrix,
-                                   const AdditionalData &)
+  PreconditionIdentity::initialize(const SparseMatrix &matrix, const AdditionalData &)
   {
     // What follows just configures a dummy preconditioner that
     // sets up the domain and range maps, as well as the communicator.
@@ -729,13 +664,10 @@ namespace TrilinosWrappers
     // From PreconditionJacobi:
     // release memory before reallocation
     preconditioner.reset();
-    preconditioner.reset(
-      Ifpack().Create("point relaxation",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                      0));
+    preconditioner.reset(Ifpack().Create(
+      "point relaxation", const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()), 0));
 
-    Ifpack_Preconditioner *ifpack =
-      static_cast<Ifpack_Preconditioner *>(preconditioner.get());
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>(preconditioner.get());
     Assert(ifpack != nullptr,
            ExcMessage("Trilinos could not create this "
                       "preconditioner"));
@@ -771,31 +703,27 @@ namespace TrilinosWrappers
   }
 
   void
-  PreconditionIdentity::vmult(dealii::Vector<double> &      dst,
-                              const dealii::Vector<double> &src) const
+  PreconditionIdentity::vmult(dealii::Vector<double> &dst, const dealii::Vector<double> &src) const
   {
     dst = src;
   }
 
   void
-  PreconditionIdentity::Tvmult(dealii::Vector<double> &      dst,
-                               const dealii::Vector<double> &src) const
+  PreconditionIdentity::Tvmult(dealii::Vector<double> &dst, const dealii::Vector<double> &src) const
   {
     dst = src;
   }
 
   void
-  PreconditionIdentity::vmult(
-    LinearAlgebra::distributed::Vector<double> &      dst,
-    const LinearAlgebra::distributed::Vector<double> &src) const
+  PreconditionIdentity::vmult(LinearAlgebra::distributed::Vector<double> &      dst,
+                              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     dst = src;
   }
 
   void
-  PreconditionIdentity::Tvmult(
-    LinearAlgebra::distributed::Vector<double> &      dst,
-    const LinearAlgebra::distributed::Vector<double> &src) const
+  PreconditionIdentity::Tvmult(LinearAlgebra::distributed::Vector<double> &      dst,
+                               const LinearAlgebra::distributed::Vector<double> &src) const
   {
     dst = src;
   }

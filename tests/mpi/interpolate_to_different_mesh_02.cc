@@ -71,38 +71,36 @@ private:
   ConstraintMatrix                                  constraints;
   TrilinosWrappers::SparseMatrix                    system_matrix;
   TrilinosWrappers::MPI::Vector                     locally_relevant_solution;
-  TrilinosWrappers::MPI::Vector interpolated_locally_relevant_solution;
-  TrilinosWrappers::MPI::Vector system_rhs;
-  parallel::distributed::Triangulation<dim> second_triangulation;
-  DoFHandler<dim>                           second_dof_handler;
-  FE_Q<dim>                                 second_fe;
-  IndexSet                                  second_locally_owned_dofs;
-  IndexSet                                  second_locally_relevant_dofs;
-  TrilinosWrappers::MPI::Vector             second_locally_relevant_solution;
-  ConditionalOStream                        pcout;
-  unsigned int                              prob_number;
+  TrilinosWrappers::MPI::Vector                     interpolated_locally_relevant_solution;
+  TrilinosWrappers::MPI::Vector                     system_rhs;
+  parallel::distributed::Triangulation<dim>         second_triangulation;
+  DoFHandler<dim>                                   second_dof_handler;
+  FE_Q<dim>                                         second_fe;
+  IndexSet                                          second_locally_owned_dofs;
+  IndexSet                                          second_locally_relevant_dofs;
+  TrilinosWrappers::MPI::Vector                     second_locally_relevant_solution;
+  ConditionalOStream                                pcout;
+  unsigned int                                      prob_number;
 };
 template <int dim>
 SeventhProblem<dim>::SeventhProblem(unsigned int prob_number) :
   mpi_communicator(MPI_COMM_WORLD),
-  settings(
-    parallel::distributed::Triangulation<2, 2>::no_automatic_repartitioning),
-  triangulation(mpi_communicator,
-                typename Triangulation<dim>::MeshSmoothing(
-                  Triangulation<dim>::smoothing_on_refinement |
-                  Triangulation<dim>::smoothing_on_coarsening),
-                settings),
+  settings(parallel::distributed::Triangulation<2, 2>::no_automatic_repartitioning),
+  triangulation(
+    mpi_communicator,
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening),
+    settings),
   dof_handler(triangulation),
   fe(2),
-  second_triangulation(mpi_communicator,
-                       typename Triangulation<dim>::MeshSmoothing(
-                         Triangulation<dim>::smoothing_on_refinement |
-                         Triangulation<dim>::smoothing_on_coarsening),
-                       settings),
+  second_triangulation(
+    mpi_communicator,
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening),
+    settings),
   second_dof_handler(second_triangulation),
   second_fe(2),
-  pcout(deallog.get_file_stream(),
-        (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
+  pcout(deallog.get_file_stream(), (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
   prob_number(prob_number)
 {}
 
@@ -120,8 +118,7 @@ SeventhProblem<dim>::setup_system()
   dof_handler.distribute_dofs(fe);
   locally_owned_dofs = dof_handler.locally_owned_dofs();
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-  locally_relevant_solution.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  locally_relevant_solution.reinit(locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
   system_rhs.reinit(locally_owned_dofs, mpi_communicator);
   system_rhs = 0;
   constraints.clear();
@@ -133,12 +130,8 @@ SeventhProblem<dim>::setup_system()
   DynamicSparsityPattern csp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, csp, constraints, false);
   SparsityTools::distribute_sparsity_pattern(
-    csp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
-    mpi_communicator,
-    locally_relevant_dofs);
-  system_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
+    csp, dof_handler.n_locally_owned_dofs_per_processor(), mpi_communicator, locally_relevant_dofs);
+  system_matrix.reinit(locally_owned_dofs, locally_owned_dofs, csp, mpi_communicator);
 }
 
 template <int dim>
@@ -147,8 +140,7 @@ SeventhProblem<dim>::setup_second_system()
 {
   second_dof_handler.distribute_dofs(fe);
   second_locally_owned_dofs = second_dof_handler.locally_owned_dofs();
-  DoFTools::extract_locally_relevant_dofs(second_dof_handler,
-                                          second_locally_relevant_dofs);
+  DoFTools::extract_locally_relevant_dofs(second_dof_handler, second_locally_relevant_dofs);
   second_locally_relevant_solution.reinit(
     second_locally_owned_dofs, second_locally_relevant_dofs, mpi_communicator);
   interpolated_locally_relevant_solution.reinit(
@@ -159,18 +151,17 @@ template <int dim>
 void
 SeventhProblem<dim>::assemble_system()
 {
-  const QGauss<dim>  quadrature_formula(3);
-  FEValues<dim>      fe_values(fe,
+  const QGauss<dim>                              quadrature_formula(3);
+  FEValues<dim>                                  fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
-  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs(dofs_per_cell);
-  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
+  const unsigned int                             dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int                             n_q_points    = quadrature_formula.size();
+  FullMatrix<double>                             cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>                                 cell_rhs(dofs_per_cell);
+  std::vector<types::global_dof_index>           local_dof_indices(dofs_per_cell);
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned())
@@ -183,18 +174,16 @@ SeventhProblem<dim>::assemble_system()
             const double rhs_value =
               (fe_values.quadrature_point(q_point)[1] >
                    0.5 +
-                     0.25 * std::sin(4.0 * numbers::PI *
-                                     fe_values.quadrature_point(q_point)[0]) ?
+                     0.25 * std::sin(4.0 * numbers::PI * fe_values.quadrature_point(q_point)[0]) ?
                  1 :
                  -1);
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  cell_matrix(i, j) +=
-                    (fe_values.shape_grad(i, q_point) *
-                     fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
-                cell_rhs(i) += (rhs_value * fe_values.shape_value(i, q_point) *
-                                fe_values.JxW(q_point));
+                  cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                        fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+                cell_rhs(i) +=
+                  (rhs_value * fe_values.shape_value(i, q_point) * fe_values.JxW(q_point));
               }
           }
         cell->get_dof_indices(local_dof_indices);
@@ -208,17 +197,14 @@ template <int dim>
 void
 SeventhProblem<dim>::solve()
 {
-  LA::MPI::Vector            completely_distributed_solution(locally_owned_dofs,
-                                                  mpi_communicator);
+  LA::MPI::Vector            completely_distributed_solution(locally_owned_dofs, mpi_communicator);
   SolverControl              solver_control(dof_handler.n_dofs(), 1e-12);
   TrilinosWrappers::SolverCG solver(solver_control);
   TrilinosWrappers::PreconditionAMG                 preconditioner;
   TrilinosWrappers::PreconditionAMG::AdditionalData data;
   preconditioner.initialize(system_matrix, data);
-  solver.solve(
-    system_matrix, completely_distributed_solution, system_rhs, preconditioner);
-  pcout << " Solved in " << solver_control.last_step() << " iterations."
-        << std::endl;
+  solver.solve(system_matrix, completely_distributed_solution, system_rhs, preconditioner);
+  pcout << " Solved in " << solver_control.last_step() << " iterations." << std::endl;
   constraints.distribute(completely_distributed_solution);
   locally_relevant_solution = completely_distributed_solution;
 }
@@ -255,21 +241,18 @@ SeventhProblem<dim>::run(unsigned int cycle)
       triangulation.execute_coarsening_and_refinement();
 
       setup_system();
-      pcout << " Number of active cells: "
-            << triangulation.n_global_active_cells() << std::endl
-            << " Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+      pcout << " Number of active cells: " << triangulation.n_global_active_cells() << std::endl
+            << " Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
       assemble_system();
       solve();
 
       setup_second_system();
       second_locally_relevant_solution = locally_relevant_solution;
 
-      VectorTools::interpolate_to_different_mesh(
-        dof_handler,
-        locally_relevant_solution,
-        second_dof_handler,
-        interpolated_locally_relevant_solution);
+      VectorTools::interpolate_to_different_mesh(dof_handler,
+                                                 locally_relevant_solution,
+                                                 second_dof_handler,
+                                                 interpolated_locally_relevant_solution);
       second_triangulation.load_coarsen_flags(c_flags);
       second_triangulation.load_refine_flags(r_flags);
       second_triangulation.execute_coarsening_and_refinement();
@@ -279,9 +262,8 @@ SeventhProblem<dim>::run(unsigned int cycle)
 void
 seventh_grid()
 {
-  ConditionalOStream pcout(
-    deallog.get_file_stream(),
-    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0));
+  ConditionalOStream pcout(deallog.get_file_stream(),
+                           (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0));
 
   pcout << "7th Starting" << std::endl;
   SeventhProblem<2>  lap(1);

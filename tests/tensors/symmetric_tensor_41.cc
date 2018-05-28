@@ -32,9 +32,8 @@ check_value(const int    dim,
   if (rel_error > tol)
     {
       deallog << "Incorrect eigenvalue calculated: "
-              << "Dim " << dim << ", index " << index << ". Expected "
-              << expected << ", actual: " << actual
-              << ", relative error: " << rel_error << std::endl;
+              << "Dim " << dim << ", index " << index << ". Expected " << expected
+              << ", actual: " << actual << ", relative error: " << rel_error << std::endl;
     }
 };
 
@@ -46,9 +45,7 @@ is_unit_vector(const Tensor<1, dim> &v)
 }
 
 template <int dim>
-bool check_orientation(Tensor<1, dim> v1,
-                       Tensor<1, dim> v2,
-                       const double   tol = 1e-9)
+bool check_orientation(Tensor<1, dim> v1, Tensor<1, dim> v2, const double tol = 1e-9)
 {
   v1 /= v1.norm();
   v2 /= v2.norm();
@@ -67,9 +64,8 @@ check_vector(const int            index,
   if (!(orientation & unit_vec))
     {
       deallog << "Incorrect eigenvector calculated: "
-              << "Dim " << dim << ", index " << index << ". Expected "
-              << expected << ", actual: " << actual
-              << ", orientation check: " << orientation
+              << "Dim " << dim << ", index " << index << ". Expected " << expected
+              << ", actual: " << actual << ", orientation check: " << orientation
               << ", unit vector check: " << unit_vec << std::endl;
     }
 };
@@ -103,8 +99,8 @@ test_dim_2(const enum SymmetricTensorEigenvectorMethod method,
   Assert(is_unit_vector(v2), ExcMessage("Vector is not of unit length."));
   Assert(e1 >= e2, ExcMessage("Input eigenvalue ordering is not correct."));
 
-  const SymmetricTensor<2, dim> T = e1 * symmetrize(outer_product(v1, v1)) +
-                                    e2 * symmetrize(outer_product(v2, v2));
+  const SymmetricTensor<2, dim> T =
+    e1 * symmetrize(outer_product(v1, v1)) + e2 * symmetrize(outer_product(v2, v2));
 
   const auto eig_vals_vecs = eigenvectors(T, method);
 
@@ -212,60 +208,35 @@ run_tests(const enum SymmetricTensorEigenvectorMethod method)
     // Diagonal
     deallog.push("Test 3a");
     {
-      test_dim_3(method,
-                 3.6,
-                 Tensor<1, 3>({1, 0, 0}),
-                 2.4,
-                 Tensor<1, 3>({0, 1, 0}),
-                 1.2);
+      test_dim_3(method, 3.6, Tensor<1, 3>({1, 0, 0}), 2.4, Tensor<1, 3>({0, 1, 0}), 1.2);
     }
     deallog.pop();
 
     // Diagonal (large difference)
     deallog.push("Test 3b");
     {
-      test_dim_3(method,
-                 1.2e7,
-                 Tensor<1, 3>({1, 0, 0}),
-                 -0.2e-8,
-                 Tensor<1, 3>({0, 1, 0}),
-                 -6.5e8);
+      test_dim_3(method, 1.2e7, Tensor<1, 3>({1, 0, 0}), -0.2e-8, Tensor<1, 3>({0, 1, 0}), -6.5e8);
     }
     deallog.pop();
 
     // Diagonal (2 equal)
     deallog.push("Test 3c");
     {
-      test_dim_3(method,
-                 16.7,
-                 Tensor<1, 3>({1, 0, 0}),
-                 16.7,
-                 Tensor<1, 3>({0, 1, 0}),
-                 1e-6);
+      test_dim_3(method, 16.7, Tensor<1, 3>({1, 0, 0}), 16.7, Tensor<1, 3>({0, 1, 0}), 1e-6);
     }
     deallog.pop();
 
     // Diagonal (3 equal)
     deallog.push("Test 3d");
     {
-      test_dim_3(method,
-                 4.2,
-                 Tensor<1, 3>({1, 0, 0}),
-                 4.2,
-                 Tensor<1, 3>({0, 1, 0}),
-                 4.2);
+      test_dim_3(method, 4.2, Tensor<1, 3>({1, 0, 0}), 4.2, Tensor<1, 3>({0, 1, 0}), 4.2);
     }
     deallog.pop();
 
     // Non-diagonal
     deallog.push("Test 3e");
     {
-      test_dim_3(method,
-                 115.7,
-                 Tensor<1, 3>({1, 1, 1}),
-                 13.6,
-                 Tensor<1, 3>({-1, 1, -1}),
-                 -45.2);
+      test_dim_3(method, 115.7, Tensor<1, 3>({1, 1, 1}), 13.6, Tensor<1, 3>({-1, 1, -1}), -45.2);
     }
     deallog.pop();
 
@@ -275,9 +246,7 @@ run_tests(const enum SymmetricTensorEigenvectorMethod method)
       const double tol =
         (method == SymmetricTensorEigenvectorMethod::hybrid ?
            1e-9 :
-           (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts ?
-              1e-10 :
-              5e-11));
+           (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts ? 1e-10 : 5e-11));
       test_dim_3(method,
                  7.2956e8,
                  Tensor<1, 3>({3, 2, 5}),

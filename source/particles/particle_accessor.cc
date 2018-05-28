@@ -27,12 +27,9 @@ namespace Particles
 
   template <int dim, int spacedim>
   ParticleAccessor<dim, spacedim>::ParticleAccessor(
-    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-    const typename std::multimap<internal::LevelInd,
-                                 Particle<dim, spacedim>>::iterator &particle) :
-    map(
-      const_cast<std::multimap<internal::LevelInd, Particle<dim, spacedim>> *>(
-        &map)),
+    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &                   map,
+    const typename std::multimap<internal::LevelInd, Particle<dim, spacedim>>::iterator &particle) :
+    map(const_cast<std::multimap<internal::LevelInd, Particle<dim, spacedim>> *>(&map)),
     particle(particle)
   {}
 
@@ -73,8 +70,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleAccessor<dim, spacedim>::set_reference_location(
-    const Point<dim> &new_loc)
+  ParticleAccessor<dim, spacedim>::set_reference_location(const Point<dim> &new_loc)
   {
     Assert(particle != map->end(), ExcInternalError());
 
@@ -107,8 +103,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleAccessor<dim, spacedim>::set_property_pool(
-    PropertyPool &new_property_pool)
+  ParticleAccessor<dim, spacedim>::set_property_pool(PropertyPool &new_property_pool)
   {
     Assert(particle != map->end(), ExcInternalError());
 
@@ -130,8 +125,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleAccessor<dim, spacedim>::set_properties(
-    const std::vector<double> &new_properties)
+  ParticleAccessor<dim, spacedim>::set_properties(const std::vector<double> &new_properties)
   {
     Assert(particle != map->end(), ExcInternalError());
 
@@ -210,8 +204,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   bool
-  ParticleAccessor<dim, spacedim>::
-  operator!=(const ParticleAccessor<dim, spacedim> &other) const
+  ParticleAccessor<dim, spacedim>::operator!=(const ParticleAccessor<dim, spacedim> &other) const
   {
     return (map != other.map) || (particle != other.particle);
   }
@@ -220,8 +213,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   bool
-  ParticleAccessor<dim, spacedim>::
-  operator==(const ParticleAccessor<dim, spacedim> &other) const
+  ParticleAccessor<dim, spacedim>::operator==(const ParticleAccessor<dim, spacedim> &other) const
   {
     return (map == other.map) && (particle == other.particle);
   }

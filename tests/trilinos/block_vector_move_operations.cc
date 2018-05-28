@@ -35,8 +35,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   {
     std::vector<IndexSet> local_owned(5);

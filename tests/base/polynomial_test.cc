@@ -52,38 +52,36 @@ check_poly(const Point<dim> &x, const PolynomialType &p)
       // Check if compute_value is ok
       double val = p.compute_value(k, x);
       if (std::fabs(val - values[k]) > eps)
-        deallog << 'P' << k << ": values differ " << val << " != " << values[k]
-                << std::endl;
+        deallog << 'P' << k << ": values differ " << val << " != " << values[k] << std::endl;
 
       // Check if compute_grad is ok
       Tensor<1, dim> grad = p.template compute_derivative<1>(k, x);
       if ((grad - gradients[k]) * (grad - gradients[k]) > eps * eps)
-        deallog << 'P' << k << ": gradients differ " << grad
-                << " != " << gradients[k] << std::endl;
+        deallog << 'P' << k << ": gradients differ " << grad << " != " << gradients[k] << std::endl;
 
       // Check if compute_grad_grad is ok
       Tensor<2, dim> grad2 = p.template compute_derivative<2>(k, x);
       Tensor<2, dim> diff  = grad2 - second[k];
 
       if (diff.norm_square() > eps * eps)
-        deallog << 'P' << k << ": second derivatives differ " << grad2
-                << " != " << second[k] << std::endl;
+        deallog << 'P' << k << ": second derivatives differ " << grad2 << " != " << second[k]
+                << std::endl;
 
       // Check if third derivative is ok
       Tensor<3, dim> grad3 = p.template compute_derivative<3>(k, x);
       if ((grad3 - third[k]).norm_square() > 5e-15 * 5e-15)
-        deallog << 'P' << k << ": third derivatives differ " << grad3
-                << " != " << third[k] << std::endl;
+        deallog << 'P' << k << ": third derivatives differ " << grad3 << " != " << third[k]
+                << std::endl;
 
       if (diff.norm_square() > eps * eps)
-        deallog << 'P' << k << ": second derivatives differ " << grad2
-                << " != " << second[k] << std::endl;
+        deallog << 'P' << k << ": second derivatives differ " << grad2 << " != " << second[k]
+                << std::endl;
 
       // Check if third derivative is ok
       Tensor<4, dim> grad4 = p.template compute_derivative<4>(k, x);
       if ((grad3 - third[k]).norm_square() > eps * eps)
-        deallog << 'P' << k << ": fourth derivatives differ " << grad4
-                << " != " << fourth[k] << std::endl;
+        deallog << 'P' << k << ": fourth derivatives differ " << grad4 << " != " << fourth[k]
+                << std::endl;
 
 
       // finally output values,

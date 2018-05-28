@@ -28,8 +28,7 @@
 class FullMatrixModified : public FullMatrix<double>
 {
 public:
-  FullMatrixModified(unsigned int size1, unsigned int size2) :
-    FullMatrix<double>(size1, size2)
+  FullMatrixModified(unsigned int size1, unsigned int size2) : FullMatrix<double>(size1, size2)
   {}
 
   double
@@ -52,9 +51,8 @@ check()
   for (unsigned int i = 0; i < size; ++i)
     in(i) = random_value<double>();
 
-  PreconditionChebyshev<FullMatrixModified, Vector<double>> prec;
-  PreconditionChebyshev<FullMatrixModified, Vector<double>>::AdditionalData
-    data;
+  PreconditionChebyshev<FullMatrixModified, Vector<double>>                 prec;
+  PreconditionChebyshev<FullMatrixModified, Vector<double>>::AdditionalData data;
   data.smoothing_range = 2 * size;
   data.degree          = 3;
   prec.initialize(m, data);

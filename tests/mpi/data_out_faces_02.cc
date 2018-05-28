@@ -65,9 +65,8 @@ main(int argc, char *argv[])
     MPI_Comm                                  mpi_communicator(MPI_COMM_WORLD);
     parallel::distributed::Triangulation<dim> triangulation(
       mpi_communicator,
-      typename Triangulation<dim>::MeshSmoothing(
-        Triangulation<dim>::smoothing_on_refinement |
-        Triangulation<dim>::smoothing_on_coarsening));
+      typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                                 Triangulation<dim>::smoothing_on_coarsening));
     FESystem<dim>   fe(FE_FaceQ<dim>(2), dim);
     DoFHandler<dim> dof_handler(triangulation);
 
@@ -81,8 +80,7 @@ main(int argc, char *argv[])
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-    locally_relevant_sol.reinit(
-      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+    locally_relevant_sol.reinit(locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
 
     DataOutFaces<dim> data_out_face(false);
 

@@ -71,9 +71,8 @@ test(const unsigned int degree)
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       for (unsigned int j = 0; j < dofs_per_cell; ++j)
         for (unsigned int d = 0; d < dim; ++d)
-          mass_matrix(i, j) +=
-            (fe.shape_value_component(i, q_point, d) *
-             fe.shape_value_component(j, q_point, d) * fe.JxW(q_point));
+          mass_matrix(i, j) += (fe.shape_value_component(i, q_point, d) *
+                                fe.shape_value_component(j, q_point, d) * fe.JxW(q_point));
 
   mass_matrix.print_formatted(logfile, 3, false, 0, "0", 1);
 
@@ -86,11 +85,10 @@ test(const unsigned int degree)
     tmp1(i) = 1. * Testing::rand() / RAND_MAX;
 
   deallog << "solving degree = " << degree << std::endl;
-  check_solver_within_range(
-    solver.solve(mass_matrix, tmp2, tmp1, PreconditionIdentity()),
-    solver_control.last_step(),
-    3,
-    45);
+  check_solver_within_range(solver.solve(mass_matrix, tmp2, tmp1, PreconditionIdentity()),
+                            solver_control.last_step(),
+                            3,
+                            45);
 }
 
 

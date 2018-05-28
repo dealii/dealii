@@ -67,8 +67,8 @@ test()
 
   v.reinit(set_my, set_ghost, MPI_COMM_WORLD);
   IndexSet from_partitioner(v.vector_partitioner());
-  deallog << "vec size: " << v.size()
-          << " from_partitioner: " << from_partitioner.size() << std::endl;
+  deallog << "vec size: " << v.size() << " from_partitioner: " << from_partitioner.size()
+          << std::endl;
 
   from_partitioner.print(deallog);
 }

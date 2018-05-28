@@ -34,23 +34,17 @@
 
 template <int dim>
 void
-pack_function(
-  const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
-    &cell,
-  const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-        status,
-  void *data)
+pack_function(const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator &cell,
+              const typename parallel::distributed::Triangulation<dim, dim>::CellStatus     status,
+              void *                                                                        data)
 {
   static int some_number = cell->index();
-  deallog << "packing cell " << cell->id() << " with data=" << some_number
-          << " status=";
+  deallog << "packing cell " << cell->id() << " with data=" << some_number << " status=";
   if (status == parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST)
     deallog << "PERSIST";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
+  else if (status == parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
     deallog << "REFINE";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
+  else if (status == parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
     deallog << "COARSEN";
   deallog << std::endl;
 
@@ -71,24 +65,18 @@ pack_function(
 
 template <int dim>
 void
-unpack_function(
-  const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
-    &cell,
-  const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-              status,
-  const void *data)
+unpack_function(const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator &cell,
+                const typename parallel::distributed::Triangulation<dim, dim>::CellStatus status,
+                const void *                                                              data)
 {
   const int *intdata = reinterpret_cast<const int *>(data);
 
-  deallog << "unpacking cell " << cell->id() << " with data=" << (*intdata)
-          << " status=";
+  deallog << "unpacking cell " << cell->id() << " with data=" << (*intdata) << " status=";
   if (status == parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST)
     deallog << "PERSIST";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
+  else if (status == parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
     deallog << "REFINE";
-  else if (status ==
-           parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
+  else if (status == parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
     deallog << "COARSEN";
   deallog << std::endl;
 
@@ -118,18 +106,17 @@ test()
       GridGenerator::hyper_cube(tr);
       tr.refine_global(1);
 
-      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-              << " / " << tr.n_global_active_cells() << std::endl;
+      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells() << " / "
+              << tr.n_global_active_cells() << std::endl;
 
       deallog << "* global refine:" << std::endl;
 
-      unsigned int offset =
-        tr.register_data_attach(sizeof(int), pack_function<dim>);
+      unsigned int offset = tr.register_data_attach(sizeof(int), pack_function<dim>);
 
       tr.refine_global(1);
 
-      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-              << " / " << tr.n_global_active_cells() << std::endl;
+      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells() << " / "
+              << tr.n_global_active_cells() << std::endl;
 
       tr.notify_ready_to_unpack(offset, unpack_function<dim>);
 
@@ -145,8 +132,8 @@ test()
 
       // tr.write_mesh_vtk("b");
 
-      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-              << " / " << tr.n_global_active_cells() << std::endl;
+      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells() << " / "
+              << tr.n_global_active_cells() << std::endl;
 
       tr.notify_ready_to_unpack(offset, unpack_function<dim>);
 

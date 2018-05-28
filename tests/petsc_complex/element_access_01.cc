@@ -48,8 +48,7 @@ test_matrix(PETScWrappers::SparseMatrix &m)
         PetscReal el_r = static_cast<double>(k + l);
         PetscReal el_i = static_cast<double>(-1. * (k + l));
 
-        AssertThrow((m(k, l).real() == el_r) && (m(k, l).imag() == el_i),
-                    ExcInternalError());
+        AssertThrow((m(k, l).real() == el_r) && (m(k, l).imag() == el_i), ExcInternalError());
       }
 
   deallog << "OK" << std::endl;
@@ -79,13 +78,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -93,12 +90,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

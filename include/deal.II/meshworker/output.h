@@ -189,11 +189,9 @@ namespace MeshWorker
     GnuplotPatch::initialize_info(DoFInfo<dim> &info, bool face)
     {
       if (face)
-        info.initialize_quadrature(Utilities::fixed_power<dim - 1>(n_points),
-                                   n_vectors + dim);
+        info.initialize_quadrature(Utilities::fixed_power<dim - 1>(n_points), n_vectors + dim);
       else
-        info.initialize_quadrature(Utilities::fixed_power<dim>(n_points),
-                                   n_vectors + dim);
+        info.initialize_quadrature(Utilities::fixed_power<dim>(n_points), n_vectors + dim);
     }
 
 
@@ -209,8 +207,7 @@ namespace MeshWorker
       // If patches are 1D, end the
       // patch after a row, else end
       // it after a square
-      const unsigned int row_length2 =
-        (patch_dim == 1) ? row_length : (row_length * row_length);
+      const unsigned int row_length2 = (patch_dim == 1) ? row_length : (row_length * row_length);
 
       //      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
       AssertDimension(nv, n_vectors + dim);

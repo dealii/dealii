@@ -61,9 +61,8 @@ test()
 
   parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD,
-    typename Triangulation<dim>::MeshSmoothing(
-      Triangulation<dim>::smoothing_on_refinement |
-      Triangulation<dim>::smoothing_on_coarsening));
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening));
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
@@ -78,11 +77,9 @@ test()
   DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
 
   std::vector<types::global_dof_index> stokes_dofs_per_block(2);
-  DoFTools::count_dofs_per_block(
-    stokes_dof_handler, stokes_dofs_per_block, stokes_sub_blocks);
+  DoFTools::count_dofs_per_block(stokes_dof_handler, stokes_dofs_per_block, stokes_sub_blocks);
 
-  const unsigned int n_u = stokes_dofs_per_block[0],
-                     n_p = stokes_dofs_per_block[1];
+  const unsigned int n_u = stokes_dofs_per_block[0], n_p = stokes_dofs_per_block[1];
 
   std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
 
@@ -91,11 +88,9 @@ test()
   stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
   IndexSet stokes_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(stokes_dof_handler,
-                                          stokes_relevant_set);
+  DoFTools::extract_locally_relevant_dofs(stokes_dof_handler, stokes_relevant_set);
   stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(0, n_u));
-  stokes_relevant_partitioning.push_back(
-    stokes_relevant_set.get_view(n_u, n_u + n_p));
+  stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(n_u, n_u + n_p));
 
   stokes_relevant_set.print(deallog.get_file_stream());
 
@@ -115,18 +110,10 @@ test()
   coupling[0][1] = DoFTools::always;
 
   DoFTools::make_sparsity_pattern(
-    stokes_dof_handler,
-    coupling,
-    sp,
-    cm,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    stokes_dof_handler, coupling, sp, cm, false, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
 
   SparsityTools::distribute_sparsity_pattern(
-    sp,
-    stokes_dof_handler.locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    stokes_relevant_set);
+    sp, stokes_dof_handler.locally_owned_dofs_per_processor(), MPI_COMM_WORLD, stokes_relevant_set);
 
 
   sp.compress();
@@ -157,9 +144,8 @@ test_LA_Trilinos()
 
   parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD,
-    typename Triangulation<dim>::MeshSmoothing(
-      Triangulation<dim>::smoothing_on_refinement |
-      Triangulation<dim>::smoothing_on_coarsening));
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening));
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
@@ -174,11 +160,9 @@ test_LA_Trilinos()
   DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
 
   std::vector<types::global_dof_index> stokes_dofs_per_block(2);
-  DoFTools::count_dofs_per_block(
-    stokes_dof_handler, stokes_dofs_per_block, stokes_sub_blocks);
+  DoFTools::count_dofs_per_block(stokes_dof_handler, stokes_dofs_per_block, stokes_sub_blocks);
 
-  const unsigned int n_u = stokes_dofs_per_block[0],
-                     n_p = stokes_dofs_per_block[1];
+  const unsigned int n_u = stokes_dofs_per_block[0], n_p = stokes_dofs_per_block[1];
 
   std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
 
@@ -187,11 +171,9 @@ test_LA_Trilinos()
   stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
   IndexSet stokes_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(stokes_dof_handler,
-                                          stokes_relevant_set);
+  DoFTools::extract_locally_relevant_dofs(stokes_dof_handler, stokes_relevant_set);
   stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(0, n_u));
-  stokes_relevant_partitioning.push_back(
-    stokes_relevant_set.get_view(n_u, n_u + n_p));
+  stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(n_u, n_u + n_p));
   stokes_relevant_set.print(deallog.get_file_stream());
 
   ConstraintMatrix cm(stokes_relevant_set);
@@ -212,12 +194,7 @@ test_LA_Trilinos()
   coupling[0][1] = DoFTools::always;
 
   DoFTools::make_sparsity_pattern(
-    stokes_dof_handler,
-    coupling,
-    sp,
-    cm,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    stokes_dof_handler, coupling, sp, cm, false, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
 
   sp.compress();
 

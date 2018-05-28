@@ -125,30 +125,20 @@ test(const Triangulation<dim> &tria,
 
   QGauss<dim>  quadrature(4);
   TestFunction function;
-  VectorTools::project(
-    mapping, dof_handler1, constraints1, quadrature, function, function1);
+  VectorTools::project(mapping, dof_handler1, constraints1, quadrature, function, function1);
 
   switch (testcase)
     {
       case 1:
-        FETools::interpolate(
-          dof_handler1, function1, dof_handler2, constraints2, function2);
+        FETools::interpolate(dof_handler1, function1, dof_handler2, constraints2, function2);
         break;
       case 2:
-        FETools::back_interpolate(dof_handler1,
-                                  constraints1,
-                                  function1,
-                                  dof_handler2,
-                                  constraints2,
-                                  function1_back);
+        FETools::back_interpolate(
+          dof_handler1, constraints1, function1, dof_handler2, constraints2, function1_back);
         break;
       case 3:
-        FETools::interpolation_difference(dof_handler1,
-                                          constraints1,
-                                          function1,
-                                          dof_handler2,
-                                          constraints2,
-                                          function1_back);
+        FETools::interpolation_difference(
+          dof_handler1, constraints1, function1, dof_handler2, constraints2, function1_back);
         break;
       default:
         Assert(false, ExcNotImplemented());

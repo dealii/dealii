@@ -51,9 +51,7 @@ test(const unsigned int degree)
 
   QGauss<dim>   q(degree + 1);
   FEValues<dim> fe_values(fe, q, update_values);
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tr.begin_active();
-       cell != tr.end();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
        ++cell)
     {
       fe_values.reinit(cell);

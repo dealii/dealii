@@ -43,8 +43,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
       patch.n_subdivisions = nsub;
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         for (unsigned int d = 0; d < spacedim; ++d)
-          patch.vertices[v](d) =
-            p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);
+          patch.vertices[v](d) = p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);
 
       unsigned int n1 = (dim > 0) ? nsubp : 1;
       unsigned int n2 = (dim > 1) ? nsubp : 1;
@@ -57,12 +56,11 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
           for (unsigned int i2 = 0; i2 < n2; ++i2)
             for (unsigned int i1 = 0; i1 < n1; ++i1)
               {
-                const unsigned int i =
-                  i1 + nsubp * (i2 + nsubp * (i3 + nsubp * i4));
-                const float x1 = 1. * i1 / nsub;
-                const float x2 = 1. * i2 / nsub;
-                const float x3 = 1. * i3 / nsub;
-                const float x4 = 1. * i4 / nsub;
+                const unsigned int i  = i1 + nsubp * (i2 + nsubp * (i3 + nsubp * i4));
+                const float        x1 = 1. * i1 / nsub;
+                const float        x2 = 1. * i2 / nsub;
+                const float        x3 = 1. * i3 / nsub;
+                const float        x4 = 1. * i4 / nsub;
 
                 patch.data(0, i) = p + x1;
                 patch.data(1, i) = p + x2;
@@ -94,15 +92,13 @@ check()
   names[4] = "i";
   std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
 
-  DataOutBase::DataOutFilter data_filter(
-    DataOutBase::DataOutFilterFlags(false, false));
+  DataOutBase::DataOutFilter data_filter(DataOutBase::DataOutFilterFlags(false, false));
 
   DataOutBase::write_filtered_data(patches, names, vectors, data_filter);
 
   std::string output_basename = std::to_string(dim) + std::to_string(spacedim);
 
-  DataOutBase::write_hdf5_parallel(
-    patches, data_filter, output_basename + ".h5", MPI_COMM_WORLD);
+  DataOutBase::write_hdf5_parallel(patches, data_filter, output_basename + ".h5", MPI_COMM_WORLD);
 
   const double current_time = 0.0;
   XDMFEntry    entry(output_basename + ".h5",
@@ -117,8 +113,7 @@ check()
   // The vector names generated here must match those generated in the HDF5 file
   for (unsigned int i = 0; i < n_data_sets; ++i)
     {
-      entry.add_attribute(data_filter.get_data_set_name(i),
-                          data_filter.get_data_set_dim(i));
+      entry.add_attribute(data_filter.get_data_set_name(i), data_filter.get_data_set_dim(i));
     }
 
   std::ofstream xdmf_file((output_basename + ".xdmf").c_str());
@@ -127,8 +122,7 @@ check()
   xdmf_file << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
   xdmf_file << "<Xdmf Version=\"2.0\">\n";
   xdmf_file << "  <Domain>\n";
-  xdmf_file
-    << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
+  xdmf_file << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
 
   // Write out the entry
   xdmf_file << entry.get_xdmf_content(3);
@@ -180,25 +174,21 @@ main(int argc, char *argv[])
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

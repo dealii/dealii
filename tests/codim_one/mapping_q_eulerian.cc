@@ -67,12 +67,10 @@ test(std::string filename, unsigned int degree)
   grid_out.write_ucd(tria, logfile);
 
   QTrapez<dim>                                    quad;
-  MappingQEulerian<dim, Vector<double>, spacedim> mapping(
-    degree, shift_dh, shift);
+  MappingQEulerian<dim, Vector<double>, spacedim> mapping(degree, shift_dh, shift);
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active(),
+                                                              endc = tria.end();
   Point<spacedim> real;
   Point<dim>      unit;
   double          eps = 1e-10;
@@ -85,8 +83,7 @@ test(std::string filename, unsigned int degree)
           unit = mapping.transform_real_to_unit_cell(cell, real);
           deallog << quad.point(q) << " -> " << real << std::endl;
           if ((unit - quad.point(q)).norm() > eps)
-            deallog << "Error: " << quad.point(q) << " != " << unit
-                    << std::endl;
+            deallog << "Error: " << quad.point(q) << " != " << unit << std::endl;
         }
     }
 }

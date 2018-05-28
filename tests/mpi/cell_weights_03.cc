@@ -36,9 +36,8 @@
 
 template <int dim>
 unsigned int
-cell_weight(
-  const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-  const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+cell_weight(const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+            const typename parallel::distributed::Triangulation<dim>::CellStatus     status)
 {
   const unsigned int cell_weight =
     (cell->center()[0] < 0.5 || cell->center()[1] < 0.5 ? 0 : 3 * 1000);
@@ -69,26 +68,21 @@ test()
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     for (unsigned int p = 0; p < numproc; ++p)
-      deallog << "processor " << p << ": "
-              << tr.n_locally_owned_active_cells_per_processor()[p]
+      deallog << "processor " << p << ": " << tr.n_locally_owned_active_cells_per_processor()[p]
               << " locally owned active cells" << std::endl;
 
   // let each processor sum up its weights
   std::vector<double> integrated_weights(numproc, 0.0);
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tr.begin_active();
-       cell != tr.end();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
        ++cell)
     if (cell->is_locally_owned())
       integrated_weights[myid] +=
-        1000 + cell_weight<dim>(
-                 cell, parallel::distributed::Triangulation<dim>::CELL_PERSIST);
+        1000 + cell_weight<dim>(cell, parallel::distributed::Triangulation<dim>::CELL_PERSIST);
 
   Utilities::MPI::sum(integrated_weights, MPI_COMM_WORLD, integrated_weights);
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     for (unsigned int p = 0; p < numproc; ++p)
-      deallog << "processor " << p << ": " << integrated_weights[p] << " weight"
-              << std::endl;
+      deallog << "processor " << p << ": " << integrated_weights[p] << " weight" << std::endl;
 }
 
 

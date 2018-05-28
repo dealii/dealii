@@ -33,8 +33,7 @@ main()
   ParameterAcceptorProxy<Functions::ParsedFunction<2>> f2("Function 2D");
   ParameterAcceptorProxy<Functions::ParsedFunction<3>> f3("Function 3D");
 
-  ParameterAcceptor::initialize(
-    SOURCE_DIR
-    "/parameter_acceptor_parameters/parameter_acceptor_proxy_01.prm");
+  ParameterAcceptor::initialize(SOURCE_DIR
+                                "/parameter_acceptor_parameters/parameter_acceptor_proxy_01.prm");
   prm.log_parameters(deallog);
 }

@@ -53,18 +53,13 @@ test();
 
 
 
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d = fe_degree + 1,
-          typename Number   = double>
+template <int dim, int fe_degree, int n_q_points_1d = fe_degree + 1, typename Number = double>
 class MatrixFreeTest
 {
 public:
   bool read_vector;
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) :
-    read_vector(false),
-    data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : read_vector(false), data(data_in){};
 
   void
   operator()(const MatrixFree<dim, Number> &data,
@@ -88,9 +83,7 @@ public:
 
         // values should evaluate to one, derivatives to zero
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
-          for (unsigned int d = 0;
-               d < VectorizedArray<Number>::n_array_elements;
-               ++d)
+          for (unsigned int d = 0; d < VectorizedArray<Number>::n_array_elements; ++d)
             {
               Assert(fe_eval.get_value(q)[d] == 1., ExcInternalError());
               for (unsigned int e = 0; e < dim; ++e)
@@ -150,8 +143,7 @@ do_test(const DoFHandler<dim> &dof, const ConstraintMatrix &constraints)
     mf_data.reinit(dof, constraints, quad, data);
   }
 
-  deallog << "Testing " << dof.get_fe().get_name() << " without read"
-          << std::endl;
+  deallog << "Testing " << dof.get_fe().get_name() << " without read" << std::endl;
   MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);
   mf.test_functions(solution);
 
@@ -186,8 +178,7 @@ test()
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))

@@ -81,8 +81,7 @@ main()
   solution = 1.0;
 
 
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(
-    dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
   triangulation.execute_coarsening_and_refinement();
@@ -95,17 +94,15 @@ main()
   q.push_back(QMidpoint<2>());
   q.push_back(QMidpoint<2>());
   hp::FEValues<2> x_fe_values(fe_collection, q, update_hessians);
-  for (hp::DoFHandler<2>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
       x_fe_values.reinit(cell);
-      std::vector<Vector<double>> derivatives(
-        q[0].size(), Vector<double>(cell->get_fe().n_components()));
+      std::vector<Vector<double>> derivatives(q[0].size(),
+                                              Vector<double>(cell->get_fe().n_components()));
 
-      x_fe_values.get_present_fe_values().get_function_laplacians(new_solution,
-                                                                  derivatives);
+      x_fe_values.get_present_fe_values().get_function_laplacians(new_solution, derivatives);
     }
 
   // we are good if we made it to here

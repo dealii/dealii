@@ -51,8 +51,7 @@ FullMatrix<long double>::Tvmult<long double>(Vector<long double> &,
                                              const Vector<long double> &,
                                              bool) const;
 template void
-FullMatrix<long double>::add<long double>(const long double,
-                                          const FullMatrix<long double> &);
+FullMatrix<long double>::add<long double>(const long double, const FullMatrix<long double> &);
 
 
 // do a few functions that currently don't fit the scheme because they have

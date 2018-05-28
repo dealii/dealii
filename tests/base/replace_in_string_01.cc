@@ -21,16 +21,13 @@
 #include "../tests.h"
 
 void
-check(const std::string in,
-      const std::string from,
-      const std::string to,
-      std::string       out)
+check(const std::string in, const std::string from, const std::string to, std::string out)
 {
   std::string result = Utilities::replace_in_string(in, from, to);
   if (result != out)
     {
-      deallog << "in='" << in << "' from='" << from << "' to='" << to
-              << "' result='" << result << "' != '" << out << "'" << std::endl;
+      deallog << "in='" << in << "' from='" << from << "' to='" << to << "' result='" << result
+              << "' != '" << out << "'" << std::endl;
     }
 }
 

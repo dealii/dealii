@@ -56,8 +56,7 @@ test()
   DoFHandler<2> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-                                             MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   AssertThrow(interpolated.has_ghost_elements() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
@@ -67,8 +66,7 @@ test()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 

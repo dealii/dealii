@@ -47,9 +47,7 @@ main()
   matrix.set(3, 4, 0.);
 
   // Print the matrix
-  for (SparseMatrix<float>::const_iterator i = matrix.begin();
-       i != matrix.end();
-       ++i)
+  for (SparseMatrix<float>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
     deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
   deallog << std::endl;
 
@@ -58,29 +56,23 @@ main()
     i->value() += .5;
 
   // Print the matrix
-  for (SparseMatrix<float>::const_iterator i = matrix.begin();
-       i != matrix.end();
-       ++i)
+  for (SparseMatrix<float>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
     deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
   deallog << std::endl;
 
   // Subtract 1 from each element in row 2
-  for (SparseMatrix<float>::iterator i = matrix.begin(2); i != matrix.end(2);
-       ++i)
+  for (SparseMatrix<float>::iterator i = matrix.begin(2); i != matrix.end(2); ++i)
     i->value() -= 1.;
 
   //  Double each element in row 1
-  for (SparseMatrix<float>::iterator i = matrix.begin(1); i != matrix.end(1);
-       ++i)
+  for (SparseMatrix<float>::iterator i = matrix.begin(1); i != matrix.end(1); ++i)
     i->value() *= 2;
 
   // Set the first entry to zero
   matrix.begin()->value() = 0;
 
   // Print the matrix
-  for (SparseMatrix<float>::const_iterator i = matrix.begin();
-       i != matrix.end();
-       ++i)
+  for (SparseMatrix<float>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
     deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
   deallog << std::endl;
 }

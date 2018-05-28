@@ -115,9 +115,8 @@ namespace Step55
 
 
     template <class Matrix, class Preconditioner>
-    InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
-      const Matrix &        m,
-      const Preconditioner &preconditioner) :
+    InverseMatrix<Matrix, Preconditioner>::InverseMatrix(const Matrix &        m,
+                                                         const Preconditioner &preconditioner) :
       matrix(&m),
       preconditioner(preconditioner)
     {}
@@ -126,11 +125,9 @@ namespace Step55
 
     template <class Matrix, class Preconditioner>
     template <typename VectorType>
-    void
-    InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &      dst,
-                                                 const VectorType &src) const
+    void InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &dst, const VectorType &src) const
     {
-      SolverControl solver_control(src.size(), 1e-8 * src.l2_norm());
+      SolverControl             solver_control(src.size(), 1e-8 * src.l2_norm());
       SolverCG<LA::MPI::Vector> cg(solver_control);
       dst = 0;
 
@@ -154,8 +151,7 @@ namespace Step55
       BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,
                                   const PreconditionerS &preconditioner_S);
 
-      void vmult(LA::MPI::BlockVector &      dst,
-                 const LA::MPI::BlockVector &src) const;
+      void vmult(LA::MPI::BlockVector &dst, const LA::MPI::BlockVector &src) const;
 
     private:
       const PreconditionerA &preconditioner_A;
@@ -163,9 +159,9 @@ namespace Step55
     };
 
     template <class PreconditionerA, class PreconditionerS>
-    BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::
-      BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,
-                                  const PreconditionerS &preconditioner_S) :
+    BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::BlockDiagonalPreconditioner(
+      const PreconditionerA &preconditioner_A,
+      const PreconditionerS &preconditioner_S) :
       preconditioner_A(preconditioner_A),
       preconditioner_S(preconditioner_S)
     {}
@@ -194,31 +190,27 @@ namespace Step55
     RightHandSide() : Function<dim>(dim + 1)
     {}
 
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
+    virtual void vector_value(const Point<dim> &p, Vector<double> &value) const override;
   };
 
 
   template <int dim>
-  void RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
+  void RightHandSide<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
   {
     const double R_x = p[0];
     const double R_y = p[1];
 
     const double pi  = numbers::PI;
     const double pi2 = pi * pi;
-    values[0] =
-      -1.0L / 2.0L * (-2 * sqrt(25.0 + 4 * pi2) + 10.0) *
-        exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
-      0.4 * pi2 * exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) +
-      0.1 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 2) *
-        exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi);
+    values[0]        = -1.0L / 2.0L * (-2 * sqrt(25.0 + 4 * pi2) + 10.0) *
+                  exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
+                0.4 * pi2 * exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) +
+                0.1 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 2) *
+                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi);
     values[1] = 0.2 * pi * (-sqrt(25.0 + 4 * pi2) + 5.0) *
                   exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) -
                 0.05 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 3) *
-                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
-                  pi;
+                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) / pi;
     values[2] = 0;
   }
 
@@ -230,38 +222,30 @@ namespace Step55
     ExactSolution() : Function<dim>(dim + 1)
     {}
 
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
+    virtual void vector_value(const Point<dim> &p, Vector<double> &value) const override;
   };
 
   template <int dim>
-  void ExactSolution<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
+  void ExactSolution<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
   {
     const double R_x = p[0];
     const double R_y = p[1];
 
     const double pi  = numbers::PI;
     const double pi2 = pi * pi;
-    values[0] =
-      -exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) + 1;
-    values[1] = (1.0L / 2.0L) * (-sqrt(25.0 + 4 * pi2) + 5.0) *
-                exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
-                pi;
+    values[0]        = -exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) + 1;
+    values[1]        = (1.0L / 2.0L) * (-sqrt(25.0 + 4 * pi2) + 5.0) *
+                exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) / pi;
     values[2] =
       -1.0L / 2.0L * exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
-      2.0 *
-        (-6538034.74494422 +
-         0.0134758939981709 * exp(4 * sqrt(25.0 + 4 * pi2))) /
+      2.0 * (-6538034.74494422 + 0.0134758939981709 * exp(4 * sqrt(25.0 + 4 * pi2))) /
         (-80.0 * exp(3 * sqrt(25.0 + 4 * pi2)) +
          16.0 * sqrt(25.0 + 4 * pi2) * exp(3 * sqrt(25.0 + 4 * pi2))) -
-      1634508.68623606 * exp(-3.0 * sqrt(25.0 + 4 * pi2)) /
-        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2)) +
+      1634508.68623606 * exp(-3.0 * sqrt(25.0 + 4 * pi2)) / (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2)) +
       (-0.00673794699908547 * exp(sqrt(25.0 + 4 * pi2)) +
        3269017.37247211 * exp(-3 * sqrt(25.0 + 4 * pi2))) /
         (-8 * sqrt(25.0 + 4 * pi2) + 40.0) +
-      0.00336897349954273 * exp(1.0 * sqrt(25.0 + 4 * pi2)) /
-        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2));
+      0.00336897349954273 * exp(1.0 * sqrt(25.0 + 4 * pi2)) / (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2));
   }
 
 
@@ -319,16 +303,13 @@ namespace Step55
     viscosity(0.1),
     mpi_communicator(MPI_COMM_WORLD),
     fe(FE_Q<dim>(velocity_degree), dim, FE_Q<dim>(velocity_degree - 1), 1),
-    triangulation(mpi_communicator,
-                  typename Triangulation<dim>::MeshSmoothing(
-                    Triangulation<dim>::smoothing_on_refinement |
-                    Triangulation<dim>::smoothing_on_coarsening)),
+    triangulation(
+      mpi_communicator,
+      typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                                 Triangulation<dim>::smoothing_on_coarsening)),
     dof_handler(triangulation),
     pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-    computing_timer(mpi_communicator,
-                    pcout,
-                    TimerOutput::summary,
-                    TimerOutput::wall_times)
+    computing_timer(mpi_communicator, pcout, TimerOutput::summary, TimerOutput::wall_times)
   {}
 
 
@@ -361,21 +342,19 @@ namespace Step55
     DoFRenumbering::component_wise(dof_handler, stokes_sub_blocks);
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, stokes_sub_blocks);
+    DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, stokes_sub_blocks);
 
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
-    pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " ("
-          << n_u << '+' << n_p << ')' << std::endl;
+    pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " (" << n_u << '+'
+          << n_p << ')' << std::endl;
 
     // We split up the IndexSet for locally owned and locally relevant DoFs
     // into two IndexSets based on how we want to create the block matrices
     // and vectors.
     owned_partitioning.resize(2);
     owned_partitioning[0] = dof_handler.locally_owned_dofs().get_view(0, n_u);
-    owned_partitioning[1] =
-      dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
+    owned_partitioning[1] = dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
     IndexSet locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
@@ -393,11 +372,8 @@ namespace Step55
 
       FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-      VectorTools::interpolate_boundary_values(dof_handler,
-                                               0,
-                                               ExactSolution<dim>(),
-                                               constraints,
-                                               fe.component_mask(velocities));
+      VectorTools::interpolate_boundary_values(
+        dof_handler, 0, ExactSolution<dim>(), constraints, fe.component_mask(velocities));
       constraints.close();
     }
 
@@ -422,14 +398,12 @@ namespace Step55
 
       BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
-      DoFTools::make_sparsity_pattern(
-        dof_handler, coupling, dsp, constraints, false);
+      DoFTools::make_sparsity_pattern(dof_handler, coupling, dsp, constraints, false);
 
-      SparsityTools::distribute_sparsity_pattern(
-        dsp,
-        dof_handler.locally_owned_dofs_per_processor(),
-        mpi_communicator,
-        locally_relevant_dofs);
+      SparsityTools::distribute_sparsity_pattern(dsp,
+                                                 dof_handler.locally_owned_dofs_per_processor(),
+                                                 mpi_communicator,
+                                                 locally_relevant_dofs);
 
       system_matrix.reinit(owned_partitioning, dsp, mpi_communicator);
     }
@@ -450,13 +424,11 @@ namespace Step55
 
       BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
-      DoFTools::make_sparsity_pattern(
-        dof_handler, coupling, dsp, constraints, false);
-      SparsityTools::distribute_sparsity_pattern(
-        dsp,
-        dof_handler.locally_owned_dofs_per_processor(),
-        mpi_communicator,
-        locally_relevant_dofs);
+      DoFTools::make_sparsity_pattern(dof_handler, coupling, dsp, constraints, false);
+      SparsityTools::distribute_sparsity_pattern(dsp,
+                                                 dof_handler.locally_owned_dofs_per_processor(),
+                                                 mpi_communicator,
+                                                 locally_relevant_dofs);
       preconditioner_matrix.reinit(owned_partitioning,
                                    //      owned_partitioning,
                                    dsp,
@@ -466,8 +438,7 @@ namespace Step55
     // Finally, we construct the block vectors with the right sizes. The
     // function call with two std::vector<IndexSet> will create a ghosted
     // vector.
-    locally_relevant_solution.reinit(
-      owned_partitioning, relevant_partitioning, mpi_communicator);
+    locally_relevant_solution.reinit(owned_partitioning, relevant_partitioning, mpi_communicator);
     system_rhs.reinit(owned_partitioning, mpi_communicator);
   }
 
@@ -490,8 +461,8 @@ namespace Step55
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients | update_quadrature_points |
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -511,8 +482,7 @@ namespace Step55
     const FEValuesExtractors::Vector     velocities(0);
     const FEValuesExtractors::Scalar     pressure(dim);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -522,8 +492,7 @@ namespace Step55
           cell_rhs     = 0;
 
           fe_values.reinit(cell);
-          right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                            rhs_values);
+          right_hand_side.vector_value_list(fe_values.get_quadrature_points(), rhs_values);
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
               for (unsigned int k = 0; k < dofs_per_cell; ++k)
@@ -538,29 +507,24 @@ namespace Step55
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
                       cell_matrix(i, j) +=
-                        (viscosity *
-                           scalar_product(grad_phi_u[i], grad_phi_u[j]) -
+                        (viscosity * scalar_product(grad_phi_u[i], grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
                         fe_values.JxW(q);
 
-                      cell_matrix2(i, j) += 1.0 / viscosity * phi_p[i] *
-                                            phi_p[j] * fe_values.JxW(q);
+                      cell_matrix2(i, j) +=
+                        1.0 / viscosity * phi_p[i] * phi_p[j] * fe_values.JxW(q);
                     }
 
-                  const unsigned int component_i =
-                    fe.system_to_component_index(i).first;
-                  cell_rhs(i) += fe_values.shape_value(i, q) *
-                                 rhs_values[q](component_i) * fe_values.JxW(q);
+                  const unsigned int component_i = fe.system_to_component_index(i).first;
+                  cell_rhs(i) +=
+                    fe_values.shape_value(i, q) * rhs_values[q](component_i) * fe_values.JxW(q);
                 }
             }
 
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
-                                                 cell_rhs,
-                                                 local_dof_indices,
-                                                 system_matrix,
-                                                 system_rhs);
+          constraints.distribute_local_to_global(
+            cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
 
           constraints.distribute_local_to_global(
             cell_matrix2, local_dof_indices, preconditioner_matrix);
@@ -619,45 +583,36 @@ namespace Step55
     }
 
     // The InverseMatrix is used to solve for the mass matrix:
-    typedef LinearSolvers::InverseMatrix<LA::MPI::SparseMatrix,
-                                         LA::MPI::PreconditionAMG>
+    typedef LinearSolvers::InverseMatrix<LA::MPI::SparseMatrix, LA::MPI::PreconditionAMG>
                        mp_inverse_t;
     const mp_inverse_t mp_inverse(preconditioner_matrix.block(1, 1), prec_S);
 
     // This constructs the block preconditioner based on the preconditioners
     // for the individual blocks defined above.
-    const LinearSolvers::BlockDiagonalPreconditioner<LA::MPI::PreconditionAMG,
-                                                     mp_inverse_t>
+    const LinearSolvers::BlockDiagonalPreconditioner<LA::MPI::PreconditionAMG, mp_inverse_t>
       preconditioner(prec_A, mp_inverse);
 
     // With that, we can finally set up the linear solver and solve the system:
-    SolverControl solver_control(system_matrix.m(),
-                                 1e-10 * system_rhs.l2_norm());
+    SolverControl solver_control(system_matrix.m(), 1e-10 * system_rhs.l2_norm());
 
     SolverMinRes<LA::MPI::BlockVector> solver(solver_control);
 
-    LA::MPI::BlockVector distributed_solution(owned_partitioning,
-                                              mpi_communicator);
+    LA::MPI::BlockVector distributed_solution(owned_partitioning, mpi_communicator);
 
     constraints.set_zero(distributed_solution);
 
-    solver.solve(
-      system_matrix, distributed_solution, system_rhs, preconditioner);
+    solver.solve(system_matrix, distributed_solution, system_rhs, preconditioner);
 
-    pcout << "   Solved in " << solver_control.last_step() << " iterations."
-          << std::endl;
+    pcout << "   Solved in " << solver_control.last_step() << " iterations." << std::endl;
 
     constraints.distribute(distributed_solution);
 
     // Like in step-56, we subtract the mean pressure to allow error
     // computations against our reference solution, which has a mean value
     // of zero.
-    locally_relevant_solution = distributed_solution;
-    const double mean_pressure =
-      VectorTools::compute_mean_value(dof_handler,
-                                      QGauss<dim>(velocity_degree + 2),
-                                      locally_relevant_solution,
-                                      dim);
+    locally_relevant_solution  = distributed_solution;
+    const double mean_pressure = VectorTools::compute_mean_value(
+      dof_handler, QGauss<dim>(velocity_degree + 2), locally_relevant_solution, dim);
     distributed_solution.block(1).add(-mean_pressure);
     locally_relevant_solution.block(1) = distributed_solution.block(1);
   }
@@ -701,8 +656,7 @@ namespace Step55
   {
     {
       const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
-      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
-                                                       dim + 1);
+      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim), dim + 1);
 
       Vector<double> cellwise_errors(triangulation.n_active_cells());
       QGauss<dim>    quadrature(velocity_degree + 2);
@@ -715,8 +669,8 @@ namespace Step55
                                         VectorTools::L2_norm,
                                         &velocity_mask);
 
-      const double error_u_l2 = VectorTools::compute_global_error(
-        triangulation, cellwise_errors, VectorTools::L2_norm);
+      const double error_u_l2 =
+        VectorTools::compute_global_error(triangulation, cellwise_errors, VectorTools::L2_norm);
 
       VectorTools::integrate_difference(dof_handler,
                                         locally_relevant_solution,
@@ -726,21 +680,18 @@ namespace Step55
                                         VectorTools::L2_norm,
                                         &pressure_mask);
 
-      const double error_p_l2 = VectorTools::compute_global_error(
-        triangulation, cellwise_errors, VectorTools::L2_norm);
+      const double error_p_l2 =
+        VectorTools::compute_global_error(triangulation, cellwise_errors, VectorTools::L2_norm);
 
-      pcout << "error: u_0: " << error_u_l2 << " p_0: " << error_p_l2
-            << std::endl;
+      pcout << "error: u_0: " << error_u_l2 << " p_0: " << error_p_l2 << std::endl;
     }
 
 
     std::vector<std::string> solution_names(dim, "velocity");
     solution_names.emplace_back("pressure");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_component_interpretation(
-        dim, DataComponentInterpretation::component_is_part_of_vector);
-    data_component_interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar);
+      data_component_interpretation(dim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
@@ -782,14 +733,11 @@ namespace Step55
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
-                              "." + Utilities::int_to_string(i, 4) + ".vtu");
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
+          filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) + "." +
+                              Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output(
-          "solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu");
+        std::ofstream master_output("solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu");
         data_out.write_pvtu_record(master_output, filenames);
       }
   }
@@ -851,13 +799,11 @@ int main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -865,12 +811,10 @@ int main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

@@ -55,21 +55,17 @@ main()
       const FE_Q<3>     dummy_fe(1);
       DoFHandler<3>     dof_handler(triangulation);
 
-      for (Triangulation<3>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         {
-          if (cell->center()[1] * cell->center()[1] +
-                cell->center()[2] * cell->center()[2] <
-              1.e-5)
+          if (cell->center()[1] * cell->center()[1] + cell->center()[2] * cell->center()[2] < 1.e-5)
             cell->set_material_id(1);
           else
             cell->set_material_id(0);
         }
 
-      Triangulation<3>::active_cell_iterator cell =
-                                               triangulation.begin_active(),
+      Triangulation<3>::active_cell_iterator cell = triangulation.begin_active(),
                                              endc = triangulation.end();
 
       for (; cell != endc; ++cell)
@@ -81,8 +77,7 @@ main()
       dof_handler.distribute_dofs(dummy_fe);
 
       Vector<double> dummy(triangulation.n_active_cells());
-      for (Triangulation<3>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         dummy(cell->active_cell_index()) = cell->material_id();

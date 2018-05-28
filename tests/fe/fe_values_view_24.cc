@@ -71,8 +71,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         deallog << "  q_point=" << q << std::endl
-                << "    div= " << fe_values[extractor].divergence(i, q)
-                << std::endl;
+                << "    div= " << fe_values[extractor].divergence(i, q) << std::endl;
     }
 }
 
@@ -88,8 +87,7 @@ test_hyper_sphere()
   static const SphericalManifold<dim> boundary;
   tr.set_manifold(0, boundary);
 
-  FESystem<dim> fe(FE_Q<dim>(1),
-                   SymmetricTensor<2, dim>::n_independent_components);
+  FESystem<dim> fe(FE_Q<dim>(1), SymmetricTensor<2, dim>::n_independent_components);
   test(tr, fe);
 }
 

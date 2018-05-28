@@ -22,16 +22,15 @@ for (deal_II_dimension : DIMENSIONS)
       dummy<deal_II_dimension, deal_II_dimension>();
       template std::string
       policy_to_string(
-        const dealii::internal::DoFHandlerImplementation::Policy::
-          PolicyBase<deal_II_dimension, deal_II_dimension> &);
+        const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<deal_II_dimension,
+                                                                             deal_II_dimension> &);
 
 #if deal_II_dimension < 3
       template const types::global_dof_index *
       dummy<deal_II_dimension, deal_II_dimension + 1>();
       template std::string
-      policy_to_string(
-        const dealii::internal::DoFHandlerImplementation::Policy::
-          PolicyBase<deal_II_dimension, deal_II_dimension + 1> &);
+      policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::
+                         PolicyBase<deal_II_dimension, deal_II_dimension + 1> &);
 #endif
     \}
 
@@ -95,8 +94,7 @@ for (deal_II_dimension : DIMENSIONS)
 #  endif
 #endif
 
-    template void
-    DoFHandler<deal_II_dimension, deal_II_dimension>::set_dof_index<1>(
+    template void DoFHandler<deal_II_dimension, deal_II_dimension>::set_dof_index<1>(
       const unsigned int            obj_level,
       const unsigned int            obj_index,
       const unsigned int            fe_index,
@@ -104,8 +102,7 @@ for (deal_II_dimension : DIMENSIONS)
       const types::global_dof_index global_index) const;
 
 #if deal_II_dimension < 3
-    template void
-    DoFHandler<deal_II_dimension, deal_II_dimension + 1>::set_dof_index<1>(
+    template void DoFHandler<deal_II_dimension, deal_II_dimension + 1>::set_dof_index<1>(
       const unsigned int            obj_level,
       const unsigned int            obj_index,
       const unsigned int            fe_index,
@@ -114,8 +111,7 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
 #if deal_II_dimension < 2
-    template void
-    DoFHandler<deal_II_dimension, deal_II_dimension + 2>::set_dof_index<1>(
+    template void DoFHandler<deal_II_dimension, deal_II_dimension + 2>::set_dof_index<1>(
       const unsigned int            obj_level,
       const unsigned int            obj_index,
       const unsigned int            fe_index,
@@ -124,8 +120,7 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
 #if deal_II_dimension >= 2
-    template void
-    DoFHandler<deal_II_dimension, deal_II_dimension>::set_dof_index<2>(
+    template void DoFHandler<deal_II_dimension, deal_II_dimension>::set_dof_index<2>(
       const unsigned int            obj_level,
       const unsigned int            obj_index,
       const unsigned int            fe_index,
@@ -133,8 +128,7 @@ for (deal_II_dimension : DIMENSIONS)
       const types::global_dof_index global_index) const;
 
 #  if deal_II_dimension < 3
-    template void
-    DoFHandler<deal_II_dimension, deal_II_dimension + 1>::set_dof_index<2>(
+    template void DoFHandler<deal_II_dimension, deal_II_dimension + 1>::set_dof_index<2>(
       const unsigned int            obj_level,
       const unsigned int            obj_index,
       const unsigned int            fe_index,
@@ -143,8 +137,7 @@ for (deal_II_dimension : DIMENSIONS)
 #  endif
 
 #  if deal_II_dimension >= 3
-    template void
-    DoFHandler<deal_II_dimension, deal_II_dimension>::set_dof_index<3>(
+    template void DoFHandler<deal_II_dimension, deal_II_dimension>::set_dof_index<3>(
       const unsigned int            obj_level,
       const unsigned int            obj_index,
       const unsigned int            fe_index,

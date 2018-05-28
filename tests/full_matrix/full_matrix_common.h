@@ -136,8 +136,7 @@ print_matrix(const FullMatrix<number> &m)
   const number tolerance = 100. * std::numeric_limits<number>::epsilon();
   for (unsigned int i = 0; i < m.m(); ++i)
     for (unsigned int j = 0; j < m.n(); ++j)
-      deallog << i << ' ' << j << ' '
-              << filter_out_small_numbers(m(i, j), tolerance) << std::endl;
+      deallog << i << ' ' << j << ' ' << filter_out_small_numbers(m(i, j), tolerance) << std::endl;
 }
 
 
@@ -149,8 +148,7 @@ print_matrix(const FullMatrix<std::complex<number>> &m)
   const number tolerance = 100. * std::numeric_limits<number>::epsilon();
   for (unsigned int i = 0; i < m.m(); ++i)
     for (unsigned int j = 0; j < m.n(); ++j)
-      deallog << i << ' ' << j << ' '
-              << filter_out_small_numbers(m(i, j), tolerance) << std::endl;
+      deallog << i << ' ' << j << ' ' << filter_out_small_numbers(m(i, j), tolerance) << std::endl;
 }
 
 
@@ -160,11 +158,9 @@ void
 print_vector(const Vector<number> &v)
 {
   const typename numbers::NumberTraits<number>::real_type tolerance =
-    100. * std::numeric_limits<
-             typename numbers::NumberTraits<number>::real_type>::epsilon();
+    100. * std::numeric_limits<typename numbers::NumberTraits<number>::real_type>::epsilon();
   for (unsigned int i = 0; i < v.size(); ++i)
-    deallog << i << ' ' << filter_out_small_numbers(v(i), tolerance)
-            << std::endl;
+    deallog << i << ' ' << filter_out_small_numbers(v(i), tolerance) << std::endl;
 }
 
 template <typename number>
@@ -224,25 +220,21 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

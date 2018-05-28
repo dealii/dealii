@@ -38,8 +38,7 @@ check(FESystem<dim> &fe)
   deallog << fe.get_name() << std::endl;
   deallog << "components: " << fe.n_components() << std::endl;
   deallog << "blocks: " << fe.n_blocks() << std::endl;
-  deallog << "conforms H1: " << fe.conforms(FiniteElementData<dim>::H1)
-          << std::endl;
+  deallog << "conforms H1: " << fe.conforms(FiniteElementData<dim>::H1) << std::endl;
   deallog << "n_base_elements: " << fe.n_base_elements() << std::endl;
 }
 
@@ -64,8 +63,7 @@ main()
     check<2>(fe);
   }
   {
-    FESystem<2> fe(
-      FESystem<2>(FE_Q<2>(1), 2), 1, FE_DGQ<2>(2), 0, FE_Q<2>(1), 1);
+    FESystem<2> fe(FESystem<2>(FE_Q<2>(1), 2), 1, FE_DGQ<2>(2), 0, FE_Q<2>(1), 1);
     check<2>(fe);
   }
 

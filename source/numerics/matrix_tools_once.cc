@@ -63,30 +63,27 @@ namespace MatrixTools
 {
 #ifdef DEAL_II_WITH_PETSC
   void
-  apply_boundary_values(
-    const std::map<types::global_dof_index, PetscScalar> &boundary_values,
-    PETScWrappers::MatrixBase &                           matrix,
-    PETScWrappers::VectorBase &                           solution,
-    PETScWrappers::VectorBase &                           right_hand_side,
-    const bool                                            eliminate_columns)
+  apply_boundary_values(const std::map<types::global_dof_index, PetscScalar> &boundary_values,
+                        PETScWrappers::MatrixBase &                           matrix,
+                        PETScWrappers::VectorBase &                           solution,
+                        PETScWrappers::VectorBase &                           right_hand_side,
+                        const bool                                            eliminate_columns)
   {
     (void)eliminate_columns;
     Assert(eliminate_columns == false, ExcNotImplemented());
 
     Assert(matrix.n() == right_hand_side.size(),
            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
-           ExcDimensionMismatch(matrix.n(), solution.size()));
+    Assert(matrix.n() == solution.size(), ExcDimensionMismatch(matrix.n(), solution.size()));
 
     // if no boundary values are to be applied, then
     // jump straight to the compress() calls that we still have
     // to perform because they are collective operations
     if (boundary_values.size() > 0)
       {
-        const std::pair<types::global_dof_index, types::global_dof_index>
-          local_range = matrix.local_range();
-        Assert(local_range == right_hand_side.local_range(),
-               ExcInternalError());
+        const std::pair<types::global_dof_index, types::global_dof_index> local_range =
+          matrix.local_range();
+        Assert(local_range == right_hand_side.local_range(), ExcInternalError());
         Assert(local_range == solution.local_range(), ExcInternalError());
 
         // determine the first nonzero diagonal
@@ -94,9 +91,7 @@ namespace MatrixTools
         // matrix that we can see. if we can't
         // find such an entry, take one
         PetscScalar average_nonzero_diagonal_entry = 1;
-        for (types::global_dof_index i = local_range.first;
-             i < local_range.second;
-             ++i)
+        for (types::global_dof_index i = local_range.first; i < local_range.second; ++i)
           if (matrix.diag_element(i) != PetscScalar())
             {
               average_nonzero_diagonal_entry = std::abs(matrix.diag_element(i));
@@ -106,12 +101,11 @@ namespace MatrixTools
         // figure out which rows of the matrix we
         // have to eliminate on this processor
         std::vector<types::global_dof_index> constrained_rows;
-        for (std::map<types::global_dof_index, PetscScalar>::const_iterator
-               dof = boundary_values.begin();
+        for (std::map<types::global_dof_index, PetscScalar>::const_iterator dof =
+               boundary_values.begin();
              dof != boundary_values.end();
              ++dof)
-          if ((dof->first >= local_range.first) &&
-              (dof->first < local_range.second))
+          if ((dof->first >= local_range.first) && (dof->first < local_range.second))
             constrained_rows.push_back(dof->first);
 
         // then eliminate these rows and set
@@ -129,12 +123,11 @@ namespace MatrixTools
 
         std::vector<types::global_dof_index> indices;
         std::vector<PetscScalar>             solution_values;
-        for (std::map<types::global_dof_index, PetscScalar>::const_iterator
-               dof = boundary_values.begin();
+        for (std::map<types::global_dof_index, PetscScalar>::const_iterator dof =
+               boundary_values.begin();
              dof != boundary_values.end();
              ++dof)
-          if ((dof->first >= local_range.first) &&
-              (dof->first < local_range.second))
+          if ((dof->first >= local_range.first) && (dof->first < local_range.second))
             {
               indices.push_back(dof->first);
               solution_values.push_back(dof->second);
@@ -163,17 +156,15 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values(
-    const std::map<types::global_dof_index, PetscScalar> &boundary_values,
-    PETScWrappers::MPI::BlockSparseMatrix &               matrix,
-    PETScWrappers::MPI::BlockVector &                     solution,
-    PETScWrappers::MPI::BlockVector &                     right_hand_side,
-    const bool                                            eliminate_columns)
+  apply_boundary_values(const std::map<types::global_dof_index, PetscScalar> &boundary_values,
+                        PETScWrappers::MPI::BlockSparseMatrix &               matrix,
+                        PETScWrappers::MPI::BlockVector &                     solution,
+                        PETScWrappers::MPI::BlockVector &                     right_hand_side,
+                        const bool                                            eliminate_columns)
   {
     Assert(matrix.n() == right_hand_side.size(),
            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
-           ExcDimensionMismatch(matrix.n(), solution.size()));
+    Assert(matrix.n() == solution.size(), ExcDimensionMismatch(matrix.n(), solution.size()));
     Assert(matrix.n_block_rows() == matrix.n_block_cols(), ExcNotQuadratic());
 
     const unsigned int n_blocks = matrix.n_block_rows();
@@ -182,8 +173,8 @@ namespace MatrixTools
     // into blocks for the boundary values.
     // To this end, generate a vector of
     // maps with the respective indices.
-    std::vector<std::map<dealii::types::global_dof_index, PetscScalar>>
-      block_boundary_values(n_blocks);
+    std::vector<std::map<dealii::types::global_dof_index, PetscScalar>> block_boundary_values(
+      n_blocks);
     {
       int                             block  = 0;
       dealii::types::global_dof_index offset = 0;
@@ -199,8 +190,7 @@ namespace MatrixTools
             }
           const types::global_dof_index index = dof->first - offset;
           block_boundary_values[block].insert(
-            std::pair<types::global_dof_index, PetscScalar>(index,
-                                                            dof->second));
+            std::pair<types::global_dof_index, PetscScalar>(index, dof->second));
         }
     }
 
@@ -220,16 +210,15 @@ namespace MatrixTools
     // the whole row.
     for (unsigned int block_m = 0; block_m < n_blocks; ++block_m)
       {
-        const std::pair<types::global_dof_index, types::global_dof_index>
-          local_range = matrix.block(block_m, 0).local_range();
+        const std::pair<types::global_dof_index, types::global_dof_index> local_range =
+          matrix.block(block_m, 0).local_range();
 
         std::vector<types::global_dof_index> constrained_rows;
-        for (std::map<types::global_dof_index, PetscScalar>::const_iterator
-               dof = block_boundary_values[block_m].begin();
+        for (std::map<types::global_dof_index, PetscScalar>::const_iterator dof =
+               block_boundary_values[block_m].begin();
              dof != block_boundary_values[block_m].end();
              ++dof)
-          if ((dof->first >= local_range.first) &&
-              (dof->first < local_range.second))
+          if ((dof->first >= local_range.first) && (dof->first < local_range.second))
             constrained_rows.push_back(dof->first);
 
         for (unsigned int block_n = 0; block_n < n_blocks; ++block_n)
@@ -250,30 +239,28 @@ namespace MatrixTools
     {
       template <typename TrilinosMatrix, typename TrilinosVector>
       void
-      apply_boundary_values(const std::map<types::global_dof_index,
-                                           TrilinosScalar> &boundary_values,
-                            TrilinosMatrix &                matrix,
-                            TrilinosVector &                solution,
-                            TrilinosVector &                right_hand_side,
-                            const bool                      eliminate_columns)
+      apply_boundary_values(
+        const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
+        TrilinosMatrix &                                         matrix,
+        TrilinosVector &                                         solution,
+        TrilinosVector &                                         right_hand_side,
+        const bool                                               eliminate_columns)
       {
         Assert(eliminate_columns == false, ExcNotImplemented());
         (void)eliminate_columns;
 
         Assert(matrix.n() == right_hand_side.size(),
                ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-        Assert(matrix.n() == solution.size(),
-               ExcDimensionMismatch(matrix.m(), solution.size()));
+        Assert(matrix.n() == solution.size(), ExcDimensionMismatch(matrix.m(), solution.size()));
 
         // if no boundary values are to be applied, then
         // jump straight to the compress() calls that we still have
         // to perform because they are collective operations
         if (boundary_values.size() > 0)
           {
-            const std::pair<types::global_dof_index, types::global_dof_index>
-              local_range = matrix.local_range();
-            Assert(local_range == right_hand_side.local_range(),
-                   ExcInternalError());
+            const std::pair<types::global_dof_index, types::global_dof_index> local_range =
+              matrix.local_range();
+            Assert(local_range == right_hand_side.local_range(), ExcInternalError());
             Assert(local_range == solution.local_range(), ExcInternalError());
 
             // determine the first nonzero diagonal
@@ -281,26 +268,21 @@ namespace MatrixTools
             // matrix that we can see. if we can't
             // find such an entry, take one
             TrilinosScalar average_nonzero_diagonal_entry = 1;
-            for (types::global_dof_index i = local_range.first;
-                 i < local_range.second;
-                 ++i)
+            for (types::global_dof_index i = local_range.first; i < local_range.second; ++i)
               if (matrix.diag_element(i) != 0)
                 {
-                  average_nonzero_diagonal_entry =
-                    std::fabs(matrix.diag_element(i));
+                  average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
                   break;
                 }
 
             // figure out which rows of the matrix we
             // have to eliminate on this processor
             std::vector<types::global_dof_index> constrained_rows;
-            for (std::map<types::global_dof_index,
-                          TrilinosScalar>::const_iterator dof =
+            for (std::map<types::global_dof_index, TrilinosScalar>::const_iterator dof =
                    boundary_values.begin();
                  dof != boundary_values.end();
                  ++dof)
-              if ((dof->first >= local_range.first) &&
-                  (dof->first < local_range.second))
+              if ((dof->first >= local_range.first) && (dof->first < local_range.second))
                 constrained_rows.push_back(dof->first);
 
             // then eliminate these rows and
@@ -314,13 +296,11 @@ namespace MatrixTools
 
             std::vector<types::global_dof_index> indices;
             std::vector<TrilinosScalar>          solution_values;
-            for (std::map<types::global_dof_index,
-                          TrilinosScalar>::const_iterator dof =
+            for (std::map<types::global_dof_index, TrilinosScalar>::const_iterator dof =
                    boundary_values.begin();
                  dof != boundary_values.end();
                  ++dof)
-              if ((dof->first >= local_range.first) &&
-                  (dof->first < local_range.second))
+              if ((dof->first >= local_range.first) && (dof->first < local_range.second))
                 {
                   indices.push_back(dof->first);
                   solution_values.push_back(dof->second);
@@ -353,21 +333,18 @@ namespace MatrixTools
       template <typename TrilinosMatrix, typename TrilinosBlockVector>
       void
       apply_block_boundary_values(
-        const std::map<types::global_dof_index, TrilinosScalar>
-          &                  boundary_values,
-        TrilinosMatrix &     matrix,
-        TrilinosBlockVector &solution,
-        TrilinosBlockVector &right_hand_side,
-        const bool           eliminate_columns)
+        const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
+        TrilinosMatrix &                                         matrix,
+        TrilinosBlockVector &                                    solution,
+        TrilinosBlockVector &                                    right_hand_side,
+        const bool                                               eliminate_columns)
       {
         Assert(eliminate_columns == false, ExcNotImplemented());
 
         Assert(matrix.n() == right_hand_side.size(),
                ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-        Assert(matrix.n() == solution.size(),
-               ExcDimensionMismatch(matrix.n(), solution.size()));
-        Assert(matrix.n_block_rows() == matrix.n_block_cols(),
-               ExcNotQuadratic());
+        Assert(matrix.n() == solution.size(), ExcDimensionMismatch(matrix.n(), solution.size()));
+        Assert(matrix.n_block_rows() == matrix.n_block_cols(), ExcNotQuadratic());
 
         const unsigned int n_blocks = matrix.n_block_rows();
 
@@ -375,13 +352,13 @@ namespace MatrixTools
         // into blocks for the boundary values.
         // To this end, generate a vector of
         // maps with the respective indices.
-        std::vector<std::map<types::global_dof_index, TrilinosScalar>>
-          block_boundary_values(n_blocks);
+        std::vector<std::map<types::global_dof_index, TrilinosScalar>> block_boundary_values(
+          n_blocks);
         {
           int                     block  = 0;
           types::global_dof_index offset = 0;
-          for (std::map<types::global_dof_index, TrilinosScalar>::const_iterator
-                 dof = boundary_values.begin();
+          for (std::map<types::global_dof_index, TrilinosScalar>::const_iterator dof =
+                 boundary_values.begin();
                dof != boundary_values.end();
                ++dof)
             {
@@ -392,8 +369,7 @@ namespace MatrixTools
                 }
               const types::global_dof_index index = dof->first - offset;
               block_boundary_values[block].insert(
-                std::pair<types::global_dof_index, TrilinosScalar>(
-                  index, dof->second));
+                std::pair<types::global_dof_index, TrilinosScalar>(index, dof->second));
             }
         }
 
@@ -413,17 +389,15 @@ namespace MatrixTools
         // the whole row.
         for (unsigned int block_m = 0; block_m < n_blocks; ++block_m)
           {
-            const std::pair<types::global_dof_index, types::global_dof_index>
-              local_range = matrix.block(block_m, 0).local_range();
+            const std::pair<types::global_dof_index, types::global_dof_index> local_range =
+              matrix.block(block_m, 0).local_range();
 
             std::vector<types::global_dof_index> constrained_rows;
-            for (std::map<types::global_dof_index,
-                          TrilinosScalar>::const_iterator dof =
+            for (std::map<types::global_dof_index, TrilinosScalar>::const_iterator dof =
                    block_boundary_values[block_m].begin();
                  dof != block_boundary_values[block_m].end();
                  ++dof)
-              if ((dof->first >= local_range.first) &&
-                  (dof->first < local_range.second))
+              if ((dof->first >= local_range.first) && (dof->first < local_range.second))
                 constrained_rows.push_back(dof->first);
 
             for (unsigned int block_n = 0; block_n < n_blocks; ++block_n)
@@ -437,12 +411,11 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values(
-    const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
-    TrilinosWrappers::SparseMatrix &                         matrix,
-    TrilinosWrappers::MPI::Vector &                          solution,
-    TrilinosWrappers::MPI::Vector &                          right_hand_side,
-    const bool                                               eliminate_columns)
+  apply_boundary_values(const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
+                        TrilinosWrappers::SparseMatrix &                         matrix,
+                        TrilinosWrappers::MPI::Vector &                          solution,
+                        TrilinosWrappers::MPI::Vector &                          right_hand_side,
+                        const bool                                               eliminate_columns)
   {
     // simply redirect to the generic function
     // used for both trilinos matrix types
@@ -453,12 +426,11 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values(
-    const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
-    TrilinosWrappers::BlockSparseMatrix &                    matrix,
-    TrilinosWrappers::MPI::BlockVector &                     solution,
-    TrilinosWrappers::MPI::BlockVector &                     right_hand_side,
-    const bool                                               eliminate_columns)
+  apply_boundary_values(const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
+                        TrilinosWrappers::BlockSparseMatrix &                    matrix,
+                        TrilinosWrappers::MPI::BlockVector &                     solution,
+                        TrilinosWrappers::MPI::BlockVector &                     right_hand_side,
+                        const bool                                               eliminate_columns)
   {
     internal::TrilinosWrappers::apply_block_boundary_values(
       boundary_values, matrix, solution, right_hand_side, eliminate_columns);

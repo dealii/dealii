@@ -47,12 +47,10 @@ main()
   sparsity_pattern.reinit(2, 2);
   sparsity_pattern.collect_sizes();
 
-  sparsity_pattern.block(0, 0).reinit(dof_handler.n_dofs(),
-                                      dof_handler.n_dofs(),
-                                      dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.block(0, 0).reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
   sparsity_pattern.block(0, 1).reinit(dof_handler.n_dofs(), 1, 1);
-  sparsity_pattern.block(1, 0).reinit(
-    1, dof_handler.n_dofs(), dof_handler.n_dofs());
+  sparsity_pattern.block(1, 0).reinit(1, dof_handler.n_dofs(), dof_handler.n_dofs());
   sparsity_pattern.block(1, 1).reinit(1, 1, 1);
   sparsity_pattern.collect_sizes();
 
@@ -70,10 +68,8 @@ main()
   B.reinit(sparsity_pattern);
 
   // check some sizes
-  AssertThrow(B.m() == B.block(0, 0).m() + B.block(1, 1).m(),
-              ExcInternalError());
-  AssertThrow(B.n() == B.block(0, 0).n() + B.block(1, 1).n(),
-              ExcInternalError());
+  AssertThrow(B.m() == B.block(0, 0).m() + B.block(1, 1).m(), ExcInternalError());
+  AssertThrow(B.n() == B.block(0, 0).n() + B.block(1, 1).n(), ExcInternalError());
   AssertThrow(B.n_block_rows() == 2, ExcInternalError());
   AssertThrow(B.n_block_cols() == 2, ExcInternalError());
 

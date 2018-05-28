@@ -56,19 +56,15 @@ void
 test()
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
-  ConditionalOStream pcout(
-    std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0));
+  ConditionalOStream pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0));
 
   parallel::distributed::Triangulation<dim> tria(
     mpi_communicator,
-    typename Triangulation<dim>::MeshSmoothing(
-      Triangulation<dim>::smoothing_on_refinement |
-      Triangulation<dim>::smoothing_on_coarsening));
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening));
 
 
   GridGenerator::hyper_cube(tria, -1, 0);
@@ -86,19 +82,16 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   PETScWrappers::MPI::Vector                 vector, vector_locally_relevant;
-  LinearAlgebra::distributed::Vector<double> vector_Re,
-    vector_Re_locally_relevant, vector_Im, vector_Im_locally_relevant;
+  LinearAlgebra::distributed::Vector<double> vector_Re, vector_Re_locally_relevant, vector_Im,
+    vector_Im_locally_relevant;
   vector.reinit(locally_owned_dofs, mpi_communicator);
-  vector_locally_relevant.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  vector_locally_relevant.reinit(locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
 
   vector_Re.reinit(locally_owned_dofs, mpi_communicator);
-  vector_Re_locally_relevant.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  vector_Re_locally_relevant.reinit(locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
 
   vector_Im.reinit(locally_owned_dofs, mpi_communicator);
-  vector_Im_locally_relevant.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  vector_Im_locally_relevant.reinit(locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
 
   const types::global_dof_index n_local_dofs = locally_owned_dofs.n_elements();
 
@@ -110,11 +103,10 @@ test()
   unsigned int myid = Utilities::MPI::this_mpi_process(mpi_communicator);
   for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); i++)
     {
-      const PetscScalar val = 1.0 + myid + (myid + i % 2) * 2.0 * PETSC_i;
-      vector(locally_owned_dofs.nth_index_in_set(i))    = val;
+      const PetscScalar val                          = 1.0 + myid + (myid + i % 2) * 2.0 * PETSC_i;
+      vector(locally_owned_dofs.nth_index_in_set(i)) = val;
       vector_Re(locally_owned_dofs.nth_index_in_set(i)) = PetscRealPart(val);
-      vector_Im(locally_owned_dofs.nth_index_in_set(i)) =
-        PetscImaginaryPart(val);
+      vector_Im(locally_owned_dofs.nth_index_in_set(i)) = PetscImaginaryPart(val);
     }
   vector.compress(VectorOperation::insert);
   vector_Re.compress(VectorOperation::insert);
@@ -129,8 +121,7 @@ test()
     // a separate quadrature formula
     // enough for mass and kinetic matrices assembly
     QGauss<dim>   quadrature_formula(poly_degree + 1);
-    FEValues<dim> fe_values(
-      fe, quadrature_formula, update_values | update_JxW_values);
+    FEValues<dim> fe_values(fe, quadrature_formula, update_values | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -140,8 +131,7 @@ test()
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -153,10 +143,8 @@ test()
 
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
-              AssertThrow(PetscRealPart(values[q]) == values_Re[q],
-                          ExcInternalError());
-              AssertThrow(PetscImaginaryPart(values[q]) == values_Im[q],
-                          ExcInternalError());
+              AssertThrow(PetscRealPart(values[q]) == values_Re[q], ExcInternalError());
+              AssertThrow(PetscImaginaryPart(values[q]) == values_Im[q], ExcInternalError());
             }
         }
   }

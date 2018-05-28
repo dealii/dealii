@@ -48,8 +48,7 @@ output(const parallel::shared::Triangulation<dim> &tr,
        const bool                                  include_artificial)
 {
   GridOut out;
-  out.write_mesh_per_processor_as_vtu(
-    tr, filename, view_levels, include_artificial);
+  out.write_mesh_per_processor_as_vtu(tr, filename, view_levels, include_artificial);
 
   // copy the .pvtu and .vtu files
   // into the logstream
@@ -73,15 +72,13 @@ test()
   if (myid == 0)
     deallog << "hyper_cube" << std::endl;
 
-  parallel::shared::Triangulation<dim> tr(
-    MPI_COMM_WORLD,
-    ::Triangulation<dim>::none,
-    false,
-    parallel::shared::Triangulation<dim>::partition_metis);
+  parallel::shared::Triangulation<dim> tr(MPI_COMM_WORLD,
+                                          ::Triangulation<dim>::none,
+                                          false,
+                                          parallel::shared::Triangulation<dim>::partition_metis);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(),
-                                                    endc = tr.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(), endc = tr.end();
   for (; cell != endc; ++cell)
     {
       if (cell->index() < 2)

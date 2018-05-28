@@ -29,8 +29,7 @@ check(const char *p)
   ParameterHandler prm;
   try
     {
-      prm.declare_entry(
-        "test_1", "abc", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
+      prm.declare_entry("test_1", "abc", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
     }
   catch (const ParameterHandler::ExcValueDoesNotMatchPattern &)
     {

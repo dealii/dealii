@@ -61,9 +61,8 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename Range, typename Domain>
 LinearOperator<Range, Domain>
-distribute_constraints_linear_operator(
-  const ConstraintMatrix &             constraint_matrix,
-  const LinearOperator<Range, Domain> &exemplar)
+distribute_constraints_linear_operator(const ConstraintMatrix &             constraint_matrix,
+                                       const LinearOperator<Range, Domain> &exemplar)
 {
   LinearOperator<Range, Domain> return_op = exemplar;
 
@@ -157,9 +156,8 @@ distribute_constraints_linear_operator(
  */
 template <typename Range, typename Domain>
 LinearOperator<Range, Domain>
-project_to_constrained_linear_operator(
-  const ConstraintMatrix &             constraint_matrix,
-  const LinearOperator<Range, Domain> &exemplar)
+project_to_constrained_linear_operator(const ConstraintMatrix &             constraint_matrix,
+                                       const LinearOperator<Range, Domain> &exemplar)
 {
   LinearOperator<Range, Domain> return_op = exemplar;
 
@@ -248,14 +246,12 @@ project_to_constrained_linear_operator(
  */
 template <typename Range, typename Domain>
 LinearOperator<Range, Domain>
-constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
+constrained_linear_operator(const ConstraintMatrix &             constraint_matrix,
                             const LinearOperator<Range, Domain> &linop)
 {
-  const auto C =
-    distribute_constraints_linear_operator(constraint_matrix, linop);
-  const auto Ct = transpose_operator(C);
-  const auto Id_c =
-    project_to_constrained_linear_operator(constraint_matrix, linop);
+  const auto C    = distribute_constraints_linear_operator(constraint_matrix, linop);
+  const auto Ct   = transpose_operator(C);
+  const auto Id_c = project_to_constrained_linear_operator(constraint_matrix, linop);
   return Ct * linop * C + Id_c;
 }
 
@@ -296,27 +292,25 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  */
 template <typename Range, typename Domain>
 PackagedOperation<Range>
-constrained_right_hand_side(const ConstraintMatrix &constraint_matrix,
+constrained_right_hand_side(const ConstraintMatrix &             constraint_matrix,
                             const LinearOperator<Range, Domain> &linop,
-                            const Range &right_hand_side)
+                            const Range &                        right_hand_side)
 {
   PackagedOperation<Range> return_comp;
 
   return_comp.reinit_vector = linop.reinit_range_vector;
 
-  return_comp.apply_add =
-    [&constraint_matrix, &linop, &right_hand_side](Range &v) {
-      const auto C =
-        distribute_constraints_linear_operator(constraint_matrix, linop);
-      const auto Ct = transpose_operator(C);
+  return_comp.apply_add = [&constraint_matrix, &linop, &right_hand_side](Range &v) {
+    const auto C  = distribute_constraints_linear_operator(constraint_matrix, linop);
+    const auto Ct = transpose_operator(C);
 
-      GrowingVectorMemory<Domain>            vector_memory;
-      typename VectorMemory<Domain>::Pointer k(vector_memory);
-      linop.reinit_domain_vector(*k, /*bool fast=*/false);
-      constraint_matrix.distribute(*k);
+    GrowingVectorMemory<Domain>            vector_memory;
+    typename VectorMemory<Domain>::Pointer k(vector_memory);
+    linop.reinit_domain_vector(*k, /*bool fast=*/false);
+    constraint_matrix.distribute(*k);
 
-      v += Ct * (right_hand_side - linop * *k);
-    };
+    v += Ct * (right_hand_side - linop * *k);
+  };
 
   // lambda capture expressions are a C++14 feature...
   const auto apply_add = return_comp.apply_add;

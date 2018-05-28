@@ -60,8 +60,7 @@ check()
       Triangulation<dim> tria;
       GridGenerator::hyper_ball(tria);
 
-      typename Triangulation<dim>::active_cell_iterator cell =
-        tria.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
       std::advance(cell, i);
       cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();

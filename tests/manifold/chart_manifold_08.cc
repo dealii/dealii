@@ -23,8 +23,7 @@
 #include "../tests.h"
 
 
-Tensor<1, 3>
-  periodicity(static_cast<Tensor<1, 3>>(Point<3>(0, 2 * numbers::PI, 0)));
+Tensor<1, 3> periodicity(static_cast<Tensor<1, 3>>(Point<3>(0, 2 * numbers::PI, 0)));
 
 class MyCylinderManifold : public ChartManifold<2, 3, 3>
 {
@@ -99,10 +98,10 @@ test_direction(const Point<3> &x1, const Point<3> &x2)
   static MyCylinderManifold manifold;
 
   // check both the direction x1->x2 and x2->x1
-  deallog << '[' << x1 << "] -> [" << x2
-          << "]: " << manifold.get_tangent_vector(x1, x2) << std::endl;
-  deallog << '[' << x2 << "] -> [" << x1
-          << "]: " << manifold.get_tangent_vector(x2, x1) << std::endl;
+  deallog << '[' << x1 << "] -> [" << x2 << "]: " << manifold.get_tangent_vector(x1, x2)
+          << std::endl;
+  deallog << '[' << x2 << "] -> [" << x1 << "]: " << manifold.get_tangent_vector(x2, x1)
+          << std::endl;
 }
 
 

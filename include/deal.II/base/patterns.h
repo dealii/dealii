@@ -203,8 +203,7 @@ namespace Patterns
      * default values are chosen such that no bounds are enforced on
      * parameters.
      */
-    Integer(const int lower_bound = min_int_value,
-            const int upper_bound = max_int_value);
+    Integer(const int lower_bound = min_int_value, const int upper_bound = max_int_value);
 
     /**
      * Return <tt>true</tt> if the string is an integer and its value is
@@ -524,8 +523,7 @@ namespace Patterns
     DeclException2(ExcInvalidRange,
                    int,
                    int,
-                   << "The values " << arg1 << " and " << arg2
-                   << " do not form a valid range.");
+                   << "The values " << arg1 << " and " << arg2 << " do not form a valid range.");
     //@}
   private:
     /**
@@ -671,8 +669,7 @@ namespace Patterns
     DeclException2(ExcInvalidRange,
                    int,
                    int,
-                   << "The values " << arg1 << " and " << arg2
-                   << " do not form a valid range.");
+                   << "The values " << arg1 << " and " << arg2 << " do not form a valid range.");
     //@}
   private:
     /**
@@ -777,8 +774,7 @@ namespace Patterns
      * necessary to avoid compilers errors due to the variadic constructors
      * provided below.
      */
-    Tuple(const std::vector<std::unique_ptr<PatternBase>> &patterns,
-          const char *                                     separator);
+    Tuple(const std::vector<std::unique_ptr<PatternBase>> &patterns, const char *separator);
 
 
     /**
@@ -945,11 +941,10 @@ namespace Patterns
     /**
      * Exception.
      */
-    DeclException1(
-      ExcCommasNotAllowed,
-      int,
-      << "A comma was found at position " << arg1
-      << " of your input string, but commas are not allowed here.");
+    DeclException1(ExcCommasNotAllowed,
+                   int,
+                   << "A comma was found at position " << arg1
+                   << " of your input string, but commas are not allowed here.");
     //@}
   private:
     /**
@@ -1315,8 +1310,8 @@ namespace Patterns
        */
       static std::string
       to_string(const T &                                     s,
-                const std::unique_ptr<Patterns::PatternBase> &p =
-                  Convert<T>::to_pattern()) = delete;
+                const std::unique_ptr<Patterns::PatternBase> &p = Convert<T>::to_pattern()) =
+        delete;
 
       /**
        * Convert a string to a value, using the given pattern. Use the pattern
@@ -1329,8 +1324,7 @@ namespace Patterns
        */
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &p =
-                 Convert<T>::to_pattern()) = delete;
+               const std::unique_ptr<Patterns::PatternBase> &p = Convert<T>::to_pattern()) = delete;
     };
 
     /**
@@ -1418,14 +1412,12 @@ namespace Patterns
 
 
   template <class... PatternTypes>
-  Tuple::Tuple(const std::string &separator, const PatternTypes &... ps) :
-    separator(separator)
+  Tuple::Tuple(const std::string &separator, const PatternTypes &... ps) : separator(separator)
   {
     static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
                   "Not all of the input arguments of this function "
                   "are derived from PatternBase");
-    static_assert(sizeof...(ps) > 0,
-                  "The number of PatternTypes must be greater than zero!");
+    static_assert(sizeof...(ps) > 0, "The number of PatternTypes must be greater than zero!");
     auto pattern_pointers = {(static_cast<const PatternBase *>(&ps))...};
     for (auto p : pattern_pointers)
       patterns.push_back(p->clone());
@@ -1481,8 +1473,7 @@ namespace Patterns
 
     // Arithmetic types
     template <class T>
-    struct Convert<T,
-                   typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    struct Convert<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
     {
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -1490,11 +1481,11 @@ namespace Patterns
         if (std::is_same<T, bool>::value)
           return std_cxx14::make_unique<Patterns::Bool>();
         else if (std::is_integral<T>::value)
-          return std_cxx14::make_unique<Patterns::Integer>(
-            std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+          return std_cxx14::make_unique<Patterns::Integer>(std::numeric_limits<T>::min(),
+                                                           std::numeric_limits<T>::max());
         else if (std::is_floating_point<T>::value)
-          return std_cxx14::make_unique<Patterns::Double>(
-            -std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
+          return std_cxx14::make_unique<Patterns::Double>(-std::numeric_limits<T>::max(),
+                                                          std::numeric_limits<T>::max());
 
         Assert(false, ExcNotImplemented());
         // the following line should never be invoked
@@ -1503,12 +1494,11 @@ namespace Patterns
 
       static std::string
       to_string(const T &                                     value,
-                const std::unique_ptr<Patterns::PatternBase> &p =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &p = Convert<T>::to_pattern())
       {
         std::stringstream str;
-        if (std::is_same<T, unsigned char>::value ||
-            std::is_same<T, signed char>::value || std::is_same<T, char>::value)
+        if (std::is_same<T, unsigned char>::value || std::is_same<T, signed char>::value ||
+            std::is_same<T, char>::value)
           str << (int)value;
         else if (std::is_same<T, bool>::value)
           str << (value ? "true" : "false");
@@ -1520,8 +1510,7 @@ namespace Patterns
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &p =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &p = Convert<T>::to_pattern())
       {
         AssertThrow(p->match(s), ExcNoMatch(s, *p));
         T value;
@@ -1530,8 +1519,7 @@ namespace Patterns
         else
           {
             std::istringstream is(s);
-            if (std::is_same<T, unsigned char>::value ||
-                std::is_same<T, signed char>::value ||
+            if (std::is_same<T, unsigned char>::value || std::is_same<T, signed char>::value ||
                 std::is_same<T, char>::value)
               {
                 int i;
@@ -1548,10 +1536,9 @@ namespace Patterns
             // function, and would throw earlier. Here it is safe to assume that
             // if we didn't fail the conversion with the operator >>, then we
             // are good to go.
-            AssertThrow(
-              !is.fail(),
-              ExcMessage("Failed to convert from \"" + s + "\" to the type \"" +
-                         boost::core::demangle(typeid(T).name()) + "\""));
+            AssertThrow(!is.fail(),
+                        ExcMessage("Failed to convert from \"" + s + "\" to the type \"" +
+                                   boost::core::demangle(typeid(T).name()) + "\""));
           }
         return value;
       }
@@ -1559,10 +1546,8 @@ namespace Patterns
 
     namespace internal
     {
-      const std::array<std::string, 4> default_list_separator{
-        {",", ";", "|", "%"}};
-      const std::array<std::string, 4> default_map_separator{
-        {":", "=", "@", "#"}};
+      const std::array<std::string, 4> default_list_separator{{",", ";", "|", "%"}};
+      const std::array<std::string, 4> default_map_separator{{":", "=", "@", "#"}};
 
       // specialize a type for all of the STL containers and maps
       template <typename T>
@@ -1590,28 +1575,24 @@ namespace Patterns
       struct is_list_compatible<std::unordered_set<Args...>> : std::true_type
       {};
       template <typename... Args>
-      struct is_list_compatible<std::unordered_multiset<Args...>>
-        : std::true_type
+      struct is_list_compatible<std::unordered_multiset<Args...>> : std::true_type
       {};
 
       template <typename T>
       struct is_map_compatible : std::false_type
       {};
       template <class Key, class T, class Compare, class Allocator>
-      struct is_map_compatible<std::map<Key, T, Compare, Allocator>>
-        : std::true_type
+      struct is_map_compatible<std::map<Key, T, Compare, Allocator>> : std::true_type
       {};
       template <class Key, class T, class Compare, class Allocator>
-      struct is_map_compatible<std::multimap<Key, T, Compare, Allocator>>
+      struct is_map_compatible<std::multimap<Key, T, Compare, Allocator>> : std::true_type
+      {};
+      template <class Key, class T, class Hash, class KeyEqual, class Allocator>
+      struct is_map_compatible<std::unordered_map<Key, T, Hash, KeyEqual, Allocator>>
         : std::true_type
       {};
       template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-      struct is_map_compatible<
-        std::unordered_map<Key, T, Hash, KeyEqual, Allocator>> : std::true_type
-      {};
-      template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-      struct is_map_compatible<
-        std::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>>
+      struct is_map_compatible<std::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>>
         : std::true_type
       {};
     } // namespace internal
@@ -1646,8 +1627,7 @@ namespace Patterns
       constexpr int
       max_list_rank()
       {
-        return std_cxx14::max(RankInfo<T1>::list_rank,
-                              max_list_rank<T2, Types...>());
+        return std_cxx14::max(RankInfo<T1>::list_rank, max_list_rank<T2, Types...>());
       }
 
       // Helper function for map_rank
@@ -1662,27 +1642,20 @@ namespace Patterns
       constexpr int
       max_map_rank()
       {
-        return std_cxx14::max(RankInfo<T1>::map_rank,
-                              max_map_rank<T2, Types...>());
+        return std_cxx14::max(RankInfo<T1>::map_rank, max_map_rank<T2, Types...>());
       }
 
       // Rank of vector types
       template <class T>
-      struct RankInfo<
-        T,
-        typename std::enable_if<is_list_compatible<T>::value>::type>
+      struct RankInfo<T, typename std::enable_if<is_list_compatible<T>::value>::type>
       {
-        static constexpr int list_rank =
-          RankInfo<typename T::value_type>::list_rank + 1;
-        static constexpr int map_rank =
-          RankInfo<typename T::value_type>::map_rank;
+        static constexpr int list_rank = RankInfo<typename T::value_type>::list_rank + 1;
+        static constexpr int map_rank  = RankInfo<typename T::value_type>::map_rank;
       };
 
       // Rank of map types
       template <class T>
-      struct RankInfo<
-        T,
-        typename std::enable_if<is_map_compatible<T>::value>::type>
+      struct RankInfo<T, typename std::enable_if<is_map_compatible<T>::value>::type>
       {
         static constexpr int list_rank =
           max_list_rank<typename T::key_type, typename T::mapped_type>() + 1;
@@ -1716,8 +1689,7 @@ namespace Patterns
         static constexpr int list_rank =
           std_cxx14::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
         static constexpr int map_rank =
-          std_cxx14::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank) +
-          1;
+          std_cxx14::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank) + 1;
       };
 
 
@@ -1731,8 +1703,7 @@ namespace Patterns
 
     // stl containers
     template <class T>
-    struct Convert<T,
-                   typename std::enable_if<is_list_compatible<T>::value>::type>
+    struct Convert<T, typename std::enable_if<is_list_compatible<T>::value>::type>
     {
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -1743,14 +1714,12 @@ namespace Patterns
           *Convert<typename T::value_type>::to_pattern(),
           0,
           std::numeric_limits<unsigned int>::max(),
-          internal::default_list_separator[internal::RankInfo<T>::list_rank -
-                                           1]);
+          internal::default_list_separator[internal::RankInfo<T>::list_rank - 1]);
       }
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
@@ -1775,8 +1744,7 @@ namespace Patterns
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
@@ -1790,8 +1758,7 @@ namespace Patterns
 
         auto v = Utilities::split_string_list(s, p->get_separator());
         for (const auto &str : v)
-          t.insert(t.end(),
-                   Convert<typename T::value_type>::to_value(str, base_p));
+          t.insert(t.end(), Convert<typename T::value_type>::to_value(str, base_p));
 
         return t;
       }
@@ -1799,8 +1766,7 @@ namespace Patterns
 
     // stl maps
     template <class T>
-    struct Convert<T,
-                   typename std::enable_if<is_map_compatible<T>::value>::type>
+    struct Convert<T, typename std::enable_if<is_map_compatible<T>::value>::type>
     {
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -1814,15 +1780,13 @@ namespace Patterns
           *Convert<typename T::mapped_type>::to_pattern(),
           0,
           std::numeric_limits<unsigned int>::max(),
-          internal::default_list_separator[internal::RankInfo<T>::list_rank -
-                                           1],
+          internal::default_list_separator[internal::RankInfo<T>::list_rank - 1],
           internal::default_map_separator[internal::RankInfo<T>::map_rank - 1]);
       }
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
         AssertThrow(p,
@@ -1834,10 +1798,9 @@ namespace Patterns
 
         unsigned int i = 0;
         for (const auto &ti : t)
-          vec[i++] =
-            Convert<typename T::key_type>::to_string(ti.first, key_p) +
-            p->get_key_value_separator() +
-            Convert<typename T::mapped_type>::to_string(ti.second, val_p);
+          vec[i++] = Convert<typename T::key_type>::to_string(ti.first, key_p) +
+                     p->get_key_value_separator() +
+                     Convert<typename T::mapped_type>::to_string(ti.second, val_p);
 
         std::string s;
         if (vec.size() > 0)
@@ -1851,8 +1814,7 @@ namespace Patterns
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
@@ -1868,12 +1830,10 @@ namespace Patterns
         auto v = Utilities::split_string_list(s, p->get_separator());
         for (const auto &str : v)
           {
-            auto key_val =
-              Utilities::split_string_list(str, p->get_key_value_separator());
+            auto key_val = Utilities::split_string_list(str, p->get_key_value_separator());
             AssertDimension(key_val.size(), 2);
-            t.insert(std::make_pair(
-              Convert<typename T::key_type>::to_value(key_val[0], key_p),
-              Convert<typename T::mapped_type>::to_value(key_val[1])));
+            t.insert(std::make_pair(Convert<typename T::key_type>::to_value(key_val[0], key_p),
+                                    Convert<typename T::mapped_type>::to_value(key_val[1])));
           }
 
         return t;
@@ -1894,14 +1854,12 @@ namespace Patterns
           *Convert<typename T::value_type>::to_pattern(),
           dim,
           dim,
-          internal::default_list_separator[internal::RankInfo<T>::list_rank -
-                                           1]);
+          internal::default_list_separator[internal::RankInfo<T>::list_rank - 1]);
       }
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
@@ -1925,8 +1883,7 @@ namespace Patterns
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
@@ -1961,17 +1918,14 @@ namespace Patterns
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
-        return Convert<Tensor<1, dim, Number>>::to_string(
-          Tensor<1, dim, Number>(t), pattern);
+        return Convert<Tensor<1, dim, Number>>::to_string(Tensor<1, dim, Number>(t), pattern);
       }
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         return T(Convert<Tensor<1, dim, Number>>::to_value(s, pattern));
       }
@@ -1992,14 +1946,12 @@ namespace Patterns
           *Convert<typename T::value_type>::to_pattern(),
           2,
           2,
-          internal::default_list_separator[internal::RankInfo<T>::list_rank -
-                                           1]);
+          internal::default_list_separator[internal::RankInfo<T>::list_rank - 1]);
       }
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p,
@@ -2007,10 +1959,9 @@ namespace Patterns
                                "to a List compatbile type."));
 
         auto        base_p = p->get_base_pattern().clone();
-        std::string s =
-          Convert<typename T::value_type>::to_string(t.real(), base_p) +
-          p->get_separator() + " " +
-          Convert<typename T::value_type>::to_string(t.imag(), base_p);
+        std::string s      = Convert<typename T::value_type>::to_string(t.real(), base_p) +
+                        p->get_separator() + " " +
+                        Convert<typename T::value_type>::to_string(t.imag(), base_p);
 
         AssertThrow(pattern->match(s), ExcNoMatch(s, *p));
         return s;
@@ -2021,8 +1972,7 @@ namespace Patterns
        */
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
@@ -2055,8 +2005,7 @@ namespace Patterns
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(t), ExcNoMatch(t, *pattern));
         return t;
@@ -2064,8 +2013,7 @@ namespace Patterns
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
         return s;
@@ -2096,8 +2044,7 @@ namespace Patterns
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         std::unordered_map<Key, Value> m;
         m.insert(t);
@@ -2108,8 +2055,7 @@ namespace Patterns
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         std::unordered_map<Key, Value> m;
         m = Convert<decltype(m)>::to_value(s, pattern);
@@ -2135,8 +2081,7 @@ namespace Patterns
 
       static std::string
       to_string(const T &                                     t,
-                const std::unique_ptr<Patterns::PatternBase> &pattern =
-                  Convert<T>::to_pattern())
+                const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
         AssertThrow(p,
@@ -2153,8 +2098,7 @@ namespace Patterns
 
       static T
       to_value(const std::string &                           s,
-               const std::unique_ptr<Patterns::PatternBase> &pattern =
-                 Convert<T>::to_pattern())
+               const std::unique_ptr<Patterns::PatternBase> &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
@@ -2185,9 +2129,7 @@ namespace Patterns
       to_string_internal_2(const T &t, const Patterns::Tuple &pattern)
       {
         return Convert<T>::to_string_internal_1(
-          t,
-          pattern,
-          std_cxx14::make_index_sequence<std::tuple_size<T>::value>{});
+          t, pattern, std_cxx14::make_index_sequence<std::tuple_size<T>::value>{});
       }
 
       template <std::size_t... I>
@@ -2196,19 +2138,15 @@ namespace Patterns
                           const Patterns::Tuple &         pattern,
                           std_cxx14::index_sequence<I...>)
       {
-        return std::make_tuple(
-          Convert<typename std::tuple_element<I, T>::type>::to_value(
-            s[I], pattern.get_pattern(I).clone())...);
+        return std::make_tuple(Convert<typename std::tuple_element<I, T>::type>::to_value(
+          s[I], pattern.get_pattern(I).clone())...);
       }
 
       static T
-      to_value_internal_2(const std::vector<std::string> &s,
-                          const Patterns::Tuple &         pattern)
+      to_value_internal_2(const std::vector<std::string> &s, const Patterns::Tuple &pattern)
       {
         return Convert<T>::to_value_internal_1(
-          s,
-          pattern,
-          std_cxx14::make_index_sequence<std::tuple_size<T>::value>{});
+          s, pattern, std_cxx14::make_index_sequence<std::tuple_size<T>::value>{});
       }
     };
 

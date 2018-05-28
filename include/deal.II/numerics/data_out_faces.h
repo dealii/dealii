@@ -37,15 +37,13 @@ namespace internal
      * documentation of the WorkStream context.
      */
     template <int dim, int spacedim>
-    struct ParallelData
-      : public internal::DataOutImplementation::ParallelDataBase<dim, spacedim>
+    struct ParallelData : public internal::DataOutImplementation::ParallelDataBase<dim, spacedim>
     {
       ParallelData(const unsigned int               n_datasets,
                    const unsigned int               n_subdivisions,
                    const std::vector<unsigned int> &n_postprocessor_outputs,
                    const Mapping<dim, spacedim> &   mapping,
-                   const std::vector<
-                     std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+                   const std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
                      &               finite_elements,
                    const UpdateFlags update_flags);
 
@@ -114,9 +112,8 @@ namespace internal
  * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2011
  */
 template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-class DataOutFaces : public DataOut_DoFData<DoFHandlerType,
-                                            DoFHandlerType::dimension - 1,
-                                            DoFHandlerType::dimension>
+class DataOutFaces
+  : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension - 1, DoFHandlerType::dimension>
 {
 public:
   /**
@@ -135,8 +132,8 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DoFHandlerType, dimension - 1, dimension>::
-    cell_iterator cell_iterator;
+  typedef
+    typename DataOut_DoFData<DoFHandlerType, dimension - 1, dimension>::cell_iterator cell_iterator;
 
   /**
    * Constructor determining whether a surface mesh (default) or the whole
@@ -182,8 +179,7 @@ public:
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
   virtual void
-  build_patches(const Mapping<dimension> &mapping,
-                const unsigned int        n_subdivisions = 0);
+  build_patches(const Mapping<dimension> &mapping, const unsigned int n_subdivisions = 0);
 
   /**
    * Declare a way to describe a face which we would like to generate output
@@ -235,11 +231,9 @@ private:
    * Build one patch. This function is called in a WorkStream context.
    */
   void
-  build_one_patch(
-    const FaceDescriptor *cell_and_face,
-    internal::DataOutFacesImplementation::ParallelData<dimension, dimension>
-      &                                                 data,
-    DataOutBase::Patch<dimension - 1, space_dimension> &patch);
+  build_one_patch(const FaceDescriptor *cell_and_face,
+                  internal::DataOutFacesImplementation::ParallelData<dimension, dimension> &data,
+                  DataOutBase::Patch<dimension - 1, space_dimension> &                      patch);
 };
 
 

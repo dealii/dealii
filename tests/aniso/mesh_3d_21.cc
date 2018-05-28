@@ -52,8 +52,8 @@ FEFaceValues<3>    fe_face_values1(mapping,
 FESubfaceValues<3> fe_face_values2(mapping,
                                    fe,
                                    quadrature,
-                                   update_quadrature_points |
-                                     update_JxW_values | update_normal_vectors);
+                                   update_quadrature_points | update_JxW_values |
+                                     update_normal_vectors);
 
 void check_this(Triangulation<3> &tria)
 {
@@ -62,11 +62,9 @@ void check_this(Triangulation<3> &tria)
 
   DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
   for (; cell != dof_handler.end(); ++cell)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell;
-         ++face_no)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell; ++face_no)
       if (!cell->at_boundary(face_no) && cell->face(face_no)->has_children())
-        for (unsigned int subface_no = 0;
-             subface_no < cell->face(face_no)->number_of_children();
+        for (unsigned int subface_no = 0; subface_no < cell->face(face_no)->number_of_children();
              ++subface_no)
           {
             unsigned int neighbor_neighbor = cell->neighbor_face_no(face_no);
@@ -79,16 +77,14 @@ void check_this(Triangulation<3> &tria)
 
             for (unsigned int q = 0; q < quadrature.size(); ++q)
               {
-                AssertThrow((fe_face_values1.quadrature_point(q) -
-                             fe_face_values2.quadrature_point(q))
-                                .norm_square() < 1e-20,
-                            ExcInternalError());
+                AssertThrow(
+                  (fe_face_values1.quadrature_point(q) - fe_face_values2.quadrature_point(q))
+                      .norm_square() < 1e-20,
+                  ExcInternalError());
 
-                AssertThrow(std::fabs(fe_face_values1.JxW(q) -
-                                      fe_face_values2.JxW(q)) < 1e-14,
+                AssertThrow(std::fabs(fe_face_values1.JxW(q) - fe_face_values2.JxW(q)) < 1e-14,
                             ExcInternalError());
-                AssertThrow((fe_face_values1.normal_vector(q) +
-                             fe_face_values2.normal_vector(q))
+                AssertThrow((fe_face_values1.normal_vector(q) + fe_face_values2.normal_vector(q))
                                 .norm_square() < 1e-20,
                             ExcInternalError());
               }
@@ -112,26 +108,23 @@ void check(Triangulation<3> &tria_org)
         cell->set_refine_flag(RefinementCase<3>(i));
         tria.execute_coarsening_and_refinement();
 
-        deallog << "Initial check, cell = " << c << ", ref_case = " << i
-                << std::endl;
+        deallog << "Initial check, cell = " << c << ", ref_case = " << i << std::endl;
         check_this(tria);
 
         for (unsigned int r = 0; r < 2; ++r)
           {
             tria.refine_global(1);
-            deallog << "Check " << r << ", " << tria.n_active_cells()
-                    << " active cells" << std::endl;
+            deallog << "Check " << r << ", " << tria.n_active_cells() << " active cells"
+                    << std::endl;
             check_this(tria);
           }
 
         coarsen_global(tria);
-        deallog << "Check " << 0 << ", " << tria.n_active_cells()
-                << " active cells" << std::endl;
+        deallog << "Check " << 0 << ", " << tria.n_active_cells() << " active cells" << std::endl;
         check_this(tria);
 
         tria.refine_global(1);
-        deallog << "Check " << 1 << ", " << tria.n_active_cells()
-                << " active cells" << std::endl;
+        deallog << "Check " << 1 << ", " << tria.n_active_cells() << " active cells" << std::endl;
         check_this(tria);
       }
 }
@@ -146,8 +139,7 @@ void check2(Triangulation<3> &orig_tria)
     {
       Triangulation<3> tria;
       tria.copy_triangulation(orig_tria);
-      Triangulation<3>::cell_iterator cell = tria.begin_active(),
-                                      endc = tria.end();
+      Triangulation<3>::cell_iterator cell = tria.begin_active(), endc = tria.end();
       for (unsigned int j = 0; j < i; ++j)
         ++cell;
       cell->set_refine_flag(RefinementCase<3>::cut_z);
@@ -162,27 +154,25 @@ void check2(Triangulation<3> &orig_tria)
           }
       tria.execute_coarsening_and_refinement();
 
-      deallog << "2 -> Initial check, cell " << i << ", "
-              << tria.n_active_cells() << " active cells" << std::endl;
+      deallog << "2 -> Initial check, cell " << i << ", " << tria.n_active_cells()
+              << " active cells" << std::endl;
       check_this(tria);
 
       for (unsigned int r = 0; r < 2; ++r)
         {
           tria.refine_global(1);
-          deallog << "2 -> Check " << r << ", " << tria.n_active_cells()
-                  << " active cells" << std::endl;
+          deallog << "2 -> Check " << r << ", " << tria.n_active_cells() << " active cells"
+                  << std::endl;
           check_this(tria);
           deallog << "           ... done." << std::endl;
         }
 
       coarsen_global(tria);
-      deallog << "Check " << 0 << ", " << tria.n_active_cells()
-              << " active cells" << std::endl;
+      deallog << "Check " << 0 << ", " << tria.n_active_cells() << " active cells" << std::endl;
       check_this(tria);
 
       tria.refine_global(1);
-      deallog << "Check " << 1 << ", " << tria.n_active_cells()
-              << " active cells" << std::endl;
+      deallog << "Check " << 1 << ", " << tria.n_active_cells() << " active cells" << std::endl;
       check_this(tria);
     }
 }

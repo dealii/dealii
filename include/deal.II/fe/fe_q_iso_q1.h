@@ -111,10 +111,9 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <int dim, int spacedim = dim>
 class FE_Q_iso_Q1
-  : public FE_Q_Base<
-      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
-      dim,
-      spacedim>
+  : public FE_Q_Base<TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
+                     dim,
+                     spacedim>
 {
 public:
   /**
@@ -162,8 +161,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim, spacedim> &fe_other) const override;
   //@}
 };
 

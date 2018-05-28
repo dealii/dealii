@@ -49,8 +49,8 @@ test(std::ostream & /*out*/)
   catch (const typename Triangulation<dim>::DistortedCellList &distorted_cells)
     {
       // ignore distorted cells
-      deallog << distorted_cells.distorted_cells.size()
-              << " distorted cells after creating mesh." << std::endl;
+      deallog << distorted_cells.distorted_cells.size() << " distorted cells after creating mesh."
+              << std::endl;
     }
 
   write_vtk(tr, "1");

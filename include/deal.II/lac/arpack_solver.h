@@ -233,10 +233,9 @@ public:
      * vectors if the problem is symmetric) to 15. Set the solver to find the
      * eigenvalues of largest magnitude for a non-symmetric problem).
      */
-    explicit AdditionalData(
-      const unsigned int     number_of_arnoldi_vectors = 15,
-      const WhichEigenvalues eigenvalue_of_interest    = largest_magnitude,
-      const bool             symmetric                 = false);
+    explicit AdditionalData(const unsigned int     number_of_arnoldi_vectors = 15,
+                            const WhichEigenvalues eigenvalue_of_interest    = largest_magnitude,
+                            const bool             symmetric                 = false);
 
     /**
      * Number of Arnoldi/Lanczos vectors. This number should be less than the
@@ -265,8 +264,7 @@ public:
   /**
    * Constructor.
    */
-  ArpackSolver(SolverControl &       control,
-               const AdditionalData &data = AdditionalData());
+  ArpackSolver(SolverControl &control, const AdditionalData &data = AdditionalData());
 
   /**
    * Set initial vector for building Krylov space.
@@ -332,10 +330,7 @@ public:
    * Leave it at its default zero, which will be reset to the size of
    * <code>eigenvalues</code> internally.
    */
-  template <typename VectorType,
-            typename MatrixType1,
-            typename MatrixType2,
-            typename INVERSE>
+  template <typename VectorType, typename MatrixType1, typename MatrixType2, typename INVERSE>
   void
   solve(const MatrixType1 &                A,
         const MatrixType2 &                B,
@@ -389,13 +384,12 @@ private:
                  << "Number of wanted eigenvalues " << arg1
                  << " is larger that the size of eigenvectors " << arg2);
 
-  DeclException2(
-    ArpackExcInvalidEigenvectorSizeNonsymmetric,
-    int,
-    int,
-    << "To store the real and complex parts of " << arg1
-    << " eigenvectors in real-valued vectors, their size (currently set to "
-    << arg2 << ") should be greater than or equal to " << arg1 + 1);
+  DeclException2(ArpackExcInvalidEigenvectorSizeNonsymmetric,
+                 int,
+                 int,
+                 << "To store the real and complex parts of " << arg1
+                 << " eigenvectors in real-valued vectors, their size (currently set to " << arg2
+                 << ") should be greater than or equal to " << arg1 + 1);
 
   DeclException2(ArpackExcInvalidEigenvalueSize,
                  int,
@@ -412,38 +406,32 @@ private:
   DeclException2(ArpackExcSmallNumberofArnoldiVectors,
                  int,
                  int,
-                 << "Number of Arnoldi vectors " << arg1
-                 << " is too small to obtain " << arg2 << " eigenvalues");
+                 << "Number of Arnoldi vectors " << arg1 << " is too small to obtain " << arg2
+                 << " eigenvalues");
 
   DeclException1(ArpackExcArpackIdo,
                  int,
-                 << "This ido " << arg1
-                 << " is not supported. Check documentation of ARPACK");
+                 << "This ido " << arg1 << " is not supported. Check documentation of ARPACK");
 
   DeclException1(ArpackExcArpackMode,
                  int,
-                 << "This mode " << arg1
-                 << " is not supported. Check documentation of ARPACK");
+                 << "This mode " << arg1 << " is not supported. Check documentation of ARPACK");
 
   DeclException1(ArpackExcArpackInfodsaupd,
                  int,
-                 << "Error with dsaupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+                 << "Error with dsaupd, info " << arg1 << ". Check documentation of ARPACK");
 
   DeclException1(ArpackExcArpackInfodnaupd,
                  int,
-                 << "Error with dnaupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+                 << "Error with dnaupd, info " << arg1 << ". Check documentation of ARPACK");
 
   DeclException1(ArpackExcArpackInfodseupd,
                  int,
-                 << "Error with dseupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+                 << "Error with dseupd, info " << arg1 << ". Check documentation of ARPACK");
 
   DeclException1(ArpackExcArpackInfodneupd,
                  int,
-                 << "Error with dneupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+                 << "Error with dneupd, info " << arg1 << ". Check documentation of ARPACK");
 
   DeclException1(ArpackExcArpackInfoMaxIt,
                  int,
@@ -456,10 +444,9 @@ private:
 };
 
 
-inline ArpackSolver::AdditionalData::AdditionalData(
-  const unsigned int     number_of_arnoldi_vectors,
-  const WhichEigenvalues eigenvalue_of_interest,
-  const bool             symmetric) :
+inline ArpackSolver::AdditionalData::AdditionalData(const unsigned int number_of_arnoldi_vectors,
+                                                    const WhichEigenvalues eigenvalue_of_interest,
+                                                    const bool             symmetric) :
   number_of_arnoldi_vectors(number_of_arnoldi_vectors),
   eigenvalue_of_interest(eigenvalue_of_interest),
   symmetric(symmetric)
@@ -467,28 +454,19 @@ inline ArpackSolver::AdditionalData::AdditionalData(
   // Check for possible options for symmetric problems
   if (symmetric)
     {
-      Assert(
-        eigenvalue_of_interest != largest_real_part,
-        ExcMessage(
-          "'largest real part' can only be used for non-symmetric problems!"));
-      Assert(
-        eigenvalue_of_interest != smallest_real_part,
-        ExcMessage(
-          "'smallest real part' can only be used for non-symmetric problems!"));
-      Assert(
-        eigenvalue_of_interest != largest_imaginary_part,
-        ExcMessage(
-          "'largest imaginary part' can only be used for non-symmetric problems!"));
-      Assert(
-        eigenvalue_of_interest != smallest_imaginary_part,
-        ExcMessage(
-          "'smallest imaginary part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest != largest_real_part,
+             ExcMessage("'largest real part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest != smallest_real_part,
+             ExcMessage("'smallest real part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest != largest_imaginary_part,
+             ExcMessage("'largest imaginary part' can only be used for non-symmetric problems!"));
+      Assert(eigenvalue_of_interest != smallest_imaginary_part,
+             ExcMessage("'smallest imaginary part' can only be used for non-symmetric problems!"));
     }
 }
 
 
-inline ArpackSolver::ArpackSolver(SolverControl &       control,
-                                  const AdditionalData &data) :
+inline ArpackSolver::ArpackSolver(SolverControl &control, const AdditionalData &data) :
   solver_control(control),
   additional_data(data),
   initial_vector_provided(false),
@@ -518,10 +496,7 @@ ArpackSolver::set_initial_vector(const VectorType &vec)
 }
 
 
-template <typename VectorType,
-          typename MatrixType1,
-          typename MatrixType2,
-          typename INVERSE>
+template <typename VectorType, typename MatrixType1, typename MatrixType2, typename INVERSE>
 inline void
 ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
                     const MatrixType2 &                mass_matrix,
@@ -534,36 +509,30 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
   unsigned int n = eigenvectors[0].size();
 
   // Number of eigenvalues
-  const unsigned int nev_const =
-    (n_eigenvalues == 0) ? eigenvalues.size() : n_eigenvalues;
+  const unsigned int nev_const = (n_eigenvalues == 0) ? eigenvalues.size() : n_eigenvalues;
   // nev for arpack, which might change by plus one during dneupd
   unsigned int nev = nev_const;
 
   // check input sizes
   if (additional_data.symmetric)
     {
-      Assert(nev <= eigenvectors.size(),
-             ArpackExcInvalidEigenvectorSize(nev, eigenvectors.size()));
+      Assert(nev <= eigenvectors.size(), ArpackExcInvalidEigenvectorSize(nev, eigenvectors.size()));
     }
   else
-    Assert(
-      nev + 1 <= eigenvectors.size(),
-      ArpackExcInvalidEigenvectorSizeNonsymmetric(nev, eigenvectors.size()));
+    Assert(nev + 1 <= eigenvectors.size(),
+           ArpackExcInvalidEigenvectorSizeNonsymmetric(nev, eigenvectors.size()));
 
-  Assert(nev <= eigenvalues.size(),
-         ArpackExcInvalidEigenvalueSize(nev, eigenvalues.size()));
+  Assert(nev <= eigenvalues.size(), ArpackExcInvalidEigenvalueSize(nev, eigenvalues.size()));
 
   // check large enough problem size
   Assert(nev < n, ArpackExcInvalidNumberofEigenvalues(nev, n));
 
   Assert(additional_data.number_of_arnoldi_vectors < n,
-         ArpackExcInvalidNumberofArnoldiVectors(
-           additional_data.number_of_arnoldi_vectors, n));
+         ArpackExcInvalidNumberofArnoldiVectors(additional_data.number_of_arnoldi_vectors, n));
 
   // check whether we have enough Arnoldi vectors
   Assert(additional_data.number_of_arnoldi_vectors > 2 * nev + 1,
-         ArpackExcSmallNumberofArnoldiVectors(
-           additional_data.number_of_arnoldi_vectors, nev));
+         ArpackExcSmallNumberofArnoldiVectors(additional_data.number_of_arnoldi_vectors, nev));
 
   // ARPACK mode for dsaupd/dnaupd, here only mode 3, i.e. shift-invert mode
   int mode = 3;
@@ -641,8 +610,7 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
 
   // work arrays for ARPACK
   std::vector<double> workd(3 * n, 0.);
-  int                 lworkl =
-    additional_data.symmetric ? ncv * ncv + 8 * ncv : 3 * ncv * ncv + 6 * ncv;
+  int lworkl = additional_data.symmetric ? ncv * ncv + 8 * ncv : 3 * ncv * ncv + 6 * ncv;
   std::vector<double> workl(lworkl, 0.);
 
   // information out of the iteration
@@ -870,8 +838,7 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
           eigenvectors[i](j) = v[i * n + j];
 
       for (unsigned int i = 0; i < nev_const; ++i)
-        eigenvalues[i] =
-          std::complex<double>(eigenvalues_real[i], eigenvalues_im[i]);
+        eigenvalues[i] = std::complex<double>(eigenvalues_real[i], eigenvalues_im[i]);
     }
 }
 

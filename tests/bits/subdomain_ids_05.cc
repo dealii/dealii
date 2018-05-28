@@ -51,8 +51,7 @@ test()
   // ids based on their position, in
   // particular we take the quadrant
   // (octant)
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     {
       unsigned int subdomain = 0;
@@ -77,12 +76,10 @@ test()
     // check that the number of dofs
     // associated is also what the respective
     // function returns
-    AssertThrow(
-      static_cast<unsigned int>(std::count(subdomain_association.begin(),
-                                           subdomain_association.end(),
-                                           subdomain)) ==
-        DoFTools::count_dofs_with_subdomain_association(dof_handler, subdomain),
-      ExcInternalError());
+    AssertThrow(static_cast<unsigned int>(std::count(
+                  subdomain_association.begin(), subdomain_association.end(), subdomain)) ==
+                  DoFTools::count_dofs_with_subdomain_association(dof_handler, subdomain),
+                ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -38,8 +38,7 @@ test(Vector<std::complex<double>> &v)
   v.compress();
 
   // then check the norm
-  AssertThrow(std::fabs((v.l2_norm() - std::sqrt(norm)) / std::sqrt(norm)) <
-                1e-14,
+  AssertThrow(std::fabs((v.l2_norm() - std::sqrt(norm)) / std::sqrt(norm)) < 1e-14,
               ExcInternalError());
 
   deallog << "OK" << std::endl;
@@ -61,13 +60,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -75,12 +72,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

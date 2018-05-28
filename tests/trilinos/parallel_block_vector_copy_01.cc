@@ -37,10 +37,8 @@ main(int argc, char **argv)
   MPILogInitAll                    log;
 
   const MPI_Comm &   mpi_communicator = MPI_COMM_WORLD;
-  const unsigned int this_mpi_process =
-    Utilities::MPI::this_mpi_process(mpi_communicator);
-  const unsigned int n_mpi_processes =
-    Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const unsigned int this_mpi_process = Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int n_mpi_processes  = Utilities::MPI::n_mpi_processes(mpi_communicator);
 
   const unsigned int n_blocks         = 2;
   const unsigned int n_dofs_per_block = 10;
@@ -49,9 +47,8 @@ main(int argc, char **argv)
   for (unsigned int b = 0; b < n_blocks; ++b)
     {
       locally_owned_partitioning[b].set_size(n_dofs_per_block);
-      locally_owned_partitioning[b].add_range(
-        this_mpi_process * (n_dofs_per_block / 2),
-        (this_mpi_process + 1) * (n_dofs_per_block / 2));
+      locally_owned_partitioning[b].add_range(this_mpi_process * (n_dofs_per_block / 2),
+                                              (this_mpi_process + 1) * (n_dofs_per_block / 2));
     }
 
   BlockVector parallel_vector;

@@ -59,8 +59,7 @@ test(const char *filename)
 
   int hash  = 0;
   int index = 0;
-  for (Triangulation<dim>::active_cell_iterator c = tria.begin_active();
-       c != tria.end();
+  for (Triangulation<dim>::active_cell_iterator c = tria.begin_active(); c != tria.end();
        ++c, ++index)
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells() + 1);

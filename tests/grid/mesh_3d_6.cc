@@ -51,9 +51,7 @@ void check_this(Triangulation<3> &tria)
 
   // look at all faces, not only
   // active ones
-  for (DoFHandler<3>::cell_iterator cell = dof_handler.begin();
-       cell != dof_handler.end();
-       ++cell)
+  for (DoFHandler<3>::cell_iterator cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
       if (!cell->at_boundary(f))
         {
@@ -79,10 +77,10 @@ void check_this(Triangulation<3> &tria)
           // in opposite directions,
           // so their sum should be
           // close to zero
-          Assert((fe_face_values1.normal_vector(0) +
-                  fe_face_values2.normal_vector(0))
-                     .norm_square() < 1e-20,
-                 ExcInternalError());
+          Assert(
+            (fe_face_values1.normal_vector(0) + fe_face_values2.normal_vector(0)).norm_square() <
+              1e-20,
+            ExcInternalError());
         }
 }
 

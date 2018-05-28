@@ -74,8 +74,7 @@ do_test()
   // add tolerance to account for different BLAS/LAPACK combinations. Float is
   // too inaccurate so numdiff does not work...
   double norm = v3.linfty_norm();
-  deallog << "Verification of vmult and inverse: " << (norm < 1e-3 ? 0. : norm)
-          << std::endl;
+  deallog << "Verification of vmult and inverse: " << (norm < 1e-3 ? 0. : norm) << std::endl;
 
   FullMatrix<float> full(v1.size(), v1.size());
   full = 0.;
@@ -89,27 +88,24 @@ do_test()
                 if (dim == 1)
                   full(c, cc) = laplace[0](k, kk);
                 else if (dim == 2)
-                  full(c, cc) = laplace[1](j, jj) * mass[0](k, kk) +
-                                mass[1](j, jj) * laplace[0](k, kk);
-                else if (dim == 3)
                   full(c, cc) =
-                    laplace[2](i, ii) * mass[1](j, jj) * mass[0](k, kk) +
-                    mass[2](i, ii) * (laplace[1](j, jj) * mass[0](k, kk) +
-                                      mass[1](j, jj) * laplace[0](k, kk));
+                    laplace[1](j, jj) * mass[0](k, kk) + mass[1](j, jj) * laplace[0](k, kk);
+                else if (dim == 3)
+                  full(c, cc) = laplace[2](i, ii) * mass[1](j, jj) * mass[0](k, kk) +
+                                mass[2](i, ii) * (laplace[1](j, jj) * mass[0](k, kk) +
+                                                  mass[1](j, jj) * laplace[0](k, kk));
   full.vmult(v3, v1);
   v3 -= v2;
 
   norm = v3.linfty_norm();
-  deallog << "Verification of vmult: " << (norm < 1e-4 ? 0. : norm)
-          << std::endl;
+  deallog << "Verification of vmult: " << (norm < 1e-4 ? 0. : norm) << std::endl;
 
   full.gauss_jordan();
   full.vmult(v3, v1);
   mat.apply_inverse(view2, view1);
   v3 -= v2;
   norm = v3.linfty_norm();
-  deallog << "Verification of inverse: " << (norm < 5e-3 ? 0. : norm)
-          << std::endl;
+  deallog << "Verification of inverse: " << (norm < 5e-3 ? 0. : norm) << std::endl;
 }
 
 

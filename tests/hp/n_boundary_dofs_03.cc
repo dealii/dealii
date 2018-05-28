@@ -54,8 +54,7 @@ test()
   GridGenerator::hyper_cube(triangulation_2, 2, 3);
 
   Triangulation<1, spacedim> triangulation;
-  GridGenerator::merge_triangulations(
-    triangulation_1, triangulation_2, triangulation);
+  GridGenerator::merge_triangulations(triangulation_1, triangulation_2, triangulation);
 
   // assign boundary ids
   triangulation.begin()->face(0)->set_boundary_id(12);
@@ -65,15 +64,13 @@ test()
 
 
   hp::FECollection<1, spacedim> fe;
-  fe.push_back(
-    FESystem<1, spacedim>(FE_Q<1, spacedim>(1), 1, FE_DGQ<1, spacedim>(1), 1));
+  fe.push_back(FESystem<1, spacedim>(FE_Q<1, spacedim>(1), 1, FE_DGQ<1, spacedim>(1), 1));
   fe.push_back(FESystem<1, spacedim>(FE_Q<1, spacedim>(2), 2));
 
   hp::DoFHandler<1, spacedim> dof_handler(triangulation);
 
   unsigned int index = 0;
-  for (typename hp::DoFHandler<1, spacedim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<1, spacedim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell, ++index)
     cell->set_active_fe_index(index);
@@ -82,8 +79,7 @@ test()
 
   for (types::boundary_id b : {12, 13, 14, 15})
     {
-      const unsigned int N =
-        dof_handler.n_boundary_dofs(std::set<types::boundary_id>{b});
+      const unsigned int N = dof_handler.n_boundary_dofs(std::set<types::boundary_id>{b});
       deallog << (int)b << ' ' << N << std::endl;
     }
 }

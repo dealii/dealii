@@ -37,30 +37,23 @@ namespace parallel
   {
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::Triangulation(
-      MPI_Comm mpi_communicator,
-      const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
-                     smooth_grid,
-      const bool     allow_artificial_cells,
-      const Settings settings) :
-      dealii::parallel::Triangulation<dim, spacedim>(mpi_communicator,
-                                                     smooth_grid,
-                                                     false),
+      MPI_Comm                                                           mpi_communicator,
+      const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing smooth_grid,
+      const bool                                                         allow_artificial_cells,
+      const Settings                                                     settings) :
+      dealii::parallel::Triangulation<dim, spacedim>(mpi_communicator, smooth_grid, false),
       settings(settings),
       allow_artificial_cells(allow_artificial_cells)
     {
       const auto partition_settings =
-        (partition_zoltan | partition_metis | partition_zorder |
-         partition_custom_signal) &
+        (partition_zoltan | partition_metis | partition_zorder | partition_custom_signal) &
         settings;
       (void)partition_settings;
-      Assert(
-        partition_settings == partition_auto ||
-          partition_settings == partition_metis ||
-          partition_settings == partition_zoltan ||
-          partition_settings == partition_zorder ||
-          partition_settings == partition_custom_signal,
-        ExcMessage(
-          "Settings must contain exactly one type of the active cell partitioning scheme."))
+      Assert(partition_settings == partition_auto || partition_settings == partition_metis ||
+               partition_settings == partition_zoltan || partition_settings == partition_zorder ||
+               partition_settings == partition_custom_signal,
+             ExcMessage(
+               "Settings must contain exactly one type of the active cell partitioning scheme."))
 
         if (settings & construct_multigrid_hierarchy) Assert(
           allow_artificial_cells,
@@ -79,17 +72,15 @@ namespace parallel
       // total number of active cells):
       const unsigned int max_active_cells =
         Utilities::MPI::max(this->n_active_cells(), this->get_communicator());
-      Assert(
-        max_active_cells == this->n_active_cells(),
-        ExcMessage(
-          "A parallel::shared::Triangulation needs to be refined in the same"
-          "way on all processors, but the participating processors don't "
-          "agree on the number of active cells."))
+      Assert(max_active_cells == this->n_active_cells(),
+             ExcMessage("A parallel::shared::Triangulation needs to be refined in the same"
+                        "way on all processors, but the participating processors don't "
+                        "agree on the number of active cells."))
 #  endif
 
-        auto partition_settings = (partition_zoltan | partition_metis |
-                                   partition_zorder | partition_custom_signal) &
-                                  settings;
+        auto partition_settings =
+          (partition_zoltan | partition_metis | partition_zorder | partition_custom_signal) &
+          settings;
       if (partition_settings == partition_auto)
 #  ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
         partition_settings = partition_zoltan;
@@ -102,13 +93,12 @@ namespace parallel
       if (partition_settings == partition_zoltan)
         {
 #  ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
-          AssertThrow(
-            false,
-            ExcMessage("Choosing 'partition_zoltan' requires the library "
-                       "to be compiled with support for Zoltan! "
-                       "Instead, you might use 'partition_auto' to select "
-                       "a partitioning algorithm that is supported "
-                       "by your current configuration."));
+          AssertThrow(false,
+                      ExcMessage("Choosing 'partition_zoltan' requires the library "
+                                 "to be compiled with support for Zoltan! "
+                                 "Instead, you might use 'partition_auto' to select "
+                                 "a partitioning algorithm that is supported "
+                                 "by your current configuration."));
 #  else
           GridTools::partition_triangulation(
             this->n_subdomains, *this, SparsityTools::Partitioner::zoltan);
@@ -117,13 +107,12 @@ namespace parallel
       else if (partition_settings == partition_metis)
         {
 #  ifndef DEAL_II_WITH_METIS
-          AssertThrow(
-            false,
-            ExcMessage("Choosing 'partition_metis' requires the library "
-                       "to be compiled with support for METIS! "
-                       "Instead, you might use 'partition_auto' to select "
-                       "a partitioning algorithm that is supported "
-                       "by your current configuration."));
+          AssertThrow(false,
+                      ExcMessage("Choosing 'partition_metis' requires the library "
+                                 "to be compiled with support for METIS! "
+                                 "Instead, you might use 'partition_auto' to select "
+                                 "a partitioning algorithm that is supported "
+                                 "by your current configuration."));
 #  else
           GridTools::partition_triangulation(
             this->n_subdomains, *this, SparsityTools::Partitioner::metis);
@@ -144,15 +133,13 @@ namespace parallel
 
       // do not partition multigrid levels if user is
       // defining a custom partition
-      if ((settings & construct_multigrid_hierarchy) &&
-          !(settings & partition_custom_signal))
+      if ((settings & construct_multigrid_hierarchy) && !(settings & partition_custom_signal))
         dealii::GridTools::partition_multigrid_levels(*this);
 
       true_subdomain_ids_of_cells.resize(this->n_active_cells());
 
       // loop over all cells and mark artificial:
-      typename parallel::shared::Triangulation<dim,
-                                               spacedim>::active_cell_iterator
+      typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator
         cell = this->begin_active(),
         endc = this->end();
 
@@ -161,20 +148,15 @@ namespace parallel
           // get active halo layer of (ghost) cells
           // parallel::shared::Triangulation<dim>::
           std::function<bool(
-            const typename parallel::shared::Triangulation<dim, spacedim>::
-              active_cell_iterator &)>
+            const typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator &)>
             predicate = IteratorFilters::SubdomainEqualTo(this->my_subdomain);
 
-          const std::vector<typename parallel::shared::Triangulation<
-            dim,
-            spacedim>::active_cell_iterator>
+          const std::vector<
+            typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator>
             active_halo_layer_vector =
-              dealii::GridTools::compute_active_cell_halo_layer(*this,
-                                                                predicate);
-          std::set<typename parallel::shared::Triangulation<dim, spacedim>::
-                     active_cell_iterator>
-            active_halo_layer(active_halo_layer_vector.begin(),
-                              active_halo_layer_vector.end());
+              dealii::GridTools::compute_active_cell_halo_layer(*this, predicate);
+          std::set<typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator>
+            active_halo_layer(active_halo_layer_vector.begin(), active_halo_layer_vector.end());
 
           for (unsigned int index = 0; cell != endc; cell++, index++)
             {
@@ -192,34 +174,28 @@ namespace parallel
               true_level_subdomain_ids_of_cells.resize(this->n_levels());
 
               std::function<bool(
-                const typename parallel::shared::Triangulation<dim, spacedim>::
-                  cell_iterator &)>
+                const typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator &)>
                 predicate = IteratorFilters::LocallyOwnedLevelCell();
               for (unsigned int lvl = 0; lvl < this->n_levels(); ++lvl)
                 {
-                  true_level_subdomain_ids_of_cells[lvl].resize(
-                    this->n_cells(lvl));
+                  true_level_subdomain_ids_of_cells[lvl].resize(this->n_cells(lvl));
 
-                  const std::vector<typename parallel::shared::Triangulation<
-                    dim,
-                    spacedim>::cell_iterator>
+                  const std::vector<
+                    typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator>
                     level_halo_layer_vector =
-                      dealii::GridTools::compute_cell_halo_layer_on_level(
-                        *this, predicate, lvl);
-                  std::set<typename parallel::shared::
-                             Triangulation<dim, spacedim>::cell_iterator>
+                      dealii::GridTools::compute_cell_halo_layer_on_level(*this, predicate, lvl);
+                  std::set<typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator>
                     level_halo_layer(level_halo_layer_vector.begin(),
                                      level_halo_layer_vector.end());
 
-                  typename parallel::shared::Triangulation<dim, spacedim>::
-                    cell_iterator cell = this->begin(lvl),
-                                  endc = this->end(lvl);
+                  typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator
+                    cell = this->begin(lvl),
+                    endc = this->end(lvl);
                   for (unsigned int index = 0; cell != endc; cell++, index++)
                     {
                       // Store true level subdomain IDs before setting
                       // artificial
-                      true_level_subdomain_ids_of_cells[lvl][index] =
-                        cell->level_subdomain_id();
+                      true_level_subdomain_ids_of_cells[lvl][index] = cell->level_subdomain_id();
 
                       // for active cells, we must have knowledge of level
                       // subdomain ids of all neighbors to our subdomain, not
@@ -229,19 +205,16 @@ namespace parallel
                       // owned by this processor or in the ghost layer of the
                       // active mesh.
                       if (!cell->has_children() &&
-                          cell->subdomain_id() !=
-                            numbers::artificial_subdomain_id)
+                          cell->subdomain_id() != numbers::artificial_subdomain_id)
                         continue;
 
                       // we must have knowledge of our parent in the hierarchy
                       if (cell->has_children())
                         {
                           bool keep_cell = false;
-                          for (unsigned int c = 0;
-                               c < GeometryInfo<dim>::max_children_per_cell;
+                          for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                                ++c)
-                            if (cell->child(c)->level_subdomain_id() ==
-                                this->my_subdomain)
+                            if (cell->child(c)->level_subdomain_id() == this->my_subdomain)
                               {
                                 keep_cell = true;
                                 break;
@@ -257,8 +230,7 @@ namespace parallel
                         continue;
 
                       // mark all other cells to artificial
-                      cell->set_level_subdomain_id(
-                        numbers::artificial_subdomain_id);
+                      cell->set_level_subdomain_id(numbers::artificial_subdomain_id);
                     }
                 }
             }
@@ -274,16 +246,14 @@ namespace parallel
       {
         // Assert that each cell is owned by a processor
         unsigned int n_my_cells = 0;
-        typename parallel::shared::Triangulation<dim,
-                                                 spacedim>::active_cell_iterator
+        typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator
           cell = this->begin_active(),
           endc = this->end();
         for (; cell != endc; ++cell)
           if (cell->is_locally_owned())
             n_my_cells += 1;
 
-        const unsigned int total_cells =
-          Utilities::MPI::sum(n_my_cells, this->get_communicator());
+        const unsigned int total_cells = Utilities::MPI::sum(n_my_cells, this->get_communicator());
         Assert(total_cells == this->n_active_cells(),
                ExcMessage("Not all cells are assigned to a processor."))
       }
@@ -292,10 +262,10 @@ namespace parallel
       // cell is owned by a processor
       if (settings & construct_multigrid_hierarchy)
         {
-          unsigned int n_my_cells = 0;
-          typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator
-            cell = this->begin(),
-            endc = this->end();
+          unsigned int                                                           n_my_cells = 0;
+          typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator cell =
+                                                                                   this->begin(),
+                                                                                 endc = this->end();
           for (; cell != endc; ++cell)
             if (cell->is_locally_owned_on_level())
               n_my_cells += 1;
@@ -351,19 +321,15 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
-    Triangulation<dim, spacedim>::create_triangulation(
-      const std::vector<Point<spacedim>> &vertices,
-      const std::vector<CellData<dim>> &  cells,
-      const SubCellData &                 subcelldata)
+    Triangulation<dim, spacedim>::create_triangulation(const std::vector<Point<spacedim>> &vertices,
+                                                       const std::vector<CellData<dim>> &  cells,
+                                                       const SubCellData &subcelldata)
     {
       try
         {
-          dealii::Triangulation<dim, spacedim>::create_triangulation(
-            vertices, cells, subcelldata);
+          dealii::Triangulation<dim, spacedim>::create_triangulation(vertices, cells, subcelldata);
         }
-      catch (
-        const typename dealii::Triangulation<dim, spacedim>::DistortedCellList
-          &)
+      catch (const typename dealii::Triangulation<dim, spacedim>::DistortedCellList &)
         {
           // the underlying triangulation should not be checking for distorted
           // cells
@@ -380,15 +346,11 @@ namespace parallel
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
-      Assert(
-        (dynamic_cast<
-           const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
-           &other_tria) == nullptr),
-        ExcMessage(
-          "Cannot use this function on parallel::distributed::Triangulation."));
+      Assert((dynamic_cast<const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+                &other_tria) == nullptr),
+             ExcMessage("Cannot use this function on parallel::distributed::Triangulation."));
 
-      dealii::parallel::Triangulation<dim, spacedim>::copy_triangulation(
-        other_tria);
+      dealii::parallel::Triangulation<dim, spacedim>::copy_triangulation(other_tria);
       partition();
       this->update_number_cache();
     }
@@ -435,8 +397,7 @@ namespace parallel
 
     template <int dim, int spacedim>
     const std::vector<unsigned int> &
-    Triangulation<dim, spacedim>::get_true_level_subdomain_ids_of_cells(
-      const unsigned int) const
+    Triangulation<dim, spacedim>::get_true_level_subdomain_ids_of_cells(const unsigned int) const
     {
       Assert(false, ExcNotImplemented());
       return true_level_subdomain_ids_of_cells;

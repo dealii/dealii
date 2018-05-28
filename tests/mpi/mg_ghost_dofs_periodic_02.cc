@@ -45,11 +45,9 @@ test()
 
   for (unsigned int d = 1; d < dim; ++d)
     {
-      std::vector<
-        GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+      std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
         periodic_faces;
-      GridTools::collect_periodic_faces(
-        tria, 2 * d, 2 * d + 1, d, periodic_faces);
+      GridTools::collect_periodic_faces(tria, 2 * d, 2 * d + 1, d, periodic_faces);
       tria.add_periodicity(periodic_faces);
     }
 
@@ -64,8 +62,7 @@ test()
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
     {
       deallog << "Level " << level << std::endl;
-      for (typename DoFHandler<dim>::cell_iterator cell =
-             dof_handler.begin(level);
+      for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(level);
            cell != dof_handler.end(level);
            ++cell)
         if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
@@ -87,9 +84,8 @@ main(int argc, char *argv[])
 {
   using namespace dealii;
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
+  MPILogInitAll                    log;
   deallog << std::setprecision(4);
 
   try
@@ -100,25 +96,21 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

@@ -60,14 +60,12 @@ plot_FE_System_shape_functions()
   // assertions)
   if (dim != 1)
     {
-      FESystem<dim> p3(
-        FE_Nedelec<dim>(1),
-        1,
-        FESystem<dim>(
-          FE_Q<dim>(1), 1, FE_DGP<dim>(3), 3, FE_Nedelec<dim>(1), 2),
-        2,
-        FE_DGQ<dim>(0),
-        2);
+      FESystem<dim> p3(FE_Nedelec<dim>(1),
+                       1,
+                       FESystem<dim>(FE_Q<dim>(1), 1, FE_DGP<dim>(3), 3, FE_Nedelec<dim>(1), 2),
+                       2,
+                       FE_DGQ<dim>(0),
+                       2);
       test_compute_functions(m, p3, "System_Nedelec_1");
 
       // the following is simply too
@@ -75,12 +73,7 @@ plot_FE_System_shape_functions()
       if (dim != 3)
         {
           FESystem<dim> p4(
-            p3,
-            1,
-            FESystem<dim>(FE_Q<dim>(1), 1, p3, 3, FE_Nedelec<dim>(1), 2),
-            1,
-            p3,
-            1);
+            p3, 1, FESystem<dim>(FE_Q<dim>(1), 1, p3, 3, FE_Nedelec<dim>(1), 2), 1, p3, 1);
           test_compute_functions(m, p4, "System_Nedelec_2");
         };
     };

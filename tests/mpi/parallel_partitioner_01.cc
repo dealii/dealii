@@ -56,16 +56,8 @@ test()
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
   local_relevant                 = local_owned;
-  unsigned int ghost_indices[10] = {1,
-                                    2,
-                                    13,
-                                    set - 2,
-                                    set - 1,
-                                    set,
-                                    set + 1,
-                                    2 * set,
-                                    2 * set + 1,
-                                    2 * set + 3};
+  unsigned int ghost_indices[10] = {
+    1, 2, 13, set - 2, set - 1, set, set + 1, 2 * set, 2 * set + 1, 2 * set + 3};
   local_relevant.add_indices(&ghost_indices[0], &ghost_indices[0] + 10);
 
   Utilities::MPI::Partitioner v(local_owned, local_relevant, MPI_COMM_WORLD);
@@ -130,8 +122,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

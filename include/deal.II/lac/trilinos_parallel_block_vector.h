@@ -105,7 +105,7 @@ namespace TrilinosWrappers
        * the MPI processes.
        */
       explicit BlockVector(const std::vector<IndexSet> &parallel_partitioning,
-                           const MPI_Comm &communicator = MPI_COMM_WORLD);
+                           const MPI_Comm &             communicator = MPI_COMM_WORLD);
 
       /**
        * Creates a BlockVector with ghost elements. See the respective
@@ -311,23 +311,20 @@ namespace TrilinosWrappers
 
 
     /*-------------------------- Inline functions ---------------------------*/
-    inline BlockVector::BlockVector(
-      const std::vector<IndexSet> &parallel_partitioning,
-      const MPI_Comm &             communicator)
+    inline BlockVector::BlockVector(const std::vector<IndexSet> &parallel_partitioning,
+                                    const MPI_Comm &             communicator)
     {
       reinit(parallel_partitioning, communicator, false);
     }
 
 
 
-    inline BlockVector::BlockVector(
-      const std::vector<IndexSet> &parallel_partitioning,
-      const std::vector<IndexSet> &ghost_values,
-      const MPI_Comm &             communicator,
-      const bool                   vector_writable)
+    inline BlockVector::BlockVector(const std::vector<IndexSet> &parallel_partitioning,
+                                    const std::vector<IndexSet> &ghost_values,
+                                    const MPI_Comm &             communicator,
+                                    const bool                   vector_writable)
     {
-      reinit(
-        parallel_partitioning, ghost_values, communicator, vector_writable);
+      reinit(parallel_partitioning, ghost_values, communicator, vector_writable);
     }
 
 
@@ -339,8 +336,7 @@ namespace TrilinosWrappers
 
 
 
-    inline BlockVector::BlockVector(const BlockVector &v) :
-      dealii::BlockVectorBase<MPI::Vector>()
+    inline BlockVector::BlockVector(const BlockVector &v) : dealii::BlockVectorBase<MPI::Vector>()
     {
       this->components.resize(v.n_blocks());
       this->block_indices = v.block_indices;
@@ -445,7 +441,7 @@ namespace internal
       static void
       reinit_range_vector(const Matrix &                      matrix,
                           TrilinosWrappers::MPI::BlockVector &v,
-                          bool omit_zeroing_entries)
+                          bool                                omit_zeroing_entries)
       {
         v.reinit(matrix.locally_owned_range_indices(),
                  matrix.get_mpi_communicator(),
@@ -456,7 +452,7 @@ namespace internal
       static void
       reinit_domain_vector(const Matrix &                      matrix,
                            TrilinosWrappers::MPI::BlockVector &v,
-                           bool omit_zeroing_entries)
+                           bool                                omit_zeroing_entries)
       {
         v.reinit(matrix.locally_owned_domain_indices(),
                  matrix.get_mpi_communicator(),

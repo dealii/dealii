@@ -65,34 +65,29 @@ main()
 
   EigenPower<> mises(control, mem);
   mises.solve(lambda, A, u);
-  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max
-          << std::endl;
+  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max << std::endl;
 
   double lambda2;
   u = 1.;
 
   EigenPower<> mises2(control, mem, -1.5 * lambda);
   mises2.solve(lambda2, A, u);
-  deallog << "Eigenvalue " << lambda2 << " Error " << lambda2 - lambda_min
-          << std::endl;
+  deallog << "Eigenvalue " << lambda2 << " Error " << lambda2 - lambda_min << std::endl;
 
   u      = 1.;
   lambda = 0.;
   EigenInverse<> wieland(control, mem);
   wieland.solve(lambda, A, u);
-  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_min
-          << std::endl;
+  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_min << std::endl;
 
   u      = 1.;
   lambda = 10.;
   wieland.solve(lambda, A, u);
-  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max
-          << std::endl;
+  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max << std::endl;
 
   u      = 1.;
   lambda = 10.;
   EigenInverse<> wieland2(control, mem, .2);
   wieland2.solve(lambda, A, u);
-  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max
-          << std::endl;
+  deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max << std::endl;
 }

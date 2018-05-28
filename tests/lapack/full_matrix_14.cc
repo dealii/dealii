@@ -57,8 +57,7 @@ test(const bool is_singular)
   // LU factorization can only be applied if state == lu!
   A.apply_lu_factorization(v, false);
 
-  deallog << "apply lu factorization succeeded with norm " << v.l2_norm()
-          << std::endl;
+  deallog << "apply lu factorization succeeded with norm " << v.l2_norm() << std::endl;
 }
 
 int

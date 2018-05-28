@@ -77,8 +77,7 @@ MixedFECollection<dim>::run()
   // looping over all cells and assigning the FE_DG object to the first cell
   // that comes up -- works. looping over all cells and assigning the FE_DG
   // object to the interior cells -- doesn't work.
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -92,12 +91,9 @@ MixedFECollection<dim>::run()
 
   dof_handler.distribute_dofs(fe_collection);
 
-  deallog << "   Number of active cells:       "
-          << triangulation.n_active_cells() << std::endl
-          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl
-          << "   Number of vertices: " << triangulation.n_vertices()
-          << std::endl;
+  deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl
+          << "   Number of vertices: " << triangulation.n_vertices() << std::endl;
 }
 
 

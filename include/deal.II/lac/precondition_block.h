@@ -79,10 +79,8 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, Guido Kanschat
  * @date 1999, 2000, 2010
  */
-template <typename MatrixType,
-          typename inverse_type = typename MatrixType::value_type>
-class PreconditionBlock : public virtual Subscriptor,
-                          protected PreconditionBlockBase<inverse_type>
+template <typename MatrixType, typename inverse_type = typename MatrixType::value_type>
+class PreconditionBlock : public virtual Subscriptor, protected PreconditionBlockBase<inverse_type>
 {
 private:
   /**
@@ -322,8 +320,8 @@ public:
   DeclException2(ExcWrongBlockSize,
                  int,
                  int,
-                 << "The blocksize " << arg1 << " and the size of the matrix "
-                 << arg2 << " do not match.");
+                 << "The blocksize " << arg1 << " and the size of the matrix " << arg2
+                 << " do not match.");
 
   /**
    * Exception
@@ -377,11 +375,9 @@ protected:
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
-template <typename MatrixType,
-          typename inverse_type = typename MatrixType::value_type>
-class PreconditionBlockJacobi
-  : public virtual Subscriptor,
-    private PreconditionBlock<MatrixType, inverse_type>
+template <typename MatrixType, typename inverse_type = typename MatrixType::value_type>
+class PreconditionBlockJacobi : public virtual Subscriptor,
+                                private PreconditionBlock<MatrixType, inverse_type>
 {
 private:
   /**
@@ -468,9 +464,8 @@ public:
     /**
      * Constructor.
      */
-    const_iterator(
-      const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
-      const size_type                                          row);
+    const_iterator(const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
+                   const size_type                                          row);
 
     /**
      * Prefix increment.
@@ -656,11 +651,9 @@ private:
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
-template <typename MatrixType,
-          typename inverse_type = typename MatrixType::value_type>
-class PreconditionBlockSOR
-  : public virtual Subscriptor,
-    protected PreconditionBlock<MatrixType, inverse_type>
+template <typename MatrixType, typename inverse_type = typename MatrixType::value_type>
+class PreconditionBlockSOR : public virtual Subscriptor,
+                             protected PreconditionBlock<MatrixType, inverse_type>
 {
 public:
   /**
@@ -821,11 +814,9 @@ protected:
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
-template <typename MatrixType,
-          typename inverse_type = typename MatrixType::value_type>
-class PreconditionBlockSSOR
-  : public virtual Subscriptor,
-    private PreconditionBlockSOR<MatrixType, inverse_type>
+template <typename MatrixType, typename inverse_type = typename MatrixType::value_type>
+class PreconditionBlockSSOR : public virtual Subscriptor,
+                              private PreconditionBlockSOR<MatrixType, inverse_type>
 {
 public:
   /**
@@ -936,10 +927,9 @@ PreconditionBlock<MatrixType, inverse_type>::el(size_type i, size_type j) const
 //---------------------------------------------------------------------------
 
 template <typename MatrixType, typename inverse_type>
-inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-  Accessor::Accessor(
-    const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
-    const size_type                                          row) :
+inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::Accessor::Accessor(
+  const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
+  const size_type                                          row) :
   matrix(matrix),
   b_iterator(&matrix->inverse(0), 0, 0),
   b_end(&matrix->inverse(0), 0, 0)
@@ -963,8 +953,7 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
 
 template <typename MatrixType, typename inverse_type>
 inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::size_type
-PreconditionBlockJacobi<MatrixType,
-                        inverse_type>::const_iterator::Accessor::row() const
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::Accessor::row() const
 {
   Assert(a_block < matrix->size(), ExcIteratorPastEnd());
 
@@ -974,8 +963,7 @@ PreconditionBlockJacobi<MatrixType,
 
 template <typename MatrixType, typename inverse_type>
 inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::size_type
-PreconditionBlockJacobi<MatrixType,
-                        inverse_type>::const_iterator::Accessor::column() const
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::Accessor::column() const
 {
   Assert(a_block < matrix->size(), ExcIteratorPastEnd());
 
@@ -985,8 +973,7 @@ PreconditionBlockJacobi<MatrixType,
 
 template <typename MatrixType, typename inverse_type>
 inline inverse_type
-PreconditionBlockJacobi<MatrixType,
-                        inverse_type>::const_iterator::Accessor::value() const
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::Accessor::value() const
 {
   Assert(a_block < matrix->size(), ExcIteratorPastEnd());
 
@@ -995,19 +982,16 @@ PreconditionBlockJacobi<MatrixType,
 
 
 template <typename MatrixType, typename inverse_type>
-inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-  const_iterator(
-    const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
-    const size_type                                          row) :
+inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::const_iterator(
+  const PreconditionBlockJacobi<MatrixType, inverse_type> *matrix,
+  const size_type                                          row) :
   accessor(matrix, row)
 {}
 
 
 template <typename MatrixType, typename inverse_type>
-inline
-  typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator &
-  PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-  operator++()
+inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator &
+PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator++()
 {
   Assert(*this != accessor.matrix->end(), ExcIteratorPastEnd());
 
@@ -1018,9 +1002,8 @@ inline
 
       if (accessor.a_block < accessor.matrix->size())
         {
-          accessor.b_iterator =
-            accessor.matrix->inverse(accessor.a_block).begin();
-          accessor.b_end = accessor.matrix->inverse(accessor.a_block).end();
+          accessor.b_iterator = accessor.matrix->inverse(accessor.a_block).begin();
+          accessor.b_end      = accessor.matrix->inverse(accessor.a_block).end();
         }
     }
   return *this;
@@ -1028,20 +1011,16 @@ inline
 
 
 template <typename MatrixType, typename inverse_type>
-inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::
-  const_iterator::Accessor &
-    PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-    operator*() const
+inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::Accessor &
+  PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator*() const
 {
   return accessor;
 }
 
 
 template <typename MatrixType, typename inverse_type>
-inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::
-  const_iterator::Accessor *
-    PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
-    operator->() const
+inline const typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::Accessor *
+  PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::operator->() const
 {
   return &accessor;
 }
@@ -1052,15 +1031,13 @@ inline bool
 PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
 operator==(const const_iterator &other) const
 {
-  if (accessor.a_block == accessor.matrix->size() &&
-      accessor.a_block == other.accessor.a_block)
+  if (accessor.a_block == accessor.matrix->size() && accessor.a_block == other.accessor.a_block)
     return true;
 
   if (accessor.a_block != other.accessor.a_block)
     return false;
 
-  return (accessor.row() == other.accessor.row() &&
-          accessor.column() == other.accessor.column());
+  return (accessor.row() == other.accessor.row() && accessor.column() == other.accessor.column());
 }
 
 
@@ -1079,34 +1056,29 @@ PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
 operator<(const const_iterator &other) const
 {
   return (accessor.row() < other.accessor.row() ||
-          (accessor.row() == other.accessor.row() &&
-           accessor.column() < other.accessor.column()));
+          (accessor.row() == other.accessor.row() && accessor.column() < other.accessor.column()));
 }
 
 
 template <typename MatrixType, typename inverse_type>
-inline
-  typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
-  PreconditionBlockJacobi<MatrixType, inverse_type>::begin() const
+inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
+PreconditionBlockJacobi<MatrixType, inverse_type>::begin() const
 {
   return const_iterator(this, 0);
 }
 
 
 template <typename MatrixType, typename inverse_type>
-inline
-  typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
-  PreconditionBlockJacobi<MatrixType, inverse_type>::end() const
+inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
+PreconditionBlockJacobi<MatrixType, inverse_type>::end() const
 {
   return const_iterator(this, this->size() * this->block_size());
 }
 
 
 template <typename MatrixType, typename inverse_type>
-inline
-  typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
-  PreconditionBlockJacobi<MatrixType, inverse_type>::begin(
-    const size_type r) const
+inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
+PreconditionBlockJacobi<MatrixType, inverse_type>::begin(const size_type r) const
 {
   Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r);
@@ -1115,10 +1087,8 @@ inline
 
 
 template <typename MatrixType, typename inverse_type>
-inline
-  typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
-  PreconditionBlockJacobi<MatrixType, inverse_type>::end(
-    const size_type r) const
+inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator
+PreconditionBlockJacobi<MatrixType, inverse_type>::end(const size_type r) const
 {
   Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r + 1);

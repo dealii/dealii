@@ -30,17 +30,14 @@
 
 template <typename number>
 void
-print_formatted(const FullMatrix<number> &A,
-                const unsigned int        precision,
-                const unsigned int        width)
+print_formatted(const FullMatrix<number> &A, const unsigned int precision, const unsigned int width)
 {
   for (unsigned int i = 0; i < A.m(); ++i)
     {
       for (unsigned int j = 0; j < A.n(); ++j)
         {
           if (A(i, j) != 0)
-            deallog << std::setw(width) << std::setprecision(precision)
-                    << A(i, j);
+            deallog << std::setw(width) << std::setprecision(precision) << A(i, j);
           else
             deallog << std::setw(width) << std::setprecision(precision) << "~";
           deallog << ' ';
@@ -64,9 +61,7 @@ test_embedding(const FiniteElement<dim> &fe)
   for (unsigned int ref = RefinementCase<dim>::cut_x;
        ref < RefinementCase<dim>::isotropic_refinement + 1;
        ++ref)
-    for (unsigned int c = 0;
-         c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref));
-         ++c)
+    for (unsigned int c = 0; c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref)); ++c)
       {
         P[ref - 1].push_back(FullMatrix<double>());
         P[ref - 1][c].reinit(n, n);
@@ -78,17 +73,14 @@ test_embedding(const FiniteElement<dim> &fe)
   for (unsigned int i = 0; i < nc; ++i)
     {
       deallog << fe.get_name() << " embedding " << i << std::endl;
-      print_formatted(
-        P[RefinementCase<dim>::isotropic_refinement - 1][i], 8, 6);
+      print_formatted(P[RefinementCase<dim>::isotropic_refinement - 1][i], 8, 6);
     }
 }
 
 
 template <int dim>
 void
-test_projection(const FiniteElement<dim> &fe1,
-                const FiniteElement<dim> &fe2,
-                std::ostream &            out)
+test_projection(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2, std::ostream &out)
 {
   out << fe1.get_name() << " -> " << fe2.get_name() << std::endl;
 

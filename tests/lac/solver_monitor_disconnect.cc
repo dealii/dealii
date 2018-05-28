@@ -56,10 +56,7 @@ monitor_mean(const unsigned int    iteration,
 
 
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType &        solver,
             const MatrixType &  A,

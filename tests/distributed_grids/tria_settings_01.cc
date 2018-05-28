@@ -48,8 +48,7 @@ testit(parallel::distributed::Triangulation<dim> &tr)
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 
-  typename parallel::distributed::Triangulation<dim>::active_cell_iterator it =
-    tr.begin_active();
+  typename parallel::distributed::Triangulation<dim>::active_cell_iterator it = tr.begin_active();
   for (; it != tr.end(); ++it)
     {
       deallog << it->center() << ", ";
@@ -74,8 +73,7 @@ test(std::ostream & /*out*/)
     parallel::distributed::Triangulation<dim> tr(
       MPI_COMM_WORLD,
       dealii::Triangulation<dim>::none,
-      parallel::distributed::Triangulation<
-        dim>::mesh_reconstruction_after_repartitioning);
+      parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning);
     testit(tr);
   }
 }

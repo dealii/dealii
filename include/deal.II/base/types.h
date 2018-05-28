@@ -170,8 +170,7 @@ namespace numbers
    * an invalid unsigned integer value, such as an invalid array index, an
    * invalid array size, and the like.
    */
-  static const unsigned int invalid_unsigned_int =
-    static_cast<unsigned int>(-1);
+  static const unsigned int invalid_unsigned_int = static_cast<unsigned int>(-1);
 
   /**
    * Representation of the largest number that can be put into a size_type.
@@ -179,22 +178,19 @@ namespace numbers
    * size_type value, such as an invalid array index, an invalid array size,
    * and the like. Invalid_size_type is equivalent to invalid_dof_index.
    */
-  const types::global_dof_index invalid_size_type =
-    static_cast<types::global_dof_index>(-1);
+  const types::global_dof_index invalid_size_type = static_cast<types::global_dof_index>(-1);
 
   /**
    * An invalid value for indices of degrees of freedom.
    */
-  const types::global_dof_index invalid_dof_index =
-    static_cast<types::global_dof_index>(-1);
+  const types::global_dof_index invalid_dof_index = static_cast<types::global_dof_index>(-1);
 
   /**
    * Invalid material_id which we need in several places as a default value.
    * We assume that all material_ids lie in the range [0,
    * invalid_material_id).
    */
-  const types::material_id invalid_material_id =
-    static_cast<types::material_id>(-1);
+  const types::material_id invalid_material_id = static_cast<types::material_id>(-1);
 
   /**
    * Invalid boundary_id which we need in several places as a default value.
@@ -204,8 +200,7 @@ namespace numbers
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id invalid_boundary_id =
-    static_cast<types::boundary_id>(-1);
+  const types::boundary_id invalid_boundary_id = static_cast<types::boundary_id>(-1);
 
   /**
    * A boundary indicator number that we reserve for internal faces.  We
@@ -220,8 +215,7 @@ namespace numbers
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id internal_face_boundary_id =
-    static_cast<types::boundary_id>(-1);
+  const types::boundary_id internal_face_boundary_id = static_cast<types::boundary_id>(-1);
 
   /**
    * Invalid manifold_id which we need in several places as a default value.
@@ -231,8 +225,7 @@ namespace numbers
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  const types::manifold_id invalid_manifold_id =
-    static_cast<types::manifold_id>(-1);
+  const types::manifold_id invalid_manifold_id = static_cast<types::manifold_id>(-1);
 
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.
@@ -240,8 +233,7 @@ namespace numbers
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  const types::manifold_id flat_manifold_id =
-    static_cast<types::manifold_id>(-1);
+  const types::manifold_id flat_manifold_id = static_cast<types::manifold_id>(-1);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a
@@ -252,8 +244,7 @@ namespace numbers
    * @ref GlossSubdomainId "glossary"
    * for more information.
    */
-  const types::subdomain_id invalid_subdomain_id =
-    static_cast<types::subdomain_id>(-1);
+  const types::subdomain_id invalid_subdomain_id = static_cast<types::subdomain_id>(-1);
 
   /**
    * The subdomain id assigned to a cell whose true subdomain id we don't
@@ -269,8 +260,7 @@ namespace numbers
    * @ref distributed
    * module for more information.
    */
-  const types::subdomain_id artificial_subdomain_id =
-    static_cast<types::subdomain_id>(-2);
+  const types::subdomain_id artificial_subdomain_id = static_cast<types::subdomain_id>(-2);
 } // namespace numbers
 
 

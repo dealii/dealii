@@ -56,16 +56,14 @@ check_this(const FiniteElement<dim> &fe, const FiniteElement<dim> & /*fe2*/)
     return;
 
   // test with different quadrature formulas
-  Quadrature<dim> q_rhs(
-    fe.get_unit_support_points(),
-    std::vector<double>(fe.dofs_per_cell, 1. / fe.dofs_per_cell));
+  Quadrature<dim> q_rhs(fe.get_unit_support_points(),
+                        std::vector<double>(fe.dofs_per_cell, 1. / fe.dofs_per_cell));
 
   FullMatrix<double> X(fe.dofs_per_cell, q_rhs.size());
 
   AssertThrow(X.m() == X.n(), ExcInternalError());
 
-  FETools::compute_projection_from_quadrature_points_matrix(
-    fe, q_rhs, q_rhs, X);
+  FETools::compute_projection_from_quadrature_points_matrix(fe, q_rhs, q_rhs, X);
 
   for (unsigned int i = 0; i < X.m(); ++i)
     X(i, i) -= 1;

@@ -36,8 +36,7 @@ test()
   GridIn<dim>        gi;
   gi.attach_triangulation(triangulation);
 
-  std::ifstream infile(SOURCE_DIR
-                       "/../grid/grids/unstructured_refined_ball.msh");
+  std::ifstream infile(SOURCE_DIR "/../grid/grids/unstructured_refined_ball.msh");
   gi.read_msh(infile);
 
   // now extract the surface mesh

@@ -31,8 +31,7 @@
 bool
 predicate(const Point<3> &p, const double diameter)
 {
-  return ((p[0] - .2) * (p[0] - .2) + (p[2] - p[1] / 4) * (p[2] - p[1] / 4) <
-          diameter * diameter);
+  return ((p[0] - .2) * (p[0] - .2) + (p[2] - p[1] / 4) * (p[2] - p[1] / 4) < diameter * diameter);
 }
 
 
@@ -57,8 +56,7 @@ main()
   // boundary points
   std::map<unsigned int, Point<dim>> new_points;
 
-  Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                           endc = tria.end();
+  Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
 
   for (cell = tria.begin_active(); cell != endc; ++cell)
     if (predicate(cell->center(), cell->diameter()))

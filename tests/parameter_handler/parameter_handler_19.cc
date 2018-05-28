@@ -75,8 +75,7 @@ check()
 
 
 
-  deallog << std::endl
-          << "* Check non empty path before parse_input()" << std::endl;
+  deallog << std::endl << "* Check non empty path before parse_input()" << std::endl;
 
   {
     prm.enter_subsection("test");
@@ -86,8 +85,7 @@ check()
   }
 
 
-  deallog << std::endl
-          << "* Check parse_input() catches messing with path:" << std::endl;
+  deallog << std::endl << "* Check parse_input() catches messing with path:" << std::endl;
   {
     prm.enter_subsection("test");
     try

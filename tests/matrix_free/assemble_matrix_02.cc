@@ -56,16 +56,15 @@ do_test(const DoFHandler<dim> &dof)
     FEValues<dim> fe_values(mapping,
                             dof.get_fe(),
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_JxW_values);
+                            update_values | update_gradients | update_JxW_values);
 
-    FEEvaluation<dim, degree_p + 1, degree_p + 2, dim> phi_u(
-      mapping,
-      dof.get_fe(),
-      QGauss<1>(degree_p + 2),
-      update_values | update_gradients | update_JxW_values,
-      0);
-    FEEvaluation<dim, degree_p, degree_p + 2> phi_p(dof.get_fe(), phi_u, dim);
+    FEEvaluation<dim, degree_p + 1, degree_p + 2, dim> phi_u(mapping,
+                                                             dof.get_fe(),
+                                                             QGauss<1>(degree_p + 2),
+                                                             update_values | update_gradients |
+                                                               update_JxW_values,
+                                                             0);
+    FEEvaluation<dim, degree_p, degree_p + 2>          phi_p(dof.get_fe(), phi_u, dim);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -80,8 +79,7 @@ do_test(const DoFHandler<dim> &dof)
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_pres(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
@@ -102,8 +100,7 @@ do_test(const DoFHandler<dim> &dof)
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   {
                     cell_matrix(i, j) += (phi_grads_u[i] * phi_grads_u[j] -
-                                          div_phi_u[i] * phi_pres[j] -
-                                          phi_pres[i] * div_phi_u[j]) *
+                                          div_phi_u[i] * phi_pres[j] - phi_pres[i] * div_phi_u[j]) *
                                          fe_values.JxW(q);
                   }
               }
@@ -129,8 +126,7 @@ do_test(const DoFHandler<dim> &dof)
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 VectorizedArray<double> div_u = phi_u.get_divergence(q);
-                phi_u.submit_symmetric_gradient(phi_u.get_symmetric_gradient(q),
-                                                q);
+                phi_u.submit_symmetric_gradient(phi_u.get_symmetric_gradient(q), q);
                 phi_p.submit_value(-div_u, q);
               }
             phi_u.integrate(false, true);
@@ -190,8 +186,7 @@ test()
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))

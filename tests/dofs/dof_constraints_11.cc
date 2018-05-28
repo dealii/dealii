@@ -65,8 +65,7 @@ test()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
-  deallog << "Number of constraints: " << constraints.n_constraints()
-          << std::endl;
+  deallog << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   // then set up a sparsity pattern and a
   // matrix on top of it
@@ -88,11 +87,8 @@ test()
   A.copy_from(sparsity);
   for (unsigned int r = 0; r < A.n_block_rows(); ++r)
     for (unsigned int c = 0; c < A.n_block_rows(); ++c)
-      for (SparsityPattern::const_iterator i = A.block(r, c).begin();
-           i != A.block(r, c).end();
-           ++i)
-        deallog << r << ' ' << c << ' ' << i->row() << ' ' << i->column()
-                << std::endl;
+      for (SparsityPattern::const_iterator i = A.block(r, c).begin(); i != A.block(r, c).end(); ++i)
+        deallog << r << ' ' << c << ' ' << i->row() << ' ' << i->column() << std::endl;
 }
 
 
@@ -112,13 +108,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -126,12 +120,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -49,7 +49,7 @@ test()
   const double       Lz = 4 * h;
   const double       ER = Ly / (Ly - h);
   Triangulation<dim> left, right, bottom, temp;
-  Point<dim> left_one, left_two, right_one, right_two, bottom_one, bottom_two;
+  Point<dim>         left_one, left_two, right_one, right_two, bottom_one, bottom_two;
 
   left_one[0] = -Li;
   left_one[1] = h;
@@ -96,10 +96,8 @@ test()
       refinements_right[2]  = 4;
       refinements_bottom[2] = 4;
     }
-  GridGenerator::subdivided_hyper_rectangle(
-    left, refinements_left, left_one, left_two, false);
-  GridGenerator::subdivided_hyper_rectangle(
-    right, refinements_right, right_one, right_two, false);
+  GridGenerator::subdivided_hyper_rectangle(left, refinements_left, left_one, left_two, false);
+  GridGenerator::subdivided_hyper_rectangle(right, refinements_right, right_one, right_two, false);
   GridGenerator::subdivided_hyper_rectangle(
     bottom, refinements_bottom, bottom_one, bottom_two, false);
 
@@ -113,8 +111,7 @@ test()
   GridGenerator::merge_triangulations(temp, bottom, triangulation);
 
   if (dim == 3)
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin();
          cell != triangulation.end();
          ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -138,14 +135,12 @@ test()
               cell->face(f)->set_all_boundary_ids(2);
           }
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
 
   if (dim == 3)
     {
-      GridTools::collect_periodic_faces(
-        triangulation, 10, 11, 2, periodic_faces);
+      GridTools::collect_periodic_faces(triangulation, 10, 11, 2, periodic_faces);
       triangulation.add_periodicity(periodic_faces);
     }
 
@@ -172,13 +167,11 @@ test()
   MatrixFree<dim, double>                          mf_data_orig;
   const QGauss<1>                                  quad(fe_degree + 1);
   typename MatrixFree<dim, double>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
-  data.tasks_block_size      = 3;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
-  data.initialize_mapping = true;
+  data.tasks_parallel_scheme               = MatrixFree<dim, double>::AdditionalData::none;
+  data.tasks_block_size                    = 3;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
+  data.initialize_mapping                  = true;
 
   mf_data_orig.reinit(mapping, dof_orig, constraints, quad, data);
   mf_data_orig.initialize_dof_vector(in_orig);

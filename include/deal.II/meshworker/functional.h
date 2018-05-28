@@ -243,8 +243,7 @@ namespace MeshWorker
     inline void
     CellsAndFaces<number>::initialize_info(DOFINFO &info, bool) const
     {
-      info.initialize_numbers(
-        results.entry<BlockVector<double> *>(0)->n_blocks());
+      info.initialize_numbers(results.entry<BlockVector<double> *>(0)->n_blocks());
     }
 
 

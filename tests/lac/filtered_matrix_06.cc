@@ -69,9 +69,7 @@ solve_filtered(std::map<types::global_dof_index, double> &bv,
 
   solver.solve(A1, u, f1, fprec);
 
-  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin();
-       i != bv.end();
-       ++i)
+  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin(); i != bv.end(); ++i)
     AssertThrow(std::fabs(u(i->first) - i->second) < 1e-8, ExcInternalError());
 }
 
@@ -123,16 +121,14 @@ check()
   FEValues<dim> fe(mapping,
                    element,
                    quadrature,
-                   update_values | update_gradients | update_quadrature_points |
-                     update_JxW_values);
+                   update_values | update_gradients | update_quadrature_points | update_JxW_values);
 
   std::vector<types::global_dof_index> global_dofs(element.dofs_per_cell);
   std::vector<double>                  function(quadrature.size());
 
   Vector<double> f(dof.n_dofs());
 
-  SparsityPattern A_pattern(
-    dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
+  SparsityPattern A_pattern(dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, A_pattern);
   A_pattern.compress();
 
@@ -171,15 +167,12 @@ check()
 
   // interpolate boundary values
   std::map<types::global_dof_index, double> bv;
-  VectorTools::interpolate_boundary_values(
-    mapping, dof, 0, cosine, bv, std::vector<bool>());
+  VectorTools::interpolate_boundary_values(mapping, dof, 0, cosine, bv, std::vector<bool>());
   // the cosine has too many zero
   // values on the boundary of the
   // domain, so reset the elements to
   // some other value
-  for (typename std::map<types::global_dof_index, double>::iterator i =
-         bv.begin();
-       i != bv.end();
+  for (typename std::map<types::global_dof_index, double>::iterator i = bv.begin(); i != bv.end();
        ++i)
     i->second = std::sin(i->second + 0.5) + 1.0;
 
@@ -199,8 +192,7 @@ check()
   for (unsigned int i = 0; i < dof.n_dofs(); ++i)
     {
       deallog << u_filtered(i) << std::endl;
-      Assert(std::fabs(u_filtered(i) - u_eliminated(i)) < 1e-8,
-             ExcInternalError());
+      Assert(std::fabs(u_filtered(i) - u_eliminated(i)) < 1e-8, ExcInternalError());
     };
 }
 

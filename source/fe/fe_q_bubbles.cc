@@ -47,26 +47,23 @@ namespace internal
     {
       template <int dim, int spacedim>
       inline void
-      compute_embedding_matrices(
-        const dealii::FE_Q_Bubbles<dim, spacedim> &   fe,
-        std::vector<std::vector<FullMatrix<double>>> &matrices,
-        const bool                                    isotropic_only)
+      compute_embedding_matrices(const dealii::FE_Q_Bubbles<dim, spacedim> &   fe,
+                                 std::vector<std::vector<FullMatrix<double>>> &matrices,
+                                 const bool                                    isotropic_only)
       {
         const unsigned int dpc    = fe.dofs_per_cell;
         const unsigned int degree = fe.degree;
 
         // Initialize quadrature formula on fine cells
         std::unique_ptr<Quadrature<dim>> q_fine;
-        Quadrature<1>                    q_dummy(std::vector<Point<1>>(1),
-                              std::vector<double>(1, 1.));
+        Quadrature<1> q_dummy(std::vector<Point<1>>(1), std::vector<double>(1, 1.));
         switch (dim)
           {
             case 1:
               if (spacedim == 1)
                 q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
               else if (spacedim == 2)
-                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
-                  QGauss<1>(degree + 1), q_dummy);
+                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1), q_dummy);
               else
                 q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
                   QGauss<1>(degree + 1), q_dummy, q_dummy);
@@ -89,23 +86,18 @@ namespace internal
         const unsigned int nq = q_fine->size();
 
         // loop over all possible refinement cases
-        unsigned int ref_case = (isotropic_only) ?
-                                  RefinementCase<dim>::isotropic_refinement :
-                                  RefinementCase<dim>::cut_x;
-        for (; ref_case <= RefinementCase<dim>::isotropic_refinement;
-             ++ref_case)
+        unsigned int ref_case =
+          (isotropic_only) ? RefinementCase<dim>::isotropic_refinement : RefinementCase<dim>::cut_x;
+        for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
           {
-            const unsigned int nc =
-              GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+            const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
 
             for (unsigned int i = 0; i < nc; ++i)
               {
-                Assert(
-                  matrices[ref_case - 1][i].n() == dpc,
-                  ExcDimensionMismatch(matrices[ref_case - 1][i].n(), dpc));
-                Assert(
-                  matrices[ref_case - 1][i].m() == dpc,
-                  ExcDimensionMismatch(matrices[ref_case - 1][i].m(), dpc));
+                Assert(matrices[ref_case - 1][i].n() == dpc,
+                       ExcDimensionMismatch(matrices[ref_case - 1][i].n(), dpc));
+                Assert(matrices[ref_case - 1][i].m() == dpc,
+                       ExcDimensionMismatch(matrices[ref_case - 1][i].m(), dpc));
               }
 
             // create a respective refinement on the triangulation
@@ -117,11 +109,11 @@ namespace internal
             dealii::DoFHandler<dim, spacedim> dh(tr);
             dh.distribute_dofs(fe);
 
-            dealii::FEValues<dim, spacedim> fine(
-              StaticMappingQ1<dim, spacedim>::mapping,
-              fe,
-              *q_fine,
-              update_quadrature_points | update_JxW_values | update_values);
+            dealii::FEValues<dim, spacedim> fine(StaticMappingQ1<dim, spacedim>::mapping,
+                                                 fe,
+                                                 *q_fine,
+                                                 update_quadrature_points | update_JxW_values |
+                                                   update_values);
 
             const unsigned int n_dofs = dh.n_dofs();
 
@@ -133,8 +125,7 @@ namespace internal
 
             // now create the mass matrix and all the right_hand sides
             unsigned int                                           child_no = 0;
-            typename dealii::DoFHandler<dim>::active_cell_iterator cell =
-              dh.begin_active();
+            typename dealii::DoFHandler<dim>::active_cell_iterator cell     = dh.begin_active();
             for (; cell != dh.end(); ++cell, ++child_no)
               {
                 fine.reinit(cell);
@@ -146,15 +137,13 @@ namespace internal
                       {
                         const unsigned int gdi = child_ldi[child_no][i];
                         const unsigned int gdj = child_ldi[child_no][j];
-                        fine_mass(gdi, gdj) += fine.shape_value(i, q) *
-                                               fine.shape_value(j, q) *
-                                               fine.JxW(q);
+                        fine_mass(gdi, gdj) +=
+                          fine.shape_value(i, q) * fine.shape_value(j, q) * fine.JxW(q);
                         Point<dim> quad_tmp;
                         for (unsigned int k = 0; k < dim; ++k)
                           quad_tmp(k) = fine.quadrature_point(q)(k);
                         coarse_rhs_matrix(gdi, j) +=
-                          fine.shape_value(i, q) * fe.shape_value(j, quad_tmp) *
-                          fine.JxW(q);
+                          fine.shape_value(i, q) * fe.shape_value(j, quad_tmp) * fine.JxW(q);
                       }
               }
 
@@ -184,12 +173,8 @@ template <int dim, int spacedim>
 FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree) :
   FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>(
     TensorProductPolynomialsBubbles<dim>(
-      Polynomials::generate_complete_Lagrange_basis(
-        QGaussLobatto<1>(q_degree + 1).get_points())),
-    FiniteElementData<dim>(get_dpo_vector(q_degree),
-                           1,
-                           q_degree + 1,
-                           FiniteElementData<dim>::H1),
+      Polynomials::generate_complete_Lagrange_basis(QGaussLobatto<1>(q_degree + 1).get_points())),
+    FiniteElementData<dim>(get_dpo_vector(q_degree), 1, q_degree + 1, FiniteElementData<dim>::H1),
     get_riaf_vector(q_degree)),
   n_bubbles((q_degree <= 1) ? 1 : dim)
 {
@@ -210,8 +195,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree) :
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
     {
-      internal::FE_Q_Bubbles::compute_embedding_matrices(
-        *this, this->prolongation, false);
+      internal::FE_Q_Bubbles::compute_embedding_matrices(*this, this->prolongation, false);
       // Fill restriction matrices with L2-projection
       FETools::compute_projection_matrices(*this, this->restriction);
     }
@@ -248,8 +232,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const Quadrature<1> &points) :
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
     {
-      internal::FE_Q_Bubbles::compute_embedding_matrices(
-        *this, this->prolongation, false);
+      internal::FE_Q_Bubbles::compute_embedding_matrices(*this, this->prolongation, false);
       // Fill restriction matrices with L2-projection
       FETools::compute_projection_matrices(*this, this->restriction);
     }
@@ -269,10 +252,9 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
   bool                           type     = true;
   const unsigned int             n_points = this->degree;
   std::vector<double>            points(n_points);
-  const unsigned int             dofs_per_cell = this->dofs_per_cell;
-  const std::vector<Point<dim>> &unit_support_points =
-    this->unit_support_points;
-  unsigned int index = 0;
+  const unsigned int             dofs_per_cell       = this->dofs_per_cell;
+  const std::vector<Point<dim>> &unit_support_points = this->unit_support_points;
+  unsigned int                   index               = 0;
 
   // Decode the support points in one coordinate direction.
   for (unsigned int j = 0; j < dofs_per_cell; j++)
@@ -292,9 +274,8 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
         }
     }
   // Do not consider the discontinuous node for dimension 1
-  Assert(
-    index == n_points || (dim == 1 && index == n_points + n_bubbles),
-    ExcMessage("Could not decode support points in one coordinate direction."));
+  Assert(index == n_points || (dim == 1 && index == n_points + n_bubbles),
+         ExcMessage("Could not decode support points in one coordinate direction."));
 
   // Check whether the support points are equidistant.
   for (unsigned int j = 0; j < n_points; j++)
@@ -310,8 +291,8 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
         namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
                 << ">(QIterated(QTrapez()," << this->degree - 1 << "))";
       else
-        namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
-                << ">(" << this->degree - 1 << ")";
+        namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim) << ">("
+                << this->degree - 1 << ")";
     }
   else
     {
@@ -327,8 +308,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
       if (type == true)
         namebuf << "FE_Q_Bubbles<" << dim << ">(" << this->degree - 1 << ")";
       else
-        namebuf << "FE_Q_Bubbles<" << dim << ">(QUnknownNodes(" << this->degree
-                << "))";
+        namebuf << "FE_Q_Bubbles<" << dim << ">(QUnknownNodes(" << this->degree << "))";
     }
   return namebuf.str();
 }
@@ -346,25 +326,21 @@ FE_Q_Bubbles<dim, spacedim>::clone() const
 
 template <int dim, int spacedim>
 void
-FE_Q_Bubbles<dim, spacedim>::
-  convert_generalized_support_point_values_to_dof_values(
-    const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const
+FE_Q_Bubbles<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
+  const std::vector<Vector<double>> &support_point_values,
+  std::vector<double> &              nodal_values) const
 {
   Assert(support_point_values.size() == this->unit_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->unit_support_points.size()));
+         ExcDimensionMismatch(support_point_values.size(), this->unit_support_points.size()));
   Assert(nodal_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
-  Assert(
-    support_point_values[0].size() == this->n_components(),
-    ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert(support_point_values[0].size() == this->n_components(),
+         ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
 
   for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
     {
-      const std::pair<unsigned int, unsigned int> index =
-        this->system_to_component_index(i);
-      nodal_values[i] = support_point_values[i](index.first);
+      const std::pair<unsigned int, unsigned int> index = this->system_to_component_index(i);
+      nodal_values[i]                                   = support_point_values[i](index.first);
     }
 
   // We don't use the bubble functions for local interpolation
@@ -385,15 +361,13 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
   // for the case that the x_source_fe is identical to this FE
   typedef FE_Q_Bubbles<dim, spacedim> FEQBUBBLES;
 
-  AssertThrow(
-    (x_source_fe.get_name().find("FE_Q_Bubbles<") == 0) ||
-      (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr),
-    (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
+  AssertThrow((x_source_fe.get_name().find("FE_Q_Bubbles<") == 0) ||
+                (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr),
+              (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
   Assert(interpolation_matrix.m() == this->dofs_per_cell,
          ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(
-    interpolation_matrix.n() == x_source_fe.dofs_per_cell,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_cell));
+  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+         ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_cell));
 
   // Provide a short cut in case we are just inquiring the identity
   auto casted_fe = dynamic_cast<const FEQBUBBLES *>(&x_source_fe);
@@ -402,10 +376,7 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
       interpolation_matrix.set(i, i, 1.);
   // else we need to do more...
   else
-    Assert(
-      false,
-      (typename FiniteElement<dim,
-                              spacedim>::ExcInterpolationNotImplemented()));
+    Assert(false, (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 }
 
 
@@ -429,8 +400,7 @@ FE_Q_Bubbles<dim, spacedim>::get_dpo_vector(const unsigned int q_deg)
   for (unsigned int i = 1; i < dpo.size(); ++i)
     dpo[i] = dpo[i - 1] * (q_deg - 1);
 
-  dpo[dim] +=
-    (q_deg <= 1 ? 1 : dim); // all the bubble functions are discontinuous
+  dpo[dim] += (q_deg <= 1 ? 1 : dim); // all the bubble functions are discontinuous
   return dpo;
 }
 
@@ -438,16 +408,15 @@ FE_Q_Bubbles<dim, spacedim>::get_dpo_vector(const unsigned int q_deg)
 
 template <int dim, int spacedim>
 bool
-FE_Q_Bubbles<dim, spacedim>::has_support_on_face(
-  const unsigned int shape_index,
-  const unsigned int face_index) const
+FE_Q_Bubbles<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
+                                                 const unsigned int face_index) const
 {
   // discontinuous functions have no support on faces
   if (shape_index >= this->n_dofs_per_cell() - n_bubbles)
     return false;
   else
-    return FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>::
-      has_support_on_face(shape_index, face_index);
+    return FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>::has_support_on_face(
+      shape_index, face_index);
 }
 
 
@@ -459,14 +428,11 @@ FE_Q_Bubbles<dim, spacedim>::get_prolongation_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Prolongation matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage("Prolongation matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
 
   Assert(this->prolongation[refinement_case - 1][child].n() != 0,
          ExcMessage("This prolongation matrix has not been computed yet!"));
@@ -483,14 +449,11 @@ FE_Q_Bubbles<dim, spacedim>::get_restriction_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Restriction matrices are only available for refined cells!"));
-  Assert(
-    child < GeometryInfo<dim>::n_children(refinement_case),
-    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
+         ExcIndexRange(refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage("Restriction matrices are only available for refined cells!"));
+  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+         ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(refinement_case)));
 
   Assert(this->restriction[refinement_case - 1][child].n() != 0,
          ExcMessage("This restriction matrix has not been computed yet!"));

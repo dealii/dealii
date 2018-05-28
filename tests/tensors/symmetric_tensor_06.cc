@@ -57,9 +57,8 @@ test()
         for (unsigned int k = 0; k < dim; ++k)
           for (unsigned int l = 0; l < dim; ++l)
             {
-              deallog << i << ' ' << j << ' ' << k << ' ' << l << ": "
-                      << ta[i][j][k][l] << ' ' << ts[i][j][k][l] << ' '
-                      << aa[k][l] << ' ' << as[k][l] << std::endl;
+              deallog << i << ' ' << j << ' ' << k << ' ' << l << ": " << ta[i][j][k][l] << ' '
+                      << ts[i][j][k][l] << ' ' << aa[k][l] << ' ' << as[k][l] << std::endl;
               tmp_ij += ts[i][j][k][l] * as[k][l];
             }
         bs[i][j] = tmp_ij;

@@ -58,8 +58,7 @@ check()
   //  now, please test with it later!
   no_normal_flux_boundaries.insert(3);
   no_normal_flux_boundaries.insert(4);
-  VectorTools::compute_no_normal_flux_constraints(
-    dofh, 0, no_normal_flux_boundaries, cm, mapping);
+  VectorTools::compute_no_normal_flux_constraints(dofh, 0, no_normal_flux_boundaries, cm, mapping);
 
   cm.print(deallog.get_file_stream());
 }

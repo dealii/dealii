@@ -84,8 +84,7 @@ namespace TrilinosWrappers
         components.resize(n_blocks());
 
       for (size_type i = 0; i < n_blocks(); ++i)
-        components[i].reinit(
-          parallel_partitioning[i], communicator, omit_zeroing_entries);
+        components[i].reinit(parallel_partitioning[i], communicator, omit_zeroing_entries);
 
       collect_sizes();
     }
@@ -109,10 +108,8 @@ namespace TrilinosWrappers
         components.resize(n_blocks());
 
       for (size_type i = 0; i < n_blocks(); ++i)
-        components[i].reinit(parallel_partitioning[i],
-                             ghost_values[i],
-                             communicator,
-                             vector_writable);
+        components[i].reinit(
+          parallel_partitioning[i], ghost_values[i], communicator, vector_writable);
 
       collect_sizes();
     }
@@ -150,9 +147,8 @@ namespace TrilinosWrappers
 
 
     void
-    BlockVector::import_nonlocal_data_for_fe(
-      const TrilinosWrappers::BlockSparseMatrix &m,
-      const BlockVector &                        v)
+    BlockVector::import_nonlocal_data_for_fe(const TrilinosWrappers::BlockSparseMatrix &m,
+                                             const BlockVector &                        v)
     {
       Assert(m.n_block_rows() == v.n_blocks(),
              ExcDimensionMismatch(m.n_block_rows(), v.n_blocks()));

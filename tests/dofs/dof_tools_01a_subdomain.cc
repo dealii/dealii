@@ -32,8 +32,7 @@ void
 check_this(const DoFHandler<dim> &dof_handler)
 {
   // create sparsity pattern
-  SparsityPattern sp(dof_handler.n_dofs(),
-                     dof_handler.max_couplings_between_dofs());
+  SparsityPattern sp(dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
 
   // pass a subdomain id; note that
   // the framework sets the subdomain
@@ -60,8 +59,7 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   unsigned int hash = 0;
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
-    hash +=
-      l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
-           (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
+    hash += l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
+                 (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
   deallog << hash << std::endl;
 }

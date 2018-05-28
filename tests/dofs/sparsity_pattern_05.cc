@@ -111,8 +111,7 @@ check()
   // tests, so only make sure that
   // sparsity_[12] are equal
   deallog << "Check 1:"
-          << " -- " << (sparsity_1 == sparsity_2 ? "ok" : "failed")
-          << std::endl;
+          << " -- " << (sparsity_1 == sparsity_2 ? "ok" : "failed") << std::endl;
 
 
 
@@ -147,8 +146,7 @@ check()
   sparsity_4.copy_from(csp_4);
 
   deallog << "Check 2:"
-          << " -- " << (sparsity_3 == sparsity_4 ? "ok" : "failed")
-          << std::endl;
+          << " -- " << (sparsity_3 == sparsity_4 ? "ok" : "failed") << std::endl;
 }
 
 

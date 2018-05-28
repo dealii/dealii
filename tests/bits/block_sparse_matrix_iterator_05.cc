@@ -49,8 +49,8 @@ test()
   // which happens to be in block 0,1
   BlockSparseMatrix<double>::const_iterator it = m.begin();
 
-  deallog << it->row() << ' ' << it->column() << ' ' << it->block_row() << ' '
-          << it->block_column() << std::endl;
+  deallog << it->row() << ' ' << it->column() << ' ' << it->block_row() << ' ' << it->block_column()
+          << std::endl;
 
   Assert(it->row() == 0, ExcInternalError());
   Assert(it->column() == 2, ExcInternalError());
@@ -82,13 +82,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -96,12 +94,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

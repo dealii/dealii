@@ -56,14 +56,13 @@ do_test(const DoFHandler<dim> &dof)
     FEValues<dim> fe_values(mapping,
                             dof.get_fe(),
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_JxW_values);
+                            update_values | update_gradients | update_JxW_values);
 
-    FEEvaluation<dim, fe_degree, fe_degree + 1> fe_eval(
-      mapping,
-      dof.get_fe(),
-      QGauss<1>(fe_degree + 1),
-      update_values | update_gradients | update_JxW_values);
+    FEEvaluation<dim, fe_degree, fe_degree + 1> fe_eval(mapping,
+                                                        dof.get_fe(),
+                                                        QGauss<1>(fe_degree + 1),
+                                                        update_values | update_gradients |
+                                                          update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -71,8 +70,7 @@ do_test(const DoFHandler<dim> &dof)
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     FullMatrix<double> test_matrix(dofs_per_cell, dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
@@ -83,16 +81,14 @@ do_test(const DoFHandler<dim> &dof)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       10. * fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                    10. * fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                   fe_values.JxW(q_point));
             }
 
         fe_eval.reinit(cell);
-        for (unsigned int i = 0; i < dofs_per_cell;
-             i += VectorizedArray<double>::n_array_elements)
+        for (unsigned int i = 0; i < dofs_per_cell; i += VectorizedArray<double>::n_array_elements)
           {
             const unsigned int n_items =
               i + VectorizedArray<double>::n_array_elements > dofs_per_cell ?
@@ -133,8 +129,7 @@ test()
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))

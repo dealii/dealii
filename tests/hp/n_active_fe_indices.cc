@@ -39,8 +39,7 @@ template <int dim>
 void
 check_cells(const hp::DoFHandler<dim> &dof_handler)
 {
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
@@ -65,8 +64,7 @@ template <int dim>
 void
 check_faces(const hp::DoFHandler<dim> &dof_handler)
 {
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -98,8 +96,7 @@ template <int dim>
 void
 check_edges(const hp::DoFHandler<dim> &dof_handler)
 {
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
@@ -112,8 +109,7 @@ check_edges(const hp::DoFHandler<dim> &dof_handler)
         deallog << std::endl;
 
         Assert(cell->line(e)->n_active_fe_indices() >= 1, ExcInternalError());
-        Assert(cell->line(e)->n_active_fe_indices() <=
-                 dof_handler.get_fe().size(),
+        Assert(cell->line(e)->n_active_fe_indices() <= dof_handler.get_fe().size(),
                ExcInternalError());
       }
 }
@@ -139,8 +135,7 @@ test()
 
   hp::DoFHandler<dim> dof_handler(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % fe_collection.size());

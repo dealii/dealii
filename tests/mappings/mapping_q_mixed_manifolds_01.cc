@@ -48,16 +48,14 @@ struct ManifoldWrapper
 
 template <>
 Manifold<2> *
-ManifoldWrapper<2>::operator()(const Tensor<1, 2> & /*direction*/,
-                               const Point<2> &center) const
+ManifoldWrapper<2>::operator()(const Tensor<1, 2> & /*direction*/, const Point<2> &center) const
 {
   return new SphericalManifold<2>(center);
 }
 
 template <>
 Manifold<3> *
-ManifoldWrapper<3>::operator()(const Tensor<1, 3> &direction,
-                               const Point<3> &    center) const
+ManifoldWrapper<3>::operator()(const Tensor<1, 3> &direction, const Point<3> &center) const
 {
   return new CylindricalManifold<3>(direction, center);
 }
@@ -69,8 +67,7 @@ test()
   Tensor<1, dim> direction;
   direction[dim - 1] = 1.;
 
-  std::shared_ptr<Manifold<dim>> cylinder_manifold(
-    ManifoldWrapper<dim>()(direction, Point<dim>()));
+  std::shared_ptr<Manifold<dim>> cylinder_manifold(ManifoldWrapper<dim>()(direction, Point<dim>()));
 
   // create cube and shift it to position 0.7
   Triangulation<dim> tria;
@@ -89,8 +86,7 @@ test()
       QGauss<dim>   quad(degree + 1);
       FEValues<dim> fe_values(mapping, fe, quad, update_JxW_values);
       double        sum = 0.;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             tria.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
            cell != tria.end();
            ++cell)
         {
@@ -104,9 +100,8 @@ test()
       // circular segment that is missing due to the manifold, whose area is
       // R^2/2(theta-sin(theta)) with theta 90 degrees and R=sqrt(0.5)
       const double reference = 1. - 0.25 * (0.5 * numbers::PI - 1.);
-      deallog << "Volume " << dim << "D mapping degree " << degree << ": "
-              << sum << " error: " << (sum - reference) / reference
-              << std::endl;
+      deallog << "Volume " << dim << "D mapping degree " << degree << ": " << sum
+              << " error: " << (sum - reference) / reference << std::endl;
     }
 }
 

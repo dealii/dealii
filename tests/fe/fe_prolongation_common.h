@@ -47,17 +47,14 @@
 
 template <typename number>
 void
-print_formatted(const FullMatrix<number> &A,
-                const unsigned int        precision,
-                const unsigned int        width)
+print_formatted(const FullMatrix<number> &A, const unsigned int precision, const unsigned int width)
 {
   for (unsigned int i = 0; i < A.m(); ++i)
     {
       for (unsigned int j = 0; j < A.n(); ++j)
         {
           if (A(i, j) != 0)
-            deallog << std::setw(width) << std::setprecision(precision)
-                    << A(i, j);
+            deallog << std::setw(width) << std::setprecision(precision) << A(i, j);
           else
             deallog << std::setw(width) << std::setprecision(precision) << "~";
           deallog << ' ';
@@ -76,8 +73,7 @@ check_prolongation(FiniteElement<dim> &fe, const char *name)
 
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
     {
-      deallog << name << '<' << dim << '>' << " prolongation " << i
-              << std::endl;
+      deallog << name << '<' << dim << '>' << " prolongation " << i << std::endl;
       if (fe.isotropic_prolongation_is_implemented())
         print_formatted(fe.get_prolongation_matrix(i), 8, 8);
     }

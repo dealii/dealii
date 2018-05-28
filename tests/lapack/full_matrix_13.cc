@@ -44,8 +44,7 @@ test()
   // test multiplication
   for (unsigned int i = 0; i < m; ++i)
     for (unsigned int j = 0; j < n; ++j)
-      AssertThrow(std::abs(A(i, j) - factor * A_check(i, j)) < 1.e-12,
-                  ExcInternalError());
+      AssertThrow(std::abs(A(i, j) - factor * A_check(i, j)) < 1.e-12, ExcInternalError());
 
   // divide by factor
   A /= factor;
@@ -53,8 +52,7 @@ test()
   // test division
   for (unsigned int i = 0; i < m; ++i)
     for (unsigned int j = 0; j < n; ++j)
-      AssertThrow(std::abs(A(i, j) - A_check(i, j)) < 1.e-12,
-                  ExcInternalError());
+      AssertThrow(std::abs(A(i, j) - A_check(i, j)) < 1.e-12, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

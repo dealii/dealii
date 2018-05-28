@@ -49,8 +49,7 @@ test()
           m.set(i, j, i * j * .5 + .5);
 
     m.compress(VectorOperation::insert);
-    deallog << "Matrix norm set local once: " << m.frobenius_norm()
-            << std::endl;
+    deallog << "Matrix norm set local once: " << m.frobenius_norm() << std::endl;
   }
 
   {
@@ -66,8 +65,7 @@ test()
           m.set(i, j, i * j + 1.);
 
     m.compress(VectorOperation::insert);
-    deallog << "Matrix norm set local twice: " << m.frobenius_norm()
-            << std::endl;
+    deallog << "Matrix norm set local twice: " << m.frobenius_norm() << std::endl;
   }
 
   {
@@ -81,8 +79,7 @@ test()
       m.set(1, 3, 10.);
 
     m.compress(VectorOperation::insert);
-    deallog << "Matrix norm set non-local once: " << m.frobenius_norm()
-            << std::endl;
+    deallog << "Matrix norm set non-local once: " << m.frobenius_norm() << std::endl;
   }
 
   {
@@ -95,8 +92,7 @@ test()
     m.set(1, 3, 10.);
 
     m.compress(VectorOperation::insert);
-    deallog << "Matrix norm set non-local twice: " << m.frobenius_norm()
-            << std::endl;
+    deallog << "Matrix norm set non-local twice: " << m.frobenius_norm() << std::endl;
   }
 
   {
@@ -110,8 +106,7 @@ test()
     m.set(2, 3, 2 * 3 * 0.5 + 0.5);
 
     m.compress(VectorOperation::insert);
-    deallog << "Matrix norm set non-local twice: " << m.frobenius_norm()
-            << std::endl;
+    deallog << "Matrix norm set non-local twice: " << m.frobenius_norm() << std::endl;
 
     for (unsigned int i = 5 * myid; i < 5 * (myid + 1); ++i)
       for (unsigned int j = 0; j < m.n(); ++j)
@@ -122,8 +117,7 @@ test()
     m.set(2, 3, 2 * 3 * 0.5 + 0.5);
 
     m.compress(VectorOperation::insert);
-    deallog << "Matrix norm set twice, 2nd attempt: " << m.frobenius_norm()
-            << std::endl;
+    deallog << "Matrix norm set twice, 2nd attempt: " << m.frobenius_norm() << std::endl;
 
     for (unsigned int i = 5 * myid; i < 5 * (myid + 1); ++i)
       for (unsigned int j = 0; j < m.n(); ++j)
@@ -135,8 +129,7 @@ test()
     m.set(2, 3, 2 * 3 * 0.5 + 0.5);
 
     m.compress(VectorOperation::insert);
-    deallog << "Matrix norm set twice-twice: " << m.frobenius_norm()
-            << std::endl;
+    deallog << "Matrix norm set twice-twice: " << m.frobenius_norm() << std::endl;
   }
 
   deallog << "OK" << std::endl;
@@ -147,8 +140,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {

@@ -26,6 +26,5 @@ void
 test()
 {
   for (unsigned int p = 1; p < 5 - dim; ++p)
-    test_with_2d_deformed_refined_mesh(
-      FESystem<dim>(FE_Q<dim>(p), 1, FE_DGQ<dim>(p + 1), 1), p);
+    test_with_2d_deformed_refined_mesh(FESystem<dim>(FE_Q<dim>(p), 1, FE_DGQ<dim>(p + 1), 1), p);
 }

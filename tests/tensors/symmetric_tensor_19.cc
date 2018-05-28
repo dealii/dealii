@@ -39,8 +39,7 @@ check(const SymmetricTensor<4, dim> &A)
             deallog << "      " << A[i][j][k][l] << ' ' << B[i][j][k][l] << ' '
                     << T_left[i][j][k][l] << std::endl;
 
-            AssertThrow(std::fabs(T_left[i][j][k][l] -
-                                  identity_tensor<dim>()[i][j][k][l]) < 1e-10,
+            AssertThrow(std::fabs(T_left[i][j][k][l] - identity_tensor<dim>()[i][j][k][l]) < 1e-10,
                         ExcInternalError());
           }
 
@@ -55,8 +54,7 @@ check(const SymmetricTensor<4, dim> &A)
             deallog << "      " << A[i][j][k][l] << ' ' << B[i][j][k][l] << ' '
                     << T_right[i][j][k][l] << std::endl;
 
-            AssertThrow(std::fabs(T_right[i][j][k][l] -
-                                  identity_tensor<dim>()[i][j][k][l]) < 1e-10,
+            AssertThrow(std::fabs(T_right[i][j][k][l] - identity_tensor<dim>()[i][j][k][l]) < 1e-10,
                         ExcInternalError());
           }
 }

@@ -40,8 +40,7 @@ test(VectorType &v)
 
   // then check the norm
   VectorTools::subtract_mean_value(v);
-  AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(),
-              ExcInternalError());
+  AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -61,30 +60,26 @@ main(int argc, char *argv[])
       IndexSet ghost_indices(10);
       ghost_indices.add_range(3, 8);
       {
-        LinearAlgebra::distributed::Vector<double> v(
-          local_range, ghost_indices, MPI_COMM_WORLD);
+        LinearAlgebra::distributed::Vector<double> v(local_range, ghost_indices, MPI_COMM_WORLD);
         test(v);
       }
 
       {
-        LinearAlgebra::distributed::Vector<float> v(
-          local_range, ghost_indices, MPI_COMM_WORLD);
+        LinearAlgebra::distributed::Vector<float> v(local_range, ghost_indices, MPI_COMM_WORLD);
         test(v);
       }
 
       {
-        LinearAlgebra::distributed::BlockVector<double> v(
-          std::vector<IndexSet>(1, local_range),
-          std::vector<IndexSet>(1, ghost_indices),
-          MPI_COMM_WORLD);
+        LinearAlgebra::distributed::BlockVector<double> v(std::vector<IndexSet>(1, local_range),
+                                                          std::vector<IndexSet>(1, ghost_indices),
+                                                          MPI_COMM_WORLD);
         test(v);
       }
 
       {
-        LinearAlgebra::distributed::BlockVector<float> v(
-          std::vector<IndexSet>(1, local_range),
-          std::vector<IndexSet>(1, ghost_indices),
-          MPI_COMM_WORLD);
+        LinearAlgebra::distributed::BlockVector<float> v(std::vector<IndexSet>(1, local_range),
+                                                         std::vector<IndexSet>(1, ghost_indices),
+                                                         MPI_COMM_WORLD);
         test(v);
       }
     }
@@ -92,13 +87,11 @@ main(int argc, char *argv[])
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -106,12 +99,10 @@ main(int argc, char *argv[])
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

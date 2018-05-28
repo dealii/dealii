@@ -23,9 +23,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 void
-DataPostprocessor<dim>::evaluate_scalar_field(
-  const DataPostprocessorInputs::Scalar<dim> &,
-  std::vector<Vector<double>> &) const
+DataPostprocessor<dim>::evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &,
+                                              std::vector<Vector<double>> &) const
 {
   AssertThrow(false, ExcPureFunctionCalled());
 }
@@ -34,9 +33,8 @@ DataPostprocessor<dim>::evaluate_scalar_field(
 
 template <int dim>
 void
-DataPostprocessor<dim>::evaluate_vector_field(
-  const DataPostprocessorInputs::Vector<dim> &,
-  std::vector<Vector<double>> &) const
+DataPostprocessor<dim>::evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &,
+                                              std::vector<Vector<double>> &) const
 {
   AssertThrow(false, ExcPureFunctionCalled());
 }
@@ -57,9 +55,8 @@ DataPostprocessor<dim>::get_data_component_interpretation() const
 // -------------------------- DataPostprocessorScalar -------------------------
 
 template <int dim>
-DataPostprocessorScalar<dim>::DataPostprocessorScalar(
-  const std::string &name,
-  const UpdateFlags  update_flags) :
+DataPostprocessorScalar<dim>::DataPostprocessorScalar(const std::string &name,
+                                                      const UpdateFlags  update_flags) :
   name(name),
   update_flags(update_flags)
 {}
@@ -96,9 +93,8 @@ DataPostprocessorScalar<dim>::get_needed_update_flags() const
 // -------------------------- DataPostprocessorVector -------------------------
 
 template <int dim>
-DataPostprocessorVector<dim>::DataPostprocessorVector(
-  const std::string &name,
-  const UpdateFlags  update_flags) :
+DataPostprocessorVector<dim>::DataPostprocessorVector(const std::string &name,
+                                                      const UpdateFlags  update_flags) :
   name(name),
   update_flags(update_flags)
 {}
@@ -135,9 +131,8 @@ DataPostprocessorVector<dim>::get_needed_update_flags() const
 // -------------------------- DataPostprocessorTensor -------------------------
 
 template <int dim>
-DataPostprocessorTensor<dim>::DataPostprocessorTensor(
-  const std::string &name,
-  const UpdateFlags  update_flags) :
+DataPostprocessorTensor<dim>::DataPostprocessorTensor(const std::string &name,
+                                                      const UpdateFlags  update_flags) :
   name(name),
   update_flags(update_flags)
 {}
@@ -148,8 +143,7 @@ template <int dim>
 std::vector<std::string>
 DataPostprocessorTensor<dim>::get_names() const
 {
-  static_assert(dim <= 3,
-                "The following variable needs to be expanded for dim>3");
+  static_assert(dim <= 3, "The following variable needs to be expanded for dim>3");
   static const char suffixes[] = {'x', 'y', 'z'};
 
   std::vector<std::string> names;

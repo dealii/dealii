@@ -41,19 +41,13 @@ template <int dim>
 FE_BDM<dim>::FE_BDM(const unsigned int deg) :
   FE_PolyTensor<PolynomialsBDM<dim>, dim>(
     deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim,
-                           deg + 1,
-                           FiniteElementData<dim>::Hdiv),
+    FiniteElementData<dim>(get_dpo_vector(deg), dim, deg + 1, FiniteElementData<dim>::Hdiv),
     get_ria_vector(deg),
     std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
                                std::vector<bool>(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
-  Assert(
-    deg > 0,
-    ExcMessage(
-      "Lowest order BDM element are degree 1, but you asked for degree 0"));
+  Assert(deg > 0, ExcMessage("Lowest order BDM element are degree 1, but you asked for degree 0"));
 
   const unsigned int n_dofs = this->dofs_per_cell;
 
@@ -85,8 +79,7 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg) :
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);
   FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0, 1.);
-  this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face,
-                                     this->dofs_per_face);
+  this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face, this->dofs_per_face);
   unsigned int target_row = 0;
   for (unsigned int d = 0; d < GeometryInfo<dim>::max_children_per_face; ++d)
     for (unsigned int i = 0; i < face_embeddings[d].m(); ++i)
@@ -136,9 +129,9 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->generalized_support_points.size()));
+  Assert(
+    support_point_values.size() == this->generalized_support_points.size(),
+    ExcDimensionMismatch(support_point_values.size(), this->generalized_support_points.size()));
   AssertDimension(support_point_values[0].size(), dim);
   Assert(nodal_values.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
@@ -158,8 +151,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
         {
           for (unsigned int i = 0; i < this->dofs_per_face; ++i)
             nodal_values[dbase + i] =
-              support_point_values[pbase + i]
-                                  [GeometryInfo<dim>::unit_normal_direction[f]];
+              support_point_values[pbase + i][GeometryInfo<dim>::unit_normal_direction[f]];
           pbase += this->dofs_per_face;
         }
       else
@@ -168,10 +160,8 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
             {
               double s = 0.;
               for (unsigned int k = 0; k < test_values_face.size(); ++k)
-                s +=
-                  support_point_values
-                    [pbase + k][GeometryInfo<dim>::unit_normal_direction[f]] *
-                  test_values_face[k][i];
+                s += support_point_values[pbase + k][GeometryInfo<dim>::unit_normal_direction[f]] *
+                     test_values_face[k][i];
               nodal_values[dbase + i] = s;
             }
           pbase += test_values_face.size();
@@ -179,10 +169,8 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
       dbase += this->dofs_per_face;
     }
 
-  AssertDimension(dbase,
-                  this->dofs_per_face * GeometryInfo<dim>::faces_per_cell);
-  AssertDimension(
-    pbase, this->generalized_support_points.size() - test_values_cell.size());
+  AssertDimension(dbase, this->dofs_per_face * GeometryInfo<dim>::faces_per_cell);
+  AssertDimension(pbase, this->generalized_support_points.size() - test_values_cell.size());
 
   // Done for BDM1
   if (dbase == this->dofs_per_cell)
@@ -225,8 +213,7 @@ FE_BDM<dim>::get_dpo_vector(const unsigned int deg)
   // PolynomialSpace::compute_n_pols()!
 
   std::vector<unsigned int> dpo(dim + 1, 0u);
-  dpo[dim] =
-    (deg > 1 ? dim * PolynomialSpace<dim>::compute_n_pols(deg - 1) : 0u);
+  dpo[dim]     = (deg > 1 ? dim * PolynomialSpace<dim>::compute_n_pols(deg - 1) : 0u);
   dpo[dim - 1] = PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
 
   return dpo;
@@ -245,11 +232,9 @@ FE_BDM<dim>::get_ria_vector(const unsigned int deg)
     }
 
   const unsigned int dofs_per_cell = PolynomialsBDM<dim>::compute_n_pols(deg);
-  const unsigned int dofs_per_face =
-    PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
+  const unsigned int dofs_per_face = PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
 
-  Assert(GeometryInfo<dim>::faces_per_cell * dofs_per_face <= dofs_per_cell,
-         ExcInternalError());
+  Assert(GeometryInfo<dim>::faces_per_cell * dofs_per_face <= dofs_per_cell, ExcInternalError());
 
   // all dofs need to be
   // non-additive, since they have
@@ -257,9 +242,7 @@ FE_BDM<dim>::get_ria_vector(const unsigned int deg)
   // however, the interior dofs are
   // made additive
   std::vector<bool> ret_val(dofs_per_cell, false);
-  for (unsigned int i = GeometryInfo<dim>::faces_per_cell * dofs_per_face;
-       i < dofs_per_cell;
-       ++i)
+  for (unsigned int i = GeometryInfo<dim>::faces_per_cell * dofs_per_face; i < dofs_per_cell; ++i)
     ret_val[i] = true;
 
   return ret_val;
@@ -294,12 +277,7 @@ namespace internal
         for (unsigned int k = 0; k < quadrature.size(); ++k)
           {
             test_values[k].resize(poly.n());
-            poly.compute(quadrature.point(k),
-                         test_values[k],
-                         dummy1,
-                         dummy2,
-                         dummy3,
-                         dummy4);
+            poly.compute(quadrature.point(k), test_values[k], dummy1, dummy2, dummy3, dummy4);
             for (unsigned int i = 0; i < poly.n(); ++i)
               {
                 test_values[k][i] *= quadrature.weight(k);
@@ -350,26 +328,21 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   this->generalized_support_points.resize(npoints);
 
   Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
-  for (unsigned int k = 0;
-       k < face_points.size() * GeometryInfo<dim>::faces_per_cell;
-       ++k)
-    this->generalized_support_points[k] =
-      faces.point(k + QProjector<dim>::DataSetDescriptor::face(
-                        0, true, false, false, this->dofs_per_face));
+  for (unsigned int k = 0; k < face_points.size() * GeometryInfo<dim>::faces_per_cell; ++k)
+    this->generalized_support_points[k] = faces.point(
+      k + QProjector<dim>::DataSetDescriptor::face(0, true, false, false, this->dofs_per_face));
 
   // Currently, for backward compatibility, we do not use moments, but
   // point values on faces in 2D. In 3D, this is impossible, since the
   // moments are only taken with respect to PolynomialsP.
   if (dim > 2)
-    internal::FE_BDM::initialize_test_values(
-      test_values_face, face_points, deg);
+    internal::FE_BDM::initialize_test_values(test_values_face, face_points, deg);
 
   if (deg <= 1)
     return;
 
   // Remember where interior points start
-  const unsigned int ibase =
-    face_points.size() * GeometryInfo<dim>::faces_per_cell;
+  const unsigned int ibase = face_points.size() * GeometryInfo<dim>::faces_per_cell;
   for (unsigned int k = 0; k < cell_points.size(); ++k)
     {
       this->generalized_support_points[ibase + k] = cell_points.point(k);
@@ -378,8 +351,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // the test functions in the
   // interior quadrature points
 
-  internal::FE_BDM::initialize_test_values(
-    test_values_cell, cell_points, deg - 2);
+  internal::FE_BDM::initialize_test_values(test_values_cell, cell_points, deg - 2);
 }
 
 

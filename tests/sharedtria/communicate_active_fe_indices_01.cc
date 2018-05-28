@@ -55,8 +55,7 @@ test()
   triangulation.refine_global(3);
 
   hp::FECollection<dim> fe;
-  for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-       ++i)
+  for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
     fe.push_back(FE_Q<dim>(1));
 
   hp::DoFHandler<dim> dof_handler(triangulation);
@@ -71,18 +70,15 @@ test()
   dof_handler.distribute_dofs(fe);
 
   deallog << "n_dofs: " << dof_handler.n_dofs() << std::endl;
-  deallog << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
-          << std::endl;
+  deallog << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
 
   // verify that the information has been communicated between processors
   for (auto cell : dof_handler.active_cell_iterators())
     {
       if (cell->is_locally_owned())
-        Assert(cell->active_fe_index() == cell->subdomain_id(),
-               ExcInternalError());
+        Assert(cell->active_fe_index() == cell->subdomain_id(), ExcInternalError());
       if (cell->is_ghost())
-        Assert(cell->active_fe_index() == cell->subdomain_id(),
-               ExcInternalError());
+        Assert(cell->active_fe_index() == cell->subdomain_id(), ExcInternalError());
 
       // in the current mode for p::s::Tria, every cell is either
       // locally owned or a ghost

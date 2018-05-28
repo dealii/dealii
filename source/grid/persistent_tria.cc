@@ -99,8 +99,7 @@ PersistentTriangulation<dim, spacedim>::restore(const unsigned int step)
     // for each of the previous
     // refinement sweeps
     {
-      Assert(step < refine_flags.size() + 1,
-             ExcDimensionMismatch(step, refine_flags.size() + 1));
+      Assert(step < refine_flags.size() + 1, ExcDimensionMismatch(step, refine_flags.size() + 1));
 
       this->load_refine_flags(refine_flags[step - 1]);
       this->load_coarsen_flags(coarsen_flags[step - 1]);
@@ -135,10 +134,9 @@ PersistentTriangulation<dim, spacedim>::copy_triangulation(
 
 template <int dim, int spacedim>
 void
-PersistentTriangulation<dim, spacedim>::create_triangulation(
-  const std::vector<Point<spacedim>> &,
-  const std::vector<CellData<dim>> &,
-  const SubCellData &)
+PersistentTriangulation<dim, spacedim>::create_triangulation(const std::vector<Point<spacedim>> &,
+                                                             const std::vector<CellData<dim>> &,
+                                                             const SubCellData &)
 {
   Assert(false, ExcImpossibleInDim(dim));
 }
@@ -169,14 +167,10 @@ PersistentTriangulation<dim, spacedim>::write_flags(std::ostream &out) const
 
   for (unsigned int i = 0; i < n_flag_levels; ++i)
     {
-      this->write_bool_vector(mn_tria_refine_flags_begin,
-                              refine_flags[i],
-                              mn_tria_refine_flags_end,
-                              out);
-      this->write_bool_vector(mn_tria_coarsen_flags_begin,
-                              coarsen_flags[i],
-                              mn_tria_coarsen_flags_end,
-                              out);
+      this->write_bool_vector(
+        mn_tria_refine_flags_begin, refine_flags[i], mn_tria_refine_flags_end, out);
+      this->write_bool_vector(
+        mn_tria_coarsen_flags_begin, coarsen_flags[i], mn_tria_coarsen_flags_end, out);
     }
 
   out << mn_persistent_tria_flags_end << std::endl;
@@ -190,8 +184,7 @@ template <int dim, int spacedim>
 void
 PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
 {
-  Assert(refine_flags.size() == 0 && coarsen_flags.size() == 0,
-         ExcFlagsNotCleared());
+  Assert(refine_flags.size() == 0 && coarsen_flags.size() == 0, ExcFlagsNotCleared());
   AssertThrow(in, ExcIO());
 
   unsigned int magic_number;
@@ -205,14 +198,10 @@ PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
     {
       refine_flags.emplace_back();
       coarsen_flags.emplace_back();
-      this->read_bool_vector(mn_tria_refine_flags_begin,
-                             refine_flags.back(),
-                             mn_tria_refine_flags_end,
-                             in);
-      this->read_bool_vector(mn_tria_coarsen_flags_begin,
-                             coarsen_flags.back(),
-                             mn_tria_coarsen_flags_end,
-                             in);
+      this->read_bool_vector(
+        mn_tria_refine_flags_begin, refine_flags.back(), mn_tria_refine_flags_end, in);
+      this->read_bool_vector(
+        mn_tria_coarsen_flags_begin, coarsen_flags.back(), mn_tria_coarsen_flags_end, in);
     }
 
   in >> magic_number;

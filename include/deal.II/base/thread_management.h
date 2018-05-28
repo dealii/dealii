@@ -206,9 +206,7 @@ namespace Threads
      * the number of threads to be synchronized is one, this constructor
      * raises an exception if the <code>count</code> argument is one.
      */
-    DummyBarrier(const unsigned int count,
-                 const char *       name = nullptr,
-                 void *             arg  = nullptr);
+    DummyBarrier(const unsigned int count, const char *name = nullptr, void *arg = nullptr);
 
     /**
      * Wait for all threads to reach this point. Since there may only be one
@@ -235,11 +233,10 @@ namespace Threads
     /**
      * Exception.
      */
-    DeclException1(
-      ExcBarrierSizeNotUseful,
-      int,
-      << "In single-thread mode, barrier sizes other than 1 are not "
-      << "useful. You gave " << arg1 << ".");
+    DeclException1(ExcBarrierSizeNotUseful,
+                   int,
+                   << "In single-thread mode, barrier sizes other than 1 are not "
+                   << "useful. You gave " << arg1 << ".");
 
     //@}
   };
@@ -437,9 +434,7 @@ namespace Threads
     /**
      * Constructor. Initialize the underlying POSIX barrier data structure.
      */
-    PosixThreadBarrier(const unsigned int count,
-                       const char *       name = nullptr,
-                       void *             arg  = nullptr);
+    PosixThreadBarrier(const unsigned int count, const char *name = nullptr, void *arg = nullptr);
 
     /**
      * Destructor. Release all resources.
@@ -577,9 +572,7 @@ namespace Threads
    * @ingroup threads
    */
   std::vector<std::pair<unsigned int, unsigned int>>
-  split_interval(const unsigned int begin,
-                 const unsigned int end,
-                 const unsigned int n_intervals);
+  split_interval(const unsigned int begin, const unsigned int end, const unsigned int n_intervals);
 
   /**
    * @cond internal
@@ -685,8 +678,7 @@ namespace Threads
             // that in the library `dist>=0' is checked (dist has a
             // template type, which here is unsigned if no cast is
             // performed)
-            std::advance(return_values[i].second,
-                         static_cast<signed int>(n_elements_per_interval));
+            std::advance(return_values[i].second, static_cast<signed int>(n_elements_per_interval));
             // distribute residual in division equally among the first
             // few subintervals
             if (i < residual)
@@ -801,8 +793,7 @@ namespace Threads
   {
     template <typename RT>
     inline void
-    call(const std::function<RT()> & function,
-         internal::return_value<RT> &ret_val)
+    call(const std::function<RT()> &function, internal::return_value<RT> &ret_val)
     {
       ret_val.set(function());
     }
@@ -1271,8 +1262,7 @@ namespace Threads
    */
   template <typename FunctionObjectType>
   inline auto
-  new_thread(FunctionObjectType function_object)
-    -> Thread<decltype(function_object())>
+  new_thread(FunctionObjectType function_object) -> Thread<decltype(function_object())>
   {
     typedef decltype(function_object()) return_type;
     return Thread<return_type>(std::function<return_type()>(function_object));
@@ -1290,8 +1280,8 @@ namespace Threads
   inline Thread<RT>
   new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return new_thread(std::function<RT()>(
-      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
+    return new_thread(
+      std::function<RT()>(std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
   }
 
 
@@ -1307,8 +1297,8 @@ namespace Threads
              typename identity<C>::type &c,
              typename identity<Args>::type... args)
   {
-    return new_thread(std::function<RT()>(std::bind(
-      fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
+    return new_thread(std::function<RT()>(
+      std::bind(fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 
 #  ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
@@ -1323,8 +1313,8 @@ namespace Threads
              typename identity<const C>::type &c,
              typename identity<Args>::type... args)
   {
-    return new_thread(std::function<RT()>(std::bind(
-      fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
+    return new_thread(std::function<RT()>(
+      std::bind(fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 #  endif
 
@@ -1361,8 +1351,7 @@ namespace Threads
     void
     join_all() const
     {
-      for (typename std::list<Thread<RT>>::const_iterator t = threads.begin();
-           t != threads.end();
+      for (typename std::list<Thread<RT>>::const_iterator t = threads.begin(); t != threads.end();
            ++t)
         t->join();
     }
@@ -1392,8 +1381,7 @@ namespace Threads
     template <typename RT>
     struct TaskEntryPoint : public tbb::task
     {
-      TaskEntryPoint(TaskDescriptor<RT> &task_descriptor) :
-        task_descriptor(task_descriptor)
+      TaskEntryPoint(TaskDescriptor<RT> &task_descriptor) : task_descriptor(task_descriptor)
       {}
 
       virtual tbb::task *
@@ -1529,8 +1517,7 @@ namespace Threads
 
 
     template <typename RT>
-    inline TaskDescriptor<RT>::TaskDescriptor(
-      const std::function<RT()> &function) :
+    inline TaskDescriptor<RT>::TaskDescriptor(const std::function<RT()> &function) :
       function(function),
       task(nullptr),
       task_is_done(false)
@@ -1546,8 +1533,7 @@ namespace Threads
       task = new (tbb::task::allocate_root()) tbb::empty_task;
       task->set_ref_count(2);
 
-      tbb::task *worker =
-        new (task->allocate_child()) TaskEntryPoint<RT>(*this);
+      tbb::task *worker = new (task->allocate_child()) TaskEntryPoint<RT>(*this);
 
       // in earlier versions of the TBB, task::spawn was a regular
       // member function; however, in later versions, it was converted
@@ -1572,8 +1558,7 @@ namespace Threads
 
 
     template <typename RT>
-    TaskDescriptor<RT>::TaskDescriptor(const TaskDescriptor &) :
-      task_is_done(false)
+    TaskDescriptor<RT>::TaskDescriptor(const TaskDescriptor &) : task_is_done(false)
     {
       // we shouldn't be getting here -- task descriptors
       // can't be copied
@@ -1709,8 +1694,7 @@ namespace Threads
     {
       // create a task descriptor and tell it to queue itself up with
       // the scheduling system
-      task_descriptor =
-        std::make_shared<internal::TaskDescriptor<RT>>(function_object);
+      task_descriptor = std::make_shared<internal::TaskDescriptor<RT>>(function_object);
       task_descriptor->queue_task();
     }
 
@@ -1768,8 +1752,7 @@ namespace Threads
     bool
     joinable() const
     {
-      return (task_descriptor !=
-              std::shared_ptr<internal::TaskDescriptor<RT>>());
+      return (task_descriptor != std::shared_ptr<internal::TaskDescriptor<RT>>());
     }
 
 
@@ -1942,8 +1925,7 @@ namespace Threads
    */
   template <typename FunctionObjectType>
   inline auto
-  new_task(FunctionObjectType function_object)
-    -> Task<decltype(function_object())>
+  new_task(FunctionObjectType function_object) -> Task<decltype(function_object())>
   {
     typedef decltype(function_object()) return_type;
     dealii::MultithreadInfo::initialize_multithreading();
@@ -1962,8 +1944,8 @@ namespace Threads
   inline Task<RT>
   new_task(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
-    return new_task(std::function<RT()>(
-      std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
+    return new_task(
+      std::function<RT()>(std::bind(fun_ptr, internal::maybe_make_ref<Args>::act(args)...)));
   }
 
 
@@ -1979,8 +1961,8 @@ namespace Threads
            typename identity<C>::type &c,
            typename identity<Args>::type... args)
   {
-    return new_task(std::function<RT()>(std::bind(
-      fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
+    return new_task(std::function<RT()>(
+      std::bind(fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 
 #  ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
@@ -1995,8 +1977,8 @@ namespace Threads
            typename identity<const C>::type &c,
            typename identity<Args>::type... args)
   {
-    return new_task(std::function<RT()>(std::bind(
-      fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
+    return new_task(std::function<RT()>(
+      std::bind(fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 #  endif
 
@@ -2039,9 +2021,7 @@ namespace Threads
     void
     join_all() const
     {
-      for (typename std::list<Task<RT>>::const_iterator t = tasks.begin();
-           t != tasks.end();
-           ++t)
+      for (typename std::list<Task<RT>>::const_iterator t = tasks.begin(); t != tasks.end(); ++t)
         t->join();
     }
 

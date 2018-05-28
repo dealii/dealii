@@ -103,8 +103,7 @@ public:
 
 template <int dim>
 double
-Coefficient<dim>::value(const Point<dim> &p,
-                        const unsigned int /*component*/) const
+Coefficient<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
 {
   if (p.square() < 0.5 * 0.5)
     return 20;
@@ -119,8 +118,7 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                              std::vector<double> &          values,
                              const unsigned int             component) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
   Assert(component == 0, ExcIndexRange(component, 0, 1));
 
   const unsigned int n_points = points.size();
@@ -147,18 +145,15 @@ LaplaceProblem<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   constraints.clear();
   VectorTools::interpolate_boundary_values(
     dof_handler, 0, Functions::ConstantFunction<dim>(1), constraints);
   constraints.close();
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern(
-    dof_handler, sparsity_pattern, constraints, false);
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern, constraints, false);
   sparsity_pattern.compress();
 
   system_matrix.reinit(sparsity_pattern);
@@ -178,8 +173,8 @@ LaplaceProblem<dim>::assemble_system()
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -192,8 +187,7 @@ LaplaceProblem<dim>::assemble_system()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values(n_q_points);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -202,22 +196,19 @@ LaplaceProblem<dim>::assemble_system()
 
       fe_values.reinit(cell);
 
-      coefficient.value_list(fe_values.get_quadrature_points(),
-                             coefficient_values);
+      coefficient.value_list(fe_values.get_quadrature_points(), coefficient_values);
 
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) += ((coefficient_values[q_point] *
-                                       fe_values.shape_grad(i, q_point) *
-                                       fe_values.shape_grad(j, q_point) +
-                                     fe_values.shape_grad(i, q_point)[0] *
-                                       fe_values.shape_value(j, q_point)) *
-                                    fe_values.JxW(q_point));
+              cell_matrix(i, j) +=
+                ((coefficient_values[q_point] * fe_values.shape_grad(i, q_point) *
+                    fe_values.shape_grad(j, q_point) +
+                  fe_values.shape_grad(i, q_point)[0] * fe_values.shape_value(j, q_point)) *
+                 fe_values.JxW(q_point));
 
-            cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 *
-                            fe_values.JxW(q_point));
+            cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 * fe_values.JxW(q_point));
           }
 
 
@@ -231,8 +222,7 @@ LaplaceProblem<dim>::assemble_system()
       // now do just the right hand side (with
       // local matrix for eliminating
       // inhomogeneities)
-      constraints.distribute_local_to_global(
-        cell_rhs, local_dof_indices, test, cell_matrix);
+      constraints.distribute_local_to_global(cell_rhs, local_dof_indices, test, cell_matrix);
     }
 
   // and compare whether we really got the
@@ -276,29 +266,24 @@ LaplaceProblem<dim>::run()
           GridGenerator::hyper_cube(triangulation, -1, 1);
           triangulation.refine_global(4 - dim);
           {
-            typename DoFHandler<dim>::active_cell_iterator cell =
-              dof_handler.begin_active();
+            typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
             cell->set_refine_flag();
           }
           triangulation.execute_coarsening_and_refinement();
           {
             // find the last cell and mark it
             // for refinement
-            for (typename DoFHandler<dim>::active_cell_iterator cell =
-                   dof_handler.begin_active();
+            for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
-              if (++typename DoFHandler<dim>::active_cell_iterator(cell) ==
-                  dof_handler.end())
+              if (++typename DoFHandler<dim>::active_cell_iterator(cell) == dof_handler.end())
                 cell->set_refine_flag();
           }
           triangulation.execute_coarsening_and_refinement();
         }
 
-      deallog << "   Number of active cells: " << triangulation.n_active_cells()
-              << std::endl
-              << "   Total number of cells: " << triangulation.n_cells()
-              << std::endl;
+      deallog << "   Number of active cells: " << triangulation.n_active_cells() << std::endl
+              << "   Total number of cells: " << triangulation.n_cells() << std::endl;
 
       setup_system();
       assemble_system();

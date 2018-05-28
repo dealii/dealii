@@ -98,8 +98,7 @@ void Explicit::operator()(AnyData &out, const AnyData &in)
         m(i, i) += 1.;
     }
   this->notifications.clear();
-  m.vmult(*out.entry<Vector<double> *>(0),
-          *in.read_ptr<Vector<double>>("Previous iterate"));
+  m.vmult(*out.entry<Vector<double> *>(0), *in.read_ptr<Vector<double>>("Previous iterate"));
 }
 
 
@@ -121,6 +120,5 @@ void Implicit::operator()(AnyData &out, const AnyData &in)
       m.gauss_jordan();
     }
   this->notifications.clear();
-  m.vmult(*out.entry<Vector<double> *>(0),
-          *in.read_ptr<Vector<double>>("Previous time"));
+  m.vmult(*out.entry<Vector<double> *>(0), *in.read_ptr<Vector<double>>("Previous time"));
 }

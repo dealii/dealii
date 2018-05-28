@@ -48,9 +48,7 @@ void
 check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 {
   // check all combinations of fe1 and fe2
-  for (unsigned int subface = 0;
-       subface < GeometryInfo<dim>::max_children_per_face;
-       ++subface)
+  for (unsigned int subface = 0; subface < GeometryInfo<dim>::max_children_per_face; ++subface)
     {
       FullMatrix<double> face_constraints;
       try
@@ -79,11 +77,9 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
         try
           {
             face_constraints.reinit(fe2.dofs_per_face, fe1.dofs_per_face);
-            fe1.get_subface_interpolation_matrix(
-              fe2, subface, face_constraints);
+            fe1.get_subface_interpolation_matrix(fe2, subface, face_constraints);
 
-            deallog << fe1.get_name() << "  vs.  " << fe2.get_name()
-                    << std::endl;
+            deallog << fe1.get_name() << "  vs.  " << fe2.get_name() << std::endl;
             output_matrix(face_constraints);
           }
         catch (...)
@@ -93,11 +89,9 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
         try
           {
             face_constraints.reinit(fe1.dofs_per_face, fe2.dofs_per_face);
-            fe2.get_subface_interpolation_matrix(
-              fe1, subface, face_constraints);
+            fe2.get_subface_interpolation_matrix(fe1, subface, face_constraints);
 
-            deallog << fe2.get_name() << "  vs.  " << fe1.get_name()
-                    << std::endl;
+            deallog << fe2.get_name() << "  vs.  " << fe1.get_name() << std::endl;
             output_matrix(face_constraints);
           }
         catch (...)
@@ -169,25 +163,21 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

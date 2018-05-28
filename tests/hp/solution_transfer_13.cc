@@ -125,8 +125,7 @@ main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans(
-    dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans(dof_handler);
   solution_trans.prepare_for_coarsening_and_refinement(solution);
 
   triangulation.execute_coarsening_and_refinement();
@@ -176,8 +175,7 @@ main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans2(
-    dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans2(dof_handler);
   solution_trans2.prepare_for_coarsening_and_refinement(solution);
 
   triangulation.execute_coarsening_and_refinement();

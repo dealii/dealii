@@ -39,8 +39,7 @@ test()
     deallog << vertex_it->center() << std::endl;
   deallog << std::endl;
 
-  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active();
-       cell != tria.end();
+  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active(); cell != tria.end();
        ++cell)
     {
       for (unsigned int i = 0; i < 4; ++i)
@@ -48,8 +47,7 @@ test()
       deallog << std::endl;
     }
 
-  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active();
-       cell != tria.end();
+  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active(); cell != tria.end();
        ++cell)
     for (unsigned int i = 0; i < 4; ++i)
       {

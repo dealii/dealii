@@ -47,8 +47,7 @@ Quadrature<dim>::Quadrature(const unsigned int n_q) :
 
 template <int dim>
 void
-Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
-                            const std::vector<double> &    w)
+Quadrature<dim>::initialize(const std::vector<Point<dim>> &p, const std::vector<double> &w)
 {
   AssertDimension(w.size(), p.size());
   quadrature_points = p;
@@ -64,8 +63,7 @@ Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points,
   weights(weights),
   is_tensor_product_flag(dim == 1)
 {
-  Assert(weights.size() == points.size(),
-         ExcDimensionMismatch(weights.size(), points.size()));
+  Assert(weights.size() == points.size(), ExcDimensionMismatch(weights.size(), points.size()));
 }
 
 
@@ -76,8 +74,7 @@ Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points) :
   weights(points.size(), std::numeric_limits<double>::infinity()),
   is_tensor_product_flag(dim == 1)
 {
-  Assert(weights.size() == points.size(),
-         ExcDimensionMismatch(weights.size(), points.size()));
+  Assert(weights.size() == points.size(), ExcDimensionMismatch(weights.size(), points.size()));
 }
 
 
@@ -262,8 +259,7 @@ Quadrature<dim>::Quadrature(const Quadrature<dim> &q) :
   is_tensor_product_flag(q.is_tensor_product_flag)
 {
   if (dim > 1 && is_tensor_product_flag)
-    tensor_basis =
-      std_cxx14::make_unique<std::array<Quadrature<1>, dim>>(*q.tensor_basis);
+    tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>>(*q.tensor_basis);
 }
 
 
@@ -278,8 +274,7 @@ Quadrature<dim>::operator=(const Quadrature<dim> &q)
   if (dim > 1 && is_tensor_product_flag)
     {
       if (tensor_basis == nullptr)
-        tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>>(
-          *q.tensor_basis);
+        tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>>(*q.tensor_basis);
       else
         *tensor_basis = *q.tensor_basis;
     }
@@ -338,8 +333,7 @@ Quadrature<1>::get_tensor_basis() const
 
 //---------------------------------------------------------------------------
 template <int dim>
-QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx) :
-  Quadrature<dim>(qx.size())
+QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx) : Quadrature<dim>(qx.size())
 {
   Assert(dim == 1, ExcImpossibleInDim(dim));
   unsigned int k = 0;
@@ -355,8 +349,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx) :
 
 
 template <int dim>
-QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
-                                const Quadrature<1> &qy) :
+QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx, const Quadrature<1> &qy) :
   Quadrature<dim>(qx.size() * qy.size())
 {
   Assert(dim == 2, ExcImpossibleInDim(dim));
@@ -365,8 +358,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
 
 
 template <>
-QAnisotropic<2>::QAnisotropic(const Quadrature<1> &qx,
-                              const Quadrature<1> &qy) :
+QAnisotropic<2>::QAnisotropic(const Quadrature<1> &qx, const Quadrature<1> &qy) :
   Quadrature<2>(qx.size() * qy.size())
 {
   unsigned int k = 0;
@@ -380,8 +372,7 @@ QAnisotropic<2>::QAnisotropic(const Quadrature<1> &qx,
   Assert(k == this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
   const std::array<Quadrature<1>, 2> q_array{{qx, qy}};
-  this->tensor_basis =
-    std_cxx14::make_unique<std::array<Quadrature<1>, 2>>(q_array);
+  this->tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, 2>>(q_array);
 }
 
 
@@ -411,13 +402,12 @@ QAnisotropic<3>::QAnisotropic(const Quadrature<1> &qx,
           this->quadrature_points[k](0) = qx.point(k1)(0);
           this->quadrature_points[k](1) = qy.point(k2)(0);
           this->quadrature_points[k](2) = qz.point(k3)(0);
-          this->weights[k++] = qx.weight(k1) * qy.weight(k2) * qz.weight(k3);
+          this->weights[k++]            = qx.weight(k1) * qy.weight(k2) * qz.weight(k3);
         }
   Assert(k == this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
   const std::array<Quadrature<1>, 3> q_array{{qx, qy, qz}};
-  this->tensor_basis =
-    std_cxx14::make_unique<std::array<Quadrature<1>, 3>>(q_array);
+  this->tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, 3>>(q_array);
 }
 
 
@@ -546,28 +536,22 @@ QProjector<3>::project_to_face(const Quadrature<2> &  quadrature,
     switch (face_no)
       {
         case 0:
-          q_points[p] =
-            Point<dim>(0, quadrature.point(p)(0), quadrature.point(p)(1));
+          q_points[p] = Point<dim>(0, quadrature.point(p)(0), quadrature.point(p)(1));
           break;
         case 1:
-          q_points[p] =
-            Point<dim>(1, quadrature.point(p)(0), quadrature.point(p)(1));
+          q_points[p] = Point<dim>(1, quadrature.point(p)(0), quadrature.point(p)(1));
           break;
         case 2:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(1), 0, quadrature.point(p)(0));
+          q_points[p] = Point<dim>(quadrature.point(p)(1), 0, quadrature.point(p)(0));
           break;
         case 3:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(1), 1, quadrature.point(p)(0));
+          q_points[p] = Point<dim>(quadrature.point(p)(1), 1, quadrature.point(p)(0));
           break;
         case 4:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(0), quadrature.point(p)(1), 0);
+          q_points[p] = Point<dim>(quadrature.point(p)(0), quadrature.point(p)(1), 0);
           break;
         case 5:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(0), quadrature.point(p)(1), 1);
+          q_points[p] = Point<dim>(quadrature.point(p)(0), quadrature.point(p)(1), 1);
           break;
 
         default:
@@ -696,16 +680,14 @@ QProjector<3>::project_to_subface(const Quadrature<2> &    quadrature,
   // indices tell, which global coordinate
   // (0->x, 1->y, 2->z) corresponds to which
   // local one
-  unsigned int xi_index    = numbers::invalid_unsigned_int,
-               eta_index   = numbers::invalid_unsigned_int,
+  unsigned int xi_index = numbers::invalid_unsigned_int, eta_index = numbers::invalid_unsigned_int,
                const_index = face_no / 2;
   // the xi and eta values have to be scaled
   // (by factor 0.5 or factor 1.0) depending on
   // the refinement case and translated (by 0.0
   // or 0.5) depending on the refinement case
   // and subface_no.
-  double xi_scale = 1.0, eta_scale = 1.0, xi_translation = 0.0,
-         eta_translation = 0.0;
+  double xi_scale = 1.0, eta_scale = 1.0, xi_translation = 0.0, eta_translation = 0.0;
   // set the index mapping between local and
   // global coordinates
   switch (face_no / 2)
@@ -749,10 +731,8 @@ QProjector<3>::project_to_subface(const Quadrature<2> &    quadrature,
   // projected quadrature points
   for (unsigned int p = 0; p < quadrature.size(); ++p)
     {
-      q_points[p][xi_index] =
-        xi_scale * quadrature.point(p)(0) + xi_translation;
-      q_points[p][eta_index] =
-        eta_scale * quadrature.point(p)(1) + eta_translation;
+      q_points[p][xi_index]    = xi_scale * quadrature.point(p)(0) + xi_translation;
+      q_points[p][eta_index]   = eta_scale * quadrature.point(p)(1) + eta_translation;
       q_points[p][const_index] = const_value;
     }
 }
@@ -802,8 +782,7 @@ QProjector<2>::project_to_all_faces(const SubQuadrature &quadrature)
 {
   const unsigned int dim = 2;
 
-  const unsigned int n_points = quadrature.size(),
-                     n_faces  = GeometryInfo<dim>::faces_per_cell;
+  const unsigned int n_points = quadrature.size(), n_faces = GeometryInfo<dim>::faces_per_cell;
 
   // first fix quadrature points
   std::vector<Point<dim>> q_points;
@@ -852,8 +831,7 @@ QProjector<3>::project_to_all_faces(const SubQuadrature &quadrature)
 
 
 
-  const unsigned int n_points = quadrature.size(),
-                     n_faces  = GeometryInfo<dim>::faces_per_cell;
+  const unsigned int n_points = quadrature.size(), n_faces = GeometryInfo<dim>::faces_per_cell;
 
   // first fix quadrature points
   std::vector<Point<dim>> q_points;
@@ -900,8 +878,7 @@ QProjector<1>::project_to_all_subfaces(const Quadrature<0> &quadrature)
   const unsigned int dim = 1;
 
   const unsigned int n_points = 1, n_faces = GeometryInfo<dim>::faces_per_cell,
-                     subfaces_per_face =
-                       GeometryInfo<dim>::max_children_per_face;
+                     subfaces_per_face = GeometryInfo<dim>::max_children_per_face;
 
   // first fix quadrature points
   std::vector<Point<dim>> q_points;
@@ -926,10 +903,8 @@ QProjector<1>::project_to_all_subfaces(const Quadrature<0> &quadrature)
                 quadrature.get_weights().end(),
                 std::back_inserter(weights));
 
-  Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
+  Assert(q_points.size() == n_points * n_faces * subfaces_per_face, ExcInternalError());
+  Assert(weights.size() == n_points * n_faces * subfaces_per_face, ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -942,10 +917,8 @@ QProjector<2>::project_to_all_subfaces(const SubQuadrature &quadrature)
 {
   const unsigned int dim = 2;
 
-  const unsigned int n_points = quadrature.size(),
-                     n_faces  = GeometryInfo<dim>::faces_per_cell,
-                     subfaces_per_face =
-                       GeometryInfo<dim>::max_children_per_face;
+  const unsigned int n_points = quadrature.size(), n_faces = GeometryInfo<dim>::faces_per_cell,
+                     subfaces_per_face = GeometryInfo<dim>::max_children_per_face;
 
   // first fix quadrature points
   std::vector<Point<dim>> q_points;
@@ -970,10 +943,8 @@ QProjector<2>::project_to_all_subfaces(const SubQuadrature &quadrature)
                 quadrature.get_weights().end(),
                 std::back_inserter(weights));
 
-  Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
+  Assert(q_points.size() == n_points * n_faces * subfaces_per_face, ExcInternalError());
+  Assert(weights.size() == n_points * n_faces * subfaces_per_face, ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -995,8 +966,7 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
                         rotate(q_reflected, 2),
                         rotate(q_reflected, 1)};
 
-  const unsigned int n_points = quadrature.size(),
-                     n_faces  = GeometryInfo<dim>::faces_per_cell,
+  const unsigned int n_points = quadrature.size(), n_faces = GeometryInfo<dim>::faces_per_cell,
                      total_subfaces_per_face = 2 + 2 + 4;
 
   // first fix quadrature points
@@ -1020,15 +990,11 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
              ref_case >= RefinementCase<dim - 1>::cut_x;
              --ref_case)
           for (unsigned int subface = 0;
-               subface < GeometryInfo<dim - 1>::n_children(
-                           RefinementCase<dim - 1>(ref_case));
+               subface < GeometryInfo<dim - 1>::n_children(RefinementCase<dim - 1>(ref_case));
                ++subface)
             {
-              project_to_subface(q[mutation],
-                                 face,
-                                 subface,
-                                 help,
-                                 RefinementCase<dim - 1>(ref_case));
+              project_to_subface(
+                q[mutation], face, subface, help, RefinementCase<dim - 1>(ref_case));
               std::copy(help.begin(), help.end(), std::back_inserter(q_points));
             }
 
@@ -1038,18 +1004,15 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
              ref_case >= RefinementCase<dim - 1>::cut_x;
              --ref_case)
           for (unsigned int subface = 0;
-               subface < GeometryInfo<dim - 1>::n_children(
-                           RefinementCase<dim - 1>(ref_case));
+               subface < GeometryInfo<dim - 1>::n_children(RefinementCase<dim - 1>(ref_case));
                ++subface)
             std::copy(q[mutation].get_weights().begin(),
                       q[mutation].get_weights().end(),
                       std::back_inserter(weights));
     }
 
-  Assert(q_points.size() == n_points * n_faces * total_subfaces_per_face * 8,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * total_subfaces_per_face * 8,
-         ExcInternalError());
+  Assert(q_points.size() == n_points * n_faces * total_subfaces_per_face * 8, ExcInternalError());
+  Assert(weights.size() == n_points * n_faces * total_subfaces_per_face * 8, ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -1059,8 +1022,7 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
 // This function is not used in the library
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_child(const Quadrature<dim> &quadrature,
-                                  const unsigned int     child_no)
+QProjector<dim>::project_to_child(const Quadrature<dim> &quadrature, const unsigned int child_no)
 {
   Assert(child_no < GeometryInfo<dim>::max_children_per_cell,
          ExcIndexRange(child_no, 0, GeometryInfo<dim>::max_children_per_cell));
@@ -1069,8 +1031,7 @@ QProjector<dim>::project_to_child(const Quadrature<dim> &quadrature,
 
   std::vector<Point<dim>> q_points(n_q_points);
   for (unsigned int i = 0; i < n_q_points; ++i)
-    q_points[i] = GeometryInfo<dim>::child_to_cell_coordinates(
-      quadrature.point(i), child_no);
+    q_points[i] = GeometryInfo<dim>::child_to_cell_coordinates(quadrature.point(i), child_no);
 
   // for the weights, things are
   // equally simple: copy them and
@@ -1173,25 +1134,20 @@ QProjector<dim>::DataSetDescriptor::face(const unsigned int face_no,
           // stick to that (implicit) convention
           static const unsigned int offset[2][2][2] = {
             {{4 * GeometryInfo<dim>::faces_per_cell,
-              5 * GeometryInfo<dim>::
-                    faces_per_cell}, // face_orientation=false; face_flip=false;
-                                     // face_rotation=false and true
+              5 * GeometryInfo<dim>::faces_per_cell}, // face_orientation=false; face_flip=false;
+                                                      // face_rotation=false and true
              {6 * GeometryInfo<dim>::faces_per_cell,
-              7 * GeometryInfo<dim>::
-                    faces_per_cell}}, // face_orientation=false; face_flip=true;
-                                      // face_rotation=false and true
+              7 * GeometryInfo<dim>::faces_per_cell}}, // face_orientation=false; face_flip=true;
+                                                       // face_rotation=false and true
             {{0 * GeometryInfo<dim>::faces_per_cell,
-              1 * GeometryInfo<dim>::
-                    faces_per_cell}, // face_orientation=true;  face_flip=false;
-                                     // face_rotation=false and true
+              1 * GeometryInfo<dim>::faces_per_cell}, // face_orientation=true;  face_flip=false;
+                                                      // face_rotation=false and true
              {2 * GeometryInfo<dim>::faces_per_cell,
-              3 * GeometryInfo<dim>::
-                    faces_per_cell}}}; // face_orientation=true; face_flip=true;
-                                       // face_rotation=false and true
+              3 * GeometryInfo<dim>::faces_per_cell}}}; // face_orientation=true; face_flip=true;
+                                                        // face_rotation=false and true
 
-          return (
-            (face_no + offset[face_orientation][face_flip][face_rotation]) *
-            n_quadrature_points);
+          return ((face_no + offset[face_orientation][face_flip][face_rotation]) *
+                  n_quadrature_points);
         }
 
       default:
@@ -1204,61 +1160,53 @@ QProjector<dim>::DataSetDescriptor::face(const unsigned int face_no,
 
 template <>
 QProjector<1>::DataSetDescriptor
-QProjector<1>::DataSetDescriptor::subface(
-  const unsigned int face_no,
-  const unsigned int subface_no,
-  const bool,
-  const bool,
-  const bool,
-  const unsigned int n_quadrature_points,
-  const internal::SubfaceCase<1>)
+QProjector<1>::DataSetDescriptor::subface(const unsigned int face_no,
+                                          const unsigned int subface_no,
+                                          const bool,
+                                          const bool,
+                                          const bool,
+                                          const unsigned int n_quadrature_points,
+                                          const internal::SubfaceCase<1>)
 {
   Assert(face_no < GeometryInfo<1>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<1>::max_children_per_face,
-         ExcInternalError());
+  Assert(subface_no < GeometryInfo<1>::max_children_per_face, ExcInternalError());
 
-  return ((face_no * GeometryInfo<1>::max_children_per_face + subface_no) *
-          n_quadrature_points);
+  return ((face_no * GeometryInfo<1>::max_children_per_face + subface_no) * n_quadrature_points);
 }
 
 
 
 template <>
 QProjector<2>::DataSetDescriptor
-QProjector<2>::DataSetDescriptor::subface(
-  const unsigned int face_no,
-  const unsigned int subface_no,
-  const bool,
-  const bool,
-  const bool,
-  const unsigned int n_quadrature_points,
-  const internal::SubfaceCase<2>)
+QProjector<2>::DataSetDescriptor::subface(const unsigned int face_no,
+                                          const unsigned int subface_no,
+                                          const bool,
+                                          const bool,
+                                          const bool,
+                                          const unsigned int n_quadrature_points,
+                                          const internal::SubfaceCase<2>)
 {
   Assert(face_no < GeometryInfo<2>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<2>::max_children_per_face,
-         ExcInternalError());
+  Assert(subface_no < GeometryInfo<2>::max_children_per_face, ExcInternalError());
 
-  return ((face_no * GeometryInfo<2>::max_children_per_face + subface_no) *
-          n_quadrature_points);
+  return ((face_no * GeometryInfo<2>::max_children_per_face + subface_no) * n_quadrature_points);
 }
 
 
 template <>
 QProjector<3>::DataSetDescriptor
-QProjector<3>::DataSetDescriptor::subface(
-  const unsigned int             face_no,
-  const unsigned int             subface_no,
-  const bool                     face_orientation,
-  const bool                     face_flip,
-  const bool                     face_rotation,
-  const unsigned int             n_quadrature_points,
-  const internal::SubfaceCase<3> ref_case)
+QProjector<3>::DataSetDescriptor::subface(const unsigned int             face_no,
+                                          const unsigned int             subface_no,
+                                          const bool                     face_orientation,
+                                          const bool                     face_flip,
+                                          const bool                     face_rotation,
+                                          const unsigned int             n_quadrature_points,
+                                          const internal::SubfaceCase<3> ref_case)
 {
   const unsigned int dim = 3;
 
   Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<dim>::max_children_per_face,
-         ExcInternalError());
+  Assert(subface_no < GeometryInfo<dim>::max_children_per_face, ExcInternalError());
 
   // As the quadrature points created by
   // QProjector are on subfaces in their
@@ -1406,29 +1354,28 @@ QProjector<3>::DataSetDescriptor::subface(
                              RefinementCase<dim - 1>::cut_xy,
                              RefinementCase<dim - 1>::cut_xy}};
 
-  static const unsigned int
-    equivalent_subface_number[internal::SubfaceCase<dim>::case_isotropic + 1]
-                             [GeometryInfo<3>::max_children_per_face] = {
-                               // case_none, see above
-                               {0, 1, 2, 3},
-                               // case_x
-                               {0, 1, e, e},
-                               // case_x1y
-                               {0, 2, 1, e},
-                               // case_x2y
-                               {0, 1, 3, e},
-                               // case_x1y2y
-                               {0, 2, 1, 3},
-                               // case_y
-                               {0, 1, e, e},
-                               // case_y1x
-                               {0, 1, 1, e},
-                               // case_y2x
-                               {0, 2, 3, e},
-                               // case_y1x2x
-                               {0, 1, 2, 3},
-                               // case_xy (case_isotropic)
-                               {0, 1, 2, 3}};
+  static const unsigned int equivalent_subface_number[internal::SubfaceCase<dim>::case_isotropic +
+                                                      1][GeometryInfo<3>::max_children_per_face] = {
+    // case_none, see above
+    {0, 1, 2, 3},
+    // case_x
+    {0, 1, e, e},
+    // case_x1y
+    {0, 2, 1, e},
+    // case_x2y
+    {0, 1, 3, e},
+    // case_x1y2y
+    {0, 2, 1, 3},
+    // case_y
+    {0, 1, e, e},
+    // case_y1x
+    {0, 1, 1, e},
+    // case_y2x
+    {0, 2, 3, e},
+    // case_y1x2x
+    {0, 1, 2, 3},
+    // case_xy (case_isotropic)
+    {0, 1, 2, 3}};
 
   // If face-orientation or face_rotation are
   // non-standard, cut_x and cut_y have to be
@@ -1441,18 +1388,14 @@ QProjector<3>::DataSetDescriptor::subface(
 
   // set a corresponding (equivalent)
   // RefineCase and subface number
-  const RefinementCase<dim - 1> equ_ref_case =
-    equivalent_refine_case[ref_case][subface_no];
-  const unsigned int equ_subface_no =
-    equivalent_subface_number[ref_case][subface_no];
+  const RefinementCase<dim - 1> equ_ref_case   = equivalent_refine_case[ref_case][subface_no];
+  const unsigned int            equ_subface_no = equivalent_subface_number[ref_case][subface_no];
   // make sure, that we got a valid subface and RefineCase
-  Assert(equ_ref_case != RefinementCase<dim>::no_refinement,
-         ExcInternalError());
+  Assert(equ_ref_case != RefinementCase<dim>::no_refinement, ExcInternalError());
   Assert(equ_subface_no != e, ExcInternalError());
   // now, finally respect non-standard faces
   const RefinementCase<dim - 1> final_ref_case =
-    (face_orientation == face_rotation ? ref_case_permutation[equ_ref_case] :
-                                         equ_ref_case);
+    (face_orientation == face_rotation ? ref_case_permutation[equ_ref_case] : equ_ref_case);
 
   // what we have now is the number of
   // the subface in the natural
@@ -1489,18 +1432,17 @@ QProjector<3>::DataSetDescriptor::subface(
                                           face_rotation,
                                           equ_ref_case);
 
-  return (((face_no * total_subfaces_per_face +
-            ref_case_offset[final_ref_case - 1] + final_subface_no) +
-           orientation_offset[face_orientation][face_flip][face_rotation]) *
-          n_quadrature_points);
+  return (
+    ((face_no * total_subfaces_per_face + ref_case_offset[final_ref_case - 1] + final_subface_no) +
+     orientation_offset[face_orientation][face_flip][face_rotation]) *
+    n_quadrature_points);
 }
 
 
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_face(const SubQuadrature &quadrature,
-                                 const unsigned int   face_no)
+QProjector<dim>::project_to_face(const SubQuadrature &quadrature, const unsigned int face_no)
 {
   std::vector<Point<dim>> points(quadrature.size());
   project_to_face(quadrature, face_no, points);
@@ -1652,8 +1594,7 @@ namespace internal
 
 
 template <>
-QIterated<0>::QIterated(const Quadrature<1> &, const unsigned int) :
-  Quadrature<0>()
+QIterated<0>::QIterated(const Quadrature<1> &, const unsigned int) : Quadrature<0>()
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1661,12 +1602,10 @@ QIterated<0>::QIterated(const Quadrature<1> &, const unsigned int) :
 
 
 template <>
-QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
-                        const unsigned int   n_copies) :
-  Quadrature<1>(
-    internal::QIteratedImplementation::uses_both_endpoints(base_quadrature) ?
-      (base_quadrature.size() - 1) * n_copies + 1 :
-      base_quadrature.size() * n_copies)
+QIterated<1>::QIterated(const Quadrature<1> &base_quadrature, const unsigned int n_copies) :
+  Quadrature<1>(internal::QIteratedImplementation::uses_both_endpoints(base_quadrature) ?
+                  (base_quadrature.size() - 1) * n_copies + 1 :
+                  base_quadrature.size() * n_copies)
 {
   //  fill(*this, base_quadrature, n_copies);
   Assert(base_quadrature.size() > 0, ExcNotInitialized());
@@ -1679,14 +1618,11 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
     {
       unsigned int next_point = 0;
       for (unsigned int copy = 0; copy < n_copies; ++copy)
-        for (unsigned int q_point = 0; q_point < base_quadrature.size();
-             ++q_point)
+        for (unsigned int q_point = 0; q_point < base_quadrature.size(); ++q_point)
           {
             this->quadrature_points[next_point] =
-              Point<1>(base_quadrature.point(q_point)(0) / n_copies +
-                       (1.0 * copy) / n_copies);
-            this->weights[next_point] =
-              base_quadrature.weight(q_point) / n_copies;
+              Point<1>(base_quadrature.point(q_point)(0) / n_copies + (1.0 * copy) / n_copies);
+            this->weights[next_point] = base_quadrature.weight(q_point) / n_copies;
 
             ++next_point;
           };
@@ -1722,8 +1658,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
 
 
       for (unsigned int copy = 0; copy < n_copies; ++copy)
-        for (unsigned int q_point = 0; q_point < base_quadrature.size();
-             ++q_point)
+        for (unsigned int q_point = 0; q_point < base_quadrature.size(); ++q_point)
           {
             // skip the left point of
             // this copy since we
@@ -1733,20 +1668,17 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
               continue;
 
             this->quadrature_points[next_point] =
-              Point<1>(base_quadrature.point(q_point)(0) / n_copies +
-                       (1.0 * copy) / n_copies);
+              Point<1>(base_quadrature.point(q_point)(0) / n_copies + (1.0 * copy) / n_copies);
 
             // if this is the
             // rightmost point of one
             // of the non-last
             // copies: give it the
             // double weight
-            if ((copy != n_copies - 1) &&
-                (base_quadrature.point(q_point) == Point<1>(1.0)))
+            if ((copy != n_copies - 1) && (base_quadrature.point(q_point) == Point<1>(1.0)))
               this->weights[next_point] = double_point_weight;
             else
-              this->weights[next_point] =
-                base_quadrature.weight(q_point) / n_copies;
+              this->weights[next_point] = base_quadrature.weight(q_point) / n_copies;
 
             ++next_point;
           };
@@ -1772,10 +1704,8 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
 // construct higher dimensional quadrature formula by tensor product
 // of lower dimensional iterated quadrature formulae
 template <int dim>
-QIterated<dim>::QIterated(const Quadrature<1> &base_quadrature,
-                          const unsigned int   N) :
-  Quadrature<dim>(QIterated<dim - 1>(base_quadrature, N),
-                  QIterated<1>(base_quadrature, N))
+QIterated<dim>::QIterated(const Quadrature<1> &base_quadrature, const unsigned int N) :
+  Quadrature<dim>(QIterated<dim - 1>(base_quadrature, N), QIterated<1>(base_quadrature, N))
 {}
 
 

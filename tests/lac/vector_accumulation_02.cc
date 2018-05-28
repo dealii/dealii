@@ -34,7 +34,7 @@ check_norms()
   for (unsigned int test = 0; test < 5; ++test)
     {
       const unsigned int size = Testing::rand() % 20000;
-      Vector<number> larger1(size + 8), larger2(size + 8), in1(size), in2(size);
+      Vector<number>     larger1(size + 8), larger2(size + 8), in1(size), in2(size);
       for (unsigned int i = 0; i < size; ++i)
         {
           in1(i) = random_value<number>();
@@ -55,8 +55,7 @@ check_norms()
               }
 
             const number result = v1 * v2;
-            deallog << static_cast<double>(std::abs(result - inner_product))
-                    << " ";
+            deallog << static_cast<double>(std::abs(result - inner_product)) << " ";
           }
       deallog << std::endl;
     }

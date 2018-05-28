@@ -44,11 +44,10 @@ using namespace std;
 
 template <int dim, typename number, int spacedim>
 void
-reinit_vector_by_blocks(
-  const dealii::DoFHandler<dim, spacedim> &          mg_dof,
-  MGLevelObject<dealii::Vector<number>> &            v,
-  const unsigned int                                 selected_block,
-  std::vector<std::vector<types::global_dof_index>> &ndofs)
+reinit_vector_by_blocks(const dealii::DoFHandler<dim, spacedim> &          mg_dof,
+                        MGLevelObject<dealii::Vector<number>> &            v,
+                        const unsigned int                                 selected_block,
+                        std::vector<std::vector<types::global_dof_index>> &ndofs)
 {
   const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
   Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
@@ -93,8 +92,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     DoFRenumbering::component_wise(mgdof, l);
   std::vector<std::vector<types::global_dof_index>> mg_ndofs(
-    mgdof.get_triangulation().n_levels(),
-    std::vector<types::global_dof_index>(fe.n_blocks()));
+    mgdof.get_triangulation().n_levels(), std::vector<types::global_dof_index>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
   deallog << "Global  dofs:";

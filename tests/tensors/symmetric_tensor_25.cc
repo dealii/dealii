@@ -52,8 +52,7 @@ check()
           for (unsigned int f = 0; f < dim; ++f)
             S_squared[d][e] += S[d][f] * S[f][e];
 
-      Tensor<2, dim> R = S_cubed - first_invariant(S) * S_squared +
-                         second_invariant(S) * S -
+      Tensor<2, dim> R = S_cubed - first_invariant(S) * S_squared + second_invariant(S) * S -
                          third_invariant(S) * unit_symmetric_tensor<dim>();
       deallog << R << std::endl;
 

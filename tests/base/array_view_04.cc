@@ -37,8 +37,7 @@ test()
 
 
   // also check a different way of creating a readable view
-  ArrayView<const int> a3 =
-    make_array_view(const_cast<const Table<2, int> &>(v), 4);
+  ArrayView<const int> a3 = make_array_view(const_cast<const Table<2, int> &>(v), 4);
   Assert(a3[2] == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;

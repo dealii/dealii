@@ -27,22 +27,18 @@ test()
 {
   // make sure that is_serial_vector< dealii::PETScWrappers::MPI::Vector > is
   // working
-  Assert(is_serial_vector<dealii::PETScWrappers::MPI::Vector>::value == false,
-         ExcInternalError());
+  Assert(is_serial_vector<dealii::PETScWrappers::MPI::Vector>::value == false, ExcInternalError());
 
-  deallog << is_serial_vector<dealii::PETScWrappers::MPI::Vector>::value
-          << std::endl;
+  deallog << is_serial_vector<dealii::PETScWrappers::MPI::Vector>::value << std::endl;
 
   deallog << "OK" << std::endl << std::endl;
 
   // make sure that is_serial_vector< dealii::PETScWrappers::MPI::BlockVector >
   // is working
-  Assert(is_serial_vector<dealii::PETScWrappers::MPI::BlockVector>::value ==
-           false,
+  Assert(is_serial_vector<dealii::PETScWrappers::MPI::BlockVector>::value == false,
          ExcInternalError());
 
-  deallog << is_serial_vector<dealii::PETScWrappers::MPI::BlockVector>::value
-          << std::endl;
+  deallog << is_serial_vector<dealii::PETScWrappers::MPI::BlockVector>::value << std::endl;
 
   deallog << "OK" << std::endl;
 }
@@ -60,13 +56,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -74,12 +68,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

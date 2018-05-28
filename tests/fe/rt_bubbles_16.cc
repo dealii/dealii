@@ -34,8 +34,7 @@ test(const unsigned int degree)
 {
   FE_RT_Bubbles<dim> fe_rt_bubbles(degree);
 
-  deallog << "Degree=" << degree
-          << ", restriction is additive flags:" << std::endl;
+  deallog << "Degree=" << degree << ", restriction is additive flags:" << std::endl;
 
   for (unsigned int i = 0; i < fe_rt_bubbles.dofs_per_cell; ++i)
     deallog << fe_rt_bubbles.restriction_is_additive(i) << " ";

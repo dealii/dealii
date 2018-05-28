@@ -50,8 +50,7 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
 void
 filename_resolution()
 {
-  check_file<3>(std::string(SOURCE_DIR "/grid_in_vtk_3d_03.vtk"),
-                GridIn<3>::vtk);
+  check_file<3>(std::string(SOURCE_DIR "/grid_in_vtk_3d_03.vtk"), GridIn<3>::vtk);
 }
 
 

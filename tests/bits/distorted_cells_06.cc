@@ -48,18 +48,16 @@ class MyManifold : public Manifold<dim>
   }
 
   virtual Point<dim>
-  get_new_point_on_line(
-    const typename Triangulation<dim>::line_iterator &line) const
+  get_new_point_on_line(const typename Triangulation<dim>::line_iterator &line) const
   {
-    deallog << "Finding point between " << line->vertex(0) << " and "
-            << line->vertex(1) << std::endl;
+    deallog << "Finding point between " << line->vertex(0) << " and " << line->vertex(1)
+            << std::endl;
 
     return Point<dim>(0, 0.5, 0.9);
   }
 
   virtual Point<dim>
-  get_new_point_on_quad(
-    const typename Triangulation<dim>::quad_iterator &) const
+  get_new_point_on_quad(const typename Triangulation<dim>::quad_iterator &) const
   {
     Assert(false, ExcInternalError());
     return Point<dim>(0, 0, 1.25);
@@ -100,15 +98,14 @@ check()
     }
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
-      deallog << "Found " << dcv.distorted_cells.size() << " distorted cells"
-              << std::endl;
+      deallog << "Found " << dcv.distorted_cells.size() << " distorted cells" << std::endl;
 
       Assert(dcv.distorted_cells.size() == 2, ExcInternalError());
 
       typename Triangulation<dim>::DistortedCellList subset =
         GridTools::fix_up_distorted_child_cells(dcv, coarse_grid);
-      deallog << "Found " << subset.distorted_cells.size()
-              << " cells that are still distorted" << std::endl;
+      deallog << "Found " << subset.distorted_cells.size() << " cells that are still distorted"
+              << std::endl;
 
       Assert(subset.distorted_cells.size() == 0, ExcInternalError());
     }

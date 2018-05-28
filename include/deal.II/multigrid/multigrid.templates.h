@@ -25,15 +25,13 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename VectorType>
 void
-Multigrid<VectorType>::reinit(const unsigned int min_level,
-                              const unsigned int max_level)
+Multigrid<VectorType>::reinit(const unsigned int min_level, const unsigned int max_level)
 {
   Assert(min_level >= matrix->get_minlevel(),
          ExcLowerRangeType<unsigned int>(min_level, matrix->get_minlevel()));
   Assert(max_level <= matrix->get_maxlevel(),
          ExcLowerRangeType<unsigned int>(matrix->get_maxlevel(), max_level));
-  Assert(min_level <= max_level,
-         ExcLowerRangeType<unsigned int>(max_level, min_level));
+  Assert(min_level <= max_level, ExcLowerRangeType<unsigned int>(max_level, min_level));
   minlevel = min_level;
   maxlevel = max_level;
   // solution, t and defect2 are resized in cycle()
@@ -92,9 +90,8 @@ Multigrid<VectorType>::set_edge_matrices(const MGMatrixBase<VectorType> &down,
 
 template <typename VectorType>
 void
-Multigrid<VectorType>::set_edge_flux_matrices(
-  const MGMatrixBase<VectorType> &down,
-  const MGMatrixBase<VectorType> &up)
+Multigrid<VectorType>::set_edge_flux_matrices(const MGMatrixBase<VectorType> &down,
+                                              const MGMatrixBase<VectorType> &up)
 {
   edge_down = &down;
   edge_up   = &up;
@@ -109,8 +106,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
   if (debug > 0)
     deallog << "V-cycle entering level " << level << std::endl;
   if (debug > 2)
-    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
-            << std::endl;
+    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm() << std::endl;
 
   if (level == minlevel)
     {
@@ -131,8 +127,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
   this->signals.pre_smoother_step(false, level);
 
   if (debug > 2)
-    deallog << "Solution norm          " << solution[level].l2_norm()
-            << std::endl;
+    deallog << "Solution norm          " << solution[level].l2_norm() << std::endl;
 
   // compute residual on level, which includes the (CG) edge matrix
   if (debug > 1)
@@ -142,8 +137,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
     {
       edge_out->vmult_add(level, t[level], solution[level]);
       if (debug > 2)
-        deallog << "Norm     t[" << level << "] " << t[level].l2_norm()
-                << std::endl;
+        deallog << "Norm     t[" << level << "] " << t[level].l2_norm() << std::endl;
     }
   t[level].sadd(-1.0, 1.0, defect[level]);
 
@@ -187,8 +181,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
     }
 
   if (debug > 2)
-    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
-            << std::endl;
+    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm() << std::endl;
 
   // post-smoothing
   if (debug > 1)
@@ -198,8 +191,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
   this->signals.post_smoother_step(false, level);
 
   if (debug > 2)
-    deallog << "Solution norm          " << solution[level].l2_norm()
-            << std::endl;
+    deallog << "Solution norm          " << solution[level].l2_norm() << std::endl;
 
   if (debug > 1)
     deallog << "V-cycle leaving  level " << level << std::endl;
@@ -236,8 +228,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   defect[level] = typename VectorType::value_type(0.);
 
   if (debug > 2)
-    deallog << cychar << "-cycle defect norm     " << defect2[level].l2_norm()
-            << std::endl;
+    deallog << cychar << "-cycle defect norm     " << defect2[level].l2_norm() << std::endl;
 
   if (level == minlevel)
     {
@@ -254,8 +245,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   pre_smooth->apply(level, solution[level], defect2[level]);
 
   if (debug > 2)
-    deallog << cychar << "-cycle solution norm   " << solution[level].l2_norm()
-            << std::endl;
+    deallog << cychar << "-cycle solution norm   " << solution[level].l2_norm() << std::endl;
 
   // compute residual on level, which includes the (CG) edge matrix
   if (debug > 1)
@@ -266,8 +256,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   t[level].sadd(-1.0, 1.0, defect2[level]);
 
   if (debug > 2)
-    deallog << cychar << "-cycle residual norm   " << t[level].l2_norm()
-            << std::endl;
+    deallog << cychar << "-cycle residual norm   " << t[level].l2_norm() << std::endl;
 
   // Get the defect on the next coarser level as part of the (DG) edge matrix
   // and then the main part by the restriction of the transfer
@@ -312,8 +301,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
     }
 
   if (debug > 2)
-    deallog << cychar << "-cycle  Defect norm    " << defect2[level].l2_norm()
-            << std::endl;
+    deallog << cychar << "-cycle  Defect norm    " << defect2[level].l2_norm() << std::endl;
 
   // post-smoothing
   if (debug > 1)
@@ -321,8 +309,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   post_smooth->smooth(level, solution[level], defect2[level]);
 
   if (debug > 2)
-    deallog << cychar << "-cycle solution norm   " << solution[level].l2_norm()
-            << std::endl;
+    deallog << cychar << "-cycle solution norm   " << solution[level].l2_norm() << std::endl;
 
   if (debug > 1)
     deallog << cychar << "-cycle leaving level   " << level << std::endl;

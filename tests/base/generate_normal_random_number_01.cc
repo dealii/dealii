@@ -68,8 +68,7 @@ main()
 
   // the random number generator is thread-local, so we should get the
   // same result every time
-  deallog << tg[0].return_value().first << ' ' << tg[0].return_value().second
-          << std::endl;
+  deallog << tg[0].return_value().first << ' ' << tg[0].return_value().second << std::endl;
   AssertThrow(tg[1].return_value() == tg[0].return_value(), ExcInternalError());
   AssertThrow(tg[2].return_value() == tg[0].return_value(), ExcInternalError());
   AssertThrow(tg[3].return_value() == tg[0].return_value(), ExcInternalError());

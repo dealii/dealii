@@ -113,8 +113,7 @@ namespace Step16
 
 
   template <int dim>
-  LaplaceIntegrator<dim>::LaplaceIntegrator() :
-    MeshWorker::LocalIntegrator<dim>(true, false, false)
+  LaplaceIntegrator<dim>::LaplaceIntegrator() : MeshWorker::LocalIntegrator<dim>(true, false, false)
   {}
 
 
@@ -149,9 +148,8 @@ namespace Step16
   // BlockVector objects, but we are again in the simplest case here,
   // we enter the information into block zero of vector zero.
   template <int dim>
-  void
-  LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
-                               MeshWorker::IntegrationInfo<dim> &info) const
+  void LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
+                                    MeshWorker::IntegrationInfo<dim> &info) const
   {
     AssertDimension(dinfo.n_matrices(), 1);
     const double coefficient = (dinfo.cell->center()(0) > 0.) ? .1 : 1.;
@@ -162,8 +160,7 @@ namespace Step16
     if (dinfo.n_vectors() > 0)
       {
         std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
-        LocalIntegrators::L2::L2(
-          dinfo.vector(0).block(0), info.fe_values(0), rhs);
+        LocalIntegrators::L2::L2(dinfo.vector(0).block(0), info.fe_values(0), rhs);
       }
   }
 
@@ -262,11 +259,9 @@ namespace Step16
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << " (by level: ";
+    deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " (by level: ";
     for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
-      deallog << dof_handler.n_dofs(level)
-              << (level == triangulation.n_levels() - 1 ? ")" : ", ");
+      deallog << dof_handler.n_dofs(level) << (level == triangulation.n_levels() - 1 ? ")" : ", ");
     deallog << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -283,9 +278,7 @@ namespace Step16
     const typename FunctionMap<dim>::type dirichlet_boundary_functions = {
       {types::boundary_id(0), &homogeneous_dirichlet_bc}};
     VectorTools::interpolate_boundary_values(
-      static_cast<const DoFHandler<dim> &>(dof_handler),
-      dirichlet_boundary_functions,
-      constraints);
+      static_cast<const DoFHandler<dim> &>(dof_handler), dirichlet_boundary_functions, constraints);
     constraints.close();
     constraints.condense(dsp);
     sparsity_pattern.copy_from(dsp);
@@ -296,8 +289,7 @@ namespace Step16
     // <code>dirichlet_boundary</code> here as well.
     mg_constrained_dofs.clear();
     mg_constrained_dofs.initialize(dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary_ids);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, dirichlet_boundary_ids);
 
 
     // Now for the things that concern the multigrid data structures. First,
@@ -336,8 +328,7 @@ namespace Step16
     // matrices.
     for (unsigned int level = 0; level < n_levels; ++level)
       {
-        DynamicSparsityPattern dsp(dof_handler.n_dofs(level),
-                                   dof_handler.n_dofs(level));
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(level), dof_handler.n_dofs(level));
         MGTools::make_sparsity_pattern(dof_handler, dsp, level);
 
         mg_sparsity_patterns[level].copy_from(dsp);
@@ -385,15 +376,13 @@ namespace Step16
   {
     MappingQ1<dim>                      mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags                         update_flags =
-      update_values | update_gradients | update_hessians;
+    UpdateFlags update_flags = update_values | update_gradients | update_hessians;
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
-    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>>
-      assembler;
+    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>> assembler;
     assembler.initialize(constraints);
     assembler.initialize(system_matrix, system_rhs);
 
@@ -427,8 +416,7 @@ namespace Step16
   {
     MappingQ1<dim>                      mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags                         update_flags =
-      update_values | update_gradients | update_hessians;
+    UpdateFlags update_flags = update_values | update_gradients | update_hessians;
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
@@ -543,8 +531,8 @@ namespace Step16
       mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
-    PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
-      preconditioner(dof_handler, mg, mg_transfer);
+    PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>> preconditioner(
+      dof_handler, mg, mg_transfer);
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
@@ -620,8 +608,8 @@ namespace Step16
         else
           refine_grid();
 
-        deallog << "   Number of active cells:       "
-                << triangulation.n_active_cells() << std::endl;
+        deallog << "   Number of active cells:       " << triangulation.n_active_cells()
+                << std::endl;
 
         setup_system();
 
@@ -653,13 +641,11 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -667,12 +653,10 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

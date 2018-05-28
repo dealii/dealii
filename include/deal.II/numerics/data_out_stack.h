@@ -109,9 +109,7 @@ class DoFHandler;
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim,
-          int spacedim            = dim,
-          typename DoFHandlerType = DoFHandler<dim, spacedim>>
+template <int dim, int spacedim = dim, typename DoFHandlerType = DoFHandler<dim, spacedim>>
 class DataOutStack : public DataOutInterface<dim + 1>
 {
 public:
@@ -143,8 +141,7 @@ public:
    * parameter direction, i.e. orthogonal to the space directions.
    */
   void
-  new_parameter_value(const double parameter_value,
-                      const double parameter_step);
+  new_parameter_value(const double parameter_value, const double parameter_step);
 
   /**
    * Attach the DoF handler for the grid and data associated with the
@@ -179,8 +176,7 @@ public:
    * finite element has only one component.
    */
   void
-  declare_data_vector(const std::vector<std::string> &name,
-                      const VectorType                vector_type);
+  declare_data_vector(const std::vector<std::string> &name, const VectorType vector_type);
 
 
   /**
@@ -226,8 +222,7 @@ public:
    */
   template <typename number>
   void
-  add_data_vector(const Vector<number> &          vec,
-                  const std::vector<std::string> &names);
+  add_data_vector(const Vector<number> &vec, const std::vector<std::string> &names);
 
   /**
    * This is the central function of this class since it builds the list of
@@ -266,11 +261,10 @@ public:
   /**
    * Exception
    */
-  DeclException1(
-    ExcVectorNotDeclared,
-    std::string,
-    << "The data vector for which the first component has the name " << arg1
-    << " has not been added before.");
+  DeclException1(ExcVectorNotDeclared,
+                 std::string,
+                 << "The data vector for which the first component has the name " << arg1
+                 << " has not been added before.");
   /**
    * Exception
    */
@@ -280,19 +274,17 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcDataAlreadyAdded,
-    "You cannot declare additional vectors after already calling "
-    "build_patches(). All data vectors need to be declared "
-    "before you call this function the first time.");
+  DeclExceptionMsg(ExcDataAlreadyAdded,
+                   "You cannot declare additional vectors after already calling "
+                   "build_patches(). All data vectors need to be declared "
+                   "before you call this function the first time.");
   /**
    * Exception
    */
   DeclException1(ExcNameAlreadyUsed,
                  std::string,
                  << "You tried to declare a component of a data vector with "
-                 << "the name <" << arg1
-                 << ">, but that name is already used.");
+                 << "the name <" << arg1 << ">, but that name is already used.");
 
 private:
   /**
@@ -310,9 +302,7 @@ private:
    * DoF handler to be used for the data corresponding to the present
    * parameter value.
    */
-  SmartPointer<const DoFHandlerType,
-               DataOutStack<dim, spacedim, DoFHandlerType>>
-    dof_handler;
+  SmartPointer<const DoFHandlerType, DataOutStack<dim, spacedim, DoFHandlerType>> dof_handler;
 
   /**
    * List of patches of all past and present parameter value data sets.

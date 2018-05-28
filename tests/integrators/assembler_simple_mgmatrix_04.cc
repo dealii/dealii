@@ -54,11 +54,9 @@ class LaplaceMatrix : public MeshWorker::LocalIntegrator<dim>
 public:
   LaplaceMatrix();
   virtual void
-  cell(MeshWorker::DoFInfo<dim> &        dinfo,
-       MeshWorker::IntegrationInfo<dim> &info) const;
+  cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
   virtual void
-  boundary(MeshWorker::DoFInfo<dim> &        dinfo,
-           MeshWorker::IntegrationInfo<dim> &info) const;
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
   virtual void
   face(MeshWorker::DoFInfo<dim> &        dinfo1,
        MeshWorker::DoFInfo<dim> &        dinfo2,
@@ -83,9 +81,8 @@ LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
 
 template <int dim>
 void
-LaplaceMatrix<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+                             typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
   Laplace::nitsche_matrix(dinfo.matrix(0, false).matrix,
@@ -108,14 +105,13 @@ LaplaceMatrix<dim>::face(MeshWorker::DoFInfo<dim> &        dinfo1,
 
   if (info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
       !info1.fe_values(0).get_fe().conforms(FiniteElementData<dim>::Hcurl))
-    Laplace::ip_tangential_matrix(
-      dinfo1.matrix(0, false).matrix,
-      dinfo1.matrix(0, true).matrix,
-      dinfo2.matrix(0, true).matrix,
-      dinfo2.matrix(0, false).matrix,
-      info1.fe_values(0),
-      info2.fe_values(0),
-      Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
+    Laplace::ip_tangential_matrix(dinfo1.matrix(0, false).matrix,
+                                  dinfo1.matrix(0, true).matrix,
+                                  dinfo2.matrix(0, true).matrix,
+                                  dinfo2.matrix(0, false).matrix,
+                                  info1.fe_values(0),
+                                  info2.fe_values(0),
+                                  Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
   else
     Laplace::ip_matrix(dinfo1.matrix(0, false).matrix,
                        dinfo1.matrix(0, true).matrix,
@@ -154,12 +150,8 @@ assemble_mg_matrix(DoFHandler<dim> &                   dof_handler,
   assembler.initialize_interfaces(mg.matrix_in, mg.matrix_out);
   assembler.initialize_fluxes(mg.matrix_up, mg.matrix_down);
 
-  MeshWorker::integration_loop<dim, dim>(dof_handler.begin_mg(),
-                                         dof_handler.end_mg(),
-                                         dof_info,
-                                         info_box,
-                                         matrix_integrator,
-                                         assembler);
+  MeshWorker::integration_loop<dim, dim>(
+    dof_handler.begin_mg(), dof_handler.end_mg(), dof_info, info_box, matrix_integrator, assembler);
 
   const unsigned int nlevels = dof_handler.get_triangulation().n_levels();
   for (unsigned int level = 0; level < nlevels; ++level)
@@ -177,15 +169,13 @@ test(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim>        tr(Triangulation<dim>::limit_level_difference_at_vertices);
   std::vector<unsigned int> repititions(dim, 1);
   repititions[0] = 2;
   const Point<dim> p1 =
-    (dim == 1 ? Point<dim>(-1.) :
-                (dim == 2 ? Point<dim>(-1., -1.) : Point<dim>(-1., -1., -1.)));
+    (dim == 1 ? Point<dim>(-1.) : (dim == 2 ? Point<dim>(-1., -1.) : Point<dim>(-1., -1., -1.)));
   const Point<dim> p2 =
-    (dim == 1 ? Point<dim>(1.) :
-                (dim == 2 ? Point<dim>(1., 1.) : Point<dim>(1., 1., 1.)));
+    (dim == 1 ? Point<dim>(1.) : (dim == 2 ? Point<dim>(1., 1.) : Point<dim>(1., 1., 1.)));
   GridGenerator::subdivided_hyper_rectangle(tr, repititions, p1, p2);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
@@ -207,22 +197,17 @@ test(FiniteElement<dim> &fe)
       const unsigned int wd   = 2;
 
       deallog << "Level " << level << std::endl << "mg" << std::endl;
-      mg.matrix[level].print_formatted(
-        deallog.get_file_stream(), prec, false, wd, "0.");
+      mg.matrix[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
       if (level > 0)
         {
           deallog << "in" << std::endl;
-          mg.matrix_in[level].print_formatted(
-            deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_in[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
           deallog << "out" << std::endl;
-          mg.matrix_out[level].print_formatted(
-            deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_out[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
           deallog << "up" << std::endl;
-          mg.matrix_up[level].print_formatted(
-            deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_up[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
           deallog << "down" << std::endl;
-          mg.matrix_down[level].print_formatted(
-            deallog.get_file_stream(), prec, false, wd, "0.");
+          mg.matrix_down[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
         }
     }
 }

@@ -111,10 +111,8 @@ test()
       for (unsigned int q = 0; q <= p + 2; ++q)
         {
           // interpolate the function
-          VectorTools::interpolate(
-            dof_handler, F<dim>(q, adj1), interpolant, mask1);
-          VectorTools::interpolate(
-            dof_handler, F<dim>(q, adj2), interpolant, mask2);
+          VectorTools::interpolate(dof_handler, F<dim>(q, adj1), interpolant, mask1);
+          VectorTools::interpolate(dof_handler, F<dim>(q, adj2), interpolant, mask2);
           constraints.distribute(interpolant);
 
 
@@ -127,12 +125,10 @@ test()
                                             VectorTools::L2_norm,
                                             &select_mask1);
           if (q <= p)
-            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
-                   ExcInternalError());
+            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(), ExcInternalError());
 
           deallog << fe.get_name() << ", Mask 1, P_" << q
-                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
-                  << std::endl;
+                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm() << std::endl;
 
           // then compute the interpolation error for mask 2
           VectorTools::integrate_difference(dof_handler,
@@ -143,12 +139,10 @@ test()
                                             VectorTools::L2_norm,
                                             &select_mask2);
           if (q <= p)
-            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
-                   ExcInternalError());
+            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(), ExcInternalError());
 
           deallog << fe.get_name() << ", Mask 2, P_" << q
-                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
-                  << std::endl;
+                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm() << std::endl;
         }
     }
 }

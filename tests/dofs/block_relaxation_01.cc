@@ -56,13 +56,13 @@ make_stokes_matrix(const DoFHandler<dim> &dof_handler,
 
   ConstraintMatrix constraints;
   constraints.close();
-  FEValues<dim>      fe_values(fe,
+  FEValues<dim>                        fe_values(fe,
                           quadrature_formula,
-                          update_values | update_quadrature_points |
-                            update_JxW_values | update_gradients);
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
-  FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
+                          update_values | update_quadrature_points | update_JxW_values |
+                            update_gradients);
+  const unsigned int                   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int                   n_q_points    = quadrature_formula.size();
+  FullMatrix<double>                   local_matrix(dofs_per_cell, dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
   const FEValuesExtractors::Vector     velocities(0);
   const FEValuesExtractors::Scalar     pressure(dim);
@@ -70,8 +70,7 @@ make_stokes_matrix(const DoFHandler<dim> &dof_handler,
   std::vector<double>                  div_phi_u(dofs_per_cell);
   std::vector<double>                  phi_p(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -87,14 +86,12 @@ make_stokes_matrix(const DoFHandler<dim> &dof_handler,
             }
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              local_matrix(i, j) +=
-                (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) -
-                 div_phi_u[i] * phi_p[j] + phi_p[i] * div_phi_u[j]) *
-                fe_values.JxW(q);
+              local_matrix(i, j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) -
+                                     div_phi_u[i] * phi_p[j] + phi_p[i] * div_phi_u[j]) *
+                                    fe_values.JxW(q);
         }
       cell->get_dof_indices(local_dof_indices);
-      constraints.distribute_local_to_global(
-        local_matrix, local_dof_indices, system_matrix);
+      constraints.distribute_local_to_global(local_matrix, local_dof_indices, system_matrix);
     }
 }
 

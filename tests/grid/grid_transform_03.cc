@@ -73,14 +73,11 @@ main()
   Triangulation<dim>::active_cell_iterator cell =
     GridTools::find_active_cell_around_point(tria, Point<dim>());
 
-  unsigned int best_vertex =
-    cell->vertex_index(0); // vertex number on local triangulation
-  Point<dim> best_pos  = cell->vertex(0);
-  double     best_dist = Point<dim>().distance(best_pos);
+  unsigned int best_vertex = cell->vertex_index(0); // vertex number on local triangulation
+  Point<dim>   best_pos    = cell->vertex(0);
+  double       best_dist   = Point<dim>().distance(best_pos);
 
-  for (unsigned int vertex_no = 1;
-       vertex_no < GeometryInfo<dim>::vertices_per_cell;
-       vertex_no++)
+  for (unsigned int vertex_no = 1; vertex_no < GeometryInfo<dim>::vertices_per_cell; vertex_no++)
     {
       const double dist = Point<dim>().distance(cell->vertex(vertex_no));
       if (dist < best_dist)
@@ -104,11 +101,9 @@ main()
 
   for (; cell != endc; ++cell)
     if (cell->at_boundary() == true)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->face(face)->at_boundary() == true)
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-               ++v)
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
             {
               unsigned int vertex_number = cell->face(face)->vertex_index(v);
               new_points[vertex_number]  = cell->face(face)->vertex(v);

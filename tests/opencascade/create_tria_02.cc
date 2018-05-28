@@ -41,8 +41,7 @@ main()
   ps.push_back(Point<2>(0, 2));
   auto edge = interpolation_curve(ps);
 
-  BRepPrimAPI_MakeRevol revol(
-    edge, gp_Ax1(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1)), -numbers::PI / 2);
+  BRepPrimAPI_MakeRevol revol(edge, gp_Ax1(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1)), -numbers::PI / 2);
   revol.Build();
   auto sh = revol.Shape();
 

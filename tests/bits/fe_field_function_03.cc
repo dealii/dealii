@@ -61,8 +61,8 @@ test()
   Point<dim> p;
   // compute the error of the laplacian in this point
   deallog << "Value of the laplacian in 0:" << std::endl;
-  deallog << "correct value: " << ff.laplacian(p)
-          << ", approximation: " << fef.laplacian(p) << std::endl;
+  deallog << "correct value: " << ff.laplacian(p) << ", approximation: " << fef.laplacian(p)
+          << std::endl;
 
   // now we want to test the list version
   Point<dim> p1              = Point<dim>::unit_vector(0);
@@ -79,8 +79,7 @@ test()
   fef.laplacian_list(vec, values_a);
   deallog << "Value of the laplacian in 0.5*e1 and 0.25 * e1:" << std::endl;
   deallog << " correct values: " << values_c[0] << " " << values_c[1]
-          << ", approximations: " << values_a[0] << " " << values_a[1]
-          << std::endl;
+          << ", approximations: " << values_a[0] << " " << values_a[1] << std::endl;
 }
 
 int

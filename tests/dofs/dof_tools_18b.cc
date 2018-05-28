@@ -30,15 +30,12 @@
 // column (well, we had to invent
 // something)
 void
-make_masks(const unsigned int            n,
-           Table<2, DoFTools::Coupling> &m1,
-           Table<2, DoFTools::Coupling> &m2)
+make_masks(const unsigned int n, Table<2, DoFTools::Coupling> &m1, Table<2, DoFTools::Coupling> &m2)
 {
   m1.reinit(n, n);
   m2.reinit(n, n);
   for (unsigned int i = 0; i < n; ++i)
-    m1(i, 0) = m1(0, i) = m2(i, 0) = m2(0, i) = m1(i, i) = m2(i, i) =
-      DoFTools::nonzero;
+    m1(i, 0) = m1(0, i) = m2(i, 0) = m2(0, i) = m1(i, i) = m2(i, i) = DoFTools::nonzero;
 }
 
 

@@ -47,8 +47,7 @@ test()
   // refine a few cells
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tria.begin_active(),
+      typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                         endc = tria.end();
       unsigned int counter                                   = 0;
       for (; cell != endc; ++cell, ++counter)
@@ -96,9 +95,7 @@ test()
         }
     }
 
-  deallog << "Norm of difference: " << error / abs << " " << error2 / abs
-          << std::endl
-          << std::endl;
+  deallog << "Norm of difference: " << error / abs << " " << error2 / abs << std::endl << std::endl;
 }
 
 

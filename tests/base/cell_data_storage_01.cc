@@ -79,11 +79,10 @@ DeclException3(ExcWrongValue,
  */
 template <int dim, typename DATA>
 void
-check_qph(Triangulation<dim> &         tr,
-          const CellDataStorage<typename Triangulation<dim, dim>::cell_iterator,
-                                DATA> &manager,
-          const Quadrature<dim> &      rhs_quadrature,
-          const MyFunction<dim> &      func)
+check_qph(Triangulation<dim> &                                                          tr,
+          const CellDataStorage<typename Triangulation<dim, dim>::cell_iterator, DATA> &manager,
+          const Quadrature<dim> &rhs_quadrature,
+          const MyFunction<dim> &func)
 {
   DoFHandler<dim> dof_handler(tr);
   FE_Q<dim>       dummy_fe(1);
@@ -93,13 +92,10 @@ check_qph(Triangulation<dim> &         tr,
   for (cell = tr.begin_active(); cell != tr.end(); ++cell)
     if (cell->is_locally_owned())
       {
-        typename DoFHandler<dim>::active_cell_iterator dof_cell(*cell,
-                                                                &dof_handler);
+        typename DoFHandler<dim>::active_cell_iterator dof_cell(*cell, &dof_handler);
         fe_values.reinit(dof_cell);
-        const std::vector<Point<dim>> &q_points =
-          fe_values.get_quadrature_points();
-        const std::vector<std::shared_ptr<const DATA>> qpd =
-          manager.get_data(cell);
+        const std::vector<Point<dim>> &                q_points = fe_values.get_quadrature_points();
+        const std::vector<std::shared_ptr<const DATA>> qpd      = manager.get_data(cell);
         for (unsigned int q = 0; q < q_points.size(); q++)
           {
             const double value  = func.value(q_points[q]);
@@ -123,9 +119,8 @@ test()
   typename Triangulation<dim, dim>::active_cell_iterator cell;
 
   // pppulate quadrature point data
-  QGauss<dim> rhs(4);
-  CellDataStorage<typename Triangulation<dim, dim>::cell_iterator, MyQData>
-    data_storage;
+  QGauss<dim>                                                               rhs(4);
+  CellDataStorage<typename Triangulation<dim, dim>::cell_iterator, MyQData> data_storage;
   {
     DoFHandler<dim> dof_handler(tr);
     FE_Q<dim>       dummy_fe(1);
@@ -134,14 +129,11 @@ test()
     for (cell = tr.begin_active(); cell != tr.end(); ++cell)
       if (cell->is_locally_owned())
         {
-          typename DoFHandler<dim>::active_cell_iterator dof_cell(*cell,
-                                                                  &dof_handler);
+          typename DoFHandler<dim>::active_cell_iterator dof_cell(*cell, &dof_handler);
           fe_values.reinit(dof_cell);
-          const std::vector<Point<dim>> &q_points =
-            fe_values.get_quadrature_points();
+          const std::vector<Point<dim>> &q_points = fe_values.get_quadrature_points();
           data_storage.initialize(cell, rhs.size());
-          std::vector<std::shared_ptr<MyQData>> qpd =
-            data_storage.get_data(cell);
+          std::vector<std::shared_ptr<MyQData>> qpd = data_storage.get_data(cell);
           for (unsigned int q = 0; q < rhs.size(); q++)
             qpd[q]->value = my_func.value(q_points[q]);
         }

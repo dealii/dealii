@@ -58,23 +58,20 @@ test_compute_pt_loc(unsigned int n_points)
 
   // Computing the description of the locally owned part of the mesh
   IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
-  std::vector<BoundingBox<dim>>     local_bbox =
-    GridTools::compute_mesh_predicate_bounding_box(
-      cache.get_triangulation(),
-      std::function<bool(
-        const typename Triangulation<dim>::active_cell_iterator &)>(
-        locally_owned_cell_predicate),
-      1,
-      true,
-      4);
+  std::vector<BoundingBox<dim>>     local_bbox = GridTools::compute_mesh_predicate_bounding_box(
+    cache.get_triangulation(),
+    std::function<bool(const typename Triangulation<dim>::active_cell_iterator &)>(
+      locally_owned_cell_predicate),
+    1,
+    true,
+    4);
 
   // Obtaining the global mesh description through an all to all communication
   std::vector<std::vector<BoundingBox<dim>>> global_bboxes;
   global_bboxes = Utilities::MPI::all_gather(mpi_communicator, local_bbox);
 
   // Using the distributed version of compute point location
-  auto output_tuple =
-    distributed_compute_point_locations(cache, points, global_bboxes);
+  auto output_tuple = distributed_compute_point_locations(cache, points, global_bboxes);
   // Testing in serial against the serial version
   auto cell_qpoint_map = GridTools::compute_point_locations(cache, points);
 
@@ -97,8 +94,7 @@ test_compute_pt_loc(unsigned int n_points)
       auto pos_cell = std::find(serial_cells.begin(), serial_cells.end(), cell);
       for (auto r : ranks)
         if (r != 0)
-          deallog << "ERROR: rank is not 0 but " << std::to_string(r)
-                  << std::endl;
+          deallog << "ERROR: rank is not 0 but " << std::to_string(r) << std::endl;
 
       if (pos_cell == serial_cells.end())
         deallog << "ERROR: cell not found" << std::endl;
@@ -106,42 +102,35 @@ test_compute_pt_loc(unsigned int n_points)
         {
           auto serial_cell_idx = pos_cell - serial_cells.begin();
           if (original_points.size() != serial_qpoints[serial_cell_idx].size())
-            deallog << "ERROR: in the number of points for cell"
-                    << std::to_string(serial_cell_idx) << std::endl;
+            deallog << "ERROR: in the number of points for cell" << std::to_string(serial_cell_idx)
+                    << std::endl;
           if (quad.size() != serial_qpoints[serial_cell_idx].size())
-            deallog << "ERROR: in the number of points for cell"
-                    << std::to_string(serial_cell_idx) << std::endl;
+            deallog << "ERROR: in the number of points for cell" << std::to_string(serial_cell_idx)
+                    << std::endl;
 
           unsigned int pt_num = 0;
           for (const auto &p_idx : local_map)
             {
-              auto serial_pt_pos =
-                std::find(local_map.begin(), local_map.end(), p_idx);
+              auto serial_pt_pos = std::find(local_map.begin(), local_map.end(), p_idx);
               auto serial_pt_idx = serial_pt_pos - local_map.begin();
               if (serial_pt_pos == local_map.end())
-                deallog << "ERROR: point index not found for "
-                        << std::to_string(serial_pt_idx) << std::endl;
+                deallog << "ERROR: point index not found for " << std::to_string(serial_pt_idx)
+                        << std::endl;
               else
                 {
                   if ((original_points[pt_num] - points[p_idx]).norm() > 1e-12)
                     {
-                      deallog
-                        << "ERROR: Point in serial : " << points[p_idx]
-                        << " Point in distributed: " << original_points[pt_num]
-                        << std::endl;
+                      deallog << "ERROR: Point in serial : " << points[p_idx]
+                              << " Point in distributed: " << original_points[pt_num] << std::endl;
                     }
 
-                  if ((quad[pt_num] -
-                       serial_qpoints[serial_cell_idx][serial_pt_idx])
-                        .norm() > 1e-10)
+                  if ((quad[pt_num] - serial_qpoints[serial_cell_idx][serial_pt_idx]).norm() >
+                      1e-10)
                     {
-                      deallog
-                        << " ERROR: Transformation of qpoint to point is not correct"
-                        << std::endl;
-                      deallog << "qpoint in serial : " << quad[pt_num]
-                              << " Point in distributed: "
-                              << serial_qpoints[serial_cell_idx][serial_pt_idx]
+                      deallog << " ERROR: Transformation of qpoint to point is not correct"
                               << std::endl;
+                      deallog << "qpoint in serial : " << quad[pt_num] << " Point in distributed: "
+                              << serial_qpoints[serial_cell_idx][serial_pt_idx] << std::endl;
                     }
                 }
               ++pt_num;

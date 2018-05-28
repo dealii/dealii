@@ -131,7 +131,7 @@ namespace PETScWrappers
      */
     template <typename SparsityPatternType>
     explicit SparseMatrix(const SparsityPatternType &sparsity_pattern,
-                          const bool preset_nonzero_locations = true);
+                          const bool                 preset_nonzero_locations = true);
 
     /**
      * This operator assigns a scalar to a matrix. Since this does usually not
@@ -194,8 +194,7 @@ namespace PETScWrappers
      */
     template <typename SparsityPatternType>
     void
-    reinit(const SparsityPatternType &sparsity_pattern,
-           const bool                 preset_nonzero_locations = true);
+    reinit(const SparsityPatternType &sparsity_pattern, const bool preset_nonzero_locations = true);
 
     /**
      * Return a reference to the MPI communicator object in use with this
@@ -224,9 +223,7 @@ namespace PETScWrappers
      * This function calls MatrixBase::mmult() to do the actual work.
      */
     void
-    mmult(SparseMatrix &      C,
-          const SparseMatrix &B,
-          const MPI::Vector & V = MPI::Vector()) const;
+    mmult(SparseMatrix &C, const SparseMatrix &B, const MPI::Vector &V = MPI::Vector()) const;
 
     /**
      * Perform the matrix-matrix multiplication with the transpose of
@@ -236,9 +233,7 @@ namespace PETScWrappers
      * This function calls MatrixBase::Tmmult() to do the actual work.
      */
     void
-    Tmmult(SparseMatrix &      C,
-           const SparseMatrix &B,
-           const MPI::Vector & V = MPI::Vector()) const;
+    Tmmult(SparseMatrix &C, const SparseMatrix &B, const MPI::Vector &V = MPI::Vector()) const;
 
   private:
     /**
@@ -276,8 +271,7 @@ namespace PETScWrappers
      */
     template <typename SparsityPatternType>
     void
-    do_reinit(const SparsityPatternType &sparsity_pattern,
-              const bool                 preset_nonzero_locations);
+    do_reinit(const SparsityPatternType &sparsity_pattern, const bool preset_nonzero_locations);
 
     /**
      * To allow calling protected prepare_add() and prepare_set().

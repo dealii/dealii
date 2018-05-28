@@ -102,11 +102,9 @@ namespace Step22
 
   template <int dim>
   double
-  BoundaryValues<dim>::value(const Point<dim> & p,
-                             const unsigned int component) const
+  BoundaryValues<dim>::value(const Point<dim> &p, const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    Assert(component < this->n_components, ExcIndexRange(component, 0, this->n_components));
     if (component == 0)
       return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
     return 0;
@@ -114,8 +112,7 @@ namespace Step22
 
   template <int dim>
   void
-  BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                    Vector<double> &  values) const
+  BoundaryValues<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value(p, c);
@@ -135,16 +132,14 @@ namespace Step22
 
   template <int dim>
   double
-  RightHandSide<dim>::value(const Point<dim> & /*p*/,
-                            const unsigned int /*component*/) const
+  RightHandSide<dim>::value(const Point<dim> & /*p*/, const unsigned int /*component*/) const
   {
     return 0;
   }
 
   template <int dim>
   void
-  RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                   Vector<double> &  values) const
+  RightHandSide<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = RightHandSide<dim>::value(p, c);
@@ -172,21 +167,16 @@ namespace Step22
       constraints.clear();
       FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-      VectorTools::interpolate_boundary_values(dof_handler,
-                                               1,
-                                               BoundaryValues<dim>(),
-                                               constraints,
-                                               fe.component_mask(velocities));
+      VectorTools::interpolate_boundary_values(
+        dof_handler, 1, BoundaryValues<dim>(), constraints, fe.component_mask(velocities));
     }
     constraints.close();
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
-    deallog << "   Number of active cells: " << triangulation.n_active_cells()
-            << std::endl
-            << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << " (" << n_u << '+' << n_p << ')' << std::endl;
+    deallog << "   Number of active cells: " << triangulation.n_active_cells() << std::endl
+            << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " (" << n_u << '+'
+            << n_p << ')' << std::endl;
     {
       BlockDynamicSparsityPattern dsp(2, 2);
       dsp.block(0, 0).reinit(n_u, n_u);
@@ -214,68 +204,60 @@ namespace Step22
   {
     system_matrix = 0;
     system_rhs    = 0;
-    QGauss<dim>        quadrature_formula(degree + 2);
-    FEValues<dim>      fe_values(fe,
+    QGauss<dim>                          quadrature_formula(degree + 2);
+    FEValues<dim>                        fe_values(fe,
                             quadrature_formula,
-                            update_values | update_quadrature_points |
-                              update_JxW_values | update_gradients);
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int n_q_points    = quadrature_formula.size();
-    FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>     local_rhs(dofs_per_cell);
+                            update_values | update_quadrature_points | update_JxW_values |
+                              update_gradients);
+    const unsigned int                   dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int                   n_q_points    = quadrature_formula.size();
+    FullMatrix<double>                   local_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>                       local_rhs(dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     const RightHandSide<dim>             right_hand_side;
-    std::vector<Vector<double>> rhs_values(n_q_points, Vector<double>(dim + 1));
+    std::vector<Vector<double>>          rhs_values(n_q_points, Vector<double>(dim + 1));
     const FEValuesExtractors::Vector     velocities(0);
     const FEValuesExtractors::Scalar     pressure(dim);
     std::vector<SymmetricTensor<2, dim>> symgrad_phi_u(dofs_per_cell);
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         local_matrix = 0;
         local_rhs    = 0;
-        right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                          rhs_values);
+        right_hand_side.vector_value_list(fe_values.get_quadrature_points(), rhs_values);
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
             for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
-                symgrad_phi_u[k] =
-                  fe_values[velocities].symmetric_gradient(k, q);
-                div_phi_u[k] = fe_values[velocities].divergence(k, q);
-                phi_p[k]     = fe_values[pressure].value(k, q);
+                symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
+                div_phi_u[k]     = fe_values[velocities].divergence(k, q);
+                phi_p[k]         = fe_values[pressure].value(k, q);
               }
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) -
-                       div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
-                       phi_p[i] * phi_p[j]) *
+                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) - div_phi_u[i] * phi_p[j] -
+                       phi_p[i] * div_phi_u[j] + phi_p[i] * phi_p[j]) *
                       fe_values.JxW(q);
                   }
-                const unsigned int component_i =
-                  fe.system_to_component_index(i).first;
-                local_rhs(i) += fe_values.shape_value(i, q) *
-                                rhs_values[q](component_i) * fe_values.JxW(q);
+                const unsigned int component_i = fe.system_to_component_index(i).first;
+                local_rhs(i) +=
+                  fe_values.shape_value(i, q) * rhs_values[q](component_i) * fe_values.JxW(q);
               }
           }
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
             local_matrix(i, j) = local_matrix(j, i);
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(local_matrix,
-                                               local_rhs,
-                                               local_dof_indices,
-                                               system_matrix,
-                                               system_rhs);
+        constraints.distribute_local_to_global(
+          local_matrix, local_rhs, local_dof_indices, system_matrix, system_rhs);
       }
   }
 
@@ -284,39 +266,33 @@ namespace Step22
   StokesProblem<dim>::solve()
   {
     // Linear operators
-    const auto A = linear_operator(system_matrix.block(0, 0));
-    const auto B = linear_operator(system_matrix.block(0, 1));
-    const auto C = linear_operator(system_matrix.block(1, 0));
-    const auto M = linear_operator(
-      system_matrix.block(1, 1)); // Mass matrix stored in this block
+    const auto A  = linear_operator(system_matrix.block(0, 0));
+    const auto B  = linear_operator(system_matrix.block(0, 1));
+    const auto C  = linear_operator(system_matrix.block(1, 0));
+    const auto M  = linear_operator(system_matrix.block(1, 1)); // Mass matrix stored in this block
     const auto D0 = null_operator(M);
 
     // Inverse of A
     SparseILU<double> preconditioner_A;
-    preconditioner_A.initialize(system_matrix.block(0, 0),
-                                SparseILU<double>::AdditionalData());
-    ReductionControl solver_control_A(
-      system_matrix.block(0, 0).m(), 1e-10, 1e-6);
-    SolverCG<> solver_A(solver_control_A);
-    const auto A_inv = inverse_operator(A, solver_A, preconditioner_A);
+    preconditioner_A.initialize(system_matrix.block(0, 0), SparseILU<double>::AdditionalData());
+    ReductionControl solver_control_A(system_matrix.block(0, 0).m(), 1e-10, 1e-6);
+    SolverCG<>       solver_A(solver_control_A);
+    const auto       A_inv = inverse_operator(A, solver_A, preconditioner_A);
 
     // Inverse of mass matrix stored in block "D"
     SparseILU<double> preconditioner_M;
-    preconditioner_M.initialize(system_matrix.block(1, 1),
-                                SparseILU<double>::AdditionalData());
-    ReductionControl solver_control_M(
-      system_matrix.block(1, 1).m(), 1e-10, 1e-6);
-    SolverCG<> solver_M(solver_control_M);
-    const auto M_inv = inverse_operator(M, solver_M, preconditioner_M);
+    preconditioner_M.initialize(system_matrix.block(1, 1), SparseILU<double>::AdditionalData());
+    ReductionControl solver_control_M(system_matrix.block(1, 1).m(), 1e-10, 1e-6);
+    SolverCG<>       solver_M(solver_control_M);
+    const auto       M_inv = inverse_operator(M, solver_M, preconditioner_M);
 
     // Schur complement
     const auto S = schur_complement(A_inv, B, C, D0);
 
     // Inverse of Schur complement
-    ReductionControl solver_control_S(
-      system_matrix.block(1, 1).m(), 1e-10, 1e-6);
-    SolverCG<> solver_S(solver_control_S);
-    const auto S_inv = inverse_operator(S, solver_S, M_inv);
+    ReductionControl solver_control_S(system_matrix.block(1, 1).m(), 1e-10, 1e-6);
+    SolverCG<>       solver_S(solver_control_S);
+    const auto       S_inv = inverse_operator(S, solver_S, M_inv);
 
     Vector<double> &      x   = solution.block(0);
     Vector<double> &      y   = solution.block(1);
@@ -328,15 +304,14 @@ namespace Step22
 
     constraints.distribute(solution);
     deallog << "  " << solver_control_S.last_step()
-            << " outer CG Schur complement iterations for pressure"
-            << std::endl;
+            << " outer CG Schur complement iterations for pressure" << std::endl;
   }
 
   template <int dim>
   void
   StokesProblem<dim>::refine_mesh()
   {
-    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+    Vector<float>              estimated_error_per_cell(triangulation.n_active_cells());
     FEValuesExtractors::Scalar pressure(dim);
     KellyErrorEstimator<dim>::estimate(dof_handler,
                                        QGauss<dim - 1>(degree + 1),
@@ -356,23 +331,19 @@ namespace Step22
     {
       std::vector<unsigned int> subdivisions(dim, 1);
 
-      const Point<dim> bottom_left =
-        (dim == 2 ? Point<dim>(-2, -1) : Point<dim>(-2, 0, -1));
-      const Point<dim> top_right =
-        (dim == 2 ? Point<dim>(2, 0) : Point<dim>(2, 1, 0));
+      const Point<dim> bottom_left = (dim == 2 ? Point<dim>(-2, -1) : Point<dim>(-2, 0, -1));
+      const Point<dim> top_right   = (dim == 2 ? Point<dim>(2, 0) : Point<dim>(2, 1, 0));
       GridGenerator::subdivided_hyper_rectangle(
         triangulation, subdivisions, bottom_left, top_right);
     }
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->center()[dim - 1] == 0)
           cell->face(f)->set_all_boundary_ids(1);
     triangulation.refine_global(4 - dim);
-    for (unsigned int refinement_cycle = 0; refinement_cycle < 2;
-         ++refinement_cycle)
+    for (unsigned int refinement_cycle = 0; refinement_cycle < 2; ++refinement_cycle)
       {
         deallog << "Refinement cycle " << refinement_cycle << std::endl;
         if (refinement_cycle > 0)

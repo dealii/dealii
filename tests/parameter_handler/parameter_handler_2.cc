@@ -30,8 +30,7 @@ main()
 
   ParameterHandler prm;
   prm.enter_subsection("Testing");
-  prm.declare_entry(
-    "Function", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
+  prm.declare_entry("Function", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
   prm.leave_subsection();
 
   prm.parse_input(SOURCE_DIR "/prm/parameter_handler_2.prm");

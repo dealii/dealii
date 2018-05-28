@@ -44,16 +44,14 @@ using namespace std;
 
 template <int dim, typename number, int spacedim>
 void
-reinit_vector_by_blocks(
-  const dealii::DoFHandler<dim, spacedim> &          mg_dof,
-  MGLevelObject<BlockVector<number>> &               v,
-  const std::vector<bool> &                          sel,
-  std::vector<std::vector<types::global_dof_index>> &ndofs)
+reinit_vector_by_blocks(const dealii::DoFHandler<dim, spacedim> &          mg_dof,
+                        MGLevelObject<BlockVector<number>> &               v,
+                        const std::vector<bool> &                          sel,
+                        std::vector<std::vector<types::global_dof_index>> &ndofs)
 {
   std::vector<bool> selected = sel;
   // Compute the number of blocks needed
-  const unsigned int n_selected =
-    std::accumulate(selected.begin(), selected.end(), 0U);
+  const unsigned int n_selected = std::accumulate(selected.begin(), selected.end(), 0U);
 
   if (ndofs.size() == 0)
     {
@@ -68,8 +66,7 @@ reinit_vector_by_blocks(
     {
       v[level].reinit(n_selected, 0);
       unsigned int k = 0;
-      for (unsigned int i = 0; i < selected.size() && (k < v[level].n_blocks());
-           ++i)
+      for (unsigned int i = 0; i < selected.size() && (k < v[level].n_blocks()); ++i)
         {
           if (selected[i])
             {
@@ -107,8 +104,7 @@ check_block(const FiniteElement<dim> &fe,
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
     DoFRenumbering::component_wise(mgdof, l);
   std::vector<std::vector<types::global_dof_index>> mg_ndofs(
-    mgdof.get_triangulation().n_levels(),
-    std::vector<types::global_dof_index>(fe.n_blocks()));
+    mgdof.get_triangulation().n_levels(), std::vector<types::global_dof_index>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
   deallog << "Global  dofs:";

@@ -72,8 +72,7 @@ test()
 
   deallog << "l1-norm: " << mat.l1_norm() << std::endl;
   if (myid == 0)
-    deallog << "mat(0,1): " << get_real_assert_zero_imag(mat(0, 1))
-            << std::endl;
+    deallog << "mat(0,1): " << get_real_assert_zero_imag(mat(0, 1)) << std::endl;
 
   {
     // disabled:
@@ -90,13 +89,11 @@ test()
     mat2.reinit(mat);
     deallog << "l1-norm: " << mat2.l1_norm() << std::endl;
     if (myid == 0)
-      deallog << "mat(0,1): " << get_real_assert_zero_imag(mat2(0, 1))
-              << std::endl;
+      deallog << "mat(0,1): " << get_real_assert_zero_imag(mat2(0, 1)) << std::endl;
     mat2.add(0, 1, 0.3);
     mat2.compress(VectorOperation::add);
     if (myid == 0)
-      deallog << "after adding mat(0,1): "
-              << get_real_assert_zero_imag(mat2(0, 1)) << std::endl;
+      deallog << "after adding mat(0,1): " << get_real_assert_zero_imag(mat2(0, 1)) << std::endl;
   }
   {
     deallog << "* copy_from():" << std::endl;
@@ -106,13 +103,11 @@ test()
     mat2.copy_from(mat);
     deallog << "l1-norm: " << mat2.l1_norm() << std::endl;
     if (myid == 0)
-      deallog << "mat(0,1): " << get_real_assert_zero_imag(mat2(0, 1))
-              << std::endl;
+      deallog << "mat(0,1): " << get_real_assert_zero_imag(mat2(0, 1)) << std::endl;
     mat2.add(0, 1, 0.3);
     mat2.compress(VectorOperation::add);
     if (myid == 0)
-      deallog << "after adding mat(0,1): "
-              << get_real_assert_zero_imag(mat2(0, 1)) << std::endl;
+      deallog << "after adding mat(0,1): " << get_real_assert_zero_imag(mat2(0, 1)) << std::endl;
   }
 
   // done

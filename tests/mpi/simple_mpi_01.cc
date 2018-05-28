@@ -30,7 +30,7 @@ test_mpi()
   Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
 
-  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int       myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (myid == 0)
@@ -46,8 +46,7 @@ test_mpi()
           unsigned int buf = numbers::invalid_unsigned_int;
           MPI_Status   status;
           MPI_Recv(&buf, 1, MPI_UNSIGNED, i, 1, MPI_COMM_WORLD, &status);
-          deallog << "got message '" << buf << "' from CPU " << i + 1 << "!"
-                  << std::endl;
+          deallog << "got message '" << buf << "' from CPU " << i + 1 << "!" << std::endl;
           Assert(buf == i, ExcInternalError());
         }
       else if (myid == i)
@@ -63,8 +62,7 @@ test_mpi()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {

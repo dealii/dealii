@@ -28,27 +28,22 @@ void
 print_is_tensor_product()
 {
   Quadrature<dim> q_0(1);
-  deallog << "Quadrature<" << dim << ">: " << q_0.is_tensor_product()
-          << std::endl;
+  deallog << "Quadrature<" << dim << ">: " << q_0.is_tensor_product() << std::endl;
 
   QIterated<dim> q_1(QGauss<1>(1), 1);
-  deallog << "QIterated<" << dim << ">: " << q_1.is_tensor_product()
-          << std::endl;
+  deallog << "QIterated<" << dim << ">: " << q_1.is_tensor_product() << std::endl;
 
   QGauss<dim> q_2(1);
   deallog << "QGauss<" << dim << ">: " << q_2.is_tensor_product() << std::endl;
 
   QGaussLobatto<dim> q_3(2);
-  deallog << "QGaussLobatto<" << dim << ">: " << q_3.is_tensor_product()
-          << std::endl;
+  deallog << "QGaussLobatto<" << dim << ">: " << q_3.is_tensor_product() << std::endl;
 
   QMidpoint<dim> q_4;
-  deallog << "QMidpoint<" << dim << ">: " << q_4.is_tensor_product()
-          << std::endl;
+  deallog << "QMidpoint<" << dim << ">: " << q_4.is_tensor_product() << std::endl;
 
   QSimpson<dim> q_5;
-  deallog << "QSimpson<" << dim << ">: " << q_5.is_tensor_product()
-          << std::endl;
+  deallog << "QSimpson<" << dim << ">: " << q_5.is_tensor_product() << std::endl;
 
   QTrapez<dim> q_6;
   deallog << "QTrapez<" << dim << ">: " << q_6.is_tensor_product() << std::endl;
@@ -60,24 +55,19 @@ print_is_tensor_product()
   deallog << "QWeddle<" << dim << ">: " << q_8.is_tensor_product() << std::endl;
 
   QGaussChebyshev<dim> q_9(3);
-  deallog << "QGaussChebyshev<" << dim << ">: " << q_9.is_tensor_product()
-          << std::endl;
+  deallog << "QGaussChebyshev<" << dim << ">: " << q_9.is_tensor_product() << std::endl;
 
   QGaussRadauChebyshev<dim> q_10(1);
-  deallog << "QGaussRadauChebyshev<" << dim << ">: " << q_10.is_tensor_product()
-          << std::endl;
+  deallog << "QGaussRadauChebyshev<" << dim << ">: " << q_10.is_tensor_product() << std::endl;
 
   QGaussLobattoChebyshev<dim> q_11(2);
-  deallog << "QGaussLobattoChebyshev<" << dim
-          << ">: " << q_11.is_tensor_product() << std::endl;
+  deallog << "QGaussLobattoChebyshev<" << dim << ">: " << q_11.is_tensor_product() << std::endl;
 
   QSorted<dim> q_16(QGauss<dim>(3));
-  deallog << "QSorted<" << dim << ">: " << q_16.is_tensor_product()
-          << std::endl;
+  deallog << "QSorted<" << dim << ">: " << q_16.is_tensor_product() << std::endl;
 
   QTelles<dim> q_17(1, Point<dim>());
-  deallog << "QTelles<" << dim << ">: " << q_17.is_tensor_product()
-          << std::endl;
+  deallog << "QTelles<" << dim << ">: " << q_17.is_tensor_product() << std::endl;
 }
 
 int

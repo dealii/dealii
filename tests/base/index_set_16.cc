@@ -44,8 +44,7 @@ test()
 
   for (unsigned int i = 0; i < is3.size(); ++i)
     {
-      AssertThrow((is1.is_element(i) && !is2.is_element(i)) ==
-                    is3.is_element(i),
+      AssertThrow((is1.is_element(i) && !is2.is_element(i)) == is3.is_element(i),
                   ExcInternalError());
     }
 

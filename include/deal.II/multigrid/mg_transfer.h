@@ -76,20 +76,13 @@ namespace internal
 
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void
-    reinit(Matrix &matrix,
-           Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           DoFHandlerType &           dh)
+    reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
-      const parallel::Triangulation<DoFHandlerType::dimension,
-                                    DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<
-          const parallel::Triangulation<DoFHandlerType::dimension,
-                                        DoFHandlerType::space_dimension> *>(
+      const parallel::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
+        *dist_tria = dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,
+                                                                DoFHandlerType::space_dimension> *>(
           &(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      MPI_Comm communicator = dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -109,20 +102,13 @@ namespace internal
 
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void
-    reinit(Matrix &matrix,
-           Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           DoFHandlerType &           dh)
+    reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
-      const parallel::Triangulation<DoFHandlerType::dimension,
-                                    DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<
-          const parallel::Triangulation<DoFHandlerType::dimension,
-                                        DoFHandlerType::space_dimension> *>(
+      const parallel::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
+        *dist_tria = dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,
+                                                                DoFHandlerType::space_dimension> *>(
           &(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      MPI_Comm communicator = dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
                     sp,
@@ -142,20 +128,13 @@ namespace internal
 
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void
-    reinit(Matrix &matrix,
-           Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           DoFHandlerType &           dh)
+    reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
-      const parallel::Triangulation<DoFHandlerType::dimension,
-                                    DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<
-          const parallel::Triangulation<DoFHandlerType::dimension,
-                                        DoFHandlerType::space_dimension> *>(
+      const parallel::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
+        *dist_tria = dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,
+                                                                DoFHandlerType::space_dimension> *>(
           &(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      MPI_Comm communicator = dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
                     sp,
@@ -177,17 +156,12 @@ namespace internal
 
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void
-    reinit(Matrix &,
-           Sparsity &,
-           int,
-           const SparsityPatternType &,
-           const DoFHandlerType &)
+    reinit(Matrix &, Sparsity &, int, const SparsityPatternType &, const DoFHandlerType &)
     {
-      AssertThrow(
-        false,
-        ExcNotImplemented(
-          "ERROR: MGTransferPrebuilt with LinearAlgebra::distributed::Vector currently "
-          "needs deal.II to be configured with Trilinos."));
+      AssertThrow(false,
+                  ExcNotImplemented(
+                    "ERROR: MGTransferPrebuilt with LinearAlgebra::distributed::Vector currently "
+                    "needs deal.II to be configured with Trilinos."));
     }
   };
 
@@ -210,19 +184,14 @@ namespace internal
            const SparsityPatternType &sp,
            const DoFHandlerType &     dh)
     {
-      const parallel::Triangulation<DoFHandlerType::dimension,
-                                    DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<
-          const parallel::Triangulation<DoFHandlerType::dimension,
-                                        DoFHandlerType::space_dimension> *>(
+      const parallel::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
+        *dist_tria = dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,
+                                                                DoFHandlerType::space_dimension> *>(
           &(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      MPI_Comm communicator = dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
       // Reinit PETSc matrix
-      matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
-                    dh.locally_owned_mg_dofs(level),
-                    sp,
-                    communicator);
+      matrix.reinit(
+        dh.locally_owned_mg_dofs(level + 1), dh.locally_owned_mg_dofs(level), sp, communicator);
     }
   };
 #endif
@@ -340,8 +309,7 @@ protected:
    * The data is organized as follows: one vector per level. Each element of
    * these vectors contains first the global index, then the level index.
    */
-  std::vector<
-    std::vector<std::pair<types::global_dof_index, types::global_dof_index>>>
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index>>>
     copy_indices;
 
   /**
@@ -351,8 +319,7 @@ protected:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<
-    std::vector<std::pair<types::global_dof_index, types::global_dof_index>>>
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index>>>
     copy_indices_global_mine;
 
   /**
@@ -362,8 +329,7 @@ protected:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<
-    std::vector<std::pair<types::global_dof_index, types::global_dof_index>>>
+  std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index>>>
     copy_indices_level_mine;
 
   /**
@@ -383,8 +349,7 @@ protected:
   /**
    * The mg_constrained_dofs of the level systems.
    */
-  SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<VectorType>>
-    mg_constrained_dofs;
+  SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<VectorType>> mg_constrained_dofs;
 };
 
 
@@ -421,7 +386,7 @@ public:
   void
   copy_to_mg(const DoFHandler<dim, spacedim> &                          mg_dof,
              MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-             const LinearAlgebra::distributed::Vector<Number2> &src) const;
+             const LinearAlgebra::distributed::Vector<Number2> &        src) const;
 
   /**
    * Transfer from multi-level vector to normal vector.
@@ -432,10 +397,9 @@ public:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_from_mg(
-    const DoFHandler<dim, spacedim> &                                mg_dof,
-    LinearAlgebra::distributed::Vector<Number2> &                    dst,
-    const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
+  copy_from_mg(const DoFHandler<dim, spacedim> &                                mg_dof,
+               LinearAlgebra::distributed::Vector<Number2> &                    dst,
+               const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
 
   /**
    * Add a multi-level vector to a normal vector.
@@ -444,10 +408,9 @@ public:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_from_mg_add(
-    const DoFHandler<dim, spacedim> &                                mg_dof,
-    LinearAlgebra::distributed::Vector<Number2> &                    dst,
-    const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
+  copy_from_mg_add(const DoFHandler<dim, spacedim> &                                mg_dof,
+                   LinearAlgebra::distributed::Vector<Number2> &                    dst,
+                   const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
 
   /**
    * If this object operates on BlockVector objects, we need to describe how
@@ -489,7 +452,7 @@ protected:
   copy_to_mg(const DoFHandler<dim, spacedim> &                          mg_dof,
              MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
              const LinearAlgebra::distributed::Vector<Number2> &        src,
-             const bool solution_transfer) const;
+             const bool                                                 solution_transfer) const;
 
   /**
    * Internal function to @p fill copy_indices*. Called by derived classes.
@@ -516,8 +479,7 @@ protected:
   /**
    * Same as above, but used to transfer solution vectors.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-    solution_copy_indices;
+  std::vector<std::vector<std::pair<unsigned int, unsigned int>>> solution_copy_indices;
 
   /**
    * Additional degrees of freedom for the copy_to_mg() function. These are
@@ -526,14 +488,12 @@ protected:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-    copy_indices_global_mine;
+  std::vector<std::vector<std::pair<unsigned int, unsigned int>>> copy_indices_global_mine;
 
   /**
    * Same as above, but used to transfer solution vectors.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-    solution_copy_indices_global_mine;
+  std::vector<std::vector<std::pair<unsigned int, unsigned int>>> solution_copy_indices_global_mine;
 
   /**
    * Additional degrees of freedom for the copy_from_mg() function. These are
@@ -542,14 +502,12 @@ protected:
    *
    * Organization of the data is like for @p copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-    copy_indices_level_mine;
+  std::vector<std::vector<std::pair<unsigned int, unsigned int>>> copy_indices_level_mine;
 
   /**
    * Same as above, but used to transfer solution vectors.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-    solution_copy_indices_level_mine;
+  std::vector<std::vector<std::pair<unsigned int, unsigned int>>> solution_copy_indices_level_mine;
 
   /**
    * Stores whether the copy operation from the global to the level vector is
@@ -576,9 +534,8 @@ protected:
   /**
    * The mg_constrained_dofs of the level systems.
    */
-  SmartPointer<
-    const MGConstrainedDoFs,
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>>
+  SmartPointer<const MGConstrainedDoFs,
+               MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>>
     mg_constrained_dofs;
 
   /**
@@ -591,21 +548,18 @@ protected:
   /**
    * Same as above but used when working with solution vectors.
    */
-  mutable LinearAlgebra::distributed::Vector<Number>
-    solution_ghosted_global_vector;
+  mutable LinearAlgebra::distributed::Vector<Number> solution_ghosted_global_vector;
 
   /**
    * In the function copy_from_mg, we access all level vectors with certain
    * ghost entries for inserting the result into a global vector.
    */
-  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
-    ghosted_level_vector;
+  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>> ghosted_level_vector;
 
   /**
    * Same as above but used when working with solution vectors.
    */
-  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
-    solution_ghosted_level_vector;
+  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>> solution_ghosted_level_vector;
 };
 
 
@@ -695,9 +649,7 @@ public:
    * finer level.
    */
   virtual void
-  prolongate(const unsigned int to_level,
-             VectorType &       dst,
-             const VectorType & src) const override;
+  prolongate(const unsigned int to_level, VectorType &dst, const VectorType &src) const override;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -745,8 +697,7 @@ private:
   /**
    * Sparsity patterns for transfer matrices.
    */
-  std::vector<
-    std::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity>>
+  std::vector<std::shared_ptr<typename internal::MatrixSelector<VectorType>::Sparsity>>
     prolongation_sparsities;
 
   /**
@@ -754,8 +705,7 @@ private:
    * of the mother cell, i.e. the coarse level.  while row indices belong to
    * the child cell, i.e. the fine level.
    */
-  std::vector<
-    std::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix>>
+  std::vector<std::shared_ptr<typename internal::MatrixSelector<VectorType>::Matrix>>
     prolongation_matrices;
 
   /**

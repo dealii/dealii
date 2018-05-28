@@ -58,17 +58,14 @@ eigenvalues(const SymmetricTensor<2, 2, Number> &T)
       const Number tr_T    = trace(T);
       const Number det_T   = determinant(T);
       const Number descrim = tr_T * tr_T - 4.0 * det_T;
-      Assert(
-        descrim > internal::NumberType<Number>::value(0.0),
-        ExcMessage(
-          "The roots of the characteristic polynomial are complex valued."));
+      Assert(descrim > internal::NumberType<Number>::value(0.0),
+             ExcMessage("The roots of the characteristic polynomial are complex valued."));
       const Number sqrt_desc = std::sqrt(descrim);
 
       const std::array<Number, 2> eig_vals = {
         {internal::NumberType<Number>::value(0.5 * (tr_T + sqrt_desc)),
          internal::NumberType<Number>::value(0.5 * (tr_T - sqrt_desc))}};
-      Assert(eig_vals[0] >= eig_vals[1],
-             ExcMessage("The eigenvalue ordering is incorrect."));
+      Assert(eig_vals[0] >= eig_vals[1], ExcMessage("The eigenvalue ordering is incorrect."));
       return eig_vals;
     }
 }
@@ -79,8 +76,7 @@ template <typename Number>
 std::array<Number, 3>
 eigenvalues(const SymmetricTensor<2, 3, Number> &T)
 {
-  const Number upp_tri_sq =
-    T[0][1] * T[0][1] + T[0][2] * T[0][2] + T[1][2] * T[1][2];
+  const Number upp_tri_sq = T[0][1] * T[0][1] + T[0][2] * T[0][2] + T[1][2] * T[1][2];
   if (upp_tri_sq == internal::NumberType<Number>::value(0.0))
     {
       // The tensor is diagonal
@@ -102,8 +98,7 @@ eigenvalues(const SymmetricTensor<2, 3, Number> &T)
       // when substituting  \lambda = 2.cos(theta) and using trig identities.
       const Number tr_T = trace(T);
       const Number q    = tr_T / 3.0;
-      const Number tmp1 = (T[0][0] - q) * (T[0][0] - q) +
-                          (T[1][1] - q) * (T[1][1] - q) +
+      const Number tmp1 = (T[0][0] - q) * (T[0][0] - q) + (T[1][1] - q) * (T[1][1] - q) +
                           (T[2][2] - q) * (T[2][2] - q) + 2.0 * upp_tri_sq;
       const Number                        p = std::sqrt(tmp1 / 6.0);
       const SymmetricTensor<2, 3, Number> B =
@@ -119,17 +114,15 @@ eigenvalues(const SymmetricTensor<2, 3, Number> &T)
       const Number phi =
         (tmp_2 <= -1.0 ?
            internal::NumberType<Number>::value(numbers::PI / 3.0) :
-           (tmp_2 >= 1.0 ?
-              internal::NumberType<Number>::value(0.0) :
-              internal::NumberType<Number>::value(std::acos(tmp_2) / 3.0)));
+           (tmp_2 >= 1.0 ? internal::NumberType<Number>::value(0.0) :
+                           internal::NumberType<Number>::value(std::acos(tmp_2) / 3.0)));
 
       // Due to the trigonometric solution, the computed eigenvalues
       // should be predictably in the order eig1 >= eig2 >= eig3...
       std::array<Number, 3> eig_vals = {
         {static_cast<Number>(q + 2.0 * p * std::cos(phi)),
          static_cast<Number>(0.0),
-         static_cast<Number>(q + 2.0 * p *
-                                   std::cos(phi + (2.0 / 3.0 * numbers::PI)))}};
+         static_cast<Number>(q + 2.0 * p * std::cos(phi + (2.0 / 3.0 * numbers::PI)))}};
       // Use the identity tr(T) = eig1 + eig2 + eig3
       eig_vals[1] = tr_T - eig_vals[0] - eig_vals[2];
 
@@ -237,10 +230,9 @@ namespace internal
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
     ql_implicit_shifts(const dealii::SymmetricTensor<2, dim, Number> &A)
     {
-      static_assert(
-        numbers::NumberTraits<Number>::is_complex == false,
-        "This implementation of the QL implicit shift algorithm does "
-        "not support complex numbers");
+      static_assert(numbers::NumberTraits<Number>::is_complex == false,
+                    "This implementation of the QL implicit shift algorithm does "
+                    "not support complex numbers");
 
       // Transform A to real tridiagonal form by the Householder method:
       // The orthogonal matrix effecting the transformation
@@ -390,8 +382,7 @@ namespace internal
 
       // Initialize the transformation matrix as the
       // identity tensor
-      dealii::Tensor<2, dim, Number> Q(
-        dealii::unit_symmetric_tensor<dim, Number>());
+      dealii::Tensor<2, dim, Number> Q(dealii::unit_symmetric_tensor<dim, Number>());
 
       // The diagonal elements of the tridiagonal matrix;
       // this will ultimately store the eigenvalues
@@ -565,8 +556,7 @@ namespace internal
         u = t * t;
 
       // Estimated maximum roundoff error
-      const Number error =
-        256.0 * std::numeric_limits<double>::epsilon() * u * u;
+      const Number error = 256.0 * std::numeric_limits<double>::epsilon() * u * u;
 
       // Store eigenvalues
       eig_vals_vecs[0].first = w[0];
@@ -621,8 +611,8 @@ namespace internal
                     "not support complex numbers");
 
       const unsigned int dim = 3;
-      Number norm; // Squared norm or inverse norm of current eigenvector
-      Number t, u; // Intermediate storage
+      Number             norm; // Squared norm or inverse norm of current eigenvector
+      Number             t, u; // Intermediate storage
 
       // Calculate eigenvalues
       const std::array<Number, dim> w = eigenvalues(A);
@@ -641,8 +631,7 @@ namespace internal
         u = t * t;
 
       // Estimated maximum roundoff error
-      const Number error =
-        256.0 * std::numeric_limits<double>::epsilon() * u * u;
+      const Number error = 256.0 * std::numeric_limits<double>::epsilon() * u * u;
 
       // Initialize the transformation matrix as the
       // identity tensor
@@ -733,12 +722,11 @@ namespace internal
     template <typename Number>
     Tensor<2, 2, Number>
     dediagonalize_tensor(const dealii::SymmetricTensor<2, 2, Number> &T,
-                         const double rotation_angle,
+                         const double                                 rotation_angle,
                          const unsigned int /*axis*/ = 0)
     {
       const Tensor<2, 2> R =
-        dealii::Physics::Transformations::Rotations::rotation_matrix_2d(
-          rotation_angle);
+        dealii::Physics::Transformations::Rotations::rotation_matrix_2d(rotation_angle);
       return R * T;
     }
 
@@ -746,8 +734,8 @@ namespace internal
     template <typename Number>
     Tensor<2, 3, Number>
     dediagonalize_tensor(const dealii::SymmetricTensor<2, 3, Number> &T,
-                         const double       rotation_angle,
-                         const unsigned int axis = 0)
+                         const double                                 rotation_angle,
+                         const unsigned int                           axis = 0)
     {
       Assert(axis < 3, ExcIndexRange(axis, 0, 3));
 
@@ -755,16 +743,16 @@ namespace internal
       switch (axis)
         {
           case (0):
-            R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {1, 0, 0}, rotation_angle);
+            R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d({1, 0, 0},
+                                                                                rotation_angle);
             break;
           case (1):
-            R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {0, 1, 0}, rotation_angle);
+            R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d({0, 1, 0},
+                                                                                rotation_angle);
             break;
           case (2):
-            R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {0, 0, 1}, rotation_angle);
+            R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d({0, 0, 1},
+                                                                                rotation_angle);
             break;
           default:
             AssertThrow(false, ExcNotImplemented());
@@ -776,9 +764,8 @@ namespace internal
 
     template <typename Number>
     std::array<std::pair<Number, Tensor<1, 1, Number>>, 1>
-    perform_eigenvector_decomposition(
-      const SymmetricTensor<2, 1, Number> &T,
-      const SymmetricTensorEigenvectorMethod /*method*/)
+    perform_eigenvector_decomposition(const SymmetricTensor<2, 1, Number> &T,
+                                      const SymmetricTensorEigenvectorMethod /*method*/)
     {
       return {{std::make_pair(T[0][0], Tensor<1, 1, Number>({1.0}))}};
     }
@@ -786,9 +773,8 @@ namespace internal
 
     template <int dim, typename Number>
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
-    perform_eigenvector_decomposition(
-      const SymmetricTensor<2, dim, Number> &T,
-      const SymmetricTensorEigenvectorMethod method)
+    perform_eigenvector_decomposition(const SymmetricTensor<2, dim, Number> &T,
+                                      const SymmetricTensorEigenvectorMethod method)
     {
       switch (method)
         {
@@ -796,8 +782,7 @@ namespace internal
             return internal::SymmetricTensorImplementation::hybrid(T);
             break;
           case SymmetricTensorEigenvectorMethod::ql_implicit_shifts:
-            return internal::SymmetricTensorImplementation::ql_implicit_shifts(
-              T);
+            return internal::SymmetricTensorImplementation::ql_implicit_shifts(T);
             break;
           case SymmetricTensorEigenvectorMethod::jacobi:
             return internal::SymmetricTensorImplementation::jacobi(T);
@@ -817,15 +802,13 @@ namespace internal
 
 
 template <int dim, typename Number>
-std::array<std::pair<Number, Tensor<1, dim, Number>>,
-           std::integral_constant<int, dim>::value>
+std::array<std::pair<Number, Tensor<1, dim, Number>>, std::integral_constant<int, dim>::value>
 eigenvectors(const SymmetricTensor<2, dim, Number> &T,
              const SymmetricTensorEigenvectorMethod method)
 {
   // Not much to do when there's only a single entry
   if (dim == 1)
-    return internal::SymmetricTensorImplementation::
-      perform_eigenvector_decomposition(T, method);
+    return internal::SymmetricTensorImplementation::perform_eigenvector_decomposition(T, method);
 
   std::array<std::pair<Number, Tensor<1, dim, Number>>, dim> eig_vals_vecs;
 
@@ -850,19 +833,17 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
 
       // If our tensor is not diagonal, then just carry on as per usual.
       if (!is_diagonal)
-        eig_vals_vecs = internal::SymmetricTensorImplementation::
-          perform_eigenvector_decomposition(T, method);
+        eig_vals_vecs =
+          internal::SymmetricTensorImplementation::perform_eigenvector_decomposition(T, method);
       else
         {
-          Assert(
-            method != SymmetricTensorEigenvectorMethod::hybrid,
-            ExcMessage(
-              "The hybrid method cannot be used with auto-differentiable numbers "
-              "when the tensor upon which an eigen-decomposition is being performed "
-              "is diagonal. This is because the hybrid method immediately assumes "
-              "the values of the eigenvectors (since the characteristic polynomial) "
-              "is not solved, and therefore the sensitivity of the eigenvalues with "
-              "respect to one another is not resolved."));
+          Assert(method != SymmetricTensorEigenvectorMethod::hybrid,
+                 ExcMessage("The hybrid method cannot be used with auto-differentiable numbers "
+                            "when the tensor upon which an eigen-decomposition is being performed "
+                            "is diagonal. This is because the hybrid method immediately assumes "
+                            "the values of the eigenvectors (since the characteristic polynomial) "
+                            "is not solved, and therefore the sensitivity of the eigenvalues with "
+                            "respect to one another is not resolved."));
 
           // These parameters are heuristicaly chosen through "rigorous"
           // eye-ball analysis of the errors of tests based on
@@ -880,8 +861,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           if (Differentiation::AD::is_taped_ad_number<Number>::value)
             {
               // Adol-C taped
-              if (method ==
-                  SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+              if (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
                 sf = (dim == 2 ? 2e11 : 2e11);
               else if (method == SymmetricTensorEigenvectorMethod::jacobi)
                 sf = (dim == 2 ? 1e6 : 1e9);
@@ -891,8 +871,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           else if (Differentiation::AD::is_sacado_rad_number<Number>::value)
             {
               // Sacado::Rad
-              if (method ==
-                  SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+              if (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
                 sf = (dim == 2 ? 1e8 : 1e9);
               else if (method == SymmetricTensorEigenvectorMethod::jacobi)
                 sf = (dim == 2 ? 1e8 : 1e9);
@@ -902,15 +881,12 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           else
             {
               // Everything else
-              Assert(Differentiation::AD::is_tapeless_ad_number<Number>::value,
+              Assert(Differentiation::AD::is_tapeless_ad_number<Number>::value, ExcInternalError());
+              Assert(Differentiation::AD::is_sacado_dfad_number<Number>::value ||
+                       Differentiation::AD::is_adolc_tapeless_number<Number>::value,
                      ExcInternalError());
-              Assert(
-                Differentiation::AD::is_sacado_dfad_number<Number>::value ||
-                  Differentiation::AD::is_adolc_tapeless_number<Number>::value,
-                ExcInternalError());
 
-              if (method ==
-                  SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+              if (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
                 sf = (dim == 2 ? 1e7 : 2.5e7);
               else if (method == SymmetricTensorEigenvectorMethod::jacobi)
                 sf = (dim == 2 ? 1e2 : 1e7);
@@ -918,18 +894,15 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                 AssertThrow(false, ExcNotImplemented());
             }
 
-          typedef
-            typename Differentiation::AD::ADNumberTraits<Number>::scalar_type
-                       scalar_type;
-          const double delta = sf * std::numeric_limits<scalar_type>::epsilon();
+          typedef typename Differentiation::AD::ADNumberTraits<Number>::scalar_type scalar_type;
+          const double delta          = sf * std::numeric_limits<scalar_type>::epsilon();
           const double rotation_angle = delta * numbers::PI / 180.0;
 
           Tensor<2, dim, Number> T_prime_ns;
           if (dim == 2)
             {
               const Tensor<2, dim, Number> T_prime_ns =
-                internal::SymmetricTensorImplementation::dediagonalize_tensor(
-                  T, rotation_angle);
+                internal::SymmetricTensorImplementation::dediagonalize_tensor(T, rotation_angle);
 
               // We can't symmetrize the tensor, otherwise the sensitivities
               // cancel out. So we take the upper triangle as an approximation
@@ -945,8 +918,9 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                 for (unsigned int j = i; j < dim; ++j)
                   T_prime[i][j] = T_prime_ns[i][j];
 
-              eig_vals_vecs = internal::SymmetricTensorImplementation::
-                perform_eigenvector_decomposition(T_prime, method);
+              eig_vals_vecs =
+                internal::SymmetricTensorImplementation::perform_eigenvector_decomposition(T_prime,
+                                                                                           method);
             }
           else
             {
@@ -970,8 +944,8 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                   // the eigen-values are equal), the linearisation of any
                   // resulting quantities is only approximate.
                   const unsigned int axis = (i + 2) % 3;
-                  T_prime_ns = internal::SymmetricTensorImplementation::
-                    dediagonalize_tensor(T, rotation_angle, axis);
+                  T_prime_ns = internal::SymmetricTensorImplementation::dediagonalize_tensor(
+                    T, rotation_angle, axis);
 
                   // We can't symmetrize the tensor, otherwise the sensitivities
                   // cancel out. So we take the upper triangle as an
@@ -983,21 +957,20 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
                   for (unsigned int j = i; j < dim; ++j)
                     T_prime[i][j] = T_prime_ns[i][j];
                 }
-              eig_vals_vecs = internal::SymmetricTensorImplementation::
-                perform_eigenvector_decomposition(T_prime, method);
+              eig_vals_vecs =
+                internal::SymmetricTensorImplementation::perform_eigenvector_decomposition(T_prime,
+                                                                                           method);
             }
         }
     }
   else
-    eig_vals_vecs = internal::SymmetricTensorImplementation::
-      perform_eigenvector_decomposition(T, method);
+    eig_vals_vecs =
+      internal::SymmetricTensorImplementation::perform_eigenvector_decomposition(T, method);
 
   // Sort in descending order before output.
-  std::sort(
-    eig_vals_vecs.begin(),
-    eig_vals_vecs.end(),
-    internal::SymmetricTensorImplementation::SortEigenValuesVectors<dim,
-                                                                    Number>());
+  std::sort(eig_vals_vecs.begin(),
+            eig_vals_vecs.end(),
+            internal::SymmetricTensorImplementation::SortEigenValuesVectors<dim, Number>());
   return eig_vals_vecs;
 }
 
@@ -1063,8 +1036,7 @@ eigenvalues(const SymmetricTensor<2, 3, adouble> & /*T*/)
 
 
 template <int dim>
-std::array<std::pair<adouble, Tensor<1, dim, adouble>>,
-           std::integral_constant<int, dim>::value>
+std::array<std::pair<adouble, Tensor<1, dim, adouble>>, std::integral_constant<int, dim>::value>
 eigenvectors(const SymmetricTensor<2, dim, adouble> & /*T*/,
              const SymmetricTensorEigenvectorMethod /*method*/)
 {

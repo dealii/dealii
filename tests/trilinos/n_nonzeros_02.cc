@@ -47,13 +47,12 @@ test()
   // create an empty sparsity pattern
   TrilinosWrappers::SparsityPattern sparsity;
   sparsity.reinit(dof_handler.n_dofs(), dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern(
-    dof_handler,
-    coupling,
-    sparsity,
-    ConstraintMatrix(),
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dof_handler,
+                                  coupling,
+                                  sparsity,
+                                  ConstraintMatrix(),
+                                  false,
+                                  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
   sparsity.compress();
 
   // attach a sparse matrix to it
@@ -71,8 +70,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   try
     {
@@ -82,13 +80,11 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -96,12 +92,10 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

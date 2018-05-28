@@ -28,10 +28,7 @@
 #include "../tests.h"
 
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 double
 check_solve(SolverType &        solver,
             const MatrixType &  A,
@@ -84,23 +81,19 @@ main()
         {
           deallog << "Block size " << blocksize << std::endl;
 
-          const unsigned int n_blocks = dim / blocksize;
-          RelaxationBlock<SparseMatrix<double>, double>::AdditionalData
-            relax_data(0.7);
-          RelaxationBlock<SparseMatrix<double>, double>::AdditionalData
-            relax_data_reorder(0.7);
+          const unsigned int                                            n_blocks = dim / blocksize;
+          RelaxationBlock<SparseMatrix<double>, double>::AdditionalData relax_data(0.7);
+          RelaxationBlock<SparseMatrix<double>, double>::AdditionalData relax_data_reorder(0.7);
 
           relax_data.block_list.reinit(n_blocks, dim, blocksize + 2);
           relax_data_reorder.block_list.reinit(n_blocks, dim, blocksize + 2);
           for (unsigned int block = 0; block < n_blocks; ++block)
             {
               for (int i = -1; i < (int)blocksize + 1; ++i)
-                if ((int)(i + block * blocksize) > -1 &&
-                    (i + block * blocksize) < dim)
+                if ((int)(i + block * blocksize) > -1 && (i + block * blocksize) < dim)
                   {
                     relax_data.block_list.add(block, i + block * blocksize);
-                    relax_data_reorder.block_list.add(block,
-                                                      i + block * blocksize);
+                    relax_data_reorder.block_list.add(block, i + block * blocksize);
                   }
             }
           relax_data.block_list.compress();
@@ -115,8 +108,7 @@ main()
           for (unsigned int i = 0; i < n_blocks; ++i)
             relax_data_reorder.order[0][i] = n_blocks - 1 - i;
 
-          RelaxationBlockJacobi<SparseMatrix<double>, double>
-            relax_jacobi_reorder;
+          RelaxationBlockJacobi<SparseMatrix<double>, double> relax_jacobi_reorder;
           relax_jacobi_reorder.initialize(A, relax_data_reorder);
 
           Vector<double> f(dim);

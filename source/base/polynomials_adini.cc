@@ -16,19 +16,18 @@
 
 #include <deal.II/base/polynomials_adini.h>
 
-#define ENTER_COEFFICIENTS(                                   \
-  koefs, z, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) \
-  koefs(0, z)  = a0;                                          \
-  koefs(1, z)  = a1;                                          \
-  koefs(2, z)  = a2;                                          \
-  koefs(3, z)  = a3;                                          \
-  koefs(4, z)  = a4;                                          \
-  koefs(5, z)  = a5;                                          \
-  koefs(6, z)  = a6;                                          \
-  koefs(7, z)  = a7;                                          \
-  koefs(8, z)  = a8;                                          \
-  koefs(9, z)  = a9;                                          \
-  koefs(10, z) = a10;                                         \
+#define ENTER_COEFFICIENTS(koefs, z, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) \
+  koefs(0, z)  = a0;                                                                   \
+  koefs(1, z)  = a1;                                                                   \
+  koefs(2, z)  = a2;                                                                   \
+  koefs(3, z)  = a3;                                                                   \
+  koefs(4, z)  = a4;                                                                   \
+  koefs(5, z)  = a5;                                                                   \
+  koefs(6, z)  = a6;                                                                   \
+  koefs(7, z)  = a7;                                                                   \
+  koefs(8, z)  = a8;                                                                   \
+  koefs(9, z)  = a9;                                                                   \
+  koefs(10, z) = a10;                                                                  \
   koefs(11, z) = a11;
 
 
@@ -162,10 +161,9 @@ PolynomialsAdini::compute_value(const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);
-  return coef(0, i) + coef(1, i) * x + coef(2, i) * y + coef(3, i) * x * x +
-         coef(4, i) * y * y + coef(5, i) * x * y + coef(6, i) * x * x * x +
-         coef(7, i) * y * y * y + coef(8, i) * x * y * y +
-         coef(9, i) * x * x * y + coef(10, i) * x * x * x * y +
+  return coef(0, i) + coef(1, i) * x + coef(2, i) * y + coef(3, i) * x * x + coef(4, i) * y * y +
+         coef(5, i) * x * y + coef(6, i) * x * x * x + coef(7, i) * y * y * y +
+         coef(8, i) * x * y * y + coef(9, i) * x * x * y + coef(10, i) * x * x * x * y +
          coef(11, i) * x * y * y * y;
 }
 
@@ -175,42 +173,36 @@ PolynomialsAdini::compute_grad(const unsigned int i, const Point<2> &p) const
   const double x = p(0);
   const double y = p(1);
   Tensor<1, 2> tensor;
-  tensor[0] = dx(0, i) + dx(1, i) * x + dx(2, i) * y + dx(3, i) * x * x +
-              dx(4, i) * y * y + dx(5, i) * x * y + dx(6, i) * x * x * x +
-              dx(7, i) * y * y * y + dx(8, i) * x * y * y +
-              dx(9, i) * x * x * y + dx(10, i) * x * x * x * y +
+  tensor[0] = dx(0, i) + dx(1, i) * x + dx(2, i) * y + dx(3, i) * x * x + dx(4, i) * y * y +
+              dx(5, i) * x * y + dx(6, i) * x * x * x + dx(7, i) * y * y * y +
+              dx(8, i) * x * y * y + dx(9, i) * x * x * y + dx(10, i) * x * x * x * y +
               dx(11, i) * x * y * y * y;
 
-  tensor[1] = dy(0, i) + dy(1, i) * x + dy(2, i) * y + dy(3, i) * x * x +
-              dy(4, i) * y * y + dy(5, i) * x * y + dy(6, i) * x * x * x +
-              dy(7, i) * y * y * y + dy(8, i) * x * y * y +
-              dy(9, i) * x * x * y + dy(10, i) * x * x * x * y +
+  tensor[1] = dy(0, i) + dy(1, i) * x + dy(2, i) * y + dy(3, i) * x * x + dy(4, i) * y * y +
+              dy(5, i) * x * y + dy(6, i) * x * x * x + dy(7, i) * y * y * y +
+              dy(8, i) * x * y * y + dy(9, i) * x * x * y + dy(10, i) * x * x * x * y +
               dy(11, i) * x * y * y * y;
   return tensor;
 }
 
 Tensor<2, 2>
-PolynomialsAdini::compute_grad_grad(const unsigned int i,
-                                    const Point<2> &   p) const
+PolynomialsAdini::compute_grad_grad(const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);
   Tensor<2, 2> tensor;
-  tensor[0][0] = dxx(0, i) + dxx(1, i) * x + dxx(2, i) * y + dxx(3, i) * x * x +
-                 dxx(4, i) * y * y + dxx(5, i) * x * y + dxx(6, i) * x * x * x +
-                 dxx(7, i) * y * y * y + dxx(8, i) * x * y * y +
-                 dxx(9, i) * x * x * y + dxx(10, i) * x * x * x * y +
+  tensor[0][0] = dxx(0, i) + dxx(1, i) * x + dxx(2, i) * y + dxx(3, i) * x * x + dxx(4, i) * y * y +
+                 dxx(5, i) * x * y + dxx(6, i) * x * x * x + dxx(7, i) * y * y * y +
+                 dxx(8, i) * x * y * y + dxx(9, i) * x * x * y + dxx(10, i) * x * x * x * y +
                  dxx(11, i) * x * y * y * y;
-  tensor[0][1] = dxy(0, i) + dxy(1, i) * x + dxy(2, i) * y + dxy(3, i) * x * x +
-                 dxy(4, i) * y * y + dxy(5, i) * x * y + dxy(6, i) * x * x * x +
-                 dxy(7, i) * y * y * y + dxy(8, i) * x * y * y +
-                 dxy(9, i) * x * x * y + dxy(10, i) * x * x * x * y +
+  tensor[0][1] = dxy(0, i) + dxy(1, i) * x + dxy(2, i) * y + dxy(3, i) * x * x + dxy(4, i) * y * y +
+                 dxy(5, i) * x * y + dxy(6, i) * x * x * x + dxy(7, i) * y * y * y +
+                 dxy(8, i) * x * y * y + dxy(9, i) * x * x * y + dxy(10, i) * x * x * x * y +
                  dxy(11, i) * x * y * y * y;
   tensor[1][0] = tensor[0][1];
-  tensor[1][1] = dyy(0, i) + dyy(1, i) * x + dyy(2, i) * y + dyy(3, i) * x * x +
-                 dyy(4, i) * y * y + dyy(5, i) * x * y + dyy(6, i) * x * x * x +
-                 dyy(7, i) * y * y * y + dyy(8, i) * x * y * y +
-                 dyy(9, i) * x * x * y + dyy(10, i) * x * x * x * y +
+  tensor[1][1] = dyy(0, i) + dyy(1, i) * x + dyy(2, i) * y + dyy(3, i) * x * x + dyy(4, i) * y * y +
+                 dyy(5, i) * x * y + dyy(6, i) * x * x * x + dyy(7, i) * y * y * y +
+                 dyy(8, i) * x * y * y + dyy(9, i) * x * x * y + dyy(10, i) * x * x * x * y +
                  dyy(11, i) * x * y * y * y;
   return tensor;
 }

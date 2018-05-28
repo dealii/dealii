@@ -92,8 +92,7 @@ check()
   hp::FECollection<dim> element;
   element.push_back(FE_Q<dim>(1));
   hp::DoFHandler<dim> dof(tr);
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % element.size());
@@ -111,8 +110,7 @@ check()
   quadrature.push_back(QGauss<dim>(3));
 
   Vector<double> rhs(dof.n_dofs());
-  VectorTools::create_right_hand_side(
-    dof, quadrature, MySquareFunction<dim>(), rhs);
+  VectorTools::create_right_hand_side(dof, quadrature, MySquareFunction<dim>(), rhs);
   for (unsigned int i = 0; i < rhs.size(); ++i)
     deallog << rhs(i) << std::endl;
 }

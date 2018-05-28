@@ -32,8 +32,7 @@ test()
     const unsigned int      n_properties = 3;
     Particles::PropertyPool pool(n_properties);
 
-    typename Particles::PropertyPool::Handle handle =
-      pool.allocate_properties_array();
+    typename Particles::PropertyPool::Handle handle = pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 1.2;
     pool.get_properties(handle)[1] = 2.5;

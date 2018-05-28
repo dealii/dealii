@@ -35,31 +35,23 @@ void
 print_info()
 {
   deallog << "type_code: "
-          << static_cast<std::underlying_type<AD::NumberTypes>::type>(
-               NumberTraitsType::type_code)
+          << static_cast<std::underlying_type<AD::NumberTypes>::type>(NumberTraitsType::type_code)
           << std::endl;
   deallog << "is_taped: " << NumberTraitsType::is_taped << std::endl;
   deallog << "is_tapeless: " << NumberTraitsType::is_tapeless << std::endl;
-  deallog << "is_real_valued: " << NumberTraitsType::is_real_valued
+  deallog << "is_real_valued: " << NumberTraitsType::is_real_valued << std::endl;
+  deallog << "is_complex_valued: " << NumberTraitsType::is_complex_valued << std::endl;
+  deallog << "n_supported_derivative_levels: " << NumberTraitsType::n_supported_derivative_levels
           << std::endl;
-  deallog << "is_complex_valued: " << NumberTraitsType::is_complex_valued
-          << std::endl;
-  deallog << "n_supported_derivative_levels: "
-          << NumberTraitsType::n_supported_derivative_levels << std::endl;
 
-  deallog << "is_ad_number: "
-          << AD::is_ad_number<typename NumberTraitsType::ad_type>::value
+  deallog << "is_ad_number: " << AD::is_ad_number<typename NumberTraitsType::ad_type>::value
           << std::endl;
-  deallog << "is_sacado_number: "
-          << AD::is_sacado_number<typename NumberTraitsType::ad_type>::value
+  deallog << "is_sacado_number: " << AD::is_sacado_number<typename NumberTraitsType::ad_type>::value
           << std::endl;
   deallog << "is_taped_ad_number: "
-          << AD::is_taped_ad_number<typename NumberTraitsType::ad_type>::value
-          << std::endl;
-  deallog
-    << "is_tapeless_ad_number: "
-    << AD::is_tapeless_ad_number<typename NumberTraitsType::ad_type>::value
-    << std::endl;
+          << AD::is_taped_ad_number<typename NumberTraitsType::ad_type>::value << std::endl;
+  deallog << "is_tapeless_ad_number: "
+          << AD::is_tapeless_ad_number<typename NumberTraitsType::ad_type>::value << std::endl;
 }
 
 int
@@ -74,8 +66,7 @@ main()
   deallog.pop();
 
   deallog.push("std::complex<float>");
-  print_info<
-    AD::NumberTraits<std::complex<float>, AD::NumberTypes::sacado_dfad>>();
+  print_info<AD::NumberTraits<std::complex<float>, AD::NumberTypes::sacado_dfad>>();
   deallog.pop();
 
   deallog.push("double");
@@ -83,28 +74,25 @@ main()
   deallog.pop();
 
   deallog.push("std::complex<double>");
-  print_info<
-    AD::NumberTraits<std::complex<double>, AD::NumberTypes::sacado_dfad>>();
+  print_info<AD::NumberTraits<std::complex<double>, AD::NumberTypes::sacado_dfad>>();
   deallog.pop();
 
   deallog.push("Sacado::Fad::DFad<float>");
-  print_info<
-    AD::NumberTraits<Sacado::Fad::DFad<float>, AD::NumberTypes::sacado_dfad>>();
+  print_info<AD::NumberTraits<Sacado::Fad::DFad<float>, AD::NumberTypes::sacado_dfad>>();
   deallog.pop();
 
   deallog.push("std::complex< Sacado::Fad::DFad<float> >");
-  print_info<AD::NumberTraits<std::complex<Sacado::Fad::DFad<float>>,
-                              AD::NumberTypes::sacado_dfad>>();
+  print_info<
+    AD::NumberTraits<std::complex<Sacado::Fad::DFad<float>>, AD::NumberTypes::sacado_dfad>>();
   deallog.pop();
 
   deallog.push("Sacado::Fad::DFad<double>");
-  print_info<AD::NumberTraits<Sacado::Fad::DFad<double>,
-                              AD::NumberTypes::sacado_dfad>>();
+  print_info<AD::NumberTraits<Sacado::Fad::DFad<double>, AD::NumberTypes::sacado_dfad>>();
   deallog.pop();
 
   deallog.push("std::complex< Sacado::Fad::DFad<double> >");
-  print_info<AD::NumberTraits<std::complex<Sacado::Fad::DFad<double>>,
-                              AD::NumberTypes::sacado_dfad>>();
+  print_info<
+    AD::NumberTraits<std::complex<Sacado::Fad::DFad<double>>, AD::NumberTypes::sacado_dfad>>();
   deallog.pop();
 
   deallog.pop(); // NumberTraits

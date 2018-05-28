@@ -41,8 +41,7 @@ namespace LinearAlgebra
   namespace EpetraWrappers
   {
     Vector::Vector() :
-      vector(new Epetra_FEVector(
-        Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
+      vector(new Epetra_FEVector(Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
 
 
@@ -54,10 +53,8 @@ namespace LinearAlgebra
 
 
 
-    Vector::Vector(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator) :
-      vector(new Epetra_FEVector(
-        parallel_partitioner.make_trilinos_map(communicator, false)))
+    Vector::Vector(const IndexSet &parallel_partitioner, const MPI_Comm &communicator) :
+      vector(new Epetra_FEVector(parallel_partitioner.make_trilinos_map(communicator, false)))
     {}
 
 
@@ -67,8 +64,7 @@ namespace LinearAlgebra
                    const MPI_Comm &communicator,
                    const bool      omit_zeroing_entries)
     {
-      Epetra_Map input_map =
-        parallel_partitioner.make_trilinos_map(communicator, false);
+      Epetra_Map input_map = parallel_partitioner.make_trilinos_map(communicator, false);
       if (vector->Map().SameAs(input_map) == false)
         vector = std_cxx14::make_unique<Epetra_FEVector>(input_map);
       else if (omit_zeroing_entries == false)
@@ -82,19 +78,15 @@ namespace LinearAlgebra
 
 
     void
-    Vector::reinit(const VectorSpaceVector<double> &V,
-                   const bool                       omit_zeroing_entries)
+    Vector::reinit(const VectorSpaceVector<double> &V, const bool omit_zeroing_entries)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V) != nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
 
-      reinit(down_V.locally_owned_elements(),
-             down_V.get_mpi_communicator(),
-             omit_zeroing_entries);
+      reinit(down_V.locally_owned_elements(), down_V.get_mpi_communicator(), omit_zeroing_entries);
     }
 
 
@@ -112,17 +104,14 @@ namespace LinearAlgebra
         {
           if (size() == V.size())
             {
-              Epetra_Import data_exchange(vector->Map(),
-                                          V.trilinos_vector().Map());
+              Epetra_Import data_exchange(vector->Map(), V.trilinos_vector().Map());
 
-              const int ierr =
-                vector->Import(V.trilinos_vector(), data_exchange, Insert);
+              const int ierr = vector->Import(V.trilinos_vector(), data_exchange, Insert);
               Assert(ierr == 0, ExcTrilinosError(ierr));
               (void)ierr;
             }
           else
-            vector =
-              std_cxx14::make_unique<Epetra_FEVector>(V.trilinos_vector());
+            vector = std_cxx14::make_unique<Epetra_FEVector>(V.trilinos_vector());
         }
 
       return *this;
@@ -145,10 +134,9 @@ namespace LinearAlgebra
 
 
     void
-    Vector::import(
-      const ReadWriteVector<double> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+    Vector::import(const ReadWriteVector<double> &                 V,
+                   VectorOperation::values                         operation,
+                   std::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwsie, use the
       // one given.
@@ -157,8 +145,7 @@ namespace LinearAlgebra
           // The first time import is called, a communication pattern is
           // created. Check if the communication pattern already exists and if
           // it can be reused.
-          if ((source_stored_elements.size() !=
-               V.get_stored_elements().size()) ||
+          if ((source_stored_elements.size() != V.get_stored_elements().size()) ||
               (source_stored_elements != V.get_stored_elements()))
             {
               create_epetra_comm_pattern(
@@ -169,13 +156,10 @@ namespace LinearAlgebra
       else
         {
           epetra_comm_pattern =
-            std::dynamic_pointer_cast<const CommunicationPattern>(
-              communication_pattern);
-          AssertThrow(
-            epetra_comm_pattern != nullptr,
-            ExcMessage(
-              std::string("The communication pattern is not of type ") +
-              "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
+            std::dynamic_pointer_cast<const CommunicationPattern>(communication_pattern);
+          AssertThrow(epetra_comm_pattern != nullptr,
+                      ExcMessage(std::string("The communication pattern is not of type ") +
+                                 "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }
 
       Epetra_Import import(epetra_comm_pattern->get_epetra_import());
@@ -220,8 +204,7 @@ namespace LinearAlgebra
     Vector::operator+=(const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V) != nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
@@ -234,14 +217,12 @@ namespace LinearAlgebra
         }
       else
         {
-          Assert(this->size() == down_V.size(),
-                 ExcDimensionMismatch(this->size(), down_V.size()));
+          Assert(this->size() == down_V.size(), ExcDimensionMismatch(this->size(), down_V.size()));
 
 #    if DEAL_II_TRILINOS_VERSION_GTE(11, 11, 0)
-          Epetra_Import data_exchange(vector->Map(),
-                                      down_V.trilinos_vector().Map());
-          const int     ierr = vector->Import(
-            down_V.trilinos_vector(), data_exchange, Epetra_AddLocalAlso);
+          Epetra_Import data_exchange(vector->Map(), down_V.trilinos_vector().Map());
+          const int     ierr =
+            vector->Import(down_V.trilinos_vector(), data_exchange, Epetra_AddLocalAlso);
           Assert(ierr == 0, ExcTrilinosError(ierr));
           (void)ierr;
 #    else
@@ -249,11 +230,9 @@ namespace LinearAlgebra
           // adding Hence, we provide a workaround in this case
 
           Epetra_MultiVector dummy(vector->Map(), 1, false);
-          Epetra_Import      data_exchange(dummy.Map(),
-                                      down_V.trilinos_vector().Map());
+          Epetra_Import      data_exchange(dummy.Map(), down_V.trilinos_vector().Map());
 
-          int ierr =
-            dummy.Import(down_V.trilinos_vector(), data_exchange, Insert);
+          int ierr = dummy.Import(down_V.trilinos_vector(), data_exchange, Insert);
           Assert(ierr == 0, ExcTrilinosError(ierr));
 
           ierr = vector->Update(1.0, dummy, 1.0);
@@ -280,13 +259,11 @@ namespace LinearAlgebra
     double Vector::operator*(const VectorSpaceVector<double> &V) const
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V) != nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
-      Assert(this->size() == down_V.size(),
-             ExcDimensionMismatch(this->size(), down_V.size()));
+      Assert(this->size() == down_V.size(), ExcDimensionMismatch(this->size(), down_V.size()));
       Assert(vector->Map().SameAs(down_V.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
@@ -315,8 +292,7 @@ namespace LinearAlgebra
     Vector::add(const double a, const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V) != nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
@@ -338,11 +314,9 @@ namespace LinearAlgebra
                 const VectorSpaceVector<double> &W)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V) != nullptr, ExcVectorTypeNotCompatible());
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&W) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&W) != nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
@@ -355,8 +329,7 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertIsFinite(b);
 
-      const int ierr = vector->Update(
-        a, down_V.trilinos_vector(), b, down_W.trilinos_vector(), 1.);
+      const int ierr = vector->Update(a, down_V.trilinos_vector(), b, down_W.trilinos_vector(), 1.);
       Assert(ierr == 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
@@ -364,13 +337,10 @@ namespace LinearAlgebra
 
 
     void
-    Vector::sadd(const double                     s,
-                 const double                     a,
-                 const VectorSpaceVector<double> &V)
+    Vector::sadd(const double s, const double a, const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V) != nullptr, ExcVectorTypeNotCompatible());
 
       *this *= s;
       // Downcast V. It fails, throws an exception.
@@ -390,13 +360,11 @@ namespace LinearAlgebra
              ExcVectorTypeNotCompatible());
 
       // Downcast scaling_factors. If fails, throws an exception.
-      const Vector &down_scaling_factors =
-        dynamic_cast<const Vector &>(scaling_factors);
+      const Vector &down_scaling_factors = dynamic_cast<const Vector &>(scaling_factors);
       Assert(vector->Map().SameAs(down_scaling_factors.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
-      const int ierr = vector->Multiply(
-        1.0, down_scaling_factors.trilinos_vector(), *vector, 0.0);
+      const int ierr = vector->Multiply(1.0, down_scaling_factors.trilinos_vector(), *vector, 0.0);
       Assert(ierr == 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
@@ -407,8 +375,7 @@ namespace LinearAlgebra
     Vector::equ(const double a, const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V) != nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);
@@ -445,8 +412,7 @@ namespace LinearAlgebra
         }
 
       // Check that the vector is zero on _all_ processors.
-      const Epetra_MpiComm *mpi_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
+      const Epetra_MpiComm *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
       Assert(mpi_comm != nullptr, ExcInternalError());
       unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
 
@@ -535,8 +501,7 @@ namespace LinearAlgebra
     MPI_Comm
     Vector::get_mpi_communicator() const
     {
-      const Epetra_MpiComm *epetra_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+      const Epetra_MpiComm *epetra_comm = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
       Assert(epetra_comm != nullptr, ExcInternalError());
       return epetra_comm->GetMpiComm();
     }
@@ -554,19 +519,16 @@ namespace LinearAlgebra
 #    ifndef DEAL_II_WITH_64BIT_INDICES
           is.add_range(vector->Map().MinMyGID(), vector->Map().MaxMyGID() + 1);
 #    else
-          is.add_range(vector->Map().MinMyGID64(),
-                       vector->Map().MaxMyGID64() + 1);
+          is.add_range(vector->Map().MinMyGID64(), vector->Map().MaxMyGID64() + 1);
 #    endif
         }
       else if (vector->Map().NumMyElements() > 0)
         {
           const size_type n_indices = vector->Map().NumMyElements();
 #    ifndef DEAL_II_WITH_64BIT_INDICES
-          unsigned int *vector_indices =
-            (unsigned int *)vector->Map().MyGlobalElements();
+          unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
 #    else
-          size_type *vector_indices =
-            (size_type *)vector->Map().MyGlobalElements64();
+          size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
 #    endif
           is.add_indices(vector_indices, vector_indices + n_indices);
         }
@@ -635,15 +597,13 @@ namespace LinearAlgebra
     Vector::memory_consumption() const
     {
       return sizeof(*this) +
-             vector->MyLength() *
-               (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));
+             vector->MyLength() * (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));
     }
 
 
 
     void
-    Vector::create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                       const MPI_Comm &mpi_comm)
+    Vector::create_epetra_comm_pattern(const IndexSet &source_index_set, const MPI_Comm &mpi_comm)
     {
       source_stored_elements = source_index_set;
       epetra_comm_pattern    = std::make_shared<CommunicationPattern>(

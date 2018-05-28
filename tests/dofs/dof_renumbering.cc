@@ -45,8 +45,7 @@ void
 print_dofs(const DoFHandler<dim> &dof)
 {
   std::vector<types::global_dof_index> v(dof.get_fe().dofs_per_cell);
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();
        ++cell)
     {
       deallog << "Cell " << cell << " -- ";
@@ -64,8 +63,7 @@ void
 print_dofs(const DoFHandler<dim> &dof, unsigned int level)
 {
   std::vector<types::global_dof_index> v(dof.get_fe().dofs_per_cell);
-  for (typename DoFHandler<dim>::cell_iterator cell = dof.begin(level);
-       cell != dof.end(level);
+  for (typename DoFHandler<dim>::cell_iterator cell = dof.begin(level); cell != dof.end(level);
        ++cell)
     {
       deallog << "Cell " << cell << " -- ";
@@ -123,8 +121,7 @@ check_renumbering(DoFHandler<dim> &mgdof, bool discontinuous)
   print_dofs(dof);
 
   // Check level ordering
-  for (unsigned int level = 0; level < dof.get_triangulation().n_levels();
-       ++level)
+  for (unsigned int level = 0; level < dof.get_triangulation().n_levels(); ++level)
     {
       print_dofs(mgdof, level);
 
@@ -146,8 +143,7 @@ check_renumbering(DoFHandler<dim> &mgdof, bool discontinuous)
       // behavior of the
       // DoFRenumbering::component_wise set
       // of functions before December 2005
-      DoFRenumbering::component_wise(static_cast<DoFHandler<dim> &>(mgdof),
-                                     order);
+      DoFRenumbering::component_wise(static_cast<DoFHandler<dim> &>(mgdof), order);
       print_dofs(mgdof, level);
     }
 }

@@ -84,11 +84,10 @@ namespace GridRefinement
    */
   template <int dim>
   std::pair<double, double>
-  adjust_refine_and_coarsen_number_fraction(
-    const unsigned int current_n_cells,
-    const unsigned int max_n_cells,
-    const double       top_fraction_of_cells,
-    const double       bottom_fraction_of_cells);
+  adjust_refine_and_coarsen_number_fraction(const unsigned int current_n_cells,
+                                            const unsigned int max_n_cells,
+                                            const double       top_fraction_of_cells,
+                                            const double       bottom_fraction_of_cells);
 
   /**
    * This function provides a strategy to mark cells for refinement and
@@ -161,7 +160,7 @@ namespace GridRefinement
     const Vector<Number> &        criteria,
     const double                  top_fraction_of_cells,
     const double                  bottom_fraction_of_cells,
-    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max());
+    const unsigned int            max_n_cells = std::numeric_limits<unsigned int>::max());
 
   /**
    * This function provides a strategy to mark cells for refinement and
@@ -226,7 +225,7 @@ namespace GridRefinement
     const Vector<Number> &        criteria,
     const double                  top_fraction,
     const double                  bottom_fraction,
-    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max());
+    const unsigned int            max_n_cells = std::numeric_limits<unsigned int>::max());
 
 
 
@@ -328,7 +327,7 @@ namespace GridRefinement
   refine(Triangulation<dim, spacedim> &tria,
          const Vector<Number> &        criteria,
          const double                  threshold,
-         const unsigned int max_to_mark = numbers::invalid_unsigned_int);
+         const unsigned int            max_to_mark = numbers::invalid_unsigned_int);
 
   /**
    * Mark all mesh cells for which the value in @p criteria is less than @p

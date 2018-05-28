@@ -57,8 +57,7 @@ test()
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1, FE_Nothing<dim>(), dim));
 
-  fe_collection.push_back(
-    FESystem<dim>(FE_Nothing<dim>(dim + 1), 1, FE_Q<dim>(2), dim));
+  fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(dim + 1), 1, FE_Q<dim>(2), dim));
 
   hp::DoFHandler<dim> dof_handler(triangulation);
 
@@ -66,16 +65,13 @@ test()
 
   dof_handler.distribute_dofs(fe_collection);
 
-  deallog << "   Number of active cells:       "
-          << triangulation.n_active_cells() << std::endl
-          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
 
   Vector<double> solution(dof_handler.n_dofs());
 
-  VectorTools::interpolate(
-    dof_handler, Functions::ZeroFunction<dim>(2 * dim + 1), solution);
+  VectorTools::interpolate(dof_handler, Functions::ZeroFunction<dim>(2 * dim + 1), solution);
 
   deallog << "l2_norm = " << solution.l2_norm() << std::endl;
 }

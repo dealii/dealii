@@ -65,8 +65,7 @@ test()
 
 
   // set refine flag for the only cell we have, then do the refinement
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> solution_trans(
-    dof_handler);
+  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> solution_trans(dof_handler);
   dof_handler.begin_active()->set_refine_flag();
   solution_trans.prepare_for_coarsening_and_refinement(solution);
   triangulation.execute_coarsening_and_refinement();

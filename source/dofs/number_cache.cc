@@ -41,9 +41,8 @@ namespace internal
 
 
 
-    NumberCache::NumberCache(
-      const std::vector<IndexSet> &locally_owned_dofs_per_processor,
-      const unsigned int           my_rank) :
+    NumberCache::NumberCache(const std::vector<IndexSet> &locally_owned_dofs_per_processor,
+                             const unsigned int           my_rank) :
       locally_owned_dofs_per_processor(locally_owned_dofs_per_processor)
     {
       const unsigned int n_procs = locally_owned_dofs_per_processor.size();
@@ -54,16 +53,14 @@ namespace internal
 
       n_locally_owned_dofs_per_processor.resize(n_procs);
       for (unsigned int p = 0; p < n_procs; ++p)
-        n_locally_owned_dofs_per_processor[p] =
-          locally_owned_dofs_per_processor[p].n_elements();
+        n_locally_owned_dofs_per_processor[p] = locally_owned_dofs_per_processor[p].n_elements();
       n_locally_owned_dofs = n_locally_owned_dofs_per_processor[my_rank];
       locally_owned_dofs   = locally_owned_dofs_per_processor[my_rank];
 
 
-      n_global_dofs =
-        std::accumulate(n_locally_owned_dofs_per_processor.begin(),
-                        n_locally_owned_dofs_per_processor.end(),
-                        types::global_dof_index(0));
+      n_global_dofs = std::accumulate(n_locally_owned_dofs_per_processor.begin(),
+                                      n_locally_owned_dofs_per_processor.end(),
+                                      types::global_dof_index(0));
     }
 
 
@@ -84,10 +81,8 @@ namespace internal
       return MemoryConsumption::memory_consumption(n_global_dofs) +
              MemoryConsumption::memory_consumption(n_locally_owned_dofs) +
              MemoryConsumption::memory_consumption(locally_owned_dofs) +
-             MemoryConsumption::memory_consumption(
-               n_locally_owned_dofs_per_processor) +
-             MemoryConsumption::memory_consumption(
-               locally_owned_dofs_per_processor);
+             MemoryConsumption::memory_consumption(n_locally_owned_dofs_per_processor) +
+             MemoryConsumption::memory_consumption(locally_owned_dofs_per_processor);
     }
   } // namespace DoFHandlerImplementation
 } // namespace internal

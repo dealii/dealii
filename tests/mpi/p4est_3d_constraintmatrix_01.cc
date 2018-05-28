@@ -55,9 +55,7 @@ test()
   tr.refine_global(2);
   for (unsigned int step = 0; step < 8; ++step)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tr.begin_active(),
-                                                        endc = tr.end();
+      typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(), endc = tr.end();
 
       for (; cell != endc; ++cell)
         if (Testing::rand() % 42 == 1)
@@ -80,8 +78,7 @@ test()
   DoFTools::make_hanging_node_constraints(dofh, cm2);
 
   {
-    std::ofstream file(
-      (std::string("dat.") + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
     file << "**** proc " << myid << std::endl;
     cm.print(file);
     file << "****" << std::endl;

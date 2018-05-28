@@ -72,8 +72,7 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-                                             MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   VectorTools::interpolate(dofh, LinearFunction<dim>(), interpolated);
 
   IndexSet relevant_set;
@@ -81,16 +80,14 @@ test()
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = interpolated;
 
-  Functions::
-    FEFieldFunction<dim, DoFHandler<dim>, TrilinosWrappers::MPI::Vector>
-      field_function(dofh, x_rel);
+  Functions::FEFieldFunction<dim, DoFHandler<dim>, TrilinosWrappers::MPI::Vector> field_function(
+    dofh, x_rel);
 
   for (unsigned int test = 0; test < 4; ++test)
     {
       double     value;
-      Point<dim> p =
-        (dim == 2 ? Point<dim>(test / 2 + 1, test % 2 + 1) / 3 :
-                    Point<dim>(test / 2 + 1, test / 2 + 1, test % 2 + 1) / 3);
+      Point<dim> p = (dim == 2 ? Point<dim>(test / 2 + 1, test % 2 + 1) / 3 :
+                                 Point<dim>(test / 2 + 1, test / 2 + 1, test % 2 + 1) / 3);
 
       // see if we can find the point on the current processor
       bool point_found = false;
@@ -99,8 +96,7 @@ test()
           value       = field_function.value(p);
           point_found = true;
 
-          Assert(std::fabs(value - (p[0] + 2)) <
-                   1e-8 * std::fabs(value + (p[0] + 2)),
+          Assert(std::fabs(value - (p[0] + 2)) < 1e-8 * std::fabs(value + (p[0] + 2)),
                  ExcInternalError());
         }
       catch (typename VectorTools::ExcPointNotAvailableHere &)
@@ -110,8 +106,7 @@ test()
 
       // the point should be found at least once (it  might also be found
       // in the ghost layer)
-      Assert(Utilities::MPI::sum(point_found ? 1 : 0, MPI_COMM_WORLD) >= 1,
-             ExcInternalError());
+      Assert(Utilities::MPI::sum(point_found ? 1 : 0, MPI_COMM_WORLD) >= 1, ExcInternalError());
     }
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

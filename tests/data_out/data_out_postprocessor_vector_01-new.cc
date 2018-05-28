@@ -74,9 +74,7 @@ private:
 
 
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem() :
-  fe(FE_Q<dim>(1), 2),
-  dof_handler(triangulation)
+LaplaceProblem<dim>::LaplaceProblem() : fe(FE_Q<dim>(1), 2), dof_handler(triangulation)
 {}
 
 
@@ -136,13 +134,12 @@ template <int dim>
 class MyPostprocessor : public DataPostprocessorVector<dim>
 {
 public:
-  MyPostprocessor() :
-    DataPostprocessorVector<dim>("magnitude_times_d", update_values)
+  MyPostprocessor() : DataPostprocessorVector<dim>("magnitude_times_d", update_values)
   {}
 
   virtual void
   evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &input_data,
-                        std::vector<Vector<double>> &computed_quantities) const
+                        std::vector<Vector<double>> &               computed_quantities) const
   {
     for (unsigned int q = 0; q < input_data.solution_values.size(); ++q)
       {
@@ -150,11 +147,9 @@ public:
 
         for (unsigned int d = 0; d < dim; ++d)
           computed_quantities[q](d) =
-            input_data.solution_values[q](0) *
-              input_data.solution_values[q](0) +
+            input_data.solution_values[q](0) * input_data.solution_values[q](0) +
             input_data.solution_values[q](1) * input_data.solution_values[q](1);
-        AssertThrow(std::fabs(computed_quantities[q](0) - 1) < 1e-12,
-                    ExcInternalError());
+        AssertThrow(std::fabs(computed_quantities[q](0) - 1) < 1e-12, ExcInternalError());
       }
   }
 };

@@ -40,15 +40,12 @@ main()
   GridGenerator::hyper_ball(tria2, Point<dim>(), 0.4);
   GridGenerator::merge_triangulations(tria1, tria2, tria);
   tria.set_all_manifold_ids(0);
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     {
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         {
           bool face_at_sphere_boundary = true;
-          for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell;
-               ++v)
+          for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell; ++v)
             if (std::abs(cell->face(f)->vertex(v).norm() - 0.4) > 1e-12)
               face_at_sphere_boundary = false;
           if (face_at_sphere_boundary)
@@ -66,8 +63,7 @@ main()
   deallog.precision(10);
   deallog << "Cell centers" << std::endl;
   for (auto cell : tria.cell_iterators())
-    deallog << cell->id() << " has center "
-            << cell->center(/*respect_manifold*/ true) << std::endl;
+    deallog << cell->id() << " has center " << cell->center(/*respect_manifold*/ true) << std::endl;
 
   return 0;
 }

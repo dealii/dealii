@@ -51,8 +51,7 @@ test()
   // ids based on their position, in
   // particular we take the quadrant
   // (octant)
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     {
       unsigned int subdomain = 0;
@@ -80,8 +79,7 @@ test()
       // the interfaces count for each
       // subdomain
       DoFTools::extract_subdomain_dofs(dof_handler, subdomain, selected_dofs);
-      deallog << std::count(selected_dofs.begin(), selected_dofs.end(), true)
-              << std::endl;
+      deallog << std::count(selected_dofs.begin(), selected_dofs.end(), true) << std::endl;
     }
 }
 

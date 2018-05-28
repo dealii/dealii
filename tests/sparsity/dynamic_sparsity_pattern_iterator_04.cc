@@ -70,8 +70,7 @@ iterate(DynamicSparsityPattern &sp)
   {
     for (unsigned int row = 0; row < sp.n_rows(); ++row)
       {
-        DynamicSparsityPattern::iterator col     = sp.begin(row),
-                                         end_col = sp.end(row);
+        DynamicSparsityPattern::iterator col = sp.begin(row), end_col = sp.end(row);
         deallog << "row " << row << ":" << std::endl;
         for (; col != end_col; ++col)
           {
@@ -124,13 +123,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -138,12 +135,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

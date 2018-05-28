@@ -40,14 +40,12 @@ using namespace std;
 template <int s_dim, int spacedim>
 void
 test_vertices_orientation(
-  const Triangulation<s_dim, spacedim> &boundary_mesh,
+  const Triangulation<s_dim, spacedim> &                           boundary_mesh,
   map<typename Triangulation<s_dim, spacedim>::cell_iterator,
-      typename Triangulation<s_dim + 1, spacedim>::face_iterator>
-    &surface_to_volume_mapping)
+      typename Triangulation<s_dim + 1, spacedim>::face_iterator> &surface_to_volume_mapping)
 {
-  typename Triangulation<s_dim, spacedim>::active_cell_iterator
-    cell = boundary_mesh.begin_active(),
-    endc = boundary_mesh.end();
+  typename Triangulation<s_dim, spacedim>::active_cell_iterator cell = boundary_mesh.begin_active(),
+                                                                endc = boundary_mesh.end();
   typename Triangulation<s_dim + 1, spacedim>::face_iterator face;
 
   for (; cell != endc; ++cell)
@@ -66,8 +64,7 @@ test_vertices_orientation(
         {
           Point<spacedim> diff(face->vertex(k));
           diff -= cell->vertex(k);
-          AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(),
-                      ExcInternalError());
+          AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(), ExcInternalError());
         }
     }
 }
@@ -94,8 +91,7 @@ main()
     const int dim = 3;
     deallog << "Testing hyper_cube in dim: " << dim << "..." << endl;
 
-    map<Triangulation<dim - 1, dim>::cell_iterator,
-        Triangulation<dim, dim>::face_iterator>
+    map<Triangulation<dim - 1, dim>::cell_iterator, Triangulation<dim, dim>::face_iterator>
                                  surface_to_volume_mapping;
     const SphericalManifold<dim> boundary_description;
     Triangulation<dim>           volume_mesh;
@@ -107,8 +103,7 @@ main()
     Triangulation<dim - 1, dim>           boundary_mesh;
     boundary_mesh.set_manifold(0, surface_description);
 
-    surface_to_volume_mapping =
-      GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
+    surface_to_volume_mapping = GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
     deallog << volume_mesh.n_active_cells() << std::endl;
     deallog << boundary_mesh.n_active_cells() << std::endl;
     save_mesh(boundary_mesh);

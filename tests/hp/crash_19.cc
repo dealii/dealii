@@ -85,24 +85,19 @@ test()
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   dof_handler.distribute_dofs(fe);
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   ExactSolution<dim>                        exact_solution;
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, exact_solution, boundary_values);
+  VectorTools::interpolate_boundary_values(dof_handler, 0, exact_solution, boundary_values);
   if (dim == 1)
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 1, exact_solution, boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler, 1, exact_solution, boundary_values);
 
-  for (std::map<types::global_dof_index, double>::iterator i =
-         boundary_values.begin();
+  for (std::map<types::global_dof_index, double>::iterator i = boundary_values.begin();
        i != boundary_values.end();
        ++i)
     deallog << i->first << ' ' << i->second << std::endl;
@@ -127,25 +122,21 @@ main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 

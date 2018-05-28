@@ -54,8 +54,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2009, 2011, 2013
  */
 template <int dim, int spacedim = dim>
-class FE_FaceQ
-  : public FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>
+class FE_FaceQ : public FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>
 {
 public:
   /**
@@ -98,7 +97,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -111,15 +110,14 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                    const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &                matrix) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   /**
    * @name Functions to support hp
@@ -144,8 +142,7 @@ public:
    * The set of such constraints is non-empty only for dim==1.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_vertex_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_vertex_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -154,8 +151,7 @@ public:
    * The set of such constraints is non-empty only for dim==2.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_line_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_line_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -164,8 +160,7 @@ public:
    * The set of such constraints is non-empty only for dim==3.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -184,8 +179,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim, spacedim> &fe_other) const override;
   /**
    * @}
    */
@@ -253,7 +247,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<1, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &              matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -266,15 +260,14 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<1, spacedim> &source,
                                    const unsigned int                subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &              matrix) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -301,8 +294,7 @@ public:
    * The set of such constraints is non-empty only for dim==1.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_vertex_dof_identities(
-    const FiniteElement<1, spacedim> &fe_other) const override;
+  hp_vertex_dof_identities(const FiniteElement<1, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -311,8 +303,7 @@ public:
    * The set of such constraints is non-empty only for dim==2.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_line_dof_identities(
-    const FiniteElement<1, spacedim> &fe_other) const override;
+  hp_line_dof_identities(const FiniteElement<1, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -321,8 +312,7 @@ public:
    * The set of such constraints is non-empty only for dim==3.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<1, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<1, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -334,8 +324,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<1, spacedim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<1, spacedim> &fe_other) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, it
@@ -353,30 +342,24 @@ protected:
 
 
   virtual std::unique_ptr<typename FiniteElement<1, spacedim>::InternalDataBase>
-  get_data(
-    const UpdateFlags /*update_flags*/,
-    const Mapping<1, spacedim> & /*mapping*/,
-    const Quadrature<1> & /*quadrature*/,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,
-                                                                       spacedim>
-      & /*output_data*/) const override
+  get_data(const UpdateFlags /*update_flags*/,
+           const Mapping<1, spacedim> & /*mapping*/,
+           const Quadrature<1> & /*quadrature*/,
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim>
+             & /*output_data*/) const override
   {
-    return std_cxx14::make_unique<
-      typename FiniteElement<1, spacedim>::InternalDataBase>();
+    return std_cxx14::make_unique<typename FiniteElement<1, spacedim>::InternalDataBase>();
   }
 
   std::unique_ptr<typename FiniteElement<1, spacedim>::InternalDataBase>
-  get_face_data(
-    const UpdateFlags update_flags,
-    const Mapping<1, spacedim> & /*mapping*/,
-    const Quadrature<0> &quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,
-                                                                       spacedim>
-      & /*output_data*/) const override
+  get_face_data(const UpdateFlags update_flags,
+                const Mapping<1, spacedim> & /*mapping*/,
+                const Quadrature<0> &quadrature,
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim>
+                  & /*output_data*/) const override
   {
     // generate a new data object and initialize some fields
-    auto data = std_cxx14::make_unique<
-      typename FiniteElement<1, spacedim>::InternalDataBase>();
+    auto data = std_cxx14::make_unique<typename FiniteElement<1, spacedim>::InternalDataBase>();
     data->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
@@ -384,8 +367,7 @@ protected:
     (void)n_q_points;
 
     // No derivatives of this element are implemented.
-    if (data->update_each & update_gradients ||
-        data->update_each & update_hessians)
+    if (data->update_each & update_gradients || data->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }
@@ -394,13 +376,11 @@ protected:
   }
 
   std::unique_ptr<typename FiniteElement<1, spacedim>::InternalDataBase>
-  get_subface_data(
-    const UpdateFlags           update_flags,
-    const Mapping<1, spacedim> &mapping,
-    const Quadrature<0> &       quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,
-                                                                       spacedim>
-      &output_data) const override
+  get_subface_data(const UpdateFlags           update_flags,
+                   const Mapping<1, spacedim> &mapping,
+                   const Quadrature<0> &       quadrature,
+                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim>
+                     &output_data) const override
   {
     return get_face_data(update_flags, mapping, quadrature, output_data);
   }
@@ -412,13 +392,10 @@ protected:
     const Quadrature<1> &                                     quadrature,
     const Mapping<1, spacedim> &                              mapping,
     const typename Mapping<1, spacedim>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<1,
-                                                                       spacedim>
-      &                                                          mapping_data,
-    const typename FiniteElement<1, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,
-                                                                       spacedim>
-      &output_data) const override;
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
+    const typename FiniteElement<1, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_face_values(
@@ -427,13 +404,10 @@ protected:
     const Quadrature<0> &                                     quadrature,
     const Mapping<1, spacedim> &                              mapping,
     const typename Mapping<1, spacedim>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<1,
-                                                                       spacedim>
-      &                                                          mapping_data,
-    const typename FiniteElement<1, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,
-                                                                       spacedim>
-      &output_data) const override;
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
+    const typename FiniteElement<1, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_subface_values(
@@ -443,13 +417,10 @@ protected:
     const Quadrature<0> &                                     quadrature,
     const Mapping<1, spacedim> &                              mapping,
     const typename Mapping<1, spacedim>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<1,
-                                                                       spacedim>
-      &                                                          mapping_data,
-    const typename FiniteElement<1, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,
-                                                                       spacedim>
-      &output_data) const override;
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
+    const typename FiniteElement<1, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data)
+    const override;
 
 private:
   /**
@@ -517,7 +488,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -530,15 +501,14 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                    const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &                matrix) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -557,8 +527,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, the

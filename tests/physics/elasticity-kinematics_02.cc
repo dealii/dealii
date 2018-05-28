@@ -79,11 +79,9 @@ main()
   SymmetricTensor<2, dim, VectorizedArray<double>> E_solution;
   E_solution =
     0.5 * (symmetrize(transpose(F_solution) * F_solution) -
-           static_cast<SymmetricTensor<2, dim, VectorizedArray<double>>>(
-             StandardTensors<dim>::I));
+           static_cast<SymmetricTensor<2, dim, VectorizedArray<double>>>(StandardTensors<dim>::I));
 
-  SymmetricTensor<2, dim, VectorizedArray<double>> E_test =
-    Kinematics::E(F_test);
+  SymmetricTensor<2, dim, VectorizedArray<double>> E_test = Kinematics::E(F_test);
 
   for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; v++)
     for (unsigned int i = 0; i < dim; i++)

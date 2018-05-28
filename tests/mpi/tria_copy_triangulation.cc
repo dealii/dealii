@@ -65,8 +65,7 @@ test()
 
   typename Triangulation<dim, dim>::active_cell_iterator cell1, cell2;
 
-  for (cell1 = tr.begin_active(), cell2 = new_tr.begin_active();
-       cell1 != tr.end();
+  for (cell1 = tr.begin_active(), cell2 = new_tr.begin_active(); cell1 != tr.end();
        ++cell1, ++cell2)
     {
       if (cell1->is_locally_owned())
@@ -74,23 +73,17 @@ test()
           if (myid == 0)
             {
               deallog << "triangulation::cell     " << cell1
-                      << ": locally owned, subdomain_id = "
-                      << cell1->subdomain_id() << std::endl;
+                      << ": locally owned, subdomain_id = " << cell1->subdomain_id() << std::endl;
               deallog << "new_triangulation::cell " << cell2
-                      << ": locally owned, subdomain_id = "
-                      << cell2->subdomain_id() << std::endl;
+                      << ": locally owned, subdomain_id = " << cell2->subdomain_id() << std::endl;
             };
 
           Assert(cell2->is_locally_owned(), ExcInternalError());
-          Assert(cell1->subdomain_id() == cell2->subdomain_id(),
-                 ExcInternalError());
+          Assert(cell1->subdomain_id() == cell2->subdomain_id(), ExcInternalError());
 
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell; ++vertex)
             {
-              Assert(cell1->vertex(vertex).distance(cell2->vertex(vertex)) <
-                       1.e-14,
+              Assert(cell1->vertex(vertex).distance(cell2->vertex(vertex)) < 1.e-14,
                      ExcInternalError());
 
               if (myid == 0)
@@ -102,11 +95,9 @@ test()
           if (myid == 0)
             {
               deallog << "triangulation::cell     " << cell1
-                      << ": ghost, subdomain_id = " << cell1->subdomain_id()
-                      << std::endl;
+                      << ": ghost, subdomain_id = " << cell1->subdomain_id() << std::endl;
               deallog << "new_triangulation::cell " << cell2
-                      << ": ghost, subdomain_id = " << cell2->subdomain_id()
-                      << std::endl;
+                      << ": ghost, subdomain_id = " << cell2->subdomain_id() << std::endl;
             };
 
           Assert(cell2->is_ghost(), ExcInternalError());
@@ -115,10 +106,8 @@ test()
         {
           if (myid == 0)
             {
-              deallog << "triangulation::cell     " << cell1 << ": artificial"
-                      << std::endl;
-              deallog << "new_triangulation::cell " << cell2 << ": artificial"
-                      << std::endl;
+              deallog << "triangulation::cell     " << cell1 << ": artificial" << std::endl;
+              deallog << "new_triangulation::cell " << cell2 << ": artificial" << std::endl;
             };
 
           Assert(cell2->is_artificial(), ExcInternalError());

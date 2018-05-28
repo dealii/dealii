@@ -112,7 +112,7 @@ curved_grid(std::ofstream &out)
       {
         const unsigned int p     = i + j * n_phi;
         const double       alpha = i * 2 * numbers::PI / n_phi;
-        vertices[p] = Point<2>(r[j] * cos(alpha), r[j] * sin(alpha));
+        vertices[p]              = Point<2>(r[j] * cos(alpha), r[j] * sin(alpha));
       }
   // create connectivity
   std::vector<CellData<2>> cells(n_phi * n_r);
@@ -132,8 +132,7 @@ curved_grid(std::ofstream &out)
       }
   // create triangulation
   Triangulation<2> triangulation;
-  triangulation.create_triangulation_compatibility(
-    vertices, cells, SubCellData());
+  triangulation.create_triangulation_compatibility(vertices, cells, SubCellData());
   // now provide everything that is
   // needed for solving a Laplace
   // equation.
@@ -141,9 +140,8 @@ curved_grid(std::ofstream &out)
   FE_Q<2>            fe(2);
   DoFHandler<2>      dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
-  SparsityPattern sparsity_pattern(dof_handler.n_dofs(),
-                                   dof_handler.n_dofs(),
-                                   dof_handler.max_couplings_between_dofs());
+  SparsityPattern sparsity_pattern(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
   SparseMatrix<double> S(sparsity_pattern);
@@ -155,24 +153,19 @@ curved_grid(std::ofstream &out)
   // fill these maps: on the inner boundary try
   // to approximate a circle, on the outer
   // boundary use straight lines
-  DoFHandler<2>::cell_iterator cell = dof_handler.begin_active(),
-                               endc = dof_handler.end();
+  DoFHandler<2>::cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
   DoFHandler<2>::face_iterator face;
   for (; cell != endc; ++cell)
     {
       // fix all vertices
-      for (unsigned int vertex_no = 0;
-           vertex_no < GeometryInfo<2>::vertices_per_cell;
-           ++vertex_no)
+      for (unsigned int vertex_no = 0; vertex_no < GeometryInfo<2>::vertices_per_cell; ++vertex_no)
         {
           for (unsigned int i = 0; i < 2; ++i)
             m[i][cell->vertex_dof_index(vertex_no, 0)] = 0.;
         }
 
       if (cell->at_boundary())
-        for (unsigned int face_no = 0;
-             face_no < GeometryInfo<2>::faces_per_cell;
-             ++face_no)
+        for (unsigned int face_no = 0; face_no < GeometryInfo<2>::faces_per_cell; ++face_no)
           {
             face = cell->face(face_no);
             // insert a modifiued value for
@@ -208,12 +201,10 @@ curved_grid(std::ofstream &out)
   FESystem<2>   cfe(FE_Q<2>(2), 2);
   DoFHandler<2> cdh(triangulation);
   cdh.distribute_dofs(cfe);
-  Vector<double> displacements(cdh.n_dofs()), dx(fe.dofs_per_cell),
-    dy(fe.dofs_per_cell), dxy(cfe.dofs_per_cell);
-  DoFHandler<2>::active_cell_iterator component_cell =
-                                        dof_handler.begin_active(),
-                                      end_c         = dof_handler.end(),
-                                      combined_cell = cdh.begin_active();
+  Vector<double> displacements(cdh.n_dofs()), dx(fe.dofs_per_cell), dy(fe.dofs_per_cell),
+    dxy(cfe.dofs_per_cell);
+  DoFHandler<2>::active_cell_iterator component_cell = dof_handler.begin_active(),
+                                      end_c = dof_handler.end(), combined_cell = cdh.begin_active();
   for (; component_cell != end_c; ++component_cell, ++combined_cell)
     {
       component_cell->get_dof_values(us[0], dx);

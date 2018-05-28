@@ -56,7 +56,6 @@ main(int argc, char **argv)
     PETScWrappers::SolverLSQR         solver(control);
     PETScWrappers::PreconditionJacobi preconditioner(A);
 
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 171, 175);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner), control.last_step(), 171, 175);
   }
 }

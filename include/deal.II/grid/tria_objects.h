@@ -185,8 +185,7 @@ namespace internal
        * lines in the interior of refined cells can be stored as single lines.
        */
       void
-      reserve_space(const unsigned int new_objs_in_pairs,
-                    const unsigned int new_objs_single = 0);
+      reserve_space(const unsigned int new_objs_in_pairs, const unsigned int new_objs_single = 0);
 
       /**
        * Return an iterator to the next free slot for a single object. This
@@ -224,8 +223,7 @@ namespace internal
        */
       template <int dim, int spacedim>
       typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator
-      next_free_hex(const dealii::Triangulation<dim, spacedim> &tria,
-                    const unsigned int                          level);
+      next_free_hex(const dealii::Triangulation<dim, spacedim> &tria, const unsigned int level);
 
       /**
        * Clear all the data contained in this object.
@@ -540,8 +538,7 @@ namespace internal
        * the needed elements.
        */
       void
-      reserve_space(const unsigned int new_quads_in_pairs,
-                    const unsigned int new_quads_single = 0);
+      reserve_space(const unsigned int new_quads_in_pairs, const unsigned int new_quads_single = 0);
 
       /**
        * Clear all the data contained in this object.
@@ -596,9 +593,7 @@ namespace internal
     template <typename G>
     template <class Archive>
     void
-    TriaObjects<G>::BoundaryOrMaterialId::serialize(
-      Archive &ar,
-      const unsigned int /*version*/)
+    TriaObjects<G>::BoundaryOrMaterialId::serialize(Archive &ar, const unsigned int /*version*/)
     {
       // serialize this
       // structure by
@@ -617,8 +612,7 @@ namespace internal
 
     template <typename G>
     inline bool
-    TriaObjects<G>::face_orientation(const unsigned int,
-                                     const unsigned int) const
+    TriaObjects<G>::face_orientation(const unsigned int, const unsigned int) const
     {
       return true;
     }
@@ -762,13 +756,10 @@ namespace internal
     //----------------------------------------------------------------------//
 
     inline bool
-    TriaObjectsHex::face_orientation(const unsigned int cell,
-                                     const unsigned int face) const
+    TriaObjectsHex::face_orientation(const unsigned int cell, const unsigned int face) const
     {
-      Assert(
-        cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
-        ExcIndexRange(
-          0, cell, face_orientations.size() / GeometryInfo<3>::faces_per_cell));
+      Assert(cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
+             ExcIndexRange(0, cell, face_orientations.size() / GeometryInfo<3>::faces_per_cell));
       Assert(face < GeometryInfo<3>::faces_per_cell,
              ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
 
@@ -778,8 +769,7 @@ namespace internal
     //----------------------------------------------------------------------//
 
     inline bool
-    TriaObjectsQuad3D::face_orientation(const unsigned int cell,
-                                        const unsigned int face) const
+    TriaObjectsQuad3D::face_orientation(const unsigned int cell, const unsigned int face) const
     {
       return line_orientations[cell * GeometryInfo<2>::faces_per_cell + face];
     }
@@ -790,8 +780,7 @@ namespace internal
     template <class G>
     template <int dim, int spacedim>
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
-    TriaObjects<G>::next_free_single_object(
-      const dealii::Triangulation<dim, spacedim> &tria)
+    TriaObjects<G>::next_free_single_object(const dealii::Triangulation<dim, spacedim> &tria)
     {
       // TODO: Think of a way to ensure that we are using the correct
       // triangulation, i.e. the one containing *this.
@@ -830,12 +819,12 @@ namespace internal
             next_free_single = pos - 1;
           else
             // no valid single object anymore
-            return dealii::TriaRawIterator<
-              dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, -1, -1);
+            return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>(
+              &tria, -1, -1);
         }
 
-      return dealii::TriaRawIterator<
-        dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, 0, pos);
+      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>(
+        &tria, 0, pos);
     }
 
 
@@ -843,8 +832,7 @@ namespace internal
     template <class G>
     template <int dim, int spacedim>
     dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
-    TriaObjects<G>::next_free_pair_object(
-      const dealii::Triangulation<dim, spacedim> &tria)
+    TriaObjects<G>::next_free_pair_object(const dealii::Triangulation<dim, spacedim> &tria)
     {
       // TODO: Think of a way to ensure that we are using the correct
       // triangulation, i.e. the one containing *this.
@@ -860,13 +848,13 @@ namespace internal
             }
       if (pos >= last)
         // no free slot
-        return dealii::TriaRawIterator<
-          dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, -1, -1);
+        return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>(
+          &tria, -1, -1);
       else
         next_free_pair = pos + 2;
 
-      return dealii::TriaRawIterator<
-        dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, 0, pos);
+      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>(
+        &tria, 0, pos);
     }
 
 

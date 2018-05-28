@@ -40,14 +40,10 @@ public:
     tria(tria_in)
   {
     tria_in.signals.post_refinement_on_cell.connect(
-      std::bind(&SignalListener<dim, spacedim>::count_on_refine,
-                this,
-                std::placeholders::_1));
+      std::bind(&SignalListener<dim, spacedim>::count_on_refine, this, std::placeholders::_1));
 
     tria_in.signals.pre_coarsening_on_cell.connect(
-      std::bind(&SignalListener<dim, spacedim>::count_on_coarsen,
-                this,
-                std::placeholders::_1));
+      std::bind(&SignalListener<dim, spacedim>::count_on_coarsen, this, std::placeholders::_1));
   }
 
   int
@@ -58,8 +54,7 @@ public:
 
 private:
   void
-  count_on_refine(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  count_on_refine(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     n_active_cells += cell->n_children();
     --n_active_cells;
@@ -68,8 +63,7 @@ private:
   }
 
   void
-  count_on_coarsen(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  count_on_coarsen(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     ++n_active_cells;
     n_active_cells -= cell->n_children();
@@ -89,8 +83,8 @@ test()
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;
 
   {
-    const std::string prefix = Utilities::int_to_string(dim, 1) + "d-" +
-                               Utilities::int_to_string(spacedim, 1) + "d";
+    const std::string prefix =
+      Utilities::int_to_string(dim, 1) + "d-" + Utilities::int_to_string(spacedim, 1) + "d";
     deallog.push(prefix.c_str());
   }
 
@@ -101,8 +95,7 @@ test()
 
   tria.refine_global(2);
 
-  deallog << "n_cell_gap after refine : "
-          << count_cell_via_signal.n_active_cell_gap() << std::endl;
+  deallog << "n_cell_gap after refine : " << count_cell_via_signal.n_active_cell_gap() << std::endl;
 
   // Test signal on coarsening
   {
@@ -116,8 +109,8 @@ test()
     tria.execute_coarsening_and_refinement();
   }
 
-  deallog << "n_cell_gap after coarsen : "
-          << count_cell_via_signal.n_active_cell_gap() << std::endl;
+  deallog << "n_cell_gap after coarsen : " << count_cell_via_signal.n_active_cell_gap()
+          << std::endl;
 
   deallog.pop();
   return;
@@ -126,9 +119,8 @@ test()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, /* int max_num_threads */ 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, /* int max_num_threads */ 1);
+  MPILogInitAll                    log;
 
   // parallel::distributed::Triangulation<1, spacedim> is not valid.
   {

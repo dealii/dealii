@@ -56,8 +56,7 @@ void
 output(parallel::distributed::Triangulation<dim> &tr)
 {
   const std::string filename =
-    ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
-     ".svg");
+    ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) + ".svg");
   std::ofstream stream(filename.c_str());
   /*
   GridOutFlags::XFig flags;
@@ -97,9 +96,7 @@ test()
 
   for (unsigned int ii = 0; ii < 5; ++ii)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tr.begin_active(),
-                                                        endc = tr.end();
+      typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(), endc = tr.end();
 
       for (; cell != endc; ++cell)
         if (Testing::rand() % 42 == 1)
@@ -119,15 +116,13 @@ test()
         for (unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)
           {
             //      deallog << "level " << lvl << ": "<< std::endl;
-            typename DoFHandler<dim>::cell_iterator cell = dofh.begin(lvl),
-                                                    endc = dofh.end(lvl);
+            typename DoFHandler<dim>::cell_iterator cell = dofh.begin(lvl), endc = dofh.end(lvl);
 
             for (; cell != endc; ++cell)
               {
                 if (cell->level_subdomain_id() != tr.locally_owned_subdomain())
                   continue;
-                for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell;
-                     ++f)
+                for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
                   {
                     if (cell->at_boundary(f))
                       continue;
@@ -135,16 +130,13 @@ test()
                     //        deallog << cell->neighbor(f)->level_subdomain_id()
                     //        << std::endl;
                     // is cell level-artificial?
-                    Assert(cell->neighbor(f)->level_subdomain_id() < 100,
-                           ExcInternalError());
+                    Assert(cell->neighbor(f)->level_subdomain_id() < 100, ExcInternalError());
 
-                    std::vector<types::global_dof_index> dofs(
-                      fe.n_dofs_per_cell());
+                    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
                     cell->neighbor(f)->get_mg_dof_indices(dofs);
                     for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                       {
-                        Assert(dofs[i] != numbers::invalid_dof_index,
-                               ExcInternalError());
+                        Assert(dofs[i] != numbers::invalid_dof_index, ExcInternalError());
                       }
                   }
               }

@@ -79,8 +79,7 @@ test()
 
   hp::DoFHandler<dim> dof_handler(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % fe_collection.size());
@@ -90,9 +89,7 @@ test()
   // interpolate a linear function
   Vector<double> vec(dof_handler.n_dofs());
   VectorTools::interpolate(
-    dof_handler,
-    VectorFunctionFromScalarFunctionObject<dim>(&f<dim>, 0, dim),
-    vec);
+    dof_handler, VectorFunctionFromScalarFunctionObject<dim>(&f<dim>, 0, dim), vec);
 
   Vector<float> diff(tria.n_active_cells());
 

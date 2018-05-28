@@ -96,15 +96,13 @@ test()
 
   VectorTools::create_boundary_right_hand_side(
     hp_dof_handler2, quadrature, rhs_function, rhs_vector2, boundary_ids);
-  Assert(std::fabs(std::accumulate(rhs_vector2.begin(), rhs_vector2.end(), 0.) -
-                   4) < 1e-12,
+  Assert(std::fabs(std::accumulate(rhs_vector2.begin(), rhs_vector2.end(), 0.) - 4) < 1e-12,
          ExcInternalError());
   deallog << rhs_vector2.l2_norm() << std::endl;
 
   VectorTools::create_boundary_right_hand_side(
     hp_dof_handler, quadrature, rhs_function, rhs_vector, boundary_ids);
-  Assert(std::fabs(std::accumulate(rhs_vector.begin(), rhs_vector.end(), 0.) -
-                   4) < 1e-12,
+  Assert(std::fabs(std::accumulate(rhs_vector.begin(), rhs_vector.end(), 0.) - 4) < 1e-12,
          ExcInternalError());
   deallog << rhs_vector.l2_norm() << std::endl;
 }

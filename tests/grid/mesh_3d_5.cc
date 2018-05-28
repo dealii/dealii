@@ -33,21 +33,18 @@ void check_this(Triangulation<3> &tria)
 {
   // look at all faces, not only
   // active ones
-  for (Triangulation<3>::cell_iterator cell = tria.begin(); cell != tria.end();
-       ++cell)
+  for (Triangulation<3>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
       if (cell->has_children())
-        for (unsigned int c = 0; c < GeometryInfo<3>::max_children_per_face;
-             ++c)
+        for (unsigned int c = 0; c < GeometryInfo<3>::max_children_per_face; ++c)
           {
-            Assert(cell->face_orientation(f) ==
-                     cell
-                       ->child(GeometryInfo<3>::child_cell_on_face(
-                         RefinementCase<3>::isotropic_refinement, f, c))
-                       ->face_orientation(f),
+            Assert(cell->face_orientation(f) == cell
+                                                  ->child(GeometryInfo<3>::child_cell_on_face(
+                                                    RefinementCase<3>::isotropic_refinement, f, c))
+                                                  ->face_orientation(f),
                    ExcInternalError());
-            deallog << "Cell << " << cell << ", face " << f << " subface " << c
-                    << " is ok." << std::endl;
+            deallog << "Cell << " << cell << ", face " << f << " subface " << c << " is ok."
+                    << std::endl;
           }
 }
 

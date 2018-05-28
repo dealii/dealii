@@ -57,8 +57,7 @@ f_post_refinement()
 
 template <int dim, int spacedim>
 void
-f_pre_coarsening_on_cell(
-  const typename Triangulation<dim, spacedim>::cell_iterator &)
+f_pre_coarsening_on_cell(const typename Triangulation<dim, spacedim>::cell_iterator &)
 {
   ++signal_counter_pre_coarsening_on_cell;
   return;
@@ -66,8 +65,7 @@ f_pre_coarsening_on_cell(
 
 template <int dim, int spacedim>
 void
-f_post_refinement_on_cell(
-  const typename Triangulation<dim, spacedim>::cell_iterator &)
+f_post_refinement_on_cell(const typename Triangulation<dim, spacedim>::cell_iterator &)
 {
   ++signal_counter_post_refinement_on_cell;
   return;
@@ -112,8 +110,8 @@ test()
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;
 
   {
-    const std::string prefix = Utilities::int_to_string(dim, 1) + "d-" +
-                               Utilities::int_to_string(spacedim, 1) + "d";
+    const std::string prefix =
+      Utilities::int_to_string(dim, 1) + "d-" + Utilities::int_to_string(spacedim, 1) + "d";
     deallog.push(prefix.c_str());
   }
 
@@ -122,10 +120,8 @@ test()
   tria.signals.create.connect(&f_create);
   tria.signals.pre_refinement.connect(&f_pre_refinement);
   tria.signals.post_refinement.connect(&f_post_refinement);
-  tria.signals.pre_coarsening_on_cell.connect(
-    &f_pre_coarsening_on_cell<dim, spacedim>);
-  tria.signals.post_refinement_on_cell.connect(
-    &f_post_refinement_on_cell<dim, spacedim>);
+  tria.signals.pre_coarsening_on_cell.connect(&f_pre_coarsening_on_cell<dim, spacedim>);
+  tria.signals.post_refinement_on_cell.connect(&f_post_refinement_on_cell<dim, spacedim>);
   tria.signals.copy.connect(&f_copy<dim, spacedim>);
   tria.signals.clear.connect(&f_clear);
   tria.signals.any_change.connect(&f_any_change);
@@ -155,14 +151,12 @@ test()
   tria.clear();
 
   deallog << "n_signal_create : " << signal_counter_create << std::endl;
-  deallog << "n_signal_pre_refinement : " << signal_counter_pre_refinement
+  deallog << "n_signal_pre_refinement : " << signal_counter_pre_refinement << std::endl;
+  deallog << "n_signal_post_refinement : " << signal_counter_post_refinement << std::endl;
+  deallog << "n_signal_pre_coarsening_on_cell : " << signal_counter_pre_coarsening_on_cell
           << std::endl;
-  deallog << "n_signal_post_refinement : " << signal_counter_post_refinement
+  deallog << "n_signal_post_refinement_on_cell : " << signal_counter_post_refinement_on_cell
           << std::endl;
-  deallog << "n_signal_pre_coarsening_on_cell : "
-          << signal_counter_pre_coarsening_on_cell << std::endl;
-  deallog << "n_signal_post_refinement_on_cell : "
-          << signal_counter_post_refinement_on_cell << std::endl;
   deallog << "n_signal_copy : " << signal_counter_copy << std::endl;
   deallog << "n_signal_clear : " << signal_counter_clear << std::endl;
   deallog << "n_signal_any_change : " << signal_counter_any_change << std::endl;
@@ -174,9 +168,8 @@ test()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, /* int max_num_threads */ 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, /* int max_num_threads */ 1);
+  MPILogInitAll                    log;
 
   // parallel::distributed::Triangulation<1, spacedim> is not valid.
   {

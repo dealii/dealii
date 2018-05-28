@@ -40,15 +40,14 @@ main()
   Triangulation<3> coarse_grid;
   create_two_cubes(coarse_grid);
 
-  const Triangulation<3>::active_cell_iterator cells[2] = {
-    coarse_grid.begin_active(), ++coarse_grid.begin_active()};
+  const Triangulation<3>::active_cell_iterator cells[2] = {coarse_grid.begin_active(),
+                                                           ++coarse_grid.begin_active()};
 
   // output all vertices
   for (unsigned int c = 0; c < 2; ++c)
     for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell; ++v)
-      deallog << "Cell " << c << ", vertex " << v << ": "
-              << cells[c]->vertex_index(v) << "  @  " << cells[c]->vertex(v)
-              << std::endl;
+      deallog << "Cell " << c << ", vertex " << v << ": " << cells[c]->vertex_index(v) << "  @  "
+              << cells[c]->vertex(v) << std::endl;
 
   // make sure by hand that certain
   // vertices match up

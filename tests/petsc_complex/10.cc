@@ -42,19 +42,15 @@ test(PETScWrappers::SparseMatrix &m)
     for (unsigned int j = 0; j < m.m(); ++j)
       if ((i + 2 * j + 1) % 3 == 0)
         {
-          AssertThrow(m(i, j) ==
-                        std::complex<double>(0., (i * j * .5 + .5) / 4 * 3),
+          AssertThrow(m(i, j) == std::complex<double>(0., (i * j * .5 + .5) / 4 * 3),
                       ExcInternalError());
-          AssertThrow(m.el(i, j) ==
-                        std::complex<double>(0., (i * j * .5 + .5) / 4 * 3),
+          AssertThrow(m.el(i, j) == std::complex<double>(0., (i * j * .5 + .5) / 4 * 3),
                       ExcInternalError());
         }
       else
         {
-          AssertThrow(m(i, j) == std::complex<double>(0., 0.),
-                      ExcInternalError());
-          AssertThrow(m.el(i, j) == std::complex<double>(0., 0.),
-                      ExcInternalError());
+          AssertThrow(m(i, j) == std::complex<double>(0., 0.), ExcInternalError());
+          AssertThrow(m.el(i, j) == std::complex<double>(0., 0.), ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
@@ -80,13 +76,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -94,12 +88,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

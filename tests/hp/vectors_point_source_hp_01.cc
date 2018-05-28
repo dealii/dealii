@@ -72,8 +72,7 @@ check()
   for (unsigned int i = 1; i < 7 - dim; ++i)
     element.push_back(FE_Q<dim>(i));
   hp::DoFHandler<dim> dof(tr);
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % element.size());
@@ -89,8 +88,7 @@ check()
     mapping.push_back(MappingQ<dim>(i + 1));
 
   Vector<double> rhs(dof.n_dofs());
-  VectorTools::create_point_source_vector(
-    mapping, dof, tr.begin()->center(), rhs);
+  VectorTools::create_point_source_vector(mapping, dof, tr.begin()->center(), rhs);
   for (unsigned int i = 0; i < rhs.size(); ++i)
     deallog << rhs(i) << std::endl;
 }

@@ -49,8 +49,7 @@ test()
   triangulation.refine_global(4 - dim);
   for (unsigned int i = 0; i < 11 - 2 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-        triangulation.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
       for (unsigned int index = 0; cell != triangulation.end(); ++cell, ++index)
         if (index % (3 * dim) == 0)
           cell->set_refine_flag();
@@ -69,8 +68,7 @@ test()
 
   Vector<double> partitions(triangulation.n_active_cells());
   {
-    typename Triangulation<dim>::active_cell_iterator cell =
-      triangulation.begin_active();
+    typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
     for (unsigned int index = 0; cell != triangulation.end(); ++cell, ++index)
       partitions(index) = cell->subdomain_id();
   }
@@ -104,13 +102,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -118,12 +114,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

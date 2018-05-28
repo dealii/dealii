@@ -49,8 +49,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(
-    fe, quadrature, update_values | update_gradients | update_hessians);
+  FEValues<dim>     fe_values(fe, quadrature, update_values | update_gradients | update_hessians);
   fe_values.reinit(dof.begin_active());
 
   for (unsigned int c = 0; c < fe.n_components(); ++c)
@@ -72,15 +71,12 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
               deallog << fe_values[vec_components].divergence(i, q) << ' ';
               for (unsigned int k = 0; k < dim; ++k)
                 for (unsigned int l = 0; l < dim; ++l)
-                  deallog << fe_values[vec_components].symmetric_gradient(
-                               i, q)[k][l]
-                          << ' ';
+                  deallog << fe_values[vec_components].symmetric_gradient(i, q)[k][l] << ' ';
               deallog << std::endl;
               for (unsigned int k = 0; k < dim; ++k)
                 for (unsigned int l = 0; l < dim; ++l)
                   for (unsigned int m = 0; m < dim; ++m)
-                    deallog << fe_values[vec_components].hessian(i, q)[k][l][m]
-                            << std::endl;
+                    deallog << fe_values[vec_components].hessian(i, q)[k][l][m] << std::endl;
 
               for (unsigned int d = 0; d < dim; ++d)
                 {
@@ -92,14 +88,12 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                                 fe_values.shape_grad_component(i, q, c + d),
                               ExcInternalError());
 
-                  AssertThrow(
-                    fe_values[vec_components].symmetric_gradient(i, q) ==
-                      decltype(
-                        fe_values[vec_components].symmetric_gradient(i, q))(
-                        (fe_values[vec_components].gradient(i, q) +
-                         transpose(fe_values[vec_components].gradient(i, q))) /
-                        2),
-                    ExcInternalError());
+                  AssertThrow(fe_values[vec_components].symmetric_gradient(i, q) ==
+                                decltype(fe_values[vec_components].symmetric_gradient(i, q))(
+                                  (fe_values[vec_components].gradient(i, q) +
+                                   transpose(fe_values[vec_components].gradient(i, q))) /
+                                  2),
+                              ExcInternalError());
 
                   AssertThrow(fe_values[vec_components].hessian(i, q)[d] ==
                                 fe_values.shape_hessian_component(i, q, c + d),

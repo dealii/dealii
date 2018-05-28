@@ -189,9 +189,7 @@ namespace Threads
 
 
   template <typename T>
-  inline ThreadLocalStorage<T>::ThreadLocalStorage(
-    const ThreadLocalStorage<T> &t) :
-    data(t)
+  inline ThreadLocalStorage<T>::ThreadLocalStorage(const ThreadLocalStorage<T> &t) : data(t)
   {}
 
 

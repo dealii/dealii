@@ -198,12 +198,10 @@ namespace internal
 template <int dim, int spacedim = dim>
 class DoFHandler : public Subscriptor
 {
-  typedef dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, false>
-      ActiveSelector;
-  typedef dealii::internal::DoFHandlerImplementation::
-    Iterators<DoFHandler<dim, spacedim>, true>
-      LevelSelector;
+  typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim, spacedim>, false>
+    ActiveSelector;
+  typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim, spacedim>, true>
+    LevelSelector;
 
 public:
   typedef typename ActiveSelector::CellAccessor cell_accessor;
@@ -328,8 +326,7 @@ public:
    * @deprecated Use numbers::invalid_dof_index instead.
    */
   DEAL_II_DEPRECATED
-  static const types::global_dof_index invalid_dof_index =
-    numbers::invalid_dof_index;
+  static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
 
   /**
    * The default index of the finite element to be used on a given cell. Since
@@ -381,8 +378,7 @@ public:
    * the distribution of degrees of freedom over the mesh.
    */
   void
-  initialize(const Triangulation<dim, spacedim> &tria,
-             const FiniteElement<dim, spacedim> &fe);
+  initialize(const Triangulation<dim, spacedim> &tria, const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Go through the triangulation and "distribute" the degrees of
@@ -545,8 +541,7 @@ public:
    * single level of a multigrid hierarchy.
    */
   void
-  renumber_dofs(const unsigned int                          level,
-                const std::vector<types::global_dof_index> &new_numbers);
+  renumber_dofs(const unsigned int level, const std::vector<types::global_dof_index> &new_numbers);
 
   /**
    * Return the maximum number of degrees of freedom a degree of freedom in
@@ -864,8 +859,7 @@ public:
   template <typename number>
   types::global_dof_index
   n_boundary_dofs(
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &boundary_ids) const;
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_ids) const;
 
   /**
    * Return the number of degrees of freedom located on those parts of the
@@ -1053,8 +1047,7 @@ public:
    */
   DeclException1(ExcInvalidLevel,
                  int,
-                 << "The given level " << arg1
-                 << " is not in the valid range!");
+                 << "The given level " << arg1 << " is not in the valid range!");
   /**
    * Exception
    * @ingroup Exceptions
@@ -1066,8 +1059,7 @@ public:
    */
   DeclException1(ExcEmptyLevel,
                  int,
-                 << "You tried to do something on level " << arg1
-                 << ", but this level is empty.");
+                 << "You tried to do something on level " << arg1 << ", but this level is empty.");
 
 
 private:
@@ -1079,8 +1071,7 @@ private:
   /**
    * Address of the triangulation to work on.
    */
-  SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
-    tria;
+  SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>> tria;
 
 
   /**
@@ -1093,8 +1084,7 @@ private:
    * An object that describes how degrees of freedom should be distributed and
    * renumbered.
    */
-  std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::
-                    PolicyBase<dim, spacedim>>
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim, spacedim>>
     policy;
 
   /**
@@ -1109,8 +1099,7 @@ private:
   /**
    * Data structure like number_cache, but for each multigrid level.
    */
-  std::vector<dealii::internal::DoFHandlerImplementation::NumberCache>
-    mg_number_cache;
+  std::vector<dealii::internal::DoFHandlerImplementation::NumberCache> mg_number_cache;
 
   /**
    * A data structure that is used to store the DoF indices associated with a
@@ -1232,24 +1221,18 @@ private:
    * Space to store the DoF numbers for the different levels. Analogous to the
    * <tt>levels[]</tt> tree of the Triangulation objects.
    */
-  std::vector<
-    std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>>
-    levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>> levels;
 
-  std::vector<
-    std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>>
-    mg_levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim>>> mg_levels;
 
   /**
    * Space to store DoF numbers of faces. They are not stored in
    * <tt>levels</tt> since faces are not organized hierarchically, but in a
    * flat array.
    */
-  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>>
-    faces;
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>> faces;
 
-  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>>
-    mg_faces;
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim>> mg_faces;
 
   /**
    * Make accessor objects friends.
@@ -1262,8 +1245,7 @@ private:
   friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 
   friend struct dealii::internal::DoFHandlerImplementation::Implementation;
-  friend struct dealii::internal::DoFHandlerImplementation::Policy::
-    Implementation;
+  friend struct dealii::internal::DoFHandlerImplementation::Policy::Implementation;
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
@@ -1313,9 +1295,8 @@ template <int dim, int spacedim>
 inline types::global_dof_index
 DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
 {
-  Assert(
-    has_level_dofs(),
-    ExcMessage("n_dofs(level) can only be called after distribute_mg_dofs()"));
+  Assert(has_level_dofs(),
+         ExcMessage("n_dofs(level) can only be called after distribute_mg_dofs()"));
   Assert(level < mg_number_cache.size(), ExcInvalidLevel(level));
   return mg_number_cache[level].n_global_dofs;
 }
@@ -1346,10 +1327,8 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 {
   Assert(level < this->get_triangulation().n_global_levels(),
          ExcMessage("invalid level in locally_owned_mg_dofs"));
-  Assert(
-    mg_number_cache.size() == this->get_triangulation().n_global_levels(),
-    ExcMessage(
-      "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
+  Assert(mg_number_cache.size() == this->get_triangulation().n_global_levels(),
+         ExcMessage("The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
   return mg_number_cache[level].locally_owned_dofs;
 }
 
@@ -1375,15 +1354,12 @@ DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor() const
 
 template <int dim, int spacedim>
 const std::vector<IndexSet> &
-DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
-  const unsigned int level) const
+DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(const unsigned int level) const
 {
   Assert(level < this->get_triangulation().n_global_levels(),
          ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
-  Assert(
-    mg_number_cache.size() == this->get_triangulation().n_global_levels(),
-    ExcMessage(
-      "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
+  Assert(mg_number_cache.size() == this->get_triangulation().n_global_levels(),
+         ExcMessage("The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
   return mg_number_cache[level].locally_owned_dofs_per_processor;
 }
 
@@ -1394,9 +1370,7 @@ inline const FiniteElement<dim, spacedim> &
 DoFHandler<dim, spacedim>::get_fe(const unsigned int index) const
 {
   (void)index;
-  Assert(index == 0,
-         ExcMessage(
-           "There is only one FiniteElement stored. The index must be zero!"));
+  Assert(index == 0, ExcMessage("There is only one FiniteElement stored. The index must be zero!"));
   return get_fe_collection()[0];
 }
 
@@ -1440,14 +1414,12 @@ template <int dim, int spacedim>
 template <typename number>
 types::global_dof_index
 DoFHandler<dim, spacedim>::n_boundary_dofs(
-  const std::map<types::boundary_id, const Function<spacedim, number> *>
-    &boundary_ids) const
+  const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_ids) const
 {
   // extract the set of boundary ids and forget about the function object
   // pointers
   std::set<types::boundary_id> boundary_ids_only;
-  for (typename std::map<types::boundary_id,
-                         const Function<spacedim, number> *>::const_iterator p =
+  for (typename std::map<types::boundary_id, const Function<spacedim, number> *>::const_iterator p =
          boundary_ids.begin();
        p != boundary_ids.end();
        ++p)
@@ -1470,8 +1442,8 @@ namespace internal
    */
   template <int dim, int spacedim>
   std::string
-  policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::
-                     PolicyBase<dim, spacedim> &policy);
+  policy_to_string(
+    const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim, spacedim> &policy);
 } // namespace internal
 
 
@@ -1556,35 +1528,29 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
   ar &n_cells &fe_name &policy_name;
 
-  AssertThrow(
-    n_cells == tria->n_cells(),
-    ExcMessage("The object being loaded into does not match the triangulation "
-               "that has been stored previously."));
-  AssertThrow(
-    fe_name == this->get_fe(0).get_name(),
-    ExcMessage(
-      "The finite element associated with this DoFHandler does not match "
-      "the one that was associated with the DoFHandler previously stored."));
-  AssertThrow(
-    policy_name == internal::policy_to_string(*policy),
-    ExcMessage("The policy currently associated with this DoFHandler (" +
-               internal::policy_to_string(*policy) +
-               ") does not match the one that was associated with the "
-               "DoFHandler previously stored (" +
-               policy_name + ")."));
+  AssertThrow(n_cells == tria->n_cells(),
+              ExcMessage("The object being loaded into does not match the triangulation "
+                         "that has been stored previously."));
+  AssertThrow(fe_name == this->get_fe(0).get_name(),
+              ExcMessage("The finite element associated with this DoFHandler does not match "
+                         "the one that was associated with the DoFHandler previously stored."));
+  AssertThrow(policy_name == internal::policy_to_string(*policy),
+              ExcMessage("The policy currently associated with this DoFHandler (" +
+                         internal::policy_to_string(*policy) +
+                         ") does not match the one that was associated with the "
+                         "DoFHandler previously stored (" +
+                         policy_name + ")."));
 }
 
 
 
 template <int dim, int spacedim>
 inline types::global_dof_index
-DoFHandler<dim, spacedim>::MGVertexDoFs::get_index(
-  const unsigned int level,
-  const unsigned int dof_number,
-  const unsigned int dofs_per_vertex) const
+DoFHandler<dim, spacedim>::MGVertexDoFs::get_index(const unsigned int level,
+                                                   const unsigned int dof_number,
+                                                   const unsigned int dofs_per_vertex) const
 {
-  Assert((level >= coarsest_level) && (level <= finest_level),
-         ExcInvalidLevel(level));
+  Assert((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel(level));
   return indices[dofs_per_vertex * (level - coarsest_level) + dof_number];
 }
 
@@ -1592,14 +1558,12 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::get_index(
 
 template <int dim, int spacedim>
 inline void
-DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(
-  const unsigned int            level,
-  const unsigned int            dof_number,
-  const unsigned int            dofs_per_vertex,
-  const types::global_dof_index index)
+DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(const unsigned int            level,
+                                                   const unsigned int            dof_number,
+                                                   const unsigned int            dofs_per_vertex,
+                                                   const types::global_dof_index index)
 {
-  Assert((level >= coarsest_level) && (level <= finest_level),
-         ExcInvalidLevel(level));
+  Assert((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel(level));
   indices[dofs_per_vertex * (level - coarsest_level) + dof_number] = index;
 }
 

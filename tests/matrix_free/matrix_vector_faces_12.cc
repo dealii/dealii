@@ -40,31 +40,30 @@ f_x(double x_m)
   double y_m = 0.0;
 
   if (x <= 9.0)
-    y_m = 0.001 * (-28.0 + std::min(28.0,
-                                    2.8e1 + 6.775070969851e-3 * x * x -
-                                      2.124527775800e-3 * x * x * x));
+    y_m =
+      0.001 *
+      (-28.0 + std::min(28.0, 2.8e1 + 6.775070969851e-3 * x * x - 2.124527775800e-3 * x * x * x));
 
   else if (x > 9.0 && x <= 14.0)
-    y_m = 0.001 * (-28.0 + 2.507355893131e1 + 9.754803562315e-1 * x -
-                   1.016116352781e-1 * x * x + 1.889794677828e-3 * x * x * x);
+    y_m = 0.001 * (-28.0 + 2.507355893131e1 + 9.754803562315e-1 * x - 1.016116352781e-1 * x * x +
+                   1.889794677828e-3 * x * x * x);
 
   else if (x > 14.0 && x <= 20.0)
-    y_m = 0.001 * (-28.0 + 2.579601052357e1 + 8.206693007457e-1 * x -
-                   9.055370274339e-2 * x * x + 1.626510569859e-3 * x * x * x);
+    y_m = 0.001 * (-28.0 + 2.579601052357e1 + 8.206693007457e-1 * x - 9.055370274339e-2 * x * x +
+                   1.626510569859e-3 * x * x * x);
 
   else if (x > 20.0 && x <= 30.0)
-    y_m = 0.001 * (-28.0 + 4.046435022819e1 - 1.379581654948 * x +
-                   1.945884504128e-2 * x * x - 2.070318932190e-4 * x * x * x);
+    y_m = 0.001 * (-28.0 + 4.046435022819e1 - 1.379581654948 * x + 1.945884504128e-2 * x * x -
+                   2.070318932190e-4 * x * x * x);
 
   else if (x > 30.0 && x <= 40.0)
-    y_m = 0.001 * (-28.0 + 1.792461334664e1 + 8.743920332081e-1 * x -
-                   5.567361123058e-2 * x * x + 6.277731764683e-4 * x * x * x);
+    y_m = 0.001 * (-28.0 + 1.792461334664e1 + 8.743920332081e-1 * x - 5.567361123058e-2 * x * x +
+                   6.277731764683e-4 * x * x * x);
 
   else if (x > 40.0 && x <= 54.0)
     y_m = 0.001 * (-28.0 + std::max(0.0,
                                     5.639011190988e1 - 2.010520359035 * x +
-                                      1.644919857549e-2 * x * x +
-                                      2.674976141766e-5 * x * x * x));
+                                      1.644919857549e-2 * x * x + 2.674976141766e-5 * x * x * x));
 
   else if (x > 54.0)
     y_m = 0.001 * (-28.0);
@@ -118,18 +117,13 @@ public:
 
     const double gamma      = gamma_x(xi[0]);
     const double tanh_gamma = std::tanh(gamma);
-    double       s_y =
-      std::tanh(gamma * (2.0 * ((xi[1] - y_FoR) / y_max) - 1.0)) / tanh_gamma;
-    double t_y =
-      std::tanh(gamma * (2.0 * (1.0 - (xi[1] - y_FoR) / y_max) - 1.0)) /
-      tanh_gamma;
+    double       s_y = std::tanh(gamma * (2.0 * ((xi[1] - y_FoR) / y_max) - 1.0)) / tanh_gamma;
+    double t_y = std::tanh(gamma * (2.0 * (1.0 - (xi[1] - y_FoR) / y_max) - 1.0)) / tanh_gamma;
     if (xi[0] <= x_max / 2.0)
-      x[1] =
-        y_max / 2.0 * s_y + 4.036 * h / 2.0 + (0.5 * t_y + 0.5) * f_x(xi[0]);
+      x[1] = y_max / 2.0 * s_y + 4.036 * h / 2.0 + (0.5 * t_y + 0.5) * f_x(xi[0]);
     // y_max/2.0*t_y+4.036*h/2.0
     else if (xi[0] > x_max / 2.0)
-      x[1] = y_max / 2.0 * s_y + 4.036 * h / 2.0 +
-             (0.5 * t_y + 0.5) * f_x(x_max - xi[0]);
+      x[1] = y_max / 2.0 * s_y + 4.036 * h / 2.0 + (0.5 * t_y + 0.5) * f_x(x_max - xi[0]);
 
     return x;
   }
@@ -150,8 +144,7 @@ public:
     if (x[0] <= x_max / 2.0)
       Y = (x[1] - f_x(x[0]) * (1 + y_FoR / y_max)) / (1.0 - f_x(x[0]) / y_max);
     else if (x[0] > x_max / 2.0)
-      Y = (x[1] - f_x(x_max - x[0]) * (1 + y_FoR / y_max)) /
-          (1.0 - f_x(x_max - x[0]) / y_max);
+      Y = (x[1] - f_x(x_max - x[0]) * (1 + y_FoR / y_max)) / (1.0 - f_x(x_max - x[0]) / y_max);
 
     if (x[0] <= x_max / 2.0)
       {
@@ -159,27 +152,24 @@ public:
         const double tanh_gamma = std::tanh(gamma);
         while (eps > tol && iter < maxiter)
           {
-            const double arg =
-              gamma * (2.0 * (1.0 - (Y - y_FoR) / y_max) - 1.0);
+            const double arg  = gamma * (2.0 * (1.0 - (Y - y_FoR) / y_max) - 1.0);
             const double arg2 = gamma * (2.0 * ((Y - y_FoR) / y_max) - 1.0);
             const double t_y  = std::tanh(arg) / tanh_gamma;
             const double s_y  = std::tanh(arg2) / tanh_gamma;
-            const double ts_y = 1.0 / (std::cosh(arg) * std::cosh(arg)) *
-                                gamma * (-2.0 / y_max) / tanh_gamma;
-            const double ss_y = 1.0 / (std::cosh(arg2) * std::cosh(arg2)) *
-                                gamma * (2.0 / y_max) / tanh_gamma;
+            const double ts_y =
+              1.0 / (std::cosh(arg) * std::cosh(arg)) * gamma * (-2.0 / y_max) / tanh_gamma;
+            const double ss_y =
+              1.0 / (std::cosh(arg2) * std::cosh(arg2)) * gamma * (2.0 / y_max) / tanh_gamma;
             const double Yn =
-              Y - (y_max / 2.0 * s_y + 4.036 * h / 2.0 +
-                   (0.5 * t_y + 0.5) * f_x(x[0]) - x[1]) /
+              Y - (y_max / 2.0 * s_y + 4.036 * h / 2.0 + (0.5 * t_y + 0.5) * f_x(x[0]) - x[1]) /
                     (y_max / 2.0 * ss_y + 0.5 * ts_y * f_x(x[0]));
 
             eps = std::abs(Yn - Y);
             Y   = Yn;
             iter++;
           }
-        AssertThrow(
-          iter < maxiter,
-          ExcMessage("Newton within PullBack did not find the solution. "));
+        AssertThrow(iter < maxiter,
+                    ExcMessage("Newton within PullBack did not find the solution. "));
         xi[1] = Y;
       }
     else if (x[0] > x_max / 2.0)
@@ -188,27 +178,24 @@ public:
         const double tanh_gamma = std::tanh(gamma);
         while (eps > tol && iter < maxiter)
           {
-            const double arg =
-              gamma * (2.0 * (1.0 - (Y - y_FoR) / y_max) - 1.0);
+            const double arg  = gamma * (2.0 * (1.0 - (Y - y_FoR) / y_max) - 1.0);
             const double arg2 = gamma * (2.0 * ((Y - y_FoR) / y_max) - 1.0);
             const double t_y  = std::tanh(arg) / tanh_gamma;
             const double s_y  = std::tanh(arg2) / tanh_gamma;
-            const double ts_y = 1.0 / (std::cosh(arg) * std::cosh(arg)) *
-                                gamma * (-2.0 / y_max) / tanh_gamma;
-            const double ss_y = 1.0 / (std::cosh(arg2) * std::cosh(arg2)) *
-                                gamma * (2.0 / y_max) / tanh_gamma;
-            const double Yn =
-              Y - (y_max / 2.0 * s_y + 4.036 * h / 2.0 +
-                   (0.5 * t_y + 0.5) * f_x(x_max - x[0]) - x[1]) /
-                    (y_max / 2.0 * ss_y + 0.5 * ts_y * f_x(x_max - x[0]));
+            const double ts_y =
+              1.0 / (std::cosh(arg) * std::cosh(arg)) * gamma * (-2.0 / y_max) / tanh_gamma;
+            const double ss_y =
+              1.0 / (std::cosh(arg2) * std::cosh(arg2)) * gamma * (2.0 / y_max) / tanh_gamma;
+            const double Yn = Y - (y_max / 2.0 * s_y + 4.036 * h / 2.0 +
+                                   (0.5 * t_y + 0.5) * f_x(x_max - x[0]) - x[1]) /
+                                    (y_max / 2.0 * ss_y + 0.5 * ts_y * f_x(x_max - x[0]));
 
             eps = std::abs(Yn - Y);
             Y   = Yn;
             iter++;
           }
-        AssertThrow(
-          iter < maxiter,
-          ExcMessage("Newton within PullBack did not find the solution. "));
+        AssertThrow(iter < maxiter,
+                    ExcMessage("Newton within PullBack did not find the solution. "));
         xi[1] = Y;
       }
     return xi;
@@ -247,8 +234,7 @@ test()
   if (dim == 3)
     p[2] = -2.25 * h;
 
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, refinements, p, coordinates);
+  GridGenerator::subdivided_hyper_rectangle(triangulation, refinements, p, coordinates);
 
   triangulation.last()->vertex(0)[1] = 0.;
   if (dim == 3)
@@ -268,15 +254,12 @@ test()
       triangulation.last()->face(5)->set_all_boundary_ids(3 + 10);
     }
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
-  GridTools::collect_periodic_faces(
-    triangulation, 0 + 10, 1 + 10, 0, periodic_faces);
+  GridTools::collect_periodic_faces(triangulation, 0 + 10, 1 + 10, 0, periodic_faces);
   if (dim == 3)
     {
-      GridTools::collect_periodic_faces(
-        triangulation, 2 + 10, 3 + 10, 2, periodic_faces);
+      GridTools::collect_periodic_faces(triangulation, 2 + 10, 3 + 10, 2, periodic_faces);
     }
 
   triangulation.add_periodicity(periodic_faces);

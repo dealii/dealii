@@ -47,33 +47,17 @@ main()
   check<Tensor<1, 1, double>, float, Tensor<1, 1, double>>();
   check<float, Tensor<1, 1, double>, Tensor<1, 1, double>>();
 
-  check<Tensor<1, 1, double>,
-        std::complex<double>,
-        Tensor<1, 1, std::complex<double>>>();
-  check<std::complex<double>,
-        Tensor<1, 1, double>,
-        Tensor<1, 1, std::complex<double>>>();
+  check<Tensor<1, 1, double>, std::complex<double>, Tensor<1, 1, std::complex<double>>>();
+  check<std::complex<double>, Tensor<1, 1, double>, Tensor<1, 1, std::complex<double>>>();
 
-  check<Tensor<1, 1, double>,
-        std::complex<float>,
-        Tensor<1, 1, std::complex<double>>>();
-  check<std::complex<float>,
-        Tensor<1, 1, double>,
-        Tensor<1, 1, std::complex<double>>>();
+  check<Tensor<1, 1, double>, std::complex<float>, Tensor<1, 1, std::complex<double>>>();
+  check<std::complex<float>, Tensor<1, 1, double>, Tensor<1, 1, std::complex<double>>>();
 
-  check<Tensor<1, 1, float>,
-        std::complex<double>,
-        Tensor<1, 1, std::complex<double>>>();
-  check<std::complex<double>,
-        Tensor<1, 1, float>,
-        Tensor<1, 1, std::complex<double>>>();
+  check<Tensor<1, 1, float>, std::complex<double>, Tensor<1, 1, std::complex<double>>>();
+  check<std::complex<double>, Tensor<1, 1, float>, Tensor<1, 1, std::complex<double>>>();
 
-  check<Tensor<1, 1, float>,
-        std::complex<float>,
-        Tensor<1, 1, std::complex<float>>>();
-  check<std::complex<float>,
-        Tensor<1, 1, float>,
-        Tensor<1, 1, std::complex<float>>>();
+  check<Tensor<1, 1, float>, std::complex<float>, Tensor<1, 1, std::complex<float>>>();
+  check<std::complex<float>, Tensor<1, 1, float>, Tensor<1, 1, std::complex<float>>>();
 
   deallog << "OK" << std::endl;
 }

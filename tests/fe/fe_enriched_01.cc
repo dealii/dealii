@@ -64,8 +64,7 @@ public:
   gradient(const Point<dim> &point, const unsigned int component = 0) const
   {
     Tensor<1, dim> res = point;
-    Assert(point.norm() > 0,
-           dealii::ExcMessage("gradient is not defined at zero"));
+    Assert(point.norm() > 0, dealii::ExcMessage("gradient is not defined at zero"));
     res *= -value(point) / point.norm();
     return res;
   }
@@ -102,13 +101,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -116,12 +113,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

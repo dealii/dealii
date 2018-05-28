@@ -28,8 +28,7 @@ template <typename T, typename U, typename CompareType>
 void
 check()
 {
-  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType),
-              ExcInternalError());
+  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType), ExcInternalError());
 }
 
 
@@ -45,9 +44,7 @@ main()
   check<Tensor<1, 2, Sdouble>, Tensor<1, 2, Sdouble>, Sdouble>();
   check<Tensor<1, 2, SSdouble>, Tensor<1, 2, SSdouble>, SSdouble>();
   check<Tensor<2, 2, Sdouble>, Tensor<2, 2, Sdouble>, Tensor<2, 2, Sdouble>>();
-  check<Tensor<2, 2, SSdouble>,
-        Tensor<2, 2, SSdouble>,
-        Tensor<2, 2, SSdouble>>();
+  check<Tensor<2, 2, SSdouble>, Tensor<2, 2, SSdouble>, Tensor<2, 2, SSdouble>>();
 
   Tensor<2, 2, SSdouble> t1;
   Tensor<2, 2, SSdouble> t2;

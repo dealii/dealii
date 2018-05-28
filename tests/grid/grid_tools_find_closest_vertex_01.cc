@@ -63,8 +63,7 @@ test(const Point<spacedim> &p)
     deallog << "Vertex: " << e.first << ": " << e.second << std::endl;
 
   auto i = GridTools::find_closest_vertex(mapping, tria, p, selected_vertices);
-  deallog << "Closest vertex to " << p << ", v[" << i << "] :" << m[i]
-          << std::endl;
+  deallog << "Closest vertex to " << p << ", v[" << i << "] :" << m[i] << std::endl;
 };
 
 

@@ -56,8 +56,7 @@ test()
                               typename Triangulation<dim>::cell_iterator>>
     CellList;
 
-  const CellList cell_list =
-    GridTools::get_finest_common_cells(tria[0], tria[1]);
+  const CellList cell_list = GridTools::get_finest_common_cells(tria[0], tria[1]);
   for (typename CellList::const_iterator cell_pair = cell_list.begin();
        cell_pair != cell_list.end();
        ++cell_pair)

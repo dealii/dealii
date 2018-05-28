@@ -47,8 +47,7 @@ test()
         block_mask[c] = (int_mask & (1 << c));
 
       // make sure that the round-trip works
-      AssertThrow(BlockMask(block_mask) ==
-                    fe.block_mask(fe.component_mask(BlockMask(block_mask))),
+      AssertThrow(BlockMask(block_mask) == fe.block_mask(fe.component_mask(BlockMask(block_mask))),
                   ExcInternalError());
     }
 

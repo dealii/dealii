@@ -32,29 +32,24 @@
 
 template <typename NumberType>
 void
-test(const unsigned int size,
-     const unsigned int block_size,
-     const NumberType   tol)
+test(const unsigned int size, const unsigned int block_size, const NumberType tol)
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_A(size);
 
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, size, size, block_size, block_size);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(
+    mpi_communicator, size, size, block_size, block_size);
   ScaLAPACKMatrix<NumberType> scalapack_A(
     size, grid, block_size, LAPACKSupport::Property::symmetric);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " "
+        << grid->get_process_grid_columns() << std::endl;
 
   create_spd(full_A);
 
@@ -69,22 +64,18 @@ test(const unsigned int size,
   const NumberType s_frobenius = scalapack_A.frobenius_norm();
 
   // make sure we have the same result on all cores, do average:
-  const NumberType as_l1 =
-    dealii::Utilities::MPI::sum(s_l1, mpi_communicator) / n_mpi_processes;
+  const NumberType as_l1 = dealii::Utilities::MPI::sum(s_l1, mpi_communicator) / n_mpi_processes;
   const NumberType as_linfty =
     dealii::Utilities::MPI::sum(s_linfty, mpi_communicator) / n_mpi_processes;
   const NumberType as_frobenius =
-    dealii::Utilities::MPI::sum(s_frobenius, mpi_communicator) /
-    n_mpi_processes;
+    dealii::Utilities::MPI::sum(s_frobenius, mpi_communicator) / n_mpi_processes;
 
   pcout << l1 << " " << s_l1 << " " << as_l1 << std::endl
         << linfty << " " << s_linfty << " " << as_linfty << std::endl
         << frobenius << " " << s_frobenius << " " << as_frobenius << std::endl;
 
-  AssertThrow(std::abs(l1 - as_l1) < tol * std::abs(l1),
-              dealii::ExcInternalError());
-  AssertThrow(std::abs(linfty - as_linfty) < tol * std::abs(linfty),
-              dealii::ExcInternalError());
+  AssertThrow(std::abs(l1 - as_l1) < tol * std::abs(l1), dealii::ExcInternalError());
+  AssertThrow(std::abs(linfty - as_linfty) < tol * std::abs(linfty), dealii::ExcInternalError());
   AssertThrow(std::abs(frobenius - as_frobenius) < tol * std::abs(frobenius),
               dealii::ExcInternalError());
 }
@@ -94,8 +85,7 @@ test(const unsigned int size,
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   const std::vector<unsigned int> sizes  = {{32, 64, 120, 320, 640}};
   const std::vector<unsigned int> blocks = {{32, 64}};

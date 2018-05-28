@@ -24,9 +24,8 @@
 void
 print_it(Utilities::MPI::MinMaxAvg &result)
 {
-  deallog << "sum: " << result.sum << " avg: " << result.avg
-          << " min: " << result.min << " @" << result.min_index
-          << " max: " << result.max << " @" << result.max_index << std::endl;
+  deallog << "sum: " << result.sum << " avg: " << result.avg << " min: " << result.min << " @"
+          << result.min_index << " max: " << result.max << " @" << result.max_index << std::endl;
 }
 
 void
@@ -34,7 +33,7 @@ test()
 {
   Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
-  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int       myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (myid == 0)
@@ -81,8 +80,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;

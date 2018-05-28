@@ -38,8 +38,7 @@ template <typename number>
 void
 MeanValueFilter::vmult(Vector<number> &dst, const Vector<number> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
@@ -53,8 +52,7 @@ template <typename number>
 void
 MeanValueFilter::vmult_add(Vector<number> &dst, const Vector<number> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
@@ -79,13 +77,11 @@ MeanValueFilter::filter(BlockVector<number> &v) const
 
 template <typename number>
 void
-MeanValueFilter::vmult(BlockVector<number> &      dst,
-                       const BlockVector<number> &src) const
+MeanValueFilter::vmult(BlockVector<number> &dst, const BlockVector<number> &src) const
 {
   Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
 
-  Assert(dst.n_blocks() == src.n_blocks(),
-         ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
+  Assert(dst.n_blocks() == src.n_blocks(), ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
   for (unsigned int i = 0; i < dst.n_blocks(); ++i)
     if (i == component)
@@ -98,13 +94,11 @@ MeanValueFilter::vmult(BlockVector<number> &      dst,
 
 template <typename number>
 void
-MeanValueFilter::vmult_add(BlockVector<number> &      dst,
-                           const BlockVector<number> &src) const
+MeanValueFilter::vmult_add(BlockVector<number> &dst, const BlockVector<number> &src) const
 {
   Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
 
-  Assert(dst.n_blocks() == src.n_blocks(),
-         ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
+  Assert(dst.n_blocks() == src.n_blocks(), ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
   for (unsigned int i = 0; i < dst.n_blocks(); ++i)
     if (i == component)

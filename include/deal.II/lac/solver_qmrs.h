@@ -209,8 +209,7 @@ private:
     SolverControl::State state;
     double               last_residual;
 
-    IterationResult(const SolverControl::State state,
-                    const double               last_residual);
+    IterationResult(const SolverControl::State state, const double last_residual);
   };
 
   /**
@@ -242,9 +241,8 @@ private:
 
 
 template <class VectorType>
-SolverQMRS<VectorType>::IterationResult::IterationResult(
-  const SolverControl::State state,
-  const double               last_residual) :
+SolverQMRS<VectorType>::IterationResult::IterationResult(const SolverControl::State state,
+                                                         const double               last_residual) :
   state(state),
   last_residual(last_residual)
 {}
@@ -261,8 +259,7 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl &           cn,
 {}
 
 template <class VectorType>
-SolverQMRS<VectorType>::SolverQMRS(SolverControl &       cn,
-                                   const AdditionalData &data) :
+SolverQMRS<VectorType>::SolverQMRS(SolverControl &cn, const AdditionalData &data) :
   Solver<VectorType>(cn),
   additional_data(data),
   step(0)
@@ -429,8 +426,7 @@ SolverQMRS<VectorType>::iterate(const MatrixType &        A,
           res = u.l2_norm();
         }
       state = this->iteration_status(step, res, x);
-      if ((state == SolverControl::success) ||
-          (state == SolverControl::failure))
+      if ((state == SolverControl::success) || (state == SolverControl::failure))
         return IterationResult(state, res);
 
       //--------------------------------------------------------------

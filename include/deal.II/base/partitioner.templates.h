@@ -37,19 +37,17 @@ namespace Utilities
 
     template <typename Number>
     void
-    Partitioner::export_to_ghosted_array_start(
-      const unsigned int             communication_channel,
-      const ArrayView<const Number> &locally_owned_array,
-      const ArrayView<Number> &      temporary_storage,
-      const ArrayView<Number> &      ghost_array,
-      std::vector<MPI_Request> &     requests) const
+    Partitioner::export_to_ghosted_array_start(const unsigned int             communication_channel,
+                                               const ArrayView<const Number> &locally_owned_array,
+                                               const ArrayView<Number> &      temporary_storage,
+                                               const ArrayView<Number> &      ghost_array,
+                                               std::vector<MPI_Request> &     requests) const
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
                ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+             ExcGhostIndexArrayHasWrongSize(
+               ghost_array.size(), n_ghost_indices(), n_ghost_indices_in_larger_set));
 
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
@@ -71,26 +69,23 @@ namespace Utilities
       // can move data to the right position in a forward loop in the _finish
       // function.
       AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set + 1);
-      const bool use_larger_set =
-        (n_ghost_indices_in_larger_set > n_ghost_indices() &&
-         ghost_array.size() == n_ghost_indices_in_larger_set);
-      Number *ghost_array_ptr =
-        use_larger_set ? ghost_array.data() + n_ghost_indices_in_larger_set -
-                           n_ghost_indices() :
+      const bool use_larger_set = (n_ghost_indices_in_larger_set > n_ghost_indices() &&
+                                   ghost_array.size() == n_ghost_indices_in_larger_set);
+      Number *   ghost_array_ptr =
+        use_larger_set ? ghost_array.data() + n_ghost_indices_in_larger_set - n_ghost_indices() :
                          ghost_array.data();
 
       for (unsigned int i = 0; i < n_ghost_targets; i++)
         {
           // allow writing into ghost indices even though we are in a
           // const function
-          const int ierr =
-            MPI_Irecv(ghost_array_ptr,
-                      ghost_targets_data[i].second * sizeof(Number),
-                      MPI_BYTE,
-                      ghost_targets_data[i].first,
-                      ghost_targets_data[i].first + communication_channel,
-                      communicator,
-                      &requests[i]);
+          const int ierr = MPI_Irecv(ghost_array_ptr,
+                                     ghost_targets_data[i].second * sizeof(Number),
+                                     MPI_BYTE,
+                                     ghost_targets_data[i].first,
+                                     ghost_targets_data[i].first + communication_channel,
+                                     communicator,
+                                     &requests[i]);
           AssertThrowMPI(ierr);
           ghost_array_ptr += ghost_targets()[i].second;
         }
@@ -100,26 +95,23 @@ namespace Utilities
         {
           // copy the data to be sent to the import_data field
           std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-            my_imports = import_indices_data.begin() +
-                         import_indices_chunks_by_rank_data[i],
-            end_my_imports = import_indices_data.begin() +
-                             import_indices_chunks_by_rank_data[i + 1];
+            my_imports = import_indices_data.begin() + import_indices_chunks_by_rank_data[i],
+            end_my_imports =
+              import_indices_data.begin() + import_indices_chunks_by_rank_data[i + 1];
           unsigned int index = 0;
           for (; my_imports != end_my_imports; ++my_imports)
-            for (unsigned int j = my_imports->first; j < my_imports->second;
-                 j++)
+            for (unsigned int j = my_imports->first; j < my_imports->second; j++)
               temp_array_ptr[index++] = locally_owned_array[j];
           AssertDimension(index, import_targets_data[i].second);
 
           // start the send operations
-          const int ierr =
-            MPI_Isend(temp_array_ptr,
-                      import_targets_data[i].second * sizeof(Number),
-                      MPI_BYTE,
-                      import_targets_data[i].first,
-                      my_pid + communication_channel,
-                      communicator,
-                      &requests[n_ghost_targets + i]);
+          const int ierr = MPI_Isend(temp_array_ptr,
+                                     import_targets_data[i].second * sizeof(Number),
+                                     MPI_BYTE,
+                                     import_targets_data[i].first,
+                                     my_pid + communication_channel,
+                                     communicator,
+                                     &requests[n_ghost_targets + i]);
           AssertThrowMPI(ierr);
           temp_array_ptr += import_targets_data[i].second;
         }
@@ -129,24 +121,20 @@ namespace Utilities
 
     template <typename Number>
     void
-    Partitioner::export_to_ghosted_array_finish(
-      const ArrayView<Number> & ghost_array,
-      std::vector<MPI_Request> &requests) const
+    Partitioner::export_to_ghosted_array_finish(const ArrayView<Number> & ghost_array,
+                                                std::vector<MPI_Request> &requests) const
     {
       Assert(ghost_array.size() == n_ghost_indices() ||
                ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+             ExcGhostIndexArrayHasWrongSize(
+               ghost_array.size(), n_ghost_indices(), n_ghost_indices_in_larger_set));
 
       // wait for both sends and receives to complete, even though only
       // receives are really necessary. this gives (much) better performance
-      AssertDimension(ghost_targets().size() + import_targets().size(),
-                      requests.size());
+      AssertDimension(ghost_targets().size() + import_targets().size(), requests.size());
       if (requests.size() > 0)
         {
-          const int ierr =
-            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+          const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
       requests.resize(0);
@@ -156,16 +144,14 @@ namespace Utilities
       if (n_ghost_indices_in_larger_set > n_ghost_indices() &&
           ghost_array.size() == n_ghost_indices_in_larger_set)
         {
-          unsigned int offset =
-            n_ghost_indices_in_larger_set - n_ghost_indices();
+          unsigned int offset = n_ghost_indices_in_larger_set - n_ghost_indices();
           // must copy ghost data into extended ghost array
-          for (std::vector<std::pair<unsigned int, unsigned int>>::
-                 const_iterator my_ghosts = ghost_indices_subset_data.begin();
+          for (std::vector<std::pair<unsigned int, unsigned int>>::const_iterator my_ghosts =
+                 ghost_indices_subset_data.begin();
                my_ghosts != ghost_indices_subset_data.end();
                ++my_ghosts)
             if (offset > my_ghosts->first)
-              for (unsigned int j = my_ghosts->first; j < my_ghosts->second;
-                   ++j, ++offset)
+              for (unsigned int j = my_ghosts->first; j < my_ghosts->second; ++j, ++offset)
                 {
                   ghost_array[j]      = ghost_array[offset];
                   ghost_array[offset] = Number();
@@ -182,19 +168,17 @@ namespace Utilities
 
     template <typename Number>
     void
-    Partitioner::import_from_ghosted_array_start(
-      const VectorOperation::values vector_operation,
-      const unsigned int            communication_channel,
-      const ArrayView<Number> &     ghost_array,
-      const ArrayView<Number> &     temporary_storage,
-      std::vector<MPI_Request> &    requests) const
+    Partitioner::import_from_ghosted_array_start(const VectorOperation::values vector_operation,
+                                                 const unsigned int        communication_channel,
+                                                 const ArrayView<Number> & ghost_array,
+                                                 const ArrayView<Number> & temporary_storage,
+                                                 std::vector<MPI_Request> &requests) const
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
                ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+             ExcGhostIndexArrayHasWrongSize(
+               ghost_array.size(), n_ghost_indices(), n_ghost_indices_in_larger_set));
 
       (void)vector_operation;
 
@@ -232,21 +216,18 @@ namespace Utilities
       Number *temp_array_ptr = temporary_storage.data();
       for (unsigned int i = 0; i < n_import_targets; i++)
         {
-          AssertThrow(
-            static_cast<std::size_t>(import_targets_data[i].second) *
-                sizeof(Number) <
-              static_cast<std::size_t>(std::numeric_limits<int>::max()),
-            ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                       "The number of ghost entries times the size of 'Number' "
-                       "exceeds this value. This is not supported."));
-          const int ierr =
-            MPI_Irecv(temp_array_ptr,
-                      import_targets_data[i].second * sizeof(Number),
-                      MPI_BYTE,
-                      import_targets_data[i].first,
-                      import_targets_data[i].first + channel,
-                      communicator,
-                      &requests[i]);
+          AssertThrow(static_cast<std::size_t>(import_targets_data[i].second) * sizeof(Number) <
+                        static_cast<std::size_t>(std::numeric_limits<int>::max()),
+                      ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                 "The number of ghost entries times the size of 'Number' "
+                                 "exceeds this value. This is not supported."));
+          const int ierr = MPI_Irecv(temp_array_ptr,
+                                     import_targets_data[i].second * sizeof(Number),
+                                     MPI_BYTE,
+                                     import_targets_data[i].first,
+                                     import_targets_data[i].first + channel,
+                                     communicator,
+                                     &requests[i]);
           AssertThrowMPI(ierr);
           temp_array_ptr += import_targets_data[i].second;
         }
@@ -265,16 +246,14 @@ namespace Utilities
               ghost_array.size() == n_ghost_indices_in_larger_set)
             {
               std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-                my_ghosts = ghost_indices_subset_data.begin() +
-                            ghost_indices_subset_chunks_by_rank_data[i],
+                my_ghosts =
+                  ghost_indices_subset_data.begin() + ghost_indices_subset_chunks_by_rank_data[i],
                 end_my_ghosts = ghost_indices_subset_data.begin() +
                                 ghost_indices_subset_chunks_by_rank_data[i + 1];
               unsigned int offset = 0;
               for (; my_ghosts != end_my_ghosts; ++my_ghosts)
-                if (ghost_array_ptr + offset !=
-                    ghost_array.data() + my_ghosts->first)
-                  for (unsigned int j = my_ghosts->first; j < my_ghosts->second;
-                       ++j, ++offset)
+                if (ghost_array_ptr + offset != ghost_array.data() + my_ghosts->first)
+                  for (unsigned int j = my_ghosts->first; j < my_ghosts->second; ++j, ++offset)
                     {
                       ghost_array_ptr[offset] = ghost_array[j];
                       ghost_array[j]          = Number();
@@ -284,21 +263,18 @@ namespace Utilities
               AssertDimension(offset, ghost_targets_data[i].second);
             }
 
-          AssertThrow(
-            static_cast<std::size_t>(ghost_targets_data[i].second) *
-                sizeof(Number) <
-              static_cast<std::size_t>(std::numeric_limits<int>::max()),
-            ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                       "The number of ghost entries times the size of 'Number' "
-                       "exceeds this value. This is not supported."));
-          const int ierr =
-            MPI_Isend(ghost_array_ptr,
-                      ghost_targets_data[i].second * sizeof(Number),
-                      MPI_BYTE,
-                      ghost_targets_data[i].first,
-                      this_mpi_process() + channel,
-                      communicator,
-                      &requests[n_import_targets + i]);
+          AssertThrow(static_cast<std::size_t>(ghost_targets_data[i].second) * sizeof(Number) <
+                        static_cast<std::size_t>(std::numeric_limits<int>::max()),
+                      ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
+                                 "The number of ghost entries times the size of 'Number' "
+                                 "exceeds this value. This is not supported."));
+          const int ierr = MPI_Isend(ghost_array_ptr,
+                                     ghost_targets_data[i].second * sizeof(Number),
+                                     MPI_BYTE,
+                                     ghost_targets_data[i].first,
+                                     this_mpi_process() + channel,
+                                     communicator,
+                                     &requests[n_import_targets + i]);
           AssertThrowMPI(ierr);
 
           ghost_array_ptr += ghost_targets_data[i].second;
@@ -314,9 +290,8 @@ namespace Utilities
       // standards. To avoid this, we use std::abs on default types but
       // simply return the number on unsigned types
       template <typename Number>
-      typename std::enable_if<
-        !std::is_unsigned<Number>::value,
-        typename numbers::NumberTraits<Number>::real_type>::type
+      typename std::enable_if<!std::is_unsigned<Number>::value,
+                              typename numbers::NumberTraits<Number>::real_type>::type
       get_abs(const Number a)
       {
         return std::abs(a);
@@ -335,42 +310,37 @@ namespace Utilities
 
     template <typename Number>
     void
-    Partitioner::import_from_ghosted_array_finish(
-      const VectorOperation::values  vector_operation,
-      const ArrayView<const Number> &temporary_storage,
-      const ArrayView<Number> &      locally_owned_array,
-      const ArrayView<Number> &      ghost_array,
-      std::vector<MPI_Request> &     requests) const
+    Partitioner::import_from_ghosted_array_finish(const VectorOperation::values  vector_operation,
+                                                  const ArrayView<const Number> &temporary_storage,
+                                                  const ArrayView<Number> & locally_owned_array,
+                                                  const ArrayView<Number> & ghost_array,
+                                                  std::vector<MPI_Request> &requests) const
     {
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
                ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+             ExcGhostIndexArrayHasWrongSize(
+               ghost_array.size(), n_ghost_indices(), n_ghost_indices_in_larger_set));
 
       // in optimized mode, no communication was started, so leave the
       // function directly (and only clear ghosts)
 #    ifndef DEBUG
       if (vector_operation == VectorOperation::insert)
         {
-          Assert(
-            requests.empty(),
-            ExcInternalError("Did not expect a non-empty communication "
-                             "request when inserting. Check that the same "
-                             "vector_operation argument was passed to "
-                             "import_from_ghosted_array_start as is passed "
-                             "to import_from_ghosted_array_finish."));
+          Assert(requests.empty(),
+                 ExcInternalError("Did not expect a non-empty communication "
+                                  "request when inserting. Check that the same "
+                                  "vector_operation argument was passed to "
+                                  "import_from_ghosted_array_start as is passed "
+                                  "to import_from_ghosted_array_finish."));
 #      ifdef DEAL_II_WITH_CXX17
           if constexpr (std::is_trivial<Number>::value)
 #      else
           if (std::is_trivial<Number>::value)
 #      endif
-            std::memset(
-              ghost_array.data(), 0, sizeof(Number) * ghost_array.size());
+            std::memset(ghost_array.data(), 0, sizeof(Number) * ghost_array.size());
           else
-            std::fill(
-              ghost_array.data(), ghost_array.data() + ghost_array.size(), 0);
+            std::fill(ghost_array.data(), ghost_array.data() + ghost_array.size(), 0);
           return;
         }
 #    endif
@@ -389,13 +359,12 @@ namespace Utilities
       if (requests.size() > 0 && n_import_targets > 0)
         {
           AssertDimension(locally_owned_array.size(), local_size());
-          const int ierr =
-            MPI_Waitall(n_import_targets, requests.data(), MPI_STATUSES_IGNORE);
+          const int ierr = MPI_Waitall(n_import_targets, requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
 
           const Number *read_position = temporary_storage.data();
-          std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-            my_imports = import_indices_data.begin();
+          std::vector<std::pair<unsigned int, unsigned int>>::const_iterator my_imports =
+            import_indices_data.begin();
 
           // If the operation is no insertion, add the imported data to the
           // local values. For insert, nothing is done here (but in debug mode
@@ -403,13 +372,11 @@ namespace Utilities
           // the ones already present
           if (vector_operation != dealii::VectorOperation::insert)
             for (; my_imports != import_indices_data.end(); ++my_imports)
-              for (unsigned int j = my_imports->first; j < my_imports->second;
-                   j++)
+              for (unsigned int j = my_imports->first; j < my_imports->second; j++)
                 locally_owned_array[j] += *read_position++;
           else
             for (; my_imports != import_indices_data.end(); ++my_imports)
-              for (unsigned int j = my_imports->first; j < my_imports->second;
-                   j++, read_position++)
+              for (unsigned int j = my_imports->first; j < my_imports->second; j++, read_position++)
                 // Below we use relatively large precision in units in the last
                 // place (ULP) as this Assert can be easily triggered in
                 // p::d::SolutionTransfer. The rationale is that during
@@ -417,26 +384,20 @@ namespace Utilities
                 // this face obtained from each side might be different due to
                 // additions being done in different order.
                 Assert(*read_position == Number() ||
-                         internal::get_abs(locally_owned_array[j] -
-                                           *read_position) <=
-                           internal::get_abs(locally_owned_array[j] +
-                                             *read_position) *
-                             100000. *
-                             std::numeric_limits<typename numbers::NumberTraits<
-                               Number>::real_type>::epsilon(),
-                       typename LinearAlgebra::distributed::Vector<
-                         Number>::ExcNonMatchingElements(*read_position,
-                                                         locally_owned_array[j],
-                                                         my_pid));
-          AssertDimension(read_position - temporary_storage.data(),
-                          n_import_indices());
+                         internal::get_abs(locally_owned_array[j] - *read_position) <=
+                           internal::get_abs(locally_owned_array[j] + *read_position) * 100000. *
+                             std::numeric_limits<
+                               typename numbers::NumberTraits<Number>::real_type>::epsilon(),
+                       typename LinearAlgebra::distributed::Vector<Number>::ExcNonMatchingElements(
+                         *read_position, locally_owned_array[j], my_pid));
+          AssertDimension(read_position - temporary_storage.data(), n_import_indices());
         }
 
       // wait for the send operations to complete
       if (requests.size() > 0 && n_ghost_targets > 0)
         {
-          const int ierr = MPI_Waitall(
-            n_ghost_targets, &requests[n_import_targets], MPI_STATUSES_IGNORE);
+          const int ierr =
+            MPI_Waitall(n_ghost_targets, &requests[n_import_targets], MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
       else
@@ -452,11 +413,9 @@ namespace Utilities
 #    else
           if (std::is_trivial<Number>::value)
 #    endif
-            std::memset(
-              ghost_array.data(), 0, sizeof(Number) * n_ghost_indices());
+            std::memset(ghost_array.data(), 0, sizeof(Number) * n_ghost_indices());
           else
-            std::fill(
-              ghost_array.data(), ghost_array.data() + n_ghost_indices(), 0);
+            std::fill(ghost_array.data(), ghost_array.data() + n_ghost_indices(), 0);
         }
 
       // clear the compress requests

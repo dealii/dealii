@@ -53,8 +53,7 @@ public:
   {}
 
   virtual double
-  value(const dealii::Point<dim> &point,
-        const unsigned int        component = 0) const;
+  value(const dealii::Point<dim> &point, const unsigned int component = 0) const;
 
   const std::vector<double> &
   get_coefficients() const
@@ -68,8 +67,7 @@ private:
 
 template <int dim>
 double
-LegendreFunction<dim>::value(const dealii::Point<dim> &point,
-                             const unsigned int) const
+LegendreFunction<dim>::value(const dealii::Point<dim> &point, const unsigned int) const
 {
   Assert(dim == 1, dealii::ExcNotImplemented());
 
@@ -115,8 +113,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 
   Vector<double> local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
-    dof_handler.begin_active();
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
 
   {
     const unsigned int cell_n_dofs          = cell->get_fe().dofs_per_cell;

@@ -29,8 +29,7 @@
 
 template <typename number>
 bool
-operator==(const PETScWrappers::MPI::BlockVector &v1,
-           const PETScWrappers::MPI::BlockVector &v2)
+operator==(const PETScWrappers::MPI::BlockVector &v1, const PETScWrappers::MPI::BlockVector &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -149,8 +148,7 @@ test()
       // check std::distance
       // algorithm
       deallog << "Check 4: "
-              << (std::distance(v1.begin(), v1.end()) ==
-                      static_cast<signed int>(v1.size()) ?
+              << (std::distance(v1.begin(), v1.end()) == static_cast<signed int>(v1.size()) ?
                     "true" :
                     "false")
               << std::endl;
@@ -161,48 +159,37 @@ test()
       deallog << "Check 5: " << (v1 == v2 ? "true" : "false") << std::endl;
 
       // check std::transform
-      std::transform(
-        v1.begin(),
-        v1.end(),
-        v2.begin(),
-        std::bind(std::multiplies<double>(), std::placeholders::_1, 2.0));
+      std::transform(v1.begin(),
+                     v1.end(),
+                     v2.begin(),
+                     std::bind(std::multiplies<double>(), std::placeholders::_1, 2.0));
       v2.compress(VectorOperation::insert);
       v2 *= 1. / 2.;
       deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
 
 
       // check operators +/-, +=/-=
-      deallog << "Check 7: "
-              << (std::distance(v1.begin(), v1.begin() + 3) == 3 ? "true" :
-                                                                   "false")
+      deallog << "Check 7: " << (std::distance(v1.begin(), v1.begin() + 3) == 3 ? "true" : "false")
               << std::endl;
-      deallog << "Check 8: "
-              << (std::distance(v1.end() - 6, v1.end()) == 6 ? "true" : "false")
+      deallog << "Check 8: " << (std::distance(v1.end() - 6, v1.end()) == 6 ? "true" : "false")
               << std::endl;
       deallog << "Check 9: "
-              << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ?
-                    "true" :
-                    "false")
+              << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ? "true" : "false")
               << std::endl;
       deallog << "Check 10: "
-              << (std::distance(v1.begin(), (v1.begin() += 7)) == 7 ? "true" :
-                                                                      "false")
+              << (std::distance(v1.begin(), (v1.begin() += 7)) == 7 ? "true" : "false")
               << std::endl;
-      deallog << "Check 11: "
-              << (std::distance((v1.end() -= 4), v1.end()) == 4 ? "true" :
-                                                                  "false")
+      deallog << "Check 11: " << (std::distance((v1.end() -= 4), v1.end()) == 4 ? "true" : "false")
               << std::endl;
 
       // check advance
       PETScWrappers::MPI::BlockVector::iterator p2 = v1.begin();
       std::advance(p2, v1.size());
-      deallog << "Check 12: " << (p2 == v1.end() ? "true" : "false")
-              << std::endl;
+      deallog << "Check 12: " << (p2 == v1.end() ? "true" : "false") << std::endl;
 
       PETScWrappers::MPI::BlockVector::const_iterator p3 = v1.begin();
       std::advance(p3, v1.size());
-      deallog << "Check 13: " << (p3 == v1.end() ? "true" : "false")
-              << std::endl;
+      deallog << "Check 13: " << (p3 == v1.end() ? "true" : "false") << std::endl;
     };
 
   // Check 14: operator[]
@@ -246,12 +233,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       // abort
       return 2;
     }
@@ -259,12 +244,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       // abort
       return 3;
     };

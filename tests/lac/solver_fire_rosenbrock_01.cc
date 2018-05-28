@@ -56,15 +56,13 @@ compute(vector_t &G, const vector_t &X)
 
   // Value of the objective function.
   for (unsigned int i = 0; i < X.size() / 2; ++i)
-    value += 100 * dealii::Utilities::fixed_power<2>(X(2 * i) * X(2 * i) -
-                                                     X(2 * i + 1)) +
+    value += 100 * dealii::Utilities::fixed_power<2>(X(2 * i) * X(2 * i) - X(2 * i + 1)) +
              dealii::Utilities::fixed_power<2>(X(2 * i) - 1);
 
   // Gradient of the objective function.
   for (unsigned int i = 0; i < X.size() / 2; ++i)
     {
-      G(2 * i) = (X(2 * i) * X(2 * i) - X(2 * i + 1)) * X(2 * i) * 400 +
-                 (X(2 * i) - 1) * 2;
+      G(2 * i) = (X(2 * i) * X(2 * i) - X(2 * i + 1)) * X(2 * i) * 400 + (X(2 * i) - 1) * 2;
 
       G(2 * i + 1) = (X(2 * i) * X(2 * i) - X(2 * i + 1)) * -200;
     }

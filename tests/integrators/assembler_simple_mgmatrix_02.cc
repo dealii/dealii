@@ -59,7 +59,7 @@ test(FiniteElement<dim> &fe)
   typename DoFHandler<dim>::face_iterator        face = cell->face(1);
 
   MeshWorker::Assembler::MGMatrixSimple<FullMatrix<double>> ass;
-  MeshWorker::DoFInfo<dim> info(dof.block_info());
+  MeshWorker::DoFInfo<dim>                                  info(dof.block_info());
   ass.initialize_info(info, false);
 
   deallog.push("cell");

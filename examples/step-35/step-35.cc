@@ -103,11 +103,10 @@ namespace Step35
       double            initial_time, final_time, Reynolds;
       double            dt;
       unsigned int      n_global_refines, pressure_degree;
-      unsigned int      vel_max_iterations, vel_Krylov_size, vel_off_diagonals,
-        vel_update_prec;
-      double       vel_eps, vel_diag_strength;
-      bool         verbose;
-      unsigned int output_interval;
+      unsigned int      vel_max_iterations, vel_Krylov_size, vel_off_diagonals, vel_update_prec;
+      double            vel_eps, vel_diag_strength;
+      bool              verbose;
+      unsigned int      output_interval;
 
     protected:
       ParameterHandler prm;
@@ -140,23 +139,17 @@ namespace Step35
                         "to use. ");
       prm.enter_subsection("Physical data");
       {
-        prm.declare_entry("initial_time",
-                          "0.",
-                          Patterns::Double(0.),
-                          " The initial time of the simulation. ");
-        prm.declare_entry("final_time",
-                          "1.",
-                          Patterns::Double(0.),
-                          " The final time of the simulation. ");
         prm.declare_entry(
-          "Reynolds", "1.", Patterns::Double(0.), " The Reynolds number. ");
+          "initial_time", "0.", Patterns::Double(0.), " The initial time of the simulation. ");
+        prm.declare_entry(
+          "final_time", "1.", Patterns::Double(0.), " The final time of the simulation. ");
+        prm.declare_entry("Reynolds", "1.", Patterns::Double(0.), " The Reynolds number. ");
       }
       prm.leave_subsection();
 
       prm.enter_subsection("Time step data");
       {
-        prm.declare_entry(
-          "dt", "5e-4", Patterns::Double(0.), " The time step size. ");
+        prm.declare_entry("dt", "5e-4", Patterns::Double(0.), " The time step size. ");
       }
       prm.leave_subsection();
 
@@ -175,13 +168,11 @@ namespace Step35
 
       prm.enter_subsection("Data solve velocity");
       {
-        prm.declare_entry(
-          "max_iterations",
-          "1000",
-          Patterns::Integer(1, 1000),
-          " The maximal number of iterations GMRES must make. ");
-        prm.declare_entry(
-          "eps", "1e-12", Patterns::Double(0.), " The stopping criterion. ");
+        prm.declare_entry("max_iterations",
+                          "1000",
+                          Patterns::Integer(1, 1000),
+                          " The maximal number of iterations GMRES must make. ");
+        prm.declare_entry("eps", "1e-12", Patterns::Double(0.), " The stopping criterion. ");
         prm.declare_entry("Krylov_size",
                           "30",
                           Patterns::Integer(1),
@@ -191,10 +182,8 @@ namespace Step35
                           Patterns::Integer(0),
                           " The number of off-diagonal elements ILU must "
                           "compute. ");
-        prm.declare_entry("diag_strength",
-                          "0.01",
-                          Patterns::Double(0.),
-                          " Diagonal strengthening coefficient. ");
+        prm.declare_entry(
+          "diag_strength", "0.01", Patterns::Double(0.), " Diagonal strengthening coefficient. ");
         prm.declare_entry("update_prec",
                           "15",
                           Patterns::Integer(1),
@@ -294,8 +283,7 @@ namespace Step35
     };
 
     template <int dim>
-    MultiComponentFunction<dim>::MultiComponentFunction(
-      const double initial_time) :
+    MultiComponentFunction<dim>::MultiComponentFunction(const double initial_time) :
       Function<dim>(1, initial_time),
       comp(0)
     {}
@@ -317,18 +305,16 @@ namespace Step35
     public:
       Velocity(const double initial_time = 0.0);
 
-      virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+      virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
       virtual void value_list(const std::vector<Point<dim>> &points,
                               std::vector<double> &          values,
-                              const unsigned int component = 0) const override;
+                              const unsigned int             component = 0) const override;
     };
 
 
     template <int dim>
-    Velocity<dim>::Velocity(const double initial_time) :
-      MultiComponentFunction<dim>(initial_time)
+    Velocity<dim>::Velocity(const double initial_time) : MultiComponentFunction<dim>(initial_time)
     {}
 
 
@@ -338,8 +324,7 @@ namespace Step35
                                    const unsigned int) const
     {
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Velocity<dim>::value(points[i]);
     }
@@ -366,17 +351,15 @@ namespace Step35
     public:
       Pressure(const double initial_time = 0.0);
 
-      virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+      virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
       virtual void value_list(const std::vector<Point<dim>> &points,
                               std::vector<double> &          values,
-                              const unsigned int component = 0) const override;
+                              const unsigned int             component = 0) const override;
     };
 
     template <int dim>
-    Pressure<dim>::Pressure(const double initial_time) :
-      Function<dim>(1, initial_time)
+    Pressure<dim>::Pressure(const double initial_time) : Function<dim>(1, initial_time)
     {}
 
 
@@ -392,8 +375,7 @@ namespace Step35
                                    const unsigned int) const
     {
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Pressure<dim>::value(points[i]);
     }
@@ -471,8 +453,7 @@ namespace Step35
     DeclException2(ExcInvalidTimeStep,
                    double,
                    double,
-                   << " The time step " << arg1 << " is out of range."
-                   << std::endl
+                   << " The time step " << arg1 << " is out of range." << std::endl
                    << " The permitted range is (0," << arg2 << "]");
 
     void create_triangulation_and_dofs(const unsigned int n_refines);
@@ -543,9 +524,7 @@ namespace Step35
       std::vector<types::global_dof_index> vel_local_dof_indices;
       std::vector<types::global_dof_index> pres_local_dof_indices;
 
-      InitGradPerTaskData(const unsigned int dd,
-                          const unsigned int vdpc,
-                          const unsigned int pdpc) :
+      InitGradPerTaskData(const unsigned int dd, const unsigned int vdpc, const unsigned int pdpc) :
         d(dd),
         vel_dpc(vdpc),
         pres_dpc(pdpc),
@@ -608,9 +587,7 @@ namespace Step35
       std::vector<Tensor<1, dim>> grad_u_star;
       std::vector<double>         u_star_tmp;
       FEValues<dim>               fe_val;
-      AdvectionScratchData(const FE_Q<dim> &  fe,
-                           const QGauss<dim> &quad,
-                           const UpdateFlags  flags) :
+      AdvectionScratchData(const FE_Q<dim> &fe, const QGauss<dim> &quad, const UpdateFlags flags) :
         nqp(quad.size()),
         dpc(fe.dofs_per_cell),
         u_star_local(nqp),
@@ -625,16 +602,13 @@ namespace Step35
         u_star_local(nqp),
         grad_u_star(nqp),
         u_star_tmp(nqp),
-        fe_val(data.fe_val.get_fe(),
-               data.fe_val.get_quadrature(),
-               data.fe_val.get_update_flags())
+        fe_val(data.fe_val.get_fe(), data.fe_val.get_quadrature(), data.fe_val.get_update_flags())
       {}
     };
 
-    void assemble_one_cell_of_advection(
-      const typename DoFHandler<dim>::active_cell_iterator &cell,
-      AdvectionScratchData &                                scratch,
-      AdvectionPerTaskData &                                data);
+    void assemble_one_cell_of_advection(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                        AdvectionScratchData &scratch,
+                                        AdvectionPerTaskData &data);
 
     void copy_advection_local_to_global(const AdvectionPerTaskData &data);
 
@@ -657,8 +631,7 @@ namespace Step35
   // that the data we read is reasonable and, finally, create the
   // triangulation and load the initial data.
   template <int dim>
-  NavierStokesProjection<dim>::NavierStokesProjection(
-    const RunTimeParameters::Data_Storage &data) :
+  NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Data_Storage &data) :
     type(data.form),
     deg(data.pressure_degree),
     dt(data.dt),
@@ -680,10 +653,8 @@ namespace Step35
     vel_diag_strength(data.vel_diag_strength)
   {
     if (deg < 1)
-      std::cout
-        << " WARNING: The chosen pair of finite element spaces is not stable."
-        << std::endl
-        << " The obtained results will be nonsense" << std::endl;
+      std::cout << " WARNING: The chosen pair of finite element spaces is not stable." << std::endl
+                << " The obtained results will be nonsense" << std::endl;
 
     AssertThrow(!((dt <= 0.) || (dt > .5 * T)), ExcInvalidTimeStep(dt, .5 * T));
 
@@ -700,8 +671,7 @@ namespace Step35
   // dependent data, i.e. it distributes degrees of freedom and renumbers
   // them, and initializes the matrices and vectors that we will use.
   template <int dim>
-  void NavierStokesProjection<dim>::create_triangulation_and_dofs(
-    const unsigned int n_refines)
+  void NavierStokesProjection<dim>::create_triangulation_and_dofs(const unsigned int n_refines)
   {
     GridIn<dim> grid_in;
     grid_in.attach_triangulation(triangulation);
@@ -715,8 +685,7 @@ namespace Step35
 
     std::cout << "Number of refines = " << n_refines << std::endl;
     triangulation.refine_global(n_refines);
-    std::cout << "Number of active cells: " << triangulation.n_active_cells()
-              << std::endl;
+    std::cout << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
 
     boundary_ids = triangulation.get_boundary_ids();
 
@@ -744,8 +713,7 @@ namespace Step35
     v_tmp.reinit(dof_handler_velocity.n_dofs());
     rot_u.reinit(dof_handler_velocity.n_dofs());
 
-    std::cout << "dim (X_h) = " << (dof_handler_velocity.n_dofs() * dim)
-              << std::endl
+    std::cout << "dim (X_h) = " << (dof_handler_velocity.n_dofs() * dim) << std::endl
               << "dim (M_h) = " << dof_handler_pressure.n_dofs() << std::endl
               << "Re        = " << Re << std::endl
               << std::endl;
@@ -775,8 +743,7 @@ namespace Step35
         VectorTools::interpolate(
           dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n_minus_1[d]);
         vel_exact.advance_time(dt);
-        VectorTools::interpolate(
-          dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n[d]);
+        VectorTools::interpolate(dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n[d]);
       }
   }
 
@@ -799,8 +766,7 @@ namespace Step35
   void NavierStokesProjection<dim>::initialize_velocity_matrices()
   {
     {
-      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(),
-                                 dof_handler_velocity.n_dofs());
+      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(), dof_handler_velocity.n_dofs());
       DoFTools::make_sparsity_pattern(dof_handler_velocity, dsp);
       sparsity_pattern_velocity.copy_from(dsp);
     }
@@ -811,10 +777,8 @@ namespace Step35
     vel_Laplace.reinit(sparsity_pattern_velocity);
     vel_Advection.reinit(sparsity_pattern_velocity);
 
-    MatrixCreator::create_mass_matrix(
-      dof_handler_velocity, quadrature_velocity, vel_Mass);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler_velocity, quadrature_velocity, vel_Laplace);
+    MatrixCreator::create_mass_matrix(dof_handler_velocity, quadrature_velocity, vel_Mass);
+    MatrixCreator::create_laplace_matrix(dof_handler_velocity, quadrature_velocity, vel_Laplace);
   }
 
   // The initialization of the matrices that act on the pressure space is
@@ -823,8 +787,7 @@ namespace Step35
   void NavierStokesProjection<dim>::initialize_pressure_matrices()
   {
     {
-      DynamicSparsityPattern dsp(dof_handler_pressure.n_dofs(),
-                                 dof_handler_pressure.n_dofs());
+      DynamicSparsityPattern dsp(dof_handler_pressure.n_dofs(), dof_handler_pressure.n_dofs());
       DoFTools::make_sparsity_pattern(dof_handler_pressure, dsp);
       sparsity_pattern_pressure.copy_from(dsp);
     }
@@ -833,10 +796,8 @@ namespace Step35
     pres_iterative.reinit(sparsity_pattern_pressure);
     pres_Mass.reinit(sparsity_pattern_pressure);
 
-    MatrixCreator::create_laplace_matrix(
-      dof_handler_pressure, quadrature_pressure, pres_Laplace);
-    MatrixCreator::create_mass_matrix(
-      dof_handler_pressure, quadrature_pressure, pres_Mass);
+    MatrixCreator::create_laplace_matrix(dof_handler_pressure, quadrature_pressure, pres_Laplace);
+    MatrixCreator::create_mass_matrix(dof_handler_pressure, quadrature_pressure, pres_Mass);
   }
 
 
@@ -851,15 +812,12 @@ namespace Step35
   void NavierStokesProjection<dim>::initialize_gradient_operator()
   {
     {
-      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(),
-                                 dof_handler_pressure.n_dofs());
-      DoFTools::make_sparsity_pattern(
-        dof_handler_velocity, dof_handler_pressure, dsp);
+      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(), dof_handler_pressure.n_dofs());
+      DoFTools::make_sparsity_pattern(dof_handler_velocity, dof_handler_pressure, dsp);
       sparsity_pattern_pres_vel.copy_from(dsp);
     }
 
-    InitGradPerTaskData per_task_data(
-      0, fe_velocity.dofs_per_cell, fe_pressure.dofs_per_cell);
+    InitGradPerTaskData per_task_data(0, fe_velocity.dofs_per_cell, fe_pressure.dofs_per_cell);
     InitGradScratchData scratch_data(fe_velocity,
                                      fe_pressure,
                                      quadrature_velocity,
@@ -873,8 +831,7 @@ namespace Step35
         WorkStream::run(
           IteratorPair(IteratorTuple(dof_handler_velocity.begin_active(),
                                      dof_handler_pressure.begin_active())),
-          IteratorPair(IteratorTuple(dof_handler_velocity.end(),
-                                     dof_handler_pressure.end())),
+          IteratorPair(IteratorTuple(dof_handler_velocity.end(), dof_handler_pressure.end())),
           *this,
           &NavierStokesProjection<dim>::assemble_one_cell_of_gradient,
           &NavierStokesProjection<dim>::copy_gradient_local_to_global,
@@ -884,10 +841,9 @@ namespace Step35
   }
 
   template <int dim>
-  void NavierStokesProjection<dim>::assemble_one_cell_of_gradient(
-    const IteratorPair & SI,
-    InitGradScratchData &scratch,
-    InitGradPerTaskData &data)
+  void NavierStokesProjection<dim>::assemble_one_cell_of_gradient(const IteratorPair & SI,
+                                                                  InitGradScratchData &scratch,
+                                                                  InitGradPerTaskData &data)
   {
     scratch.fe_val_vel.reinit(std::get<0>(*SI));
     scratch.fe_val_pres.reinit(std::get<1>(*SI));
@@ -900,23 +856,20 @@ namespace Step35
       {
         for (unsigned int i = 0; i < data.vel_dpc; ++i)
           for (unsigned int j = 0; j < data.pres_dpc; ++j)
-            data.local_grad(i, j) +=
-              -scratch.fe_val_vel.JxW(q) *
-              scratch.fe_val_vel.shape_grad(i, q)[data.d] *
-              scratch.fe_val_pres.shape_value(j, q);
+            data.local_grad(i, j) += -scratch.fe_val_vel.JxW(q) *
+                                     scratch.fe_val_vel.shape_grad(i, q)[data.d] *
+                                     scratch.fe_val_pres.shape_value(j, q);
       }
   }
 
 
   template <int dim>
-  void NavierStokesProjection<dim>::copy_gradient_local_to_global(
-    const InitGradPerTaskData &data)
+  void NavierStokesProjection<dim>::copy_gradient_local_to_global(const InitGradPerTaskData &data)
   {
     for (unsigned int i = 0; i < data.vel_dpc; ++i)
       for (unsigned int j = 0; j < data.pres_dpc; ++j)
-        pres_Diff[data.d].add(data.vel_local_dof_indices[i],
-                              data.pres_local_dof_indices[j],
-                              data.local_grad(i, j));
+        pres_Diff[data.d].add(
+          data.vel_local_dof_indices[i], data.pres_local_dof_indices[j], data.local_grad(i, j));
   }
 
 
@@ -943,8 +896,7 @@ namespace Step35
   // @endcode
   // and does the right thing in either case.
   template <int dim>
-  void NavierStokesProjection<dim>::run(const bool         verbose,
-                                        const unsigned int output_interval)
+  void NavierStokesProjection<dim>::run(const bool verbose, const unsigned int output_interval)
   {
     ConditionalOStream verbose_cout(std::cout, verbose);
 
@@ -964,8 +916,7 @@ namespace Step35
         interpolate_velocity();
         verbose_cout << "  Diffusion Step" << std::endl;
         if (n % vel_update_prec == 0)
-          verbose_cout << "    With reinitialization of the preconditioner"
-                       << std::endl;
+          verbose_cout << "    With reinitialization of the preconditioner" << std::endl;
         diffusion_step((n % vel_update_prec == 0) || (n == 2));
         verbose_cout << "  Projection Step" << std::endl;
         projection_step((n == 2));
@@ -1025,47 +976,40 @@ namespace Step35
 
         vel_exact.set_component(d);
         boundary_values.clear();
-        for (std::vector<types::boundary_id>::const_iterator boundaries =
-               boundary_ids.begin();
+        for (std::vector<types::boundary_id>::const_iterator boundaries = boundary_ids.begin();
              boundaries != boundary_ids.end();
              ++boundaries)
           {
             switch (*boundaries)
               {
                 case 1:
-                  VectorTools::interpolate_boundary_values(
-                    dof_handler_velocity,
-                    *boundaries,
-                    Functions::ZeroFunction<dim>(),
-                    boundary_values);
-                  break;
-                case 2:
                   VectorTools::interpolate_boundary_values(dof_handler_velocity,
                                                            *boundaries,
-                                                           vel_exact,
+                                                           Functions::ZeroFunction<dim>(),
                                                            boundary_values);
+                  break;
+                case 2:
+                  VectorTools::interpolate_boundary_values(
+                    dof_handler_velocity, *boundaries, vel_exact, boundary_values);
                   break;
                 case 3:
                   if (d != 0)
-                    VectorTools::interpolate_boundary_values(
-                      dof_handler_velocity,
-                      *boundaries,
-                      Functions::ZeroFunction<dim>(),
-                      boundary_values);
+                    VectorTools::interpolate_boundary_values(dof_handler_velocity,
+                                                             *boundaries,
+                                                             Functions::ZeroFunction<dim>(),
+                                                             boundary_values);
                   break;
                 case 4:
-                  VectorTools::interpolate_boundary_values(
-                    dof_handler_velocity,
-                    *boundaries,
-                    Functions::ZeroFunction<dim>(),
-                    boundary_values);
+                  VectorTools::interpolate_boundary_values(dof_handler_velocity,
+                                                           *boundaries,
+                                                           Functions::ZeroFunction<dim>(),
+                                                           boundary_values);
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
               }
           }
-        MatrixTools::apply_boundary_values(
-          boundary_values, vel_it_matrix[d], u_n[d], force[d]);
+        MatrixTools::apply_boundary_values(boundary_values, vel_it_matrix[d], u_n[d], force[d]);
       }
 
 
@@ -1073,11 +1017,11 @@ namespace Step35
     for (unsigned int d = 0; d < dim; ++d)
       {
         if (reinit_prec)
-          prec_velocity[d].initialize(vel_it_matrix[d],
-                                      SparseILU<double>::AdditionalData(
-                                        vel_diag_strength, vel_off_diagonals));
-        tasks += Threads::new_task(
-          &NavierStokesProjection<dim>::diffusion_component_solve, *this, d);
+          prec_velocity[d].initialize(
+            vel_it_matrix[d],
+            SparseILU<double>::AdditionalData(vel_diag_strength, vel_off_diagonals));
+        tasks +=
+          Threads::new_task(&NavierStokesProjection<dim>::diffusion_component_solve, *this, d);
       }
     tasks.join_all();
   }
@@ -1085,12 +1029,10 @@ namespace Step35
 
 
   template <int dim>
-  void
-  NavierStokesProjection<dim>::diffusion_component_solve(const unsigned int d)
+  void NavierStokesProjection<dim>::diffusion_component_solve(const unsigned int d)
   {
     SolverControl solver_control(vel_max_its, vel_eps * force[d].l2_norm());
-    SolverGMRES<> gmres(solver_control,
-                        SolverGMRES<>::AdditionalData(vel_Krylov_size));
+    SolverGMRES<> gmres(solver_control, SolverGMRES<>::AdditionalData(vel_Krylov_size));
     gmres.solve(vel_it_matrix[d], u_n[d], force[d], prec_velocity[d]);
   }
 
@@ -1108,18 +1050,15 @@ namespace Step35
   {
     vel_Advection = 0.;
     AdvectionPerTaskData data(fe_velocity.dofs_per_cell);
-    AdvectionScratchData scratch(fe_velocity,
-                                 quadrature_velocity,
-                                 update_values | update_JxW_values |
-                                   update_gradients);
-    WorkStream::run(
-      dof_handler_velocity.begin_active(),
-      dof_handler_velocity.end(),
-      *this,
-      &NavierStokesProjection<dim>::assemble_one_cell_of_advection,
-      &NavierStokesProjection<dim>::copy_advection_local_to_global,
-      scratch,
-      data);
+    AdvectionScratchData scratch(
+      fe_velocity, quadrature_velocity, update_values | update_JxW_values | update_gradients);
+    WorkStream::run(dof_handler_velocity.begin_active(),
+                    dof_handler_velocity.end(),
+                    *this,
+                    &NavierStokesProjection<dim>::assemble_one_cell_of_advection,
+                    &NavierStokesProjection<dim>::copy_advection_local_to_global,
+                    scratch,
+                    data);
   }
 
 
@@ -1165,14 +1104,12 @@ namespace Step35
 
 
   template <int dim>
-  void NavierStokesProjection<dim>::copy_advection_local_to_global(
-    const AdvectionPerTaskData &data)
+  void NavierStokesProjection<dim>::copy_advection_local_to_global(const AdvectionPerTaskData &data)
   {
     for (unsigned int i = 0; i < fe_velocity.dofs_per_cell; ++i)
       for (unsigned int j = 0; j < fe_velocity.dofs_per_cell; ++j)
-        vel_Advection.add(data.local_dof_indices[i],
-                          data.local_dof_indices[j],
-                          data.local_advection(i, j));
+        vel_Advection.add(
+          data.local_dof_indices[i], data.local_dof_indices[j], data.local_advection(i, j));
   }
 
 
@@ -1199,9 +1136,8 @@ namespace Step35
     MatrixTools::apply_boundary_values(bval, pres_iterative, phi_n, pres_tmp);
 
     if (reinit_prec)
-      prec_pres_Laplace.initialize(pres_iterative,
-                                   SparseILU<double>::AdditionalData(
-                                     vel_diag_strength, vel_off_diagonals));
+      prec_pres_Laplace.initialize(
+        pres_iterative, SparseILU<double>::AdditionalData(vel_diag_strength, vel_off_diagonals));
 
     SolverControl solvercontrol(vel_max_its, vel_eps * pres_tmp.l2_norm());
     SolverCG<>    cg(solvercontrol);
@@ -1265,24 +1201,20 @@ namespace Step35
   void NavierStokesProjection<dim>::output_results(const unsigned int step)
   {
     assemble_vorticity((step == 1));
-    const FESystem<dim> joint_fe(
-      fe_velocity, dim, fe_pressure, 1, fe_velocity, 1);
-    DoFHandler<dim> joint_dof_handler(triangulation);
+    const FESystem<dim> joint_fe(fe_velocity, dim, fe_pressure, 1, fe_velocity, 1);
+    DoFHandler<dim>     joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
     Assert(joint_dof_handler.n_dofs() ==
-             ((dim + 1) * dof_handler_velocity.n_dofs() +
-              dof_handler_pressure.n_dofs()),
+             ((dim + 1) * dof_handler_velocity.n_dofs() + dof_handler_pressure.n_dofs()),
            ExcInternalError());
-    Vector<double> joint_solution(joint_dof_handler.n_dofs());
-    std::vector<types::global_dof_index> loc_joint_dof_indices(
-      joint_fe.dofs_per_cell),
+    Vector<double>                       joint_solution(joint_dof_handler.n_dofs());
+    std::vector<types::global_dof_index> loc_joint_dof_indices(joint_fe.dofs_per_cell),
       loc_vel_dof_indices(fe_velocity.dofs_per_cell),
       loc_pres_dof_indices(fe_pressure.dofs_per_cell);
-    typename DoFHandler<dim>::active_cell_iterator
-      joint_cell = joint_dof_handler.begin_active(),
-      joint_endc = joint_dof_handler.end(),
-      vel_cell   = dof_handler_velocity.begin_active(),
-      pres_cell  = dof_handler_pressure.begin_active();
+    typename DoFHandler<dim>::active_cell_iterator joint_cell = joint_dof_handler.begin_active(),
+                                                   joint_endc = joint_dof_handler.end(),
+                                                   vel_cell   = dof_handler_velocity.begin_active(),
+                                                   pres_cell  = dof_handler_pressure.begin_active();
     for (; joint_cell != joint_endc; ++joint_cell, ++vel_cell, ++pres_cell)
       {
         joint_cell->get_dof_indices(loc_joint_dof_indices);
@@ -1292,25 +1224,20 @@ namespace Step35
           switch (joint_fe.system_to_base_index(i).first.first)
             {
               case 0:
-                Assert(joint_fe.system_to_base_index(i).first.second < dim,
-                       ExcInternalError());
+                Assert(joint_fe.system_to_base_index(i).first.second < dim, ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) =
                   u_n[joint_fe.system_to_base_index(i).first.second](
-                    loc_vel_dof_indices[joint_fe.system_to_base_index(i)
-                                          .second]);
+                    loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               case 1:
-                Assert(joint_fe.system_to_base_index(i).first.second == 0,
-                       ExcInternalError());
+                Assert(joint_fe.system_to_base_index(i).first.second == 0, ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) =
-                  pres_n(loc_pres_dof_indices[joint_fe.system_to_base_index(i)
-                                                .second]);
+                  pres_n(loc_pres_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               case 2:
-                Assert(joint_fe.system_to_base_index(i).first.second == 0,
-                       ExcInternalError());
-                joint_solution(loc_joint_dof_indices[i]) = rot_u(
-                  loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
+                Assert(joint_fe.system_to_base_index(i).first.second == 0, ExcInternalError());
+                joint_solution(loc_joint_dof_indices[i]) =
+                  rot_u(loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               default:
                 Assert(false, ExcInternalError());
@@ -1321,20 +1248,14 @@ namespace Step35
     joint_solution_names.emplace_back("rot_u");
     DataOut<dim> data_out;
     data_out.attach_dof_handler(joint_dof_handler);
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      component_interpretation(
-        dim + 2, DataComponentInterpretation::component_is_part_of_vector);
-    component_interpretation[dim] =
-      DataComponentInterpretation::component_is_scalar;
-    component_interpretation[dim + 1] =
-      DataComponentInterpretation::component_is_scalar;
-    data_out.add_data_vector(joint_solution,
-                             joint_solution_names,
-                             DataOut<dim>::type_dof_data,
-                             component_interpretation);
+    std::vector<DataComponentInterpretation::DataComponentInterpretation> component_interpretation(
+      dim + 2, DataComponentInterpretation::component_is_part_of_vector);
+    component_interpretation[dim]     = DataComponentInterpretation::component_is_scalar;
+    component_interpretation[dim + 1] = DataComponentInterpretation::component_is_scalar;
+    data_out.add_data_vector(
+      joint_solution, joint_solution_names, DataOut<dim>::type_dof_data, component_interpretation);
     data_out.build_patches(deg + 1);
-    std::ofstream output("solution-" + Utilities::int_to_string(step, 5) +
-                         ".vtk");
+    std::ofstream output("solution-" + Utilities::int_to_string(step, 5) + ".vtk");
     data_out.write_vtk(output);
   }
 
@@ -1355,22 +1276,17 @@ namespace Step35
     if (reinit_prec)
       prec_vel_mass.initialize(vel_Mass);
 
-    FEValues<dim>      fe_val_vel(fe_velocity,
-                             quadrature_velocity,
-                             update_gradients | update_JxW_values |
-                               update_values);
-    const unsigned int dpc = fe_velocity.dofs_per_cell,
-                       nqp = quadrature_velocity.size();
+    FEValues<dim> fe_val_vel(
+      fe_velocity, quadrature_velocity, update_gradients | update_JxW_values | update_values);
+    const unsigned int dpc = fe_velocity.dofs_per_cell, nqp = quadrature_velocity.size();
     std::vector<types::global_dof_index> ldi(dpc);
     Vector<double>                       loc_rot(dpc);
 
     std::vector<Tensor<1, dim>> grad_u1(nqp), grad_u2(nqp);
     rot_u = 0.;
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler_velocity
-                                                            .begin_active(),
-                                                   end =
-                                                     dof_handler_velocity.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler_velocity.begin_active(),
+                                                   end  = dof_handler_velocity.end();
     for (; cell != end; ++cell)
       {
         fe_val_vel.reinit(cell);
@@ -1380,8 +1296,8 @@ namespace Step35
         loc_rot = 0.;
         for (unsigned int q = 0; q < nqp; ++q)
           for (unsigned int i = 0; i < dpc; ++i)
-            loc_rot(i) += (grad_u2[q][0] - grad_u1[q][1]) *
-                          fe_val_vel.shape_value(i, q) * fe_val_vel.JxW(q);
+            loc_rot(i) +=
+              (grad_u2[q][0] - grad_u1[q][1]) * fe_val_vel.shape_value(i, q) * fe_val_vel.JxW(q);
 
         for (unsigned int i = 0; i < dpc; ++i)
           rot_u(ldi[i]) += loc_rot(i);
@@ -1415,29 +1331,24 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
-  std::cout << "----------------------------------------------------"
-            << std::endl
+  std::cout << "----------------------------------------------------" << std::endl
             << "Apparently everything went fine!" << std::endl
             << "Don't forget to brush your teeth :-)" << std::endl
             << std::endl;

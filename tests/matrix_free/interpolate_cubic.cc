@@ -39,8 +39,7 @@ public:
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int e = 0; e < dim; ++e)
         for (unsigned int f = 0; f < dim; ++f)
-          value += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) *
-                   p[d] * p[e] * p[f];
+          value += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) * p[d] * p[e] * p[f];
     return value;
   }
   virtual Tensor<1, dim>
@@ -51,15 +50,9 @@ public:
       for (unsigned int e = 0; e < dim; ++e)
         for (unsigned int f = 0; f < dim; ++f)
           {
-            grad[d] +=
-              (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) * p[e] *
-              p[f];
-            grad[e] +=
-              (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) * p[d] *
-              p[f];
-            grad[f] +=
-              (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) * p[d] *
-              p[e];
+            grad[d] += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) * p[e] * p[f];
+            grad[e] += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) * p[d] * p[f];
+            grad[f] += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) * p[d] * p[e];
           }
     return grad;
   }
@@ -71,15 +64,12 @@ public:
       for (unsigned int e = 0; e < dim; ++e)
         for (unsigned int f = 0; f < dim; ++f)
           {
-            hess[d][e] +=
-              (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) *
-              (d == e ? 2.0 : 1.0) * p[f];
-            hess[d][f] +=
-              (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) *
-              (d == f ? 2.0 : 1.0) * p[e];
-            hess[e][f] +=
-              (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) *
-              (f == e ? 2.0 : 1.0) * p[d];
+            hess[d][e] += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) *
+                          (d == e ? 2.0 : 1.0) * p[f];
+            hess[d][f] += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) *
+                          (d == f ? 2.0 : 1.0) * p[e];
+            hess[e][f] += (1.3 + 0.9 * d * (e + 1) - 1.4 * (d + 1) * (e - 1.) * f) *
+                          (f == e ? 2.0 : 1.0) * p[d];
           }
     return hess;
   }

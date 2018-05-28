@@ -30,13 +30,11 @@ template <int dim>
 void
 test_fe(const char *name)
 {
-  std::unique_ptr<FiniteElement<dim>> fe =
-    FETools::get_fe_by_name<dim, dim>(std::string(name));
+  std::unique_ptr<FiniteElement<dim>> fe = FETools::get_fe_by_name<dim, dim>(std::string(name));
 
   deallog << fe->get_name() << std::endl
-          << '\t' << fe->dofs_per_cell << '\t' << fe->dofs_per_vertex << '\t'
-          << fe->dofs_per_line << '\t' << fe->dofs_per_quad << '\t'
-          << fe->dofs_per_hex << std::endl;
+          << '\t' << fe->dofs_per_cell << '\t' << fe->dofs_per_vertex << '\t' << fe->dofs_per_line
+          << '\t' << fe->dofs_per_quad << '\t' << fe->dofs_per_hex << std::endl;
 }
 
 

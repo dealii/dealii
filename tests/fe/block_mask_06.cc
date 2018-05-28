@@ -45,8 +45,7 @@ test()
   // though:
   try
     {
-      Assert(BlockMask(12, true).n_selected_blocks(13) == 12,
-             ExcInternalError());
+      Assert(BlockMask(12, true).n_selected_blocks(13) == 12, ExcInternalError());
     }
   catch (ExceptionBase &e)
     {

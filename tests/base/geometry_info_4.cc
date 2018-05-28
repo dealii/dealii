@@ -33,8 +33,8 @@ test()
   for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-        const double phi_i = GeometryInfo<dim>::d_linear_shape_function(
-          GeometryInfo<dim>::unit_cell_vertex(v), i);
+        const double phi_i =
+          GeometryInfo<dim>::d_linear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v), i);
 
         deallog << phi_i << std::endl;
         AssertThrow(phi_i == (i == v ? 1 : 0), ExcInternalError());
@@ -48,8 +48,7 @@ test()
     {
       double s = 0;
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
-        s += GeometryInfo<dim>::d_linear_shape_function(
-          GeometryInfo<dim>::unit_cell_vertex(v), i);
+        s += GeometryInfo<dim>::d_linear_shape_function(GeometryInfo<dim>::unit_cell_vertex(v), i);
       AssertThrow(s == 1, ExcInternalError());
 
       deallog << "Sum of shape functions: " << s << std::endl;

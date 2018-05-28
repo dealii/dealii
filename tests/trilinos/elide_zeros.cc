@@ -106,16 +106,14 @@ namespace LinearAdvectionTest
     assemble_system();
     void
     calculate_flux_terms(
-      const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-        &                current_cell,
-      FEFaceValues<dim> &current_face_values,
-      const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-        &                    neighbor_cell,
-      FEFaceValuesBase<dim> &neighbor_face_values,
-      FullMatrix<double> &   current_to_current_flux,
-      FullMatrix<double> &   current_to_neighbor_flux,
-      FullMatrix<double> &   neighbor_to_current_flux,
-      FullMatrix<double> &   neighbor_to_neighbor_flux);
+      const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>> &current_cell,
+      FEFaceValues<dim> &                                                current_face_values,
+      const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>> &      neighbor_cell,
+      FEFaceValuesBase<dim> &                                            neighbor_face_values,
+      FullMatrix<double> &                                               current_to_current_flux,
+      FullMatrix<double> &                                               current_to_neighbor_flux,
+      FullMatrix<double> &                                               neighbor_to_current_flux,
+      FullMatrix<double> &                                               neighbor_to_neighbor_flux);
 
     const unsigned int n_mpi_processes;
     const unsigned int this_mpi_process;
@@ -146,8 +144,7 @@ namespace LinearAdvectionTest
 
     const Point<2> p0(0.0, 0.0);
     const Point<2> p1(2.0, 1.0);
-    GridGenerator::subdivided_hyper_rectangle(
-      triangulation, repetitions, p0, p1);
+    GridGenerator::subdivided_hyper_rectangle(triangulation, repetitions, p0, p1);
   }
 
   template <int dim>
@@ -158,27 +155,22 @@ namespace LinearAdvectionTest
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
-    DynamicSparsityPattern dynamic_sparsity_pattern(locally_relevant_dofs);
+    DynamicSparsityPattern       dynamic_sparsity_pattern(locally_relevant_dofs);
     Table<2, DoFTools::Coupling> cell_integral_mask(1, 1);
     Table<2, DoFTools::Coupling> flux_integral_mask(1, 1);
     cell_integral_mask(0, 0) = DoFTools::always;
     flux_integral_mask(0, 0) = DoFTools::nonzero;
 
-    DoFTools::make_flux_sparsity_pattern(dof_handler,
-                                         dynamic_sparsity_pattern,
-                                         cell_integral_mask,
-                                         flux_integral_mask);
+    DoFTools::make_flux_sparsity_pattern(
+      dof_handler, dynamic_sparsity_pattern, cell_integral_mask, flux_integral_mask);
 
-    SparsityTools::distribute_sparsity_pattern(
-      dynamic_sparsity_pattern,
-      dof_handler.n_locally_owned_dofs_per_processor(),
-      MPI_COMM_WORLD,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(dynamic_sparsity_pattern,
+                                               dof_handler.n_locally_owned_dofs_per_processor(),
+                                               MPI_COMM_WORLD,
+                                               locally_relevant_dofs);
 
-    system_matrix.reinit(locally_owned_dofs,
-                         locally_owned_dofs,
-                         dynamic_sparsity_pattern,
-                         MPI_COMM_WORLD);
+    system_matrix.reinit(
+      locally_owned_dofs, locally_owned_dofs, dynamic_sparsity_pattern, MPI_COMM_WORLD);
   }
 
 
@@ -186,21 +178,18 @@ namespace LinearAdvectionTest
   template <int dim>
   void
   AdvectionProblem<dim>::calculate_flux_terms(
-    const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-      &                current_cell,
-    FEFaceValues<dim> &current_face_values,
-    const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>> &neighbor_cell,
-    FEFaceValuesBase<dim> &neighbor_face_values,
+    const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>> &current_cell,
+    FEFaceValues<dim> &                                                current_face_values,
+    const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>> &      neighbor_cell,
+    FEFaceValuesBase<dim> &                                            neighbor_face_values,
     FullMatrix<double> & /*current_to_current_flux*/,
     FullMatrix<double> & /*current_to_neighbor_flux*/,
     FullMatrix<double> & /*neighbor_to_current_flux*/,
     FullMatrix<double> &neighbor_to_neighbor_flux)
   {
-    std::vector<types::global_dof_index> current_dofs(
-      current_face_values.dofs_per_cell);
+    std::vector<types::global_dof_index> current_dofs(current_face_values.dofs_per_cell);
     current_cell->get_dof_indices(current_dofs);
-    std::vector<types::global_dof_index> neighbor_dofs(
-      neighbor_face_values.dofs_per_cell);
+    std::vector<types::global_dof_index> neighbor_dofs(neighbor_face_values.dofs_per_cell);
     neighbor_cell->get_dof_indices(neighbor_dofs);
 
     // This is the actual test.
@@ -222,30 +211,26 @@ namespace LinearAdvectionTest
 
     const QGauss<dim - 1> face_quadrature(3);
 
-    const UpdateFlags update_flags =
-      update_values | update_quadrature_points | update_JxW_values;
+    const UpdateFlags update_flags = update_values | update_quadrature_points | update_JxW_values;
 
     FEFaceValues<dim> current_face_values(fe, face_quadrature, update_flags);
     FEFaceValues<dim> neighbor_face_values(fe, face_quadrature, update_flags);
 
-    typename DoFHandler<dim>::active_cell_iterator current_cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator current_cell = dof_handler.begin_active(),
+                                                   endc         = dof_handler.end();
     for (; current_cell != endc; ++current_cell)
       {
         if (current_cell->is_locally_owned())
           {
-            for (unsigned int face_n = 0;
-                 face_n < GeometryInfo<dim>::faces_per_cell;
-                 ++face_n)
+            for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell; ++face_n)
               {
                 const int neighbor_index = current_cell->neighbor_index(face_n);
                 if (neighbor_index != -1) // interior face
                   {
                     // for DG we need to access the FE space on the adjacent
                     // cell.
-                    typename DoFHandler<dim>::active_cell_iterator
-                      neighbor_cell = current_cell->neighbor(face_n);
+                    typename DoFHandler<dim>::active_cell_iterator neighbor_cell =
+                      current_cell->neighbor(face_n);
 
                     bool do_face_integration     = false;
                     bool neighbor_is_level_lower = false;
@@ -275,10 +260,8 @@ namespace LinearAdvectionTest
                             Assert(neighbor_cell->is_ghost(),
                                    ExcMessage("All neighbors should be locally "
                                               "owned or ghost cells."));
-                            if (current_cell->level() ==
-                                  neighbor_cell->level() &&
-                                current_cell->subdomain_id() <
-                                  neighbor_cell->subdomain_id())
+                            if (current_cell->level() == neighbor_cell->level() &&
+                                current_cell->subdomain_id() < neighbor_cell->subdomain_id())
                               {
                                 do_face_integration = true;
                               }
@@ -287,13 +270,10 @@ namespace LinearAdvectionTest
 
                     if (do_face_integration)
                       {
-                        const unsigned int neighbor_face_n =
-                          current_cell->neighbor_face_no(face_n);
-                        AssertThrow(!neighbor_is_level_lower,
-                                    ExcNotImplemented());
+                        const unsigned int neighbor_face_n = current_cell->neighbor_face_no(face_n);
+                        AssertThrow(!neighbor_is_level_lower, ExcNotImplemented());
 
-                        neighbor_face_values.reinit(neighbor_cell,
-                                                    neighbor_face_n);
+                        neighbor_face_values.reinit(neighbor_cell, neighbor_face_n);
                         current_face_values.reinit(current_cell, face_n);
 
                         calculate_flux_terms(current_cell,

@@ -33,8 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number>
 template <typename somenumber>
 void
-SparseILU<number>::initialize(const SparseMatrix<somenumber> &matrix,
-                              const AdditionalData &          data)
+SparseILU<number>::initialize(const SparseMatrix<somenumber> &matrix, const AdditionalData &data)
 {
   SparseLUDecomposition<number>::initialize(matrix, data);
 
@@ -42,8 +41,7 @@ SparseILU<number>::initialize(const SparseMatrix<somenumber> &matrix,
   Assert(this->m() == this->n(), ExcNotQuadratic());
   Assert(matrix.m() == this->m(), ExcDimensionMismatch(matrix.m(), this->m()));
 
-  Assert(data.strengthen_diagonal >= 0,
-         ExcInvalidStrengthening(data.strengthen_diagonal));
+  Assert(data.strengthen_diagonal >= 0, ExcInvalidStrengthening(data.strengthen_diagonal));
 
   this->strengthen_diagonal = data.strengthen_diagonal;
   this->prebuild_lower_bound();
@@ -136,18 +134,14 @@ SparseILU<number>::initialize(const SparseMatrix<somenumber> &matrix,
 template <typename number>
 template <typename somenumber>
 void
-SparseILU<number>::vmult(Vector<somenumber> &      dst,
-                         const Vector<somenumber> &src) const
+SparseILU<number>::vmult(Vector<somenumber> &dst, const Vector<somenumber> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert(dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
-  const size_type          N = dst.size();
-  const std::size_t *const rowstart_indices =
-    this->get_sparsity_pattern().rowstart.get();
-  const size_type *const column_numbers =
-    this->get_sparsity_pattern().colnums.get();
+  const size_type          N                = dst.size();
+  const std::size_t *const rowstart_indices = this->get_sparsity_pattern().rowstart.get();
+  const size_type *const   column_numbers   = this->get_sparsity_pattern().colnums.get();
 
   // solve LUx=b in two steps:
   // first Ly = b, then
@@ -166,18 +160,14 @@ SparseILU<number>::vmult(Vector<somenumber> &      dst,
     {
       // get start of this row. skip the
       // diagonal element
-      const size_type *const rowstart =
-        &column_numbers[rowstart_indices[row] + 1];
+      const size_type *const rowstart = &column_numbers[rowstart_indices[row] + 1];
       // find the position where the part
       // right of the diagonal starts
-      const size_type *const first_after_diagonal =
-        this->prebuilt_lower_bound[row];
+      const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       somenumber    dst_row = dst(row);
-      const number *luval =
-        this->SparseMatrix<number>::val.get() + (rowstart - column_numbers);
-      for (const size_type *col = rowstart; col != first_after_diagonal;
-           ++col, ++luval)
+      const number *luval   = this->SparseMatrix<number>::val.get() + (rowstart - column_numbers);
+      for (const size_type *col = rowstart; col != first_after_diagonal; ++col, ++luval)
         dst_row -= *luval * dst(*col);
       dst(row) = dst_row;
     }
@@ -193,18 +183,15 @@ SparseILU<number>::vmult(Vector<somenumber> &      dst,
   for (int row = N - 1; row >= 0; --row)
     {
       // get end of this row
-      const size_type *const rowend =
-        &column_numbers[rowstart_indices[row + 1]];
+      const size_type *const rowend = &column_numbers[rowstart_indices[row + 1]];
       // find the position where the part
       // right of the diagonal starts
-      const size_type *const first_after_diagonal =
-        this->prebuilt_lower_bound[row];
+      const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       somenumber    dst_row = dst(row);
-      const number *luval   = this->SparseMatrix<number>::val.get() +
-                            (first_after_diagonal - column_numbers);
-      for (const size_type *col = first_after_diagonal; col != rowend;
-           ++col, ++luval)
+      const number *luval =
+        this->SparseMatrix<number>::val.get() + (first_after_diagonal - column_numbers);
+      for (const size_type *col = first_after_diagonal; col != rowend; ++col, ++luval)
         dst_row -= *luval * dst(*col);
 
       // scale by the diagonal element.
@@ -218,18 +205,14 @@ SparseILU<number>::vmult(Vector<somenumber> &      dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseILU<number>::Tvmult(Vector<somenumber> &      dst,
-                          const Vector<somenumber> &src) const
+SparseILU<number>::Tvmult(Vector<somenumber> &dst, const Vector<somenumber> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert(dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
-  const size_type          N = dst.size();
-  const std::size_t *const rowstart_indices =
-    this->get_sparsity_pattern().rowstart.get();
-  const size_type *const column_numbers =
-    this->get_sparsity_pattern().colnums.get();
+  const size_type          N                = dst.size();
+  const std::size_t *const rowstart_indices = this->get_sparsity_pattern().rowstart.get();
+  const size_type *const   column_numbers   = this->get_sparsity_pattern().colnums.get();
 
   // solve (LU)'x=b in two steps:
   // first U'y = b, then
@@ -251,18 +234,15 @@ SparseILU<number>::Tvmult(Vector<somenumber> &      dst,
       dst(row) *= this->diag_element(row);
 
       // get end of this row
-      const size_type *const rowend =
-        &column_numbers[rowstart_indices[row + 1]];
+      const size_type *const rowend = &column_numbers[rowstart_indices[row + 1]];
       // find the position where the part
       // right of the diagonal starts
-      const size_type *const first_after_diagonal =
-        this->prebuilt_lower_bound[row];
+      const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       const somenumber dst_row = dst(row);
-      const number *   luval   = this->SparseMatrix<number>::val.get() +
-                            (first_after_diagonal - column_numbers);
-      for (const size_type *col = first_after_diagonal; col != rowend;
-           ++col, ++luval)
+      const number *   luval =
+        this->SparseMatrix<number>::val.get() + (first_after_diagonal - column_numbers);
+      for (const size_type *col = first_after_diagonal; col != rowend; ++col, ++luval)
         tmp(*col) += *luval * dst_row;
     }
 
@@ -281,18 +261,14 @@ SparseILU<number>::Tvmult(Vector<somenumber> &      dst,
 
       // get start of this row. skip the
       // diagonal element
-      const size_type *const rowstart =
-        &column_numbers[rowstart_indices[row] + 1];
+      const size_type *const rowstart = &column_numbers[rowstart_indices[row] + 1];
       // find the position where the part
       // right of the diagonal starts
-      const size_type *const first_after_diagonal =
-        this->prebuilt_lower_bound[row];
+      const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       const somenumber dst_row = dst(row);
-      const number *   luval =
-        this->SparseMatrix<number>::val.get() + (rowstart - column_numbers);
-      for (const size_type *col = rowstart; col != first_after_diagonal;
-           ++col, ++luval)
+      const number *   luval = this->SparseMatrix<number>::val.get() + (rowstart - column_numbers);
+      for (const size_type *col = rowstart; col != first_after_diagonal; ++col, ++luval)
         tmp(*col) += *luval * dst_row;
     }
 }

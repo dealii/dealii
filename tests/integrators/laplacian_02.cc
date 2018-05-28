@@ -46,10 +46,8 @@ test_boundary(const FiniteElement<dim> &fe, bool diff = false)
   DoFTools::make_zero_boundary_constraints(dof, constraints);
 
   QGauss<dim - 1>   quadrature(fe.tensor_degree() + 1);
-  FEFaceValues<dim> fev(fe,
-                        quadrature,
-                        update_values | update_gradients |
-                          update_normal_vectors | update_JxW_values);
+  FEFaceValues<dim> fev(
+    fe, quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
 
   FullMatrix<double>                   M(fe.dofs_per_cell);
   FullMatrix<double>                   Mglobal(dof.n_dofs());
@@ -65,8 +63,7 @@ test_boundary(const FiniteElement<dim> &fe, bool diff = false)
         nitsche_matrix(M, fev, 10., -1.);
       constraints.distribute_local_to_global(M, indices, indices, Mglobal);
     }
-  deallog << fe.get_name() << ": bdry norm " << Mglobal.frobenius_norm()
-          << std::endl;
+  deallog << fe.get_name() << ": bdry norm " << Mglobal.frobenius_norm() << std::endl;
 }
 
 
@@ -85,14 +82,10 @@ test_face(const FiniteElement<dim> &fe, bool diff = false)
   DoFTools::make_zero_boundary_constraints(dof, constraints);
 
   QGauss<dim - 1>   quadrature(fe.tensor_degree() + 1);
-  FEFaceValues<dim> fev1(fe,
-                         quadrature,
-                         update_values | update_gradients |
-                           update_normal_vectors | update_JxW_values);
-  FEFaceValues<dim> fev2(fe,
-                         quadrature,
-                         update_values | update_gradients |
-                           update_normal_vectors | update_JxW_values);
+  FEFaceValues<dim> fev1(
+    fe, quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
+  FEFaceValues<dim> fev2(
+    fe, quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
 
   FullMatrix<double>                   M11(fe.dofs_per_cell);
   FullMatrix<double>                   M12(fe.dofs_per_cell);
@@ -119,8 +112,7 @@ test_face(const FiniteElement<dim> &fe, bool diff = false)
   constraints.distribute_local_to_global(M21, indices2, indices1, Mglobal);
   constraints.distribute_local_to_global(M12, indices1, indices2, Mglobal);
   constraints.distribute_local_to_global(M22, indices2, indices2, Mglobal);
-  deallog << fe.get_name() << ": face norm " << Mglobal.frobenius_norm()
-          << std::endl;
+  deallog << fe.get_name() << ": face norm " << Mglobal.frobenius_norm() << std::endl;
 }
 
 

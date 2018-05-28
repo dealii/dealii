@@ -50,8 +50,7 @@ test(const unsigned int &size)
   for (const auto &p : points)
     if (p.distance(points_unpacked[i++]) > 1e-12)
       {
-        deallog << "NOT OK: " << p << " != " << points_unpacked[i - 1]
-                << std::endl;
+        deallog << "NOT OK: " << p << " != " << points_unpacked[i - 1] << std::endl;
         ok = false;
       }
 

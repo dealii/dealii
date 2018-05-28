@@ -33,9 +33,7 @@ namespace internal
         VectorType &                          V);
 
     static void
-    set(typename VectorType::value_type value,
-        const types::global_dof_index   i,
-        VectorType &                    V);
+    set(typename VectorType::value_type value, const types::global_dof_index i, VectorType &V);
 
     static typename VectorType::value_type
     get(const VectorType &V, const types::global_dof_index i);
@@ -67,8 +65,7 @@ namespace internal
 
   template <typename VectorType>
   inline typename VectorType::value_type
-  ElementAccess<VectorType>::get(const VectorType &            V,
-                                 const types::global_dof_index i)
+  ElementAccess<VectorType>::get(const VectorType &V, const types::global_dof_index i)
   {
     return V(i);
   }

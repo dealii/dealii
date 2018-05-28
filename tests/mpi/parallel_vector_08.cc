@@ -57,25 +57,15 @@ test()
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
   local_relevant                 = local_owned;
-  unsigned int ghost_indices[10] = {1,
-                                    2,
-                                    13,
-                                    set - 2,
-                                    set - 1,
-                                    set,
-                                    set + 1,
-                                    2 * set,
-                                    2 * set + 1,
-                                    2 * set + 3};
+  unsigned int ghost_indices[10] = {
+    1, 2, 13, set - 2, set - 1, set, set + 1, 2 * set, 2 * set + 1, 2 * set + 3};
   local_relevant.add_indices(&ghost_indices[0], &ghost_indices[0] + 10);
 
   // v has ghosts, w has none. set some entries
   // on w, copy into v and check if they are
   // there
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
-  LinearAlgebra::distributed::Vector<double> w(
-    local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> w(local_owned, local_owned, MPI_COMM_WORLD);
 
   // set a few of the local elements
   for (unsigned i = 0; i < local_size; ++i)
@@ -91,26 +81,22 @@ test()
   // check local values with two different
   // access operators
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == v(local_owned.nth_index_in_set(i)),
-                ExcInternalError());
+    AssertThrow(v.local_element(i) == v(local_owned.nth_index_in_set(i)), ExcInternalError());
   for (unsigned int i = 0; i < local_size; ++i)
     AssertThrow(v.local_element(i) == v(i + my_start), ExcInternalError());
 
   // check non-local entries on all processors
   for (unsigned int i = 0; i < 10; ++i)
-    AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i],
-                ExcInternalError());
+    AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i], ExcInternalError());
 
   // compare direct access local_element with access ()
   for (unsigned int i = 0; i < 10; ++i)
     if (ghost_indices[i] < my_start)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i),
-                  ExcInternalError());
+      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i), ExcInternalError());
 
   if (myid == 0)
     for (unsigned int i = 5; i < 10; ++i)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i - 5),
-                  ExcInternalError());
+      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i - 5), ExcInternalError());
 
 
   // now the same again, but import ghosts automatically because v had ghosts
@@ -126,26 +112,22 @@ test()
   // check local values with two different
   // access operators
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == v(local_owned.nth_index_in_set(i)),
-                ExcInternalError());
+    AssertThrow(v.local_element(i) == v(local_owned.nth_index_in_set(i)), ExcInternalError());
   for (unsigned int i = 0; i < local_size; ++i)
     AssertThrow(v.local_element(i) == v(i + my_start), ExcInternalError());
 
   // check non-local entries on all processors
   for (unsigned int i = 0; i < 10; ++i)
-    AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i],
-                ExcInternalError());
+    AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i], ExcInternalError());
 
   // compare direct access [] with access ()
   for (unsigned int i = 0; i < 10; ++i)
     if (ghost_indices[i] < my_start)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i),
-                  ExcInternalError());
+      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i), ExcInternalError());
 
   if (myid == 0)
     for (unsigned int i = 5; i < 10; ++i)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i - 5),
-                  ExcInternalError());
+      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i - 5), ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -156,8 +138,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

@@ -31,52 +31,31 @@ test()
   auto t2 = it;
   deallog << std::boolalpha;
   deallog << boost::core::demangle(typeid(Container).name()) << std::endl;
-  deallog << "++it == it:           " << (++table.begin() == table.begin())
-          << std::endl;
-  deallog << "++it != it:           " << (++table.begin() != table.begin())
-          << std::endl;
-  deallog << "it++ == it:           " << (table.begin()++ == table.begin())
-          << std::endl;
-  deallog << "it++ != it + 1:       " << (table.begin()++ != table.begin() + 1)
-          << std::endl;
-  deallog << "++(++it) == it + 2:   "
-          << (++(++table.begin()) == table.begin() + 2) << std::endl;
-  deallog << "it++ == it + 1:       " << (table.begin()++ == table.begin() + 1)
-          << std::endl;
-  deallog << "--(++it) == it:       " << (--(++table.begin()) == table.begin())
-          << std::endl;
-  deallog << "(it--)-- == it:       " << ((table.end()--)-- == table.end())
-          << std::endl;
-  deallog << "end - 5 <= end:       " << ((table.end() - 5) <= table.end())
-          << std::endl;
-  deallog << "end <= end:           " << (table.end() <= table.end())
-          << std::endl;
-  deallog << "end >= end:           " << (table.end() >= table.end())
-          << std::endl;
-  deallog << "begin + 5 >= begin:   " << ((table.begin() + 5) >= table.begin())
-          << std::endl;
-  deallog << "begin + 5 <= begin:   " << ((table.begin() + 5) <= table.begin())
-          << std::endl;
-  deallog << "end - begin:          " << table.end() - table.begin()
-          << std::endl;
-  deallog << "begin - end:          " << table.begin() - table.end()
-          << std::endl;
-  deallog << "(begin + 2) - begin:  " << (table.begin() + 2) - table.begin()
-          << std::endl;
-  deallog << "begin + 6 < begin:    " << ((table.begin() + 6) < table.begin())
-          << std::endl;
-  deallog << "begin < begin + 1:    " << (table.begin() < (table.begin() + 6))
-          << std::endl;
-  deallog << "end - 5 < begin:      " << ((table.end() - 6) < table.begin())
-          << std::endl;
+  deallog << "++it == it:           " << (++table.begin() == table.begin()) << std::endl;
+  deallog << "++it != it:           " << (++table.begin() != table.begin()) << std::endl;
+  deallog << "it++ == it:           " << (table.begin()++ == table.begin()) << std::endl;
+  deallog << "it++ != it + 1:       " << (table.begin()++ != table.begin() + 1) << std::endl;
+  deallog << "++(++it) == it + 2:   " << (++(++table.begin()) == table.begin() + 2) << std::endl;
+  deallog << "it++ == it + 1:       " << (table.begin()++ == table.begin() + 1) << std::endl;
+  deallog << "--(++it) == it:       " << (--(++table.begin()) == table.begin()) << std::endl;
+  deallog << "(it--)-- == it:       " << ((table.end()--)-- == table.end()) << std::endl;
+  deallog << "end - 5 <= end:       " << ((table.end() - 5) <= table.end()) << std::endl;
+  deallog << "end <= end:           " << (table.end() <= table.end()) << std::endl;
+  deallog << "end >= end:           " << (table.end() >= table.end()) << std::endl;
+  deallog << "begin + 5 >= begin:   " << ((table.begin() + 5) >= table.begin()) << std::endl;
+  deallog << "begin + 5 <= begin:   " << ((table.begin() + 5) <= table.begin()) << std::endl;
+  deallog << "end - begin:          " << table.end() - table.begin() << std::endl;
+  deallog << "begin - end:          " << table.begin() - table.end() << std::endl;
+  deallog << "(begin + 2) - begin:  " << (table.begin() + 2) - table.begin() << std::endl;
+  deallog << "begin + 6 < begin:    " << ((table.begin() + 6) < table.begin()) << std::endl;
+  deallog << "begin < begin + 1:    " << (table.begin() < (table.begin() + 6)) << std::endl;
+  deallog << "end - 5 < begin:      " << ((table.end() - 6) < table.begin()) << std::endl;
   t2 = it + 5;
   deallog << "it+5 == (t2 = (it+5)):" << (it + 5 == t2) << std::endl;
   const auto it2 = table.end() - 5;
-  deallog << "end - 5 position:     " << it2->row() << ", " << it2->column()
-          << std::endl;
+  deallog << "end - 5 position:     " << it2->row() << ", " << it2->column() << std::endl;
   const auto it3 = table.begin() + 5;
-  deallog << "begin + 5 position:   " << it3->row() << ", " << it3->column()
-          << std::endl;
+  deallog << "begin + 5 position:   " << it3->row() << ", " << it3->column() << std::endl;
 }
 
 int
@@ -103,11 +82,9 @@ main()
 
     TransposeTableIterators::Accessor<double, true>  a3(&table, 2);
     TransposeTableIterators::Accessor<double, false> a4(&table, 2);
-    deallog
-      << "Accessors refer to the same entry: "
-      << (&(TransposeTableIterators::Accessor<double, true>(a4).value()) ==
-          &(a3.value()))
-      << std::endl;
+    deallog << "Accessors refer to the same entry: "
+            << (&(TransposeTableIterators::Accessor<double, true>(a4).value()) == &(a3.value()))
+            << std::endl;
   }
 
   // test a non-empty rectangular table

@@ -68,8 +68,7 @@ test()
   else
     Assert(false, ExcNotImplemented());
 
-  TrilinosWrappers::SparsityPattern sp(
-    row_partitioning, col_partitioning, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(row_partitioning, col_partitioning, MPI_COMM_WORLD);
   if (my_id == 0)
     {
       sp.add(0, 0);
@@ -95,8 +94,7 @@ test()
   x.reinit(col_partitioning, MPI_COMM_WORLD);
   y.reinit(row_partitioning, MPI_COMM_WORLD);
 
-  LinearAlgebra::distributed::Vector<double> dx(
-    col_partitioning, col_partitioning, MPI_COMM_WORLD),
+  LinearAlgebra::distributed::Vector<double> dx(col_partitioning, col_partitioning, MPI_COMM_WORLD),
     dy(row_partitioning, row_partitioning, MPI_COMM_WORLD);
 
   for (unsigned int i = 0; i < row_partitioning.n_elements(); ++i)
@@ -126,8 +124,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int       myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);

@@ -65,8 +65,7 @@ check_support_points(const FiniteElement<dim> &fe)
               const double sf = fe.shape_value_component(i, p, d);
               deallog << ' ' << (int)rint(60 * sf);
 
-              const double diff =
-                std::abs(sf - vals.shape_value_component(i, k, d));
+              const double diff = std::abs(sf - vals.shape_value_component(i, k, d));
               if (diff > 1.e-12)
                 deallog << "Error values" << std::endl;
               Tensor<1, dim> grad = fe.shape_grad_component(i, p, d);
@@ -87,11 +86,10 @@ check_face_support_points(const FiniteElement<dim> &fe)
 {
   deallog << "Face " << fe.get_name() << std::endl;
 
-  const std::vector<Point<dim - 1>> &sub_points =
-    fe.get_generalized_face_support_points();
-  std::vector<double>     weights(sub_points.size());
-  Quadrature<dim - 1>     sub_quadrature(sub_points, weights);
-  std::vector<Point<dim>> points(sub_points.size());
+  const std::vector<Point<dim - 1>> &sub_points = fe.get_generalized_face_support_points();
+  std::vector<double>                weights(sub_points.size());
+  Quadrature<dim - 1>                sub_quadrature(sub_points, weights);
+  std::vector<Point<dim>>            points(sub_points.size());
 
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -120,8 +118,7 @@ check_face_support_points(const FiniteElement<dim> &fe)
                   const double sf = fe.shape_value_component(i, p, d);
                   deallog << ' ' << (int)rint(60 * sf);
 
-                  const double diff =
-                    std::abs(sf - vals.shape_value_component(i, k, d));
+                  const double diff = std::abs(sf - vals.shape_value_component(i, k, d));
                   if (diff > 1.e-12)
                     deallog << "Error values" << std::endl;
                   Tensor<1, dim> grad = fe.shape_grad_component(i, p, d);

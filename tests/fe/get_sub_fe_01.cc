@@ -115,10 +115,8 @@ check()
     FESystem<dim> fe(fe_q, 3);
     works(fe, mask_all(3));       // keep system
     works(fe, mask_single(3, 1)); // select one component
-    fails(fe,
-          mask(3,
-               1,
-               2)); // select more than one component but not the whole FESystem
+    fails(fe, mask(3, 1,
+                   2)); // select more than one component but not the whole FESystem
   }
 
   // more systems:

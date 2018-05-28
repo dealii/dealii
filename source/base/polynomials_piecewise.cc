@@ -41,8 +41,7 @@ namespace Polynomials
 
   template <typename number>
   void
-  PiecewisePolynomial<number>::value(const number         x,
-                                     std::vector<number> &values) const
+  PiecewisePolynomial<number>::value(const number x, std::vector<number> &values) const
   {
     Assert(values.size() > 0, ExcZero());
 
@@ -96,8 +95,7 @@ namespace Polynomials
 
         // on subinterval boundaries, cannot evaluate derivatives properly, so
         // set them to zero
-        if ((std::abs(y) < 1e-14 &&
-             (interval > 0 || derivative_change_sign == -1.)) ||
+        if ((std::abs(y) < 1e-14 && (interval > 0 || derivative_change_sign == -1.)) ||
             (std::abs(y - step) < 1e-14 &&
              (interval < n_intervals - 1 || derivative_change_sign == -1.)))
           {
@@ -118,9 +116,8 @@ namespace Polynomials
 
 
   std::vector<PiecewisePolynomial<double>>
-  generate_complete_Lagrange_basis_on_subdivisions(
-    const unsigned int n_subdivisions,
-    const unsigned int base_degree)
+  generate_complete_Lagrange_basis_on_subdivisions(const unsigned int n_subdivisions,
+                                                   const unsigned int base_degree)
   {
     std::vector<Polynomial<double>> p_base =
       LagrangeEquidistant::generate_complete_basis(base_degree);
@@ -133,10 +130,8 @@ namespace Polynomials
     p.emplace_back(p_base[0], n_subdivisions, 0, false);
     for (unsigned int s = 0; s < n_subdivisions; ++s)
       for (unsigned int i = 0; i < base_degree; ++i)
-        p.emplace_back(p_base[i + 1],
-                       n_subdivisions,
-                       s,
-                       i == (base_degree - 1) && s < n_subdivisions - 1);
+        p.emplace_back(
+          p_base[i + 1], n_subdivisions, s, i == (base_degree - 1) && s < n_subdivisions - 1);
     return p;
   }
 

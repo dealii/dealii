@@ -59,31 +59,14 @@ test()
 
   if (myid == 0)
     {
-      std::vector<unsigned int> ghost_indices = {1,
-                                                 2,
-                                                 13,
-                                                 set - 2,
-                                                 set - 1,
-                                                 set,
-                                                 set + 1,
-                                                 2 * set,
-                                                 2 * set + 1,
-                                                 2 * set + 3};
+      std::vector<unsigned int> ghost_indices = {
+        1, 2, 13, set - 2, set - 1, set, set + 1, 2 * set, 2 * set + 1, 2 * set + 3};
       local_relevant.add_indices(ghost_indices.begin(), ghost_indices.end());
     }
   else if (myid == 1)
     {
-      std::vector<unsigned int> ghost_indices = {1,
-                                                 2,
-                                                 13,
-                                                 set - 2,
-                                                 set - 1,
-                                                 set,
-                                                 set + 1,
-                                                 2 * set,
-                                                 2 * set + 1,
-                                                 2 * set + 3,
-                                                 3 * set};
+      std::vector<unsigned int> ghost_indices = {
+        1, 2, 13, set - 2, set - 1, set, set + 1, 2 * set, 2 * set + 1, 2 * set + 3, 3 * set};
       local_relevant.add_indices(ghost_indices.begin(), ghost_indices.end());
     }
   else if (myid == 2)
@@ -102,8 +85,7 @@ test()
 
   // write the info on ghost processors and import indices to file
   {
-    std::ofstream file(
-      (std::string("dat.") + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
     file << "**** proc " << myid << std::endl;
     file << "owned:" << std::endl;
     local_owned.print(file);
@@ -111,18 +93,16 @@ test()
     local_relevant.print(file);
     file << "ghost targets: ";
     for (unsigned int i = 0; i < v.ghost_targets().size(); ++i)
-      file << "[" << v.ghost_targets()[i].first << "/"
-           << v.ghost_targets()[i].second << "] ";
+      file << "[" << v.ghost_targets()[i].first << "/" << v.ghost_targets()[i].second << "] ";
     file << std::endl;
     file << "import targets: ";
     for (unsigned int i = 0; i < v.import_targets().size(); ++i)
-      file << "[" << v.import_targets()[i].first << "/"
-           << v.import_targets()[i].second << "] ";
+      file << "[" << v.import_targets()[i].first << "/" << v.import_targets()[i].second << "] ";
     file << std::endl;
     file << "import indices:" << std::endl;
     for (unsigned int i = 0; i < v.import_indices().size(); ++i)
-      file << "[" << v.import_indices()[i].first << "/"
-           << v.import_indices()[i].second << ")" << std::endl;
+      file << "[" << v.import_indices()[i].first << "/" << v.import_indices()[i].second << ")"
+           << std::endl;
     file << "****" << std::endl;
   }
 
@@ -142,8 +122,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

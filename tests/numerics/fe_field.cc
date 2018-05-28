@@ -59,8 +59,7 @@ check()
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     vector(i) = i;
 
-  Functions::FEFieldFunction<dim, hp::DoFHandler<dim>> fe_field(dof_handler,
-                                                                vector);
+  Functions::FEFieldFunction<dim, hp::DoFHandler<dim>> fe_field(dof_handler, vector);
   QGauss<dim>                                          quadrature(5);
 
   deallog << "values:" << std::endl;

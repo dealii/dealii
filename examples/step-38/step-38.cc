@@ -142,12 +142,10 @@ namespace Step38
     Solution() : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
-    virtual Tensor<1, dim>
-    gradient(const Point<dim> & p,
-             const unsigned int component = 0) const override;
+    virtual Tensor<1, dim> gradient(const Point<dim> & p,
+                                    const unsigned int component = 0) const override;
   };
 
 
@@ -159,8 +157,7 @@ namespace Step38
 
 
   template <>
-  Tensor<1, 2> Solution<2>::gradient(const Point<2> &p,
-                                     const unsigned int) const
+  Tensor<1, 2> Solution<2>::gradient(const Point<2> &p, const unsigned int) const
   {
     Tensor<1, 2> return_value;
     return_value[0] = -2. * p(1) * (1 - 2. * p(0) * p(0));
@@ -173,14 +170,12 @@ namespace Step38
   template <>
   double Solution<3>::value(const Point<3> &p, const unsigned int) const
   {
-    return (std::sin(numbers::PI * p(0)) * std::cos(numbers::PI * p(1)) *
-            exp(p(2)));
+    return (std::sin(numbers::PI * p(0)) * std::cos(numbers::PI * p(1)) * exp(p(2)));
   }
 
 
   template <>
-  Tensor<1, 3> Solution<3>::gradient(const Point<3> &p,
-                                     const unsigned int) const
+  Tensor<1, 3> Solution<3>::gradient(const Point<3> &p, const unsigned int) const
   {
     using numbers::PI;
 
@@ -202,21 +197,18 @@ namespace Step38
     RightHandSide() : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
   };
 
   template <>
-  double RightHandSide<2>::value(const Point<2> &p,
-                                 const unsigned int /*component*/) const
+  double RightHandSide<2>::value(const Point<2> &p, const unsigned int /*component*/) const
   {
     return (-8. * p(0) * p(1));
   }
 
 
   template <>
-  double RightHandSide<3>::value(const Point<3> &p,
-                                 const unsigned int /*component*/) const
+  double RightHandSide<3>::value(const Point<3> &p, const unsigned int /*component*/) const
   {
     using numbers::PI;
 
@@ -243,8 +235,7 @@ namespace Step38
     Point<3> normal = p;
     normal /= p.norm();
 
-    return (-trace(hessian) + 2 * (gradient * normal) +
-            (hessian * normal) * normal);
+    return (-trace(hessian) + 2 * (gradient * normal) + (hessian * normal) * normal);
   }
 
 
@@ -255,8 +246,7 @@ namespace Step38
   // polynomial degree of the finite element and mapping, and associating the
   // DoF handler to the triangulation:
   template <int spacedim>
-  LaplaceBeltramiProblem<spacedim>::LaplaceBeltramiProblem(
-    const unsigned degree) :
+  LaplaceBeltramiProblem<spacedim>::LaplaceBeltramiProblem(const unsigned degree) :
     fe(degree),
     dof_handler(triangulation),
     mapping(degree)
@@ -313,21 +303,18 @@ namespace Step38
       std::set<types::boundary_id> boundary_ids;
       boundary_ids.insert(0);
 
-      GridGenerator::extract_boundary_mesh(
-        volume_mesh, triangulation, boundary_ids);
+      GridGenerator::extract_boundary_mesh(volume_mesh, triangulation, boundary_ids);
     }
     triangulation.set_all_manifold_ids(0);
     triangulation.set_manifold(0, SphericalManifold<dim, spacedim>());
 
     triangulation.refine_global(4);
 
-    std::cout << "Surface mesh has " << triangulation.n_active_cells()
-              << " cells." << std::endl;
+    std::cout << "Surface mesh has " << triangulation.n_active_cells() << " cells." << std::endl;
 
     dof_handler.distribute_dofs(fe);
 
-    std::cout << "Surface mesh has " << dof_handler.n_dofs()
-              << " degrees of freedom." << std::endl;
+    std::cout << "Surface mesh has " << dof_handler.n_dofs() << " degrees of freedom." << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, dsp);
@@ -360,8 +347,7 @@ namespace Step38
     FEValues<dim, spacedim> fe_values(mapping,
                                       fe,
                                       quadrature_formula,
-                                      update_values | update_gradients |
-                                        update_quadrature_points |
+                                      update_values | update_gradients | update_quadrature_points |
                                         update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
@@ -375,9 +361,8 @@ namespace Step38
 
     const RightHandSide<spacedim> rhs;
 
-    for (typename DoFHandler<dim, spacedim>::active_cell_iterator
-           cell = dof_handler.begin_active(),
-           endc = dof_handler.end();
+    for (typename DoFHandler<dim, spacedim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                                  endc = dof_handler.end();
          cell != endc;
          ++cell)
       {
@@ -392,20 +377,18 @@ namespace Step38
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
               cell_matrix(i, j) += fe_values.shape_grad(i, q_point) *
-                                   fe_values.shape_grad(j, q_point) *
-                                   fe_values.JxW(q_point);
+                                   fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point);
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-            cell_rhs(i) += fe_values.shape_value(i, q_point) *
-                           rhs_values[q_point] * fe_values.JxW(q_point);
+            cell_rhs(i) +=
+              fe_values.shape_value(i, q_point) * rhs_values[q_point] * fe_values.JxW(q_point);
 
         cell->get_dof_indices(local_dof_indices);
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(
-                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+              system_matrix.add(local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -415,8 +398,7 @@ namespace Step38
     VectorTools::interpolate_boundary_values(
       mapping, dof_handler, 0, Solution<spacedim>(), boundary_values);
 
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, solution, system_rhs, false);
+    MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs, false);
   }
 
 
@@ -471,9 +453,7 @@ namespace Step38
     DataOut<dim, DoFHandler<dim, spacedim>> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(
-      solution,
-      "solution",
-      DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
+      solution, "solution", DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
     data_out.build_patches(mapping, mapping.get_degree());
 
     std::string filename("solution-");
@@ -505,8 +485,8 @@ namespace Step38
                                       QGauss<dim>(2 * fe.degree + 1),
                                       VectorTools::H1_norm);
 
-    double h1_error = VectorTools::compute_global_error(
-      triangulation, difference_per_cell, VectorTools::H1_norm);
+    double h1_error =
+      VectorTools::compute_global_error(triangulation, difference_per_cell, VectorTools::H1_norm);
     std::cout << "H1 error = " << h1_error << std::endl;
   }
 
@@ -547,25 +527,21 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

@@ -132,8 +132,7 @@ void Step5<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, dsp);
@@ -170,8 +169,8 @@ void Step5<dim>::assemble_system()
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -195,17 +194,14 @@ void Step5<dim>::assemble_system()
 
       for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
-          const double current_coefficient =
-            coefficient<dim>(fe_values.quadrature_point(q_index));
+          const double current_coefficient = coefficient<dim>(fe_values.quadrature_point(q_index));
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) +=
-                  (current_coefficient * fe_values.shape_grad(i, q_index) *
-                   fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+                cell_matrix(i, j) += (current_coefficient * fe_values.shape_grad(i, q_index) *
+                                      fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
-                              fe_values.JxW(q_index));
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 * fe_values.JxW(q_index));
             }
         }
 
@@ -214,8 +210,7 @@ void Step5<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(
-              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+            system_matrix.add(local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -225,8 +220,7 @@ void Step5<dim>::assemble_system()
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(
     dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 }
 
 
@@ -268,8 +262,8 @@ void Step5<dim>::solve()
 
   solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-  std::cout << "   " << solver_control.last_step()
-            << " CG iterations needed to obtain convergence." << std::endl;
+  std::cout << "   " << solver_control.last_step() << " CG iterations needed to obtain convergence."
+            << std::endl;
 }
 
 
@@ -451,10 +445,8 @@ void Step5<dim>::run()
 
       // Now that we have a mesh for sure, we write some output and do all the
       // things that we have already seen in the previous examples.
-      std::cout << "   Number of active cells: "
-                << triangulation.n_active_cells() << std::endl
-                << "   Total number of cells: " << triangulation.n_cells()
-                << std::endl;
+      std::cout << "   Number of active cells: " << triangulation.n_active_cells() << std::endl
+                << "   Total number of cells: " << triangulation.n_cells() << std::endl;
 
       setup_system();
       assemble_system();

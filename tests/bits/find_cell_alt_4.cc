@@ -46,8 +46,8 @@ void check(Triangulation<3> &tria)
   deallog << std::endl;
 
   // Now transform back and check distance
-  Point<3> pp = map.transform_unit_to_real_cell(
-    cell.first, GeometryInfo<3>::project_to_unit_cell(cell.second));
+  Point<3> pp =
+    map.transform_unit_to_real_cell(cell.first, GeometryInfo<3>::project_to_unit_cell(cell.second));
   deallog << pp.distance(p) << std::endl;
   Assert(pp.distance(p) < 1e-13, ExcInternalError());
 }

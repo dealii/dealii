@@ -45,8 +45,7 @@ test()
   tria.refine_global(1);
 
   GridOut              grid_out;
-  GridOutFlags::Eps<2> eps2(
-    GridOutFlags::EpsFlagsBase::width, 300, .5, false, 5, true);
+  GridOutFlags::Eps<2> eps2(GridOutFlags::EpsFlagsBase::width, 300, .5, false, 5, true);
   grid_out.set_flags(eps2);
 
   if (dim != 1)

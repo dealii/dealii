@@ -51,13 +51,11 @@ reinit_vector(const dealii::DoFHandler<dim, spacedim> &     mg_dof,
       &mg_dof.get_triangulation()));
   AssertThrow(
     tria != nullptr,
-    ExcMessage(
-      "multigrid with Trilinos vectors only works with distributed Triangulation!"));
+    ExcMessage("multigrid with Trilinos vectors only works with distributed Triangulation!"));
 
   for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
     {
-      v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
-                      tria->get_communicator());
+      v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria->get_communicator());
     }
 }
 
@@ -100,8 +98,7 @@ check_simple(const FiniteElement<dim> &fe)
   u[0] = 0.;
   transfer.restrict_and_add(2, u[1], u[2]);
   transfer.restrict_and_add(1, u[0], u[1]);
-  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl
-          << "u0\t" << (u[0] * u[0] + .5) << std::endl;
+  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl << "u0\t" << (u[0] * u[0] + .5) << std::endl;
 
   // Now the same for a non-constant
   // vector
@@ -117,8 +114,7 @@ check_simple(const FiniteElement<dim> &fe)
   u[0] = 0.;
   transfer.restrict_and_add(2, u[1], u[2]);
   transfer.restrict_and_add(1, u[0], u[1]);
-  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl
-          << "u0\t" << (u[0] * u[0] + .5) << std::endl;
+  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl << "u0\t" << (u[0] * u[0] + .5) << std::endl;
 
   // Fill a global vector by counting
   // from one up
@@ -151,8 +147,7 @@ check_simple(const FiniteElement<dim> &fe)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   std::ofstream logfile("output");
   deallog << std::setprecision(10);

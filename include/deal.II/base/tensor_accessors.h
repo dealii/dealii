@@ -136,8 +136,7 @@ namespace TensorAccessors
   template <int deref_steps, typename T>
   struct ReturnType
   {
-    typedef typename ReturnType<deref_steps - 1,
-                                typename ValueType<T>::value_type>::value_type
+    typedef typename ReturnType<deref_steps - 1, typename ValueType<T>::value_type>::value_type
       value_type;
   };
 
@@ -224,8 +223,7 @@ namespace TensorAccessors
   typename ReturnType<rank, T>::value_type &
   extract(T &t, const ArrayType &indices)
   {
-    return internal::ExtractHelper<0, rank>::template extract<T, ArrayType>(
-      t, indices);
+    return internal::ExtractHelper<0, rank>::template extract<T, ArrayType>(t, indices);
   }
 
 
@@ -268,13 +266,7 @@ namespace TensorAccessors
    *
    * @author Matthias Maier, 2015
    */
-  template <int no_contr,
-            int rank_1,
-            int rank_2,
-            int dim,
-            typename T1,
-            typename T2,
-            typename T3>
+  template <int no_contr, int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3>
   inline DEAL_II_ALWAYS_INLINE void
   contract(T1 &result, const T2 &left, const T3 &right)
   {
@@ -287,8 +279,8 @@ namespace TensorAccessors
                   "equal or greater than the number of "
                   "contractions");
 
-    internal::Contract<no_contr, rank_1, rank_2, dim>::
-      template contract<T1, T2, T3>(result, left, right);
+    internal::Contract<no_contr, rank_1, rank_2, dim>::template contract<T1, T2, T3>(
+      result, left, right);
   }
 
 
@@ -321,18 +313,12 @@ namespace TensorAccessors
    *
    * @author Matthias Maier, 2015
    */
-  template <int rank_1,
-            int rank_2,
-            int dim,
-            typename T1,
-            typename T2,
-            typename T3,
-            typename T4>
+  template <int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3, typename T4>
   T1
   contract3(const T2 &left, const T3 &middle, const T4 &right)
   {
-    return internal::Contract3<rank_1, rank_2, dim>::
-      template contract3<T1, T2, T3, T4>(left, middle, right);
+    return internal::Contract3<rank_1, rank_2, dim>::template contract3<T1, T2, T3, T4>(
+      left, middle, right);
   }
 
 
@@ -412,10 +398,7 @@ namespace TensorAccessors
       ReorderedIndexView(typename ReferenceType<T>::type t) : t_(t)
       {}
 
-      typedef ReorderedIndexView<index - 1,
-                                 rank - 1,
-                                 typename ValueType<T>::value_type>
-        value_type;
+      typedef ReorderedIndexView<index - 1, rank - 1, typename ValueType<T>::value_type> value_type;
 
       // Recurse by applying index j directly:
       inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
@@ -466,8 +449,7 @@ namespace TensorAccessors
       ReorderedIndexView(typename ReferenceType<T>::type t) : t_(t)
       {}
 
-      typedef typename ReferenceType<typename ValueType<T>::value_type>::type
-        value_type;
+      typedef typename ReferenceType<typename ValueType<T>::value_type>::type value_type;
 
       inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
@@ -524,8 +506,7 @@ namespace TensorAccessors
         return value_type(*this, j);
       }
 
-      typedef
-        typename ValueType<typename S::return_type>::value_type return_type;
+      typedef typename ValueType<typename S::return_type>::value_type return_type;
 
       inline typename ReferenceType<return_type>::type
       apply(unsigned int j) const
@@ -549,9 +530,8 @@ namespace TensorAccessors
       StoreIndex(S s, int i) : s_(s), i_(i)
       {}
 
-      typedef
-        typename ValueType<typename S::return_type>::value_type return_type;
-      typedef return_type                                       value_type;
+      typedef typename ValueType<typename S::return_type>::value_type return_type;
+      typedef return_type                                             value_type;
 
       inline DEAL_II_ALWAYS_INLINE return_type &operator[](unsigned int j) const
       {
@@ -578,9 +558,9 @@ namespace TensorAccessors
       inline static typename ReturnType<rank - position, T>::value_type &
       extract(T &t, const ArrayType &indices)
       {
-        return ExtractHelper<position + 1, rank>::
-          template extract<typename ValueType<T>::value_type, ArrayType>(
-            t[indices[position]], indices);
+        return ExtractHelper<position + 1,
+                             rank>::template extract<typename ValueType<T>::value_type,
+                                                     ArrayType>(t[indices[position]], indices);
       }
     };
 
@@ -622,8 +602,7 @@ namespace TensorAccessors
       contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
-          Contract<no_contr, rank_1 - 1, rank_2, dim>::contract(
-            result[i], left[i], right);
+          Contract<no_contr, rank_1 - 1, rank_2, dim>::contract(result[i], left[i], right);
       }
     };
 
@@ -651,8 +630,7 @@ namespace TensorAccessors
       contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
-          Contract<no_contr, no_contr, rank_2 - 1, dim>::contract(
-            result[i], left, right[i]);
+          Contract<no_contr, no_contr, rank_2 - 1, dim>::contract(result[i], left, right[i]);
       }
     };
 
@@ -699,8 +677,7 @@ namespace TensorAccessors
         // zero initialization.
         T1 result = dealii::internal::NumberType<T1>::value(0.0);
         for (unsigned int i = 0; i < dim; ++i)
-          result += Contract2<no_contr - 1, dim>::template contract2<T1>(
-            left[i], right[i]);
+          result += Contract2<no_contr - 1, dim>::template contract2<T1>(left[i], right[i]);
         return result;
       }
     };
@@ -747,8 +724,8 @@ namespace TensorAccessors
         // zero initialization.
         T1 result = dealii::internal::NumberType<T1>::value(0.0);
         for (unsigned int i = 0; i < dim; ++i)
-          result += Contract3<rank_1 - 1, rank_2, dim>::template contract3<T1>(
-            left[i], middle[i], right);
+          result +=
+            Contract3<rank_1 - 1, rank_2, dim>::template contract3<T1>(left[i], middle[i], right);
         return result;
       }
     };
@@ -777,8 +754,8 @@ namespace TensorAccessors
         // zero initialization.
         T1 result = dealii::internal::NumberType<T1>::value(0.0);
         for (unsigned int i = 0; i < dim; ++i)
-          result += Contract3<0, rank_2 - 1, dim>::template contract3<T1>(
-            left, middle[i], right[i]);
+          result +=
+            Contract3<0, rank_2 - 1, dim>::template contract3<T1>(left, middle[i], right[i]);
         return result;
       }
     };

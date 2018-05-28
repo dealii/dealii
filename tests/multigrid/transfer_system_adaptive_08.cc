@@ -58,9 +58,7 @@ reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
 
 template <typename Transfer>
 void
-make_matrix(const Transfer &    transfer,
-            const unsigned int  high_level,
-            FullMatrix<double> &matrix)
+make_matrix(const Transfer &transfer, const unsigned int high_level, FullMatrix<double> &matrix)
 {
   Vector<double> src(matrix.n());
   Vector<double> dst(matrix.m());
@@ -93,8 +91,7 @@ void
 refine_mesh(Triangulation<dim> &triangulation)
 {
   bool cell_refined = false;
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     {
@@ -107,8 +104,7 @@ refine_mesh(Triangulation<dim> &triangulation)
         }
     }
   if (!cell_refined) // if no cell was selected for refinement, refine global
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       cell->set_refine_flag();
@@ -128,12 +124,9 @@ check(const FiniteElement<dim> &fe)
   std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
 
-  const Point<dim> bottom_left =
-    (dim == 2 ? Point<dim>(-1, -1) : Point<dim>(-1, -1, -1));
-  const Point<dim> top_right =
-    (dim == 2 ? Point<dim>(1, 1) : Point<dim>(1, 1, 1));
-  GridGenerator::subdivided_hyper_rectangle(
-    tr, subdivisions, bottom_left, top_right, true);
+  const Point<dim> bottom_left = (dim == 2 ? Point<dim>(-1, -1) : Point<dim>(-1, -1, -1));
+  const Point<dim> top_right   = (dim == 2 ? Point<dim>(1, 1) : Point<dim>(1, 1, 1));
+  GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, bottom_left, top_right, true);
   refine_mesh(tr);
 
   DoFHandler<dim> mg_dof_handler(tr);
@@ -155,23 +148,16 @@ check(const FiniteElement<dim> &fe)
   for (unsigned int level = 0; level < tr.n_levels(); ++level)
     DoFRenumbering::component_wise(mg_dof_handler, level, block_selected);
 
-  std::vector<std::set<types::global_dof_index>> boundary_indices(
-    tr.n_levels());
-  typename FunctionMap<dim>::type dirichlet_boundary;
-  Functions::ZeroFunction<dim>    dirichlet_bc(fe.n_components());
+  std::vector<std::set<types::global_dof_index>> boundary_indices(tr.n_levels());
+  typename FunctionMap<dim>::type                dirichlet_boundary;
+  Functions::ZeroFunction<dim>                   dirichlet_bc(fe.n_components());
   dirichlet_boundary[3] = &dirichlet_bc;
 
-  MGTools::make_boundary_list(
-    mg_dof_handler, dirichlet_boundary, boundary_indices);
+  MGTools::make_boundary_list(mg_dof_handler, dirichlet_boundary, boundary_indices);
 
   MGTransferSelect<double> transfer;
-  transfer.build_matrices(mg_dof_handler,
-                          mg_dof_handler,
-                          0,
-                          0,
-                          block_selected,
-                          block_selected,
-                          boundary_indices);
+  transfer.build_matrices(
+    mg_dof_handler, mg_dof_handler, 0, 0, block_selected, block_selected, boundary_indices);
 
   std::vector<std::vector<types::global_dof_index>> dofs_per_block(
     tr.n_levels(), std::vector<types::global_dof_index>(2));

@@ -80,8 +80,7 @@ test()
   {
     FullMatrix<double> full_matrix(2 * m.n_block_rows(), 2 * m.n_block_cols());
     for (unsigned int block_row = 0; block_row < m.n_block_rows(); ++block_row)
-      for (unsigned int block_col = 0; block_col < m.n_block_cols();
-           ++block_col)
+      for (unsigned int block_col = 0; block_col < m.n_block_cols(); ++block_col)
         {
           full_matrix(block_row * 2, block_col * 2)         = 1;
           full_matrix(block_row * 2 + 1, block_col * 2 + 1) = 1.;
@@ -89,26 +88,20 @@ test()
           full_matrix(block_row * 2 + 1, block_col * 2)     = -1.;
         }
 
-    std::vector<types::global_dof_index> local_row_indices(2 *
-                                                           m.n_block_rows());
-    std::vector<types::global_dof_index> local_col_indices(2 *
-                                                           m.n_block_cols());
+    std::vector<types::global_dof_index> local_row_indices(2 * m.n_block_rows());
+    std::vector<types::global_dof_index> local_col_indices(2 * m.n_block_cols());
 
     for (unsigned int i = 0; i < block_size - 1; ++i)
       {
-        for (unsigned int block_row = 0; block_row < m.n_block_rows();
-             ++block_row)
+        for (unsigned int block_row = 0; block_row < m.n_block_rows(); ++block_row)
           {
-            local_row_indices[2 * block_row] = block_row * block_size + i;
-            local_row_indices[2 * block_row + 1] =
-              block_row * block_size + i + 1;
+            local_row_indices[2 * block_row]     = block_row * block_size + i;
+            local_row_indices[2 * block_row + 1] = block_row * block_size + i + 1;
           }
-        for (unsigned int block_col = 0; block_col < m.n_block_cols();
-             ++block_col)
+        for (unsigned int block_col = 0; block_col < m.n_block_cols(); ++block_col)
           {
-            local_col_indices[2 * block_col] = block_col * block_size + i;
-            local_col_indices[2 * block_col + 1] =
-              block_col * block_size + i + 1;
+            local_col_indices[2 * block_col]     = block_col * block_size + i;
+            local_col_indices[2 * block_col + 1] = block_col * block_size + i + 1;
           }
 
         m2.add(local_row_indices, local_col_indices, full_matrix);
@@ -142,8 +135,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   try
     {
@@ -155,13 +147,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -169,12 +159,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

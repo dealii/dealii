@@ -33,17 +33,15 @@ namespace LinearAlgebra
 {
   namespace EpetraWrappers
   {
-    CommunicationPattern::CommunicationPattern(
-      const IndexSet &vector_space_vector_index_set,
-      const IndexSet &read_write_vector_index_set,
-      const MPI_Comm &communicator)
+    CommunicationPattern::CommunicationPattern(const IndexSet &vector_space_vector_index_set,
+                                               const IndexSet &read_write_vector_index_set,
+                                               const MPI_Comm &communicator)
     {
       // virtual functions called in constructors and destructors never use the
       // override in a derived class
       // for clarity be explicit on which function is called
-      CommunicationPattern::reinit(vector_space_vector_index_set,
-                                   read_write_vector_index_set,
-                                   communicator);
+      CommunicationPattern::reinit(
+        vector_space_vector_index_set, read_write_vector_index_set, communicator);
     }
 
 
@@ -57,14 +55,13 @@ namespace LinearAlgebra
 
       Epetra_Map vector_space_vector_map =
         vector_space_vector_index_set.make_trilinos_map(*comm, false);
-      Epetra_Map read_write_vector_map =
-        read_write_vector_index_set.make_trilinos_map(*comm, true);
+      Epetra_Map read_write_vector_map = read_write_vector_index_set.make_trilinos_map(*comm, true);
 
       // Target map is read_write_vector_map
       // Source map is vector_space_vector_map. This map must have uniquely
       // owned GID.
-      import = std_cxx14::make_unique<Epetra_Import>(read_write_vector_map,
-                                                     vector_space_vector_map);
+      import =
+        std_cxx14::make_unique<Epetra_Import>(read_write_vector_map, vector_space_vector_map);
     }
 
 

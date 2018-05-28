@@ -75,13 +75,11 @@ namespace Utilities
   DeclException2(ExcInvalidNumber2StringConversersion,
                  unsigned int,
                  unsigned int,
-                 << "When trying to convert " << arg1 << " to a string with "
-                 << arg2 << " digits");
+                 << "When trying to convert " << arg1 << " to a string with " << arg2 << " digits");
   DeclException1(ExcInvalidNumber, unsigned int, << "Invalid number " << arg1);
   DeclException1(ExcCantConvertString,
                  std::string,
-                 << "Can't convert the string " << arg1
-                 << " to the desired type");
+                 << "Can't convert the string " << arg1 << " to the desired type");
 
 
   std::string
@@ -121,9 +119,7 @@ namespace Utilities
 
 
   std::string
-  replace_in_string(const std::string &input,
-                    const std::string &from,
-                    const std::string &to)
+  replace_in_string(const std::string &input, const std::string &from, const std::string &to)
   {
     if (from.empty())
       return input;
@@ -216,9 +212,8 @@ namespace Utilities
     char *p;
     errno       = 0;
     const int i = std::strtol(s.c_str(), &p, 10);
-    AssertThrow(
-      !((errno != 0) || (s.size() == 0) || ((s.size() > 0) && (*p != '\0'))),
-      ExcMessage("Can't convert <" + s + "> to an integer."));
+    AssertThrow(!((errno != 0) || (s.size() == 0) || ((s.size() > 0) && (*p != '\0'))),
+                ExcMessage("Can't convert <" + s + "> to an integer."));
 
     return i;
   }
@@ -255,9 +250,8 @@ namespace Utilities
     char *p;
     errno          = 0;
     const double d = std::strtod(s.c_str(), &p);
-    AssertThrow(
-      !((errno != 0) || (s.size() == 0) || ((s.size() > 0) && (*p != '\0'))),
-      ExcMessage("Can't convert <" + s + "> to a double."));
+    AssertThrow(!((errno != 0) || (s.size() == 0) || ((s.size() > 0) && (*p != '\0'))),
+                ExcMessage("Can't convert <" + s + "> to a double."));
 
     return d;
   }
@@ -353,8 +347,7 @@ namespace Utilities
         if (pos_newline != std::string::npos && pos_newline <= width)
           {
             std::string line(text, 0, pos_newline);
-            while ((line.length() != 0) &&
-                   (line[line.length() - 1] == delimiter))
+            while ((line.length() != 0) && (line[line.length() - 1] == delimiter))
               line.erase(line.length() - 1, 1);
             lines.push_back(line);
             text.erase(0, pos_newline + 1);
@@ -367,8 +360,7 @@ namespace Utilities
         if (text.length() < width)
           {
             // remove trailing spaces
-            while ((text.length() != 0) &&
-                   (text[text.length() - 1] == delimiter))
+            while ((text.length() != 0) && (text[text.length() - 1] == delimiter))
               text.erase(text.length() - 1, 1);
             lines.push_back(text);
             text = "";
@@ -396,8 +388,7 @@ namespace Utilities
             // location and put it into a single
             // line, and remove it from 'text'
             std::string line(text, 0, location);
-            while ((line.length() != 0) &&
-                   (line[line.length() - 1] == delimiter))
+            while ((line.length() != 0) && (line[line.length() - 1] == delimiter))
               line.erase(line.length() - 1, 1);
             lines.push_back(line);
             text.erase(0, location);
@@ -479,8 +470,7 @@ namespace Utilities
     // least it is reentrant). these two approaches being
     // non-workable, use a thread-local random number generator here
     static Threads::ThreadLocalStorage<boost::mt19937> random_number_generator;
-    return boost::normal_distribution<>(a,
-                                        sigma)(random_number_generator.get());
+    return boost::normal_distribution<>(a, sigma)(random_number_generator.get());
   }
 
 
@@ -640,9 +630,7 @@ namespace Utilities
           case 3:
             return "AVX512";
           default:
-            AssertThrow(false,
-                        ExcInternalError(
-                          "Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
+            AssertThrow(false, ExcInternalError("Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
             return "ERROR";
         }
     }
@@ -704,9 +692,8 @@ namespace Utilities
       std::tm *   time  = std::localtime(&time1);
 
       std::ostringstream o;
-      o << time->tm_hour << ":" << (time->tm_min < 10 ? "0" : "")
-        << time->tm_min << ":" << (time->tm_sec < 10 ? "0" : "")
-        << time->tm_sec;
+      o << time->tm_hour << ":" << (time->tm_min < 10 ? "0" : "") << time->tm_min << ":"
+        << (time->tm_sec < 10 ? "0" : "") << time->tm_sec;
 
       return o.str();
     }
@@ -720,8 +707,7 @@ namespace Utilities
       std::tm *   time  = std::localtime(&time1);
 
       std::ostringstream o;
-      o << time->tm_year + 1900 << "/" << time->tm_mon + 1 << "/"
-        << time->tm_mday;
+      o << time->tm_year + 1900 << "/" << time->tm_mon + 1 << "/" << time->tm_mday;
 
       return o.str();
     }
@@ -799,21 +785,17 @@ namespace Utilities
       // see if the communicator is in fact a
       // parallel MPI communicator; if so,
       // return a duplicate of it
-      const Epetra_MpiComm *mpi_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&communicator);
+      const Epetra_MpiComm *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
       if (mpi_comm != nullptr)
-        return new Epetra_MpiComm(
-          Utilities::MPI::duplicate_communicator(mpi_comm->GetMpiComm()));
+        return new Epetra_MpiComm(Utilities::MPI::duplicate_communicator(mpi_comm->GetMpiComm()));
 #  endif
 
       // if we don't support MPI, or if the
       // communicator in question was in fact
       // not an MPI communicator, return a
       // copy of the same object again
-      Assert(dynamic_cast<const Epetra_SerialComm *>(&communicator) != nullptr,
-             ExcInternalError());
-      return new Epetra_SerialComm(
-        dynamic_cast<const Epetra_SerialComm &>(communicator));
+      Assert(dynamic_cast<const Epetra_SerialComm *>(&communicator) != nullptr, ExcInternalError());
+      return new Epetra_SerialComm(dynamic_cast<const Epetra_SerialComm &>(communicator));
     }
 
 
@@ -862,20 +844,14 @@ namespace Utilities
           // elements in the
           // following constructor
           // call
-          return Epetra_Map(map.NumGlobalElements(),
-                            map.NumMyElements(),
-                            map.IndexBase(),
-                            comm);
+          return Epetra_Map(map.NumGlobalElements(), map.NumMyElements(), map.IndexBase(), comm);
         }
       else
         {
           // the range is not
           // contiguous
-          return Epetra_Map(map.NumGlobalElements(),
-                            map.NumMyElements(),
-                            map.MyGlobalElements(),
-                            0,
-                            comm);
+          return Epetra_Map(
+            map.NumGlobalElements(), map.NumMyElements(), map.MyGlobalElements(), 0, comm);
         }
     }
   } // namespace Trilinos

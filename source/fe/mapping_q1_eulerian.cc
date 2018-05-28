@@ -63,14 +63,12 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
   AssertDimension(spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
   AssertDimension(shiftmap_dof_handler->get_fe(0).n_components(), spacedim);
 
-  AssertDimension(shiftmap_dof_handler->n_dofs(),
-                  euler_transform_vectors->size());
+  AssertDimension(shiftmap_dof_handler->n_dofs(), euler_transform_vectors->size());
 
   // cast the Triangulation<dim>::cell_iterator into a
   // DoFHandler<dim>::cell_iterator which is necessary for access to
   // DoFCellAccessor::get_dof_values()
-  typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
-    *cell, shiftmap_dof_handler);
+  typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(*cell, shiftmap_dof_handler);
 
   // We require the cell to be active since we can only then get nodal
   // values for the shifts
@@ -104,8 +102,8 @@ std::vector<Point<spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  const std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-    vertices = this->get_vertices(cell);
+  const std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices =
+    this->get_vertices(cell);
 
   std::vector<Point<spacedim>> a(GeometryInfo<dim>::vertices_per_cell);
   for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -120,8 +118,7 @@ template <int dim, class VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(
-    *this);
+  return std_cxx14::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(*this);
 }
 
 
@@ -131,20 +128,15 @@ CellSimilarity::Similarity
 MappingQ1Eulerian<dim, VectorType, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity,
-  const Quadrature<dim> &                                  quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &internal_data,
-  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &output_data) const
+  const Quadrature<dim> &                                              quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &            internal_data,
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &output_data) const
 {
   // call the function of the base class, but ignoring
   // any potentially detected cell similarity between
   // the current and the previous cell
   MappingQGeneric<dim, spacedim>::fill_fe_values(
-    cell,
-    CellSimilarity::invalid_next_cell,
-    quadrature,
-    internal_data,
-    output_data);
+    cell, CellSimilarity::invalid_next_cell, quadrature, internal_data, output_data);
   // also return the updated flag since any detected
   // similarity wasn't based on the mapped field, but
   // the original vertices which are meaningless

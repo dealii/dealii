@@ -47,9 +47,8 @@ plot_shape_functions(const unsigned int degree)
         for (unsigned int mx = 0; mx <= div; ++mx)
           {
             const Point<dim> p =
-              (dim == 2 ?
-                 Point<dim>(1. * mx / div, 1. * my / div) :
-                 Point<dim>(1. * mx / div, 1. * my / div, 1. * mz / div));
+              (dim == 2 ? Point<dim>(1. * mx / div, 1. * my / div) :
+                          Point<dim>(1. * mx / div, 1. * my / div, 1. * mz / div));
 
             // Lines with function
             // values contain

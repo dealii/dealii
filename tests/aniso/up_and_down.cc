@@ -125,8 +125,8 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   const double relative_residual = (x2.l2_norm() / x.l2_norm());
 
   const double threshold = 1e-6;
-  deallog << ", dofs_per_cell=" << fe.dofs_per_cell << "; relative residual: "
-          << (relative_residual < threshold ? "ok" : "botched up!")
+  deallog << ", dofs_per_cell=" << fe.dofs_per_cell
+          << "; relative residual: " << (relative_residual < threshold ? "ok" : "botched up!")
           << std::endl;
 }
 
@@ -174,36 +174,30 @@ test()
     new FESystem<dim>(FE_DGQ<dim>(1), 2),
     new FESystem<dim>(FE_DGP<dim>(1), 1, FE_DGQ<dim>(2), 2),
     new FESystem<dim>(FE_DGP<dim>(1), 2, FE_DGQ<dim>(2), 2, FE_DGP<dim>(0), 1),
-    new FESystem<dim>(
-      FE_DGQ<dim>(1),
-      2,
-      FESystem<dim>(FE_DGQ<dim>(1), 2, FE_DGP<dim>(2), 2, FE_DGQ<dim>(2), 1),
-      2,
-      FE_DGP<dim>(0),
-      1),
-    new FESystem<dim>(FE_DGP<dim>(1),
+    new FESystem<dim>(FE_DGQ<dim>(1),
                       2,
-                      FESystem<dim>(FE_DGP<dim>(1),
-                                    2,
-                                    FE_DGQ<dim>(2),
-                                    2,
-                                    FESystem<dim>(FE_DGQ<dim>(0), 3),
-                                    1),
+                      FESystem<dim>(FE_DGQ<dim>(1), 2, FE_DGP<dim>(2), 2, FE_DGQ<dim>(2), 1),
                       2,
-                      FE_DGQ<dim>(0),
+                      FE_DGP<dim>(0),
                       1),
+    new FESystem<dim>(
+      FE_DGP<dim>(1),
+      2,
+      FESystem<dim>(FE_DGP<dim>(1), 2, FE_DGQ<dim>(2), 2, FESystem<dim>(FE_DGQ<dim>(0), 3), 1),
+      2,
+      FE_DGQ<dim>(0),
+      1),
 
     // some continuous FEs
     new FE_Q<dim>(1),
     new FE_Q<dim>(2),
     new FESystem<dim>(FE_Q<dim>(1), 2),
-    new FESystem<dim>(
-      FE_DGQ<dim>(1),
-      2,
-      FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(2), 1, FE_DGP<dim>(2), 1),
-      2,
-      FE_Q<dim>(3),
-      1)};
+    new FESystem<dim>(FE_DGQ<dim>(1),
+                      2,
+                      FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(2), 1, FE_DGP<dim>(2), 1),
+                      2,
+                      FE_Q<dim>(3),
+                      1)};
 
   for (unsigned int j = 0; j < n_ref_cases_for_dim[dim]; ++j)
     {
@@ -218,9 +212,7 @@ test()
       Point<dim> (*p)(Point<dim>) = &transform<dim>;
       GridTools::transform(p, tr);
       tr.refine_global(1);
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tr.begin_active(),
-                                                        endc = tr.end();
+      typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(), endc = tr.end();
       for (; cell != endc; ++cell)
         cell->set_refine_flag(RefinementCase<dim>(j + 1));
 
@@ -231,8 +223,7 @@ test()
       for (unsigned int i = 0; i < sizeof(fe_list) / sizeof(fe_list[0]); ++i)
         if (fe_list[i] != nullptr)
           {
-            deallog << dim << "d, uniform grid, fe #" << i << ", "
-                    << ref_case_names[j];
+            deallog << dim << "d, uniform grid, fe #" << i << ", " << ref_case_names[j];
             check_element(tr, *fe_list[i]);
           }
     }

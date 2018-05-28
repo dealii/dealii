@@ -37,16 +37,14 @@ namespace internal
      * documentation of the WorkStream class.
      */
     template <int dim, int spacedim>
-    struct ParallelData
-      : public internal::DataOutImplementation::ParallelDataBase<dim, spacedim>
+    struct ParallelData : public internal::DataOutImplementation::ParallelDataBase<dim, spacedim>
     {
       ParallelData(const unsigned int               n_datasets,
                    const unsigned int               n_subdivisions,
                    const unsigned int               n_patches_per_circle,
                    const std::vector<unsigned int> &n_postprocessor_outputs,
                    const Mapping<dim, spacedim> &   mapping,
-                   const std::vector<
-                     std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+                   const std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
                      &               finite_elements,
                    const UpdateFlags update_flags);
 
@@ -120,8 +118,7 @@ namespace internal
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-class DataOutRotation
-  : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension + 1>
+class DataOutRotation : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension + 1>
 {
 public:
   /**
@@ -140,8 +137,7 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DoFHandlerType, dimension + 1>::cell_iterator
-    cell_iterator;
+  typedef typename DataOut_DoFData<DoFHandlerType, dimension + 1>::cell_iterator cell_iterator;
 
   /**
    * This is the central function of this class since it builds the list of
@@ -161,8 +157,7 @@ public:
    * description of this parameter.
    */
   virtual void
-  build_patches(const unsigned int n_patches_per_circle,
-                const unsigned int n_subdivisions = 0);
+  build_patches(const unsigned int n_patches_per_circle, const unsigned int n_subdivisions = 0);
 
   /**
    * Return the first cell which we want output for. The default
@@ -208,12 +203,9 @@ private:
    */
   void
   build_one_patch(
-    const cell_iterator *cell,
-    internal::DataOutRotationImplementation::ParallelData<dimension,
-                                                          space_dimension>
-      &data,
-    std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
-      &my_patches);
+    const cell_iterator *                                                              cell,
+    internal::DataOutRotationImplementation::ParallelData<dimension, space_dimension> &data,
+    std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>> &              my_patches);
 };
 
 

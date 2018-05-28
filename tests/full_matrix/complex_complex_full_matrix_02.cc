@@ -32,8 +32,6 @@ check()
   FullMatrix<std::complex<number>> m;
   make_complex_matrix(m);
 
-  for (typename FullMatrix<std::complex<number>>::const_iterator p = m.begin();
-       p != m.end();
-       ++p)
+  for (typename FullMatrix<std::complex<number>>::const_iterator p = m.begin(); p != m.end(); ++p)
     deallog << p->row() << ' ' << p->column() << ' ' << p->value() << std::endl;
 }

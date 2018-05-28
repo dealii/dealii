@@ -90,8 +90,7 @@ main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
-    SolverControl control(
-      5000, 1e-11 /*1000*PETSC_MACHINE_EPSILON*/, false, false);
+    SolverControl control(5000, 1e-11 /*1000*PETSC_MACHINE_EPSILON*/, false, false);
 
     const unsigned int size = 46;
     unsigned int       dim  = (size - 1) * (size - 1);
@@ -110,9 +109,9 @@ main(int argc, char **argv)
     diagonal.diag(B);
     B.compress(VectorOperation::insert);
 
-    std::vector<PETScWrappers::MPI::Vector> u(
-      n_eigenvalues, PETScWrappers::MPI::Vector(MPI_COMM_WORLD, dim, dim));
-    std::vector<PetscScalar> v(n_eigenvalues);
+    std::vector<PETScWrappers::MPI::Vector> u(n_eigenvalues,
+                                              PETScWrappers::MPI::Vector(MPI_COMM_WORLD, dim, dim));
+    std::vector<PetscScalar>                v(n_eigenvalues);
 
     PETScWrappers::set_option_value("-st_ksp_type", "cg");
     PETScWrappers::set_option_value("-st_pc_type", "jacobi");
@@ -141,8 +140,7 @@ main(int argc, char **argv)
 
     {
       SLEPcWrappers::SolverGeneralizedDavidson::AdditionalData data(true);
-      SLEPcWrappers::SolverGeneralizedDavidson                 solver(
-        control, PETSC_COMM_SELF, data);
+      SLEPcWrappers::SolverGeneralizedDavidson solver(control, PETSC_COMM_SELF, data);
       check_solve(solver, control, A, B, u, v);
     }
 

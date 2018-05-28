@@ -57,27 +57,19 @@ private:
     if (refine_case == 1)
       {
         std::vector<unsigned int> repetitions(dim);
-        repetitions[0] = repetitions[1] =
-          5; // Non-unity number of initial partitions
+        repetitions[0] = repetitions[1] = 5; // Non-unity number of initial partitions
         const std::array<double, dim> L = {{1.0, 1.0}};
-        GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                                  repetitions,
-                                                  Point<dim>(0.0, 0.0),
-                                                  Point<dim>(L[0], L[1]),
-                                                  true);
+        GridGenerator::subdivided_hyper_rectangle(
+          triangulation, repetitions, Point<dim>(0.0, 0.0), Point<dim>(L[0], L[1]), true);
         triangulation.refine_global(1); // With refinement
       }
     else if (refine_case == 2)
       {
         std::vector<unsigned int> repetitions(dim);
-        repetitions[0] = repetitions[1] =
-          5; // Non-unity number of initial partitions
+        repetitions[0] = repetitions[1] = 5; // Non-unity number of initial partitions
         const std::array<double, dim> L = {{1.0, 1.0}};
-        GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                                  repetitions,
-                                                  Point<dim>(0.0, 0.0),
-                                                  Point<dim>(L[0], L[1]),
-                                                  true);
+        GridGenerator::subdivided_hyper_rectangle(
+          triangulation, repetitions, Point<dim>(0.0, 0.0), Point<dim>(L[0], L[1]), true);
         triangulation.refine_global(0); // With no refinement
       }
     else if (refine_case == 3)
@@ -85,11 +77,8 @@ private:
         std::vector<unsigned int> repetitions(dim);
         repetitions[0] = repetitions[1] = 10; // Finer initial mesh
         const std::array<double, dim> L = {{1.0, 1.0}};
-        GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                                  repetitions,
-                                                  Point<dim>(0.0, 0.0),
-                                                  Point<dim>(L[0], L[1]),
-                                                  true);
+        GridGenerator::subdivided_hyper_rectangle(
+          triangulation, repetitions, Point<dim>(0.0, 0.0), Point<dim>(L[0], L[1]), true);
         triangulation.refine_global(0); // With no refinement
       }
     else if (refine_case == 4)
@@ -97,11 +86,8 @@ private:
         std::vector<unsigned int> repetitions(dim);
         repetitions[0] = repetitions[1] = 1; // Single cell
         const std::array<double, dim> L = {{1.0, 1.0}};
-        GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                                  repetitions,
-                                                  Point<dim>(0.0, 0.0),
-                                                  Point<dim>(L[0], L[1]),
-                                                  true);
+        GridGenerator::subdivided_hyper_rectangle(
+          triangulation, repetitions, Point<dim>(0.0, 0.0), Point<dim>(L[0], L[1]), true);
         triangulation.refine_global(4); // With pure global refinement
       }
     else
@@ -116,8 +102,7 @@ private:
     const double               tol = 1e-8;
     const MappingQGeneric<dim> mapping(1);
 
-    deallog << "Number of active cells: " << triangulation.n_active_cells()
-            << std::endl;
+    deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
 
     auto       cell = dof_handler.begin_active();
     const auto endc = dof_handler.end();
@@ -133,9 +118,8 @@ private:
         test[1] = (P2[1] + P3[1]) / 2.0;
 
         // Map to and from the unit cell
-        const Point<dim> dp = mapping.transform_real_to_unit_cell(cell, test);
-        const Point<dim> dp_real =
-          mapping.transform_unit_to_real_cell(cell, dp);
+        const Point<dim> dp      = mapping.transform_real_to_unit_cell(cell, test);
+        const Point<dim> dp_real = mapping.transform_unit_to_real_cell(cell, dp);
 
         // Now we start off at the mid-point of the unit cell
         Point<dim> test_unit_mid;
@@ -143,10 +127,8 @@ private:
         test_unit_mid[1] = 0.5;
 
         // And map to and from the real cell
-        const Point<dim> dp_real_mid =
-          mapping.transform_unit_to_real_cell(cell, test_unit_mid);
-        const Point<dim> dp_test_mid =
-          mapping.transform_real_to_unit_cell(cell, dp_real_mid);
+        const Point<dim> dp_real_mid = mapping.transform_unit_to_real_cell(cell, test_unit_mid);
+        const Point<dim> dp_test_mid = mapping.transform_real_to_unit_cell(cell, dp_real_mid);
 
         if ((test - dp_real).norm() > tol)
           {

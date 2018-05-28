@@ -33,8 +33,7 @@ check_function_value_consistency(const Function<dim> &f,
   QIterated<dim> quadrature(mid, sub);
 
   std::vector<double>         f1(quadrature.size());
-  std::vector<Vector<double>> f2(quadrature.size(),
-                                 Vector<double>(f.n_components));
+  std::vector<Vector<double>> f2(quadrature.size(), Vector<double>(f.n_components));
 
   f.vector_value_list(quadrature.get_points(), f2);
 
@@ -70,8 +69,8 @@ check_function_gradient_consistency(const Function<dim> &f,
   QIterated<dim> quadrature(mid, sub);
 
   std::vector<Tensor<1, dim>>              f1(quadrature.size());
-  std::vector<std::vector<Tensor<1, dim>>> f2(
-    quadrature.size(), std::vector<Tensor<1, dim>>(f.n_components));
+  std::vector<std::vector<Tensor<1, dim>>> f2(quadrature.size(),
+                                              std::vector<Tensor<1, dim>>(f.n_components));
 
   f.vector_gradient_list(quadrature.get_points(), f2);
 
@@ -124,8 +123,7 @@ private:
 
 
 template <int dim>
-DerivativeTestFunction<dim>::DerivativeTestFunction(const Function<dim> &f,
-                                                    const double         h) :
+DerivativeTestFunction<dim>::DerivativeTestFunction(const Function<dim> &f, const double h) :
   AutoDerivativeFunction<dim>(h, f.n_components),
   func(f)
 {
@@ -140,9 +138,8 @@ DerivativeTestFunction<dim>::~DerivativeTestFunction()
 
 template <int dim>
 void
-DerivativeTestFunction<dim>::vector_value_list(
-  const std::vector<Point<dim>> &points,
-  std::vector<Vector<double>> &  values) const
+DerivativeTestFunction<dim>::vector_value_list(const std::vector<Point<dim>> &points,
+                                               std::vector<Vector<double>> &  values) const
 {
   func.vector_value_list(points, values);
 }
@@ -150,8 +147,7 @@ DerivativeTestFunction<dim>::vector_value_list(
 
 template <int dim>
 void
-DerivativeTestFunction<dim>::vector_value(const Point<dim> &point,
-                                          Vector<double> &  value) const
+DerivativeTestFunction<dim>::vector_value(const Point<dim> &point, Vector<double> &value) const
 {
   func.vector_value(point, value);
 }
@@ -159,8 +155,7 @@ DerivativeTestFunction<dim>::vector_value(const Point<dim> &point,
 
 template <int dim>
 double
-DerivativeTestFunction<dim>::value(const Point<dim> & point,
-                                   const unsigned int comp) const
+DerivativeTestFunction<dim>::value(const Point<dim> &point, const unsigned int comp) const
 {
   //  std::cerr << '[' << point << '!' << func.value(point, comp) << ']';
 
@@ -171,9 +166,7 @@ DerivativeTestFunction<dim>::value(const Point<dim> & point,
 // Check whether the difference quotients converge to the gradient
 template <int dim>
 void
-check_gradient(const Function<dim> &f,
-               unsigned int         sub,
-               double               threshold = 1. / 14.)
+check_gradient(const Function<dim> &f, unsigned int sub, double threshold = 1. / 14.)
 {
   DerivativeTestFunction<dim> dtest1(f, 1.e-2);
   DerivativeTestFunction<dim> dtest2(f, 2.e-2);
@@ -182,12 +175,12 @@ check_gradient(const Function<dim> &f,
   QIterated<dim>                 quadrature(mid, sub);
   const std::vector<Point<dim>> &points = quadrature.get_points();
 
-  std::vector<std::vector<Tensor<1, dim>>> gradients(
-    f.n_components, std::vector<Tensor<1, dim>>(points.size()));
-  std::vector<std::vector<Tensor<1, dim>>> gradients1(
-    f.n_components, std::vector<Tensor<1, dim>>(points.size()));
-  std::vector<std::vector<Tensor<1, dim>>> gradients2(
-    f.n_components, std::vector<Tensor<1, dim>>(points.size()));
+  std::vector<std::vector<Tensor<1, dim>>> gradients(f.n_components,
+                                                     std::vector<Tensor<1, dim>>(points.size()));
+  std::vector<std::vector<Tensor<1, dim>>> gradients1(f.n_components,
+                                                      std::vector<Tensor<1, dim>>(points.size()));
+  std::vector<std::vector<Tensor<1, dim>>> gradients2(f.n_components,
+                                                      std::vector<Tensor<1, dim>>(points.size()));
 
   deallog << "gradients vs difference quotients";
 
@@ -215,15 +208,13 @@ check_gradient(const Function<dim> &f,
             // bit generous
             if (threshold * d2.norm() < d1.norm())
               {
-                deallog << "Gradient error: point " << i << " (" << points[i]
-                        << " )"
+                deallog << "Gradient error: point " << i << " (" << points[i] << " )"
                         << " comp "
                         << k
                         //      << " norms " << d1.norm() << " " << d2.norm()
                         << std::endl;
                 for (unsigned int d = 0; d < dim; ++d)
-                  deallog << " " << gradients[k][i][d] << " "
-                          << gradients1[i][k][d] << std::endl;
+                  deallog << " " << gradients[k][i][d] << " " << gradients1[i][k][d] << std::endl;
               }
           }
       }

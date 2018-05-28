@@ -53,12 +53,11 @@ print_dofs(const DoFHandler<dim> &dof, stream &out)
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = std::shared_ptr<FEValues<dim>>(
-        new FEValues<dim>(fe, quad, update_quadrature_points));
+      fevalues =
+        std::shared_ptr<FEValues<dim>>(new FEValues<dim>(fe, quad, update_quadrature_points));
     }
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();
        ++cell)
     {
       Point<dim> p = cell->center();

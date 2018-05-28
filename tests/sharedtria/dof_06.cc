@@ -55,9 +55,7 @@ test()
   DoFHandler<dim> dof_handler(tria);
   GridGenerator::subdivided_hyper_cube(tria, 3, -1, 1);
   {
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         if (cell->index() == 0 || cell->index() == 5 || cell->index() == 6)
@@ -69,17 +67,13 @@ test()
   FE_Q<dim> fe(2);
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Number of locally owned dofs: "
-          << dof_handler.n_locally_owned_dofs() << std::endl;
+  deallog << "Number of locally owned dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
 
-  std::vector<IndexSet> shared_dofs_per_proc =
-    dof_handler.locally_owned_dofs_per_processor();
-  for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-       ++i)
+  std::vector<IndexSet> shared_dofs_per_proc = dof_handler.locally_owned_dofs_per_processor();
+  for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
     shared_dofs_per_proc[i].print(deallog.get_file_stream());
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {

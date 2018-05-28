@@ -58,35 +58,29 @@ test()
   MappingManifold<dim, spacedim> mapping_manifold;
   MappingQGeneric<dim, spacedim> mapping_q(1);
 
-  FEValues<dim, spacedim> fe_values_mapping(
-    mapping_manifold, fe, quad, update_jacobians);
+  FEValues<dim, spacedim> fe_values_mapping(mapping_manifold, fe, quad, update_jacobians);
 
   FEValues<dim, spacedim> fe_values_q(mapping_q, fe, quad, update_jacobians);
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-    triangulation.begin_active();
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell = triangulation.begin_active();
 
   fe_values_mapping.reinit(cell);
   fe_values_q.reinit(cell);
   std::vector<DerivativeForm<1, dim, spacedim>> jac_from_mapping_manifold =
     fe_values_mapping.get_jacobians();
 
-  std::vector<DerivativeForm<1, dim, spacedim>> jac_from_mapping_q =
-    fe_values_q.get_jacobians();
+  std::vector<DerivativeForm<1, dim, spacedim>> jac_from_mapping_q = fe_values_q.get_jacobians();
 
-  AssertThrow(jac_from_mapping_q.size() == jac_from_mapping_manifold.size(),
-              ExcInternalError());
+  AssertThrow(jac_from_mapping_q.size() == jac_from_mapping_manifold.size(), ExcInternalError());
 
   for (unsigned int q = 0; q < jac_from_mapping_q.size(); ++q)
     {
       double dist = 0;
       for (unsigned int d = 0; d < spacedim; ++d)
-        dist +=
-          (jac_from_mapping_manifold[q][d] - jac_from_mapping_q[q][d]).norm();
+        dist += (jac_from_mapping_manifold[q][d] - jac_from_mapping_q[q][d]).norm();
       if (dist > 1e-10)
         {
-          deallog << "Jacobian from mapping manifold at point " << q
-                  << std::endl;
+          deallog << "Jacobian from mapping manifold at point " << q << std::endl;
           for (unsigned int d = 0; d < spacedim; ++d)
             deallog << jac_from_mapping_manifold[q][d] << std::endl;
 

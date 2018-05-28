@@ -72,9 +72,8 @@ test(const unsigned int degree)
               deallog << '[';
               for (unsigned int c = 0; c < fe_rt_bubbles.n_components(); ++c)
                 for (unsigned int d = 0; d < dim; ++d)
-                  deallog << filter_out_small_numbers(
-                               fe_values.shape_grad_component(i, q, c)[d],
-                               2.e-5)
+                  deallog << filter_out_small_numbers(fe_values.shape_grad_component(i, q, c)[d],
+                                                      2.e-5)
                           << ' ';
               deallog << ']';
             }

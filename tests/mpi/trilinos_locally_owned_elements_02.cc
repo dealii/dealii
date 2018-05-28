@@ -48,35 +48,25 @@ test()
   distributed.reinit(locally_owned, MPI_COMM_WORLD);
   ghosted.reinit(locally_owned, locally_relevant, MPI_COMM_WORLD);
 
-  IndexSet locally_owned_elements_distributed =
-    distributed.locally_owned_elements();
-  IndexSet locally_owned_elements_ghosted = ghosted.locally_owned_elements();
+  IndexSet locally_owned_elements_distributed = distributed.locally_owned_elements();
+  IndexSet locally_owned_elements_ghosted     = ghosted.locally_owned_elements();
 
-  const types::global_dof_index local_range_begin_ghosted =
-    ghosted.local_range().first;
-  const types::global_dof_index local_range_end_ghosted =
-    ghosted.local_range().second;
+  const types::global_dof_index local_range_begin_ghosted = ghosted.local_range().first;
+  const types::global_dof_index local_range_end_ghosted   = ghosted.local_range().second;
 
-  const types::global_dof_index local_range_begin_distributed =
-    distributed.local_range().first;
-  const types::global_dof_index local_range_end_distributed =
-    distributed.local_range().second;
+  const types::global_dof_index local_range_begin_distributed = distributed.local_range().first;
+  const types::global_dof_index local_range_end_distributed   = distributed.local_range().second;
 
   deallog << "locally_owned_elements_distributed: ";
   locally_owned_elements_distributed.print(deallog);
   deallog << "locally_owned_elements_ghosted: ";
   locally_owned_elements_ghosted.print(deallog);
-  deallog << "local_range_begin_ghosted: " << local_range_begin_ghosted
-          << std::endl;
-  deallog << "local_range_end_ghosted: " << local_range_end_ghosted
-          << std::endl;
-  deallog << "local_range_begin_distributed: " << local_range_begin_distributed
-          << std::endl;
-  deallog << "local_range_end_distributed: " << local_range_end_distributed
-          << std::endl;
+  deallog << "local_range_begin_ghosted: " << local_range_begin_ghosted << std::endl;
+  deallog << "local_range_end_ghosted: " << local_range_end_ghosted << std::endl;
+  deallog << "local_range_begin_distributed: " << local_range_begin_distributed << std::endl;
+  deallog << "local_range_end_distributed: " << local_range_end_distributed << std::endl;
 
-  AssertThrow(locally_owned_elements_distributed ==
-                locally_owned_elements_ghosted,
+  AssertThrow(locally_owned_elements_distributed == locally_owned_elements_ghosted,
               ExcInternalError());
 
   deallog << "OK" << std::endl;

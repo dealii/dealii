@@ -95,8 +95,7 @@ main()
       check_solve<SolverQMRS<>>(A, u, f);
 
       // test use_default_residual=false case
-      check_solve<SolverGMRES<>>(
-        A, u, f, SolverGMRES<>::AdditionalData(30, false, false));
+      check_solve<SolverGMRES<>>(A, u, f, SolverGMRES<>::AdditionalData(30, false, false));
 
       deallog.pop();
     }

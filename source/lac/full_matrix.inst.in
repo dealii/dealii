@@ -19,10 +19,9 @@ for (S : REAL_AND_COMPLEX_SCALARS)
   {
     template class FullMatrix<S>;
 
-    template void FullMatrix<S>::print(
-      LogStream &, const unsigned int, const unsigned int) const;
-    template void FullMatrix<S>::print(
-      std::ostream &, const unsigned int, const unsigned int) const;
+    template void FullMatrix<S>::print(LogStream &, const unsigned int, const unsigned int) const;
+    template void FullMatrix<S>::print(std::ostream &, const unsigned int, const unsigned int)
+      const;
 
     template void FullMatrix<S>::copy_from<1>(const Tensor<2, 1> &,
                                               const unsigned int,
@@ -80,8 +79,7 @@ for (S : REAL_SCALARS)
 
 for (S1, S2 : REAL_SCALARS)
   {
-    template FullMatrix<S1> &FullMatrix<S1>::operator=(
-      const LAPACKFullMatrix<S2> &);
+    template FullMatrix<S1> &FullMatrix<S1>::operator=(const LAPACKFullMatrix<S2> &);
 
     template void FullMatrix<S1>::fill<S2>(
       const FullMatrix<S2> &, size_type, size_type, size_type, size_type);
@@ -108,46 +106,38 @@ for (S1, S2 : REAL_SCALARS)
                                           const FullMatrix<S2> &,
                                           const S1,
                                           const FullMatrix<S2> &);
-    template void FullMatrix<S1>::mmult<S2>(
-      FullMatrix<S2> &, const FullMatrix<S2> &, const bool) const;
-    template void FullMatrix<S1>::Tmmult<S2>(
-      FullMatrix<S2> &, const FullMatrix<S2> &, const bool) const;
-    template void FullMatrix<S1>::mTmult<S2>(
-      FullMatrix<S2> &, const FullMatrix<S2> &, const bool) const;
-    template void FullMatrix<S1>::TmTmult<S2>(
-      FullMatrix<S2> &, const FullMatrix<S2> &, const bool) const;
+    template void FullMatrix<S1>::mmult<S2>(FullMatrix<S2> &, const FullMatrix<S2> &, const bool)
+      const;
+    template void FullMatrix<S1>::Tmmult<S2>(FullMatrix<S2> &, const FullMatrix<S2> &, const bool)
+      const;
+    template void FullMatrix<S1>::mTmult<S2>(FullMatrix<S2> &, const FullMatrix<S2> &, const bool)
+      const;
+    template void FullMatrix<S1>::TmTmult<S2>(FullMatrix<S2> &, const FullMatrix<S2> &, const bool)
+      const;
     template void FullMatrix<S1>::invert<S2>(const FullMatrix<S2> &);
 
     template void FullMatrix<S1>::left_invert<S2>(const FullMatrix<S2> &);
     template void FullMatrix<S1>::right_invert<S2>(const FullMatrix<S2> &);
 
     template void FullMatrix<S1>::fill_permutation<S2>(
-      const FullMatrix<S2> &,
-      const std::vector<size_type> &,
-      const std::vector<size_type> &);
+      const FullMatrix<S2> &, const std::vector<size_type> &, const std::vector<size_type> &);
 
     template void FullMatrix<S1>::cholesky<S2>(const FullMatrix<S2> &);
 
-    template void FullMatrix<S1>::outer_product<S2>(const Vector<S2> &,
-                                                    const Vector<S2> &);
+    template void FullMatrix<S1>::outer_product<S2>(const Vector<S2> &, const Vector<S2> &);
   }
 
 
 // real matrices can be multiplied by real or complex vectors
 for (S1 : REAL_SCALARS; S2 : REAL_AND_COMPLEX_SCALARS)
   {
-    template void FullMatrix<S1>::vmult<S2>(
-      Vector<S2> &, const Vector<S2> &, bool) const;
-    template void FullMatrix<S1>::Tvmult<S2>(
-      Vector<S2> &, const Vector<S2> &, bool) const;
-    template S2 FullMatrix<S1>::matrix_norm_square<S2>(const Vector<S2> &)
+    template void FullMatrix<S1>::vmult<S2>(Vector<S2> &, const Vector<S2> &, bool) const;
+    template void FullMatrix<S1>::Tvmult<S2>(Vector<S2> &, const Vector<S2> &, bool) const;
+    template S2   FullMatrix<S1>::matrix_norm_square<S2>(const Vector<S2> &) const;
+    template S2   FullMatrix<S1>::matrix_scalar_product<S2>(const Vector<S2> &, const Vector<S2> &)
       const;
-    template S2 FullMatrix<S1>::matrix_scalar_product<S2>(
-      const Vector<S2> &, const Vector<S2> &) const;
-    template void FullMatrix<S1>::forward<S2>(Vector<S2> &, const Vector<S2> &)
-      const;
-    template void FullMatrix<S1>::backward<S2>(Vector<S2> &, const Vector<S2> &)
-      const;
+    template void FullMatrix<S1>::forward<S2>(Vector<S2> &, const Vector<S2> &) const;
+    template void FullMatrix<S1>::backward<S2>(Vector<S2> &, const Vector<S2> &) const;
 
     template void FullMatrix<S1>::precondition_Jacobi<S2>(
       Vector<S2> &, const Vector<S2> &, const S1) const;
@@ -157,18 +147,13 @@ for (S1 : REAL_SCALARS; S2 : REAL_AND_COMPLEX_SCALARS)
 // complex matrices can be multiplied only by complex vectors
 for (S1 : COMPLEX_SCALARS; S2 : COMPLEX_SCALARS)
   {
-    template void FullMatrix<S1>::vmult<S2>(
-      Vector<S2> &, const Vector<S2> &, bool) const;
-    template void FullMatrix<S1>::Tvmult<S2>(
-      Vector<S2> &, const Vector<S2> &, bool) const;
-    template S2 FullMatrix<S1>::matrix_norm_square<S2>(const Vector<S2> &)
+    template void FullMatrix<S1>::vmult<S2>(Vector<S2> &, const Vector<S2> &, bool) const;
+    template void FullMatrix<S1>::Tvmult<S2>(Vector<S2> &, const Vector<S2> &, bool) const;
+    template S2   FullMatrix<S1>::matrix_norm_square<S2>(const Vector<S2> &) const;
+    template S2   FullMatrix<S1>::matrix_scalar_product<S2>(const Vector<S2> &, const Vector<S2> &)
       const;
-    template S2 FullMatrix<S1>::matrix_scalar_product<S2>(
-      const Vector<S2> &, const Vector<S2> &) const;
-    template void FullMatrix<S1>::forward<S2>(Vector<S2> &, const Vector<S2> &)
-      const;
-    template void FullMatrix<S1>::backward<S2>(Vector<S2> &, const Vector<S2> &)
-      const;
+    template void FullMatrix<S1>::forward<S2>(Vector<S2> &, const Vector<S2> &) const;
+    template void FullMatrix<S1>::backward<S2>(Vector<S2> &, const Vector<S2> &) const;
 
     template void FullMatrix<S1>::precondition_Jacobi<S2>(
       Vector<S2> &, const Vector<S2> &, const S1) const;
@@ -211,19 +196,17 @@ for (S1, S2 : COMPLEX_SCALARS)
                                           const FullMatrix<S2> &,
                                           const S1,
                                           const FullMatrix<S2> &);
-    template void FullMatrix<S1>::mmult<S2>(
-      FullMatrix<S2> &, const FullMatrix<S2> &, const bool) const;
-    template void FullMatrix<S1>::Tmmult<S2>(
-      FullMatrix<S2> &, const FullMatrix<S2> &, const bool) const;
+    template void FullMatrix<S1>::mmult<S2>(FullMatrix<S2> &, const FullMatrix<S2> &, const bool)
+      const;
+    template void FullMatrix<S1>::Tmmult<S2>(FullMatrix<S2> &, const FullMatrix<S2> &, const bool)
+      const;
     template void FullMatrix<S1>::invert<S2>(const FullMatrix<S2> &);
 
     template void FullMatrix<S1>::left_invert<S2>(const FullMatrix<S2> &);
     template void FullMatrix<S1>::right_invert<S2>(const FullMatrix<S2> &);
 
     template void FullMatrix<S1>::fill_permutation<S2>(
-      const FullMatrix<S2> &,
-      const std::vector<size_type> &,
-      const std::vector<size_type> &);
+      const FullMatrix<S2> &, const std::vector<size_type> &, const std::vector<size_type> &);
   }
 
 for (S1, S2, S3 : COMPLEX_SCALARS)

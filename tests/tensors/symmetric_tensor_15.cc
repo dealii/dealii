@@ -34,15 +34,14 @@ test()
 
   // test 1: check trace-like operator
   {
-    const SymmetricTensor<4, dim> T = outer_product<dim>(
-      unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
+    const SymmetricTensor<4, dim> T =
+      outer_product<dim>(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
 
     // T*t should yield a diagonal tensor
     // where the diagonal elements are the
     // traces of t
     SymmetricTensor<2, dim> x = T * t;
-    AssertThrow((x - trace(t) * unit_symmetric_tensor<dim>()).norm() <
-                  1e-15 * t.norm(),
+    AssertThrow((x - trace(t) * unit_symmetric_tensor<dim>()).norm() < 1e-15 * t.norm(),
                 ExcInternalError());
 
     deallog << "x=" << std::endl;
@@ -58,8 +57,7 @@ test()
 
     // T*t should yield norm(t)^2*t
     SymmetricTensor<2, dim> x = T * t;
-    AssertThrow((x - (t * t) * t).norm() < 1e-15 * t.norm(),
-                ExcInternalError());
+    AssertThrow((x - (t * t) * t).norm() < 1e-15 * t.norm(), ExcInternalError());
 
     deallog << "x=" << std::endl;
     for (unsigned int i = 0; i < dim; ++i)

@@ -45,16 +45,12 @@ test()
 
   deallog << "view1_const==view1: " << (view1_const == view1) << '\n';
   deallog << "view1_const!=view1: " << (view1_const != view1) << '\n';
-  deallog << "view1_const==view1_const: " << (view1_const == view1_const)
-          << '\n';
-  deallog << "view1_const!=view1_const: " << (view1_const != view1_const)
-          << '\n';
+  deallog << "view1_const==view1_const: " << (view1_const == view1_const) << '\n';
+  deallog << "view1_const!=view1_const: " << (view1_const != view1_const) << '\n';
   deallog << "view1_const==view2: " << (view1_const == view2) << '\n';
   deallog << "view1_const!=view2: " << (view1_const != view2) << '\n';
-  deallog << "view1_const==view2_const: " << (view1_const == view2_const)
-          << '\n';
-  deallog << "view1_const!=view2_const: " << (view1_const != view2_const)
-          << std::endl;
+  deallog << "view1_const==view2_const: " << (view1_const == view2_const) << '\n';
+  deallog << "view1_const!=view2_const: " << (view1_const != view2_const) << std::endl;
 
   deallog << "view2==view1: " << (view2 == view1) << '\n';
   deallog << "view2!=view1: " << (view2 != view1) << '\n';
@@ -67,16 +63,12 @@ test()
 
   deallog << "view2_const==view1: " << (view2_const == view1) << '\n';
   deallog << "view2_const!=view1: " << (view2_const != view1) << '\n';
-  deallog << "view2_const==view1_const: " << (view2_const == view1_const)
-          << '\n';
-  deallog << "view2_const!=view1_const: " << (view2_const != view1_const)
-          << '\n';
+  deallog << "view2_const==view1_const: " << (view2_const == view1_const) << '\n';
+  deallog << "view2_const!=view1_const: " << (view2_const != view1_const) << '\n';
   deallog << "view2_const==view2: " << (view2_const == view2) << '\n';
   deallog << "view2_const!=view2: " << (view2_const != view2) << '\n';
-  deallog << "view2_const==view2_const: " << (view2_const == view2_const)
-          << '\n';
-  deallog << "view2_const!=view2_const: " << (view2_const != view2_const)
-          << std::endl;
+  deallog << "view2_const==view2_const: " << (view2_const == view2_const) << '\n';
+  deallog << "view2_const!=view2_const: " << (view2_const != view2_const) << std::endl;
 }
 
 

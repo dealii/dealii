@@ -313,15 +313,13 @@ public:
   DeclException2(ExcParseError,
                  int,
                  char *,
-                 << "Parsing Error at Column " << arg1
-                 << ". The parser said: " << arg2);
+                 << "Parsing Error at Column " << arg1 << ". The parser said: " << arg2);
 
   DeclException2(ExcInvalidExpressionSize,
                  int,
                  int,
                  << "The number of components (" << arg1
-                 << ") is not equal to the number of expressions (" << arg2
-                 << ").");
+                 << ") is not equal to the number of expressions (" << arg2 << ").");
 
   //@}
 
@@ -338,14 +336,12 @@ private:
    * mu::Parser in this header.
    */
 #  if TBB_VERSION_MAJOR >= 4
-  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser>>>
-    fp;
+  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser>>> fp;
 #  else
   // older TBBs have a bug in which they want to return thread-local
   // objects by value. this doesn't work for std::unique_ptr, so use a
   // std::shared_ptr
-  mutable Threads::ThreadLocalStorage<std::vector<std::shared_ptr<mu::Parser>>>
-    fp;
+  mutable Threads::ThreadLocalStorage<std::vector<std::shared_ptr<mu::Parser>>> fp;
 #  endif
 
   /**

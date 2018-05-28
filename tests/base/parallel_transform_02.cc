@@ -41,12 +41,8 @@ main()
     }
 
   // set z=x+2y, which happens to be zero
-  parallel::transform(x.begin(),
-                      x.end(),
-                      y.begin(),
-                      z.begin(),
-                      (boost::lambda::_1 + 2 * boost::lambda::_2),
-                      10);
+  parallel::transform(
+    x.begin(), x.end(), y.begin(), z.begin(), (boost::lambda::_1 + 2 * boost::lambda::_2), 10);
 
   Assert(z.l2_norm() == 0, ExcInternalError());
 

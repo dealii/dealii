@@ -106,8 +106,7 @@ public:
 
 template <int dim>
 double
-RightHandSide<dim>::value(const Point<dim> &p,
-                          const unsigned int /*component*/) const
+RightHandSide<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
 {
   double product = 1;
   for (unsigned int d = 0; d < dim; ++d)
@@ -146,15 +145,13 @@ AdvectionProblem<dim>::setup_system()
   // boundary function
   {
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      dof_handler, 0, RightHandSide<dim>(), boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler, 0, RightHandSide<dim>(), boundary_values);
     std::map<types::global_dof_index, double>::const_iterator boundary_value =
       boundary_values.begin();
     for (; boundary_value != boundary_values.end(); ++boundary_value)
       {
         test_all_constraints.add_line(boundary_value->first);
-        test_all_constraints.set_inhomogeneity(boundary_value->first,
-                                               boundary_value->second);
+        test_all_constraints.set_inhomogeneity(boundary_value->first, boundary_value->second);
       }
   }
   DoFTools::make_hanging_node_constraints(dof_handler, hanging_nodes_only);
@@ -183,9 +180,8 @@ AdvectionProblem<dim>::test_equality()
   // entries in constrained lines.
   for (unsigned int i = 0; i < reference_matrix.m(); ++i)
     {
-      SparseMatrix<double>::const_iterator reference =
-        reference_matrix.begin(i);
-      SparseMatrix<double>::iterator test = test_matrix.begin(i);
+      SparseMatrix<double>::const_iterator reference = reference_matrix.begin(i);
+      SparseMatrix<double>::iterator       test      = test_matrix.begin(i);
       if (test_all_constraints.is_constrained(i) == false)
         {
           for (; test != test_matrix.end(i); ++test, ++reference)
@@ -196,8 +192,7 @@ AdvectionProblem<dim>::test_equality()
           test->value() = 0;
     }
 
-  deallog << "  Matrix difference norm: " << test_matrix.frobenius_norm()
-          << std::endl;
+  deallog << "  Matrix difference norm: " << test_matrix.frobenius_norm() << std::endl;
   Assert(test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
 
   // same here -- Dirichlet lines will have
@@ -227,8 +222,8 @@ AdvectionProblem<dim>::assemble_reference()
   QGauss<dim>   quadrature_formula(3);
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const RightHandSide<dim> rhs_function;
   const unsigned int       dofs_per_cell = fe.dofs_per_cell;
@@ -240,8 +235,7 @@ AdvectionProblem<dim>::assemble_reference()
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
   std::vector<double>                  rhs_values(n_q_points);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -260,12 +254,11 @@ AdvectionProblem<dim>::assemble_reference()
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_value(i, q_point) * advection_direction *
-                 fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+              cell_matrix(i, j) += (fe_values.shape_value(i, q_point) * advection_direction *
+                                    fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
-            cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                            rhs_values[q_point] * fe_values.JxW(q_point));
+            cell_rhs(i) +=
+              (fe_values.shape_value(i, q_point) * rhs_values[q_point] * fe_values.JxW(q_point));
           }
 
       local_dof_indices.resize(dofs_per_cell);
@@ -281,10 +274,8 @@ AdvectionProblem<dim>::assemble_reference()
   // use some other rhs vector as dummy for
   // application of Dirichlet conditions
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, RightHandSide<dim>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, reference_matrix, test_rhs, reference_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler, 0, RightHandSide<dim>(), boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values, reference_matrix, test_rhs, reference_rhs);
 }
 
 
@@ -300,8 +291,8 @@ AdvectionProblem<dim>::assemble_test_1()
   QGauss<dim>   quadrature_formula(3);
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const RightHandSide<dim> rhs_function;
   const unsigned int       dofs_per_cell = fe.dofs_per_cell;
@@ -313,8 +304,7 @@ AdvectionProblem<dim>::assemble_test_1()
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
   std::vector<double>                  rhs_values(n_q_points);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -333,12 +323,11 @@ AdvectionProblem<dim>::assemble_test_1()
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_value(i, q_point) * advection_direction *
-                 fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+              cell_matrix(i, j) += (fe_values.shape_value(i, q_point) * advection_direction *
+                                    fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
-            cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                            rhs_values[q_point] * fe_values.JxW(q_point));
+            cell_rhs(i) +=
+              (fe_values.shape_value(i, q_point) * rhs_values[q_point] * fe_values.JxW(q_point));
           }
 
       local_dof_indices.resize(dofs_per_cell);
@@ -366,8 +355,8 @@ AdvectionProblem<dim>::assemble_test_2()
   QGauss<dim>   quadrature_formula(3);
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const RightHandSide<dim> rhs_function;
   const unsigned int       dofs_per_cell = fe.dofs_per_cell;
@@ -379,8 +368,7 @@ AdvectionProblem<dim>::assemble_test_2()
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
   std::vector<double>                  rhs_values(n_q_points);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -399,12 +387,11 @@ AdvectionProblem<dim>::assemble_test_2()
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_value(i, q_point) * advection_direction *
-                 fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+              cell_matrix(i, j) += (fe_values.shape_value(i, q_point) * advection_direction *
+                                    fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
-            cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                            rhs_values[q_point] * fe_values.JxW(q_point));
+            cell_rhs(i) +=
+              (fe_values.shape_value(i, q_point) * rhs_values[q_point] * fe_values.JxW(q_point));
           }
 
       local_dof_indices.resize(dofs_per_cell);
@@ -429,20 +416,17 @@ AdvectionProblem<dim>::run()
   // and then one of these cells once again
   // to create some hanging nodes
   {
-    typename DoFHandler<dim>::active_cell_iterator cell =
-      dof_handler.begin_active();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
     cell->set_refine_flag();
   }
   triangulation.execute_coarsening_and_refinement();
   {
     // find the last cell and mark it
     // for refinement
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
+    for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
-      if (++typename DoFHandler<dim>::active_cell_iterator(cell) ==
-          dof_handler.end())
+      if (++typename DoFHandler<dim>::active_cell_iterator(cell) == dof_handler.end())
         cell->set_refine_flag();
   }
   triangulation.execute_coarsening_and_refinement();
@@ -451,12 +435,9 @@ AdvectionProblem<dim>::run()
 
   deallog << std::endl
           << std::endl
-          << "  Number of active cells:       "
-          << triangulation.n_active_cells() << std::endl
-          << "  Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl
-          << "  Number of constraints       : "
-          << hanging_nodes_only.n_constraints() << std::endl;
+          << "  Number of active cells:       " << triangulation.n_active_cells() << std::endl
+          << "  Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl
+          << "  Number of constraints       : " << hanging_nodes_only.n_constraints() << std::endl;
 
   assemble_reference();
   assemble_test_1();

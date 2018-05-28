@@ -68,10 +68,8 @@ check_boundary(const DoFHandler<dim> &dof)
   DoFTools::map_dof_to_boundary_indices(dof, dof_to_boundary_mapping);
 
   // first way: direct generation
-  SparsityPattern sparsity_1(dof.n_boundary_dofs(),
-                             dof.max_couplings_between_boundary_dofs());
-  DoFTools::make_boundary_sparsity_pattern(
-    dof, dof_to_boundary_mapping, sparsity_1);
+  SparsityPattern sparsity_1(dof.n_boundary_dofs(), dof.max_couplings_between_boundary_dofs());
+  DoFTools::make_boundary_sparsity_pattern(dof, dof_to_boundary_mapping, sparsity_1);
   sparsity_1.compress();
 
   // second way: via a DynamicSparsityPattern
@@ -85,8 +83,7 @@ check_boundary(const DoFHandler<dim> &dof)
   // tests, so only make sure that
   // sparsity_[12] are equal
   deallog << "Check boundary"
-          << " -- " << (sparsity_1 == sparsity_2 ? "ok" : "failed")
-          << std::endl;
+          << " -- " << (sparsity_1 == sparsity_2 ? "ok" : "failed") << std::endl;
 }
 
 
@@ -148,8 +145,7 @@ check()
   // tests, so only make sure that
   // sparsity_[12] are equal
   deallog << "Check 1:"
-          << " -- " << (sparsity_1 == sparsity_2 ? "ok" : "failed")
-          << std::endl;
+          << " -- " << (sparsity_1 == sparsity_2 ? "ok" : "failed") << std::endl;
 
 
 
@@ -185,8 +181,7 @@ check()
   sparsity_4.copy_from(csp_4);
 
   deallog << "Check 2:"
-          << " -- " << (sparsity_3 == sparsity_4 ? "ok" : "failed")
-          << std::endl;
+          << " -- " << (sparsity_3 == sparsity_4 ? "ok" : "failed") << std::endl;
 
 
   //-------- Sparsity pattern checks for boundary sparsity generators ---------

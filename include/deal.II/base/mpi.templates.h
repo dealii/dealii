@@ -140,42 +140,29 @@ namespace Utilities
               unsigned int       size_min = 0;
               unsigned int       size_max = 0;
               int                ierr2    = 0;
-              ierr2                       = MPI_Reduce(&size,
-                                 &size_min,
-                                 1,
-                                 MPI_UNSIGNED,
-                                 MPI_MIN,
-                                 0,
-                                 mpi_communicator);
+              ierr2 = MPI_Reduce(&size, &size_min, 1, MPI_UNSIGNED, MPI_MIN, 0, mpi_communicator);
               AssertThrowMPI(ierr2);
-              ierr2 = MPI_Reduce(&size,
-                                 &size_max,
-                                 1,
-                                 MPI_UNSIGNED,
-                                 MPI_MAX,
-                                 0,
-                                 mpi_communicator);
+              ierr2 = MPI_Reduce(&size, &size_max, 1, MPI_UNSIGNED, MPI_MAX, 0, mpi_communicator);
               AssertThrowMPI(ierr2);
               if (rank == 0)
                 Assert(size_min == size_max,
-                       ExcMessage(
-                         "values has different size across MPI processes."));
+                       ExcMessage("values has different size across MPI processes."));
             }
 #  endif
-            const int ierr = MPI_Allreduce(
-              values != output ?
-                // TODO This const_cast is only needed for older
-                // (e.g., openMPI 1.6, released in 2012)
-                // implementations of MPI-2. It is not needed as
-                // of MPI-3 and we should remove it at some
-                // point in the future.
-                const_cast<void *>(static_cast<const void *>(values.data())) :
-                MPI_IN_PLACE,
-              static_cast<void *>(output.data()),
-              static_cast<int>(values.size()),
-              internal::mpi_type_id(values.data()),
-              mpi_op,
-              mpi_communicator);
+            const int ierr =
+              MPI_Allreduce(values != output ?
+                              // TODO This const_cast is only needed for older
+                              // (e.g., openMPI 1.6, released in 2012)
+                              // implementations of MPI-2. It is not needed as
+                              // of MPI-3 and we should remove it at some
+                              // point in the future.
+                              const_cast<void *>(static_cast<const void *>(values.data())) :
+                              MPI_IN_PLACE,
+                            static_cast<void *>(output.data()),
+                            static_cast<int>(values.size()),
+                            internal::mpi_type_id(values.data()),
+                            mpi_op,
+                            mpi_communicator);
             AssertThrowMPI(ierr);
           }
         else
@@ -201,20 +188,20 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
-            const int ierr = MPI_Allreduce(
-              values != output ?
-                // TODO This const_cast is only needed for older
-                // (e.g., openMPI 1.6, released in 2012)
-                // implementations of MPI-2. It is not needed as
-                // of MPI-3 and we should remove it at some
-                // point in the future.
-                const_cast<void *>(static_cast<const void *>(values.data())) :
-                MPI_IN_PLACE,
-              static_cast<void *>(output.data()),
-              static_cast<int>(values.size() * 2),
-              internal::mpi_type_id(static_cast<T *>(nullptr)),
-              mpi_op,
-              mpi_communicator);
+            const int ierr =
+              MPI_Allreduce(values != output ?
+                              // TODO This const_cast is only needed for older
+                              // (e.g., openMPI 1.6, released in 2012)
+                              // implementations of MPI-2. It is not needed as
+                              // of MPI-3 and we should remove it at some
+                              // point in the future.
+                              const_cast<void *>(static_cast<const void *>(values.data())) :
+                              MPI_IN_PLACE,
+                            static_cast<void *>(output.data()),
+                            static_cast<int>(values.size() * 2),
+                            internal::mpi_type_id(static_cast<T *>(nullptr)),
+                            mpi_op,
+                            mpi_communicator);
             AssertThrowMPI(ierr);
           }
         else
@@ -235,10 +222,8 @@ namespace Utilities
     sum(const T &t, const MPI_Comm &mpi_communicator)
     {
       T return_value;
-      internal::all_reduce(MPI_SUM,
-                           ArrayView<const T>(&t, 1),
-                           mpi_communicator,
-                           ArrayView<T>(&return_value, 1));
+      internal::all_reduce(
+        MPI_SUM, ArrayView<const T>(&t, 1), mpi_communicator, ArrayView<T>(&return_value, 1));
       return return_value;
     }
 
@@ -248,15 +233,11 @@ namespace Utilities
     void
     sum(const T &values, const MPI_Comm &mpi_communicator, U &sums)
     {
-      static_assert(std::is_same<typename std::decay<T>::type,
-                                 typename std::decay<U>::type>::value,
+      static_assert(std::is_same<typename std::decay<T>::type, typename std::decay<U>::type>::value,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
-      using const_type =
-        ArrayView<const typename decltype(array_view_values)::value_type>;
-      sum(static_cast<const_type>(array_view_values),
-          mpi_communicator,
-          make_array_view(sums));
+      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
+      sum(static_cast<const_type>(array_view_values), mpi_communicator, make_array_view(sums));
     }
 
 
@@ -274,8 +255,7 @@ namespace Utilities
 
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
-    sum(const Tensor<rank, dim, Number> &local,
-        const MPI_Comm &                 mpi_communicator)
+    sum(const Tensor<rank, dim, Number> &local, const MPI_Comm &mpi_communicator)
     {
       Tensor<rank, dim, Number> sums;
       sum(local, mpi_communicator, sums);
@@ -286,19 +266,15 @@ namespace Utilities
 
     template <int rank, int dim, typename Number>
     SymmetricTensor<rank, dim, Number>
-    sum(const SymmetricTensor<rank, dim, Number> &local,
-        const MPI_Comm &                          mpi_communicator)
+    sum(const SymmetricTensor<rank, dim, Number> &local, const MPI_Comm &mpi_communicator)
     {
-      const unsigned int n_entries =
-        SymmetricTensor<rank, dim, Number>::n_independent_components;
-      Number
-        entries[SymmetricTensor<rank, dim, Number>::n_independent_components];
+      const unsigned int n_entries = SymmetricTensor<rank, dim, Number>::n_independent_components;
+      Number             entries[SymmetricTensor<rank, dim, Number>::n_independent_components];
 
       for (unsigned int i = 0; i < n_entries; ++i)
         entries[i] = local[local.unrolled_to_component_indices(i)];
 
-      Number global_entries
-        [SymmetricTensor<rank, dim, Number>::n_independent_components];
+      Number global_entries[SymmetricTensor<rank, dim, Number>::n_independent_components];
       sum(entries, mpi_communicator, global_entries);
 
       SymmetricTensor<rank, dim, Number> global;
@@ -316,10 +292,8 @@ namespace Utilities
         const MPI_Comm &            mpi_communicator,
         SparseMatrix<Number> &      global)
     {
-      Assert(
-        local.get_sparsity_pattern() == global.get_sparsity_pattern(),
-        ExcMessage(
-          "The sparsity pattern of the local and the global matrices should match."));
+      Assert(local.get_sparsity_pattern() == global.get_sparsity_pattern(),
+             ExcMessage("The sparsity pattern of the local and the global matrices should match."));
 #ifdef DEAL_II_WITH_MPI
       // makes use of the fact that the matrix stores its data in a
       // contiguous array.
@@ -340,10 +314,8 @@ namespace Utilities
     max(const T &t, const MPI_Comm &mpi_communicator)
     {
       T return_value;
-      internal::all_reduce(MPI_MAX,
-                           ArrayView<const T>(&t, 1),
-                           mpi_communicator,
-                           ArrayView<T>(&return_value, 1));
+      internal::all_reduce(
+        MPI_MAX, ArrayView<const T>(&t, 1), mpi_communicator, ArrayView<T>(&return_value, 1));
       return return_value;
     }
 
@@ -353,15 +325,11 @@ namespace Utilities
     void
     max(const T &values, const MPI_Comm &mpi_communicator, U &maxima)
     {
-      static_assert(std::is_same<typename std::decay<T>::type,
-                                 typename std::decay<U>::type>::value,
+      static_assert(std::is_same<typename std::decay<T>::type, typename std::decay<U>::type>::value,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
-      using const_type =
-        ArrayView<const typename decltype(array_view_values)::value_type>;
-      max(static_cast<const_type>(array_view_values),
-          mpi_communicator,
-          make_array_view(maxima));
+      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
+      max(static_cast<const_type>(array_view_values), mpi_communicator, make_array_view(maxima));
     }
 
 
@@ -382,10 +350,8 @@ namespace Utilities
     min(const T &t, const MPI_Comm &mpi_communicator)
     {
       T return_value;
-      internal::all_reduce(MPI_MIN,
-                           ArrayView<const T>(&t, 1),
-                           mpi_communicator,
-                           ArrayView<T>(&return_value, 1));
+      internal::all_reduce(
+        MPI_MIN, ArrayView<const T>(&t, 1), mpi_communicator, ArrayView<T>(&return_value, 1));
       return return_value;
     }
 
@@ -395,15 +361,11 @@ namespace Utilities
     void
     min(const T &values, const MPI_Comm &mpi_communicator, U &minima)
     {
-      static_assert(std::is_same<typename std::decay<T>::type,
-                                 typename std::decay<U>::type>::value,
+      static_assert(std::is_same<typename std::decay<T>::type, typename std::decay<U>::type>::value,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
-      using const_type =
-        ArrayView<const typename decltype(array_view_values)::value_type>;
-      min(static_cast<const_type>(array_view_values),
-          mpi_communicator,
-          make_array_view(minima));
+      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
+      min(static_cast<const_type>(array_view_values), mpi_communicator, make_array_view(minima));
     }
 
 

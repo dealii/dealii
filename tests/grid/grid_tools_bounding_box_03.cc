@@ -34,13 +34,11 @@ test_tria_bounding_box()
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_rectangle(tria, p1, p2);
   tria.refine_global(1);
-  const BoundingBox<spacedim> bounding_box =
-    GridTools::compute_bounding_box(tria);
+  const BoundingBox<spacedim> bounding_box = GridTools::compute_bounding_box(tria);
   const std::pair<Point<spacedim>, Point<spacedim>> &boundary_points =
     bounding_box.get_boundary_points();
 
-  deallog << boundary_points.first << ", " << boundary_points.second
-          << std::endl;
+  deallog << boundary_points.first << ", " << boundary_points.second << std::endl;
 }
 
 int

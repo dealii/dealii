@@ -29,8 +29,7 @@ DEAL_II_NAMESPACE_OPEN
  * An exception that is thrown whenever the edges of a mesh are not
  * orientable.
  */
-DeclExceptionMsg(ExcMeshNotOrientable,
-                 "The edges of the mesh are not consistently orientable.");
+DeclExceptionMsg(ExcMeshNotOrientable, "The edges of the mesh are not consistently orientable.");
 
 
 /**
@@ -667,30 +666,26 @@ public:
    * Note, that this function should be called before reorder_cells().
    */
   static void
-  invert_all_cells_of_negative_grid(
-    const std::vector<Point<spacedim>> &all_vertices,
-    std::vector<CellData<dim>> &        original_cells);
+  invert_all_cells_of_negative_grid(const std::vector<Point<spacedim>> &all_vertices,
+                                    std::vector<CellData<dim>> &        original_cells);
 };
 
 
 // declaration of explicit specializations
 template <>
 void
-GridReordering<2>::invert_all_cells_of_negative_grid(
-  const std::vector<Point<2>> &all_vertices,
-  std::vector<CellData<2>> &   cells);
+GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2>> &all_vertices,
+                                                     std::vector<CellData<2>> &   cells);
 
 template <>
 void
-GridReordering<2, 3>::invert_all_cells_of_negative_grid(
-  const std::vector<Point<3>> &all_vertices,
-  std::vector<CellData<2>> &   cells);
+GridReordering<2, 3>::invert_all_cells_of_negative_grid(const std::vector<Point<3>> &all_vertices,
+                                                        std::vector<CellData<2>> &   cells);
 
 template <>
 void
-GridReordering<3>::invert_all_cells_of_negative_grid(
-  const std::vector<Point<3>> &all_vertices,
-  std::vector<CellData<3>> &   cells);
+GridReordering<3>::invert_all_cells_of_negative_grid(const std::vector<Point<3>> &all_vertices,
+                                                     std::vector<CellData<3>> &   cells);
 
 DEAL_II_NAMESPACE_CLOSE
 

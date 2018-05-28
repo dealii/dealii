@@ -81,8 +81,7 @@ Lh(const Point<dim> &x_q, const TableIndices<dim> &indices)
 
 template <>
 double
-LegendreFunction<2>::value(const dealii::Point<2> &point,
-                           const unsigned int) const
+LegendreFunction<2>::value(const dealii::Point<2> &point, const unsigned int) const
 {
   double f = 0.0;
 
@@ -95,8 +94,7 @@ LegendreFunction<2>::value(const dealii::Point<2> &point,
 
 template <>
 double
-LegendreFunction<3>::value(const dealii::Point<3> &point,
-                           const unsigned int) const
+LegendreFunction<3>::value(const dealii::Point<3> &point, const unsigned int) const
 {
   double f = 0.0;
 
@@ -148,8 +146,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 {
   const unsigned int max_poly = poly_degree + 3;
   deallog << "-----------------------------------" << std::endl;
-  deallog << dim << "d, p=" << poly_degree << ", max_p=" << max_poly
-          << std::endl;
+  deallog << dim << "d, p=" << poly_degree << ", max_p=" << max_poly << std::endl;
   deallog << "-----------------------------------" << std::endl;
   Triangulation<dim>    triangulation;
   hp::DoFHandler<dim>   dof_handler(triangulation);
@@ -181,8 +178,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 
   Vector<double> local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
-    dof_handler.begin_active();
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
   {
     const unsigned int cell_n_dofs          = cell->get_fe().dofs_per_cell;
     const unsigned int cell_active_fe_index = cell->active_fe_index();

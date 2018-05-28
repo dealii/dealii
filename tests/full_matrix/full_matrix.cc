@@ -54,8 +54,8 @@ main()
   FullMatrix<double>::const_iterator end = T.end();
   while (it != end)
     {
-      deallog << "Row " << it->row() << "\tCol " << it->column() << "\tVal "
-              << it->value() << std::endl;
+      deallog << "Row " << it->row() << "\tCol " << it->column() << "\tVal " << it->value()
+              << std::endl;
       ++it;
     }
 
@@ -63,8 +63,8 @@ main()
   end = T.end(1);
   while (it != end)
     {
-      deallog << "Row " << it->row() << "\tCol " << it->column() << "\tVal "
-              << it->value() << std::endl;
+      deallog << "Row " << it->row() << "\tCol " << it->column() << "\tVal " << it->value()
+              << std::endl;
       ++it;
     }
 

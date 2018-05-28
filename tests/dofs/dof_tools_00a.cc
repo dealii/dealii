@@ -48,18 +48,14 @@ check_this(const DoFHandler<dim> &dof_handler)
     {
       std::vector<unsigned int> target_component(n_components, 0U);
       dofs_per_component.resize(1);
-      DoFTools::count_dofs_per_component(
-        dof_handler, dofs_per_component, false, target_component);
-      for (unsigned int i = 0;
-           i < std::min(n_components, (unsigned int)dofs_per_component.size());
+      DoFTools::count_dofs_per_component(dof_handler, dofs_per_component, false, target_component);
+      for (unsigned int i = 0; i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)
         deallog << ' ' << dofs_per_component[i];
       deallog << std::endl;
 
-      DoFTools::count_dofs_per_component(
-        dof_handler, dofs_per_component, true, target_component);
-      for (unsigned int i = 0;
-           i < std::min(n_components, (unsigned int)dofs_per_component.size());
+      DoFTools::count_dofs_per_component(dof_handler, dofs_per_component, true, target_component);
+      for (unsigned int i = 0; i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)
         deallog << ' ' << dofs_per_component[i];
       deallog << std::endl;
@@ -68,17 +64,13 @@ check_this(const DoFHandler<dim> &dof_handler)
         target_component[i] = 1;
       dofs_per_component.resize(2);
 
-      DoFTools::count_dofs_per_component(
-        dof_handler, dofs_per_component, false, target_component);
-      for (unsigned int i = 0;
-           i < std::min(n_components, (unsigned int)dofs_per_component.size());
+      DoFTools::count_dofs_per_component(dof_handler, dofs_per_component, false, target_component);
+      for (unsigned int i = 0; i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)
         deallog << ' ' << dofs_per_component[i];
       deallog << std::endl;
-      DoFTools::count_dofs_per_component(
-        dof_handler, dofs_per_component, true, target_component);
-      for (unsigned int i = 0;
-           i < std::min(n_components, (unsigned int)dofs_per_component.size());
+      DoFTools::count_dofs_per_component(dof_handler, dofs_per_component, true, target_component);
+      for (unsigned int i = 0; i < std::min(n_components, (unsigned int)dofs_per_component.size());
            ++i)
         deallog << ' ' << dofs_per_component[i];
       deallog << std::endl;

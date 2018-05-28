@@ -43,11 +43,7 @@
 
 template <class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve(SOLVER &            solver,
-            const MATRIX &      A,
-            VECTOR &            u,
-            VECTOR &            f,
-            const PRECONDITION &P)
+check_solve(SOLVER &solver, const MATRIX &A, VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
@@ -64,8 +60,7 @@ check_solve(SOLVER &            solver,
       abort();
     }
 
-  deallog << "Solver stopped after " << solver.control().last_step()
-          << " iterations" << std::endl;
+  deallog << "Solver stopped after " << solver.control().last_step() << " iterations" << std::endl;
 }
 
 

@@ -34,18 +34,15 @@ test()
 
   deallog << " n_active_cells: " << tr1.n_active_cells() << "\n" << std::endl;
 
-  parallel::shared::Triangulation<dim> tr2(
-    MPI_COMM_WORLD,
-    ::Triangulation<dim>::none,
-    false,
-    parallel::shared::Triangulation<dim>::partition_metis);
+  parallel::shared::Triangulation<dim> tr2(MPI_COMM_WORLD,
+                                           ::Triangulation<dim>::none,
+                                           false,
+                                           parallel::shared::Triangulation<dim>::partition_metis);
   tr2.copy_triangulation(tr1);
 
   deallog << " n_active_cells: " << tr2.n_active_cells() << "\n"
-          << " locally_owned_subdomain(): " << tr2.locally_owned_subdomain()
-          << "\n"
-          << " n_locally_owned_active_cells: "
-          << tr2.n_locally_owned_active_cells() << "\n"
+          << " locally_owned_subdomain(): " << tr2.locally_owned_subdomain() << "\n"
+          << " n_locally_owned_active_cells: " << tr2.n_locally_owned_active_cells() << "\n"
           << " n_global_active_cells: " << tr2.n_global_active_cells() << "\n"
           << std::endl;
 
@@ -53,10 +50,8 @@ test()
   tr3.copy_triangulation(tr1);
 
   deallog << " n_active_cells: " << tr3.n_active_cells() << "\n"
-          << " locally_owned_subdomain(): " << tr3.locally_owned_subdomain()
-          << "\n"
-          << " n_locally_owned_active_cells: "
-          << tr3.n_locally_owned_active_cells() << "\n"
+          << " locally_owned_subdomain(): " << tr3.locally_owned_subdomain() << "\n"
+          << " n_locally_owned_active_cells: " << tr3.n_locally_owned_active_cells() << "\n"
           << " n_global_active_cells: " << tr3.n_global_active_cells() << "\n"
           << std::endl;
 
@@ -64,10 +59,8 @@ test()
   tr4.copy_triangulation(tr2);
 
   deallog << " n_active_cells: " << tr4.n_active_cells() << "\n"
-          << " locally_owned_subdomain(): " << tr4.locally_owned_subdomain()
-          << "\n"
-          << " n_locally_owned_active_cells: "
-          << tr4.n_locally_owned_active_cells() << "\n"
+          << " locally_owned_subdomain(): " << tr4.locally_owned_subdomain() << "\n"
+          << " n_locally_owned_active_cells: " << tr4.n_locally_owned_active_cells() << "\n"
           << " n_global_active_cells: " << tr4.n_global_active_cells() << "\n"
           << std::endl;
 
@@ -75,10 +68,8 @@ test()
   tr5.copy_triangulation(tr3);
 
   deallog << " n_active_cells: " << tr5.n_active_cells() << "\n"
-          << " locally_owned_subdomain(): " << tr5.locally_owned_subdomain()
-          << "\n"
-          << " n_locally_owned_active_cells: "
-          << tr5.n_locally_owned_active_cells() << "\n"
+          << " locally_owned_subdomain(): " << tr5.locally_owned_subdomain() << "\n"
+          << " n_locally_owned_active_cells: " << tr5.n_locally_owned_active_cells() << "\n"
           << " n_global_active_cells: " << tr5.n_global_active_cells() << "\n"
           << std::endl;
 }

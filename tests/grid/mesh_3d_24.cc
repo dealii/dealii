@@ -70,11 +70,9 @@ main()
 
   for (unsigned int f = 0; f < 6; ++f)
     deallog << "face: " << f << std::endl
-            << "  Face orientation status: " << cell->face_orientation(f)
-            << std::endl
+            << "  Face orientation status: " << cell->face_orientation(f) << std::endl
             << "  On boundary: " << cell->at_boundary(f) << std::endl
-            << "  Neighbor: "
-            << (cell->at_boundary(f) ? triangulation.end() : cell->neighbor(f))
+            << "  Neighbor: " << (cell->at_boundary(f) ? triangulation.end() : cell->neighbor(f))
             << std::endl;
 
   for (double x = 0; x <= 1; x += 1.0 / 3.0)

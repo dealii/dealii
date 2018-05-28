@@ -80,18 +80,15 @@ namespace FESeries
 
   template <int dim>
   void
-  Fourier<dim>::calculate(
-    const Vector<double> &            local_dof_values,
-    const unsigned int                cell_active_fe_index,
-    Table<dim, std::complex<double>> &fourier_coefficients)
+  Fourier<dim>::calculate(const Vector<double> &            local_dof_values,
+                          const unsigned int                cell_active_fe_index,
+                          Table<dim, std::complex<double>> &fourier_coefficients)
   {
     ensure_existence(cell_active_fe_index);
     const FullMatrix<std::complex<double>> &matrix =
       fourier_transform_matrices[cell_active_fe_index];
 
-    std::fill(unrolled_coefficients.begin(),
-              unrolled_coefficients.end(),
-              std::complex<double>(0.));
+    std::fill(unrolled_coefficients.begin(), unrolled_coefficients.end(), std::complex<double>(0.));
 
     Assert(unrolled_coefficients.size() == matrix.m(), ExcInternalError());
 
@@ -116,8 +113,8 @@ namespace FESeries
     for (unsigned int q = 0; q < quadrature.size(); ++q)
       {
         const Point<dim> &x_q = quadrature.point(q);
-        sum += std::exp(std::complex<double>(0, 1) * (k_vector * x_q)) *
-               fe.shape_value(j, x_q) * quadrature.weight(q);
+        sum += std::exp(std::complex<double>(0, 1) * (k_vector * x_q)) * fe.shape_value(j, x_q) *
+               quadrature.weight(q);
       }
     return sum;
   }
@@ -127,8 +124,7 @@ namespace FESeries
   void
   Fourier<2>::ensure_existence(const unsigned int fe)
   {
-    Assert(fe < fe_collection->size(),
-           ExcIndexRange(fe, 0, fe_collection->size()))
+    Assert(fe < fe_collection->size(), ExcIndexRange(fe, 0, fe_collection->size()))
 
       if (fourier_transform_matrices[fe].m() == 0)
     {
@@ -139,8 +135,8 @@ namespace FESeries
       for (unsigned int k1 = 0; k1 < k_vectors.size(0); ++k1)
         for (unsigned int k2 = 0; k2 < k_vectors.size(1); ++k2, k++)
           for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell; ++j)
-            fourier_transform_matrices[fe](k, j) = integrate(
-              (*fe_collection)[fe], (*q_collection)[fe], k_vectors(k1, k2), j);
+            fourier_transform_matrices[fe](k, j) =
+              integrate((*fe_collection)[fe], (*q_collection)[fe], k_vectors(k1, k2), j);
     }
   }
 
@@ -148,8 +144,7 @@ namespace FESeries
   void
   Fourier<3>::ensure_existence(const unsigned int fe)
   {
-    Assert(fe < fe_collection->size(),
-           ExcIndexRange(fe, 0, fe_collection->size()))
+    Assert(fe < fe_collection->size(), ExcIndexRange(fe, 0, fe_collection->size()))
 
       if (fourier_transform_matrices[fe].m() == 0)
     {
@@ -160,13 +155,9 @@ namespace FESeries
       for (unsigned int k1 = 0; k1 < k_vectors.size(0); ++k1)
         for (unsigned int k2 = 0; k2 < k_vectors.size(1); ++k2)
           for (unsigned int k3 = 0; k3 < k_vectors.size(2); ++k3, k++)
-            for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell;
-                 ++j)
+            for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell; ++j)
               fourier_transform_matrices[fe](k, j) =
-                integrate((*fe_collection)[fe],
-                          (*q_collection)[fe],
-                          k_vectors(k1, k2, k3),
-                          j);
+                integrate((*fe_collection)[fe], (*q_collection)[fe], k_vectors(k1, k2, k3), j);
     }
   }
 
@@ -174,8 +165,7 @@ namespace FESeries
   void
   Fourier<1>::ensure_existence(const unsigned int fe)
   {
-    Assert(fe < fe_collection->size(),
-           ExcIndexRange(fe, 0, fe_collection->size()))
+    Assert(fe < fe_collection->size(), ExcIndexRange(fe, 0, fe_collection->size()))
 
       if (fourier_transform_matrices[fe].m() == 0)
     {
@@ -184,17 +174,14 @@ namespace FESeries
 
       for (unsigned int k = 0; k < k_vectors.size(0); ++k)
         for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell; ++j)
-          fourier_transform_matrices[fe](k, j) = integrate(
-            (*fe_collection)[fe], (*q_collection)[fe], k_vectors(k), j);
+          fourier_transform_matrices[fe](k, j) =
+            integrate((*fe_collection)[fe], (*q_collection)[fe], k_vectors(k), j);
     }
   }
 
 
   /*-------------- Legendre -------------------------------*/
-  DeclException2(ExcLegendre,
-                 int,
-                 double,
-                 << "x[" << arg1 << "] = " << arg2 << " is not in [0,1]");
+  DeclException2(ExcLegendre, int, double, << "x[" << arg1 << "] = " << arg2 << " is not in [0,1]");
 
   /* dim dimensional Legendre function with indices @p indices
    * evaluated at @p x_q in [0,1]^dim.
@@ -258,8 +245,7 @@ namespace FESeries
                            Table<dim, double> &          legendre_coefficients)
   {
     ensure_existence(cell_active_fe_index);
-    const FullMatrix<double> &matrix =
-      legendre_transform_matrices[cell_active_fe_index];
+    const FullMatrix<double> &matrix = legendre_transform_matrices[cell_active_fe_index];
 
     std::fill(unrolled_coefficients.begin(), unrolled_coefficients.end(), 0.);
 
@@ -287,8 +273,7 @@ namespace FESeries
     for (unsigned int q = 0; q < quadrature.size(); ++q)
       {
         const Point<dim> &x_q = quadrature.point(q);
-        sum +=
-          Lh(x_q, indices) * fe.shape_value(dof, x_q) * quadrature.weight(q);
+        sum += Lh(x_q, indices) * fe.shape_value(dof, x_q) * quadrature.weight(q);
       }
     return sum * multiplier(indices);
   }
@@ -298,19 +283,15 @@ namespace FESeries
   Legendre<1>::ensure_existence(const unsigned int fe)
   {
     Assert(fe < fe_collection->size(),
-           ExcIndexRange(
-             fe,
-             0,
-             fe_collection->size())) if (legendre_transform_matrices[fe].m() ==
-                                         0)
+           ExcIndexRange(fe, 0, fe_collection->size())) if (legendre_transform_matrices[fe].m() ==
+                                                            0)
     {
-      legendre_transform_matrices[fe].reinit(
-        N, (*fe_collection)[fe].dofs_per_cell);
+      legendre_transform_matrices[fe].reinit(N, (*fe_collection)[fe].dofs_per_cell);
 
       for (unsigned int k = 0; k < N; ++k)
         for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell; ++j)
-          legendre_transform_matrices[fe](k, j) = integrate_Legendre(
-            (*fe_collection)[fe], (*q_collection)[fe], TableIndices<1>(k), j);
+          legendre_transform_matrices[fe](k, j) =
+            integrate_Legendre((*fe_collection)[fe], (*q_collection)[fe], TableIndices<1>(k), j);
     }
   }
 
@@ -320,23 +301,18 @@ namespace FESeries
   void
   Legendre<2>::ensure_existence(const unsigned int fe)
   {
-    Assert(fe < fe_collection->size(),
-           ExcIndexRange(fe, 0, fe_collection->size()))
+    Assert(fe < fe_collection->size(), ExcIndexRange(fe, 0, fe_collection->size()))
 
       if (legendre_transform_matrices[fe].m() == 0)
     {
-      legendre_transform_matrices[fe].reinit(
-        N * N, (*fe_collection)[fe].dofs_per_cell);
+      legendre_transform_matrices[fe].reinit(N * N, (*fe_collection)[fe].dofs_per_cell);
 
       unsigned int k = 0;
       for (unsigned int k1 = 0; k1 < N; ++k1)
         for (unsigned int k2 = 0; k2 < N; ++k2, k++)
           for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell; ++j)
-            legendre_transform_matrices[fe](k, j) =
-              integrate_Legendre((*fe_collection)[fe],
-                                 (*q_collection)[fe],
-                                 TableIndices<2>(k1, k2),
-                                 j);
+            legendre_transform_matrices[fe](k, j) = integrate_Legendre(
+              (*fe_collection)[fe], (*q_collection)[fe], TableIndices<2>(k1, k2), j);
     }
   }
 
@@ -344,25 +320,19 @@ namespace FESeries
   void
   Legendre<3>::ensure_existence(const unsigned int fe)
   {
-    Assert(fe < fe_collection->size(),
-           ExcIndexRange(fe, 0, fe_collection->size()))
+    Assert(fe < fe_collection->size(), ExcIndexRange(fe, 0, fe_collection->size()))
 
       if (legendre_transform_matrices[fe].m() == 0)
     {
-      legendre_transform_matrices[fe].reinit(
-        N * N * N, (*fe_collection)[fe].dofs_per_cell);
+      legendre_transform_matrices[fe].reinit(N * N * N, (*fe_collection)[fe].dofs_per_cell);
 
       unsigned int k = 0;
       for (unsigned int k1 = 0; k1 < N; ++k1)
         for (unsigned int k2 = 0; k2 < N; ++k2)
           for (unsigned int k3 = 0; k3 < N; ++k3, k++)
-            for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell;
-                 ++j)
-              legendre_transform_matrices[fe](k, j) =
-                integrate_Legendre((*fe_collection)[fe],
-                                   (*q_collection)[fe],
-                                   TableIndices<3>(k1, k2, k3),
-                                   j);
+            for (unsigned int j = 0; j < (*fe_collection)[fe].dofs_per_cell; ++j)
+              legendre_transform_matrices[fe](k, j) = integrate_Legendre(
+                (*fe_collection)[fe], (*q_collection)[fe], TableIndices<3>(k1, k2, k3), j);
     }
   }
 
@@ -373,12 +343,10 @@ namespace FESeries
     FullMatrix<double> K(2, 2), invK(2, 2);
     Vector<double>     X(2), B(2);
 
-    Assert(x.size() == y.size(),
-           ExcMessage("x and y are expected to have the same size"));
+    Assert(x.size() == y.size(), ExcMessage("x and y are expected to have the same size"));
 
     Assert(x.size() >= 2,
-           dealii::ExcMessage(
-             "at least two points are required for linear regression fit"));
+           dealii::ExcMessage("at least two points are required for linear regression fit"));
 
     double sum_1 = 0.0, sum_x = 0.0, sum_x2 = 0.0, sum_y = 0.0, sum_xy = 0.0;
 

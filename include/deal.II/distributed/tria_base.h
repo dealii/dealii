@@ -50,11 +50,10 @@ namespace parallel
     /**
      * Constructor.
      */
-    Triangulation(
-      MPI_Comm mpi_communicator,
-      const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
-                 smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
-      const bool check_for_distorted_cells = false);
+    Triangulation(MPI_Comm mpi_communicator,
+                  const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing smooth_grid =
+                    (dealii::Triangulation<dim, spacedim>::none),
+                  const bool check_for_distorted_cells = false);
 
     /**
      * Destructor.
@@ -71,8 +70,7 @@ namespace parallel
      * Implementation of the same function as in the base class.
      */
     virtual void
-    copy_triangulation(
-      const dealii::Triangulation<dim, spacedim> &old_tria) override;
+    copy_triangulation(const dealii::Triangulation<dim, spacedim> &old_tria) override;
 
     /**
      * Return the number of active cells owned by each of the MPI processes

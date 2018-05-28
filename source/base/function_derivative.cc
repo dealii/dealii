@@ -54,8 +54,7 @@ FunctionDerivative<dim>::FunctionDerivative(const Function<dim> &          f,
 
 template <int dim>
 void
-FunctionDerivative<dim>::set_formula(
-  typename AutoDerivativeFunction<dim>::DifferenceFormula form)
+FunctionDerivative<dim>::set_formula(typename AutoDerivativeFunction<dim>::DifferenceFormula form)
 {
   // go through all known formulas, reject ones we don't know about
   // and don't handle in the member functions of this class
@@ -89,26 +88,20 @@ FunctionDerivative<dim>::set_h(const double new_h)
 
 template <int dim>
 double
-FunctionDerivative<dim>::value(const Point<dim> & p,
-                               const unsigned int component) const
+FunctionDerivative<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   Assert(incr.size() == 1,
-         ExcMessage(
-           "FunctionDerivative was not initialized for constant direction"));
+         ExcMessage("FunctionDerivative was not initialized for constant direction"));
 
   switch (formula)
     {
       case AutoDerivativeFunction<dim>::Euler:
-        return (f.value(p + incr[0], component) -
-                f.value(p - incr[0], component)) /
-               (2 * h);
+        return (f.value(p + incr[0], component) - f.value(p - incr[0], component)) / (2 * h);
       case AutoDerivativeFunction<dim>::UpwindEuler:
         return (f.value(p, component) - f.value(p - incr[0], component)) / h;
       case AutoDerivativeFunction<dim>::FourthOrder:
-        return (-f.value(p + 2 * incr[0], component) +
-                8 * f.value(p + incr[0], component) -
-                8 * f.value(p - incr[0], component) +
-                f.value(p - 2 * incr[0], component)) /
+        return (-f.value(p + 2 * incr[0], component) + 8 * f.value(p + incr[0], component) -
+                8 * f.value(p - incr[0], component) + f.value(p - 2 * incr[0], component)) /
                (12 * h);
       default:
         Assert(false, ExcNotImplemented());
@@ -120,12 +113,10 @@ FunctionDerivative<dim>::value(const Point<dim> & p,
 
 template <int dim>
 void
-FunctionDerivative<dim>::vector_value(const Point<dim> &p,
-                                      Vector<double> &  result) const
+FunctionDerivative<dim>::vector_value(const Point<dim> &p, Vector<double> &result) const
 {
   Assert(incr.size() == 1,
-         ExcMessage(
-           "FunctionDerivative was not initialized for constant direction"));
+         ExcMessage("FunctionDerivative was not initialized for constant direction"));
   Vector<double> aux(result.size());
 
   // Formulas are the same as in
@@ -164,13 +155,12 @@ template <int dim>
 void
 FunctionDerivative<dim>::value_list(const std::vector<Point<dim>> &points,
                                     std::vector<double> &          values,
-                                    const unsigned int component) const
+                                    const unsigned int             component) const
 {
   const unsigned int n                  = points.size();
   const bool         variable_direction = (incr.size() == 1) ? false : true;
   if (variable_direction)
-    Assert(incr.size() == points.size(),
-           ExcDimensionMismatch(incr.size(), points.size()));
+    Assert(incr.size() == points.size(), ExcDimensionMismatch(incr.size(), points.size()));
 
   // Vector of auxiliary values
   std::vector<double> aux(n);

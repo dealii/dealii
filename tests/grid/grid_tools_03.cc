@@ -44,8 +44,8 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "hypercube volume, " << i * 2
-                  << " refinements: " << GridTools::volume(tria) << std::endl;
+                  << "hypercube volume, " << i * 2 << " refinements: " << GridTools::volume(tria)
+                  << std::endl;
         };
     };
 
@@ -62,11 +62,10 @@ test1()
         {
           tria.refine_global(1);
           deallog << dim << "d, "
-                  << "hyperball volume, " << i
-                  << " refinements: " << GridTools::volume(tria) << std::endl;
+                  << "hyperball volume, " << i << " refinements: " << GridTools::volume(tria)
+                  << std::endl;
         }
-      deallog << "exact value="
-              << (dim == 2 ? numbers::PI : 4. / 3. * numbers::PI) << std::endl;
+      deallog << "exact value=" << (dim == 2 ? numbers::PI : 4. / 3. * numbers::PI) << std::endl;
     }
 }
 

@@ -86,8 +86,7 @@ test(MappingEnum::type mapping_name, unsigned int refinements = 1)
   // static const RotatedSphericalManifold rotated_sphere;
   // triangulation.set_manifold (1, rotated_sphere);
 
-  for (Triangulation<2, 3>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (Triangulation<2, 3>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     {
@@ -126,7 +125,7 @@ test(MappingEnum::type mapping_name, unsigned int refinements = 1)
         break;
     }
 
-  FEValues<2, 3> fe_values(*mapping, fe, cell_quadrature, update_JxW_values);
+  FEValues<2, 3>     fe_values(*mapping, fe, cell_quadrature, update_JxW_values);
   const unsigned int n_q_points = cell_quadrature.size();
 
   double surface_area = 0;

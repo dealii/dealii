@@ -46,20 +46,15 @@ test()
 
   double d(-3.14159265358979323846264338327950288419716939937510);
   Assert(Utilities::to_string(d) == "-3.1415926535897931", ExcInternalError());
-  Assert(Utilities::to_string(d, 20) == "-03.1415926535897931",
-         ExcInternalError());
+  Assert(Utilities::to_string(d, 20) == "-03.1415926535897931", ExcInternalError());
 
   long double ld(-3.14159265358979323846264338327950288419716939937510L);
-  Assert(Utilities::to_string(ld) == "-3.14159265358979323851",
-         ExcInternalError());
-  Assert(Utilities::to_string(ld, 24) == "-03.14159265358979323851",
-         ExcInternalError());
+  Assert(Utilities::to_string(ld) == "-3.14159265358979323851", ExcInternalError());
+  Assert(Utilities::to_string(ld, 24) == "-03.14159265358979323851", ExcInternalError());
 
   double ed(-3.1415926535e-115);
-  Assert(Utilities::to_string(ed) == "-3.1415926534999999e-115",
-         ExcInternalError());
-  Assert(Utilities::to_string(ed, 28) == "-00003.1415926534999999e-115",
-         ExcInternalError());
+  Assert(Utilities::to_string(ed) == "-3.1415926534999999e-115", ExcInternalError());
+  Assert(Utilities::to_string(ed, 28) == "-00003.1415926534999999e-115", ExcInternalError());
 
   deallog << "Ok." << std::endl;
 }

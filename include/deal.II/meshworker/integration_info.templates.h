@@ -88,9 +88,8 @@ namespace MeshWorker
   template <int dim, int sdim>
   template <typename number>
   void
-  IntegrationInfo<dim, sdim>::fill_local_data(
-    const DoFInfo<dim, sdim, number> &info,
-    bool                              split_fevalues)
+  IntegrationInfo<dim, sdim>::fill_local_data(const DoFInfo<dim, sdim, number> &info,
+                                              bool                              split_fevalues)
   {
     if (split_fevalues)
       {
@@ -98,13 +97,11 @@ namespace MeshWorker
         // Loop over all blocks
         for (unsigned int b = 0; b < info.block_info->local().size(); ++b)
           {
-            const unsigned int fe_no = info.block_info->base_element(b);
-            const FEValuesBase<dim, sdim> &fe     = this->fe_values(fe_no);
-            const unsigned int             n_comp = fe.get_fe().n_components();
-            const unsigned int             block_start =
-              info.block_info->local().block_start(b);
-            const unsigned int block_size =
-              info.block_info->local().block_size(b);
+            const unsigned int             fe_no       = info.block_info->base_element(b);
+            const FEValuesBase<dim, sdim> &fe          = this->fe_values(fe_no);
+            const unsigned int             n_comp      = fe.get_fe().n_components();
+            const unsigned int             block_start = info.block_info->local().block_start(b);
+            const unsigned int             block_size  = info.block_info->local().block_size(b);
 
             if (info.level_cell)
               this->global_data->mg_fill(values,
@@ -146,15 +143,8 @@ namespace MeshWorker
                                      0,
                                      info.indices.size());
         else
-          this->global_data->fill(values,
-                                  gradients,
-                                  hessians,
-                                  fe,
-                                  info.indices,
-                                  0,
-                                  n_comp,
-                                  0,
-                                  info.indices.size());
+          this->global_data->fill(
+            values, gradients, hessians, fe, info.indices, 0, n_comp, 0, info.indices.size());
       }
   }
 
@@ -163,9 +153,8 @@ namespace MeshWorker
   std::size_t
   IntegrationInfo<dim, sdim>::memory_consumption() const
   {
-    std::size_t mem = sizeof(*this) +
-                      MemoryConsumption::memory_consumption(fevalv) -
-                      sizeof(fevalv);
+    std::size_t mem =
+      sizeof(*this) + MemoryConsumption::memory_consumption(fevalv) - sizeof(fevalv);
     for (unsigned int i = 0; i < fevalv.size(); ++i)
       mem += fevalv[i]->memory_consumption();
     return mem;
@@ -247,22 +236,16 @@ namespace MeshWorker
   {
     std::size_t mem =
       sizeof(*this) + MemoryConsumption::memory_consumption(cell_quadrature) -
-      sizeof(cell_quadrature) +
-      MemoryConsumption::memory_consumption(boundary_quadrature) -
-      sizeof(boundary_quadrature) +
-      MemoryConsumption::memory_consumption(face_quadrature) -
-      sizeof(face_quadrature) +
-      MemoryConsumption::memory_consumption(cell_selector) -
-      sizeof(cell_selector) +
-      MemoryConsumption::memory_consumption(boundary_selector) -
-      sizeof(boundary_selector) +
-      MemoryConsumption::memory_consumption(face_selector) -
-      sizeof(face_selector) + MemoryConsumption::memory_consumption(cell) -
-      sizeof(cell) + MemoryConsumption::memory_consumption(boundary) -
-      sizeof(boundary) + MemoryConsumption::memory_consumption(face) -
-      sizeof(face) + MemoryConsumption::memory_consumption(subface) -
-      sizeof(subface) + MemoryConsumption::memory_consumption(neighbor) -
-      sizeof(neighbor);
+      sizeof(cell_quadrature) + MemoryConsumption::memory_consumption(boundary_quadrature) -
+      sizeof(boundary_quadrature) + MemoryConsumption::memory_consumption(face_quadrature) -
+      sizeof(face_quadrature) + MemoryConsumption::memory_consumption(cell_selector) -
+      sizeof(cell_selector) + MemoryConsumption::memory_consumption(boundary_selector) -
+      sizeof(boundary_selector) + MemoryConsumption::memory_consumption(face_selector) -
+      sizeof(face_selector) + MemoryConsumption::memory_consumption(cell) - sizeof(cell) +
+      MemoryConsumption::memory_consumption(boundary) - sizeof(boundary) +
+      MemoryConsumption::memory_consumption(face) - sizeof(face) +
+      MemoryConsumption::memory_consumption(subface) - sizeof(subface) +
+      MemoryConsumption::memory_consumption(neighbor) - sizeof(neighbor);
     //   if (cell_data != 0)
     //     mem += MemoryConsumption::memory_consumption(*cell_data);
     //   if (boundary_data != 0)

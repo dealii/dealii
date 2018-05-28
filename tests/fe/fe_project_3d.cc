@@ -105,9 +105,8 @@ static const Point<3> vertices_rectangular[] = {
 
   Point<3>(-1., 1., 1.),   Point<3>(0., 1., 1.),   Point<3>(1., 1., 1.)};
 
-static const unsigned n_vertices =
-  sizeof(vertices_rectangular) / sizeof(vertices_rectangular[0]);
-static const unsigned n_cells = 8;
+static const unsigned n_vertices = sizeof(vertices_rectangular) / sizeof(vertices_rectangular[0]);
+static const unsigned n_cells    = 8;
 
 template <int dim>
 class VectorFunction : public Function<dim>
@@ -148,8 +147,7 @@ VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 
 template <int dim>
 void
-VectorFunction<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
@@ -157,8 +155,7 @@ VectorFunction<dim>::vector_value(const Point<dim> &p,
 
 template <>
 Tensor<1, 3>
-VectorFunction<3>::gradient(const Point<3> &   p,
-                            const unsigned int component) const
+VectorFunction<3>::gradient(const Point<3> &p, const unsigned int component) const
 {
   const double PI = numbers::PI;
   Tensor<1, 3> val;
@@ -185,8 +182,7 @@ VectorFunction<3>::gradient(const Point<3> &   p,
   return val;
 }
 
-void create_tria(Triangulation<3> &triangulation,
-                 const Point<3> *  vertices_parallelograms)
+void create_tria(Triangulation<3> &triangulation, const Point<3> *vertices_parallelograms)
 {
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
@@ -244,13 +240,11 @@ test(const FiniteElement<dim> &fe,
   // MappingQ<dim> mapping(2);
   MappingQGeneric<dim>                                        mapping(1);
   std::vector<double>                                         div_v(n_q_points);
-  std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(
-    n_q_points);
-  std::vector<Tensor<3, dim>> hessians(n_q_points);
+  std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(n_q_points);
+  std::vector<Tensor<3, dim>>                                 hessians(n_q_points);
 
-  std::vector<Tensor<1, dim>> face_values(n_face_q_points);
-  std::vector<typename FEValuesViews::Vector<dim>::curl_type> face_curls(
-    n_face_q_points);
+  std::vector<Tensor<1, dim>>                                 face_values(n_face_q_points);
+  std::vector<typename FEValuesViews::Vector<dim>::curl_type> face_curls(n_face_q_points);
 
   for (unsigned cycle = 0; cycle < n_cycles; ++cycle)
     {
@@ -261,8 +255,7 @@ test(const FiniteElement<dim> &fe,
       constraints.close();
 
       Vector<double> v(dof_handler.n_dofs());
-      VectorTools::project(
-        mapping, dof_handler, constraints, quadrature, fe_function, v);
+      VectorTools::project(mapping, dof_handler, constraints, quadrature, fe_function, v);
 
       Vector<float> diff(triangulation.n_active_cells());
       VectorTools::integrate_difference(mapping,
@@ -273,30 +266,26 @@ test(const FiniteElement<dim> &fe,
                                         QGauss<dim>(fe.degree + 2),
                                         VectorTools::L1_norm);
 
-      typename FEValuesViews::Vector<dim>::curl_type total_curl,
-        boundary_tangentials;
-      Tensor<1, dim> total_curl_curl, boundary_curl_curl_traces;
-      double         total_div     = 0;
-      double         boundary_flux = 0;
+      typename FEValuesViews::Vector<dim>::curl_type total_curl, boundary_tangentials;
+      Tensor<1, dim>                                 total_curl_curl, boundary_curl_curl_traces;
+      double                                         total_div     = 0;
+      double                                         boundary_flux = 0;
       total_curl *= 0.;
       boundary_tangentials *= 0.;
 
       FEValues<dim>     fe_values(mapping,
                               fe,
                               quadrature,
-                              update_JxW_values | update_quadrature_points |
-                                update_values | update_gradients |
-                                update_hessians);
-      FEFaceValues<dim> fe_face_values(
-        mapping,
-        fe,
-        face_quadrature,
-        update_JxW_values | update_quadrature_points | update_values |
-          update_gradients | update_normal_vectors);
-      unsigned int cell_index = 0;
+                              update_JxW_values | update_quadrature_points | update_values |
+                                update_gradients | update_hessians);
+      FEFaceValues<dim> fe_face_values(mapping,
+                                       fe,
+                                       face_quadrature,
+                                       update_JxW_values | update_quadrature_points |
+                                         update_values | update_gradients | update_normal_vectors);
+      unsigned int      cell_index = 0;
 
-      for (typename DoFHandler<dim>::active_cell_iterator cell =
-             dof_handler.begin_active();
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell, ++cell_index)
         {
@@ -312,52 +301,42 @@ test(const FiniteElement<dim> &fe,
               if (dim == 3)
                 {
                   total_curl_curl[0] +=
-                    JxW_values[q_point] *
-                    (hessians[q_point][1][0][1] + hessians[q_point][2][0][2] -
-                     hessians[q_point][0][1][1] - hessians[q_point][0][2][2]);
+                    JxW_values[q_point] * (hessians[q_point][1][0][1] + hessians[q_point][2][0][2] -
+                                           hessians[q_point][0][1][1] - hessians[q_point][0][2][2]);
                   total_curl_curl[1] +=
-                    JxW_values[q_point] *
-                    (hessians[q_point][2][1][2] + hessians[q_point][0][0][1] -
-                     hessians[q_point][1][2][2] - hessians[q_point][1][0][0]);
+                    JxW_values[q_point] * (hessians[q_point][2][1][2] + hessians[q_point][0][0][1] -
+                                           hessians[q_point][1][2][2] - hessians[q_point][1][0][0]);
                   total_curl_curl[2] +=
-                    JxW_values[q_point] *
-                    (hessians[q_point][0][0][2] + hessians[q_point][1][1][2] -
-                     hessians[q_point][2][0][0] - hessians[q_point][2][1][1]);
+                    JxW_values[q_point] * (hessians[q_point][0][0][2] + hessians[q_point][1][1][2] -
+                                           hessians[q_point][2][0][0] - hessians[q_point][2][1][1]);
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             {
               fe_face_values.reinit(cell, face);
-              const std::vector<double> &face_JxW_values =
-                fe_face_values.get_JxW_values();
+              const std::vector<double> &face_JxW_values = fe_face_values.get_JxW_values();
               fe_face_values[vec].get_function_values(v, face_values);
               if (dim == 3)
                 fe_face_values[vec].get_function_curls(v, face_curls);
-              for (unsigned int q_point = 0; q_point < n_face_q_points;
-                   ++q_point)
+              for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                 {
-                  const Tensor<1, dim> &normal =
-                    fe_face_values.normal_vector(q_point);
+                  const Tensor<1, dim> &normal = fe_face_values.normal_vector(q_point);
 
                   // boundary flux
                   if (cell->at_boundary(face))
-                    boundary_flux += face_JxW_values[q_point] *
-                                     (face_values[q_point] * normal);
+                    boundary_flux += face_JxW_values[q_point] * (face_values[q_point] * normal);
                   else
-                    total_div -= face_JxW_values[q_point] *
-                                 (face_values[q_point] * normal);
+                    total_div -= face_JxW_values[q_point] * (face_values[q_point] * normal);
 
                   // boundary tangentials (curl traces)
                   typename FEValuesViews::Vector<dim>::curl_type n_x_v;
                   if (dim == 2)
-                    n_x_v[0] = (-normal[1] * face_values[q_point][0] +
-                                normal[0] * face_values[q_point][1]);
+                    n_x_v[0] =
+                      (-normal[1] * face_values[q_point][0] + normal[0] * face_values[q_point][1]);
                   else if (dim == 3)
-                    cross_product(*reinterpret_cast<Tensor<1, dim> *>(&n_x_v),
-                                  normal,
-                                  face_values[q_point]);
+                    cross_product(
+                      *reinterpret_cast<Tensor<1, dim> *>(&n_x_v), normal, face_values[q_point]);
 
                   if (cell->at_boundary(face))
                     boundary_tangentials += face_JxW_values[q_point] * n_x_v;
@@ -370,31 +349,26 @@ test(const FiniteElement<dim> &fe,
                       Tensor<1, dim> n_x_curl_u;
                       cross_product(n_x_curl_u,
                                     normal,
-                                    *reinterpret_cast<Tensor<1, dim> *>(
-                                      &face_curls[q_point]));
+                                    *reinterpret_cast<Tensor<1, dim> *>(&face_curls[q_point]));
                       if (cell->at_boundary(face))
-                        boundary_curl_curl_traces +=
-                          face_JxW_values[q_point] * n_x_curl_u;
+                        boundary_curl_curl_traces += face_JxW_values[q_point] * n_x_curl_u;
                       else
-                        total_curl_curl -=
-                          face_JxW_values[q_point] * n_x_curl_u;
+                        total_curl_curl -= face_JxW_values[q_point] * n_x_curl_u;
                     }
                 }
             }
         }
 
-      deallog << dof_handler.n_dofs() << "\t\t" << diff.l1_norm() << "\t"
-              << total_curl.norm() << "\t" << boundary_tangentials.norm()
-              << "\t" << total_curl_curl.norm() << "\t"
-              << boundary_curl_curl_traces.norm() << "\t" << total_div << "\t"
-              << boundary_flux << std::endl;
+      deallog << dof_handler.n_dofs() << "\t\t" << diff.l1_norm() << "\t" << total_curl.norm()
+              << "\t" << boundary_tangentials.norm() << "\t" << total_curl_curl.norm() << "\t"
+              << boundary_curl_curl_traces.norm() << "\t" << total_div << "\t" << boundary_flux
+              << std::endl;
 
       if (global)
         triangulation.refine_global();
       else
         {
-          GridRefinement::refine_and_coarsen_fixed_number(
-            triangulation, diff, 0.3, 0.0);
+          GridRefinement::refine_and_coarsen_fixed_number(triangulation, diff, 0.3, 0.0);
           triangulation.prepare_coarsening_and_refinement();
           triangulation.execute_coarsening_and_refinement();
         }

@@ -51,8 +51,7 @@ print_info(const FEEval &eval)
   deallog << "FEEvaluation::tensor_dofs_per_cell: " << v << std::endl;
   v = FEEval::static_dofs_per_cell;
   deallog << "FEEvaluation::static_dofs_per_cell: " << v << std::endl;
-  deallog << "FEEvaluation::dofs_per_component: " << eval.dofs_per_component
-          << std::endl;
+  deallog << "FEEvaluation::dofs_per_component: " << eval.dofs_per_component << std::endl;
   deallog << "FEEvaluation::dofs_per_cell: " << eval.dofs_per_cell << std::endl;
   deallog << "FEEvaluation::n_q_points: " << eval.n_q_points << std::endl;
 }
@@ -78,10 +77,8 @@ test()
       deallog << "Checking " << fes[i]->get_name() << std::endl;
       dof.distribute_dofs(*fes[i]);
       MatrixFree<dim> matrix_free;
-      matrix_free.reinit(dof,
-                         ConstraintMatrix(),
-                         QGauss<1>(degree + 3),
-                         typename MatrixFree<dim>::AdditionalData());
+      matrix_free.reinit(
+        dof, ConstraintMatrix(), QGauss<1>(degree + 3), typename MatrixFree<dim>::AdditionalData());
       if (i < 2)
         {
           FEEvaluation<dim, degree + 1, degree + 3, dim> phi(matrix_free);

@@ -32,8 +32,8 @@ DeclException5(ExcEl,
                double,
                double,
                double,
-               << "Error in element (" << arg1 << "," << arg2 << "): " << arg3
-               << " != " << arg4 << " delta=" << arg5);
+               << "Error in element (" << arg1 << "," << arg2 << "): " << arg3 << " != " << arg4
+               << " delta=" << arg5);
 
 template <typename NumberType>
 void

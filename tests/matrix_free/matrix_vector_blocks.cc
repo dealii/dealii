@@ -63,7 +63,7 @@ private:
   local_apply(const MatrixFree<dim, Number> &                        data,
               LinearAlgebra::distributed::BlockVector<Number> &      dst,
               const LinearAlgebra::distributed::BlockVector<Number> &src,
-              const std::pair<unsigned int, unsigned int> &cell_range) const
+              const std::pair<unsigned int, unsigned int> &          cell_range) const
   {
     AssertDimension(src.n_blocks(), dst.n_blocks());
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> phi(data);
@@ -98,9 +98,8 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  cell                                                   = tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+  cell = tria.begin_active();
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm() < 0.2)
@@ -134,8 +133,7 @@ test()
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -144,25 +142,20 @@ test()
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, number>::AdditionalData data;
-    data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
+    data.tasks_parallel_scheme             = MatrixFree<dim, number>::AdditionalData::none;
     data.overlap_communication_computation = false;
     mf_data.reinit(dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 number,
-                 LinearAlgebra::distributed::Vector<number>>
-                                          mf_ref(mf_data);
+  MatrixFreeTest<dim, fe_degree, number, LinearAlgebra::distributed::Vector<number>> mf_ref(
+    mf_data);
   MatrixFreeBlock<dim, fe_degree, number> mf(mf_data);
 
   // make sure that the value we set here at least includes some case where we
   // need to go to the alternative case of calling the full
   // update_ghost_values()
-  Assert(
-    LinearAlgebra::distributed::BlockVector<number>::communication_block_size <
-      80,
-    ExcInternalError());
+  Assert(LinearAlgebra::distributed::BlockVector<number>::communication_block_size < 80,
+         ExcInternalError());
   for (unsigned int n_blocks = 5; n_blocks < 81; n_blocks *= 2)
     {
       LinearAlgebra::distributed::BlockVector<number> in, out, ref;
@@ -206,8 +199,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   mpi_initlog();
   deallog << std::setprecision(4);

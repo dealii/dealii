@@ -65,8 +65,7 @@ test()
   else
     Assert(false, ExcNotImplemented());
 
-  TrilinosWrappers::SparsityPattern sp(
-    row_partitioning, col_partitioning, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(row_partitioning, col_partitioning, MPI_COMM_WORLD);
   if ((n_procs == 1) || (my_id == 1))
     sp.add(2, 3);
   sp.compress();
@@ -87,8 +86,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int       myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);

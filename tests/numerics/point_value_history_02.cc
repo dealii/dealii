@@ -58,7 +58,7 @@ class Postprocess : public DataPostprocessor<dim>
 public:
   void
   evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &inputs,
-                        std::vector<Vector<double>> &computed_quantities) const;
+                        std::vector<Vector<double>> &               computed_quantities) const;
 
   std::vector<std::string>
   get_names() const;
@@ -97,13 +97,11 @@ Postprocess<dim>::n_output_variables() const
 
 template <int dim>
 void
-Postprocess<dim>::evaluate_vector_field(
-  const DataPostprocessorInputs::Vector<dim> &inputs,
-  std::vector<Vector<double>> &               computed_quantities) const
+Postprocess<dim>::evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &inputs,
+                                        std::vector<Vector<double>> &computed_quantities) const
 {
   Assert(computed_quantities.size() == inputs.solution_values.size(),
-         ExcDimensionMismatch(computed_quantities.size(),
-                              inputs.solution_values.size()));
+         ExcDimensionMismatch(computed_quantities.size(), inputs.solution_values.size()));
 
   for (unsigned int i = 0; i < computed_quantities.size(); i++)
     {
@@ -112,13 +110,10 @@ Postprocess<dim>::evaluate_vector_field(
       Assert(inputs.solution_values[i].size() == dim + 1,
              ExcDimensionMismatch(inputs.solution_values[i].size(), dim + 1));
 
-      computed_quantities[i](0) =
-        inputs.solution_gradients[i][0].norm(); // norm of x gradient
-      computed_quantities[i](1) =
-        inputs.solution_hessians[i][1].norm(); // norm of y hessian
-      computed_quantities[i](2) =
-        inputs.solution_gradients[i][0].norm() +
-        inputs.solution_hessians[i][1].norm(); // norm of y hessian
+      computed_quantities[i](0) = inputs.solution_gradients[i][0].norm(); // norm of x gradient
+      computed_quantities[i](1) = inputs.solution_hessians[i][1].norm();  // norm of y hessian
+      computed_quantities[i](2) = inputs.solution_gradients[i][0].norm() +
+                                  inputs.solution_hessians[i][1].norm(); // norm of y hessian
       computed_quantities[i](3) = inputs.solution_values[i].l2_norm();
     }
 }
@@ -211,17 +206,15 @@ TestPointValueHistory<dim>::run()
   // and this is not corrected for. The code used in this test simplified from
   // point_value_history_01.
   {
-    Quadrature<dim> quadrature_formula(
-      finite_element.get_unit_support_points());
-    FEValues<dim> fe_values(
-      finite_element,
-      quadrature_formula,
-      update_values | update_quadrature_points); // just need local_dof_indices
-                                                 // and quadrature_points
+    Quadrature<dim> quadrature_formula(finite_element.get_unit_support_points());
+    FEValues<dim>   fe_values(finite_element,
+                            quadrature_formula,
+                            update_values |
+                              update_quadrature_points); // just need local_dof_indices
+                                                           // and quadrature_points
 
-    std::vector<types::global_dof_index> local_dof_indices(
-      finite_element.dofs_per_cell);
-    std::vector<Point<dim>> dof_locations(finite_element.dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(finite_element.dofs_per_cell);
+    std::vector<Point<dim>>              dof_locations(finite_element.dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator cell, endc;
     cell = dof_handler.begin_active();
@@ -234,11 +227,9 @@ TestPointValueHistory<dim>::run()
 
         for (unsigned int dof = 0; dof != finite_element.dofs_per_cell; dof++)
           {
-            unsigned int dof_component =
-              finite_element.system_to_component_index(dof).first;
+            unsigned int dof_component = finite_element.system_to_component_index(dof).first;
 
-            poles(local_dof_indices[dof]) =
-              -dof_locations[dof](dof_component % dim);
+            poles(local_dof_indices[dof]) = -dof_locations[dof](dof_component % dim);
 
             if (dof_component == dim) // components start numbering at 0
               poles(local_dof_indices[dof]) =
@@ -284,8 +275,7 @@ TestPointValueHistory<dim>::run()
     solution_names.emplace_back("Y velocity");
     solution_names.emplace_back("Z velocity");
     node_monitor.add_component_names("Solution", solution_names);
-    node_monitor.add_field_name(
-      "Post Processed Vector"); // not sensitive to spaces
+    node_monitor.add_field_name("Post Processed Vector"); // not sensitive to spaces
     std::vector<bool> component_mask(3, false);
     component_mask[2] = true;
     node_monitor.add_field_name("Pressure", component_mask);
@@ -306,8 +296,7 @@ TestPointValueHistory<dim>::run()
     // two alternatives here, adding a point at a time or a vector of points
     // 2d points
     std::vector<Point<2>> point_vector(5, Point<2>());
-    point_vector[0] =
-      Point<2>(0, 0); // some of these points will hit a node, others won't
+    point_vector[0] = Point<2>(0, 0); // some of these points will hit a node, others won't
     point_vector[1] = Point<2>(0.25, 0);
     point_vector[2] = Point<2>(0.25, 0.45);
     point_vector[3] = Point<2>(0.45, 0.45);
@@ -325,8 +314,7 @@ TestPointValueHistory<dim>::run()
     node_monitor.get_support_locations(selected_locations);
     Vector<double> node_locations = node_monitor.mark_support_locations();
     QGauss<dim>    postprocess_quadrature(2);
-    node_monitor.get_postprocessor_locations(postprocess_quadrature,
-                                             postprocessor_locations);
+    node_monitor.get_postprocessor_locations(postprocess_quadrature, postprocessor_locations);
   }
 
   double       delta_t = 0.000001;
@@ -353,8 +341,7 @@ TestPointValueHistory<dim>::run()
       std::vector<std::string> names;
       names.emplace_back("Vector_out");
       names.emplace_back("Scalar_out");
-      node_monitor.evaluate_field(
-        names, solution, postprocessor, postprocess_quadrature);
+      node_monitor.evaluate_field(names, solution, postprocessor, postprocess_quadrature);
       //         output_results (step, solution);
       step++;
 
@@ -406,24 +393,19 @@ TestPointValueHistory<dim>::run()
 
 template <int dim>
 void
-TestPointValueHistory<dim>::output_results(unsigned int   step,
-                                           Vector<double> solution) const
+TestPointValueHistory<dim>::output_results(unsigned int step, Vector<double> solution) const
 {
   std::vector<std::string> solution_names(dim, "velocity");
   solution_names.emplace_back("pressure");
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(
-      dim, DataComponentInterpretation::component_is_part_of_vector);
-  data_component_interpretation.push_back(
-    DataComponentInterpretation::component_is_scalar);
+    data_component_interpretation(dim, DataComponentInterpretation::component_is_part_of_vector);
+  data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
-  data_out.add_data_vector(solution,
-                           solution_names,
-                           DataOut<dim>::type_dof_data,
-                           data_component_interpretation);
+  data_out.add_data_vector(
+    solution, solution_names, DataOut<dim>::type_dof_data, data_component_interpretation);
   data_out.build_patches(2);
 
   std::ostringstream filename;

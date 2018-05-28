@@ -32,8 +32,7 @@ check(const Function<dim> &f, const unsigned int degree)
 
   std::vector<double> dofs(fe.dofs_per_cell);
 
-  std::vector<Vector<double>> values(fe.get_unit_support_points().size(),
-                                     Vector<double>(1));
+  std::vector<Vector<double>> values(fe.get_unit_support_points().size(), Vector<double>(1));
   f.vector_value_list(fe.get_unit_support_points(), values);
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
   deallog << " vector " << difference(fe, dofs, f) << std::endl;

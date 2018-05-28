@@ -93,7 +93,7 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int                     myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   test<2>();
 }

@@ -75,8 +75,7 @@ test()
     solution(i) = i;
 
   // do the test
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
@@ -86,8 +85,7 @@ test()
 
       // then do the same with the "correct", local fe_index
       Vector<double> local2(cell->get_fe().dofs_per_cell);
-      cell->get_interpolated_dof_values(
-        solution, local2, cell->active_fe_index());
+      cell->get_interpolated_dof_values(solution, local2, cell->active_fe_index());
 
       // and do it a third time with the fe_index for a Q1 element
       Vector<double> local3(fe[0].dofs_per_cell);
@@ -99,10 +97,8 @@ test()
       // also for the second test. note that vertex dofs always come first in
       // local1, so we can easily compare
       for (unsigned int i = 0; i < fe[0].dofs_per_cell; ++i)
-        AssertThrow(std::abs(local1[i] - local3[i]) <
-                      1e-15 * dof_handler.n_dofs(),
-                    ExcInternalError("Got difference " +
-                                     std::to_string(local1[i] - local3[i])));
+        AssertThrow(std::abs(local1[i] - local3[i]) < 1e-15 * dof_handler.n_dofs(),
+                    ExcInternalError("Got difference " + std::to_string(local1[i] - local3[i])));
     }
   deallog << "OK" << std::endl;
 }

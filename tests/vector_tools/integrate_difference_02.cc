@@ -84,21 +84,14 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
   QIterated<dim> quadrature(QTrapez<1>(), 5);
 
   const dealii::Function<dim, double> *w = nullptr;
-  VectorTools::integrate_difference(dofh,
-                                    solution,
-                                    Functions::ZeroFunction<dim>(dim),
-                                    cellwise_errors,
-                                    quadrature,
-                                    norm,
-                                    w,
-                                    exp);
+  VectorTools::integrate_difference(
+    dofh, solution, Functions::ZeroFunction<dim>(dim), cellwise_errors, quadrature, norm, w, exp);
 
-  const double error =
-    VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
+  const double error = VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
 
   const double difference = std::abs(error - value);
-  deallog << "computed: " << error << " expected: " << value
-          << " difference: " << difference << std::endl;
+  deallog << "computed: " << error << " expected: " << value << " difference: " << difference
+          << std::endl;
   Assert(difference < 2e-3, ExcMessage("Error in integrate_difference"));
 }
 

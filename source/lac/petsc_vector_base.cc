@@ -45,8 +45,7 @@ namespace PETScWrappers
       if (vector.ghosted)
         {
           PetscInt       begin, end;
-          PetscErrorCode ierr =
-            VecGetOwnershipRange(vector.vector, &begin, &end);
+          PetscErrorCode ierr = VecGetOwnershipRange(vector.vector, &begin, &end);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
           Vec locally_stored_elements = PETSC_NULL;
@@ -63,8 +62,7 @@ namespace PETScWrappers
 
           PetscScalar value;
 
-          if (index >= static_cast<size_type>(begin) &&
-              index < static_cast<size_type>(end))
+          if (index >= static_cast<size_type>(begin) && index < static_cast<size_type>(end))
             {
               // local entry
               value = *(ptr + index - begin);
@@ -72,19 +70,16 @@ namespace PETScWrappers
           else
             {
               // ghost entry
-              const size_type ghostidx =
-                vector.ghost_indices.index_within_set(index);
+              const size_type ghostidx = vector.ghost_indices.index_within_set(index);
 
-              Assert(ghostidx + end - begin < (size_type)lsize,
-                     ExcInternalError());
+              Assert(ghostidx + end - begin < (size_type)lsize, ExcInternalError());
               value = *(ptr + ghostidx + end - begin);
             }
 
           ierr = VecRestoreArray(locally_stored_elements, &ptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-          ierr =
-            VecGhostRestoreLocalForm(vector.vector, &locally_stored_elements);
+          ierr = VecGhostRestoreLocalForm(vector.vector, &locally_stored_elements);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
           return value;
@@ -99,8 +94,7 @@ namespace PETScWrappers
       PetscErrorCode ierr = VecGetOwnershipRange(vector.vector, &begin, &end);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      AssertThrow((index >= static_cast<size_type>(begin)) &&
-                    (index < static_cast<size_type>(end)),
+      AssertThrow((index >= static_cast<size_type>(begin)) && (index < static_cast<size_type>(end)),
                   ExcAccessToNonlocalElement(index, begin, end - 1));
 
       PetscInt    idx = index;
@@ -282,8 +276,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::set(const std::vector<size_type> &  indices,
-                  const std::vector<PetscScalar> &values)
+  VectorBase::set(const std::vector<size_type> &indices, const std::vector<PetscScalar> &values)
   {
     Assert(indices.size() == values.size(),
            ExcMessage("Function called with arguments of different sizes"));
@@ -293,8 +286,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add(const std::vector<size_type> &  indices,
-                  const std::vector<PetscScalar> &values)
+  VectorBase::add(const std::vector<size_type> &indices, const std::vector<PetscScalar> &values)
   {
     Assert(indices.size() == values.size(),
            ExcMessage("Function called with arguments of different sizes"));
@@ -315,9 +307,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add(const size_type    n_elements,
-                  const size_type *  indices,
-                  const PetscScalar *values)
+  VectorBase::add(const size_type n_elements, const size_type *indices, const PetscScalar *values)
   {
     do_set_add_operation(n_elements, indices, values, true);
   }
@@ -346,9 +336,7 @@ namespace PETScWrappers
 
 
   PetscScalar
-  VectorBase::add_and_dot(const PetscScalar a,
-                          const VectorBase &V,
-                          const VectorBase &W)
+  VectorBase::add_and_dot(const PetscScalar a, const VectorBase &V, const VectorBase &W)
   {
     this->add(a, V);
     return *this * W;
@@ -367,27 +355,20 @@ namespace PETScWrappers
       int my_int_last_action = last_action;
       int all_int_last_action;
 
-      const int ierr = MPI_Allreduce(&my_int_last_action,
-                                     &all_int_last_action,
-                                     1,
-                                     MPI_INT,
-                                     MPI_BOR,
-                                     get_mpi_communicator());
+      const int ierr = MPI_Allreduce(
+        &my_int_last_action, &all_int_last_action, 1, MPI_INT, MPI_BOR, get_mpi_communicator());
       AssertThrowMPI(ierr);
 
-      AssertThrow(all_int_last_action != (::dealii::VectorOperation::add |
-                                          ::dealii::VectorOperation::insert),
+      AssertThrow(all_int_last_action !=
+                    (::dealii::VectorOperation::add | ::dealii::VectorOperation::insert),
                   ExcMessage("Error: not all processors agree on the last "
                              "VectorOperation before this compress() call."));
 #    endif
 #  endif
     }
 
-    AssertThrow(
-      last_action == ::dealii::VectorOperation::unknown ||
-        last_action == operation,
-      ExcMessage(
-        "Missing compress() or calling with wrong VectorOperation argument."));
+    AssertThrow(last_action == ::dealii::VectorOperation::unknown || last_action == operation,
+                ExcMessage("Missing compress() or calling with wrong VectorOperation argument."));
 
     // note that one may think that
     // we only need to do something
@@ -779,9 +760,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::sadd(const PetscScalar s,
-                   const PetscScalar a,
-                   const VectorBase &v)
+  VectorBase::sadd(const PetscScalar s, const PetscScalar a, const VectorBase &v)
   {
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
@@ -841,8 +820,7 @@ namespace PETScWrappers
     // TODO[TH]:assert(is_compressed())
 
     // Set options
-    PetscErrorCode ierr =
-      PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, format);
+    PetscErrorCode ierr = PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, format);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
@@ -943,10 +921,8 @@ namespace PETScWrappers
                                    const bool         add_values)
   {
     ::dealii::VectorOperation::values action =
-      (add_values ? ::dealii::VectorOperation::add :
-                    ::dealii::VectorOperation::insert);
-    Assert((last_action == action) ||
-             (last_action == ::dealii::VectorOperation::unknown),
+      (add_values ? ::dealii::VectorOperation::add : ::dealii::VectorOperation::insert);
+    Assert((last_action == action) || (last_action == ::dealii::VectorOperation::unknown),
            internal::VectorReference::ExcWrongMode(action, last_action));
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     // VecSetValues complains if we
@@ -957,12 +933,10 @@ namespace PETScWrappers
     // (unlike the above calls)
     if (n_elements != 0)
       {
-        const PetscInt *petsc_indices =
-          reinterpret_cast<const PetscInt *>(indices);
+        const PetscInt *petsc_indices = reinterpret_cast<const PetscInt *>(indices);
 
         const InsertMode     mode = (add_values ? ADD_VALUES : INSERT_VALUES);
-        const PetscErrorCode ierr =
-          VecSetValues(vector, n_elements, petsc_indices, values, mode);
+        const PetscErrorCode ierr = VecSetValues(vector, n_elements, petsc_indices, values, mode);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 

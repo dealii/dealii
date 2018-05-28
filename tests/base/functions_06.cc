@@ -38,8 +38,7 @@ check1()
         p[d] = i + d;
 
       for (unsigned int c = 0; c < 3; ++c)
-        AssertThrow(object.value(p, c) == (c == 1 ? p.norm() : 0),
-                    ExcInternalError());
+        AssertThrow(object.value(p, c) == (c == 1 ? p.norm() : 0), ExcInternalError());
 
       Vector<double> v(3);
       object.vector_value(p, v);

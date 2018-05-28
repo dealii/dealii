@@ -35,8 +35,7 @@ Histogram::logarithmic_less(const number n1, const number n2)
 
 
 
-Histogram::Interval::Interval(const double left_point,
-                              const double right_point) :
+Histogram::Interval::Interval(const double left_point, const double right_point) :
   left_point(left_point),
   right_point(right_point),
   content(0)
@@ -59,11 +58,9 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
                     const unsigned int                 n_intervals,
                     const IntervalSpacing              interval_spacing)
 {
-  Assert(
-    values.size() > 0,
-    ExcMessage("Your input data needs to contain at least one input vector."));
-  Assert(n_intervals > 0,
-         ExcMessage("The number of intervals needs to be at least one."));
+  Assert(values.size() > 0,
+         ExcMessage("Your input data needs to contain at least one input vector."));
+  Assert(n_intervals > 0, ExcMessage("The number of intervals needs to be at least one."));
   for (unsigned int i = 0; i < values.size(); ++i)
     Assert(values[i].size() > 0, ExcEmptyData());
   Assert(values.size() == y_values_.size(),
@@ -85,11 +82,9 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
           for (unsigned int i = 1; i < values.size(); ++i)
             {
               min_value =
-                std::min(min_value,
-                         *std::min_element(values[i].begin(), values[i].end()));
+                std::min(min_value, *std::min_element(values[i].begin(), values[i].end()));
               max_value =
-                std::max(max_value,
-                         *std::max_element(values[i].begin(), values[i].end()));
+                std::max(max_value, *std::max_element(values[i].begin(), values[i].end()));
             };
 
           break;
@@ -101,25 +96,23 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
           const comparator logarithmic_less_function =
             &Histogram::template logarithmic_less<number>;
 
-          min_value = *std::min_element(
-            values[0].begin(), values[0].end(), logarithmic_less_function);
+          min_value =
+            *std::min_element(values[0].begin(), values[0].end(), logarithmic_less_function);
 
-          max_value = *std::max_element(
-            values[0].begin(), values[0].end(), logarithmic_less_function);
+          max_value =
+            *std::max_element(values[0].begin(), values[0].end(), logarithmic_less_function);
 
           for (unsigned int i = 1; i < values.size(); ++i)
             {
-              min_value = std::min(min_value,
-                                   *std::min_element(values[i].begin(),
-                                                     values[i].end(),
-                                                     logarithmic_less_function),
-                                   logarithmic_less_function);
+              min_value = std::min(
+                min_value,
+                *std::min_element(values[i].begin(), values[i].end(), logarithmic_less_function),
+                logarithmic_less_function);
 
-              max_value = std::max(max_value,
-                                   *std::max_element(values[i].begin(),
-                                                     values[i].end(),
-                                                     logarithmic_less_function),
-                                   logarithmic_less_function);
+              max_value = std::max(
+                max_value,
+                *std::max_element(values[i].begin(), values[i].end(), logarithmic_less_function),
+                logarithmic_less_function);
             }
 
           break;
@@ -155,21 +148,18 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
           const float delta = (max_value - min_value) / n_intervals;
 
           for (unsigned int n = 0; n < n_intervals; ++n)
-            intervals[0].emplace_back(min_value + n * delta,
-                                      min_value + (n + 1) * delta);
+            intervals[0].emplace_back(min_value + n * delta, min_value + (n + 1) * delta);
 
           break;
         };
 
       case logarithmic:
         {
-          const float delta =
-            (std::log(max_value) - std::log(min_value)) / n_intervals;
+          const float delta = (std::log(max_value) - std::log(min_value)) / n_intervals;
 
           for (unsigned int n = 0; n < n_intervals; ++n)
-            intervals[0].emplace_back(
-              std::exp(std::log(min_value) + n * delta),
-              std::exp(std::log(min_value) + (n + 1) * delta));
+            intervals[0].emplace_back(std::exp(std::log(min_value) + n * delta),
+                                      std::exp(std::log(min_value) + (n + 1) * delta));
 
           break;
         };
@@ -185,9 +175,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
 
   // finally fill the intervals
   for (unsigned int i = 0; i < values.size(); ++i)
-    for (typename Vector<number>::const_iterator p = values[i].begin();
-         p < values[i].end();
-         ++p)
+    for (typename Vector<number>::const_iterator p = values[i].begin(); p < values[i].end(); ++p)
       {
         // find the right place for *p in
         // intervals[i]. use regular
@@ -213,8 +201,7 @@ Histogram::evaluate(const Vector<number> &values,
                     const IntervalSpacing interval_spacing)
 {
   std::vector<Vector<number>> values_list(1, values);
-  evaluate(
-    values_list, std::vector<double>(1, 0.), n_intervals, interval_spacing);
+  evaluate(values_list, std::vector<double>(1, 0.), n_intervals, interval_spacing);
 }
 
 
@@ -232,10 +219,8 @@ Histogram::write_gnuplot(std::ostream &out) const
   if (intervals.size() == 1)
     {
       for (unsigned int n = 0; n < intervals[0].size(); ++n)
-        out << intervals[0][n].left_point << ' ' << intervals[0][n].content
-            << std::endl
-            << intervals[0][n].right_point << ' ' << intervals[0][n].content
-            << std::endl;
+        out << intervals[0][n].left_point << ' ' << intervals[0][n].content << std::endl
+            << intervals[0][n].right_point << ' ' << intervals[0][n].content << std::endl;
     }
   else
     // otherwise create a whole 3d plot
@@ -262,10 +247,10 @@ Histogram::write_gnuplot(std::ostream &out) const
 
         out << std::endl;
         for (unsigned int n = 0; n < intervals[i].size(); ++n)
-          out << intervals[i][n].left_point << ' ' << y_values[i] << ' '
-              << intervals[i][n].content << std::endl
-              << intervals[i][n].right_point << ' ' << y_values[i] << ' '
-              << intervals[i][n].content << std::endl;
+          out << intervals[i][n].left_point << ' ' << y_values[i] << ' ' << intervals[i][n].content
+              << std::endl
+              << intervals[i][n].right_point << ' ' << y_values[i] << ' ' << intervals[i][n].content
+              << std::endl;
 
         out << std::endl;
       };
@@ -326,7 +311,7 @@ template void
 Histogram::evaluate<double>(const std::vector<Vector<double>> &values,
                             const std::vector<double> &        y_values,
                             const unsigned int                 n_intervals,
-                            const IntervalSpacing interval_spacing);
+                            const IntervalSpacing              interval_spacing);
 template void
 Histogram::evaluate<double>(const Vector<double> &values,
                             const unsigned int    n_intervals,

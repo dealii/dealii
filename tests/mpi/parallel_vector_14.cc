@@ -53,8 +53,7 @@ test()
   // and once where they have not
   for (unsigned int run = 0; run < 2; ++run)
     {
-      LinearAlgebra::distributed::Vector<double> v(
-        local_owned, local_relevant, MPI_COMM_WORLD);
+      LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
       // set local values
       if (myid < 2)
@@ -85,8 +84,7 @@ test()
         }
 
       // copy vector content to non-ghosted vectors, manually created.
-      LinearAlgebra::distributed::Vector<double> v_dist(local_owned,
-                                                        MPI_COMM_WORLD),
+      LinearAlgebra::distributed::Vector<double> v_dist(local_owned, MPI_COMM_WORLD),
         w_dist(v_dist), u_dist(v_dist);
 
       v_dist = v;
@@ -130,8 +128,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

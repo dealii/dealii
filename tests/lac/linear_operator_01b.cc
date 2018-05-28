@@ -25,8 +25,7 @@
 
 #include "../tests.h"
 
-#define PRINTME(name, var) \
-  deallog << "Solution vector: " << name << ": " << var;
+#define PRINTME(name, var) deallog << "Solution vector: " << name << ": " << var;
 
 using namespace dealii;
 
@@ -58,8 +57,7 @@ main()
     SolverCG<Vector<double>>                 solver_A_1(solver_control_A_1);
     PreconditionJacobi<SparseMatrix<double>> preconditioner_A_1;
     preconditioner_A_1.initialize(A);
-    const auto lo_A_inv =
-      inverse_operator(lo_A, solver_A_1, preconditioner_A_1);
+    const auto lo_A_inv   = inverse_operator(lo_A, solver_A_1, preconditioner_A_1);
     const auto lo_A_inv_t = transpose_operator(lo_A_inv);
 
     // build inverse of transpose
@@ -67,8 +65,7 @@ main()
     SolverCG<Vector<double>>                 solver_A_2(solver_control_A_2);
     PreconditionJacobi<SparseMatrix<double>> preconditioner_A_2;
     preconditioner_A_2.initialize(A);
-    const auto lo_A_t_inv =
-      inverse_operator(lo_A_t, solver_A_2, preconditioner_A_2);
+    const auto lo_A_t_inv = inverse_operator(lo_A_t, solver_A_2, preconditioner_A_2);
 
 
 
@@ -109,48 +106,40 @@ main()
 
     deallog << "Single packaged operation" << std::endl;
     {
-      const auto S = lo_D - lo_C * lo_A_inv * lo_B;
-      const auto S_t_1 =
-        lo_D_t - lo_B_t * lo_A_inv_t * lo_C_t; // using transpose of inverse
-      const auto S_t_2 =
-        lo_D_t - lo_B_t * lo_A_t_inv * lo_C_t; // using inverse of transpose
+      const auto S     = lo_D - lo_C * lo_A_inv * lo_B;
+      const auto S_t_1 = lo_D_t - lo_B_t * lo_A_inv_t * lo_C_t; // using transpose of inverse
+      const auto S_t_2 = lo_D_t - lo_B_t * lo_A_t_inv * lo_C_t; // using inverse of transpose
 
       const Vector<double> x5  = S * b;
       const Vector<double> x6a = S_t_1 * b;
       const Vector<double> x6b = S_t_2 * b;
 
-      deallog << "x5==x6a : " << (x5 == x6a)
-              << std::endl; // using transpose of inverse
-      deallog << "x5==x6b : " << (x5 == x6b)
-              << std::endl; // using inverse of transpose
-                            //      PRINTME("x5", x5);
-                            //      PRINTME("x6a", x6a);
-                            //      PRINTME("x6b", x6b);
+      deallog << "x5==x6a : " << (x5 == x6a) << std::endl; // using transpose of inverse
+      deallog << "x5==x6b : " << (x5 == x6b) << std::endl; // using inverse of transpose
+                                                           //      PRINTME("x5", x5);
+                                                           //      PRINTME("x6a", x6a);
+                                                           //      PRINTME("x6b", x6b);
     }
 
     deallog << "Manual operations" << std::endl;
     {
-      const Vector<double> x5a = lo_B * b;
-      const Vector<double> x5b = lo_A_inv * x5a;
-      const Vector<double> x5c = lo_C * x5b;
-      const Vector<double> x5d = lo_D * b - x5c;
-      const Vector<double> x6a = lo_C_t * b;
-      const Vector<double> x6b_1 =
-        lo_A_inv_t * x6a; // using transpose of inverse
+      const Vector<double> x5a   = lo_B * b;
+      const Vector<double> x5b   = lo_A_inv * x5a;
+      const Vector<double> x5c   = lo_C * x5b;
+      const Vector<double> x5d   = lo_D * b - x5c;
+      const Vector<double> x6a   = lo_C_t * b;
+      const Vector<double> x6b_1 = lo_A_inv_t * x6a; // using transpose of inverse
       const Vector<double> x6c_1 = lo_B_t * x6b_1;
       const Vector<double> x6d_1 = lo_D_t * b - x6c_1;
-      const Vector<double> x6b_2 =
-        lo_A_t_inv * x6a; // using inverse of transpose
+      const Vector<double> x6b_2 = lo_A_t_inv * x6a; // using inverse of transpose
       const Vector<double> x6c_2 = lo_B_t * x6b_2;
       const Vector<double> x6d_2 = lo_D_t * b - x6c_2;
 
       deallog << "x5a==x6a : " << (x5a == x6a) << std::endl;
-      deallog << "x5b==x6b_1 : " << (x5b == x6b_1)
-              << std::endl; // using transpose of inverse
+      deallog << "x5b==x6b_1 : " << (x5b == x6b_1) << std::endl; // using transpose of inverse
       deallog << "x5c==x6c_1 : " << (x5c == x6c_1) << std::endl;
       deallog << "x5d==x6d_1 : " << (x5d == x6d_1) << std::endl;
-      deallog << "x5b==x6b_2 : " << (x5b == x6b_2)
-              << std::endl; // using inverse of transpose
+      deallog << "x5b==x6b_2 : " << (x5b == x6b_2) << std::endl; // using inverse of transpose
       deallog << "x5c==x6c_2 : " << (x5c == x6c_2) << std::endl;
       deallog << "x5d==x6d_2 : " << (x5d == x6d_2) << std::endl;
       //     PRINTME("x5a", x5a);

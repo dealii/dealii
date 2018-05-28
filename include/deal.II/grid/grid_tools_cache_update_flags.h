@@ -49,8 +49,7 @@ namespace GridTools
      * Update vertex_to_cell_centers_directions, as returned by
      * GridTools::vertex_to_cell_centers_directions()
      */
-    update_vertex_to_cell_centers_directions =
-      update_vertex_to_cell_map | 0x0002,
+    update_vertex_to_cell_centers_directions = update_vertex_to_cell_map | 0x0002,
 
     /**
      * Update a KDTree object, initialized with the vertices of the
@@ -149,8 +148,7 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  inline CacheUpdateFlags operator&(const CacheUpdateFlags f1,
-                                    const CacheUpdateFlags f2)
+  inline CacheUpdateFlags operator&(const CacheUpdateFlags f1, const CacheUpdateFlags f2)
   {
     return static_cast<CacheUpdateFlags>(static_cast<unsigned int>(f1) &
                                          static_cast<unsigned int>(f2));

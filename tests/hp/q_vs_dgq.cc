@@ -75,8 +75,7 @@ namespace Step27
     triangulation.refine_global(1);
 
     // looping over all cells and assigning the FE_DG object to the first cell
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                        endc = dof_handler.end();
     for (unsigned int counter = 0; cell != endc; ++cell, counter++)
       if (counter == 0)
@@ -86,10 +85,8 @@ namespace Step27
 
     dof_handler.distribute_dofs(fe_collection);
 
-    deallog << "   Number of active cells:       "
-            << triangulation.n_active_cells() << std::endl
-            << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+    deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl
+            << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
   }
 } // namespace Step27
 

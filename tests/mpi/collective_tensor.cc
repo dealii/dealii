@@ -27,7 +27,7 @@ test()
 {
   Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
-  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int       myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (myid == 0)
@@ -75,8 +75,7 @@ test()
   rank_2_tensor[2][1] = 8.0;
   rank_2_tensor[2][2] = 9.0;
 
-  Tensor<2, 3> result_rank_2 =
-    Utilities::MPI::sum(rank_2_tensor, MPI_COMM_WORLD);
+  Tensor<2, 3> result_rank_2 = Utilities::MPI::sum(rank_2_tensor, MPI_COMM_WORLD);
 
   if (myid == 0)
     deallog << "Rank 2 tensor: " << result_rank_2 << std::endl;
@@ -87,8 +86,7 @@ test()
   symmetric_tensor[0][1] = 2.0;
   symmetric_tensor[1][1] = 3.0;
 
-  SymmetricTensor<2, 2> result_symmetric =
-    Utilities::MPI::sum(symmetric_tensor, MPI_COMM_WORLD);
+  SymmetricTensor<2, 2> result_symmetric = Utilities::MPI::sum(symmetric_tensor, MPI_COMM_WORLD);
 
   if (myid == 0)
     deallog << "Symmetric tensor: " << result_symmetric << std::endl;
@@ -99,8 +97,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;

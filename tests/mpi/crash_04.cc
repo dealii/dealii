@@ -53,8 +53,7 @@ test()
   triangulation.refine_global(1);
 
   {
-    typename Triangulation<dim>::cell_iterator it =
-      triangulation.begin_active();
+    typename Triangulation<dim>::cell_iterator it = triangulation.begin_active();
     it->set_refine_flag();
     triangulation.execute_coarsening_and_refinement();
 
@@ -80,8 +79,7 @@ test()
       {
         unsigned int index = 0;
 
-        for (typename Triangulation<dim>::active_cell_iterator cell =
-               triangulation.begin_active();
+        for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
              cell != triangulation.end();
              ++cell, ++index)
           {
@@ -101,8 +99,8 @@ test()
       }
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         {
-          deallog << "id=" << triangulation.locally_owned_subdomain()
-                  << " n_coarsen=" << n_coarse << std::endl;
+          deallog << "id=" << triangulation.locally_owned_subdomain() << " n_coarsen=" << n_coarse
+                  << std::endl;
           for (unsigned int i = 0; i < subdomain.size(); ++i)
             deallog << subdomain(i) << std::endl;
         }

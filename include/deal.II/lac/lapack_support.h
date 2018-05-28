@@ -188,19 +188,17 @@ namespace LAPACKSupport
   DeclException2(ExcErrorCode,
                  char *,
                  types::blas_int,
-                 << "The function " << arg1 << " returned with an error code "
-                 << arg2);
+                 << "The function " << arg1 << " returned with an error code " << arg2);
 
   /**
    * Exception thrown when a matrix is not in a suitable state for an
    * operation. For instance, a LAPACK routine may have left the matrix in an
    * unusable state, then vmult does not make sense anymore.
    */
-  DeclException1(
-    ExcState,
-    State,
-    << "The function cannot be called while the matrix is in state "
-    << state_name(arg1));
+  DeclException1(ExcState,
+                 State,
+                 << "The function cannot be called while the matrix is in state "
+                 << state_name(arg1));
 
   /**
    * Exception thrown when a matrix does not have suitable properties for an
@@ -208,23 +206,21 @@ namespace LAPACKSupport
    */
   DeclException1(ExcProperty,
                  Property,
-                 << "The function cannot be called with a "
-                 << property_name(arg1) << " matrix.");
+                 << "The function cannot be called with a " << property_name(arg1) << " matrix.");
 
   /**
    * This exception is thrown if a certain LAPACK function is not available
    * because no LAPACK installation was detected during configuration.
    */
-  DeclException1(
-    ExcMissing,
-    char *,
-    << "When you ran 'cmake' during installation of deal.II, "
-    << "no suitable installation of the BLAS or LAPACK library could "
-    << "be found. Consequently, the function <" << arg1
-    << "> can not be called. Refer to the doc/readme.html "
-    << "file for information on how to ensure that deal.II "
-    << "picks up an existing BLAS and LAPACK installation at "
-    << "configuration time.");
+  DeclException1(ExcMissing,
+                 char *,
+                 << "When you ran 'cmake' during installation of deal.II, "
+                 << "no suitable installation of the BLAS or LAPACK library could "
+                 << "be found. Consequently, the function <" << arg1
+                 << "> can not be called. Refer to the doc/readme.html "
+                 << "file for information on how to ensure that deal.II "
+                 << "picks up an existing BLAS and LAPACK installation at "
+                 << "configuration time.");
 } // namespace LAPACKSupport
 
 

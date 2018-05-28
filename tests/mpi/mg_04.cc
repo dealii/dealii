@@ -64,8 +64,7 @@ void
 output(parallel::distributed::Triangulation<dim> &tr)
 {
   const std::string filename =
-    ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
-     ".vtu");
+    ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) + ".vtu");
 }
 
 template <int dim>
@@ -95,8 +94,7 @@ test()
     for (unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)
       {
         deallog << "level " << lvl << ": ";
-        typename DoFHandler<dim>::cell_iterator cell = dofh.begin(lvl),
-                                                endc = dofh.end(lvl);
+        typename DoFHandler<dim>::cell_iterator cell = dofh.begin(lvl), endc = dofh.end(lvl);
 
         for (; cell != endc; ++cell)
           {

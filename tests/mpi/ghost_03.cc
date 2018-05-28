@@ -96,7 +96,7 @@ main(int argc, char **argv)
   deal_II_exceptions::disable_abort_on_exception();
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int                     myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 

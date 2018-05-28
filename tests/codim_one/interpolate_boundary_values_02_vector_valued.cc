@@ -71,34 +71,26 @@ test()
   for (unsigned int boundary_id = 0; boundary_id < 2; ++boundary_id)
     {
       std::map<types::global_dof_index, double> bv;
-      VectorTools::interpolate_boundary_values(
-        dof_handler, boundary_id, X<spacedim>(), bv);
+      VectorTools::interpolate_boundary_values(dof_handler, boundary_id, X<spacedim>(), bv);
       deallog << bv.size() << " boundary degrees of freedom" << std::endl;
 
-      for (std::map<types::global_dof_index, double>::const_iterator i =
-             bv.begin();
-           i != bv.end();
+      for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin(); i != bv.end();
            ++i)
         deallog << i->first << ' ' << i->second << std::endl;
 
-      for (DoFHandler<dim, spacedim>::active_cell_iterator cell =
-             dof_handler.begin_active();
+      for (DoFHandler<dim, spacedim>::active_cell_iterator cell = dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell)
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-          if (cell->at_boundary(f) &&
-              (cell->face(f)->boundary_id() == boundary_id))
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-                 ++v)
+          if (cell->at_boundary(f) && (cell->face(f)->boundary_id() == boundary_id))
+            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
               for (unsigned int i = 0; i < fe.dofs_per_vertex; ++i)
                 {
-                  AssertThrow(bv.find(cell->face(f)->vertex_dof_index(v, i)) !=
-                                bv.end(),
+                  AssertThrow(bv.find(cell->face(f)->vertex_dof_index(v, i)) != bv.end(),
                               ExcInternalError());
-                  AssertThrow(
-                    bv[cell->face(f)->vertex_dof_index(v, i)] ==
-                      X<spacedim>().value(cell->face(f)->vertex(v), i),
-                    ExcInternalError());
+                  AssertThrow(bv[cell->face(f)->vertex_dof_index(v, i)] ==
+                                X<spacedim>().value(cell->face(f)->vertex(v), i),
+                              ExcInternalError());
                 }
     }
 }

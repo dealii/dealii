@@ -41,22 +41,17 @@ test()
     v.push_back(i);
 
   // first run with only a worker
-  WorkStream::run(v.begin(),
-                  v.end(),
-                  &foo,
-                  std::function<void(const unsigned int &)>(),
-                  ScratchData(),
-                  0U);
+  WorkStream::run(
+    v.begin(), v.end(), &foo, std::function<void(const unsigned int &)>(), ScratchData(), 0U);
 
   // next run with only a copier
-  WorkStream::run(v.begin(),
-                  v.end(),
-                  std::function<void(const std::vector<unsigned int>::iterator,
-                                     ScratchData &,
-                                     unsigned int &)>(),
-                  &bar,
-                  ScratchData(),
-                  0U);
+  WorkStream::run(
+    v.begin(),
+    v.end(),
+    std::function<void(const std::vector<unsigned int>::iterator, ScratchData &, unsigned int &)>(),
+    &bar,
+    ScratchData(),
+    0U);
 }
 
 

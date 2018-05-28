@@ -90,8 +90,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
         // this, _all_ children have
         // to be active, not only
         // some of them
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
+        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
           Assert(cell->child(c)->active(), ExcInternalError());
 
         // then restrict and prolongate
@@ -119,8 +118,8 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   const double relative_residual = (x2.l2_norm() / x.l2_norm());
 
   const double threshold = 1e-6;
-  deallog << ", dofs_per_cell=" << fe.dofs_per_cell << "; relative residual: "
-          << (relative_residual < threshold ? "ok" : "botched up!")
+  deallog << ", dofs_per_cell=" << fe.dofs_per_cell
+          << "; relative residual: " << (relative_residual < threshold ? "ok" : "botched up!")
           << " (relative residual=" << relative_residual << ")" << std::endl;
 }
 
@@ -145,9 +144,8 @@ test()
   // elements, for which we want to
   // test. we happily waste tons of
   // memory here, but who cares...
-  const FiniteElement<dim> *fe_list[] = {new FE_RaviartThomas<dim>(0),
-                                         new FE_RaviartThomas<dim>(1),
-                                         new FE_RaviartThomas<dim>(2)};
+  const FiniteElement<dim> *fe_list[] = {
+    new FE_RaviartThomas<dim>(0), new FE_RaviartThomas<dim>(1), new FE_RaviartThomas<dim>(2)};
 
   for (unsigned int i = 0; i < sizeof(fe_list) / sizeof(fe_list[0]); ++i)
     if (fe_list[i] != nullptr)

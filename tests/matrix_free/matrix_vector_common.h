@@ -72,24 +72,20 @@ do_test(const DoFHandler<dim> & dof,
     const QGauss<1>                                  quad(n_q_points_1d);
     typename MatrixFree<dim, number>::AdditionalData data;
     if (parallel_option == 1)
-      data.tasks_parallel_scheme =
-        MatrixFree<dim, number>::AdditionalData::partition_color;
+      data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_color;
     else if (parallel_option == 2)
-      data.tasks_parallel_scheme =
-        MatrixFree<dim, number>::AdditionalData::color;
+      data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::color;
     else
       {
         Assert(parallel_option == 0, ExcInternalError());
-        data.tasks_parallel_scheme =
-          MatrixFree<dim, number>::AdditionalData::partition_partition;
+        data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_partition;
       }
     data.tasks_block_size = 7;
 
     mf_data.reinit(mapping, dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim, fe_degree, number, Vector<number>, n_q_points_1d> mf(
-    mf_data);
+  MatrixFreeTest<dim, fe_degree, number, Vector<number>, n_q_points_1d> mf(mf_data);
   Vector<number> in(dof.n_dofs()), out(dof.n_dofs());
   Vector<number> in_dist(dof.n_dofs());
   Vector<number> out_dist(in_dist);
@@ -120,17 +116,15 @@ do_test(const DoFHandler<dim> & dof,
     FEValues<dim> fe_values(mapping,
                             dof.get_fe(),
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_JxW_values);
+                            update_values | update_gradients | update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
@@ -140,16 +134,14 @@ do_test(const DoFHandler<dim> & dof,
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       10. * fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                    10. * fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                   fe_values.JxW(q_point));
             }
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, sparse_matrix);
+        constraints.distribute_local_to_global(cell_matrix, local_dof_indices, sparse_matrix);
       }
   }
 

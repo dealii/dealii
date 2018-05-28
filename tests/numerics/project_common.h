@@ -63,9 +63,7 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const unsigned int n_components) :
-    Function<dim>(n_components),
-    q(q)
+  F(const unsigned int q, const unsigned int n_components) : Function<dim>(n_components), q(q)
   {}
 
   virtual double
@@ -118,11 +116,8 @@ do_project(const Triangulation<dim> &triangulation,
   for (unsigned int q = 0; q <= p + 2 - order_difference; ++q)
     {
       // project the function
-      VectorTools::project(dof_handler,
-                           constraints,
-                           QGauss<dim>(p + 2),
-                           F<dim>(q, fe.n_components()),
-                           projection);
+      VectorTools::project(
+        dof_handler, constraints, QGauss<dim>(p + 2), F<dim>(q, fe.n_components()), projection);
       // just to make sure it doesn't get
       // forgotten: handle hanging node
       // constraints
@@ -136,8 +131,7 @@ do_project(const Triangulation<dim> &triangulation,
                                         QGauss<dim>(std::max(p, q) + 1),
                                         VectorTools::L2_norm);
       deallog << fe.get_name() << ", P_" << q
-              << ", rel. error=" << error.l2_norm() / projection.l2_norm()
-              << std::endl;
+              << ", rel. error=" << error.l2_norm() / projection.l2_norm() << std::endl;
 
       if (q <= p - order_difference)
         if (error.l2_norm() > 1e-10 * projection.l2_norm())
@@ -210,8 +204,7 @@ test_with_wrong_face_orientation(const FiniteElement<dim> &fe,
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball(triangulation);
       triangulation.set_manifold(0);
-      typename Triangulation<dim>::active_cell_iterator cell =
-        triangulation.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
       std::advance(cell, i);
       cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
@@ -280,7 +273,7 @@ template <int dim>
 void
 test_with_2d_deformed_refined_mesh(const FiniteElement<dim> &fe,
                                    const unsigned int        p,
-                                   const unsigned int order_difference = 0)
+                                   const unsigned int        order_difference = 0)
 {
   if (dim != 2)
     return;

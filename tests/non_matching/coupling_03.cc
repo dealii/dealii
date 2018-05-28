@@ -56,8 +56,7 @@ test()
   space_tria.refine_global(2);
 
   FESystem<dim, spacedim>      fe(FE_Q<dim, spacedim>(1), spacedim + 1);
-  FESystem<spacedim, spacedim> space_fe(FE_Q<spacedim, spacedim>(1),
-                                        spacedim + 1);
+  FESystem<spacedim, spacedim> space_fe(FE_Q<spacedim, spacedim>(1), spacedim + 1);
 
   ComponentMask immersed_mask(spacedim + 1, false);
   ComponentMask space_mask(spacedim + 1, false);

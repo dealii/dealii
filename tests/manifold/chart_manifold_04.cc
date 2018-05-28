@@ -92,8 +92,8 @@ test(unsigned int ref, const MappingQ<dim> &mapping)
   FEValues<dim> fe_values(mapping,
                           fe,
                           quadrature,
-                          update_gradients | update_values |
-                            update_quadrature_points | update_JxW_values);
+                          update_gradients | update_values | update_quadrature_points |
+                            update_JxW_values);
 
   for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
@@ -108,19 +108,15 @@ test(unsigned int ref, const MappingQ<dim> &mapping)
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         {
           deallog << "  JxW(" << q << "): " << fe_values.JxW(q) << std::endl;
-          deallog << "  p(" << q << "): " << fe_values.quadrature_point(q)
-                  << std::endl;
+          deallog << "  p(" << q << "): " << fe_values.quadrature_point(q) << std::endl;
           for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
-            deallog << "  shape " << i << "," << q << ": "
-                    << fe_values.shape_value(i, q) << " "
+            deallog << "  shape " << i << "," << q << ": " << fe_values.shape_value(i, q) << " "
                     << fe_values.shape_grad(i, q) << std::endl;
         }
 
-      if (cell->get_manifold().get_new_point_on_cell(cell).distance(
-            cell->center()) > 1e-6)
+      if (cell->get_manifold().get_new_point_on_cell(cell).distance(cell->center()) > 1e-6)
         {
-          deallog << "Default manifold: "
-                  << cell->get_manifold().get_new_point_on_cell(cell)
+          deallog << "Default manifold: " << cell->get_manifold().get_new_point_on_cell(cell)
                   << std::endl;
           deallog << "Center of cell  : " << cell->center() << std::endl;
         }

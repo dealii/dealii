@@ -33,17 +33,13 @@ void
 test()
 {
   deallog << "DerivativeForm<1, 2, 2> is trivially copyable: "
-          << boost::has_trivial_copy<DerivativeForm<1, 2, 2, Number>>::value
-          << std::endl;
+          << boost::has_trivial_copy<DerivativeForm<1, 2, 2, Number>>::value << std::endl;
   deallog << "DerivativeForm<2, 2, 2> is trivially copyable: "
-          << boost::has_trivial_copy<DerivativeForm<2, 2, 2, Number>>::value
-          << std::endl;
+          << boost::has_trivial_copy<DerivativeForm<2, 2, 2, Number>>::value << std::endl;
   deallog << "DerivativeForm<2, 2, 3> is trivially copyable: "
-          << boost::has_trivial_copy<DerivativeForm<2, 2, 3, Number>>::value
-          << std::endl;
+          << boost::has_trivial_copy<DerivativeForm<2, 2, 3, Number>>::value << std::endl;
   deallog << "DerivativeForm<2, 3, 3> is trivially copyable: "
-          << boost::has_trivial_copy<DerivativeForm<2, 3, 3, Number>>::value
-          << std::endl;
+          << boost::has_trivial_copy<DerivativeForm<2, 3, 3, Number>>::value << std::endl;
 }
 
 int

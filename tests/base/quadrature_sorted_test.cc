@@ -100,8 +100,7 @@ check_cells(std::vector<Quadrature<dim> *> &quadratures)
 
 template <int dim>
 void
-check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
-            const bool                                sub)
+check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures, const bool sub)
 {
   if (sub)
     deallog.push("subfaces");
@@ -110,10 +109,9 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
 
   for (unsigned int n = 0; n < quadratures.size(); ++n)
     {
-      Quadrature<dim> quadrature(
-        sub == false ?
-          QProjector<dim>::project_to_all_faces(*quadratures[n]) :
-          QProjector<dim>::project_to_all_subfaces(*quadratures[n]));
+      Quadrature<dim>                quadrature(sub == false ?
+                                   QProjector<dim>::project_to_all_faces(*quadratures[n]) :
+                                   QProjector<dim>::project_to_all_subfaces(*quadratures[n]));
       const std::vector<Point<dim>> &points  = quadrature.get_points();
       const std::vector<double> &    weights = quadrature.get_weights();
 
@@ -155,8 +153,7 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
                 exact_int = 2 * (sub ? 2 : 1) / (double)(i + 1);
                 break;
               case 3:
-                exact_int =
-                  3 * (sub ? (4 + 2 + 2) : 1) * 8 / (double)(i + 1) / (i + 1);
+                exact_int = 3 * (sub ? (4 + 2 + 2) : 1) * 8 / (double)(i + 1) / (i + 1);
                 break;
             }
 
@@ -192,9 +189,7 @@ check_quadratures(const std::vector<Quadrature<dim> *> &quadratures)
           }
       if (check == false)
         {
-          deallog
-            << "Something went wrong. The qudrature is not properly sorted."
-            << std::endl;
+          deallog << "Something went wrong. The qudrature is not properly sorted." << std::endl;
           for (unsigned int q = 1; q < quad.size(); ++q)
             {
               deallog << "q(" << q << "): " << quad.point(q) << ", w(" << q

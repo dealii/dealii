@@ -64,9 +64,8 @@ template <int dim>
 void
 test()
 {
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  const unsigned int n_processes =
-    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  const unsigned int myid        = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int n_processes = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -106,8 +105,7 @@ test()
   cm.close();
 
   TrilinosWrappers::MPI::Vector vec(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
-  for (unsigned int i = vec.local_range().first; i < vec.local_range().second;
-       ++i)
+  for (unsigned int i = vec.local_range().first; i < vec.local_range().second; ++i)
     vec(i) = i;
   vec.compress(VectorOperation::insert);
 

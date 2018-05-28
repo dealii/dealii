@@ -49,12 +49,10 @@ test()
 
     const types::particle_index index(7);
 
-    Particles::Particle<dim, spacedim> particle(
-      position, reference_position, index);
+    Particles::Particle<dim, spacedim> particle(position, reference_position, index);
 
     deallog << "Particle location: " << particle.get_location() << std::endl
-            << "Particle reference location: "
-            << particle.get_reference_location() << std::endl
+            << "Particle reference location: " << particle.get_reference_location() << std::endl
             << "Particle index: " << particle.get_id() << std::endl;
 
     std::stringstream             stream;
@@ -67,10 +65,9 @@ test()
     boost::archive::text_iarchive iarchive(stream);
     iarchive >> new_particle;
 
-    deallog << "Copy particle location: " << new_particle.get_location()
+    deallog << "Copy particle location: " << new_particle.get_location() << std::endl
+            << "Copy particle reference location: " << new_particle.get_reference_location()
             << std::endl
-            << "Copy particle reference location: "
-            << new_particle.get_reference_location() << std::endl
             << "Copy particle index: " << new_particle.get_id() << std::endl;
   }
 

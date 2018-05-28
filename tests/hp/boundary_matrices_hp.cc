@@ -95,22 +95,17 @@ check()
   // of one RT-i and one DGQ-i.
   hp::FECollection<dim> element;
   for (unsigned int i = 0; i < 5 - dim; ++i)
-    element.push_back(FESystem<dim>(FE_RaviartThomasNodal<dim>(i),
-                                    1,
-                                    FE_DGQ<dim>(i),
-                                    1,
-                                    FE_Nothing<dim>(),
-                                    dim));
+    element.push_back(
+      FESystem<dim>(FE_RaviartThomasNodal<dim>(i), 1, FE_DGQ<dim>(i), 1, FE_Nothing<dim>(), dim));
 
   // ... also add Q-(i+1) ^ dim
   // to this system
   for (unsigned int i = 1; i < 3; ++i)
-    element.push_back(FESystem<dim>(
-      FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1, FE_Q<dim>(i), dim));
+    element.push_back(
+      FESystem<dim>(FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1, FE_Q<dim>(i), dim));
 
   hp::DoFHandler<dim> dof(tr);
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     cell->set_active_fe_index(Testing::rand() % element.size());
@@ -130,21 +125,15 @@ check()
 
   SparsityPattern sparsity(dof.n_boundary_dofs(function_map),
                            dof.max_couplings_between_boundary_dofs());
-  DoFTools::make_boundary_sparsity_pattern(
-    dof, function_map, dof_to_boundary_mapping, sparsity);
+  DoFTools::make_boundary_sparsity_pattern(dof, function_map, dof_to_boundary_mapping, sparsity);
   sparsity.compress();
 
   SparseMatrix<double> matrix;
   matrix.reinit(sparsity);
 
   Vector<double> rhs(dof.n_boundary_dofs(function_map));
-  MatrixTools::create_boundary_mass_matrix(dof,
-                                           face_quadrature,
-                                           matrix,
-                                           function_map,
-                                           rhs,
-                                           dof_to_boundary_mapping,
-                                           &coefficient);
+  MatrixTools::create_boundary_mass_matrix(
+    dof, face_quadrature, matrix, function_map, rhs, dof_to_boundary_mapping, &coefficient);
 
   // Multiply matrix by 100 to
   // make test more sensitive

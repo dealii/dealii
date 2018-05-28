@@ -116,12 +116,9 @@ namespace Step
     sparsity_pattern.copy_from(csp);
     system_matrix.reinit(sparsity_pattern);
 
-    deallog << "   Number of active cells:       "
-            << triangulation.n_active_cells() << std::endl
-            << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl
-            << "   Number of constraints       : "
-            << constraints.n_constraints() << std::endl;
+    deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl
+            << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl
+            << "   Number of constraints       : " << constraints.n_constraints() << std::endl;
     deallog << "nnz=" << sparsity_pattern.n_nonzero_elements() << std::endl;
   }
 

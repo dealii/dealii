@@ -45,12 +45,9 @@ test_tensor(const Tensor<2, dim> &F)
       for (unsigned int I = 0; I < dim; ++I)
         T_calc[i] += F[i][I] * T[I];
 
-    const Tensor<1, dim> T_trans =
-      Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
-      (T_calc - T_trans).norm() < 1e-9,
-      ExcMessage(
-        "Rank 1 tensor: Contraction using push_forward() function is incorrect."));
+    const Tensor<1, dim> T_trans = Physics::Transformations::Contravariant::push_forward(T, F);
+    Assert((T_calc - T_trans).norm() < 1e-9,
+           ExcMessage("Rank 1 tensor: Contraction using push_forward() function is incorrect."));
   }
 
   // Rank-2 Tensors
@@ -75,12 +72,9 @@ test_tensor(const Tensor<2, dim> &F)
         for (unsigned int J = 0; J < dim; ++J)
           T_calc[i][j] += F[j][J] * tmp0[i][J];
 
-    const Tensor<2, dim> T_trans =
-      Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
-      (T_calc - T_trans).norm() < 1e-9,
-      ExcMessage(
-        "Rank 2 tensor: Contraction using push_forward() function is incorrect."));
+    const Tensor<2, dim> T_trans = Physics::Transformations::Contravariant::push_forward(T, F);
+    Assert((T_calc - T_trans).norm() < 1e-9,
+           ExcMessage("Rank 2 tensor: Contraction using push_forward() function is incorrect."));
   }
 
   // Rank-4 Tensors
@@ -129,12 +123,9 @@ test_tensor(const Tensor<2, dim> &F)
             for (unsigned int L = 0; L < dim; ++L)
               T_calc[i][j][k][l] += F[l][L] * tmp2[i][j][k][L];
 
-    const Tensor<4, dim> T_trans =
-      Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
-      (T_calc - T_trans).norm() < 1e-9,
-      ExcMessage(
-        "Rank 4 tensor: Contraction using push_forward() function is incorrect."));
+    const Tensor<4, dim> T_trans = Physics::Transformations::Contravariant::push_forward(T, F);
+    Assert((T_calc - T_trans).norm() < 1e-9,
+           ExcMessage("Rank 4 tensor: Contraction using push_forward() function is incorrect."));
   }
 }
 
@@ -168,12 +159,10 @@ test_symmetric_tensor(const Tensor<2, dim> &F)
         for (unsigned int J = 0; J < dim; ++J)
           T_calc[i][j] += F[j][J] * tmp0[i][J];
 
-    const Tensor<2, dim> T_trans =
-      Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
-      (T_calc - T_trans).norm() < 1e-9,
-      ExcMessage(
-        "Rank 2 symmetric tensor: Contraction using push_forward() function is incorrect."));
+    const Tensor<2, dim> T_trans = Physics::Transformations::Contravariant::push_forward(T, F);
+    Assert((T_calc - T_trans).norm() < 1e-9,
+           ExcMessage(
+             "Rank 2 symmetric tensor: Contraction using push_forward() function is incorrect."));
   }
 
   // Rank-4 Symmetric tensors
@@ -232,10 +221,9 @@ test_symmetric_tensor(const Tensor<2, dim> &F)
     std::cout << "T_calc: " << T_calc << std::endl;
     std::cout << "T_trans: " << T_trans << std::endl;
 
-    Assert(
-      (T_calc - T_trans).norm() < 1e-9,
-      ExcMessage(
-        "Rank 4 symmetric tensor: Contraction using push_forward() function is incorrect."));
+    Assert((T_calc - T_trans).norm() < 1e-9,
+           ExcMessage(
+             "Rank 4 symmetric tensor: Contraction using push_forward() function is incorrect."));
   }
 }
 

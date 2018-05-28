@@ -49,21 +49,17 @@ test()
           subdivisions[d] = 2 - d;
         }
       GridGenerator::subdivided_hyper_rectangle(tria, subdivisions, p1, p2);
-      for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-           cell != tria.end();
+      for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end();
            ++cell)
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->at_boundary(face))
             cell->face(face)->set_all_boundary_ids(face);
 
-      std::vector<
-        GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+      std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
         periodic_faces;
       // the second time around we only set pbc in the y direction
       for (unsigned int d = run; d < dim; ++d)
-        GridTools::collect_periodic_faces(
-          tria, 2 * d, 2 * d + 1, d, periodic_faces);
+        GridTools::collect_periodic_faces(tria, 2 * d, 2 * d + 1, d, periodic_faces);
       tria.add_periodicity(periodic_faces);
 
       tria.refine_global(3);
@@ -77,14 +73,13 @@ test()
       for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
         {
           deallog << "Level " << level << std::endl;
-          for (typename DoFHandler<dim>::cell_iterator cell =
-                 dof_handler.begin(level);
+          for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(level);
                cell != dof_handler.end(level);
                ++cell)
             if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
               {
-                deallog << "Cell with center: " << cell->center()
-                        << ", owned by " << cell->level_subdomain_id() << ": ";
+                deallog << "Cell with center: " << cell->center() << ", owned by "
+                        << cell->level_subdomain_id() << ": ";
                 cell->get_mg_dof_indices(dof_indices);
                 for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
                   deallog << dof_indices[i] << " ";
@@ -102,9 +97,8 @@ main(int argc, char *argv[])
 {
   using namespace dealii;
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
+  MPILogInitAll                    log;
   deallog << std::setprecision(4);
 
   try
@@ -115,25 +109,21 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

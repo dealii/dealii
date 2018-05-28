@@ -46,9 +46,7 @@
 
 template <typename MatrixType>
 void
-check_vmult_quadratic(std::vector<double> &residuals,
-                      const MatrixType &   A,
-                      const char *         prefix)
+check_vmult_quadratic(std::vector<double> &residuals, const MatrixType &A, const char *prefix)
 {
   deallog.push(prefix);
 
@@ -57,17 +55,13 @@ check_vmult_quadratic(std::vector<double> &residuals,
   GrowingVectorMemory<> mem;
 
   SolverControl      control(10, 1.e-13, false);
-  SolverRichardson<> rich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
-  SolverRichardson<> prich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
+  SolverRichardson<> rich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
+  SolverRichardson<> prich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
 
-  const types::global_dof_index block_size =
-    (types::global_dof_index)std::sqrt(A.n() + .3);
-  const unsigned int n_blocks = A.n() / block_size;
+  const types::global_dof_index block_size = (types::global_dof_index)std::sqrt(A.n() + .3);
+  const unsigned int            n_blocks   = A.n() / block_size;
 
-  typename PreconditionBlock<MatrixType, float>::AdditionalData data(block_size,
-                                                                     1.2);
+  typename PreconditionBlock<MatrixType, float>::AdditionalData data(block_size, 1.2);
   std::vector<types::global_dof_index>                          perm(A.n());
   std::vector<types::global_dof_index>                          iperm(A.n());
   for (unsigned int i = 0; i < n_blocks; ++i)
@@ -135,12 +129,10 @@ check_vmult_quadratic(std::vector<double> &            residuals,
   Vector<double>        f(A.m());
   GrowingVectorMemory<> mem;
 
-  SolverControl      control(10, 1.e-13, false);
-  SolverRichardson<> rich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
-  SolverRichardson<> prich(
-    control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
-  PreconditionIdentity                          identity;
+  SolverControl        control(10, 1.e-13, false);
+  SolverRichardson<>   rich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/.01));
+  SolverRichardson<>   prich(control, mem, SolverRichardson<>::AdditionalData(/*omega=*/1.));
+  PreconditionIdentity identity;
   PreconditionJacobi<BlockSparseMatrix<double>> jacobi;
   jacobi.initialize(A, .5);
 
@@ -183,8 +175,8 @@ check_iterator(const MatrixType &A)
         if (b == E)
           deallog << "Final" << std::endl;
         else
-          deallog << r << '\t' << b->row() << '\t' << b->column() << '\t'
-                  << b->value() << std::endl;
+          deallog << r << '\t' << b->row() << '\t' << b->column() << '\t' << b->value()
+                  << std::endl;
         typename MatrixType::const_iterator e = A.end(r);
         if (e == E)
           deallog << "Final" << std::endl;
@@ -197,12 +189,10 @@ check_iterator(const MatrixType &A)
         deallog << std::endl;
       }
   for (typename MatrixType::const_iterator i = A.begin(); i != A.end(); ++i)
-    deallog << '\t' << i->row() << '\t' << i->column() << '\t' << i->value()
-            << std::endl;
+    deallog << '\t' << i->row() << '\t' << i->column() << '\t' << i->value() << std::endl;
   deallog << "Repeat row 2" << std::endl;
   for (typename MatrixType::const_iterator i = A.begin(2); i != A.end(2); ++i)
-    deallog << '\t' << i->row() << '\t' << i->column() << '\t' << i->value()
-            << std::endl;
+    deallog << '\t' << i->row() << '\t' << i->column() << '\t' << i->value() << std::endl;
 
   //  deallog.pop();
 }
@@ -380,6 +370,5 @@ main()
   SparseMatrix<double>::const_iterator p = A.begin(), p_tmp = A_tmp.begin();
   for (; p != A.end(); ++p, ++p_tmp)
     if (std::fabs(p->value() - p_tmp->value()) <= std::fabs(1e-14 * p->value()))
-      deallog << "write/read-error at global position " << (p - A.begin())
-              << std::endl;
+      deallog << "write/read-error at global position " << (p - A.begin()) << std::endl;
 }

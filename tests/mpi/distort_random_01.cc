@@ -48,16 +48,13 @@ test1(const bool keep_boundary)
     filename = "keep_false-";
   filename += Utilities::int_to_string(dim);
 
-  std::ofstream logfile(
-    (filename + "-" + Utilities::int_to_string(my_id, 2)).c_str());
+  std::ofstream logfile((filename + "-" + Utilities::int_to_string(my_id, 2)).c_str());
 
   GridOut().write_gnuplot(tria, logfile);
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (my_id == 0)
-    for (unsigned int i = 0;
-         i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-         ++i)
+    for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
       {
         deallog << "Process " << i << ":" << std::endl;
         cat_file((filename + "-" + Utilities::int_to_string(i, 2)).c_str());
@@ -71,8 +68,7 @@ test1(const bool keep_boundary)
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {

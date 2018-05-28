@@ -44,11 +44,10 @@ void
 test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
 {
   MPI_Comm     mpi_communicator = MPI_COMM_WORLD;
-  unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
-  unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_communicator);
+  unsigned int n_procs          = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  unsigned int my_rank          = Utilities::MPI::this_mpi_process(mpi_communicator);
 
-  deallog << "Testing for dim = " << dim << " on " << n_procs << " processes"
-          << std::endl;
+  deallog << "Testing for dim = " << dim << " on " << n_procs << " processes" << std::endl;
   deallog << "Cube refinements: " << ref_cube << std::endl;
   deallog << "Sphere refinements:" << ref_sphere << std::endl;
 
@@ -79,11 +78,10 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
   // Building by hand the output of distributed points (see the function's
   // description for more details, this is in fact compute point location
   // code with the addition of rank storing)
-  std::vector<typename Triangulation<dim, dim>::active_cell_iterator>
-                                         computed_cells;
-  std::vector<std::vector<Point<dim>>>   computed_qpoints;
-  std::vector<std::vector<Point<dim>>>   computed_points;
-  std::vector<std::vector<unsigned int>> computed_ranks;
+  std::vector<typename Triangulation<dim, dim>::active_cell_iterator> computed_cells;
+  std::vector<std::vector<Point<dim>>>                                computed_qpoints;
+  std::vector<std::vector<Point<dim>>>                                computed_points;
+  std::vector<std::vector<unsigned int>>                              computed_ranks;
 
   unsigned int computed_pts = 0;
   for (auto cell : sphere.active_cell_iterators())
@@ -100,8 +98,7 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
       if (my_pair.first->is_locally_owned())
         {
           computed_pts++;
-          auto cells_it = std::find(
-            computed_cells.begin(), computed_cells.end(), my_pair.first);
+          auto cells_it = std::find(computed_cells.begin(), computed_cells.end(), my_pair.first);
 
           if (cells_it == computed_cells.end())
             {
@@ -124,23 +121,20 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
 
   // Computing bounding boxes describing the locally owned part of the mesh
   IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
-  std::vector<BoundingBox<dim>>     local_bbox =
-    GridTools::compute_mesh_predicate_bounding_box(
-      cache.get_triangulation(),
-      std::function<bool(
-        const typename Triangulation<dim>::active_cell_iterator &)>(
-        locally_owned_cell_predicate),
-      1,
-      true,
-      4);
+  std::vector<BoundingBox<dim>>     local_bbox = GridTools::compute_mesh_predicate_bounding_box(
+    cache.get_triangulation(),
+    std::function<bool(const typename Triangulation<dim>::active_cell_iterator &)>(
+      locally_owned_cell_predicate),
+    1,
+    true,
+    4);
 
   // Obtaining the global mesh description through an all to all communication
   std::vector<std::vector<BoundingBox<dim>>> global_bboxes;
   global_bboxes = Utilities::MPI::all_gather(mpi_communicator, local_bbox);
 
   // Using the distributed version of compute point location
-  auto output_tuple =
-    distributed_compute_point_locations(cache, loc_owned_points, global_bboxes);
+  auto output_tuple = distributed_compute_point_locations(cache, loc_owned_points, global_bboxes);
   deallog << "Comparing results" << std::endl;
   const auto &output_cells   = std::get<0>(output_tuple);
   const auto &output_qpoints = std::get<1>(output_tuple);
@@ -159,13 +153,12 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
   for (unsigned int c = 0; c < output_cells.size(); c++)
     {
       output_computed_pts += output_points[c].size();
-      const auto &cell = output_cells[c];
-      auto        cell_it =
-        std::find(computed_cells.begin(), computed_cells.end(), cell);
+      const auto &cell    = output_cells[c];
+      auto        cell_it = std::find(computed_cells.begin(), computed_cells.end(), cell);
       if (cell_it == computed_cells.end())
         {
-          deallog << "ERROR: active cell " << cell->active_cell_index()
-                  << " not found" << std::endl;
+          deallog << "ERROR: active cell " << cell->active_cell_index() << " not found"
+                  << std::endl;
           test_passed = false;
         }
       else
@@ -176,56 +169,44 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
               test_passed = false;
               deallog << "ERROR: non-matching number of points for cell "
                       << cell->active_cell_index() << std::endl;
-              deallog << "Distributed compute point location output:"
-                      << std::endl;
-              for (unsigned int pt_idx = 0; pt_idx < output_points[c].size();
-                   pt_idx++)
-                deallog << output_points[c][pt_idx] << " from process "
-                        << output_ranks[c][pt_idx] << " to " << my_rank
-                        << std::endl;
+              deallog << "Distributed compute point location output:" << std::endl;
+              for (unsigned int pt_idx = 0; pt_idx < output_points[c].size(); pt_idx++)
+                deallog << output_points[c][pt_idx] << " from process " << output_ranks[c][pt_idx]
+                        << " to " << my_rank << std::endl;
               deallog << "Expected points:" << std::endl;
-              for (unsigned int pt_idx = 0;
-                   pt_idx < computed_points[c_cell].size();
-                   pt_idx++)
+              for (unsigned int pt_idx = 0; pt_idx < computed_points[c_cell].size(); pt_idx++)
                 deallog << computed_points[c_cell][pt_idx] << std::endl;
             }
           else
             {
               // Checking if the points inside are the same
-              for (unsigned int pt_idx = 0; pt_idx < output_points[c].size();
-                   pt_idx++)
+              for (unsigned int pt_idx = 0; pt_idx < output_points[c].size(); pt_idx++)
                 {
-                  const auto &pt    = output_points[c][pt_idx];
-                  auto        pt_it = std::find(computed_points[c_cell].begin(),
-                                         computed_points[c_cell].end(),
-                                         pt);
+                  const auto &pt = output_points[c][pt_idx];
+                  auto        pt_it =
+                    std::find(computed_points[c_cell].begin(), computed_points[c_cell].end(), pt);
                   if (pt_it == computed_points[c_cell].end())
                     {
-                      deallog << "ERROR: point " << pt << " not found"
-                              << std::endl;
+                      deallog << "ERROR: point " << pt << " not found" << std::endl;
                       test_passed = false;
                     }
                   else
                     {
-                      unsigned int c_pt =
-                        pt_it - computed_points[c_cell].begin();
+                      unsigned int c_pt = pt_it - computed_points[c_cell].begin();
                       // Checking the value of the transformed point
-                      if ((output_qpoints[c][pt_idx] -
-                           computed_qpoints[c_cell][c_pt])
-                            .norm() > 1e-12)
+                      if ((output_qpoints[c][pt_idx] - computed_qpoints[c_cell][c_pt]).norm() >
+                          1e-12)
                         {
                           // Cell not found: adding a new cell
-                          deallog << "ERROR: qpoint " << c_pt << " not matching"
-                                  << std::endl;
+                          deallog << "ERROR: qpoint " << c_pt << " not matching" << std::endl;
                           test_passed = false;
                         }
                       // Checking the rank of the owner
-                      if (output_ranks[c][pt_idx] !=
-                          computed_ranks[c_cell][c_pt])
+                      if (output_ranks[c][pt_idx] != computed_ranks[c_cell][c_pt])
                         {
                           // Cell not found: adding a new cell
-                          deallog << "ERROR: rank of point " << c_pt
-                                  << " not matching" << std::endl;
+                          deallog << "ERROR: rank of point " << c_pt << " not matching"
+                                  << std::endl;
                           test_passed = false;
                         }
                     }
@@ -238,12 +219,9 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
 
   if (output_computed_pts != computed_pts)
     {
-      deallog << "ERROR: the number of points is different from expected: "
-              << std::endl;
-      deallog << "Number of locally computed points: " << computed_pts
-              << std::endl;
-      deallog << "Number of points from distributed: " << output_computed_pts
-              << std::endl;
+      deallog << "ERROR: the number of points is different from expected: " << std::endl;
+      deallog << "Number of locally computed points: " << computed_pts << std::endl;
+      deallog << "Number of points from distributed: " << output_computed_pts << std::endl;
     }
 
   if (test_passed)

@@ -33,11 +33,11 @@ void
 helmholtz_operator(const MatrixFree<dim, typename VectorType::value_type> &data,
                    VectorType &                                            dst,
                    const VectorType &                                      src,
-                   const std::pair<unsigned int, unsigned int> &cell_range)
+                   const std::pair<unsigned int, unsigned int> &           cell_range)
 {
   typedef typename VectorType::value_type                Number;
   FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(data);
-  const unsigned int n_q_points = fe_eval.n_q_points;
+  const unsigned int                                     n_q_points = fe_eval.n_q_points;
 
   for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
     {
@@ -73,11 +73,10 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = 0;
-    const std::function<void(
-      const MatrixFree<dim, typename VectorType::value_type> &,
-      VectorType &,
-      const VectorType &,
-      const std::pair<unsigned int, unsigned int> &)>
+    const std::function<void(const MatrixFree<dim, typename VectorType::value_type> &,
+                             VectorType &,
+                             const VectorType &,
+                             const std::pair<unsigned int, unsigned int> &)>
       wrap = helmholtz_operator<dim, fe_degree, VectorType, n_q_points_1d>;
     data.cell_loop(wrap, dst, src);
   }

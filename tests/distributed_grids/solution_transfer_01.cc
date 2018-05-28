@@ -51,9 +51,7 @@ test(std::ostream & /*out*/)
 
   parallel::distributed::SolutionTransfer<dim, Vector<double>> soltrans(dofh);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tr.begin_active();
-       cell != tr.end();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
        ++cell)
     {
       cell->set_refine_flag();

@@ -23,15 +23,14 @@ for (deal_II_dimension : DIMENSIONS)
 
 for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
   {
-    template void PointValueHistory<deal_II_dimension>::evaluate_field(
-      const std::string &, const VEC &);
+    template void PointValueHistory<deal_II_dimension>::evaluate_field(const std::string &,
+                                                                       const VEC &);
   }
 
 
 for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
   {
-    template void
-    PointValueHistory<deal_II_dimension>::evaluate_field_at_requested_location(
+    template void PointValueHistory<deal_II_dimension>::evaluate_field_at_requested_location(
       const std::string &, const VEC &);
   }
 

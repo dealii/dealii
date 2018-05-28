@@ -297,8 +297,7 @@ DiagonalMatrix<VectorType>::n() const
 
 template <typename VectorType>
 typename VectorType::value_type
-DiagonalMatrix<VectorType>::operator()(const size_type i,
-                                       const size_type j) const
+DiagonalMatrix<VectorType>::operator()(const size_type i, const size_type j) const
 {
   Assert(i == j, ExcIndexRange(j, i, i + 1));
   (void)j;
@@ -337,9 +336,7 @@ DiagonalMatrix<VectorType>::add(const size_type  row,
 
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::add(const size_type  i,
-                                const size_type  j,
-                                const value_type value)
+DiagonalMatrix<VectorType>::add(const size_type i, const size_type j, const value_type value)
 {
   if (i == j)
     diagonal(i) += value;
@@ -368,8 +365,7 @@ DiagonalMatrix<VectorType>::Tvmult(VectorType &dst, const VectorType &src) const
 
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::vmult_add(VectorType &      dst,
-                                      const VectorType &src) const
+DiagonalMatrix<VectorType>::vmult_add(VectorType &dst, const VectorType &src) const
 {
   VectorType tmp(src);
   tmp.scale(diagonal);
@@ -380,8 +376,7 @@ DiagonalMatrix<VectorType>::vmult_add(VectorType &      dst,
 
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::Tvmult_add(VectorType &      dst,
-                                       const VectorType &src) const
+DiagonalMatrix<VectorType>::Tvmult_add(VectorType &dst, const VectorType &src) const
 {
   vmult_add(dst, src);
 }

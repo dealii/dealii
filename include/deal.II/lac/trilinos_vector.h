@@ -684,9 +684,8 @@ namespace TrilinosWrappers
        * systems.
        */
       void
-      import_nonlocal_data_for_fe(
-        const dealii::TrilinosWrappers::SparseMatrix &matrix,
-        const Vector &                                vector);
+      import_nonlocal_data_for_fe(const dealii::TrilinosWrappers::SparseMatrix &matrix,
+                                  const Vector &                                vector);
 
       /**
        * Test for equality. This function assumes that the present vector and
@@ -1029,16 +1028,14 @@ namespace TrilinosWrappers
        * the corresponding values in the second.
        */
       void
-      set(const std::vector<size_type> &     indices,
-          const std::vector<TrilinosScalar> &values);
+      set(const std::vector<size_type> &indices, const std::vector<TrilinosScalar> &values);
 
       /**
        * This is a second collective set operation. As a difference, this
        * function takes a deal.II vector of values.
        */
       void
-      set(const std::vector<size_type> &          indices,
-          const ::dealii::Vector<TrilinosScalar> &values);
+      set(const std::vector<size_type> &indices, const ::dealii::Vector<TrilinosScalar> &values);
 
       /**
        * This collective set operation is of lower level and can handle anything
@@ -1046,25 +1043,21 @@ namespace TrilinosWrappers
        * the indices are stored and the number of elements to be set.
        */
       void
-      set(const size_type       n_elements,
-          const size_type *     indices,
-          const TrilinosScalar *values);
+      set(const size_type n_elements, const size_type *indices, const TrilinosScalar *values);
 
       /**
        * A collective add operation: This function adds a whole set of values
        * stored in @p values to the vector components specified by @p indices.
        */
       void
-      add(const std::vector<size_type> &     indices,
-          const std::vector<TrilinosScalar> &values);
+      add(const std::vector<size_type> &indices, const std::vector<TrilinosScalar> &values);
 
       /**
        * This is a second collective add operation. As a difference, this
        * function takes a deal.II vector of values.
        */
       void
-      add(const std::vector<size_type> &          indices,
-          const ::dealii::Vector<TrilinosScalar> &values);
+      add(const std::vector<size_type> &indices, const ::dealii::Vector<TrilinosScalar> &values);
 
       /**
        * Take an address where <tt>n_elements</tt> are stored contiguously and
@@ -1072,9 +1065,7 @@ namespace TrilinosWrappers
        * the other two <tt>add()</tt> functions above.
        */
       void
-      add(const size_type       n_elements,
-          const size_type *     indices,
-          const TrilinosScalar *values);
+      add(const size_type n_elements, const size_type *indices, const TrilinosScalar *values);
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -1132,10 +1123,7 @@ namespace TrilinosWrappers
        * Multiple addition of scaled vectors, i.e. <tt>*this += a*V + b*W</tt>.
        */
       void
-      add(const TrilinosScalar a,
-          const Vector &       V,
-          const TrilinosScalar b,
-          const Vector &       W);
+      add(const TrilinosScalar a, const Vector &V, const TrilinosScalar b, const Vector &W);
 
       /**
        * Scaling and simple vector addition, i.e.  <tt>*this = s*(*this) +
@@ -1250,21 +1238,18 @@ namespace TrilinosWrappers
       /**
        * Exception
        */
-      DeclException4(
-        ExcAccessToNonLocalElement,
-        size_type,
-        size_type,
-        size_type,
-        size_type,
-        << "You tried to access element " << arg1
-        << " of a distributed vector, but this element is not stored "
-        << "on the current processor. Note: There are " << arg2
-        << " elements stored "
-        << "on the current processor from within the range " << arg3
-        << " through " << arg4
-        << " but Trilinos vectors need not store contiguous "
-        << "ranges on each processor, and not every element in "
-        << "this range may in fact be stored locally.");
+      DeclException4(ExcAccessToNonLocalElement,
+                     size_type,
+                     size_type,
+                     size_type,
+                     size_type,
+                     << "You tried to access element " << arg1
+                     << " of a distributed vector, but this element is not stored "
+                     << "on the current processor. Note: There are " << arg2 << " elements stored "
+                     << "on the current processor from within the range " << arg3 << " through "
+                     << arg4 << " but Trilinos vectors need not store contiguous "
+                     << "ranges on each processor, and not every element in "
+                     << "this range may in fact be stored locally.");
 
     private:
       /**
@@ -1341,8 +1326,7 @@ namespace TrilinosWrappers
 
   namespace internal
   {
-    inline VectorReference::VectorReference(MPI::Vector &   vector,
-                                            const size_type index) :
+    inline VectorReference::VectorReference(MPI::Vector &vector, const size_type index) :
       vector(vector),
       index(index)
     {}
@@ -1435,10 +1419,9 @@ namespace TrilinosWrappers
     Vector::locally_owned_elements() const
     {
       Assert(owned_elements.size() == size(),
-             ExcMessage(
-               "The locally owned elements have not been properly initialized!"
-               " This happens for example if this object has been initialized"
-               " with exactly one overlapping IndexSet."));
+             ExcMessage("The locally owned elements have not been properly initialized!"
+                        " This happens for example if this object has been initialized"
+                        " with exactly one overlapping IndexSet."));
       return owned_elements;
     }
 
@@ -1539,15 +1522,13 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::set(const std::vector<size_type> &     indices,
-                const std::vector<TrilinosScalar> &values)
+    Vector::set(const std::vector<size_type> &indices, const std::vector<TrilinosScalar> &values)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-      Assert(indices.size() == values.size(),
-             ExcDimensionMismatch(indices.size(), values.size()));
+      Assert(indices.size() == values.size(), ExcDimensionMismatch(indices.size(), values.size()));
 
       set(indices.size(), indices.data(), values.data());
     }
@@ -1562,8 +1543,7 @@ namespace TrilinosWrappers
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-      Assert(indices.size() == values.size(),
-             ExcDimensionMismatch(indices.size(), values.size()));
+      Assert(indices.size() == values.size(), ExcDimensionMismatch(indices.size(), values.size()));
 
       set(indices.size(), indices.data(), values.begin());
     }
@@ -1571,9 +1551,7 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::set(const size_type       n_elements,
-                const size_type *     indices,
-                const TrilinosScalar *values)
+    Vector::set(const size_type n_elements, const size_type *indices, const TrilinosScalar *values)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
@@ -1590,17 +1568,15 @@ namespace TrilinosWrappers
 
       for (size_type i = 0; i < n_elements; ++i)
         {
-          const size_type                         row       = indices[i];
-          const TrilinosWrappers::types::int_type local_row = vector->Map().LID(
-            static_cast<TrilinosWrappers::types::int_type>(row));
+          const size_type                         row = indices[i];
+          const TrilinosWrappers::types::int_type local_row =
+            vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
           if (local_row != -1)
             (*vector)[0][local_row] = values[i];
           else
             {
               const int ierr = vector->ReplaceGlobalValues(
-                1,
-                (const TrilinosWrappers::types::int_type *)(&row),
-                &values[i]);
+                1, (const TrilinosWrappers::types::int_type *)(&row), &values[i]);
               AssertThrow(ierr == 0, ExcTrilinosError(ierr));
               compressed = false;
             }
@@ -1615,14 +1591,12 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::add(const std::vector<size_type> &     indices,
-                const std::vector<TrilinosScalar> &values)
+    Vector::add(const std::vector<size_type> &indices, const std::vector<TrilinosScalar> &values)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(indices.size() == values.size(),
-             ExcDimensionMismatch(indices.size(), values.size()));
+      Assert(indices.size() == values.size(), ExcDimensionMismatch(indices.size(), values.size()));
 
       add(indices.size(), indices.data(), values.data());
     }
@@ -1636,8 +1610,7 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(indices.size() == values.size(),
-             ExcDimensionMismatch(indices.size(), values.size()));
+      Assert(indices.size() == values.size(), ExcDimensionMismatch(indices.size(), values.size()));
 
       add(indices.size(), indices.data(), values.begin());
     }
@@ -1645,9 +1618,7 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::add(const size_type       n_elements,
-                const size_type *     indices,
-                const TrilinosScalar *values)
+    Vector::add(const size_type n_elements, const size_type *indices, const TrilinosScalar *values)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
@@ -1665,17 +1636,15 @@ namespace TrilinosWrappers
 
       for (size_type i = 0; i < n_elements; ++i)
         {
-          const size_type                         row       = indices[i];
-          const TrilinosWrappers::types::int_type local_row = vector->Map().LID(
-            static_cast<TrilinosWrappers::types::int_type>(row));
+          const size_type                         row = indices[i];
+          const TrilinosWrappers::types::int_type local_row =
+            vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
           if (local_row != -1)
             (*vector)[0][local_row] += values[i];
           else if (nonlocal_vector.get() == nullptr)
             {
               const int ierr = vector->SumIntoGlobalValues(
-                1,
-                (const TrilinosWrappers::types::int_type *)(&row),
-                &values[i]);
+                1, (const TrilinosWrappers::types::int_type *)(&row), &values[i]);
               AssertThrow(ierr == 0, ExcTrilinosError(ierr));
               compressed = false;
             }
@@ -1684,13 +1653,11 @@ namespace TrilinosWrappers
               // use pre-allocated vector for non-local entries if it exists for
               // addition operation
               const TrilinosWrappers::types::int_type my_row =
-                nonlocal_vector->Map().LID(
-                  static_cast<TrilinosWrappers::types::int_type>(row));
-              Assert(
-                my_row != -1,
-                ExcMessage("Attempted to write into off-processor vector entry "
-                           "that has not be specified as being writable upon "
-                           "initialization"));
+                nonlocal_vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
+              Assert(my_row != -1,
+                     ExcMessage("Attempted to write into off-processor vector entry "
+                                "that has not be specified as being writable upon "
+                                "initialization"));
               (*nonlocal_vector)[0][my_row] += values[i];
               compressed = false;
             }
@@ -1703,11 +1670,9 @@ namespace TrilinosWrappers
     Vector::size() const
     {
 #    ifndef DEAL_II_WITH_64BIT_INDICES
-      return (size_type)(vector->Map().MaxAllGID() + 1 -
-                         vector->Map().MinAllGID());
+      return (size_type)(vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID());
 #    else
-      return (size_type)(vector->Map().MaxAllGID64() + 1 -
-                         vector->Map().MinAllGID64());
+      return (size_type)(vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64());
 #    endif
     }
 
@@ -1726,21 +1691,16 @@ namespace TrilinosWrappers
     {
 #    ifndef DEAL_II_WITH_64BIT_INDICES
       const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID();
-      const TrilinosWrappers::types::int_type end =
-        vector->Map().MaxMyGID() + 1;
+      const TrilinosWrappers::types::int_type end   = vector->Map().MaxMyGID() + 1;
 #    else
-      const TrilinosWrappers::types::int_type begin =
-        vector->Map().MinMyGID64();
-      const TrilinosWrappers::types::int_type end =
-        vector->Map().MaxMyGID64() + 1;
+      const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID64();
+      const TrilinosWrappers::types::int_type end   = vector->Map().MaxMyGID64() + 1;
 #    endif
 
-      Assert(
-        end - begin == vector->Map().NumMyElements(),
-        ExcMessage(
-          "This function only makes sense if the elements that this "
-          "vector stores on the current processor form a contiguous range. "
-          "This does not appear to be the case for the current vector."));
+      Assert(end - begin == vector->Map().NumMyElements(),
+             ExcMessage("This function only makes sense if the elements that this "
+                        "vector stores on the current processor form a contiguous range. "
+                        "This does not appear to be the case for the current vector."));
 
       return std::make_pair(begin, end);
     }
@@ -1749,8 +1709,7 @@ namespace TrilinosWrappers
 
     inline TrilinosScalar Vector::operator*(const Vector &vec) const
     {
-      Assert(vector->Map().SameAs(vec.vector->Map()),
-             ExcDifferentParallelPartitioning());
+      Assert(vector->Map().SameAs(vec.vector->Map()), ExcDifferentParallelPartitioning());
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
       TrilinosScalar result;
@@ -1877,9 +1836,7 @@ namespace TrilinosWrappers
 
 
     inline TrilinosScalar
-    Vector::add_and_dot(const TrilinosScalar a,
-                        const Vector &       V,
-                        const Vector &       W)
+    Vector::add_and_dot(const TrilinosScalar a, const Vector &V, const Vector &W)
     {
       this->add(a, V);
       return *this * W;
@@ -1926,8 +1883,7 @@ namespace TrilinosWrappers
     Vector::operator+=(const Vector &v)
     {
       Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
-      Assert(vector->Map().SameAs(v.vector->Map()),
-             ExcDifferentParallelPartitioning());
+      Assert(vector->Map().SameAs(v.vector->Map()), ExcDifferentParallelPartitioning());
 
       const int ierr = vector->Update(1.0, *(v.vector), 1.0);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
@@ -1941,8 +1897,7 @@ namespace TrilinosWrappers
     Vector::operator-=(const Vector &v)
     {
       Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
-      Assert(vector->Map().SameAs(v.vector->Map()),
-             ExcDifferentParallelPartitioning());
+      Assert(vector->Map().SameAs(v.vector->Map()), ExcDifferentParallelPartitioning());
 
       const int ierr = vector->Update(-1.0, *(v.vector), 1.0);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
@@ -1973,8 +1928,7 @@ namespace TrilinosWrappers
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(local_size() == v.local_size(),
-             ExcDimensionMismatch(local_size(), v.local_size()));
+      Assert(local_size() == v.local_size(), ExcDimensionMismatch(local_size(), v.local_size()));
 
       AssertIsFinite(a);
 
@@ -1985,18 +1939,13 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::add(const TrilinosScalar a,
-                const Vector &       v,
-                const TrilinosScalar b,
-                const Vector &       w)
+    Vector::add(const TrilinosScalar a, const Vector &v, const TrilinosScalar b, const Vector &w)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(local_size() == v.local_size(),
-             ExcDimensionMismatch(local_size(), v.local_size()));
-      Assert(local_size() == w.local_size(),
-             ExcDimensionMismatch(local_size(), w.local_size()));
+      Assert(local_size() == v.local_size(), ExcDimensionMismatch(local_size(), v.local_size()));
+      Assert(local_size() == w.local_size(), ExcDimensionMismatch(local_size(), w.local_size()));
 
       AssertIsFinite(a);
       AssertIsFinite(b);
@@ -2037,9 +1986,7 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::sadd(const TrilinosScalar s,
-                 const TrilinosScalar a,
-                 const Vector &       v)
+    Vector::sadd(const TrilinosScalar s, const TrilinosScalar a, const Vector &v)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
@@ -2139,9 +2086,8 @@ namespace TrilinosWrappers
 
 #    ifdef DEAL_II_WITH_MPI
 
-      const Epetra_MpiComm *mpi_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
-      comm = mpi_comm->Comm();
+      const Epetra_MpiComm *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
+      comm                           = mpi_comm->Comm();
 
 #    else
 
@@ -2157,8 +2103,7 @@ namespace TrilinosWrappers
                    const dealii::Vector<number> &v,
                    const MPI_Comm &              communicator)
     {
-      *this =
-        Vector(parallel_partitioner.make_trilinos_map(communicator, true), v);
+      *this          = Vector(parallel_partitioner.make_trilinos_map(communicator, true), v);
       owned_elements = parallel_partitioner;
     }
 

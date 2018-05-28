@@ -38,8 +38,7 @@ public:
   virtual std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override
   {
-    return std::unique_ptr<Manifold<dim, spacedim>>(
-      new MyFlatManifold<dim, spacedim>());
+    return std::unique_ptr<Manifold<dim, spacedim>>(new MyFlatManifold<dim, spacedim>());
   }
 
   virtual Point<spacedim>
@@ -89,14 +88,11 @@ test(unsigned int ref = 1)
       deallog << "Cell: " << cell << std::endl;
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         {
-          const typename Triangulation<dim, spacedim>::face_iterator &face =
-            cell->face(f);
-          if (face->get_manifold().get_new_point_on_face(face).distance(
-                face->center()) > 1e-6)
+          const typename Triangulation<dim, spacedim>::face_iterator &face = cell->face(f);
+          if (face->get_manifold().get_new_point_on_face(face).distance(face->center()) > 1e-6)
             {
               deallog << "Face            : " << face << std::endl;
-              deallog << "Default manifold: "
-                      << cell->get_manifold().get_new_point_on_cell(cell)
+              deallog << "Default manifold: " << cell->get_manifold().get_new_point_on_cell(cell)
                       << std::endl;
               deallog << "Center of cell  : " << cell->center() << std::endl;
             }

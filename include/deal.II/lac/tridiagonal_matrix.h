@@ -140,9 +140,7 @@ public:
    * Source and destination must not be the same vector.
    */
   void
-  vmult(Vector<number> &      w,
-        const Vector<number> &v,
-        const bool            adding = false) const;
+  vmult(Vector<number> &w, const Vector<number> &v, const bool adding = false) const;
 
   /**
    * Adding Matrix-vector-multiplication. Same as vmult() with parameter
@@ -163,9 +161,7 @@ public:
    * Source and destination must not be the same vector.
    */
   void
-  Tvmult(Vector<number> &      w,
-         const Vector<number> &v,
-         const bool            adding = false) const;
+  Tvmult(Vector<number> &w, const Vector<number> &v, const bool adding = false) const;
 
   /**
    * Adding transpose matrix-vector-multiplication. Same as Tvmult() with
@@ -223,9 +219,7 @@ public:
    */
   template <class OutputStream>
   void
-  print(OutputStream &     s,
-        const unsigned int width     = 5,
-        const unsigned int precision = 2) const;
+  print(OutputStream &s, const unsigned int width = 5, const unsigned int precision = 2) const;
   //@}
 
 private:

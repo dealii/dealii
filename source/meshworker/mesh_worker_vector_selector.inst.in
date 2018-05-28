@@ -31,18 +31,10 @@ for (VECTOR : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
     namespace MeshWorker
     \{
 #if deal_II_dimension <= deal_II_space_dimension
-      template class VectorData<VECTOR,
-                                deal_II_dimension,
-                                deal_II_space_dimension>;
-      template class VectorData<const VECTOR,
-                                deal_II_dimension,
-                                deal_II_space_dimension>;
-      template class MGVectorData<VECTOR,
-                                  deal_II_dimension,
-                                  deal_II_space_dimension>;
-      template class MGVectorData<const VECTOR,
-                                  deal_II_dimension,
-                                  deal_II_space_dimension>;
+      template class VectorData<VECTOR, deal_II_dimension, deal_II_space_dimension>;
+      template class VectorData<const VECTOR, deal_II_dimension, deal_II_space_dimension>;
+      template class MGVectorData<VECTOR, deal_II_dimension, deal_II_space_dimension>;
+      template class MGVectorData<const VECTOR, deal_II_dimension, deal_II_space_dimension>;
 #endif
     \}
   }

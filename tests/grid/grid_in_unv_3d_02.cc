@@ -54,8 +54,7 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
 void
 filename_resolution()
 {
-  check_file<3>(std::string(SOURCE_DIR "/grid_in_unv_3d_02/mesh"),
-                GridIn<3>::unv);
+  check_file<3>(std::string(SOURCE_DIR "/grid_in_unv_3d_02/mesh"), GridIn<3>::unv);
 }
 
 

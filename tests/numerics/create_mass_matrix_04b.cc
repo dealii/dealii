@@ -104,8 +104,7 @@ check()
 
   Functions::ExpFunction<dim> coefficient;
 
-  MatrixTools::create_mass_matrix(
-    mapping, dof, quadrature, matrix, &coefficient);
+  MatrixTools::create_mass_matrix(mapping, dof, quadrature, matrix, &coefficient);
 
   // since we only generate
   // output with two digits after
@@ -115,9 +114,7 @@ check()
   // multiply matrix by 100 to
   // make test more sensitive
   deallog << "Matrix: " << std::endl;
-  for (SparseMatrix<double>::const_iterator p = matrix.begin();
-       p != matrix.end();
-       ++p)
+  for (SparseMatrix<double>::const_iterator p = matrix.begin(); p != matrix.end(); ++p)
     deallog << p->value() * 100 << std::endl;
 }
 

@@ -51,8 +51,7 @@ void check(Triangulation<3> &tria)
   tria.execute_coarsening_and_refinement();
 
   const unsigned int                       dim  = 3;
-  Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                           endc = tria.end();
+  Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
 
   // loop over all interior faces of active
   // cells with children. there should be
@@ -61,8 +60,7 @@ void check(Triangulation<3> &tria)
   // active cells on the refined side don't
   // have any children)
   for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-         ++face_no)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
       {
         const Triangulation<dim>::face_iterator face = cell->face(face_no);
 
@@ -71,15 +69,12 @@ void check(Triangulation<3> &tria)
             deallog << "Interior face with children:" << std::endl;
             deallog << "  cell=" << cell << std::endl;
             deallog << "  face_no=" << face_no << std::endl;
-            deallog << "  vertices=" << face->vertex_index(0) << ' '
-                    << face->vertex_index(1) << ' ' << face->vertex_index(2)
-                    << ' ' << face->vertex_index(3) << std::endl;
-            deallog << "  face orientation="
-                    << (cell->face_orientation(face_no) ? "true" : "false")
+            deallog << "  vertices=" << face->vertex_index(0) << ' ' << face->vertex_index(1) << ' '
+                    << face->vertex_index(2) << ' ' << face->vertex_index(3) << std::endl;
+            deallog << "  face orientation=" << (cell->face_orientation(face_no) ? "true" : "false")
                     << std::endl;
 
-            const Triangulation<dim>::cell_iterator neighbor =
-              cell->neighbor(face_no);
+            const Triangulation<dim>::cell_iterator neighbor = cell->neighbor(face_no);
 
             const unsigned int nb_of_nb = cell->neighbor_of_neighbor(face_no);
 
@@ -87,27 +82,21 @@ void check(Triangulation<3> &tria)
             // neighbor_of_neighbor works:
             Assert(neighbor->neighbor(nb_of_nb) == cell, ExcInternalError());
 
-            const Triangulation<dim>::face_iterator neighbor_face =
-              neighbor->face(nb_of_nb);
+            const Triangulation<dim>::face_iterator neighbor_face = neighbor->face(nb_of_nb);
 
-            deallog << "  neighbor face vertices="
-                    << neighbor_face->vertex_index(0) << ' '
-                    << neighbor_face->vertex_index(1) << ' '
-                    << neighbor_face->vertex_index(2) << ' '
-                    << neighbor_face->vertex_index(3) << std::endl;
+            deallog << "  neighbor face vertices=" << neighbor_face->vertex_index(0) << ' '
+                    << neighbor_face->vertex_index(1) << ' ' << neighbor_face->vertex_index(2)
+                    << ' ' << neighbor_face->vertex_index(3) << std::endl;
             deallog << "  neighbor->face_orientation(nb_of_nb)="
-                    << (neighbor->face_orientation(nb_of_nb) ? "true" : "false")
-                    << std::endl;
+                    << (neighbor->face_orientation(nb_of_nb) ? "true" : "false") << std::endl;
 
 
             deallog << "  checking subfaces:" << std::endl;
-            for (unsigned int subface_no = 0;
-                 subface_no < GeometryInfo<dim>::max_children_per_face;
+            for (unsigned int subface_no = 0; subface_no < GeometryInfo<dim>::max_children_per_face;
                  ++subface_no)
               {
                 deallog << "    subface_no=" << subface_no << std::endl;
-                deallog << "      center=" << face->child(subface_no)->center()
-                        << std::endl;
+                deallog << "      center=" << face->child(subface_no)->center() << std::endl;
 
                 // we used to abort in the
                 // following call, due to a

@@ -65,8 +65,8 @@ test(unsigned int ref = 1)
       Point<spacedim> p1 = manifold.pull_back(p0);
 
       if (p1.distance(vertices[i]) > 1e-10)
-        deallog << "ERROR! d: " << p1.distance(vertices[i]) << " - " << p1
-                << " != " << vertices[i] << std::endl;
+        deallog << "ERROR! d: " << p1.distance(vertices[i]) << " - " << p1 << " != " << vertices[i]
+                << std::endl;
     }
 }
 

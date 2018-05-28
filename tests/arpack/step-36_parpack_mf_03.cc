@@ -70,10 +70,8 @@ test()
   const unsigned int number_of_eigenvalues        = 5;
 
   MPI_Comm           mpi_communicator = MPI_COMM_WORLD;
-  const unsigned int n_mpi_processes =
-    Utilities::MPI::n_mpi_processes(mpi_communicator);
-  const unsigned int this_mpi_process =
-    Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int n_mpi_processes  = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const unsigned int this_mpi_process = Utilities::MPI::this_mpi_process(mpi_communicator);
 
   parallel::distributed::Triangulation<dim> triangulation(mpi_communicator);
   GridGenerator::hyper_cube(triangulation, -1, 1);
@@ -94,33 +92,23 @@ test()
     dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
-  std::shared_ptr<MatrixFree<dim, double>> mf_data(
-    new MatrixFree<dim, double>());
+  std::shared_ptr<MatrixFree<dim, double>> mf_data(new MatrixFree<dim, double>());
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, double>::AdditionalData data;
-    data.tasks_parallel_scheme =
-      MatrixFree<dim, double>::AdditionalData::partition_color;
-    data.mapping_update_flags =
-      update_values | update_gradients | update_JxW_values;
+    data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::partition_color;
+    data.mapping_update_flags  = update_values | update_gradients | update_JxW_values;
     mf_data->reinit(dof_handler, constraints, quad, data);
   }
 
   std::vector<LinearAlgebra::distributed::Vector<double>> eigenfunctions;
   std::vector<double>                                     eigenvalues;
-  MatrixFreeOperators::MassOperator<dim,
-                                    fe_degree,
-                                    fe_degree + 1,
-                                    1,
-                                    LinearAlgebra::distributed::Vector<double>>
-    mass;
-  MatrixFreeOperators::LaplaceOperator<
-    dim,
-    fe_degree,
-    fe_degree + 1,
-    1,
-    LinearAlgebra::distributed::Vector<double>>
-    laplace;
+  MatrixFreeOperators::
+    MassOperator<dim, fe_degree, fe_degree + 1, 1, LinearAlgebra::distributed::Vector<double>>
+      mass;
+  MatrixFreeOperators::
+    LaplaceOperator<dim, fe_degree, fe_degree + 1, 1, LinearAlgebra::distributed::Vector<double>>
+      laplace;
   mass.initialize(mf_data);
   laplace.initialize(mf_data);
 
@@ -137,17 +125,15 @@ test()
     static ReductionControl inner_control_c(dof_handler.n_dofs(), 0.0, 1.e-14);
 
     typedef LinearAlgebra::distributed::Vector<double> VectorType;
-    SolverCG<VectorType> solver_c(inner_control_c);
-    PreconditionIdentity preconditioner;
-    const auto           invert = inverse_operator(
-      linear_operator<VectorType>(mass), solver_c, preconditioner);
+    SolverCG<VectorType>                               solver_c(inner_control_c);
+    PreconditionIdentity                               preconditioner;
+    const auto                                         invert =
+      inverse_operator(linear_operator<VectorType>(mass), solver_c, preconditioner);
 
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 10;
-    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-    additional_data(
+    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData additional_data(
       num_arnoldi_vectors,
-      PArpackSolver<
-        LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
+      PArpackSolver<LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
       true,
       1);
 
@@ -170,8 +156,7 @@ test()
     }
     // avoid output of iterative solver:
     const unsigned int previous_depth = deallog.depth_file(0);
-    eigensolver.solve(
-      laplace, mass, invert, lambda, eigenfunctions, eigenvalues.size());
+    eigensolver.solve(laplace, mass, invert, lambda, eigenfunctions, eigenvalues.size());
     deallog.depth_file(previous_depth);
 
     for (unsigned int i = 0; i < lambda.size(); i++)
@@ -190,13 +175,11 @@ test()
         {
           for (unsigned int j = 0; j < eigenfunctions.size(); j++)
             {
-              const double err =
-                std::abs(eigenfunctions[j] * eigenfunctions[i] - (i == j));
-              Assert(
-                err < precision,
-                ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
-                           " and " + Utilities::int_to_string(j) +
-                           " are not orthonormal: " + std::to_string(err)));
+              const double err = std::abs(eigenfunctions[j] * eigenfunctions[i] - (i == j));
+              Assert(err < precision,
+                     ExcMessage("Eigenvectors " + Utilities::int_to_string(i) + " and " +
+                                Utilities::int_to_string(j) +
+                                " are not orthonormal: " + std::to_string(err)));
             }
 
           laplace.vmult(Ax, eigenfunctions[i]);
@@ -232,13 +215,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -246,12 +227,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

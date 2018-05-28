@@ -103,8 +103,7 @@ main()
   CHECK_SYS3(FE_Q<3>(1), 3, FE_DGQ<3>(3), 1, FE_Q<3>(1), 3, 3);
 
   // systems of systems
-  CHECK_SYS3(
-    (FESystem<2>(FE_Q<2>(1), 3)), 3, FE_DGQ<2>(3), 1, FE_Q<2>(1), 3, 2);
+  CHECK_SYS3((FESystem<2>(FE_Q<2>(1), 3)), 3, FE_DGQ<2>(3), 1, FE_Q<2>(1), 3, 2);
   CHECK_SYS3(FE_DGQ<2>(3),
              1,
              FESystem<2>(FE_DGQ<2>(3), 3),

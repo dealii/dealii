@@ -60,17 +60,13 @@ test()
   DoFTools::extract_locally_relevant_dofs(dof, relevant_set);
 
   ConstraintMatrix constraints_0(relevant_set), constraints_1(relevant_set);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints_0);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints_0);
   constraints_0.close();
   constraints_1.close();
 
-  std::shared_ptr<MatrixFree<dim, number>> mf_data_0(
-    new MatrixFree<dim, number>());
-  std::shared_ptr<MatrixFree<dim, number>> mf_data_1(
-    new MatrixFree<dim, number>());
-  std::shared_ptr<MatrixFree<dim, number>> mf_data_combined(
-    new MatrixFree<dim, number>());
+  std::shared_ptr<MatrixFree<dim, number>>         mf_data_0(new MatrixFree<dim, number>());
+  std::shared_ptr<MatrixFree<dim, number>>         mf_data_1(new MatrixFree<dim, number>());
+  std::shared_ptr<MatrixFree<dim, number>>         mf_data_combined(new MatrixFree<dim, number>());
   const QGauss<1>                                  quad(2);
   typename MatrixFree<dim, number>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
@@ -84,9 +80,8 @@ test()
     mf_data_combined->reinit(dof_handlers, constraint, quad, data);
   }
 
-  MatrixFreeOperators::
-    MassOperator<dim, 1, 2, 1, LinearAlgebra::distributed::Vector<number>>
-      mf_0, mf_1, mf_c0, mf_c1;
+  MatrixFreeOperators::MassOperator<dim, 1, 2, 1, LinearAlgebra::distributed::Vector<number>> mf_0,
+    mf_1, mf_c0, mf_c1;
   mf_0.initialize(mf_data_0);
   mf_1.initialize(mf_data_1);
 

@@ -38,8 +38,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase() :
-  update_each(update_default)
+FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase() : update_each(update_default)
 {}
 
 
@@ -54,51 +53,40 @@ FiniteElement<dim, spacedim>::InternalDataBase::memory_consumption() const
 
 
 template <int dim, int spacedim>
-FiniteElement<dim, spacedim>::FiniteElement(
-  const FiniteElementData<dim> &    fe_data,
-  const std::vector<bool> &         r_i_a_f,
-  const std::vector<ComponentMask> &nonzero_c) :
+FiniteElement<dim, spacedim>::FiniteElement(const FiniteElementData<dim> &    fe_data,
+                                            const std::vector<bool> &         r_i_a_f,
+                                            const std::vector<ComponentMask> &nonzero_c) :
   FiniteElementData<dim>(fe_data),
-  adjust_quad_dof_index_for_face_orientation_table(
-    dim == 3 ? this->dofs_per_quad : 0,
-    dim == 3 ? 8 : 0),
-  adjust_line_dof_index_for_line_orientation_table(
-    dim == 3 ? this->dofs_per_line : 0),
+  adjust_quad_dof_index_for_face_orientation_table(dim == 3 ? this->dofs_per_quad : 0,
+                                                   dim == 3 ? 8 : 0),
+  adjust_line_dof_index_for_line_orientation_table(dim == 3 ? this->dofs_per_line : 0),
   system_to_base_table(this->dofs_per_cell),
   face_system_to_base_table(this->dofs_per_face),
-  component_to_base_table(this->components,
-                          std::make_pair(std::make_pair(0U, 0U), 0U)),
+  component_to_base_table(this->components, std::make_pair(std::make_pair(0U, 0U), 0U)),
 
   // Special handling of vectors of length one: in this case, we
   // assume that all entries were supposed to be equal
   restriction_is_additive_flags(
-    r_i_a_f.size() == 1 ? std::vector<bool>(fe_data.dofs_per_cell, r_i_a_f[0]) :
-                          r_i_a_f),
-  nonzero_components(
-    nonzero_c.size() == 1 ?
-      std::vector<ComponentMask>(fe_data.dofs_per_cell, nonzero_c[0]) :
-      nonzero_c),
+    r_i_a_f.size() == 1 ? std::vector<bool>(fe_data.dofs_per_cell, r_i_a_f[0]) : r_i_a_f),
+  nonzero_components(nonzero_c.size() == 1 ?
+                       std::vector<ComponentMask>(fe_data.dofs_per_cell, nonzero_c[0]) :
+                       nonzero_c),
   n_nonzero_components_table(compute_n_nonzero_components(nonzero_components)),
-  cached_primitivity(std::find_if(n_nonzero_components_table.begin(),
-                                  n_nonzero_components_table.end(),
-                                  std::bind(std::not_equal_to<unsigned int>(),
-                                            std::placeholders::_1,
-                                            1U)) ==
-                     n_nonzero_components_table.end())
+  cached_primitivity(
+    std::find_if(n_nonzero_components_table.begin(),
+                 n_nonzero_components_table.end(),
+                 std::bind(std::not_equal_to<unsigned int>(), std::placeholders::_1, 1U)) ==
+    n_nonzero_components_table.end())
 {
   Assert(restriction_is_additive_flags.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(restriction_is_additive_flags.size(),
-                              this->dofs_per_cell));
+         ExcDimensionMismatch(restriction_is_additive_flags.size(), this->dofs_per_cell));
   AssertDimension(nonzero_components.size(), this->dofs_per_cell);
   for (unsigned int i = 0; i < nonzero_components.size(); ++i)
     {
-      Assert(nonzero_components[i].size() == this->n_components(),
-             ExcInternalError());
-      Assert(nonzero_components[i].n_selected_components() >= 1,
-             ExcInternalError());
+      Assert(nonzero_components[i].size() == this->n_components(), ExcInternalError());
+      Assert(nonzero_components[i].n_selected_components() >= 1, ExcInternalError());
       Assert(n_nonzero_components_table[i] >= 1, ExcInternalError());
-      Assert(n_nonzero_components_table[i] <= this->n_components(),
-             ExcInternalError());
+      Assert(n_nonzero_components_table[i] <= this->n_components(), ExcInternalError());
     }
 
   // initialize some tables in the default way, i.e. if there is only one
@@ -130,12 +118,10 @@ FiniteElement<dim, spacedim>::FiniteElement(
        ref < RefinementCase<dim>::isotropic_refinement + 1;
        ++ref)
     {
-      prolongation[ref - 1].resize(
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref)),
-        FullMatrix<double>());
-      restriction[ref - 1].resize(
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref)),
-        FullMatrix<double>());
+      prolongation[ref - 1].resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(ref)),
+                                   FullMatrix<double>());
+      restriction[ref - 1].resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(ref)),
+                                  FullMatrix<double>());
     }
 
   adjust_quad_dof_index_for_face_orientation_table.fill(0);
@@ -154,8 +140,7 @@ FiniteElement<dim, spacedim>::operator^(const unsigned int multiplicity) const
 
 template <int dim, int spacedim>
 double
-FiniteElement<dim, spacedim>::shape_value(const unsigned int,
-                                          const Point<dim> &) const
+FiniteElement<dim, spacedim>::shape_value(const unsigned int, const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return 0.;
@@ -177,8 +162,7 @@ FiniteElement<dim, spacedim>::shape_value_component(const unsigned int,
 
 template <int dim, int spacedim>
 Tensor<1, dim>
-FiniteElement<dim, spacedim>::shape_grad(const unsigned int,
-                                         const Point<dim> &) const
+FiniteElement<dim, spacedim>::shape_grad(const unsigned int, const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<1, dim>();
@@ -200,8 +184,7 @@ FiniteElement<dim, spacedim>::shape_grad_component(const unsigned int,
 
 template <int dim, int spacedim>
 Tensor<2, dim>
-FiniteElement<dim, spacedim>::shape_grad_grad(const unsigned int,
-                                              const Point<dim> &) const
+FiniteElement<dim, spacedim>::shape_grad_grad(const unsigned int, const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<2, dim>();
@@ -211,10 +194,9 @@ FiniteElement<dim, spacedim>::shape_grad_grad(const unsigned int,
 
 template <int dim, int spacedim>
 Tensor<2, dim>
-FiniteElement<dim, spacedim>::shape_grad_grad_component(
-  const unsigned int,
-  const Point<dim> &,
-  const unsigned int) const
+FiniteElement<dim, spacedim>::shape_grad_grad_component(const unsigned int,
+                                                        const Point<dim> &,
+                                                        const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<2, dim>();
@@ -224,8 +206,7 @@ FiniteElement<dim, spacedim>::shape_grad_grad_component(
 
 template <int dim, int spacedim>
 Tensor<3, dim>
-FiniteElement<dim, spacedim>::shape_3rd_derivative(const unsigned int,
-                                                   const Point<dim> &) const
+FiniteElement<dim, spacedim>::shape_3rd_derivative(const unsigned int, const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<3, dim>();
@@ -235,10 +216,9 @@ FiniteElement<dim, spacedim>::shape_3rd_derivative(const unsigned int,
 
 template <int dim, int spacedim>
 Tensor<3, dim>
-FiniteElement<dim, spacedim>::shape_3rd_derivative_component(
-  const unsigned int,
-  const Point<dim> &,
-  const unsigned int) const
+FiniteElement<dim, spacedim>::shape_3rd_derivative_component(const unsigned int,
+                                                             const Point<dim> &,
+                                                             const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<3, dim>();
@@ -248,8 +228,7 @@ FiniteElement<dim, spacedim>::shape_3rd_derivative_component(
 
 template <int dim, int spacedim>
 Tensor<4, dim>
-FiniteElement<dim, spacedim>::shape_4th_derivative(const unsigned int,
-                                                   const Point<dim> &) const
+FiniteElement<dim, spacedim>::shape_4th_derivative(const unsigned int, const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<4, dim>();
@@ -259,10 +238,9 @@ FiniteElement<dim, spacedim>::shape_4th_derivative(const unsigned int,
 
 template <int dim, int spacedim>
 Tensor<4, dim>
-FiniteElement<dim, spacedim>::shape_4th_derivative_component(
-  const unsigned int,
-  const Point<dim> &,
-  const unsigned int) const
+FiniteElement<dim, spacedim>::shape_4th_derivative_component(const unsigned int,
+                                                             const Point<dim> &,
+                                                             const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<4, dim>();
@@ -279,21 +257,18 @@ FiniteElement<dim, spacedim>::reinit_restriction_and_prolongation_matrices(
        ref_case <= RefinementCase<dim>::isotropic_refinement;
        ++ref_case)
     {
-      const unsigned int nc =
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+      const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
 
       for (unsigned int i = 0; i < nc; ++i)
         {
           if (this->restriction[ref_case - 1][i].m() != this->dofs_per_cell &&
               (!isotropic_restriction_only ||
                ref_case == RefinementCase<dim>::isotropic_refinement))
-            this->restriction[ref_case - 1][i].reinit(this->dofs_per_cell,
-                                                      this->dofs_per_cell);
+            this->restriction[ref_case - 1][i].reinit(this->dofs_per_cell, this->dofs_per_cell);
           if (this->prolongation[ref_case - 1][i].m() != this->dofs_per_cell &&
               (!isotropic_prolongation_only ||
                ref_case == RefinementCase<dim>::isotropic_refinement))
-            this->prolongation[ref_case - 1][i].reinit(this->dofs_per_cell,
-                                                       this->dofs_per_cell);
+            this->prolongation[ref_case - 1][i].reinit(this->dofs_per_cell, this->dofs_per_cell);
         }
     }
 }
@@ -306,22 +281,16 @@ FiniteElement<dim, spacedim>::get_restriction_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Restriction matrices are only available for refined cells!"));
+         ExcIndexRange(refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage("Restriction matrices are only available for refined cells!"));
   Assert(
     child < GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-    ExcIndexRange(
-      child,
-      0,
-      GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
+    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
   // we use refinement_case-1 here. the -1 takes care of the origin of the
   // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
   // available and so the vector indices are shifted
-  Assert(restriction[refinement_case - 1][child].n() == this->dofs_per_cell,
-         ExcProjectionVoid());
+  Assert(restriction[refinement_case - 1][child].n() == this->dofs_per_cell, ExcProjectionVoid());
   return restriction[refinement_case - 1][child];
 }
 
@@ -334,24 +303,18 @@ FiniteElement<dim, spacedim>::get_prolongation_matrix(
   const RefinementCase<dim> &refinement_case) const
 {
   Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(
-           refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(
-    refinement_case != RefinementCase<dim>::no_refinement,
-    ExcMessage("Prolongation matrices are only available for refined cells!"));
+         ExcIndexRange(refinement_case, 0, RefinementCase<dim>::isotropic_refinement + 1));
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage("Prolongation matrices are only available for refined cells!"));
   Assert(
     child < GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-    ExcIndexRange(
-      child,
-      0,
-      GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
+    ExcIndexRange(child, 0, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
   // we use refinement_case-1 here. the -1 takes care
   // of the origin of the vector, as for
   // RefinementCase::no_refinement (=0) there is no
   // data available and so the vector indices
   // are shifted
-  Assert(prolongation[refinement_case - 1][child].n() == this->dofs_per_cell,
-         ExcEmbeddingVoid());
+  Assert(prolongation[refinement_case - 1][child].n() == this->dofs_per_cell, ExcEmbeddingVoid());
   return prolongation[refinement_case - 1][child];
 }
 
@@ -359,11 +322,9 @@ FiniteElement<dim, spacedim>::get_prolongation_matrix(
 // TODO:[GK] This is probably not the most efficient way of doing this.
 template <int dim, int spacedim>
 unsigned int
-FiniteElement<dim, spacedim>::component_to_block_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::component_to_block_index(const unsigned int index) const
 {
-  Assert(index < this->n_components(),
-         ExcIndexRange(index, 0, this->n_components()));
+  Assert(index < this->n_components(), ExcIndexRange(index, 0, this->n_components()));
 
   return first_block_of_base(component_to_base_table[index].first.first) +
          component_to_base_table[index].second;
@@ -372,8 +333,7 @@ FiniteElement<dim, spacedim>::component_to_block_index(
 
 template <int dim, int spacedim>
 ComponentMask
-FiniteElement<dim, spacedim>::component_mask(
-  const FEValuesExtractors::Scalar &scalar) const
+FiniteElement<dim, spacedim>::component_mask(const FEValuesExtractors::Scalar &scalar) const
 {
   AssertIndexRange(scalar.component, this->n_components());
 
@@ -390,11 +350,9 @@ FiniteElement<dim, spacedim>::component_mask(
 
 template <int dim, int spacedim>
 ComponentMask
-FiniteElement<dim, spacedim>::component_mask(
-  const FEValuesExtractors::Vector &vector) const
+FiniteElement<dim, spacedim>::component_mask(const FEValuesExtractors::Vector &vector) const
 {
-  AssertIndexRange(vector.first_vector_component + dim - 1,
-                   this->n_components());
+  AssertIndexRange(vector.first_vector_component + dim - 1, this->n_components());
 
   // TODO: it would be nice to verify that it is indeed possible
   // to select these vector components, i.e., that they don't span
@@ -402,9 +360,7 @@ FiniteElement<dim, spacedim>::component_mask(
   // unfortunately, there is no simple way to write such a condition...
 
   std::vector<bool> mask(this->n_components(), false);
-  for (unsigned int c = vector.first_vector_component;
-       c < vector.first_vector_component + dim;
-       ++c)
+  for (unsigned int c = vector.first_vector_component; c < vector.first_vector_component + dim; ++c)
     mask[c] = true;
   return mask;
 }
@@ -415,9 +371,9 @@ ComponentMask
 FiniteElement<dim, spacedim>::component_mask(
   const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
 {
-  AssertIndexRange((sym_tensor.first_tensor_component +
-                    SymmetricTensor<2, dim>::n_independent_components - 1),
-                   this->n_components());
+  AssertIndexRange(
+    (sym_tensor.first_tensor_component + SymmetricTensor<2, dim>::n_independent_components - 1),
+    this->n_components());
 
   // TODO: it would be nice to verify that it is indeed possible
   // to select these vector components, i.e., that they don't span
@@ -426,8 +382,7 @@ FiniteElement<dim, spacedim>::component_mask(
 
   std::vector<bool> mask(this->n_components(), false);
   for (unsigned int c = sym_tensor.first_tensor_component;
-       c < sym_tensor.first_tensor_component +
-             SymmetricTensor<2, dim>::n_independent_components;
+       c < sym_tensor.first_tensor_component + SymmetricTensor<2, dim>::n_independent_components;
        ++c)
     mask[c] = true;
   return mask;
@@ -458,8 +413,7 @@ FiniteElement<dim, spacedim>::component_mask(const BlockMask &block_mask) const
 
 template <int dim, int spacedim>
 BlockMask
-FiniteElement<dim, spacedim>::block_mask(
-  const FEValuesExtractors::Scalar &scalar) const
+FiniteElement<dim, spacedim>::block_mask(const FEValuesExtractors::Scalar &scalar) const
 {
   // simply create the corresponding component mask (a simpler
   // process) and then convert it to a block mask
@@ -469,8 +423,7 @@ FiniteElement<dim, spacedim>::block_mask(
 
 template <int dim, int spacedim>
 BlockMask
-FiniteElement<dim, spacedim>::block_mask(
-  const FEValuesExtractors::Vector &vector) const
+FiniteElement<dim, spacedim>::block_mask(const FEValuesExtractors::Vector &vector) const
 {
   // simply create the corresponding component mask (a simpler
   // process) and then convert it to a block mask
@@ -492,8 +445,7 @@ FiniteElement<dim, spacedim>::block_mask(
 
 template <int dim, int spacedim>
 BlockMask
-FiniteElement<dim, spacedim>::block_mask(
-  const ComponentMask &component_mask) const
+FiniteElement<dim, spacedim>::block_mask(const ComponentMask &component_mask) const
 {
   // if we get a component mask that represents all component, then
   // do the same for the returned block mask
@@ -522,16 +474,14 @@ FiniteElement<dim, spacedim>::block_mask(
       // components that correspond
       // to this block
       ++c;
-      while ((c < this->n_components()) &&
-             (component_to_block_index(c) == block))
+      while ((c < this->n_components()) && (component_to_block_index(c) == block))
         {
           Assert(component_mask[c] == block_mask[block],
-                 ExcMessage(
-                   "The component mask argument given to this function "
-                   "is not a mask where the individual components belonging "
-                   "to one block of the finite element are either all "
-                   "selected or not selected. You can't call this function "
-                   "with a component mask that splits blocks."));
+                 ExcMessage("The component mask argument given to this function "
+                            "is not a mask where the individual components belonging "
+                            "to one block of the finite element are either all "
+                            "selected or not selected. You can't call this function "
+                            "with a component mask that splits blocks."));
           ++c;
         }
     }
@@ -546,12 +496,11 @@ template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
                                                  const unsigned int face,
-                                                 const bool face_orientation,
-                                                 const bool face_flip,
-                                                 const bool face_rotation) const
+                                                 const bool         face_orientation,
+                                                 const bool         face_flip,
+                                                 const bool         face_rotation) const
 {
-  Assert(face_index < this->dofs_per_face,
-         ExcIndexRange(face_index, 0, this->dofs_per_face));
+  Assert(face_index < this->dofs_per_face, ExcIndexRange(face_index, 0, this->dofs_per_face));
   Assert(face < GeometryInfo<dim>::faces_per_cell,
          ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
 
@@ -568,14 +517,12 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
   // assertion -- in essence, derived classes have to implement
   // an overloaded version of this function if we are to use any
   // other than standard orientation
-  if ((face_orientation != true) || (face_flip != false) ||
-      (face_rotation != false))
-    Assert(
-      (this->dofs_per_line <= 1) && (this->dofs_per_quad <= 1),
-      ExcMessage("The function in this base class can not handle this case. "
-                 "Rather, the derived class you are using must provide "
-                 "an overloaded version but apparently hasn't done so. See "
-                 "the documentation of this function for more information."));
+  if ((face_orientation != true) || (face_flip != false) || (face_rotation != false))
+    Assert((this->dofs_per_line <= 1) && (this->dofs_per_quad <= 1),
+           ExcMessage("The function in this base class can not handle this case. "
+                      "Rather, the derived class you are using must provide "
+                      "an overloaded version but apparently hasn't done so. See "
+                      "the documentation of this function for more information."));
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
@@ -584,9 +531,8 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
     {
       // get the number of the vertex on the face that corresponds to this DoF,
       // along with the number of the DoF on this vertex
-      const unsigned int face_vertex = face_index / this->dofs_per_vertex;
-      const unsigned int dof_index_on_vertex =
-        face_index % this->dofs_per_vertex;
+      const unsigned int face_vertex         = face_index / this->dofs_per_vertex;
+      const unsigned int dof_index_on_vertex = face_index % this->dofs_per_vertex;
 
       // then get the number of this vertex on the cell and translate
       // this to a DoF number on the cell
@@ -650,10 +596,8 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   // in 3d), so we don't need the table, but
   // the function should also not have been
   // called
-  Assert(index < this->dofs_per_quad,
-         ExcIndexRange(index, 0, this->dofs_per_quad));
-  Assert(adjust_quad_dof_index_for_face_orientation_table.n_elements() ==
-           8 * this->dofs_per_quad,
+  Assert(index < this->dofs_per_quad, ExcIndexRange(index, 0, this->dofs_per_quad));
+  Assert(adjust_quad_dof_index_for_face_orientation_table.n_elements() == 8 * this->dofs_per_quad,
          ExcInternalError());
   return index + adjust_quad_dof_index_for_face_orientation_table(
                    index, 4 * face_orientation + 2 * face_flip + face_rotation);
@@ -674,10 +618,8 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   if (dim < 3)
     return index;
 
-  Assert(index < this->dofs_per_line,
-         ExcIndexRange(index, 0, this->dofs_per_line));
-  Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
-           this->dofs_per_line,
+  Assert(index < this->dofs_per_line, ExcIndexRange(index, 0, this->dofs_per_line));
+  Assert(adjust_line_dof_index_for_line_orientation_table.size() == this->dofs_per_line,
          ExcInternalError());
   if (line_orientation)
     return index;
@@ -694,9 +636,7 @@ FiniteElement<dim, spacedim>::prolongation_is_implemented() const
   for (unsigned int ref_case = RefinementCase<dim>::cut_x;
        ref_case < RefinementCase<dim>::isotropic_refinement + 1;
        ++ref_case)
-    for (unsigned int c = 0;
-         c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-         ++c)
+    for (unsigned int c = 0; c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
       {
         // make sure also the lazily initialized matrices are created
         get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
@@ -706,8 +646,7 @@ FiniteElement<dim, spacedim>::prolongation_is_implemented() const
         Assert((prolongation[ref_case - 1][c].n() == this->dofs_per_cell) ||
                  (prolongation[ref_case - 1][c].n() == 0),
                ExcInternalError());
-        if ((prolongation[ref_case - 1][c].m() == 0) ||
-            (prolongation[ref_case - 1][c].n() == 0))
+        if ((prolongation[ref_case - 1][c].m() == 0) || (prolongation[ref_case - 1][c].n() == 0))
           return false;
       }
   return true;
@@ -722,9 +661,7 @@ FiniteElement<dim, spacedim>::restriction_is_implemented() const
   for (unsigned int ref_case = RefinementCase<dim>::cut_x;
        ref_case < RefinementCase<dim>::isotropic_refinement + 1;
        ++ref_case)
-    for (unsigned int c = 0;
-         c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-         ++c)
+    for (unsigned int c = 0; c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
       {
         // make sure also the lazily initialized matrices are created
         get_restriction_matrix(c, RefinementCase<dim>(ref_case));
@@ -734,8 +671,7 @@ FiniteElement<dim, spacedim>::restriction_is_implemented() const
         Assert((restriction[ref_case - 1][c].n() == this->dofs_per_cell) ||
                  (restriction[ref_case - 1][c].n() == 0),
                ExcInternalError());
-        if ((restriction[ref_case - 1][c].m() == 0) ||
-            (restriction[ref_case - 1][c].n() == 0))
+        if ((restriction[ref_case - 1][c].m() == 0) || (restriction[ref_case - 1][c].n() == 0))
           return false;
       }
   return true;
@@ -747,12 +683,9 @@ template <int dim, int spacedim>
 bool
 FiniteElement<dim, spacedim>::isotropic_prolongation_is_implemented() const
 {
-  const RefinementCase<dim> ref_case =
-    RefinementCase<dim>::isotropic_refinement;
+  const RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement;
 
-  for (unsigned int c = 0;
-       c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-       ++c)
+  for (unsigned int c = 0; c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
     {
       // make sure also the lazily initialized matrices are created
       get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
@@ -762,8 +695,7 @@ FiniteElement<dim, spacedim>::isotropic_prolongation_is_implemented() const
       Assert((prolongation[ref_case - 1][c].n() == this->dofs_per_cell) ||
                (prolongation[ref_case - 1][c].n() == 0),
              ExcInternalError());
-      if ((prolongation[ref_case - 1][c].m() == 0) ||
-          (prolongation[ref_case - 1][c].n() == 0))
+      if ((prolongation[ref_case - 1][c].m() == 0) || (prolongation[ref_case - 1][c].n() == 0))
         return false;
     }
   return true;
@@ -775,12 +707,9 @@ template <int dim, int spacedim>
 bool
 FiniteElement<dim, spacedim>::isotropic_restriction_is_implemented() const
 {
-  const RefinementCase<dim> ref_case =
-    RefinementCase<dim>::isotropic_refinement;
+  const RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement;
 
-  for (unsigned int c = 0;
-       c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-       ++c)
+  for (unsigned int c = 0; c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
     {
       // make sure also the lazily initialized matrices are created
       get_restriction_matrix(c, RefinementCase<dim>(ref_case));
@@ -790,8 +719,7 @@ FiniteElement<dim, spacedim>::isotropic_restriction_is_implemented() const
       Assert((restriction[ref_case - 1][c].n() == this->dofs_per_cell) ||
                (restriction[ref_case - 1][c].n() == 0),
              ExcInternalError());
-      if ((restriction[ref_case - 1][c].m() == 0) ||
-          (restriction[ref_case - 1][c].n() == 0))
+      if ((restriction[ref_case - 1][c].m() == 0) || (restriction[ref_case - 1][c].n() == 0))
         return false;
     }
   return true;
@@ -823,8 +751,7 @@ FiniteElement<dim, spacedim>::hp_constraints_are_implemented() const
 
 template <int dim, int spacedim>
 const FullMatrix<double> &
-FiniteElement<dim, spacedim>::constraints(
-  const internal::SubfaceCase<dim> &subface_case) const
+FiniteElement<dim, spacedim>::constraints(const internal::SubfaceCase<dim> &subface_case) const
 {
   (void)subface_case;
   Assert(subface_case == internal::SubfaceCase<dim>::case_isotropic,
@@ -840,8 +767,7 @@ FiniteElement<dim, spacedim>::constraints(
 
   if (dim == 1)
     Assert((interface_constraints.m() == 0) && (interface_constraints.n() == 0),
-           ExcWrongInterfaceMatrixSize(interface_constraints.m(),
-                                       interface_constraints.n()));
+           ExcWrongInterfaceMatrixSize(interface_constraints.m(), interface_constraints.n()));
 
   return interface_constraints;
 }
@@ -860,72 +786,60 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
         return TableIndices<2>(this->dofs_per_vertex + 2 * this->dofs_per_line,
                                this->dofs_per_face);
       case 3:
-        return TableIndices<2>(5 * this->dofs_per_vertex +
-                                 12 * this->dofs_per_line +
+        return TableIndices<2>(5 * this->dofs_per_vertex + 12 * this->dofs_per_line +
                                  4 * this->dofs_per_quad,
                                this->dofs_per_face);
       default:
         Assert(false, ExcNotImplemented());
     };
-  return TableIndices<2>(numbers::invalid_unsigned_int,
-                         numbers::invalid_unsigned_int);
+  return TableIndices<2>(numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
 }
 
 
 
 template <int dim, int spacedim>
 void
-FiniteElement<dim, spacedim>::get_interpolation_matrix(
-  const FiniteElement<dim, spacedim> &,
-  FullMatrix<double> &) const
+FiniteElement<dim, spacedim>::get_interpolation_matrix(const FiniteElement<dim, spacedim> &,
+                                                       FullMatrix<double> &) const
 {
   // by default, no interpolation
   // implemented. so throw exception,
   // as documentation says
-  AssertThrow(
-    false,
-    (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
+  AssertThrow(false, (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 }
 
 
 
 template <int dim, int spacedim>
 void
-FiniteElement<dim, spacedim>::get_face_interpolation_matrix(
-  const FiniteElement<dim, spacedim> &,
-  FullMatrix<double> &) const
+FiniteElement<dim, spacedim>::get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &,
+                                                            FullMatrix<double> &) const
 {
   // by default, no interpolation
   // implemented. so throw exception,
   // as documentation says
-  AssertThrow(
-    false,
-    (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
+  AssertThrow(false, (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 }
 
 
 
 template <int dim, int spacedim>
 void
-FiniteElement<dim, spacedim>::get_subface_interpolation_matrix(
-  const FiniteElement<dim, spacedim> &,
-  const unsigned int,
-  FullMatrix<double> &) const
+FiniteElement<dim, spacedim>::get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &,
+                                                               const unsigned int,
+                                                               FullMatrix<double> &) const
 {
   // by default, no interpolation
   // implemented. so throw exception,
   // as documentation says
-  AssertThrow(
-    false,
-    (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
+  AssertThrow(false, (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 }
 
 
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FiniteElement<dim, spacedim>::hp_vertex_dof_identities(
-  const FiniteElement<dim, spacedim> &) const
+FiniteElement<dim, spacedim>::hp_vertex_dof_identities(const FiniteElement<dim, spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
   return std::vector<std::pair<unsigned int, unsigned int>>();
@@ -935,8 +849,7 @@ FiniteElement<dim, spacedim>::hp_vertex_dof_identities(
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FiniteElement<dim, spacedim>::hp_line_dof_identities(
-  const FiniteElement<dim, spacedim> &) const
+FiniteElement<dim, spacedim>::hp_line_dof_identities(const FiniteElement<dim, spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
   return std::vector<std::pair<unsigned int, unsigned int>>();
@@ -946,8 +859,7 @@ FiniteElement<dim, spacedim>::hp_line_dof_identities(
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FiniteElement<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &) const
+FiniteElement<dim, spacedim>::hp_quad_dof_identities(const FiniteElement<dim, spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
   return std::vector<std::pair<unsigned int, unsigned int>>();
@@ -968,8 +880,7 @@ FiniteElement<dim, spacedim>::compare_for_face_domination(
 
 template <int dim, int spacedim>
 bool
-FiniteElement<dim, spacedim>::
-operator==(const FiniteElement<dim, spacedim> &f) const
+FiniteElement<dim, spacedim>::operator==(const FiniteElement<dim, spacedim> &f) const
 {
   // Compare fields in roughly increasing order of how expensive the
   // comparison is
@@ -983,8 +894,7 @@ operator==(const FiniteElement<dim, spacedim> &f) const
 
 template <int dim, int spacedim>
 bool
-FiniteElement<dim, spacedim>::
-operator!=(const FiniteElement<dim, spacedim> &f) const
+FiniteElement<dim, spacedim>::operator!=(const FiniteElement<dim, spacedim> &f) const
 {
   return !(*this == f);
 }
@@ -999,8 +909,7 @@ FiniteElement<dim, spacedim>::get_unit_support_points() const
   // support points, but only if
   // there are as many as there are
   // degrees of freedom
-  Assert((unit_support_points.size() == 0) ||
-           (unit_support_points.size() == this->dofs_per_cell),
+  Assert((unit_support_points.size() == 0) || (unit_support_points.size() == this->dofs_per_cell),
          ExcInternalError());
   return unit_support_points;
 }
@@ -1022,9 +931,8 @@ FiniteElement<dim, spacedim>::get_generalized_support_points() const
 {
   // If the finite element implements generalized support points, return
   // those. Otherwise fall back to unit support points.
-  return ((generalized_support_points.size() == 0) ?
-            unit_support_points :
-            generalized_support_points);
+  return ((generalized_support_points.size() == 0) ? unit_support_points :
+                                                     generalized_support_points);
 }
 
 
@@ -1042,10 +950,8 @@ template <int dim, int spacedim>
 Point<dim>
 FiniteElement<dim, spacedim>::unit_support_point(const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
-  Assert(unit_support_points.size() == this->dofs_per_cell,
-         ExcFEHasNoSupportPoints());
+  Assert(index < this->dofs_per_cell, ExcIndexRange(index, 0, this->dofs_per_cell));
+  Assert(unit_support_points.size() == this->dofs_per_cell, ExcFEHasNoSupportPoints());
   return unit_support_points[index];
 }
 
@@ -1084,9 +990,8 @@ FiniteElement<dim, spacedim>::get_generalized_face_support_points() const
   // support points, but only if
   // there are as many as there are
   // degrees of freedom on a face
-  return ((generalized_face_support_points.size() == 0) ?
-            unit_face_support_points :
-            generalized_face_support_points);
+  return ((generalized_face_support_points.size() == 0) ? unit_face_support_points :
+                                                          generalized_face_support_points);
 }
 
 
@@ -1102,13 +1007,10 @@ FiniteElement<dim, spacedim>::has_generalized_face_support_points() const
 
 template <int dim, int spacedim>
 Point<dim - 1>
-FiniteElement<dim, spacedim>::unit_face_support_point(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::unit_face_support_point(const unsigned int index) const
 {
-  Assert(index < this->dofs_per_face,
-         ExcIndexRange(index, 0, this->dofs_per_face));
-  Assert(unit_face_support_points.size() == this->dofs_per_face,
-         ExcFEHasNoSupportPoints());
+  Assert(index < this->dofs_per_face, ExcIndexRange(index, 0, this->dofs_per_face));
+  Assert(unit_face_support_points.size() == this->dofs_per_face, ExcFEHasNoSupportPoints());
   return unit_face_support_points[index];
 }
 
@@ -1116,8 +1018,7 @@ FiniteElement<dim, spacedim>::unit_face_support_point(
 
 template <int dim, int spacedim>
 bool
-FiniteElement<dim, spacedim>::has_support_on_face(const unsigned int,
-                                                  const unsigned int) const
+FiniteElement<dim, spacedim>::has_support_on_face(const unsigned int, const unsigned int) const
 {
   return true;
 }
@@ -1134,22 +1035,18 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
   Assert((n_total_components == mask.size()) || (mask.size() == 0),
          ExcMessage("The given ComponentMask has the wrong size."));
 
-  const unsigned int n_selected =
-    mask.n_selected_components(n_total_components);
-  Assert(n_selected > 0,
-         ExcMessage("You need at least one selected component."));
+  const unsigned int n_selected = mask.n_selected_components(n_total_components);
+  Assert(n_selected > 0, ExcMessage("You need at least one selected component."));
 
-  const unsigned int first_selected =
-    mask.first_selected_component(n_total_components);
+  const unsigned int first_selected = mask.first_selected_component(n_total_components);
 
 #ifdef DEBUG
   // check that it is contiguous:
   for (unsigned int c = 0; c < n_total_components; ++c)
-    Assert(
-      (c < first_selected && (!mask[c])) ||
-        (c >= first_selected && c < first_selected + n_selected && mask[c]) ||
-        (c >= first_selected + n_selected && !mask[c]),
-      ExcMessage("Error: the given ComponentMask is not contiguous!"));
+    Assert((c < first_selected && (!mask[c])) ||
+             (c >= first_selected && c < first_selected + n_selected && mask[c]) ||
+             (c >= first_selected + n_selected && !mask[c]),
+           ExcMessage("Error: the given ComponentMask is not contiguous!"));
 #endif
 
   return get_sub_fe(first_selected, n_selected);
@@ -1159,15 +1056,13 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
 
 template <int dim, int spacedim>
 const FiniteElement<dim, spacedim> &
-FiniteElement<dim, spacedim>::get_sub_fe(
-  const unsigned int first_component,
-  const unsigned int n_selected_components) const
+FiniteElement<dim, spacedim>::get_sub_fe(const unsigned int first_component,
+                                         const unsigned int n_selected_components) const
 {
   // No complicated logic is needed here, because it is overridden in
   // FESystem<dim,spacedim>. Just make sure that what the user chose is valid:
   Assert(first_component == 0 && n_selected_components == this->n_components(),
-         ExcMessage(
-           "You can only select a whole FiniteElement, not a part of one."));
+         ExcMessage("You can only select a whole FiniteElement, not a part of one."));
 
   (void)first_component;
   (void)n_selected_components;
@@ -1190,10 +1085,9 @@ FiniteElement<dim, spacedim>::get_constant_modes() const
 
 template <int dim, int spacedim>
 void
-FiniteElement<dim, spacedim>::
-  convert_generalized_support_point_values_to_dof_values(
-    const std::vector<Vector<double>> &,
-    std::vector<double> &) const
+FiniteElement<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
+  const std::vector<Vector<double>> &,
+  std::vector<double> &) const
 {
   Assert(has_generalized_support_points(),
          ExcMessage("The element for which you are calling the current "
@@ -1210,19 +1104,17 @@ template <int dim, int spacedim>
 std::size_t
 FiniteElement<dim, spacedim>::memory_consumption() const
 {
-  return (
-    sizeof(FiniteElementData<dim>) +
-    MemoryConsumption::memory_consumption(restriction) +
-    MemoryConsumption::memory_consumption(prolongation) +
-    MemoryConsumption::memory_consumption(interface_constraints) +
-    MemoryConsumption::memory_consumption(system_to_component_table) +
-    MemoryConsumption::memory_consumption(face_system_to_component_table) +
-    MemoryConsumption::memory_consumption(system_to_base_table) +
-    MemoryConsumption::memory_consumption(face_system_to_base_table) +
-    MemoryConsumption::memory_consumption(component_to_base_table) +
-    MemoryConsumption::memory_consumption(restriction_is_additive_flags) +
-    MemoryConsumption::memory_consumption(nonzero_components) +
-    MemoryConsumption::memory_consumption(n_nonzero_components_table));
+  return (sizeof(FiniteElementData<dim>) + MemoryConsumption::memory_consumption(restriction) +
+          MemoryConsumption::memory_consumption(prolongation) +
+          MemoryConsumption::memory_consumption(interface_constraints) +
+          MemoryConsumption::memory_consumption(system_to_component_table) +
+          MemoryConsumption::memory_consumption(face_system_to_component_table) +
+          MemoryConsumption::memory_consumption(system_to_base_table) +
+          MemoryConsumption::memory_consumption(face_system_to_base_table) +
+          MemoryConsumption::memory_consumption(component_to_base_table) +
+          MemoryConsumption::memory_consumption(restriction_is_additive_flags) +
+          MemoryConsumption::memory_consumption(nonzero_components) +
+          MemoryConsumption::memory_consumption(n_nonzero_components_table));
 }
 
 
@@ -1245,17 +1137,13 @@ FiniteElement<dim, spacedim>::compute_n_nonzero_components(
 template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FiniteElement<dim, spacedim>::get_face_data(
-  const UpdateFlags             flags,
-  const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
-  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                     spacedim>
-    &output_data) const
+  const UpdateFlags                                                                  flags,
+  const Mapping<dim, spacedim> &                                                     mapping,
+  const Quadrature<dim - 1> &                                                        quadrature,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+  const
 {
-  return get_data(flags,
-                  mapping,
-                  QProjector<dim>::project_to_all_faces(quadrature),
-                  output_data);
+  return get_data(flags, mapping, QProjector<dim>::project_to_all_faces(quadrature), output_data);
 }
 
 
@@ -1263,17 +1151,14 @@ FiniteElement<dim, spacedim>::get_face_data(
 template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FiniteElement<dim, spacedim>::get_subface_data(
-  const UpdateFlags             flags,
-  const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
-  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                     spacedim>
-    &output_data) const
+  const UpdateFlags                                                                  flags,
+  const Mapping<dim, spacedim> &                                                     mapping,
+  const Quadrature<dim - 1> &                                                        quadrature,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+  const
 {
-  return get_data(flags,
-                  mapping,
-                  QProjector<dim>::project_to_all_subfaces(quadrature),
-                  output_data);
+  return get_data(
+    flags, mapping, QProjector<dim>::project_to_all_subfaces(quadrature), output_data);
 }
 
 

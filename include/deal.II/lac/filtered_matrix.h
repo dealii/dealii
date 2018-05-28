@@ -268,8 +268,7 @@ public:
     /**
      * Constructor.
      */
-    const_iterator(const FilteredMatrix<VectorType> *matrix,
-                   const size_type                   index);
+    const_iterator(const FilteredMatrix<VectorType> *matrix, const size_type index);
 
     /**
      * Prefix increment.
@@ -356,8 +355,7 @@ public:
    * #expect_constrained_source.
    */
   template <typename MatrixType>
-  FilteredMatrix(const MatrixType &matrix,
-                 const bool        expect_constrained_source = false);
+  FilteredMatrix(const MatrixType &matrix, const bool expect_constrained_source = false);
 
   /**
    * Copy operator. Take over matrix and constraints from the other object.
@@ -520,8 +518,7 @@ private:
    * since that data type is so often used and is rather awkward to write out
    * each time.
    */
-  typedef typename std::vector<IndexValuePair>::const_iterator
-    const_index_value_iterator;
+  typedef typename std::vector<IndexValuePair>::const_iterator const_index_value_iterator;
 
   /**
    * Helper class used to sort pairs of indices and values. Only the index is
@@ -576,14 +573,12 @@ private:
 //--------------------------------Iterators--------------------------------------//
 
 template <typename VectorType>
-inline FilteredMatrix<VectorType>::Accessor::Accessor(
-  const FilteredMatrix<VectorType> *matrix,
-  const size_type                   index) :
+inline FilteredMatrix<VectorType>::Accessor::Accessor(const FilteredMatrix<VectorType> *matrix,
+                                                      const size_type                   index) :
   matrix(matrix),
   index(index)
 {
-  Assert(index <= matrix->constraints.size(),
-         ExcIndexRange(index, 0, matrix->constraints.size()));
+  Assert(index <= matrix->constraints.size(), ExcIndexRange(index, 0, matrix->constraints.size()));
 }
 
 
@@ -644,16 +639,16 @@ FilteredMatrix<VectorType>::const_iterator::operator++()
 
 
 template <typename number>
-inline const typename FilteredMatrix<number>::Accessor &
-  FilteredMatrix<number>::const_iterator::operator*() const
+inline const typename FilteredMatrix<number>::Accessor &FilteredMatrix<number>::const_iterator::
+                                                        operator*() const
 {
   return accessor;
 }
 
 
 template <typename number>
-inline const typename FilteredMatrix<number>::Accessor *
-  FilteredMatrix<number>::const_iterator::operator->() const
+inline const typename FilteredMatrix<number>::Accessor *FilteredMatrix<number>::const_iterator::
+                                                        operator->() const
 {
   return &accessor;
 }
@@ -661,18 +656,15 @@ inline const typename FilteredMatrix<number>::Accessor *
 
 template <typename number>
 inline bool
-FilteredMatrix<number>::const_iterator::
-operator==(const const_iterator &other) const
+FilteredMatrix<number>::const_iterator::operator==(const const_iterator &other) const
 {
-  return (accessor.index == other.accessor.index &&
-          accessor.matrix == other.accessor.matrix);
+  return (accessor.index == other.accessor.index && accessor.matrix == other.accessor.matrix);
 }
 
 
 template <typename number>
 inline bool
-FilteredMatrix<number>::const_iterator::
-operator!=(const const_iterator &other) const
+FilteredMatrix<number>::const_iterator::operator!=(const const_iterator &other) const
 {
   return !(*this == other);
 }
@@ -699,8 +691,8 @@ FilteredMatrix<number>::end() const
 
 template <typename VectorType>
 inline bool
-FilteredMatrix<VectorType>::PairComparison::
-operator()(const IndexValuePair &i1, const IndexValuePair &i2) const
+FilteredMatrix<VectorType>::PairComparison::operator()(const IndexValuePair &i1,
+                                                       const IndexValuePair &i2) const
 {
   return (i1.first < i2.first);
 }
@@ -720,8 +712,7 @@ FilteredMatrix<VectorType>::initialize(const MatrixType &m, bool ecs)
 
 
 template <typename VectorType>
-inline FilteredMatrix<VectorType>::FilteredMatrix() :
-  expect_constrained_source(false)
+inline FilteredMatrix<VectorType>::FilteredMatrix() : expect_constrained_source(false)
 {}
 
 
@@ -738,8 +729,7 @@ inline FilteredMatrix<VectorType>::FilteredMatrix(const FilteredMatrix &fm) :
 
 template <typename VectorType>
 template <typename MatrixType>
-inline FilteredMatrix<VectorType>::FilteredMatrix(const MatrixType &m,
-                                                  const bool        ecs) :
+inline FilteredMatrix<VectorType>::FilteredMatrix(const MatrixType &m, const bool ecs) :
   expect_constrained_source(false)
 {
   initialize(m, ecs);
@@ -761,8 +751,7 @@ FilteredMatrix<VectorType>::operator=(const FilteredMatrix &fm)
 
 template <typename VectorType>
 inline void
-FilteredMatrix<VectorType>::add_constraint(const size_type index,
-                                           const double    value)
+FilteredMatrix<VectorType>::add_constraint(const size_type index, const double value)
 {
   // add new constraint to end
   constraints.push_back(IndexValuePair(index, value));
@@ -773,20 +762,16 @@ FilteredMatrix<VectorType>::add_constraint(const size_type index,
 template <typename VectorType>
 template <class ConstraintList>
 inline void
-FilteredMatrix<VectorType>::add_constraints(
-  const ConstraintList &new_constraints)
+FilteredMatrix<VectorType>::add_constraints(const ConstraintList &new_constraints)
 {
   // add new constraints to end
   const size_type old_size = constraints.size();
   constraints.reserve(old_size + new_constraints.size());
-  constraints.insert(
-    constraints.end(), new_constraints.begin(), new_constraints.end());
+  constraints.insert(constraints.end(), new_constraints.begin(), new_constraints.end());
   // then merge the two arrays to
   // form one sorted one
-  std::inplace_merge(constraints.begin(),
-                     constraints.begin() + old_size,
-                     constraints.end(),
-                     PairComparison());
+  std::inplace_merge(
+    constraints.begin(), constraints.begin() + old_size, constraints.end(), PairComparison());
 }
 
 
@@ -814,9 +799,8 @@ FilteredMatrix<VectorType>::clear()
 
 template <typename VectorType>
 inline void
-FilteredMatrix<VectorType>::apply_constraints(
-  VectorType &v,
-  const bool /* matrix_is_symmetric */) const
+FilteredMatrix<VectorType>::apply_constraints(VectorType &v,
+                                              const bool /* matrix_is_symmetric */) const
 {
   apply_constraints(v);
 }
@@ -867,8 +851,7 @@ FilteredMatrix<VectorType>::pre_filter(VectorType &v) const
 
 template <typename VectorType>
 inline void
-FilteredMatrix<VectorType>::post_filter(const VectorType &in,
-                                        VectorType &      out) const
+FilteredMatrix<VectorType>::post_filter(const VectorType &in, VectorType &out) const
 {
   // iterate over all constraints and
   // set value correctly
@@ -939,8 +922,7 @@ FilteredMatrix<VectorType>::Tvmult(VectorType &dst, const VectorType &src) const
 
 template <typename VectorType>
 inline void
-FilteredMatrix<VectorType>::vmult_add(VectorType &      dst,
-                                      const VectorType &src) const
+FilteredMatrix<VectorType>::vmult_add(VectorType &dst, const VectorType &src) const
 {
   if (!expect_constrained_source)
     {
@@ -967,8 +949,7 @@ FilteredMatrix<VectorType>::vmult_add(VectorType &      dst,
 
 template <typename VectorType>
 inline void
-FilteredMatrix<VectorType>::Tvmult_add(VectorType &      dst,
-                                       const VectorType &src) const
+FilteredMatrix<VectorType>::Tvmult_add(VectorType &dst, const VectorType &src) const
 {
   if (!expect_constrained_source)
     {

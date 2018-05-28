@@ -60,8 +60,7 @@ test()
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-        triangulation.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
       // cell->set_refine_flag ();
       (++cell)->set_refine_flag();
     }

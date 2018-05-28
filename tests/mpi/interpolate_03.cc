@@ -72,8 +72,7 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-                                             MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   VectorTools::interpolate(dofh, LinearFunction<dim>(), interpolated);
 
   double norm = interpolated.l2_norm();

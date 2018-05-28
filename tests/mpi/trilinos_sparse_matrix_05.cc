@@ -71,8 +71,7 @@ test()
   else
     Assert(false, ExcNotImplemented());
 
-  TrilinosWrappers::SparsityPattern sp(
-    row_partitioning, col_partitioning, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(row_partitioning, col_partitioning, MPI_COMM_WORLD);
   if (my_id == 0)
     {
       sp.add(0, 0);
@@ -103,13 +102,11 @@ test()
   // now access elements by iterator. ensure that we can iterate over
   // all rows but that iterators into rows not stored locally just
   // look empty
-  for (TrilinosWrappers::SparseMatrix::const_iterator p = B.begin();
-       p != B.end();
-       ++p)
+  for (TrilinosWrappers::SparseMatrix::const_iterator p = B.begin(); p != B.end(); ++p)
     if (my_id == 0)
       {
-        deallog << "Looking at entry (" << p->row() << ',' << p->column()
-                << ") with value " << p->value() << std::endl;
+        deallog << "Looking at entry (" << p->row() << ',' << p->column() << ") with value "
+                << p->value() << std::endl;
         AssertThrow(p->row() == 0, ExcInternalError());
       }
     else
@@ -126,8 +123,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int       myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);

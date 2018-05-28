@@ -47,8 +47,7 @@ test_cell(const FEValuesBase<dim> &fev)
   }
 
   Vector<double>                   u(n), v(n), w(n);
-  std::vector<std::vector<double>> uval(
-    d, std::vector<double>(fev.n_quadrature_points));
+  std::vector<std::vector<double>> uval(d, std::vector<double>(fev.n_quadrature_points));
 
   std::vector<types::global_dof_index> indices(n);
   for (unsigned int i = 0; i < n; ++i)
@@ -62,10 +61,7 @@ test_cell(const FEValuesBase<dim> &fev)
         u(i) = 1.;
         w    = 0.;
         fev.get_function_values(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<double>>>(uval),
-          true);
+          u, indices, VectorSlice<std::vector<std::vector<double>>>(uval), true);
         cell_residual(w, fev, make_slice(uval), vel);
         M.vmult(v, u);
         w.add(-1., v);
@@ -102,10 +98,8 @@ test_boundary(const FEValuesBase<dim> &fev)
   }
 
   Vector<double>                   u(n), v(n), w(n);
-  std::vector<std::vector<double>> uval(
-    d, std::vector<double>(fev.n_quadrature_points));
-  std::vector<std::vector<double>> null_val(
-    d, std::vector<double>(fev.n_quadrature_points, 0.));
+  std::vector<std::vector<double>> uval(d, std::vector<double>(fev.n_quadrature_points));
+  std::vector<std::vector<double>> null_val(d, std::vector<double>(fev.n_quadrature_points, 0.));
   std::vector<std::vector<Tensor<1, dim>>> ugrad(
     d, std::vector<Tensor<1, dim>>(fev.n_quadrature_points));
 
@@ -121,12 +115,8 @@ test_boundary(const FEValuesBase<dim> &fev)
         u(i) = 1.;
         w    = 0.;
         fev.get_function_values(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<double>>>(uval),
-          true);
-        upwind_value_residual(
-          w, fev, make_slice(uval), make_slice(null_val), vel);
+          u, indices, VectorSlice<std::vector<std::vector<double>>>(uval), true);
+        upwind_value_residual(w, fev, make_slice(uval), make_slice(null_val), vel);
         M.vmult(v, u);
         w.add(-1., v);
         deallog << ' ' << w.l2_norm();
@@ -180,8 +170,7 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
 
   Vector<double>                   u1(n1), v1(n1), w1(n1);
   Vector<double>                   u2(n2), v2(n2), w2(n2);
-  std::vector<std::vector<double>> u1val(
-    d, std::vector<double>(fev1.n_quadrature_points)),
+  std::vector<std::vector<double>> u1val(d, std::vector<double>(fev1.n_quadrature_points)),
     nullval(d, std::vector<double>(fev2.n_quadrature_points, 0.));
 
   std::vector<types::global_dof_index> indices1(n1), indices2(n2);
@@ -199,18 +188,13 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
         w1     = 0.;
         w2     = 0.;
         fev1.get_function_values(
-          u1,
-          indices1,
-          VectorSlice<std::vector<std::vector<double>>>(u1val),
-          true);
-        upwind_face_residual(
-          w1, w2, fev1, fev2, make_slice(u1val), make_slice(nullval), vel);
+          u1, indices1, VectorSlice<std::vector<std::vector<double>>>(u1val), true);
+        upwind_face_residual(w1, w2, fev1, fev2, make_slice(u1val), make_slice(nullval), vel);
         M11.vmult(v1, u1);
         w1.add(-1., v1);
         M21.vmult(v2, u1);
         w2.add(-1., v2);
-        deallog << "sys  a " << w1.l2_norm() << ' ' << w2.l2_norm()
-                << std::endl;
+        deallog << "sys  a " << w1.l2_norm() << ' ' << w2.l2_norm() << std::endl;
         if (d == 1)
           {
             w1 = 0.;
@@ -220,24 +204,18 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
             w1.add(-1., v1);
             M21.vmult(v2, u1);
             w2.add(-1., v2);
-            deallog << "sing a " << w1.l2_norm() << ' ' << w2.l2_norm()
-                    << std::endl;
+            deallog << "sing a " << w1.l2_norm() << ' ' << w2.l2_norm() << std::endl;
           }
         w1 = 0.;
         w2 = 0.;
         fev2.get_function_values(
-          u1,
-          indices2,
-          VectorSlice<std::vector<std::vector<double>>>(u1val),
-          true);
-        upwind_face_residual(
-          w1, w2, fev1, fev2, make_slice(nullval), make_slice(u1val), vel);
+          u1, indices2, VectorSlice<std::vector<std::vector<double>>>(u1val), true);
+        upwind_face_residual(w1, w2, fev1, fev2, make_slice(nullval), make_slice(u1val), vel);
         M12.vmult(v1, u1);
         w1.add(-1., v1);
         M22.vmult(v2, u1);
         w2.add(-1., v2);
-        deallog << "sys  b " << w1.l2_norm() << ' ' << w2.l2_norm()
-                << std::endl;
+        deallog << "sys  b " << w1.l2_norm() << ' ' << w2.l2_norm() << std::endl;
         if (d == 1)
           {
             w1 = 0.;
@@ -247,8 +225,7 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
             w1.add(-1., v1);
             M22.vmult(v2, u1);
             w2.add(-1., v2);
-            deallog << "sing b " << w1.l2_norm() << ' ' << w2.l2_norm()
-                    << std::endl;
+            deallog << "sing b " << w1.l2_norm() << ' ' << w2.l2_norm() << std::endl;
           }
       }
     deallog << std::endl;
@@ -262,8 +239,7 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl << "cell matrix" << std::endl;
   QGauss<dim>   quadrature(fe.tensor_degree());
-  FEValues<dim> fev(
-    fe, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fev(fe, quadrature, update_values | update_gradients | update_JxW_values);
 
   typename Triangulation<dim>::cell_iterator cell1 = tr.begin(1);
   fev.reinit(cell1);
@@ -272,8 +248,8 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
   QGauss<dim - 1>   face_quadrature(fe.tensor_degree() + 1);
   FEFaceValues<dim> fef1(fe,
                          face_quadrature,
-                         update_values | update_gradients |
-                           update_normal_vectors | update_JxW_values);
+                         update_values | update_gradients | update_normal_vectors |
+                           update_JxW_values);
   for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
       deallog << "boundary_matrix " << i << std::endl;
@@ -283,8 +259,8 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
 
   FEFaceValues<dim>                          fef2(fe,
                          face_quadrature,
-                         update_values | update_gradients |
-                           update_normal_vectors | update_JxW_values);
+                         update_values | update_gradients | update_normal_vectors |
+                           update_JxW_values);
   typename Triangulation<dim>::cell_iterator cell2 = cell1->neighbor(1);
 
   deallog << "face_matrix " << 0 << std::endl;

@@ -52,10 +52,8 @@ main()
   MappingQGeneric<dim>   mapping(4);
   QGaussLobatto<dim - 1> quadrature(4);
   FE_Nothing<dim>        dummy;
-  FEFaceValues<dim>      fe_values(mapping,
-                              dummy,
-                              quadrature,
-                              update_normal_vectors | update_quadrature_points);
+  FEFaceValues<dim>      fe_values(
+    mapping, dummy, quadrature, update_normal_vectors | update_quadrature_points);
 
   for (auto cell : tria.active_cell_iterators())
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -69,39 +67,28 @@ main()
           const double tolerance = 1e-7;
           for (unsigned int q = 0; q < quadrature.size(); ++q)
             {
-              const Tensor<1, dim> normal_manifold = spherical.normal_vector(
-                cell->face(f), fe_values.quadrature_point(q));
+              const Tensor<1, dim> normal_manifold =
+                spherical.normal_vector(cell->face(f), fe_values.quadrature_point(q));
               if (cell->face(f)->boundary_id() == 2)
                 {
-                  const Tensor<1, dim> normal_flat = flat.normal_vector(
-                    cell->face(f), fe_values.quadrature_point(q));
-                  if (std::abs(1.0 - std::abs(normal_manifold * normal_flat)) >
-                      tolerance)
-                    deallog
-                      << "Error in point " << fe_values.quadrature_point(q)
-                      << ": "
-                      << "FlatManifold says " << normal_flat
-                      << " but SphericalManifold says " << normal_manifold
-                      << std::endl
-                      << "error: "
-                      << std::abs(1.0 - std::abs(normal_manifold * normal_flat))
-                      << std::endl;
+                  const Tensor<1, dim> normal_flat =
+                    flat.normal_vector(cell->face(f), fe_values.quadrature_point(q));
+                  if (std::abs(1.0 - std::abs(normal_manifold * normal_flat)) > tolerance)
+                    deallog << "Error in point " << fe_values.quadrature_point(q) << ": "
+                            << "FlatManifold says " << normal_flat << " but SphericalManifold says "
+                            << normal_manifold << std::endl
+                            << "error: " << std::abs(1.0 - std::abs(normal_manifold * normal_flat))
+                            << std::endl;
                 }
               else
                 {
-                  const Tensor<1, dim> normal_feval =
-                    fe_values.normal_vector(q);
-                  if (std::abs(1.0 - std::abs(normal_manifold * normal_feval)) >
-                      tolerance)
-                    deallog
-                      << "Error in point " << fe_values.quadrature_point(q)
-                      << ": "
-                      << "FEFaceValues says " << normal_feval
-                      << " but manifold says " << normal_manifold << std::endl
-                      << "error: "
-                      << std::abs(1.0 -
-                                  std::abs(normal_manifold * normal_feval))
-                      << std::endl;
+                  const Tensor<1, dim> normal_feval = fe_values.normal_vector(q);
+                  if (std::abs(1.0 - std::abs(normal_manifold * normal_feval)) > tolerance)
+                    deallog << "Error in point " << fe_values.quadrature_point(q) << ": "
+                            << "FEFaceValues says " << normal_feval << " but manifold says "
+                            << normal_manifold << std::endl
+                            << "error: " << std::abs(1.0 - std::abs(normal_manifold * normal_feval))
+                            << std::endl;
                 }
             }
         }

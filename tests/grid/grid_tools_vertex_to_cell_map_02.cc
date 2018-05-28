@@ -45,8 +45,7 @@ test()
   std::vector<std::set<Triangulation<3>::active_cell_iterator>> vertex_to_cell =
     GridTools::vertex_to_cell_map(tria);
 
-  AssertThrow(tria.n_vertices() == vertex_to_cell.size(),
-              ExcMessage("Wrong number of vertices"));
+  AssertThrow(tria.n_vertices() == vertex_to_cell.size(), ExcMessage("Wrong number of vertices"));
 
   std::vector<unsigned int> n_cells;
   for (unsigned int i = 0; i < vertex_to_cell.size(); ++i)

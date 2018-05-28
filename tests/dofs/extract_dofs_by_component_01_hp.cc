@@ -54,8 +54,7 @@ check()
   // element of this collection
   hp::FECollection<dim> element;
   for (unsigned int i = 0; i < 2; ++i)
-    element.push_back(
-      FESystem<dim>(FE_Q<dim>(1 + i), 1, FE_Nedelec<dim>(0), 1));
+    element.push_back(FESystem<dim>(FE_Q<dim>(1 + i), 1, FE_Nedelec<dim>(0), 1));
   hp::DoFHandler<dim> dof(tr);
   dof.begin_active()->set_active_fe_index(1);
   dof.distribute_dofs(element);
@@ -63,8 +62,7 @@ check()
   // try all possible component
   // masks, which we encode as bit
   // strings
-  for (unsigned int int_mask = 0; int_mask < (1U << element.n_components());
-       ++int_mask)
+  for (unsigned int int_mask = 0; int_mask < (1U << element.n_components()); ++int_mask)
     {
       std::vector<bool> component_mask(element.n_components());
       for (unsigned int c = 0; c < element.n_components(); ++c)

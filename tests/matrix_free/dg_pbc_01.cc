@@ -54,12 +54,10 @@ test()
   for (unsigned int face = 2; face < GeometryInfo<dim>::faces_per_cell; ++face)
     tria.begin()->face(face)->set_all_boundary_ids(face);
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   for (unsigned int d = 1; d < dim; ++d)
-    GridTools::collect_periodic_faces(
-      tria, 2 * d, 2 * d + 1, d, periodic_faces);
+    GridTools::collect_periodic_faces(tria, 2 * d, 2 * d + 1, d, periodic_faces);
   deallog << "Periodic faces: " << periodic_faces.size() << std::endl;
   tria.add_periodicity(periodic_faces);
 
@@ -75,11 +73,9 @@ test()
 
   const QGauss<1>                          quad(1);
   typename MatrixFree<dim>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
+  data.tasks_parallel_scheme               = MatrixFree<dim>::AdditionalData::none;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
 
   MatrixFree<dim> mf_data;
   mf_data.reinit(dof, constraints, quad, data);
@@ -89,10 +85,9 @@ test()
   rhs = 1.;
   mf_data.initialize_dof_vector(sol);
 
-  MatrixFreeTest<dim, 0, 1, double, LinearAlgebra::distributed::Vector<double>>
-    mf(mf_data);
+  MatrixFreeTest<dim, 0, 1, double, LinearAlgebra::distributed::Vector<double>> mf(mf_data);
 
-  SolverControl control(1000, 1e-12 * std::sqrt(rhs.size()));
+  SolverControl                                        control(1000, 1e-12 * std::sqrt(rhs.size()));
   SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
   solver.solve(mf, sol, rhs, PreconditionIdentity());
   // gather all data at root
@@ -102,9 +97,7 @@ test()
       double *       sol_gather_ptr = solution_gather0.begin();
       for (unsigned int i = 0; i < sol.local_size(); ++i)
         *sol_gather_ptr++ = sol.local_element(i);
-      for (unsigned int i = 1;
-           i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-           ++i)
+      for (unsigned int i = 1; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
         {
           MPI_Recv(sol_gather_ptr,
                    dof.locally_owned_dofs_per_processor()[i].n_elements(),
@@ -113,8 +106,7 @@ test()
                    i,
                    MPI_COMM_WORLD,
                    MPI_STATUS_IGNORE);
-          sol_gather_ptr +=
-            dof.locally_owned_dofs_per_processor()[i].n_elements();
+          sol_gather_ptr += dof.locally_owned_dofs_per_processor()[i].n_elements();
         }
       solution_gather0.print(deallog.get_file_stream());
     }

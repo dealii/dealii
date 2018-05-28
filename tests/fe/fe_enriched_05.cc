@@ -71,8 +71,7 @@ public:
   gradient(const Point<dim> &point, const unsigned int component = 0) const
   {
     Tensor<1, dim> res = point;
-    Assert(point.norm() > 0,
-           dealii::ExcMessage("gradient is not defined at zero"));
+    Assert(point.norm() > 0, dealii::ExcMessage("gradient is not defined at zero"));
     res *= -value(point) / point.norm();
     return res;
   }
@@ -113,8 +112,7 @@ test4()
   for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
     if (!constraints.is_constrained(s))
       {
-        names.push_back(std::string("N_") +
-                        dealii::Utilities::int_to_string(s));
+        names.push_back(std::string("N_") + dealii::Utilities::int_to_string(s));
 
         Vector<double> shape_function;
         shape_function.reinit(dof_handler.n_dofs());
@@ -133,8 +131,7 @@ test4()
 
   data_out.build_patches(patches);
 
-  std::string filename =
-    "h-shape_functions_" + dealii::Utilities::int_to_string(dim) + "D.vtu";
+  std::string   filename = "h-shape_functions_" + dealii::Utilities::int_to_string(dim) + "D.vtu";
   std::ofstream output(filename.c_str());
   data_out.write_vtu(output);
 #endif
@@ -161,13 +158,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -175,12 +170,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -62,7 +62,6 @@ main()
     {
       for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
         if (cell->face(f)->manifold_id() != numbers::flat_manifold_id)
-          deallog << cell << " (" << f << ")  "
-                  << int(cell->face(f)->manifold_id()) << std::endl;
+          deallog << cell << " (" << f << ")  " << int(cell->face(f)->manifold_id()) << std::endl;
     }
 }

@@ -27,15 +27,10 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 FE_DGP<dim, spacedim>::FE_DGP(const unsigned int degree) :
   FE_Poly<PolynomialSpace<dim>, dim, spacedim>(
-    PolynomialSpace<dim>(
-      Polynomials::Legendre::generate_complete_basis(degree)),
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
-    std::vector<bool>(
-      FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
-      true),
+    PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
+    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
+                      true),
     std::vector<ComponentMask>(
       FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
       std::vector<bool>(1, true)))
@@ -62,8 +57,7 @@ FE_DGP<dim, spacedim>::get_name() const
   // kept in sync
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGP<" << Utilities::dim_string(dim, spacedim) << ">("
-          << this->degree << ")";
+  namebuf << "FE_DGP<" << Utilities::dim_string(dim, spacedim) << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -117,10 +111,8 @@ FE_DGP<dim, spacedim>::get_face_interpolation_matrix(
                 (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
               typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  Assert(interpolation_matrix.m() == 0, ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  Assert(interpolation_matrix.n() == 0, ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -143,10 +135,8 @@ FE_DGP<dim, spacedim>::get_subface_interpolation_matrix(
                 (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
               typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  Assert(interpolation_matrix.m() == 0, ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  Assert(interpolation_matrix.n() == 0, ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -162,8 +152,7 @@ FE_DGP<dim, spacedim>::hp_constraints_are_implemented() const
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FE_DGP<dim, spacedim>::hp_vertex_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+FE_DGP<dim, spacedim>::hp_vertex_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const
 {
   // there are no such constraints for DGP elements at all
   if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
@@ -179,8 +168,7 @@ FE_DGP<dim, spacedim>::hp_vertex_dof_identities(
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FE_DGP<dim, spacedim>::hp_line_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+FE_DGP<dim, spacedim>::hp_line_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const
 {
   // there are no such constraints for DGP elements at all
   if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
@@ -196,8 +184,7 @@ FE_DGP<dim, spacedim>::hp_line_dof_identities(
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FE_DGP<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+FE_DGP<dim, spacedim>::hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const
 {
   // there are no such constraints for DGP elements at all
   if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
@@ -229,8 +216,7 @@ FE_DGP<dim, spacedim>::compare_for_face_domination(
 
 template <int dim, int spacedim>
 bool
-FE_DGP<dim, spacedim>::has_support_on_face(const unsigned int,
-                                           const unsigned int) const
+FE_DGP<dim, spacedim>::has_support_on_face(const unsigned int, const unsigned int) const
 {
   // all shape functions have support on all faces
   return true;
@@ -244,8 +230,8 @@ FE_DGP<dim, spacedim>::get_constant_modes() const
 {
   Table<2, bool> constant_modes(1, this->dofs_per_cell);
   constant_modes(0, 0) = true;
-  return std::pair<Table<2, bool>, std::vector<unsigned int>>(
-    constant_modes, std::vector<unsigned int>(1, 0));
+  return std::pair<Table<2, bool>, std::vector<unsigned int>>(constant_modes,
+                                                              std::vector<unsigned int>(1, 0));
 }
 
 

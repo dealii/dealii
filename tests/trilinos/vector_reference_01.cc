@@ -53,12 +53,9 @@ test()
   (c = a) = b;
   b       = a;
 
-  deallog << static_cast<TrilinosScalar>(a)
-          << std::endl; // should point to v(0)
-  deallog << static_cast<TrilinosScalar>(b)
-          << std::endl; // should point to v(0)
-  deallog << static_cast<TrilinosScalar>(c)
-          << std::endl; // should point to v(1)
+  deallog << static_cast<TrilinosScalar>(a) << std::endl; // should point to v(0)
+  deallog << static_cast<TrilinosScalar>(b) << std::endl; // should point to v(0)
+  deallog << static_cast<TrilinosScalar>(c) << std::endl; // should point to v(1)
 }
 
 
@@ -66,8 +63,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
   initlog();
   ;
 

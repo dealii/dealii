@@ -71,8 +71,7 @@ public:
     /**
      * Constructor. By default, set the damping parameter to one.
      */
-    explicit AdditionalData(const double omega                       = 1,
-                            const bool   use_preconditioned_residual = false);
+    explicit AdditionalData(const double omega = 1, const bool use_preconditioned_residual = false);
 
     /**
      * Relaxation parameter.
@@ -96,8 +95,7 @@ public:
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverRichardson(SolverControl &       cn,
-                   const AdditionalData &data = AdditionalData());
+  SolverRichardson(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   /**
    * Virtual destructor.
@@ -182,8 +180,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
 
 
 template <class VectorType>
-SolverRichardson<VectorType>::SolverRichardson(SolverControl &       cn,
-                                               const AdditionalData &data) :
+SolverRichardson<VectorType>::SolverRichardson(SolverControl &cn, const AdditionalData &data) :
   Solver<VectorType>(cn),
   additional_data(data)
 {}
@@ -313,8 +310,7 @@ SolverRichardson<VectorType>::print_vectors(const unsigned int,
 
 template <class VectorType>
 inline typename VectorType::value_type
-SolverRichardson<VectorType>::criterion(const VectorType &r,
-                                        const VectorType &d) const
+SolverRichardson<VectorType>::criterion(const VectorType &r, const VectorType &d) const
 {
   if (!additional_data.use_preconditioned_residual)
     return r.l2_norm();

@@ -75,8 +75,7 @@ test()
 
       // refine triangulation
       unsigned int index = 0;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell, ++index)
         if (flags[index])
@@ -88,8 +87,7 @@ test()
       // some of them will actually be
       // coarsened)
       index = 0;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell, ++index)
         if (!flags[index])
@@ -109,8 +107,7 @@ test()
       AssertThrow(dof_handler.n_locally_owned_dofs_per_processor() ==
                     std::vector<types::global_dof_index>(1, N),
                   ExcInternalError());
-      AssertThrow(dof_handler.locally_owned_dofs_per_processor() ==
-                    std::vector<IndexSet>(1, all),
+      AssertThrow(dof_handler.locally_owned_dofs_per_processor() == std::vector<IndexSet>(1, all),
                   ExcInternalError());
     }
 }

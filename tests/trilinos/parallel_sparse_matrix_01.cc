@@ -42,12 +42,11 @@ test()
   // the third one 30, and so on
   unsigned int              N = 0;
   std::vector<unsigned int> local_rows_per_process(
-    Utilities::Trilinos::get_n_mpi_processes(
-      Utilities::Trilinos::comm_world()));
-  std::vector<unsigned int> start_row(Utilities::Trilinos::get_n_mpi_processes(
-    Utilities::Trilinos::comm_world()));
-  for (unsigned int i = 0; i < Utilities::Trilinos::get_n_mpi_processes(
-                                 Utilities::Trilinos::comm_world());
+    Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
+  std::vector<unsigned int> start_row(
+    Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
+  for (unsigned int i = 0;
+       i < Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
        ++i)
     {
       N += (i + 1) * 10;
@@ -84,13 +83,12 @@ test()
 
   // now create a matrix with this sparsity
   // pattern
-  Epetra_Map map(
-    TrilinosWrappers::types::int_type(-1),
-    TrilinosWrappers::types::int_type(
-      local_rows_per_process[Utilities::Trilinos::get_this_mpi_process(
-        Utilities::Trilinos::comm_world())]),
-    0,
-    Utilities::Trilinos::comm_world());
+  Epetra_Map map(TrilinosWrappers::types::int_type(-1),
+                 TrilinosWrappers::types::int_type(
+                   local_rows_per_process[Utilities::Trilinos::get_this_mpi_process(
+                     Utilities::Trilinos::comm_world())]),
+                 0,
+                 Utilities::Trilinos::comm_world());
 
   TrilinosWrappers::SparseMatrix m;
   m.reinit(map, csp);
@@ -113,8 +111,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
 
   try
@@ -125,13 +122,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -139,12 +134,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -67,9 +67,7 @@ check(const unsigned int p)
   // from the coarse grid to the
   // child cells.
   Vector<double> values(dof.n_dofs());
-  for (typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active();
-       c != dof.end();
-       ++c)
+  for (typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active(); c != dof.end(); ++c)
     {
       Vector<double> tmp(fe_ned.dofs_per_cell);
       fe_ned.get_prolongation_matrix(c->index()).vmult(tmp, coarse_grid_values);
@@ -81,14 +79,10 @@ check(const unsigned int p)
   // quadrature points of all cells
   // of the finer grid
   QTrapez<dim>                quadrature;
-  std::vector<Vector<double>> shape_values(quadrature.size(),
-                                           Vector<double>(dim));
-  FEValues<dim>               fe(
-    fe_ned, quadrature, update_values | update_quadrature_points);
+  std::vector<Vector<double>> shape_values(quadrature.size(), Vector<double>(dim));
+  FEValues<dim>               fe(fe_ned, quadrature, update_values | update_quadrature_points);
 
-  for (typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active();
-       c != dof.end();
-       ++c)
+  for (typename DoFHandler<dim>::active_cell_iterator c = dof.begin_active(); c != dof.end(); ++c)
     {
       deallog << "  CELL " << c << std::endl;
       fe.reinit(c);

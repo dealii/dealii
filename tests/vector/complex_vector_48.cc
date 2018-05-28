@@ -45,13 +45,10 @@ test(Vector<std::complex<double>> &v,
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(w(i) == std::complex<double>(i + 2., i + 3.),
-                  ExcInternalError());
-      AssertThrow(x(i) == std::complex<double>(i + 3., i + 4.),
-                  ExcInternalError());
+      AssertThrow(w(i) == std::complex<double>(i + 2., i + 3.), ExcInternalError());
+      AssertThrow(x(i) == std::complex<double>(i + 3., i + 4.), ExcInternalError());
       AssertThrow(std::abs(v(i) - std::complex<double>(i + 2., i + 3.) /
-                                    std::complex<double>(i + 3., i + 4.)) <
-                    1e-14 * std::abs(v(i)),
+                                    std::complex<double>(i + 3., i + 4.)) < 1e-14 * std::abs(v(i)),
                   ExcInternalError());
     }
 
@@ -76,13 +73,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -90,12 +85,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

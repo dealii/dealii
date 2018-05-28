@@ -203,16 +203,14 @@ namespace CUDAWrappers
      * Obviously, the matrix needs to be quadratic for this operation.
      */
     Number
-    matrix_norm_square(
-      const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
+    matrix_norm_square(const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
 
     /**
      * Compute the matrix scalar product $\left(u,Mv\right)$.
      */
     Number
-    matrix_scalar_product(
-      const LinearAlgebra::CUDAWrappers::Vector<Number> &u,
-      const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
+    matrix_scalar_product(const LinearAlgebra::CUDAWrappers::Vector<Number> &u,
+                          const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const;
 
     /**
      * Compute the residual of an equation $M \cdot x=b$, where the residual is

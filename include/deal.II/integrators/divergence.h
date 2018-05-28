@@ -98,17 +98,15 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    cell_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fetest,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      const double factor = 1.)
+    cell_residual(Vector<number> &                                                   result,
+                  const FEValuesBase<dim> &                                          fetest,
+                  const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
+                  const double                                                       factor = 1.)
     {
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
-             ExcDimensionMismatch(result.size(), t_dofs));
+      Assert(result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
         {
@@ -135,17 +133,15 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    cell_residual(
-      Vector<number> &                                           result,
-      const FEValuesBase<dim> &                                  fetest,
-      const VectorSlice<const std::vector<std::vector<double>>> &input,
-      const double                                               factor = 1.)
+    cell_residual(Vector<number> &                                           result,
+                  const FEValuesBase<dim> &                                  fetest,
+                  const VectorSlice<const std::vector<std::vector<double>>> &input,
+                  const double                                               factor = 1.)
     {
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
-             ExcDimensionMismatch(result.size(), t_dofs));
+      Assert(result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
         {
@@ -221,8 +217,7 @@ namespace LocalIntegrators
       AssertDimension(fetest.get_fe().n_components(), dim);
       AssertDimension(input.size(), fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
-             ExcDimensionMismatch(result.size(), t_dofs));
+      Assert(result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
         {
@@ -230,8 +225,7 @@ namespace LocalIntegrators
 
           for (unsigned int i = 0; i < t_dofs; ++i)
             for (unsigned int d = 0; d < dim; ++d)
-              result(i) +=
-                dx * input[k][d] * fetest.shape_value_component(i, k, d);
+              result(i) += dx * input[k][d] * fetest.shape_value_component(i, k, d);
         }
     }
 
@@ -257,8 +251,7 @@ namespace LocalIntegrators
       AssertDimension(fetest.get_fe().n_components(), dim);
       AssertDimension(input.size(), fetest.n_quadrature_points);
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      Assert(result.size() == t_dofs,
-             ExcDimensionMismatch(result.size(), t_dofs));
+      Assert(result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
         {
@@ -266,8 +259,7 @@ namespace LocalIntegrators
 
           for (unsigned int i = 0; i < t_dofs; ++i)
             for (unsigned int d = 0; d < dim; ++d)
-              result(i) -=
-                dx * input[k] * fetest.shape_grad_component(i, k, d)[d];
+              result(i) -= dx * input[k] * fetest.shape_grad_component(i, k, d)[d];
         }
     }
 
@@ -300,8 +292,7 @@ namespace LocalIntegrators
           for (unsigned int i = 0; i < t_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               for (unsigned int d = 0; d < dim; ++d)
-                M(i, j) += ndx[d] * fe.shape_value_component(j, k, d) *
-                           fetest.shape_value(i, k);
+                M(i, j) += ndx[d] * fe.shape_value_component(j, k, d) * fetest.shape_value(i, k);
         }
     }
 
@@ -317,12 +308,11 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    u_dot_n_residual(
-      Vector<number> &                                           result,
-      const FEValuesBase<dim> &                                  fe,
-      const FEValuesBase<dim> &                                  fetest,
-      const VectorSlice<const std::vector<std::vector<double>>> &data,
-      double                                                     factor = 1.)
+    u_dot_n_residual(Vector<number> &                                           result,
+                     const FEValuesBase<dim> &                                  fe,
+                     const FEValuesBase<dim> &                                  fetest,
+                     const VectorSlice<const std::vector<std::vector<double>>> &data,
+                     double                                                     factor = 1.)
     {
       const unsigned int t_dofs = fetest.dofs_per_cell;
 
@@ -366,13 +356,11 @@ namespace LocalIntegrators
 
       for (unsigned int k = 0; k < fetest.n_quadrature_points; ++k)
         {
-          const Tensor<1, dim> ndx =
-            factor * fetest.normal_vector(k) * fetest.JxW(k);
+          const Tensor<1, dim> ndx = factor * fetest.normal_vector(k) * fetest.JxW(k);
 
           for (unsigned int i = 0; i < t_dofs; ++i)
             for (unsigned int d = 0; d < dim; ++d)
-              result(i) +=
-                ndx[d] * fetest.shape_value_component(i, k, d) * data[k];
+              result(i) += ndx[d] * fetest.shape_value_component(i, k, d) * data[k];
         }
     }
 
@@ -423,12 +411,10 @@ namespace LocalIntegrators
             for (unsigned int j = 0; j < n_dofs; ++j)
               for (unsigned int d = 0; d < dim; ++d)
                 {
-                  const double un1 = fe1.shape_value_component(j, k, d) *
-                                     fe1.normal_vector(k)[d];
-                  const double un2 = -fe2.shape_value_component(j, k, d) *
-                                     fe1.normal_vector(k)[d];
-                  const double v1 = fetest1.shape_value(i, k);
-                  const double v2 = fetest2.shape_value(i, k);
+                  const double un1 = fe1.shape_value_component(j, k, d) * fe1.normal_vector(k)[d];
+                  const double un2 = -fe2.shape_value_component(j, k, d) * fe1.normal_vector(k)[d];
+                  const double v1  = fetest1.shape_value(i, k);
+                  const double v2  = fetest2.shape_value(i, k);
 
                   M11(i, j) += .5 * dx * un1 * v1;
                   M12(i, j) += .5 * dx * un2 * v1;
@@ -443,15 +429,11 @@ namespace LocalIntegrators
      */
     template <int dim>
     DEAL_II_DEPRECATED void
-    grad_div_matrix(FullMatrix<double> &     M,
-                    const FEValuesBase<dim> &fe,
-                    const double             factor = 1.);
+    grad_div_matrix(FullMatrix<double> &M, const FEValuesBase<dim> &fe, const double factor = 1.);
 
     template <int dim>
     void
-    grad_div_matrix(FullMatrix<double> &     M,
-                    const FEValuesBase<dim> &fe,
-                    const double             factor)
+    grad_div_matrix(FullMatrix<double> &M, const FEValuesBase<dim> &fe, const double factor)
     {
       GradDiv::cell_matrix(M, fe, factor);
     }
@@ -461,19 +443,17 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     DEAL_II_DEPRECATED void
-    grad_div_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fetest,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      const double factor = 1.);
+    grad_div_residual(Vector<number> &                                                   result,
+                      const FEValuesBase<dim> &                                          fetest,
+                      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
+                      const double factor = 1.);
 
     template <int dim, typename number>
     void
-    grad_div_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fetest,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      const double                                                       factor)
+    grad_div_residual(Vector<number> &                                                   result,
+                      const FEValuesBase<dim> &                                          fetest,
+                      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
+                      const double                                                       factor)
     {
       GradDiv::cell_residual(result, fetest, input, factor);
     }
@@ -520,14 +500,10 @@ namespace LocalIntegrators
             for (unsigned int j = 0; j < n_dofs; ++j)
               for (unsigned int d = 0; d < dim; ++d)
                 {
-                  const double un1 = fe1.shape_value_component(j, k, d) *
-                                     fe1.normal_vector(k)[d];
-                  const double un2 = -fe2.shape_value_component(j, k, d) *
-                                     fe1.normal_vector(k)[d];
-                  const double vn1 = fe1.shape_value_component(i, k, d) *
-                                     fe1.normal_vector(k)[d];
-                  const double vn2 = -fe2.shape_value_component(i, k, d) *
-                                     fe1.normal_vector(k)[d];
+                  const double un1 = fe1.shape_value_component(j, k, d) * fe1.normal_vector(k)[d];
+                  const double un2 = -fe2.shape_value_component(j, k, d) * fe1.normal_vector(k)[d];
+                  const double vn1 = fe1.shape_value_component(i, k, d) * fe1.normal_vector(k)[d];
+                  const double vn2 = -fe2.shape_value_component(i, k, d) * fe1.normal_vector(k)[d];
 
                   M11(i, j) += dx * un1 * vn1;
                   M12(i, j) += dx * un2 * vn1;

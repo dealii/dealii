@@ -61,7 +61,6 @@ main(int argc, char **argv)
     PETScWrappers::PreconditionICC preconditioner(A);
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 16, 18);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner), control.last_step(), 16, 18);
   }
 }

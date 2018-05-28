@@ -43,8 +43,7 @@ check(T function, const unsigned int degree)
   function.vector_value_list(fe.get_generalized_support_points(), values);
 
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
-  deallog << " vector " << vector_difference(fe, dofs, function, 0)
-          << std::endl;
+  deallog << " vector " << vector_difference(fe, dofs, function, 0) << std::endl;
 }
 
 int

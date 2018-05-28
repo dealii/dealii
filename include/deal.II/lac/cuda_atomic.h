@@ -48,21 +48,17 @@ namespace LinearAlgebra
     atomicAdd_wrapper(double *address, double val)
     {
       // Use native instruction for CUDA 8 on Pascal or newer architecture
-#  if __CUDACC_VER_MAJOR__ >= 8 && \
-    (!defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600)
+#  if __CUDACC_VER_MAJOR__ >= 8 && (!defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600)
       return atomicAdd(address, val);
 #  else
 
-      unsigned long long int *address_as_ull =
-        reinterpret_cast<unsigned long long int *>(address);
-      unsigned long long int old = *address_as_ull, assumed;
+      unsigned long long int *address_as_ull = reinterpret_cast<unsigned long long int *>(address);
+      unsigned long long int  old            = *address_as_ull, assumed;
       do
         {
           assumed = old;
           old     = atomicCAS(
-            address_as_ull,
-            assumed,
-            __double_as_longlong(val + __longlong_as_double(assumed)));
+            address_as_ull, assumed, __double_as_longlong(val + __longlong_as_double(assumed)));
         }
       while (assumed != old);
 
@@ -85,9 +81,7 @@ namespace LinearAlgebra
       do
         {
           assumed = old;
-          old     = atomicCAS(address_as_int,
-                          assumed,
-                          atomicMax(address_as_int, __float_as_int(val)));
+          old = atomicCAS(address_as_int, assumed, atomicMax(address_as_int, __float_as_int(val)));
         }
       while (assumed != old);
 
@@ -104,17 +98,16 @@ namespace LinearAlgebra
     inline __device__ double
     atomicMax_wrapper(double *address, double val)
     {
-      unsigned long long int *address_as_ull =
-        reinterpret_cast<unsigned long long int *>(address);
-      unsigned long long int old = *address_as_ull, assumed;
+      unsigned long long int *address_as_ull = reinterpret_cast<unsigned long long int *>(address);
+      unsigned long long int  old            = *address_as_ull, assumed;
       do
         {
           assumed = old;
-          old     = atomicCAS(address_as_ull,
-                          assumed,
-                          atomicMax(address_as_ull,
-                                    static_cast<unsigned long long int>(
-                                      __double_as_longlong(val))));
+          old =
+            atomicCAS(address_as_ull,
+                      assumed,
+                      atomicMax(address_as_ull,
+                                static_cast<unsigned long long int>(__double_as_longlong(val))));
         }
       while (assumed != old);
 

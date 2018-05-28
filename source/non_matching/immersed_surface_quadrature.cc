@@ -31,8 +31,7 @@ namespace NonMatching
     for (auto normal : normals)
       {
         (void)normal;
-        Assert(std::abs(normal.norm() - 1.0) < 1e-9,
-               ExcMessage("Normal is not normalized."));
+        Assert(std::abs(normal.norm() - 1.0) < 1e-9, ExcMessage("Normal is not normalized."));
       }
   }
 
@@ -47,8 +46,7 @@ namespace NonMatching
     this->quadrature_points.push_back(point);
     this->weights.push_back(weight);
     this->normals.push_back(normal);
-    Assert(std::abs(normal.norm() - 1.0) < 1e-9,
-           ExcMessage("Normal is not normalized."));
+    Assert(std::abs(normal.norm() - 1.0) < 1e-9, ExcMessage("Normal is not normalized."));
   }
 
 

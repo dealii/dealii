@@ -165,10 +165,8 @@ namespace Step19
   // number as well.
   void declare_parameters()
   {
-    prm.declare_entry("Output file",
-                      "",
-                      Patterns::Anything(),
-                      "The name of the output file to be generated");
+    prm.declare_entry(
+      "Output file", "", Patterns::Anything(), "The name of the output file to be generated");
 
     DataOutInterface<1>::declare_parameters(prm);
 
@@ -398,8 +396,7 @@ namespace Step19
     std::ofstream output_stream(output_file);
     AssertThrow(output_stream, ExcIO());
 
-    const DataOutBase::OutputFormat format =
-      DataOutBase::parse_output_format(output_format);
+    const DataOutBase::OutputFormat format = DataOutBase::parse_output_format(output_format);
 
     // Finally, write the merged data to the output:
     merged_data.write(output_stream, format);
@@ -430,8 +427,7 @@ namespace Step19
   // code that shouldn't be reached:
   void convert()
   {
-    AssertThrow(input_file_names.size() > 0,
-                ExcMessage("No input files specified."));
+    AssertThrow(input_file_names.size() > 0, ExcMessage("No input files specified."));
 
     std::ifstream input(input_file_names[0]);
     AssertThrow(input, ExcIO());
@@ -508,13 +504,11 @@ int main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -522,12 +516,10 @@ int main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 

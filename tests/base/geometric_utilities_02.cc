@@ -28,8 +28,7 @@ DeclException3(DifferentComponent,
                int,
                double,
                double,
-               << arg1 << "-th component is different: " << arg2
-               << "!=" << arg3);
+               << arg1 << "-th component is different: " << arg2 << "!=" << arg3);
 
 
 template <int dim>
@@ -43,12 +42,11 @@ test()
       for (double phi = 0.01; phi <= numbers::PI; phi += numbers::PI / 4.)
         {
           std::array<double, dim> sp;
-          sp[0]        = r;
-          sp[1]        = theta;
-          sp[2]        = phi;
-          Point<dim> p = GeometricUtilities::Coordinates::from_spherical(sp);
-          const std::array<double, dim> sp2 =
-            GeometricUtilities::Coordinates::to_spherical(p);
+          sp[0]                             = r;
+          sp[1]                             = theta;
+          sp[2]                             = phi;
+          Point<dim>                    p   = GeometricUtilities::Coordinates::from_spherical(sp);
+          const std::array<double, dim> sp2 = GeometricUtilities::Coordinates::to_spherical(p);
           for (unsigned int i = 0; i < dim; i++)
             AssertThrow(std::fabs(sp[i] - sp2[i]) <= std::fabs(sp[i]) * 1e-10,
                         DifferentComponent(i, sp[i], sp2[i]));

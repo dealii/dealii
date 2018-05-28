@@ -47,14 +47,12 @@ for (deal_II_dimension : DIMENSIONS)
     \{
       namespace hp
       \{
-        template class FEValuesBase<
-          deal_II_dimension,
-          deal_II_dimension,
-          dealii::FEValues<deal_II_dimension, deal_II_dimension + 1>>;
-        template class FEValuesBase<
-          deal_II_dimension,
-          deal_II_dimension - 1,
-          dealii::FEFaceValues<deal_II_dimension, deal_II_dimension + 1>>;
+        template class FEValuesBase<deal_II_dimension,
+                                    deal_II_dimension,
+                                    dealii::FEValues<deal_II_dimension, deal_II_dimension + 1>>;
+        template class FEValuesBase<deal_II_dimension,
+                                    deal_II_dimension - 1,
+                                    dealii::FEFaceValues<deal_II_dimension, deal_II_dimension + 1>>;
         template class FEValuesBase<
           deal_II_dimension,
           deal_II_dimension - 1,
@@ -101,26 +99,23 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
 
       template void
       FEValues<deal_II_dimension, deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<
-          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
-          lda>>,
+        TriaIterator<
+          DoFCellAccessor<dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>, lda>>,
         unsigned int,
         unsigned int,
         unsigned int);
       template void
       FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<
-          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
-          lda>>,
+        TriaIterator<
+          DoFCellAccessor<dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>, lda>>,
         unsigned int,
         unsigned int,
         unsigned int,
         unsigned int);
       template void
       FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<
-          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
-          lda>>,
+        TriaIterator<
+          DoFCellAccessor<dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>, lda>>,
         unsigned int,
         unsigned int,
         unsigned int,

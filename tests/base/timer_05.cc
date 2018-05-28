@@ -47,10 +47,8 @@ assert_min_max_avg_invalid(const Utilities::MPI::MinMaxAvg &data)
   AssertThrow(std::isnan(data.min), ExcInternalError());
   AssertThrow(std::isnan(data.max), ExcInternalError());
   AssertThrow(std::isnan(data.avg), ExcInternalError());
-  AssertThrow(data.min_index == numbers::invalid_unsigned_int,
-              ExcInternalError());
-  AssertThrow(data.max_index == numbers::invalid_unsigned_int,
-              ExcInternalError());
+  AssertThrow(data.min_index == numbers::invalid_unsigned_int, ExcInternalError());
+  AssertThrow(data.max_index == numbers::invalid_unsigned_int, ExcInternalError());
 }
 
 // check that the MinMaxAvg values are reasonable.
@@ -60,10 +58,8 @@ assert_min_max_avg_valid(const Utilities::MPI::MinMaxAvg &data)
   AssertThrow(data.min > 0., ExcInternalError());
   AssertThrow(data.max >= data.min, ExcInternalError());
   AssertThrow(data.avg >= data.min, ExcInternalError());
-  AssertThrow(data.min_index != numbers::invalid_unsigned_int,
-              ExcInternalError());
-  AssertThrow(data.max_index != numbers::invalid_unsigned_int,
-              ExcInternalError());
+  AssertThrow(data.min_index != numbers::invalid_unsigned_int, ExcInternalError());
+  AssertThrow(data.max_index != numbers::invalid_unsigned_int, ExcInternalError());
 }
 
 

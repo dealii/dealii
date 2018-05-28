@@ -73,14 +73,12 @@ test()
     test(locally_owned.nth_index_in_set(5)) = 7;
 
   if (myid == 0)
-    deallog << "before compress: " << test(locally_owned.nth_index_in_set(5))
-            << std::endl;
+    deallog << "before compress: " << test(locally_owned.nth_index_in_set(5)) << std::endl;
 
   test.compress(VectorOperation::insert);
 
   if (myid == 0)
-    deallog << "after compress: " << test(locally_owned.nth_index_in_set(5))
-            << std::endl;
+    deallog << "after compress: " << test(locally_owned.nth_index_in_set(5)) << std::endl;
 
   // Trilinos produces a 0 instead of a 7 here. Why?
   if (myid == 0)
@@ -97,8 +95,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

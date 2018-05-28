@@ -74,19 +74,15 @@ public:
 
     typedef Vector<double> VectorType;
 
-    time_stepper.residual = [&](const double      t,
-                                const VectorType &y,
-                                const VectorType &y_dot,
-                                VectorType &      res) -> int {
+    time_stepper.residual =
+      [&](const double t, const VectorType &y, const VectorType &y_dot, VectorType &res) -> int {
       res = y_dot;
       A.vmult_add(res, y);
       return 0;
     };
 
-    time_stepper.setup_jacobian = [&](const double,
-                                      const VectorType &,
-                                      const VectorType &,
-                                      const double alpha) -> int {
+    time_stepper.setup_jacobian =
+      [&](const double, const VectorType &, const VectorType &, const double alpha) -> int {
       A(0, 1) = -1.0;
       A(1, 0) = kappa * kappa;
 
@@ -99,8 +95,7 @@ public:
       return 0;
     };
 
-    time_stepper.solve_jacobian_system = [&](const VectorType &src,
-                                             VectorType &      dst) -> int {
+    time_stepper.solve_jacobian_system = [&](const VectorType &src, VectorType &dst) -> int {
       Jinv.vmult(dst, src);
       return 0;
     };
@@ -113,13 +108,12 @@ public:
       return 0;
     };
 
-    time_stepper.solver_should_restart =
-      [](const double, VectorType &, VectorType &) -> bool { return false; };
-
-
-    time_stepper.differential_components = [&]() -> IndexSet {
-      return complete_index_set(2);
+    time_stepper.solver_should_restart = [](const double, VectorType &, VectorType &) -> bool {
+      return false;
     };
+
+
+    time_stepper.differential_components = [&]() -> IndexSet { return complete_index_set(2); };
   }
 
   void
@@ -144,8 +138,7 @@ private:
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   HarmonicOscillator ode(2 * numbers::PI);
   ode.run();

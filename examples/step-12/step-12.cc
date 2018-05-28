@@ -92,7 +92,7 @@ namespace Step12
     {}
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
   // Given the flow direction, the inflow boundary of the unit square
@@ -105,8 +105,7 @@ namespace Step12
                                        std::vector<double> &          values,
                                        const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
@@ -209,20 +208,15 @@ namespace Step12
     // fact other arguments already bound.
     static void integrate_cell_term(DoFInfo &dinfo, CellInfo &info);
     static void integrate_boundary_term(DoFInfo &dinfo, CellInfo &info);
-    static void integrate_face_term(DoFInfo & dinfo1,
-                                    DoFInfo & dinfo2,
-                                    CellInfo &info1,
-                                    CellInfo &info2);
+    static void
+    integrate_face_term(DoFInfo &dinfo1, DoFInfo &dinfo2, CellInfo &info1, CellInfo &info2);
   };
 
 
   // We start with the constructor. The 1 in the constructor call of
   // <code>fe</code> is the polynomial degree.
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem() :
-    mapping(),
-    fe(1),
-    dof_handler(triangulation)
+  AdvectionProblem<dim>::AdvectionProblem() : mapping(), fe(1), dof_handler(triangulation)
   {}
 
 
@@ -277,16 +271,14 @@ namespace Step12
     // used. Since the quadratures for cells, boundary and interior faces can
     // be selected independently, we have to hand over this value three times.
     const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-    info_box.initialize_gauss_quadrature(
-      n_gauss_points, n_gauss_points, n_gauss_points);
+    info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
 
     // These are the types of values we need for integrating our system. They
     // are added to the flags used on cells, boundary and interior faces, as
     // well as interior neighbor faces, which is forced by the four @p true
     // values.
     info_box.initialize_update_flags();
-    UpdateFlags update_flags =
-      update_quadrature_points | update_values | update_gradients;
+    UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
     info_box.add_update_flags(update_flags, true, true, true, true);
 
     // After preparing all data in <tt>info_box</tt>, we initialize the
@@ -301,8 +293,7 @@ namespace Step12
     // Now, we have to create the assembler object and tell it, where to put
     // the local data. These will be our system matrix and the right hand
     // side.
-    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>>
-      assembler;
+    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>> assembler;
     assembler.initialize(system_matrix, right_hand_side);
 
     // Finally, the integration loop over all active cells (determined by the
@@ -316,10 +307,7 @@ namespace Step12
     // appropriate operator() implementations here, or the result of std::bind
     // if the local integrators were, for example, non-static member
     // functions.
-    MeshWorker::loop<dim,
-                     dim,
-                     MeshWorker::DoFInfo<dim>,
-                     MeshWorker::IntegrationInfoBox<dim>>(
+    MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>>(
       dof_handler.begin_active(),
       dof_handler.end(),
       dof_info,
@@ -337,8 +325,7 @@ namespace Step12
   // called just above. They compute the local contributions to the system
   // matrix and right hand side on cells and faces.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo & dinfo,
-                                                  CellInfo &info)
+  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo &dinfo, CellInfo &info)
   {
     // First, let us retrieve some of the objects used here from @p info. Note
     // that these objects can handle much more complex structures, thus the
@@ -352,15 +339,13 @@ namespace Step12
     // the current point.
     for (unsigned int point = 0; point < fe_values.n_quadrature_points; ++point)
       {
-        const Tensor<1, dim> beta_at_q_point =
-          beta(fe_values.quadrature_point(point));
+        const Tensor<1, dim> beta_at_q_point = beta(fe_values.quadrature_point(point));
 
         // We solve a homogeneous equation, thus no right hand side shows up
         // in the cell term.  What's left is integrating the matrix entries.
         for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
           for (unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
-            local_matrix(i, j) += -beta_at_q_point *
-                                  fe_values.shape_grad(i, point) *
+            local_matrix(i, j) += -beta_at_q_point * fe_values.shape_grad(i, point) *
                                   fe_values.shape_value(j, point) * JxW[point];
       }
   }
@@ -369,38 +354,32 @@ namespace Step12
   // the base class for both FEFaceValues and FESubfaceValues, in order to get
   // access to normal vectors.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo & dinfo,
-                                                      CellInfo &info)
+  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo &dinfo, CellInfo &info)
   {
     const FEValuesBase<dim> &fe_face_values = info.fe_values();
     FullMatrix<double> &     local_matrix   = dinfo.matrix(0).matrix;
     Vector<double> &         local_vector   = dinfo.vector(0).block(0);
 
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
-    const std::vector<Tensor<1, dim>> &normals =
-      fe_face_values.get_normal_vectors();
+    const std::vector<double> &        JxW     = fe_face_values.get_JxW_values();
+    const std::vector<Tensor<1, dim>> &normals = fe_face_values.get_normal_vectors();
 
     std::vector<double> g(fe_face_values.n_quadrature_points);
 
     static BoundaryValues<dim> boundary_function;
     boundary_function.value_list(fe_face_values.get_quadrature_points(), g);
 
-    for (unsigned int point = 0; point < fe_face_values.n_quadrature_points;
-         ++point)
+    for (unsigned int point = 0; point < fe_face_values.n_quadrature_points; ++point)
       {
-        const double beta_dot_n =
-          beta(fe_face_values.quadrature_point(point)) * normals[point];
+        const double beta_dot_n = beta(fe_face_values.quadrature_point(point)) * normals[point];
         if (beta_dot_n > 0)
           for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
             for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
-              local_matrix(i, j) +=
-                beta_dot_n * fe_face_values.shape_value(j, point) *
-                fe_face_values.shape_value(i, point) * JxW[point];
+              local_matrix(i, j) += beta_dot_n * fe_face_values.shape_value(j, point) *
+                                    fe_face_values.shape_value(i, point) * JxW[point];
         else
           for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-            local_vector(i) += -beta_dot_n * g[point] *
-                               fe_face_values.shape_value(i, point) *
-                               JxW[point];
+            local_vector(i) +=
+              -beta_dot_n * g[point] * fe_face_values.shape_value(i, point) * JxW[point];
       }
   }
 
@@ -436,54 +415,41 @@ namespace Step12
     // hand side vectors. Fortunately, the interface terms only involve the
     // solution and the right hand side does not receive any contributions.
 
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
-    const std::vector<Tensor<1, dim>> &normals =
-      fe_face_values.get_normal_vectors();
+    const std::vector<double> &        JxW     = fe_face_values.get_JxW_values();
+    const std::vector<Tensor<1, dim>> &normals = fe_face_values.get_normal_vectors();
 
-    for (unsigned int point = 0; point < fe_face_values.n_quadrature_points;
-         ++point)
+    for (unsigned int point = 0; point < fe_face_values.n_quadrature_points; ++point)
       {
-        const double beta_dot_n =
-          beta(fe_face_values.quadrature_point(point)) * normals[point];
+        const double beta_dot_n = beta(fe_face_values.quadrature_point(point)) * normals[point];
         if (beta_dot_n > 0)
           {
             // This term we've already seen:
             for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
               for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
-                u1_v1_matrix(i, j) +=
-                  beta_dot_n * fe_face_values.shape_value(j, point) *
-                  fe_face_values.shape_value(i, point) * JxW[point];
+                u1_v1_matrix(i, j) += beta_dot_n * fe_face_values.shape_value(j, point) *
+                                      fe_face_values.shape_value(i, point) * JxW[point];
 
             // We additionally assemble the term $(\beta\cdot n u,\hat
             // v)_{\partial \kappa_+}$,
-            for (unsigned int k = 0; k < fe_face_values_neighbor.dofs_per_cell;
-                 ++k)
+            for (unsigned int k = 0; k < fe_face_values_neighbor.dofs_per_cell; ++k)
               for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
-                u1_v2_matrix(k, j) +=
-                  -beta_dot_n * fe_face_values.shape_value(j, point) *
-                  fe_face_values_neighbor.shape_value(k, point) * JxW[point];
+                u1_v2_matrix(k, j) += -beta_dot_n * fe_face_values.shape_value(j, point) *
+                                      fe_face_values_neighbor.shape_value(k, point) * JxW[point];
           }
         else
           {
             // This one we've already seen, too:
             for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-              for (unsigned int l = 0;
-                   l < fe_face_values_neighbor.dofs_per_cell;
-                   ++l)
-                u2_v1_matrix(i, l) +=
-                  beta_dot_n * fe_face_values_neighbor.shape_value(l, point) *
-                  fe_face_values.shape_value(i, point) * JxW[point];
+              for (unsigned int l = 0; l < fe_face_values_neighbor.dofs_per_cell; ++l)
+                u2_v1_matrix(i, l) += beta_dot_n * fe_face_values_neighbor.shape_value(l, point) *
+                                      fe_face_values.shape_value(i, point) * JxW[point];
 
             // And this is another new one: $(\beta\cdot n \hat u,\hat
             // v)_{\partial \kappa_-}$:
-            for (unsigned int k = 0; k < fe_face_values_neighbor.dofs_per_cell;
-                 ++k)
-              for (unsigned int l = 0;
-                   l < fe_face_values_neighbor.dofs_per_cell;
-                   ++l)
-                u2_v2_matrix(k, l) +=
-                  -beta_dot_n * fe_face_values_neighbor.shape_value(l, point) *
-                  fe_face_values_neighbor.shape_value(k, point) * JxW[point];
+            for (unsigned int k = 0; k < fe_face_values_neighbor.dofs_per_cell; ++k)
+              for (unsigned int l = 0; l < fe_face_values_neighbor.dofs_per_cell; ++l)
+                u2_v2_matrix(k, l) += -beta_dot_n * fe_face_values_neighbor.shape_value(l, point) *
+                                      fe_face_values_neighbor.shape_value(k, point) * JxW[point];
           }
       }
   }
@@ -551,16 +517,13 @@ namespace Step12
       mapping, dof_handler, solution, gradient_indicator);
 
     // and they are cell-wise scaled by the factor $h^{1+d/2}$
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-      gradient_indicator(cell_no) *=
-        std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
+      gradient_indicator(cell_no) *= std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
 
     // Finally they serve as refinement indicator.
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, gradient_indicator, 0.3, 0.1);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation, gradient_indicator, 0.3, 0.1);
 
     triangulation.execute_coarsening_and_refinement();
   }
@@ -616,13 +579,11 @@ namespace Step12
           refine_grid();
 
 
-        deallog << "Number of active cells:       "
-                << triangulation.n_active_cells() << std::endl;
+        deallog << "Number of active cells:       " << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
-        deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-                << std::endl;
+        deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
         assemble_system();
         solve(solution);
@@ -646,25 +607,21 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

@@ -277,14 +277,12 @@ EigenPower<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
 
       // Check the change of the eigenvalue
       // Brrr, this is not really a good criterion
-      conv = this->iteration_status(
-        iter, std::fabs(1. / length - 1. / old_length), x);
+      conv = this->iteration_status(iter, std::fabs(1. / length - 1. / old_length), x);
     }
 
   // in case of failure: throw exception
   AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(
-                iter, std::fabs(1. / length - 1. / old_length)));
+              SolverControl::NoConvergence(iter, std::fabs(1. / length - 1. / old_length)));
 
   // otherwise exit as normal
 }
@@ -310,9 +308,7 @@ EigenInverse<VectorType>::~EigenInverse()
 template <class VectorType>
 template <typename MatrixType>
 void
-EigenInverse<VectorType>::solve(double &          value,
-                                const MatrixType &A,
-                                VectorType &      x)
+EigenInverse<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
 {
   LogStream::Prefix prefix("Wielandt");
 
@@ -374,8 +370,7 @@ EigenInverse<VectorType>::solve(double &          value,
       if (iter == goal)
         {
           const auto & relaxation = additional_data.relaxation;
-          const double new_shift =
-            relaxation * (-value) + (1. - relaxation) * current_shift;
+          const double new_shift  = relaxation * (-value) + (1. - relaxation) * current_shift;
 
           A_s           = A_op + new_shift * identity_operator(A_op);
           current_shift = new_shift;
@@ -405,8 +400,7 @@ EigenInverse<VectorType>::solve(double &          value,
 
   // in case of failure: throw
   // exception
-  AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(iter, res));
+  AssertThrow(conv == SolverControl::success, SolverControl::NoConvergence(iter, res));
   // otherwise exit as normal
 }
 

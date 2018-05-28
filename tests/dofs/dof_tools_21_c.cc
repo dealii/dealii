@@ -140,8 +140,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
   std::vector<CellData<3>> cells(2, CellData<3>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {
-    0, 1, 2, 3, 4, 5, 6, 7};
+  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {0, 1, 2, 3, 4, 5, 6, 7};
 
   /* cell 1 */
   int cell_vertices_1[8][GeometryInfo<3>::vertices_per_cell] = {
@@ -193,8 +192,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
  */
 template <int dim>
 void
-print_matching(DoFHandler<dim> &dof_handler,
-               bool             constrain_only_velocity = false)
+print_matching(DoFHandler<dim> &dof_handler, bool constrain_only_velocity = false)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();
   MappingQ<dim>             mapping(1);
@@ -202,8 +200,7 @@ print_matching(DoFHandler<dim> &dof_handler,
   ConstraintMatrix        constraint_matrix;
   ConstraintMatrix        constraint_matrix_reverse;
   std::vector<Point<dim>> support_points(dof_handler.n_dofs());
-  DoFTools::map_dofs_to_support_points<dim>(
-    mapping, dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points<dim>(mapping, dof_handler, support_points);
 
   FEValuesExtractors::Vector v(0);
   FEValuesExtractors::Scalar v_1(0);
@@ -235,8 +232,8 @@ print_matching(DoFHandler<dim> &dof_handler,
 
   std::vector<types::global_dof_index> dofs_1(fe.dofs_per_face);
   std::vector<types::global_dof_index> dofs_2(fe.dofs_per_face);
-  const unsigned int face_1_index = face_1->nth_active_fe_index(0);
-  const unsigned int face_2_index = face_2->nth_active_fe_index(0);
+  const unsigned int                   face_1_index = face_1->nth_active_fe_index(0);
+  const unsigned int                   face_2_index = face_2->nth_active_fe_index(0);
   face_1->get_dof_indices(dofs_1, face_1_index);
   face_2->get_dof_indices(dofs_2, face_2_index);
 
@@ -248,8 +245,7 @@ print_matching(DoFHandler<dim> &dof_handler,
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
         {
           if (fe.face_system_to_component_index(i).first == c)
-            deallog << " (" << dofs_1[i] << " - " << support_points[dofs_1[i]]
-                    << ")";
+            deallog << " (" << dofs_1[i] << " - " << support_points[dofs_1[i]] << ")";
         }
     }
   deallog << std::endl;
@@ -260,22 +256,17 @@ print_matching(DoFHandler<dim> &dof_handler,
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
         {
           if (fe.face_system_to_component_index(i).first == c)
-            deallog << " (" << dofs_2[i] << " - " << support_points[dofs_2[i]]
-                    << ")";
+            deallog << " (" << dofs_2[i] << " - " << support_points[dofs_2[i]] << ")";
         }
     }
   deallog << std::endl;
 
 
   std::bitset<3> orientation;
-  if (not GridTools::orthogonal_equality(orientation,
-                                         face_1,
-                                         face_2,
-                                         dim == 2 ? 1 : 2,
-                                         dealii::Tensor<1, dim>()))
+  if (not GridTools::orthogonal_equality(
+        orientation, face_1, face_2, dim == 2 ? 1 : 2, dealii::Tensor<1, dim>()))
     std::cerr << " not match! oh noze!! " << std::endl;
-  deallog << "Orientation: " << orientation[0] << orientation[1]
-          << orientation[2] << std::endl;
+  deallog << "Orientation: " << orientation[0] << orientation[1] << orientation[2] << std::endl;
 
 
   DoFTools::make_periodicity_constraints(face_1,
@@ -289,14 +280,14 @@ print_matching(DoFHandler<dim> &dof_handler,
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
 
-  DoFTools::make_periodicity_constraints(
-    face_2,
-    face_1,
-    constraint_matrix_reverse,
-    velocity_mask,
-    orientation[0],
-    orientation[0] ? orientation[1] ^ orientation[2] : orientation[1],
-    orientation[2]);
+  DoFTools::make_periodicity_constraints(face_2,
+                                         face_1,
+                                         constraint_matrix_reverse,
+                                         velocity_mask,
+                                         orientation[0],
+                                         orientation[0] ? orientation[1] ^ orientation[2] :
+                                                          orientation[1],
+                                         orientation[2]);
   deallog << "Reverse Matching:" << std::endl;
   constraint_matrix_reverse.print(deallog.get_file_stream());
   constraint_matrix_reverse.close();
@@ -344,8 +335,7 @@ main()
     }
 
 
-  deallog << "Test for 3D, Q1, correct subface iteration:" << std::endl
-          << std::endl;
+  deallog << "Test for 3D, Q1, correct subface iteration:" << std::endl << std::endl;
 
   for (int i = 0; i < 8; ++i)
     {

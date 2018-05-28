@@ -69,8 +69,7 @@ test()
 
       // refine triangulation
       unsigned int index = 0;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         if (!cell->is_ghost() && !cell->is_artificial())
@@ -87,8 +86,7 @@ test()
       // some of them will actually be
       // coarsened)
       index = 0;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         if (!cell->is_ghost() && !cell->is_artificial())
@@ -106,22 +104,16 @@ test()
         deallog << N << std::endl;
 
       Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
-      for (unsigned int i = 0;
-           i < dof_handler.n_locally_owned_dofs_per_processor().size();
-           ++i)
-        AssertThrow(dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
-                    ExcInternalError());
-      AssertThrow(std::accumulate(
-                    dof_handler.n_locally_owned_dofs_per_processor().begin(),
-                    dof_handler.n_locally_owned_dofs_per_processor().end(),
-                    0U) == N,
+      for (unsigned int i = 0; i < dof_handler.n_locally_owned_dofs_per_processor().size(); ++i)
+        AssertThrow(dof_handler.n_locally_owned_dofs_per_processor()[i] <= N, ExcInternalError());
+      AssertThrow(std::accumulate(dof_handler.n_locally_owned_dofs_per_processor().begin(),
+                                  dof_handler.n_locally_owned_dofs_per_processor().end(),
+                                  0U) == N,
                   ExcInternalError());
 
       IndexSet all(N), really_all(N);
       // poor man's union operation
-      for (unsigned int i = 0;
-           i < dof_handler.n_locally_owned_dofs_per_processor().size();
-           ++i)
+      for (unsigned int i = 0; i < dof_handler.n_locally_owned_dofs_per_processor().size(); ++i)
         for (unsigned int j = 0; j < N; ++j)
           if (dof_handler.locally_owned_dofs_per_processor()[i].is_element(j))
             {

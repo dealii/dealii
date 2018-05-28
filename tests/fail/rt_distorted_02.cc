@@ -101,8 +101,7 @@ TestMap1<dim>::value(const Point<dim> &p, const unsigned int component) const
 
 template <int dim>
 void
-TestMap1<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+TestMap1<dim>::vector_value(const Point<dim> &p, Vector<double> &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -123,9 +122,7 @@ private:
   const double phi;
 
 public:
-  TestDef1(const unsigned int n_components, const double ph) :
-    Function<dim>(n_components),
-    phi(ph)
+  TestDef1(const unsigned int n_components, const double ph) : Function<dim>(n_components), phi(ph)
   {}
 
   virtual ~TestDef1()
@@ -145,10 +142,9 @@ double
 TestDef1<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   Point<2> center;
-  center(0)    = 0.5;
-  center(1)    = 0.5;
-  double rad   = p.distance(center),
-         phi_p = atan2(p(0) - center(0), p(1) - center(1));
+  center(0)  = 0.5;
+  center(1)  = 0.5;
+  double rad = p.distance(center), phi_p = atan2(p(0) - center(0), p(1) - center(1));
 
   if (component == 0)
     return rad * (sin(phi + phi_p) - sin(phi_p));
@@ -159,8 +155,7 @@ TestDef1<dim>::value(const Point<dim> &p, const unsigned int component) const
 
 template <int dim>
 void
-TestDef1<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+TestDef1<dim>::vector_value(const Point<dim> &p, Vector<double> &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -210,8 +205,7 @@ TestDef2<dim>::value(const Point<dim> &p, const unsigned int component) const
 
 template <int dim>
 void
-TestDef2<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+TestDef2<dim>::vector_value(const Point<dim> &p, Vector<double> &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -262,8 +256,7 @@ TestDef3<dim>::value(const Point<dim> &p, const unsigned int component) const
 
 template <int dim>
 void
-TestDef3<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+TestDef3<dim>::vector_value(const Point<dim> &p, Vector<double> &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -277,38 +270,33 @@ TestDef3<dim>::vector_value(const Point<dim> &p,
  * Check the value of the derivative field.
  */
 
-double EvaluateDiver(Mapping<2> &    mapping,
-                     DoFHandler<2> & dof_handler,
-                     Vector<double> &solution)
+double EvaluateDiver(Mapping<2> &mapping, DoFHandler<2> &dof_handler, Vector<double> &solution)
 {
   // Use a high order quadrature.
   QGauss<2>   quad(6);
   FEValues<2> fe_values(mapping,
                         dof_handler.get_fe(),
                         quad,
-                        UpdateFlags(update_values | update_quadrature_points |
-                                    update_gradients | update_JxW_values |
-                                    update_contravariant_transformation));
+                        UpdateFlags(update_values | update_quadrature_points | update_gradients |
+                                    update_JxW_values | update_contravariant_transformation));
 
   const unsigned int n_q_points   = quad.size();
   const unsigned int n_components = dof_handler.get_fe().n_components();
 
   // Cell iterators
-  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
-                                      endc = dof_handler.end();
-  double result                            = 0;
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
+  double                              result = 0;
 
   for (; cell != endc; ++cell)
     {
       fe_values.reinit(cell);
 
       // Get values from solution vector (For Trap.Rule)
-      std::vector<Vector<double>> this_value(n_q_points,
-                                             Vector<double>(n_components));
+      std::vector<Vector<double>> this_value(n_q_points, Vector<double>(n_components));
       fe_values.get_function_values(solution, this_value);
 
-      std::vector<std::vector<Tensor<1, 2>>> grads_here(
-        n_q_points, std::vector<Tensor<1, 2>>(n_components));
+      std::vector<std::vector<Tensor<1, 2>>> grads_here(n_q_points,
+                                                        std::vector<Tensor<1, 2>>(n_components));
       fe_values.get_function_gradients(solution, grads_here);
 
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
@@ -370,8 +358,7 @@ main()
   hn_constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, hn_constraints);
   hn_constraints.close();
-  VectorTools::project(
-    dof_handler, hn_constraints, QGauss<2>(6), TestMap1<2>(2), solution);
+  VectorTools::project(dof_handler, hn_constraints, QGauss<2>(6), TestMap1<2>(2), solution);
 
   // Project reference solution onto RT FE field
   ConstraintMatrix hn_constraints_def;
@@ -379,11 +366,8 @@ main()
   DoFTools::make_hanging_node_constraints(dof_handler_def, hn_constraints_def);
   hn_constraints_def.close();
 
-  VectorTools::project(dof_handler_def,
-                       hn_constraints_def,
-                       QGauss<2>(6),
-                       TestMap1<2>(2),
-                       solution_q);
+  VectorTools::project(
+    dof_handler_def, hn_constraints_def, QGauss<2>(6), TestMap1<2>(2), solution_q);
 
   MappingQ1Eulerian<2> mapping_euler(deformation, dof_handler_def);
 
@@ -397,11 +381,8 @@ main()
   for (double rotat = 0; rotat < 2 * numbers::PI; rotat += 0.25 * numbers::PI)
     {
       // Rotate element
-      VectorTools::project(dof_handler_def,
-                           hn_constraints_def,
-                           QGauss<2>(6),
-                           TestDef1<2>(2, rotat),
-                           deformation);
+      VectorTools::project(
+        dof_handler_def, hn_constraints_def, QGauss<2>(6), TestDef1<2>(2, rotat), deformation);
       sprintf(buf,
               "phi = %e FE_RT Area %e  FE_Q Area %e\n",
               rotat,
@@ -413,11 +394,8 @@ main()
   // Try resizing the elements
   for (double scale = -0.75; scale < 4.0; scale += 0.25)
     {
-      VectorTools::project(dof_handler_def,
-                           hn_constraints_def,
-                           QGauss<2>(6),
-                           TestDef2<2>(2, scale),
-                           deformation);
+      VectorTools::project(
+        dof_handler_def, hn_constraints_def, QGauss<2>(6), TestDef2<2>(2, scale), deformation);
       sprintf(buf,
               "Scale = %e FE_RT Area %e  FE_Q Area %e\n",
               scale,
@@ -429,11 +407,8 @@ main()
   // Try paralellogramming the elements
   for (double scale = -1.0; scale < 1.0; scale += 0.25)
     {
-      VectorTools::project(dof_handler_def,
-                           hn_constraints_def,
-                           QGauss<2>(6),
-                           TestDef3<2>(2, scale),
-                           deformation);
+      VectorTools::project(
+        dof_handler_def, hn_constraints_def, QGauss<2>(6), TestDef3<2>(2, scale), deformation);
       sprintf(buf,
               "Scale = %e FE_RT Area %e  FE_Q Area %e\n",
               scale,

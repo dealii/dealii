@@ -55,8 +55,7 @@ test(FiniteElement<dim> &fe)
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-        triangulation.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
       for (; cell != triangulation.end(); ++cell)
         if (Testing::rand() % 2)
           cell->set_refine_flag();
@@ -80,10 +79,8 @@ void
 testit()
 {
   std::vector<std::shared_ptr<FiniteElement<dim>>> fes;
-  fes.push_back(
-    std::shared_ptr<FiniteElement<dim>>(new FE_RaviartThomas<dim>(0)));
-  fes.push_back(
-    std::shared_ptr<FiniteElement<dim>>(new FE_RaviartThomas<dim>(1)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim>>(new FE_RaviartThomas<dim>(0)));
+  fes.push_back(std::shared_ptr<FiniteElement<dim>>(new FE_RaviartThomas<dim>(1)));
   fes.push_back(std::shared_ptr<FiniteElement<dim>>(new FE_Nedelec<dim>(0)));
   fes.push_back(std::shared_ptr<FiniteElement<dim>>(new FE_Nedelec<dim>(1)));
   fes.push_back(std::shared_ptr<FiniteElement<dim>>(new FE_Q<dim>(3)));

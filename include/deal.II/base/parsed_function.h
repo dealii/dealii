@@ -106,8 +106,7 @@ namespace Functions
      *
      */
     static void
-    declare_parameters(ParameterHandler & prm,
-                       const unsigned int n_components = 1);
+    declare_parameters(ParameterHandler &prm, const unsigned int n_components = 1);
 
     /**
      * Parse parameters needed by this class.  If the number of components

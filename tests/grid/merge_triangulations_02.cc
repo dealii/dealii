@@ -43,13 +43,10 @@ mesh_info(const Triangulation<dim> &tria)
   // indicator is used:
   {
     std::map<unsigned int, unsigned int>              boundary_count;
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;
@@ -57,8 +54,7 @@ mesh_info(const Triangulation<dim> &tria)
       }
 
     deallog << " boundary indicators: ";
-    for (std::map<unsigned int, unsigned int>::iterator it =
-           boundary_count.begin();
+    for (std::map<unsigned int, unsigned int>::iterator it = boundary_count.begin();
          it != boundary_count.end();
          ++it)
       {
@@ -90,8 +86,7 @@ make_grid()
   GridGenerator::merge_triangulations(tria1, tria3, triangulation2);
 
   mesh_info(triangulation2);
-  deallog << "Number of active cells: " << triangulation2.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation2.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation2.n_cells() << std::endl;
 }
 

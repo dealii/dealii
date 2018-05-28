@@ -99,10 +99,7 @@ namespace Utilities
 
 
     int
-    create_group(const MPI_Comm & comm,
-                 const MPI_Group &group,
-                 const int        tag,
-                 MPI_Comm *       new_comm)
+    create_group(const MPI_Comm &comm, const MPI_Group &group, const int tag, MPI_Comm *new_comm)
     {
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
       return MPI_Comm_create_group(comm, group, tag, new_comm);
@@ -134,8 +131,7 @@ namespace Utilities
       std::vector<int> pids(grp_size);
       std::vector<int> grp_pids(grp_size);
       std::iota(grp_pids.begin(), grp_pids.end(), 0);
-      ierr = MPI_Group_translate_ranks(
-        group, grp_size, grp_pids.data(), parent_grp, pids.data());
+      ierr = MPI_Group_translate_ranks(group, grp_size, grp_pids.data(), parent_grp, pids.data());
       AssertThrowMPI(ierr);
       ierr = MPI_Group_free(&parent_grp);
       AssertThrowMPI(ierr);
@@ -159,8 +155,7 @@ namespace Utilities
             }
           else
             {
-              ierr = MPI_Intercomm_create(
-                *new_comm, 0, comm, pids[(gid - 1) * merge_sz], tag, &ic);
+              ierr = MPI_Intercomm_create(*new_comm, 0, comm, pids[(gid - 1) * merge_sz], tag, &ic);
               AssertThrowMPI(ierr);
               ierr = MPI_Intercomm_merge(ic, 1 /* HIGH */, new_comm);
               AssertThrowMPI(ierr);
@@ -181,27 +176,23 @@ namespace Utilities
 
 
     std::vector<unsigned int>
-    compute_point_to_point_communication_pattern(
-      const MPI_Comm &                 mpi_comm,
-      const std::vector<unsigned int> &destinations)
+    compute_point_to_point_communication_pattern(const MPI_Comm &                 mpi_comm,
+                                                 const std::vector<unsigned int> &destinations)
     {
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
       for (unsigned int i = 0; i < destinations.size(); ++i)
         {
-          Assert(destinations[i] < n_procs,
-                 ExcIndexRange(destinations[i], 0, n_procs));
-          Assert(
-            destinations[i] != myid,
-            ExcMessage("There is no point in communicating with ourselves."));
+          Assert(destinations[i] < n_procs, ExcIndexRange(destinations[i], 0, n_procs));
+          Assert(destinations[i] != myid,
+                 ExcMessage("There is no point in communicating with ourselves."));
         }
 
 
       // let all processors communicate the maximal number of destinations
       // they have
-      const unsigned int max_n_destinations =
-        Utilities::MPI::max(destinations.size(), mpi_comm);
+      const unsigned int max_n_destinations = Utilities::MPI::max(destinations.size(), mpi_comm);
 
       if (max_n_destinations == 0)
         // all processes have nothing to send/receive:
@@ -210,10 +201,8 @@ namespace Utilities
       // now that we know the number of data packets every processor wants to
       // send, set up a buffer with the maximal size and copy our destinations
       // in there, padded with -1's
-      std::vector<unsigned int> my_destinations(max_n_destinations,
-                                                numbers::invalid_unsigned_int);
-      std::copy(
-        destinations.begin(), destinations.end(), my_destinations.begin());
+      std::vector<unsigned int> my_destinations(max_n_destinations, numbers::invalid_unsigned_int);
+      std::copy(destinations.begin(), destinations.end(), my_destinations.begin());
 
       // now exchange these (we could communicate less data if we used
       // MPI_Allgatherv, but we'd have to communicate my_n_destinations to all
@@ -236,8 +225,7 @@ namespace Utilities
         for (unsigned int j = 0; j < max_n_destinations; ++j)
           if (all_destinations[i * max_n_destinations + j] == myid)
             origins.push_back(i);
-          else if (all_destinations[i * max_n_destinations + j] ==
-                   numbers::invalid_unsigned_int)
+          else if (all_destinations[i * max_n_destinations + j] == numbers::invalid_unsigned_int)
             break;
 
       return origins;
@@ -248,10 +236,7 @@ namespace Utilities
     {
       // custom MIP_Op for calculate_collective_mpi_min_max_avg
       void
-      max_reduce(const void *in_lhs_,
-                 void *      inout_rhs_,
-                 int *       len,
-                 MPI_Datatype *)
+      max_reduce(const void *in_lhs_, void *inout_rhs_, int *len, MPI_Datatype *)
       {
         (void)len;
         const MinMaxAvg *in_lhs    = static_cast<const MinMaxAvg *>(in_lhs_);
@@ -308,17 +293,11 @@ namespace Utilities
 
       // To avoid uninitialized values on some MPI implementations, provide
       // result with a default value already...
-      MinMaxAvg result = {0.,
-                          std::numeric_limits<double>::max(),
-                          -std::numeric_limits<double>::max(),
-                          0,
-                          0,
-                          0.};
+      MinMaxAvg result = {
+        0., std::numeric_limits<double>::max(), -std::numeric_limits<double>::max(), 0, 0, 0.};
 
-      const unsigned int my_id =
-        dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
-      const unsigned int numproc =
-        dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
+      const unsigned int my_id   = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
+      const unsigned int numproc = dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
 
       MPI_Op op;
       int    ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
@@ -396,9 +375,7 @@ namespace Utilities
 
 
 
-    MPI_InitFinalize::MPI_InitFinalize(int &              argc,
-                                       char **&           argv,
-                                       const unsigned int max_num_threads)
+    MPI_InitFinalize::MPI_InitFinalize(int &argc, char **&argv, const unsigned int max_num_threads)
     {
       static bool constructor_has_already_run = false;
       (void)constructor_has_already_run;
@@ -414,8 +391,7 @@ namespace Utilities
       int MPI_has_been_started = 0;
       ierr                     = MPI_Initialized(&MPI_has_been_started);
       AssertThrowMPI(ierr);
-      AssertThrow(MPI_has_been_started == 0,
-                  ExcMessage("MPI error. You can only start MPI once!"));
+      AssertThrow(MPI_has_been_started == 0, ExcMessage("MPI error. You can only start MPI once!"));
 
       int provided;
       // this works like ierr = MPI_Init (&argc, &argv); but tells MPI that
@@ -500,12 +476,10 @@ namespace Utilities
           const unsigned int max_hostname_size =
             Utilities::MPI::max(hostname.size() + 1, MPI_COMM_WORLD);
           std::vector<char> hostname_array(max_hostname_size);
-          std::copy(hostname.c_str(),
-                    hostname.c_str() + hostname.size() + 1,
-                    hostname_array.begin());
+          std::copy(
+            hostname.c_str(), hostname.c_str() + hostname.size() + 1, hostname_array.begin());
 
-          std::vector<char> all_hostnames(max_hostname_size *
-                                          MPI::n_mpi_processes(MPI_COMM_WORLD));
+          std::vector<char> all_hostnames(max_hostname_size * MPI::n_mpi_processes(MPI_COMM_WORLD));
           const int         ierr = MPI_Allgather(hostname_array.data(),
                                          max_hostname_size,
                                          MPI_CHAR,
@@ -519,10 +493,8 @@ namespace Utilities
           // instance the current process represents
           unsigned int n_local_processes   = 0;
           unsigned int nth_process_on_host = 0;
-          for (unsigned int i = 0; i < MPI::n_mpi_processes(MPI_COMM_WORLD);
-               ++i)
-            if (std::string(all_hostnames.data() + i * max_hostname_size) ==
-                hostname)
+          for (unsigned int i = 0; i < MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+            if (std::string(all_hostnames.data() + i * max_hostname_size) == hostname)
               {
                 ++n_local_processes;
                 if (i <= MPI::this_mpi_process(MPI_COMM_WORLD))
@@ -537,13 +509,10 @@ namespace Utilities
           //
           // if the number would be zero, round up to one since every process
           // needs to have at least one thread
-          const unsigned int n_threads =
-            std::max(MultithreadInfo::n_cores() / n_local_processes +
-                       (nth_process_on_host <=
-                            MultithreadInfo::n_cores() % n_local_processes ?
-                          1 :
-                          0),
-                     1U);
+          const unsigned int n_threads = std::max(
+            MultithreadInfo::n_cores() / n_local_processes +
+              (nth_process_on_host <= MultithreadInfo::n_cores() % n_local_processes ? 1 : 0),
+            1U);
 #else
           const unsigned int n_threads = MultithreadInfo::n_cores();
 #endif
@@ -564,21 +533,15 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       // Start with the deal.II MPI vectors (need to do this before finalizing
       // PETSc because it finalizes MPI).  Delete vectors from the pools:
-      GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
-      GrowingVectorMemory<LinearAlgebra::distributed::BlockVector<double>>::
-        release_unused_memory();
-      GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<float>>::release_unused_memory();
-      GrowingVectorMemory<LinearAlgebra::distributed::BlockVector<float>>::
-        release_unused_memory();
+      GrowingVectorMemory<LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
+      GrowingVectorMemory<LinearAlgebra::distributed::BlockVector<double>>::release_unused_memory();
+      GrowingVectorMemory<LinearAlgebra::distributed::Vector<float>>::release_unused_memory();
+      GrowingVectorMemory<LinearAlgebra::distributed::BlockVector<float>>::release_unused_memory();
 
       // Next with Trilinos:
 #  if defined(DEAL_II_WITH_TRILINOS)
-      GrowingVectorMemory<
-        TrilinosWrappers::MPI::Vector>::release_unused_memory();
-      GrowingVectorMemory<
-        TrilinosWrappers::MPI::BlockVector>::release_unused_memory();
+      GrowingVectorMemory<TrilinosWrappers::MPI::Vector>::release_unused_memory();
+      GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>::release_unused_memory();
 #  endif
 #endif
 
@@ -586,13 +549,10 @@ namespace Utilities
       // Now deal with PETSc (with or without MPI). Only delete the vectors if
       // finalize hasn't been called yet, otherwise this will lead to errors.
 #ifdef DEAL_II_WITH_PETSC
-      if ((PetscInitializeCalled == PETSC_TRUE) &&
-          (PetscFinalizeCalled == PETSC_FALSE))
+      if ((PetscInitializeCalled == PETSC_TRUE) && (PetscFinalizeCalled == PETSC_FALSE))
         {
-          GrowingVectorMemory<
-            PETScWrappers::MPI::Vector>::release_unused_memory();
-          GrowingVectorMemory<
-            PETScWrappers::MPI::BlockVector>::release_unused_memory();
+          GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
+          GrowingVectorMemory<PETScWrappers::MPI::BlockVector>::release_unused_memory();
 
 #  ifdef DEAL_II_WITH_SLEPC
           // and now end SLEPc (with PETSc)
@@ -619,11 +579,9 @@ namespace Utilities
         {
           if (std::uncaught_exception())
             {
-              std::cerr
-                << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
-                << this_mpi_process(MPI_COMM_WORLD)
-                << ". Skipping MPI_Finalize() to avoid a deadlock."
-                << std::endl;
+              std::cerr << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
+                        << this_mpi_process(MPI_COMM_WORLD)
+                        << ". Skipping MPI_Finalize() to avoid a deadlock." << std::endl;
             }
           else
             {

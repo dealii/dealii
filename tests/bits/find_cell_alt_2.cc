@@ -46,8 +46,7 @@ void check(Triangulation<3> &tria)
 
   deallog << std::endl << std::endl;
 
-  Assert(p.distance(cell.first->center()) < cell.first->diameter() / 2,
-         ExcInternalError());
+  Assert(p.distance(cell.first->center()) < cell.first->diameter() / 2, ExcInternalError());
 }
 
 

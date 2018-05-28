@@ -143,9 +143,7 @@ public:
    * @param open_mode The mode handed over to the @p fopen function.
    */
   std::string
-  find(const std::string &filename,
-       const std::string &suffix,
-       const char *       open_mode = "r");
+  find(const std::string &filename, const std::string &suffix, const char *open_mode = "r");
 
   /**
    * Show the paths and suffixes used for this object.
@@ -265,9 +263,7 @@ PathSearch::show(StreamType &out) const
 {
   out << "DEAL_II_" << cls << "PATH=\"";
   bool first = true;
-  for (std::vector<std::string>::iterator p = my_path_list.begin();
-       p != my_path_list.end();
-       ++p)
+  for (std::vector<std::string>::iterator p = my_path_list.begin(); p != my_path_list.end(); ++p)
     {
       if (!first)
         out << ':';
@@ -275,8 +271,7 @@ PathSearch::show(StreamType &out) const
       first = false;
     }
   out << '"' << std::endl << " Suffixes";
-  for (std::vector<std::string>::iterator s = my_suffix_list.begin();
-       s != my_suffix_list.end();
+  for (std::vector<std::string>::iterator s = my_suffix_list.begin(); s != my_suffix_list.end();
        ++s)
     out << " \"" << *s << '"';
   out << std::endl;

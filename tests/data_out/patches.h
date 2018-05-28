@@ -37,8 +37,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
       patch.n_subdivisions = nsub;
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         for (unsigned int d = 0; d < spacedim; ++d)
-          patch.vertices[v](d) =
-            p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);
+          patch.vertices[v](d) = p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);
 
       unsigned int n1 = (dim > 0) ? nsubp : 1;
       unsigned int n2 = (dim > 1) ? nsubp : 1;
@@ -51,12 +50,11 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
           for (unsigned int i2 = 0; i2 < n2; ++i2)
             for (unsigned int i1 = 0; i1 < n1; ++i1)
               {
-                const unsigned int i =
-                  i1 + nsubp * (i2 + nsubp * (i3 + nsubp * i4));
-                const float x1 = 1. * i1 / nsub;
-                const float x2 = 1. * i2 / nsub;
-                const float x3 = 1. * i3 / nsub;
-                const float x4 = 1. * i4 / nsub;
+                const unsigned int i  = i1 + nsubp * (i2 + nsubp * (i3 + nsubp * i4));
+                const float        x1 = 1. * i1 / nsub;
+                const float        x2 = 1. * i2 / nsub;
+                const float        x3 = 1. * i3 / nsub;
+                const float        x4 = 1. * i4 / nsub;
 
                 patch.data(0, i) = p + x1;
                 patch.data(1, i) = p + x2;

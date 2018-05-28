@@ -47,8 +47,7 @@ test()
   if (dim == 2)
     tria.refine_global(1);
   {
-    typename Triangulation<dim>::active_cell_iterator cell =
-      tria.begin_active();
+    typename Triangulation<dim>::active_cell_iterator cell    = tria.begin_active();
     typename Triangulation<dim>::active_cell_iterator endc    = tria.end();
     unsigned int                                      counter = 0;
     for (; cell != endc; ++cell, ++counter)
@@ -80,13 +79,11 @@ test()
   MatrixFree<dim, double>                          mf_data_orig;
   const QGauss<1>                                  quad(fe_degree + 1);
   typename MatrixFree<dim, double>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
-  data.tasks_block_size      = 3;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
-  data.initialize_mapping = true;
+  data.tasks_parallel_scheme               = MatrixFree<dim, double>::AdditionalData::none;
+  data.tasks_block_size                    = 3;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
+  data.initialize_mapping                  = true;
 
   mf_data_orig.reinit(mapping, dof_orig, constraints, quad, data);
   mf_data_orig.initialize_dof_vector(in_orig);

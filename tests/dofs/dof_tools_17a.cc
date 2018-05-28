@@ -31,8 +31,7 @@ void
 check_this(const DoFHandler<dim> &dof_handler)
 {
   // create sparsity pattern
-  SparsityPattern sp(dof_handler.n_dofs(),
-                     dof_handler.max_couplings_between_dofs() * 2);
+  SparsityPattern sp(dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs() * 2);
   DoFTools::make_flux_sparsity_pattern(dof_handler, sp);
   sp.compress();
 
@@ -55,8 +54,7 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   unsigned int hash = 0;
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
-    hash +=
-      l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
-           (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
+    hash += l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
+                 (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
   deallog << hash << std::endl;
 }

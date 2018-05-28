@@ -92,17 +92,14 @@ LaplaceProblem::make_grid_and_dofs()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(5);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   dof_handler.distribute_dofs(fe);
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
 
@@ -118,10 +115,8 @@ void
 LaplaceProblem::assemble_system()
 {
   hp::QCollection<2> quadrature_formula(QGauss<2>(2));
-  hp::FEValues<2>    x_fe_values(fe,
-                              quadrature_formula,
-                              update_values | update_gradients |
-                                update_JxW_values);
+  hp::FEValues<2>    x_fe_values(
+    fe, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe[0].dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula[0].size();
@@ -145,21 +140,18 @@ LaplaceProblem::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-            cell_matrix(i, j) +=
-              (fe_values.shape_grad(i, q_point) *
-               fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+            cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                  fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          cell_rhs(i) +=
-            (fe_values.shape_value(i, q_point) * 1 * fe_values.JxW(q_point));
+          cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1 * fe_values.JxW(q_point));
 
       cell->get_dof_indices(local_dof_indices);
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
@@ -169,8 +161,7 @@ LaplaceProblem::assemble_system()
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(
     dof_handler, 0, Functions::ZeroFunction<2>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 }
 
 

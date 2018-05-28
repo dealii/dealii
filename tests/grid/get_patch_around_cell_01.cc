@@ -34,8 +34,7 @@ template <int dim>
 void
 test()
 {
-  Triangulation<dim> triangulation(
-    Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> triangulation(Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
@@ -53,8 +52,7 @@ test()
 
       // refine triangulation
       unsigned int index = 0;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell, ++index)
         if (flags[index])
@@ -66,8 +64,7 @@ test()
       // some of them will actually be
       // coarsened)
       index = 0;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell, ++index)
         if (!flags[index])
@@ -78,14 +75,12 @@ test()
 
   // now extract patches and print every fifth of them
   unsigned int index = 0;
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell, ++index)
     {
-      std::vector<typename Triangulation<dim>::active_cell_iterator>
-        patch_cells =
-          GridTools::get_patch_around_cell<Triangulation<dim>>(cell);
+      std::vector<typename Triangulation<dim>::active_cell_iterator> patch_cells =
+        GridTools::get_patch_around_cell<Triangulation<dim>>(cell);
 
       if (index % 5 == 0)
         {

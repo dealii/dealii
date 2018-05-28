@@ -35,15 +35,12 @@ test()
   GridGenerator::hyper_cube(tria);
 
   deallog << "Coarse mesh:" << std::endl;
-  deallog << "Left vertex=" << tria.begin_active()->face(0)->vertex(0)
-          << std::endl;
-  deallog << "Right vertex=" << tria.begin_active()->face(1)->vertex(0)
-          << std::endl;
+  deallog << "Left vertex=" << tria.begin_active()->face(0)->vertex(0) << std::endl;
+  deallog << "Right vertex=" << tria.begin_active()->face(1)->vertex(0) << std::endl;
 
   tria.refine_global(2);
 
-  for (typename Triangulation<1, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<1, spacedim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     {

@@ -37,9 +37,7 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
-  typedef
-    typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-      cell_iterator;
+  typedef typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell_iterator;
 
   // Mark a small block at the corner of the hypercube
   std::vector<cell_iterator> ghost_cells_tria;
@@ -53,42 +51,32 @@ test()
 
   // Compute a halo layer around the locally owned cells.
   // These should all be ghost cells
-  std::vector<cell_iterator> ghost_cell_halo_layer =
-    GridTools::compute_ghost_cell_halo_layer(tria);
-  AssertThrow(ghost_cell_halo_layer.size() > 0,
-              ExcMessage("Ghost cell halo layer found."));
+  std::vector<cell_iterator> ghost_cell_halo_layer = GridTools::compute_ghost_cell_halo_layer(tria);
+  AssertThrow(ghost_cell_halo_layer.size() > 0, ExcMessage("Ghost cell halo layer found."));
   AssertThrow(ghost_cell_halo_layer.size() == ghost_cells_tria.size(),
               ExcMessage("Ghost cell halo layer wrong size."));
   std::sort(ghost_cell_halo_layer.begin(), ghost_cell_halo_layer.end());
 
-  for (unsigned int proc = 0;
-       proc < Utilities::MPI::n_mpi_processes(mpi_communicator);
-       ++proc)
+  for (unsigned int proc = 0; proc < Utilities::MPI::n_mpi_processes(mpi_communicator); ++proc)
     {
       if (proc == Utilities::MPI::this_mpi_process(mpi_communicator))
         {
           for (typename std::vector<cell_iterator>::const_iterator
                  it_1 = ghost_cells_tria.begin(),
                  it_2 = ghost_cell_halo_layer.begin();
-               it_1 != ghost_cells_tria.end() &&
-               it_2 != ghost_cell_halo_layer.end();
+               it_1 != ghost_cells_tria.end() && it_2 != ghost_cell_halo_layer.end();
                ++it_1, ++it_2)
             {
               const cell_iterator &cell_1 = *it_1;
               const cell_iterator &cell_2 = *it_2;
-              AssertThrow(cell_1->is_ghost() == true,
-                          ExcMessage("Cell is not a ghost cell!"));
-              AssertThrow(cell_2->is_ghost() == true,
-                          ExcMessage("Halo cell is not a ghost cell!"));
-              deallog << "Ghost " << cell_1->level() << " " << cell_1->index()
-                      << " " << cell_1->id() << " " << cell_1->id().to_string()
-                      << " "
-                      << "Halo " << cell_2->level() << " " << cell_2->index()
-                      << " " << cell_2->id() << " " << cell_2->id().to_string()
-                      << std::endl;
-              AssertThrow(
-                cell_2 == cell_1,
-                ExcMessage("Halo cell is not identical to ghost cell."));
+              AssertThrow(cell_1->is_ghost() == true, ExcMessage("Cell is not a ghost cell!"));
+              AssertThrow(cell_2->is_ghost() == true, ExcMessage("Halo cell is not a ghost cell!"));
+              deallog << "Ghost " << cell_1->level() << " " << cell_1->index() << " "
+                      << cell_1->id() << " " << cell_1->id().to_string() << " "
+                      << "Halo " << cell_2->level() << " " << cell_2->index() << " " << cell_2->id()
+                      << " " << cell_2->id().to_string() << std::endl;
+              AssertThrow(cell_2 == cell_1,
+                          ExcMessage("Halo cell is not identical to ghost cell."));
             }
         }
     }

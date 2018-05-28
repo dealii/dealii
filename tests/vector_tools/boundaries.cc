@@ -78,9 +78,7 @@ boundary_q(const DoFHandler<dim> &)
 void
 write_map(const std::map<types::global_dof_index, double> &bv)
 {
-  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin();
-       i != bv.end();
-       ++i)
+  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin(); i != bv.end(); ++i)
     deallog << i->first << ' ' << i->second << std::endl;
 }
 
@@ -96,9 +94,8 @@ check()
       GridGenerator::hyper_ball(tr, Point<dim>(), 1);
     }
   else
-    GridGenerator::hyper_cube(tr,
-                              -1. / std::sqrt(static_cast<double>(dim)),
-                              1. / std::sqrt(static_cast<double>(dim)));
+    GridGenerator::hyper_cube(
+      tr, -1. / std::sqrt(static_cast<double>(dim)), 1. / std::sqrt(static_cast<double>(dim)));
   GridTools::copy_boundary_to_manifold_id(tr);
   static const SphericalManifold<dim> boundary;
   if (dim != 1)

@@ -45,13 +45,11 @@ initialize_node_matrix(const FiniteElement<dim> &other,
                        FullMatrix<double> &      N)
 {
   const unsigned int n_dofs = other.dofs_per_cell;
-  Assert(n_dofs == nodes.dofs_per_cell,
-         ExcDimensionMismatch(n_dofs, nodes.dofs_per_cell));
+  Assert(n_dofs == nodes.dofs_per_cell, ExcDimensionMismatch(n_dofs, nodes.dofs_per_cell));
 
   N.reinit(n_dofs, n_dofs);
 
-  const std::vector<Point<dim>> &unit_support_points =
-    nodes.get_generalized_support_points();
+  const std::vector<Point<dim>> &unit_support_points = nodes.get_generalized_support_points();
 
   // The current node functional index
   unsigned int current = 0;
@@ -66,9 +64,7 @@ initialize_node_matrix(const FiniteElement<dim> &other,
       {
         for (unsigned int i = 0; i < n_dofs; ++i)
           N(current, i) = other.shape_value_component(
-            i,
-            unit_support_points[current],
-            GeometryInfo<dim>::unit_normal_direction[face]);
+            i, unit_support_points[current], GeometryInfo<dim>::unit_normal_direction[face]);
         ++current;
       }
   // Interior degrees of freedom in each direction
@@ -78,8 +74,7 @@ initialize_node_matrix(const FiniteElement<dim> &other,
     for (unsigned int k = 0; k < n_cell; ++k)
       {
         for (unsigned int i = 0; i < n_dofs; ++i)
-          N(current, i) =
-            other.shape_value_component(i, unit_support_points[current], d);
+          N(current, i) = other.shape_value_component(i, unit_support_points[current], d);
         ++current;
       }
   Assert(current == n_dofs, ExcInternalError());
@@ -92,25 +87,19 @@ compare_shapes(const FiniteElement<dim> &other,
                const FiniteElement<dim> &nodes,
                FullMatrix<double> &      M)
 {
-  QGauss<dim>      quadrature(other.degree + 1);
-  Table<3, double> other_values(quadrature.size(), other.dofs_per_cell, dim);
-  Table<3, double> nodes_values(quadrature.size(), other.dofs_per_cell, dim);
-  Table<3, Tensor<1, dim>> other_grads(
-    quadrature.size(), other.dofs_per_cell, dim);
-  Table<3, Tensor<1, dim>> nodes_grads(
-    quadrature.size(), other.dofs_per_cell, dim);
+  QGauss<dim>              quadrature(other.degree + 1);
+  Table<3, double>         other_values(quadrature.size(), other.dofs_per_cell, dim);
+  Table<3, double>         nodes_values(quadrature.size(), other.dofs_per_cell, dim);
+  Table<3, Tensor<1, dim>> other_grads(quadrature.size(), other.dofs_per_cell, dim);
+  Table<3, Tensor<1, dim>> nodes_grads(quadrature.size(), other.dofs_per_cell, dim);
   for (unsigned int k = 0; k < quadrature.size(); ++k)
     for (unsigned int i = 0; i < other.dofs_per_cell; ++i)
       for (unsigned int d = 0; d < dim; ++d)
         {
-          other_values[k][i][d] =
-            other.shape_value_component(i, quadrature.point(k), d);
-          nodes_values[k][i][d] =
-            nodes.shape_value_component(i, quadrature.point(k), d);
-          other_grads[k][i][d] =
-            other.shape_grad_component(i, quadrature.point(k), d);
-          nodes_grads[k][i][d] =
-            nodes.shape_grad_component(i, quadrature.point(k), d);
+          other_values[k][i][d] = other.shape_value_component(i, quadrature.point(k), d);
+          nodes_values[k][i][d] = nodes.shape_value_component(i, quadrature.point(k), d);
+          other_grads[k][i][d]  = other.shape_grad_component(i, quadrature.point(k), d);
+          nodes_grads[k][i][d]  = nodes.shape_grad_component(i, quadrature.point(k), d);
         }
 
   for (unsigned int k = 0; k < quadrature.size(); ++k)
@@ -127,11 +116,11 @@ compare_shapes(const FiniteElement<dim> &other,
               }
             deallog << '.';
             if (std::fabs(value) > 1.e-12)
-              deallog << "Error value\t" << k << '\t' << i << '\t' << d << '\t'
-                      << value << std::endl;
+              deallog << "Error value\t" << k << '\t' << i << '\t' << d << '\t' << value
+                      << std::endl;
             if (grad.norm() > 1.e-12)
-              deallog << "Error grad\t" << k << '\t' << i << '\t' << d << '\t'
-                      << grad << '\t' << other_grads[k][i][d] << std::endl;
+              deallog << "Error grad\t" << k << '\t' << i << '\t' << d << '\t' << grad << '\t'
+                      << other_grads[k][i][d] << std::endl;
           }
       deallog << std::endl;
     }

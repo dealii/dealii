@@ -49,9 +49,7 @@ template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:
-  MySquareFunction(const unsigned int n_components) :
-    Function<dim>(n_components),
-    scaling(1)
+  MySquareFunction(const unsigned int n_components) : Function<dim>(n_components), scaling(1)
   {}
 
   void
@@ -98,14 +96,10 @@ boundary_q(const DoFHandler<1> &)
 void
 write_map(const std::map<types::global_dof_index, double> &bv)
 {
-  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin();
-       i != bv.end();
-       ++i)
+  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin(); i != bv.end(); ++i)
     // also output log of value to also display small numbers
     deallog << i->first << ' ' << i->second << " "
-            << (std::abs(i->second) > 0 ? std::log(std::abs(i->second)) :
-                                          -10000)
-            << std::endl;
+            << (std::abs(i->second) > 0 ? std::log(std::abs(i->second)) : -10000) << std::endl;
 }
 
 
@@ -120,9 +114,8 @@ check()
       GridGenerator::hyper_ball(tr, Point<dim>(), 1);
     }
   else
-    GridGenerator::hyper_cube(tr,
-                              -1. / std::sqrt(static_cast<double>(dim)),
-                              1. / std::sqrt(static_cast<double>(dim)));
+    GridGenerator::hyper_cube(
+      tr, -1. / std::sqrt(static_cast<double>(dim)), 1. / std::sqrt(static_cast<double>(dim)));
   GridTools::copy_boundary_to_manifold_id(tr);
 
   static const SphericalManifold<dim> boundary;

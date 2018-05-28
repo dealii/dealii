@@ -75,8 +75,7 @@ test_nodal_matrix()
     {
       for (unsigned int k = 0; k < values.size(); ++k)
         values[k][0] = fe.shape_value(i, points[k]);
-      fe.convert_generalized_support_point_values_to_dof_values(values,
-                                                                local_dofs);
+      fe.convert_generalized_support_point_values_to_dof_values(values, local_dofs);
 
       for (unsigned int j = 0; j < n_dofs; ++j)
         N(j, i) = local_dofs[j];
@@ -134,8 +133,7 @@ test_interpolation()
       fev.get_function_values(input_vector, values);
 
       std::vector<double> interpolated_local_dofs(n_dofs);
-      fe.convert_generalized_support_point_values_to_dof_values(
-        values, interpolated_local_dofs);
+      fe.convert_generalized_support_point_values_to_dof_values(values, interpolated_local_dofs);
 
       Vector<double> local_dofs(n_dofs);
       cell->get_dof_values(input_vector, local_dofs);

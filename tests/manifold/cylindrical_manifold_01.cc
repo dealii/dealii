@@ -38,8 +38,7 @@ test(unsigned int ref = 1)
   Triangulation<dim, spacedim> tria;
   GridGenerator::cylinder(tria);
 
-  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     {

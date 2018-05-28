@@ -45,8 +45,7 @@ main(int argc, char **argv)
   initlog();
   deallog << std::setprecision(4);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
 
   {
@@ -80,7 +79,6 @@ main(int argc, char **argv)
 
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 49, 51);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner), control.last_step(), 49, 51);
   }
 }

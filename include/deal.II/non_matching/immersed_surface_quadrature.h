@@ -106,9 +106,7 @@ namespace NonMatching
      * quadrature formula.
      */
     void
-    push_back(const Point<dim> &    point,
-              const double          weight,
-              const Tensor<1, dim> &normal);
+    push_back(const Point<dim> &point, const double weight, const Tensor<1, dim> &normal);
 
     /**
      * Return a reference to the <tt>i</tt>th surface normal.

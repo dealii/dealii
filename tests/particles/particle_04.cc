@@ -46,12 +46,10 @@ test()
 
     const types::particle_index index(7);
 
-    Particles::Particle<dim, spacedim> particle(
-      position, reference_position, index);
+    Particles::Particle<dim, spacedim> particle(position, reference_position, index);
 
     deallog << "Particle location: " << particle.get_location() << std::endl
-            << "Particle reference location: "
-            << particle.get_reference_location() << std::endl
+            << "Particle reference location: " << particle.get_reference_location() << std::endl
             << "Particle index: " << particle.get_id() << std::endl;
     Assert(!particle.has_properties(), ExcInternalError());
 
@@ -63,10 +61,9 @@ test()
     const void *read_pointer = static_cast<const void *>(&data.front());
     const Particles::Particle<dim, spacedim> new_particle(read_pointer);
 
-    deallog << "Copy particle location: " << new_particle.get_location()
+    deallog << "Copy particle location: " << new_particle.get_location() << std::endl
+            << "Copy particle reference location: " << new_particle.get_reference_location()
             << std::endl
-            << "Copy particle reference location: "
-            << new_particle.get_reference_location() << std::endl
             << "Copy particle index: " << new_particle.get_id() << std::endl;
     Assert(!new_particle.has_properties(), ExcInternalError());
   }

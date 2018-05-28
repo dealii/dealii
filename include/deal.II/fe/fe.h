@@ -835,8 +835,7 @@ public:
    * with index zero within its collection (that, of course, consists only of
    * the present finite element anyway).
    */
-  const FiniteElement<dim, spacedim> &
-  operator[](const unsigned int fe_index) const;
+  const FiniteElement<dim, spacedim> &operator[](const unsigned int fe_index) const;
 
   /**
    * @name Shape function access
@@ -1027,8 +1026,7 @@ public:
    * returns @p true. This is the safe way to go.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const;
 
   //@}
   /**
@@ -1052,9 +1050,9 @@ public:
    * isotropic_restriction_is_implemented() function.
    */
   virtual const FullMatrix<double> &
-  get_restriction_matrix(const unsigned int         child,
-                         const RefinementCase<dim> &refinement_case =
-                           RefinementCase<dim>::isotropic_refinement) const;
+  get_restriction_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case = RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * Prolongation/embedding matrix between grids.
@@ -1086,9 +1084,9 @@ public:
    * isotropic_prolongation_is_implemented() function.
    */
   virtual const FullMatrix<double> &
-  get_prolongation_matrix(const unsigned int         child,
-                          const RefinementCase<dim> &refinement_case =
-                            RefinementCase<dim>::isotropic_refinement) const;
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case = RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * Return whether this element implements its prolongation matrices. The
@@ -1217,9 +1215,8 @@ public:
    * just expresses.
    */
   bool
-  constraints_are_implemented(
-    const dealii::internal::SubfaceCase<dim> &subface_case =
-      dealii::internal::SubfaceCase<dim>::case_isotropic) const;
+  constraints_are_implemented(const dealii::internal::SubfaceCase<dim> &subface_case =
+                                dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
 
   /**
@@ -1282,7 +1279,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const;
+                                FullMatrix<double> &                matrix) const;
 
 
   /**
@@ -1299,7 +1296,7 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                    const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const;
+                                   FullMatrix<double> &                matrix) const;
   //@}
 
 
@@ -1350,8 +1347,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const;
+  compare_for_face_domination(const FiniteElement<dim, spacedim> &fe_other) const;
 
   //@}
 
@@ -1443,8 +1439,7 @@ public:
    * function.
    */
   unsigned int
-  component_to_system_index(const unsigned int component,
-                            const unsigned int index) const;
+  component_to_system_index(const unsigned int component, const unsigned int index) const;
 
   /**
    * Same as system_to_component_index(), but do it for shape functions and
@@ -1468,9 +1463,9 @@ public:
    */
   unsigned int
   adjust_quad_dof_index_for_face_orientation(const unsigned int index,
-                                             const bool face_orientation,
-                                             const bool face_flip,
-                                             const bool face_rotation) const;
+                                             const bool         face_orientation,
+                                             const bool         face_flip,
+                                             const bool         face_rotation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
@@ -1542,7 +1537,7 @@ public:
    */
   unsigned int
   adjust_line_dof_index_for_line_orientation(const unsigned int index,
-                                             const bool line_orientation) const;
+                                             const bool         line_orientation) const;
 
   /**
    * Return in which of the vector components of this finite element the @p
@@ -1714,8 +1709,7 @@ public:
    * See the other get_sub_fe() function above for more details.
    */
   virtual const FiniteElement<dim, spacedim> &
-  get_sub_fe(const unsigned int first_component,
-             const unsigned int n_selected_components) const;
+  get_sub_fe(const unsigned int first_component, const unsigned int n_selected_components) const;
 
   /**
    * Return for shape function @p index the base element it belongs to, the
@@ -1846,8 +1840,7 @@ public:
    * ones that corresponds to the argument.
    */
   ComponentMask
-  component_mask(
-    const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+  component_mask(const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
   /**
    * Given a block mask (see
@@ -2314,13 +2307,12 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(
-    ExcUnitShapeValuesDoNotExist,
-    "You are trying to access the values or derivatives of shape functions "
-    "on the reference cell of an element that does not define its shape "
-    "functions through mapping from the reference cell. Consequently, "
-    "you cannot ask for shape function values or derivatives on the "
-    "reference cell.");
+  DeclExceptionMsg(ExcUnitShapeValuesDoNotExist,
+                   "You are trying to access the values or derivatives of shape functions "
+                   "on the reference cell of an element that does not define its shape "
+                   "functions through mapping from the reference cell. Consequently, "
+                   "you cannot ask for shape function values or derivatives on the "
+                   "reference cell.");
 
   /**
    * Attempt to access support points of a finite element that is not
@@ -2394,9 +2386,8 @@ protected:
    * required for isotropic refinement are reinited to the right size.
    */
   void
-  reinit_restriction_and_prolongation_matrices(
-    const bool isotropic_restriction_only  = false,
-    const bool isotropic_prolongation_only = false);
+  reinit_restriction_and_prolongation_matrices(const bool isotropic_restriction_only  = false,
+                                               const bool isotropic_prolongation_only = false);
 
   /**
    * Vector of projection matrices. See get_restriction_matrix() above. The
@@ -2515,8 +2506,7 @@ protected:
    * information thus makes only sense if a shape function is non-zero in only
    * one component.
    */
-  std::vector<std::pair<unsigned int, unsigned int>>
-    face_system_to_component_table;
+  std::vector<std::pair<unsigned int, unsigned int>> face_system_to_component_table;
 
   /**
    * For each shape function, store to which base element and which instance
@@ -2534,8 +2524,7 @@ protected:
    * primitive) shape functions, in contrast to the
    * #system_to_component_table.
    */
-  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>
-    system_to_base_table;
+  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>> system_to_base_table;
 
   /**
    * Likewise for the indices on faces.
@@ -2624,8 +2613,7 @@ protected:
    * This function is used in the constructor of this class.
    */
   static std::vector<unsigned int>
-  compute_n_nonzero_components(
-    const std::vector<ComponentMask> &nonzero_components);
+  compute_n_nonzero_components(const std::vector<ComponentMask> &nonzero_components);
 
   /**
    * Given a set of update flags, compute which other quantities <i>also</i>
@@ -2730,8 +2718,8 @@ protected:
   get_data(const UpdateFlags             update_flags,
            const Mapping<dim, spacedim> &mapping,
            const Quadrature<dim> &       quadrature,
-           dealii::internal::FEValuesImplementation::
-             FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+             &output_data) const = 0;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2778,8 +2766,8 @@ protected:
   get_face_data(const UpdateFlags             update_flags,
                 const Mapping<dim, spacedim> &mapping,
                 const Quadrature<dim - 1> &   quadrature,
-                dealii::internal::FEValuesImplementation::
-                  FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+                  &output_data) const;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2823,13 +2811,11 @@ protected:
    * it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
-  get_subface_data(
-    const UpdateFlags             update_flags,
-    const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim - 1> &   quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const;
+  get_subface_data(const UpdateFlags             update_flags,
+                   const Mapping<dim, spacedim> &mapping,
+                   const Quadrature<dim - 1> &   quadrature,
+                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+                     &output_data) const;
 
   /**
    * Compute information about the shape functions on the cell denoted by the
@@ -2917,14 +2903,11 @@ protected:
     const CellSimilarity::Similarity                            cell_similarity,
     const Quadrature<dim> &                                     quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                     mapping_data,
-    const InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const = 0;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const InternalDataBase &                                                           fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const = 0;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but
@@ -2974,14 +2957,11 @@ protected:
     const unsigned int                                          face_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                     mapping_data,
-    const InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const = 0;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const InternalDataBase &                                                           fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const = 0;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but
@@ -3035,14 +3015,11 @@ protected:
     const unsigned int                                          sub_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                     mapping_data,
-    const InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const = 0;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const InternalDataBase &                                                           fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const = 0;
 
   friend class InternalDataBase;
   friend class FEValuesBase<dim, spacedim>;
@@ -3069,8 +3046,7 @@ inline const FiniteElement<dim, spacedim> &FiniteElement<dim, spacedim>::
                                            operator[](const unsigned int fe_index) const
 {
   (void)fe_index;
-  Assert(fe_index == 0,
-         ExcMessage("A fe_index of zero is the only index allowed here"));
+  Assert(fe_index == 0, ExcMessage("A fe_index of zero is the only index allowed here"));
   return *this;
 }
 
@@ -3078,14 +3054,12 @@ inline const FiniteElement<dim, spacedim> &FiniteElement<dim, spacedim>::
 
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
-FiniteElement<dim, spacedim>::system_to_component_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::system_to_component_index(const unsigned int index) const
 {
   Assert(index < system_to_component_table.size(),
          ExcIndexRange(index, 0, system_to_component_table.size()));
   Assert(is_primitive(index),
-         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
-           index)));
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(index)));
   return system_to_component_table[index];
 }
 
@@ -3102,8 +3076,7 @@ FiniteElement<dim, spacedim>::n_base_elements() const
 
 template <int dim, int spacedim>
 inline unsigned int
-FiniteElement<dim, spacedim>::element_multiplicity(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::element_multiplicity(const unsigned int index) const
 {
   return static_cast<unsigned int>(base_to_block_indices.block_size(index));
 }
@@ -3112,9 +3085,8 @@ FiniteElement<dim, spacedim>::element_multiplicity(
 
 template <int dim, int spacedim>
 inline unsigned int
-FiniteElement<dim, spacedim>::component_to_system_index(
-  const unsigned int component,
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::component_to_system_index(const unsigned int component,
+                                                        const unsigned int index) const
 {
   AssertIndexRange(component, this->n_components());
   const std::vector<std::pair<unsigned int, unsigned int>>::const_iterator it =
@@ -3139,8 +3111,7 @@ FiniteElement<dim, spacedim>::component_to_system_index(
 
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
-FiniteElement<dim, spacedim>::face_system_to_component_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::face_system_to_component_index(const unsigned int index) const
 {
   Assert(index < face_system_to_component_table.size(),
          ExcIndexRange(index, 0, face_system_to_component_table.size()));
@@ -3159,8 +3130,7 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
   // in 1d, the face index is equal
   // to the cell index
   Assert(is_primitive(this->face_to_cell_index(index, 0)),
-         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
-           index)));
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(index)));
 
   return face_system_to_component_table[index];
 }
@@ -3169,11 +3139,9 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
 
 template <int dim, int spacedim>
 inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-FiniteElement<dim, spacedim>::system_to_base_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::system_to_base_index(const unsigned int index) const
 {
-  Assert(index < system_to_base_table.size(),
-         ExcIndexRange(index, 0, system_to_base_table.size()));
+  Assert(index < system_to_base_table.size(), ExcIndexRange(index, 0, system_to_base_table.size()));
   return system_to_base_table[index];
 }
 
@@ -3181,8 +3149,7 @@ FiniteElement<dim, spacedim>::system_to_base_index(
 
 template <int dim, int spacedim>
 inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-FiniteElement<dim, spacedim>::face_system_to_base_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::face_system_to_base_index(const unsigned int index) const
 {
   Assert(index < face_system_to_base_table.size(),
          ExcIndexRange(index, 0, face_system_to_base_table.size()));
@@ -3193,8 +3160,7 @@ FiniteElement<dim, spacedim>::face_system_to_base_index(
 
 template <int dim, int spacedim>
 inline types::global_dof_index
-FiniteElement<dim, spacedim>::first_block_of_base(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::first_block_of_base(const unsigned int index) const
 {
   return base_to_block_indices.block_start(index);
 }
@@ -3203,8 +3169,7 @@ FiniteElement<dim, spacedim>::first_block_of_base(
 
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
-FiniteElement<dim, spacedim>::component_to_base_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::component_to_base_index(const unsigned int index) const
 {
   Assert(index < component_to_base_table.size(),
          ExcIndexRange(index, 0, component_to_base_table.size()));
@@ -3216,8 +3181,7 @@ FiniteElement<dim, spacedim>::component_to_base_index(
 
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
-FiniteElement<dim, spacedim>::block_to_base_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::block_to_base_index(const unsigned int index) const
 {
   return base_to_block_indices.global_to_local(index);
 }
@@ -3226,11 +3190,9 @@ FiniteElement<dim, spacedim>::block_to_base_index(
 
 template <int dim, int spacedim>
 inline std::pair<unsigned int, types::global_dof_index>
-FiniteElement<dim, spacedim>::system_to_block_index(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::system_to_block_index(const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  Assert(index < this->dofs_per_cell, ExcIndexRange(index, 0, this->dofs_per_cell));
   // The block is computed simply as
   // first block of this base plus
   // the index within the base blocks
@@ -3244,11 +3206,9 @@ FiniteElement<dim, spacedim>::system_to_block_index(
 
 template <int dim, int spacedim>
 inline bool
-FiniteElement<dim, spacedim>::restriction_is_additive(
-  const unsigned int index) const
+FiniteElement<dim, spacedim>::restriction_is_additive(const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  Assert(index < this->dofs_per_cell, ExcIndexRange(index, 0, this->dofs_per_cell));
   return restriction_is_additive_flags[index];
 }
 

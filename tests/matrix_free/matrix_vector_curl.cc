@@ -92,8 +92,7 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &MatrixFreeTest<dim, degree, VectorType>::local_apply, this, dst, src);
+    data.cell_loop(&MatrixFreeTest<dim, degree, VectorType>::local_apply, this, dst, src);
   };
 
 private:
@@ -109,8 +108,7 @@ test()
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
@@ -121,8 +119,7 @@ test()
   // refine a few cells
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tria.begin_active(),
+      typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                         endc = tria.end();
       unsigned int counter                                   = 0;
       for (; cell != endc; ++cell, ++counter)
@@ -181,10 +178,8 @@ test()
   {
     QGauss<dim> quadrature_formula(fe_degree + 1);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_JxW_values |
-                              update_gradients);
+    FEValues<dim> fe_values(
+      fe, quadrature_formula, update_values | update_JxW_values | update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -198,8 +193,7 @@ test()
     const unsigned int               curl_dim = dim == 2 ? 1 : dim;
     std::vector<Tensor<1, curl_dim>> phi_curl(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -226,8 +220,7 @@ test()
                 for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i, j) +=
-                      (phi_curl[i] * phi_curl[j] * global_coefficient) *
-                      fe_values.JxW(q);
+                      (phi_curl[i] * phi_curl[j] * global_coefficient) * fe_values.JxW(q);
                   }
               }
           }
@@ -236,8 +229,7 @@ test()
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix, local_dof_indices, system_matrix);
       }
   }
 
@@ -256,8 +248,7 @@ test()
     mf_data.reinit(dof_handler_sca,
                    constraints,
                    quad,
-                   typename MatrixFree<dim>::AdditionalData(
-                     MatrixFree<dim>::AdditionalData::none));
+                   typename MatrixFree<dim>::AdditionalData(MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult(solution, system_rhs);
@@ -269,8 +260,7 @@ test()
   mf_solution -= solution;
   const double error    = mf_solution.linfty_norm();
   const double relative = solution.linfty_norm();
-  deallog << "  Verification fe degree " << fe_degree << ": "
-          << error / relative << std::endl
+  deallog << "  Verification fe degree " << fe_degree << ": " << error / relative << std::endl
           << std::endl;
 }
 

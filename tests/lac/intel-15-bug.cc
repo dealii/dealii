@@ -68,9 +68,8 @@ check()
   if (1)
     {
       // fails:
-      tbb::parallel_for(tbb::blocked_range<size_type>(0, N, 2),
-                        vector_add,
-                        tbb::auto_partitioner());
+      tbb::parallel_for(
+        tbb::blocked_range<size_type>(0, N, 2), vector_add, tbb::auto_partitioner());
     }
   else
     {

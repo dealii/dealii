@@ -81,8 +81,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;

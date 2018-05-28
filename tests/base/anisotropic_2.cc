@@ -39,12 +39,10 @@ print_2d(const AnisotropicPolynomials<2> &aniso)
         {
           deallog << 1. * i / N << " " << 1. * j / M << " ";
           for (unsigned int k = 0; k < aniso.n(); ++k)
-            deallog << aniso.compute_value(k, Point<2>(1. * i / N, 1. * j / M))
-                    << " ";
+            deallog << aniso.compute_value(k, Point<2>(1. * i / N, 1. * j / M)) << " ";
           deallog << std::endl;
           for (unsigned int k = 0; k < aniso.n(); ++k)
-            deallog << aniso.compute_grad(k, Point<2>(1. * i / N, 1. * j / M))
-                    << " ";
+            deallog << aniso.compute_grad(k, Point<2>(1. * i / N, 1. * j / M)) << " ";
           deallog << std::endl;
         }
     }
@@ -59,15 +57,13 @@ check_2d()
   // two checks with higher degree in
   // x or y direction
   {
-    PolVector                 pols[2] = {Pol::generate_complete_basis(3),
-                         Pol::generate_complete_basis(1)};
+    PolVector pols[2] = {Pol::generate_complete_basis(3), Pol::generate_complete_basis(1)};
     std::vector<PolVector>    p(&pols[0], &pols[2]);
     AnisotropicPolynomials<2> aniso(p);
     print_2d(aniso);
   }
   {
-    PolVector                 pols[2] = {Pol::generate_complete_basis(2),
-                         Pol::generate_complete_basis(3)};
+    PolVector pols[2] = {Pol::generate_complete_basis(2), Pol::generate_complete_basis(3)};
     std::vector<PolVector>    p(&pols[0], &pols[2]);
     AnisotropicPolynomials<2> aniso(p);
 
@@ -90,13 +86,11 @@ print_3d(const AnisotropicPolynomials<3> &aniso)
             {
               deallog << 1. * i / N << " " << 1. * j / M << " " << 1. * k / P;
               for (unsigned int k = 0; k < aniso.n(); ++k)
-                deallog << aniso.compute_value(
-                             k, Point<3>(1. * i / N, 1. * j / M, 1. * k / P))
+                deallog << aniso.compute_value(k, Point<3>(1. * i / N, 1. * j / M, 1. * k / P))
                         << " ";
               deallog << std::endl;
               for (unsigned int k = 0; k < aniso.n(); ++k)
-                deallog << aniso.compute_grad(
-                             k, Point<3>(1. * i / N, 1. * j / M, 1. * k / P))
+                deallog << aniso.compute_grad(k, Point<3>(1. * i / N, 1. * j / M, 1. * k / P))
                         << " ";
               deallog << std::endl;
             }

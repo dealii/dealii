@@ -33,22 +33,17 @@ namespace TimeStepping
   double
   RungeKutta<VectorType>::evolve_one_time_step(
     std::vector<std::function<VectorType(const double, const VectorType &)>> &F,
-    std::vector<
-      std::function<VectorType(const double, const double, const VectorType &)>>
+    std::vector<std::function<VectorType(const double, const double, const VectorType &)>>
       &J_inverse,
 
     double      t,
     double      delta_t,
     VectorType &y)
   {
-    AssertThrow(
-      F.size() == 0,
-      ExcMessage(
-        "RungeKutta methods cannot handle more that one function to integate."));
-    AssertThrow(
-      J_inverse.size() == 0,
-      ExcMessage(
-        "RungeKutta methods cannot handle more that one function to integate."));
+    AssertThrow(F.size() == 0,
+                ExcMessage("RungeKutta methods cannot handle more that one function to integate."));
+    AssertThrow(J_inverse.size() == 0,
+                ExcMessage("RungeKutta methods cannot handle more that one function to integate."));
 
     return evolve_one_time_step(F[0], J_inverse[0], t, delta_t, y);
   }
@@ -60,8 +55,7 @@ namespace TimeStepping
   // ----------------------------------------------------------------------
 
   template <typename VectorType>
-  ExplicitRungeKutta<VectorType>::ExplicitRungeKutta(
-    const runge_kutta_method method)
+  ExplicitRungeKutta<VectorType>::ExplicitRungeKutta(const runge_kutta_method method)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -141,8 +135,7 @@ namespace TimeStepping
           }
         default:
           {
-            AssertThrow(
-              false, ExcMessage("Unimplemented explicit Runge-Kutta method."));
+            AssertThrow(false, ExcMessage("Unimplemented explicit Runge-Kutta method."));
           }
       }
   }
@@ -153,8 +146,7 @@ namespace TimeStepping
   double
   ExplicitRungeKutta<VectorType>::evolve_one_time_step(
     const std::function<VectorType(const double, const VectorType &)> &f,
-    const std::function<
-      VectorType(const double, const double, const VectorType &)>
+    const std::function<VectorType(const double, const double, const VectorType &)>
       & /*id_minus_tau_J_inverse*/,
     double      t,
     double      delta_t,
@@ -202,7 +194,7 @@ namespace TimeStepping
     const double                                                       t,
     const double                                                       delta_t,
     const VectorType &                                                 y,
-    std::vector<VectorType> &f_stages) const
+    std::vector<VectorType> &                                          f_stages) const
   {
     for (unsigned int i = 0; i < this->n_stages; ++i)
       {
@@ -221,10 +213,9 @@ namespace TimeStepping
   // ----------------------------------------------------------------------
 
   template <typename VectorType>
-  ImplicitRungeKutta<VectorType>::ImplicitRungeKutta(
-    const runge_kutta_method method,
-    const unsigned int       max_it,
-    const double             tolerance) :
+  ImplicitRungeKutta<VectorType>::ImplicitRungeKutta(const runge_kutta_method method,
+                                                     const unsigned int       max_it,
+                                                     const double             tolerance) :
     RungeKutta<VectorType>(),
     skip_linear_combi(false),
     max_it(max_it),
@@ -295,8 +286,7 @@ namespace TimeStepping
           }
         default:
           {
-            AssertThrow(
-              false, ExcMessage("Unimplemented implicit Runge-Kutta method."));
+            AssertThrow(false, ExcMessage("Unimplemented implicit Runge-Kutta method."));
           }
       }
   }
@@ -307,12 +297,11 @@ namespace TimeStepping
   double
   ImplicitRungeKutta<VectorType>::evolve_one_time_step(
     const std::function<VectorType(const double, const VectorType &)> &f,
-    const std::function<VectorType(const double,
-                                   const double,
-                                   const VectorType &)> &id_minus_tau_J_inverse,
-    double                                               t,
-    double                                               delta_t,
-    VectorType &                                         y)
+    const std::function<VectorType(const double, const double, const VectorType &)>
+      &         id_minus_tau_J_inverse,
+    double      t,
+    double      delta_t,
+    VectorType &y)
   {
     VectorType              old_y(y);
     std::vector<VectorType> f_stages(this->n_stages, y);
@@ -334,9 +323,8 @@ namespace TimeStepping
 
   template <typename VectorType>
   void
-  ImplicitRungeKutta<VectorType>::set_newton_solver_parameters(
-    unsigned int max_it_,
-    double       tolerance_)
+  ImplicitRungeKutta<VectorType>::set_newton_solver_parameters(unsigned int max_it_,
+                                                               double       tolerance_)
   {
     max_it    = max_it_;
     tolerance = tolerance_;
@@ -357,13 +345,12 @@ namespace TimeStepping
   void
   ImplicitRungeKutta<VectorType>::compute_stages(
     const std::function<VectorType(const double, const VectorType &)> &f,
-    const std::function<VectorType(const double,
-                                   const double,
-                                   const VectorType &)> &id_minus_tau_J_inverse,
-    double                                               t,
-    double                                               delta_t,
-    VectorType &                                         y,
-    std::vector<VectorType> &                            f_stages)
+    const std::function<VectorType(const double, const double, const VectorType &)>
+      &                      id_minus_tau_J_inverse,
+    double                   t,
+    double                   delta_t,
+    VectorType &             y,
+    std::vector<VectorType> &f_stages)
   {
     VectorType z(y);
     for (unsigned int i = 0; i < this->n_stages; ++i)
@@ -375,19 +362,17 @@ namespace TimeStepping
         // Solve the nonlinear system using Newton's method
         const double new_t       = t + this->c[i] * delta_t;
         const double new_delta_t = this->a[i][i] * delta_t;
-        newton_solve(
-          std::bind(&ImplicitRungeKutta<VectorType>::compute_residual,
-                    this,
-                    f,
-                    new_t,
-                    new_delta_t,
-                    std::cref(old_y),
-                    std::placeholders::_1,
-                    std::ref(f_stages[i]),
-                    std::placeholders::_2),
-          std::bind(
-            id_minus_tau_J_inverse, new_t, new_delta_t, std::placeholders::_1),
-          y);
+        newton_solve(std::bind(&ImplicitRungeKutta<VectorType>::compute_residual,
+                               this,
+                               f,
+                               new_t,
+                               new_delta_t,
+                               std::cref(old_y),
+                               std::placeholders::_1,
+                               std::ref(f_stages[i]),
+                               std::placeholders::_2),
+                     std::bind(id_minus_tau_J_inverse, new_t, new_delta_t, std::placeholders::_1),
+                     y);
       }
   }
 
@@ -397,8 +382,8 @@ namespace TimeStepping
   void
   ImplicitRungeKutta<VectorType>::newton_solve(
     const std::function<void(const VectorType &, VectorType &)> &get_residual,
-    const std::function<VectorType(const VectorType &)> &id_minus_tau_J_inverse,
-    VectorType &                                         y)
+    const std::function<VectorType(const VectorType &)> &        id_minus_tau_J_inverse,
+    VectorType &                                                 y)
   {
     VectorType residual(y);
     get_residual(y, residual);
@@ -429,7 +414,7 @@ namespace TimeStepping
     const VectorType &                                                 old_y,
     const VectorType &                                                 y,
     VectorType &                                                       tendency,
-    VectorType &residual) const
+    VectorType &                                                       residual) const
   {
     // The tendency is stored to save one evaluation of f.
     tendency = f(t, y);
@@ -473,8 +458,7 @@ namespace TimeStepping
 
   template <typename VectorType>
   void
-  EmbeddedExplicitRungeKutta<VectorType>::initialize(
-    const runge_kutta_method method)
+  EmbeddedExplicitRungeKutta<VectorType>::initialize(const runge_kutta_method method)
   {
     status.method = method;
 
@@ -706,8 +690,7 @@ namespace TimeStepping
           }
         default:
           {
-            AssertThrow(
-              false, ExcMessage("Unimplemented Embedded Runge-Kutta method."));
+            AssertThrow(false, ExcMessage("Unimplemented Embedded Runge-Kutta method."));
           }
       }
   }
@@ -730,8 +713,7 @@ namespace TimeStepping
   double
   EmbeddedExplicitRungeKutta<VectorType>::evolve_one_time_step(
     const std::function<VectorType(const double, const VectorType &)> &f,
-    const std::function<
-      VectorType(const double, const double, const VectorType &)>
+    const std::function<VectorType(const double, const double, const VectorType &)>
       & /*id_minus_tau_J_inverse*/,
     double      t,
     double      delta_t,

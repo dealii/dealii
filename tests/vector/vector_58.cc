@@ -53,15 +53,12 @@ test(const std::vector<unsigned int> &size_sequence)
           v.grow_or_shrink(s);
           for (unsigned int i = 0; i < check_s; ++i)
             AssertThrow(v(i) == v_old(i),
-                        ExcMessage("s=" + std::to_string(s) +
-                                   " i=" + std::to_string(i) + " " +
-                                   std::to_string(v(i)) +
-                                   "!=" + std::to_string(v_old(i))));
+                        ExcMessage("s=" + std::to_string(s) + " i=" + std::to_string(i) + " " +
+                                   std::to_string(v(i)) + "!=" + std::to_string(v_old(i))));
 
           for (unsigned int i = check_s; i < s; ++i)
             AssertThrow(v(i) == 0.,
-                        ExcMessage("s=" + std::to_string(s) +
-                                   " i=" + std::to_string(i) + " " +
+                        ExcMessage("s=" + std::to_string(s) + " i=" + std::to_string(i) + " " +
                                    std::to_string(v(i)) + "!=0"));
         }
 
@@ -81,7 +78,6 @@ main()
   initlog();
 
   const std::vector<unsigned int> size_sequence = {
-    {1,   2,  3,  5,  4,  7,  9,  7,   11,  15,
-     220, 19, 18, 17, 16, 40, 35, 129, 300, 287}};
+    {1, 2, 3, 5, 4, 7, 9, 7, 11, 15, 220, 19, 18, 17, 16, 40, 35, 129, 300, 287}};
   test<double>(size_sequence);
 }

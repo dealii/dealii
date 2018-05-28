@@ -32,8 +32,8 @@ check(const char *defaults, const char *defined, const char *input)
   std::stringstream in(input);
   prm.parse_input(in);
 
-  deallog << "defaults='" << defaults << "' defined='" << defined << "' input='"
-          << input << "' result='" << prm.get("v") << "'" << std::endl;
+  deallog << "defaults='" << defaults << "' defined='" << defined << "' input='" << input
+          << "' result='" << prm.get("v") << "'" << std::endl;
 }
 
 void
@@ -49,17 +49,14 @@ test()
   check("", "bla|bla 2|1", "set v=bla,bla,bla");
 
   check("default,alsodefault", "default|nodefault|alsodefault", "");
-  check(
-    "default,alsodefault", "default|nodefault|alsodefault", "set v=nodefault");
+  check("default,alsodefault", "default|nodefault|alsodefault", "set v=nodefault");
 
   check("  input 2  ,  have spaces  ", "have spaces|input 2", "");
 
   // check correct handling of space in input, default, and values:
-  check(
-    "input 2", "have spaces|input 2", "set v=   input 2  ,   have spaces  ");
+  check("input 2", "have spaces|input 2", "set v=   input 2  ,   have spaces  ");
 
-  check(
-    "", "double  spaces|input 2", "set v = double  spaces  ,  double  spaces");
+  check("", "double  spaces|input 2", "set v = double  spaces  ,  double  spaces");
 }
 
 

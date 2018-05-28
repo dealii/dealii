@@ -146,8 +146,7 @@ public:
                  int,
                  std::string,
                  std::string,
-                 << "Object of class " << arg2 << " is still used by " << arg1
-                 << " other objects."
+                 << "Object of class " << arg2 << " is still used by " << arg1 << " other objects."
                  << "\n\n"
                  << "(Additional information: " << arg3 << ")\n\n"
                  << "See the entry in the Frequently Asked Questions of "

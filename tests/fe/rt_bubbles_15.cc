@@ -62,8 +62,7 @@ test(const unsigned int degree)
 
       QTrapez<dim - 1> quadrature;
 
-      FESubfaceValues<dim> fe_values(
-        fe_rt_bubbles, quadrature, update_gradients);
+      FESubfaceValues<dim> fe_values(fe_rt_bubbles, quadrature, update_gradients);
       fe_values.reinit(dof.begin_active(), 0, 0);
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         {
@@ -73,9 +72,8 @@ test(const unsigned int degree)
               deallog << '[';
               for (unsigned int c = 0; c < fe_rt_bubbles.n_components(); ++c)
                 for (unsigned int d = 0; d < dim; ++d)
-                  deallog << filter_out_small_numbers(
-                               fe_values.shape_grad_component(i, q, c)[d],
-                               5.e-6)
+                  deallog << filter_out_small_numbers(fe_values.shape_grad_component(i, q, c)[d],
+                                                      5.e-6)
                           << ' ';
               deallog << ']';
             }

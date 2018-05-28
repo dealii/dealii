@@ -30,8 +30,7 @@ check()
   for (unsigned int test = 0; test < 5; ++test)
     {
       const unsigned int                          size = 17 + test * 1101;
-      LinearAlgebra::Vector<std::complex<number>> v1(size), v2(size), v3(size),
-        check(size);
+      LinearAlgebra::Vector<std::complex<number>> v1(size), v2(size), v3(size), check(size);
       for (unsigned int i = 0; i < size; ++i)
         {
           v1(i) = std::complex<number>(0.1 + 0.005 * i, 1.234 + 12 * i);
@@ -57,8 +56,8 @@ check()
           deallog << std::endl;
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot should be " << prod / static_cast<number>(size) << ", is "
+              << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 

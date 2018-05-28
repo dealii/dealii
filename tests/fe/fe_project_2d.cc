@@ -91,9 +91,8 @@ static const Point<2> vertices_rectangular[] = {
   Point<2>(1., 1.),
 };
 
-static const unsigned n_vertices =
-  sizeof(vertices_rectangular) / sizeof(vertices_rectangular[0]);
-static const unsigned n_cells = 4;
+static const unsigned n_vertices = sizeof(vertices_rectangular) / sizeof(vertices_rectangular[0]);
+static const unsigned n_cells    = 4;
 
 template <int dim>
 class VectorFunction : public Function<dim>
@@ -129,15 +128,13 @@ VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
 
 template <int dim>
 void
-VectorFunction<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
 }
 
-void create_tria(Triangulation<2> &triangulation,
-                 const Point<2> *  vertices_parallelograms)
+void create_tria(Triangulation<2> &triangulation, const Point<2> *vertices_parallelograms)
 {
   const std::vector<Point<2>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
@@ -179,8 +176,7 @@ test(const FiniteElement<dim> &fe,
   MappingQ<dim>                    mapping(1);
   // MappingQGeneric<dim> mapping(1);
   std::vector<double>                                         div_v(n_q_points);
-  std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(
-    n_q_points);
+  std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(n_q_points);
 
   for (unsigned cycle = 0; cycle < n_cycles; ++cycle)
     {
@@ -191,8 +187,7 @@ test(const FiniteElement<dim> &fe,
       constraints.close();
 
       Vector<double> v(dof_handler.n_dofs());
-      VectorTools::project(
-        mapping, dof_handler, constraints, quadrature, fe_function, v);
+      VectorTools::project(mapping, dof_handler, constraints, quadrature, fe_function, v);
 
       Vector<float> diff(triangulation.n_active_cells());
       VectorTools::integrate_difference(mapping,
@@ -210,12 +205,11 @@ test(const FiniteElement<dim> &fe,
       FEValues<dim> fe_values(mapping,
                               fe,
                               quadrature,
-                              update_JxW_values | update_quadrature_points |
-                                update_values | update_gradients);
+                              update_JxW_values | update_quadrature_points | update_values |
+                                update_gradients);
       unsigned int  cell_index = 0;
 
-      for (typename DoFHandler<dim>::active_cell_iterator cell =
-             dof_handler.begin_active();
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell, ++cell_index)
         {
@@ -230,15 +224,14 @@ test(const FiniteElement<dim> &fe,
             }
         }
 
-      deallog << dof_handler.n_dofs() << "\t\t" << diff.l2_norm() << "\t"
-              << total_curl << "\t" << total_div << std::endl;
+      deallog << dof_handler.n_dofs() << "\t\t" << diff.l2_norm() << "\t" << total_curl << "\t"
+              << total_div << std::endl;
 
       if (global)
         triangulation.refine_global();
       else
         {
-          GridRefinement::refine_and_coarsen_fixed_number(
-            triangulation, diff, 0.3, 0.0);
+          GridRefinement::refine_and_coarsen_fixed_number(triangulation, diff, 0.3, 0.0);
           triangulation.prepare_coarsening_and_refinement();
           triangulation.execute_coarsening_and_refinement();
         }

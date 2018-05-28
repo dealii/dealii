@@ -67,8 +67,7 @@ namespace Polynomials
 
 
   template <typename number>
-  Polynomial<number>::Polynomial(const std::vector<Point<1>> &supp,
-                                 const unsigned int           center) :
+  Polynomial<number>::Polynomial(const std::vector<Point<1>> &supp, const unsigned int center) :
     in_lagrange_product_form(true)
   {
     Assert(supp.size() > 0, ExcEmptyObject());
@@ -107,9 +106,7 @@ namespace Polynomials
 
   template <typename number>
   void
-  Polynomial<number>::value(const number       x,
-                            const unsigned int n_derivatives,
-                            number *           values) const
+  Polynomial<number>::value(const number x, const unsigned int n_derivatives, number *values) const
   {
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)
@@ -258,8 +255,8 @@ namespace Polynomials
           {
             coefficients[i + 1] = 1.;
             for (unsigned int j = i; j > 0; --j)
-              coefficients[j] = (-lagrange_support_points[i] * coefficients[j] +
-                                 coefficients[j - 1]);
+              coefficients[j] =
+                (-lagrange_support_points[i] * coefficients[j] + coefficients[j - 1]);
             coefficients[0] *= -lagrange_support_points[i];
           }
       }
@@ -277,12 +274,10 @@ namespace Polynomials
 
   template <typename number>
   void
-  Polynomial<number>::scale(std::vector<number> &coefficients,
-                            const number         factor)
+  Polynomial<number>::scale(std::vector<number> &coefficients, const number factor)
   {
     number f = 1.;
-    for (typename std::vector<number>::iterator c = coefficients.begin();
-         c != coefficients.end();
+    for (typename std::vector<number>::iterator c = coefficients.begin(); c != coefficients.end();
          ++c)
       {
         *c *= f;
@@ -319,11 +314,9 @@ namespace Polynomials
 
   template <typename number>
   void
-  Polynomial<number>::multiply(std::vector<number> &coefficients,
-                               const number         factor)
+  Polynomial<number>::multiply(std::vector<number> &coefficients, const number factor)
   {
-    for (typename std::vector<number>::iterator c = coefficients.begin();
-         c != coefficients.end();
+    for (typename std::vector<number>::iterator c = coefficients.begin(); c != coefficients.end();
          ++c)
       *c *= factor;
   }
@@ -506,8 +499,7 @@ namespace Polynomials
   template <typename number>
   template <typename number2>
   void
-  Polynomial<number>::shift(std::vector<number> &coefficients,
-                            const number2        offset)
+  Polynomial<number>::shift(std::vector<number> &coefficients, const number2 offset)
   {
     // too many coefficients cause overflow in
     // the binomial coefficient used below
@@ -515,8 +507,7 @@ namespace Polynomials
 
     // Copy coefficients to a vector of
     // accuracy given by the argument
-    std::vector<number2> new_coefficients(coefficients.begin(),
-                                          coefficients.end());
+    std::vector<number2> new_coefficients(coefficients.begin(), coefficients.end());
 
     // Traverse all coefficients from
     // c_1. c_0 will be modified by
@@ -714,11 +705,10 @@ namespace Polynomials
 
 
 
-  LagrangeEquidistant::LagrangeEquidistant(const unsigned int n,
-                                           const unsigned int support_point) :
-    Polynomial<double>(internal::LagrangeEquidistantImplementation::
-                         generate_equidistant_unit_points(n),
-                       support_point)
+  LagrangeEquidistant::LagrangeEquidistant(const unsigned int n, const unsigned int support_point) :
+    Polynomial<double>(
+      internal::LagrangeEquidistantImplementation::generate_equidistant_unit_points(n),
+      support_point)
   {
     Assert(coefficients.size() == 0, ExcInternalError());
 
@@ -745,8 +735,7 @@ namespace Polynomials
     Assert(support_point < n + 1, ExcIndexRange(support_point, 0, n + 1));
 
     unsigned int n_functions = n + 1;
-    Assert(support_point < n_functions,
-           ExcIndexRange(support_point, 0, n_functions));
+    Assert(support_point < n_functions, ExcIndexRange(support_point, 0, n_functions));
     double const *x = nullptr;
 
     switch (n)
@@ -759,9 +748,8 @@ namespace Polynomials
           }
         case 2:
           {
-            static const double x2[9] = {
-              1.0, -3.0, 2.0, 0.0, 4.0, -4.0, 0.0, -1.0, 2.0};
-            x = &x2[0];
+            static const double x2[9] = {1.0, -3.0, 2.0, 0.0, 4.0, -4.0, 0.0, -1.0, 2.0};
+            x                         = &x2[0];
             break;
           }
         case 3:
@@ -801,8 +789,7 @@ namespace Polynomials
   {
     if (degree == 0)
       // create constant polynomial
-      return std::vector<Polynomial<double>>(
-        1, Polynomial<double>(std::vector<double>(1, 1.)));
+      return std::vector<Polynomial<double>>(1, Polynomial<double>(std::vector<double>(1, 1.)));
     else
       {
         // create array of Lagrange
@@ -876,8 +863,7 @@ namespace Polynomials
   // ------------------ class Lobatto -------------------- //
 
 
-  Lobatto::Lobatto(const unsigned int p) :
-    Polynomial<double>(compute_coefficients(p))
+  Lobatto::Lobatto(const unsigned int p) : Polynomial<double>(compute_coefficients(p))
   {}
 
   std::vector<double>
@@ -933,28 +919,23 @@ namespace Polynomials
 
                 coefficients[0] =
                   std::sqrt(2 * i + 1.) *
-                  ((1.0 - 2 * i) * legendre_coefficients_tmp1[0] /
-                     std::sqrt(2 * i - 1.) +
-                   (1.0 - i) * legendre_coefficients_tmp2[0] /
-                     std::sqrt(2 * i - 3.)) /
+                  ((1.0 - 2 * i) * legendre_coefficients_tmp1[0] / std::sqrt(2 * i - 1.) +
+                   (1.0 - i) * legendre_coefficients_tmp2[0] / std::sqrt(2 * i - 3.)) /
                   i;
 
                 for (unsigned int j = 1; j < i - 1; ++j)
                   coefficients[j] =
                     std::sqrt(2 * i + 1.) *
                     (std::sqrt(2 * i - 1.) *
-                       (2.0 * legendre_coefficients_tmp1[j - 1] -
-                        legendre_coefficients_tmp1[j]) +
-                     (1.0 - i) * legendre_coefficients_tmp2[j] /
-                       std::sqrt(2 * i - 3.)) /
+                       (2.0 * legendre_coefficients_tmp1[j - 1] - legendre_coefficients_tmp1[j]) +
+                     (1.0 - i) * legendre_coefficients_tmp2[j] / std::sqrt(2 * i - 3.)) /
                     i;
 
-                coefficients[i - 1] = std::sqrt(4 * i * i - 1.) *
-                                      (2.0 * legendre_coefficients_tmp1[i - 2] -
-                                       legendre_coefficients_tmp1[i - 1]) /
-                                      i;
-                coefficients[i] = 2.0 * std::sqrt(4 * i * i - 1.) *
-                                  legendre_coefficients_tmp1[i - 1] / i;
+                coefficients[i - 1] =
+                  std::sqrt(4 * i * i - 1.) *
+                  (2.0 * legendre_coefficients_tmp1[i - 2] - legendre_coefficients_tmp1[i - 1]) / i;
+                coefficients[i] =
+                  2.0 * std::sqrt(4 * i * i - 1.) * legendre_coefficients_tmp1[i - 1] / i;
               }
 
             for (int i = p; i > 0; --i)
@@ -984,13 +965,11 @@ namespace Polynomials
 
   // Reserve space for polynomials up to degree 19. Should be sufficient
   // for the start.
-  std::vector<std::unique_ptr<const std::vector<double>>>
-    Hierarchical::recursive_coefficients(20);
+  std::vector<std::unique_ptr<const std::vector<double>>> Hierarchical::recursive_coefficients(20);
 
 
 
-  Hierarchical::Hierarchical(const unsigned int k) :
-    Polynomial<double>(get_coefficients(k))
+  Hierarchical::Hierarchical(const unsigned int k) : Polynomial<double>(get_coefficients(k))
   {}
 
 
@@ -1013,8 +992,7 @@ namespace Polynomials
       k = 1;
     // check: does the information
     // already exist?
-    if ((recursive_coefficients.size() < k + 1) ||
-        (recursive_coefficients[k].get() == nullptr))
+    if ((recursive_coefficients.size() < k + 1) || (recursive_coefficients[k].get() == nullptr))
       // no, then generate the
       // respective coefficients
       {
@@ -1158,8 +1136,7 @@ namespace Polynomials
       // zero does _not_ create the
       // constant polynomial, but
       // rather 1-x
-      return std::vector<Polynomial<double>>(
-        1, Polynomial<double>(std::vector<double>(1, 1.)));
+      return std::vector<Polynomial<double>>(1, Polynomial<double>(std::vector<double>(1, 1.)));
     else
       {
         std::vector<Polynomial<double>> v;
@@ -1174,8 +1151,7 @@ namespace Polynomials
 
   // ------------------ HermiteInterpolation --------------- //
 
-  HermiteInterpolation::HermiteInterpolation(const unsigned int p) :
-    Polynomial<double>(0)
+  HermiteInterpolation::HermiteInterpolation(const unsigned int p) : Polynomial<double>(0)
   {
     this->coefficients.clear();
     this->in_lagrange_product_form = true;
@@ -1277,16 +1253,14 @@ namespace Polynomials
           for (unsigned int j = 0; j < degree - 3; ++j)
             poly_val_common *= Utilities::fixed_power<2>(x - jacobi_roots[j]);
           poly_val_common *= Utilities::fixed_power<4>(x - 1.);
-          integral_left +=
-            gauss.weight(q) * (poly_val_common * (x - guess_left));
-          integral_right +=
-            gauss.weight(q) * (poly_val_common * (x - guess_right));
+          integral_left += gauss.weight(q) * (poly_val_common * (x - guess_left));
+          integral_right += gauss.weight(q) * (poly_val_common * (x - guess_right));
         }
 
       // compute guess by secant method. Due to linearity in the root x_star,
       // this is the correct position after this single step
-      return guess_right - (guess_right - guess_left) /
-                             (integral_right - integral_left) * integral_right;
+      return guess_right -
+             (guess_right - guess_left) / (integral_right - integral_left) * integral_right;
     }
   } // namespace
 
@@ -1402,8 +1376,7 @@ namespace Polynomials
         // (1-x)^2 (1+x)^2, the two polynomials achieving zero value and zero
         // derivative at the boundary.
 
-        std::vector<double> jacobi_roots =
-          jacobi_polynomial_roots<double>(degree - 3, 2, 2);
+        std::vector<double> jacobi_roots = jacobi_polynomial_roots<double>(degree - 3, 2, 2);
         AssertDimension(jacobi_roots.size(), degree - 3);
 
         // iteration from variable support point N with secant method
@@ -1412,8 +1385,7 @@ namespace Polynomials
         this->lagrange_support_points.resize(degree);
         if (index == 0)
           {
-            const double auxiliary_zero =
-              find_support_point_x_star(jacobi_roots);
+            const double auxiliary_zero      = find_support_point_x_star(jacobi_roots);
             this->lagrange_support_points[0] = auxiliary_zero;
             for (unsigned int m = 0; m < degree - 3; m++)
               this->lagrange_support_points[m + 1] = jacobi_roots[m];
@@ -1453,11 +1425,9 @@ namespace Polynomials
             Assert(std::abs(value_and_grad[0]) > 1e-10,
                    ExcInternalError("There should not be a zero at x=0."));
 
-            const double auxiliary_zero =
-              find_support_point_x_star(jacobi_roots);
+            const double auxiliary_zero = find_support_point_x_star(jacobi_roots);
             this->lagrange_weight =
-              (1. / auxiliary_zero - value_and_grad[1] / value_and_grad[0]) /
-              ratio;
+              (1. / auxiliary_zero - value_and_grad[1] / value_and_grad[0]) / ratio;
           }
         else if (index >= 2 && index < degree - 1)
           {
@@ -1495,16 +1465,13 @@ namespace Polynomials
             Assert(std::abs(value_and_grad[0]) > 1e-10,
                    ExcInternalError("There should not be a zero at x=1."));
 
-            const double auxiliary_zero =
-              find_support_point_x_star(jacobi_roots);
+            const double auxiliary_zero = find_support_point_x_star(jacobi_roots);
             this->lagrange_weight =
-              (-1. / auxiliary_zero - value_and_grad[1] / value_and_grad[0]) /
-              ratio;
+              (-1. / auxiliary_zero - value_and_grad[1] / value_and_grad[0]) / ratio;
           }
         else if (index == degree)
           {
-            const double auxiliary_zero =
-              find_support_point_x_star(jacobi_roots);
+            const double auxiliary_zero      = find_support_point_x_star(jacobi_roots);
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
             for (unsigned int m = 0; m < degree - 3; m++)

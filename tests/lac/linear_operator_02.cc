@@ -187,10 +187,8 @@ main()
   SolverCG<>    inner_solver(solver_control);
 
   deallog.depth_file(0);
-  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()),
-               v,
-               u,
-               PreconditionIdentity());
+  solver.solve(
+    inverse_operator(op_b, inner_solver, PreconditionIdentity()), v, u, PreconditionIdentity());
   deallog.depth_file(3);
   deallog << "solve(inverse_operator(B), v, u) == Bu: " << v << std::endl;
 

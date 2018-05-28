@@ -53,8 +53,7 @@ test()
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
@@ -86,8 +85,7 @@ test()
   double                       error_points = 0, abs_points = 0;
   const unsigned int           n_cells = mf_data.n_macro_cells();
   FEEvaluation<dim, fe_degree> fe_eval(mf_data);
-  FEValues<dim>                fe_values(
-    mapping, fe, mf_data.get_quadrature(), update_quadrature_points);
+  FEValues<dim> fe_values(mapping, fe, mf_data.get_quadrature(), update_quadrature_points);
 
   typedef VectorizedArray<double> vector_t;
   for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -100,14 +98,13 @@ test()
             {
               abs_points += fe_values.quadrature_point(q).norm();
               for (unsigned int d = 0; d < dim; ++d)
-                error_points += std::fabs(fe_values.quadrature_point(q)[d] -
-                                          fe_eval.quadrature_point(q)[d][j]);
+                error_points +=
+                  std::fabs(fe_values.quadrature_point(q)[d] - fe_eval.quadrature_point(q)[d][j]);
             }
         }
     }
 
-  deallog << "Norm of difference: " << error_points / abs_points << std::endl
-          << std::endl;
+  deallog << "Norm of difference: " << error_points / abs_points << std::endl << std::endl;
 }
 
 

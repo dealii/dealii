@@ -29,10 +29,7 @@
 #include "../testmatrix.h"
 #include "../tests.h"
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 double
 check_solve(SolverType &        solver,
             const MatrixType &  A,
@@ -85,11 +82,9 @@ main()
         {
           deallog << "Block size " << blocksize << std::endl;
 
-          const unsigned int n_blocks = dim / blocksize;
-          RelaxationBlock<SparseMatrix<double>, double>::AdditionalData
-            relax_data(0.8);
-          PreconditionBlock<SparseMatrix<double>, double>::AdditionalData
-            prec_data(blocksize, 0.8);
+          const unsigned int                                            n_blocks = dim / blocksize;
+          RelaxationBlock<SparseMatrix<double>, double>::AdditionalData relax_data(0.8);
+          PreconditionBlock<SparseMatrix<double>, double>::AdditionalData prec_data(blocksize, 0.8);
 
           relax_data.block_list.reinit(n_blocks, dim, blocksize);
           for (unsigned int block = 0; block < n_blocks; ++block)

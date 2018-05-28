@@ -69,8 +69,7 @@ public:
   /**
    * Constructor.
    */
-  SolverRelaxation(SolverControl &       cn,
-                   const AdditionalData &data = AdditionalData());
+  SolverRelaxation(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   /**
    * Virtual destructor.
@@ -84,17 +83,13 @@ public:
    */
   template <typename MatrixType, class RelaxationType>
   void
-  solve(const MatrixType &    A,
-        VectorType &          x,
-        const VectorType &    b,
-        const RelaxationType &R);
+  solve(const MatrixType &A, VectorType &x, const VectorType &b, const RelaxationType &R);
 };
 
 //----------------------------------------------------------------------//
 
 template <class VectorType>
-SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
-                                               const AdditionalData &) :
+SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn, const AdditionalData &) :
   Solver<VectorType>(cn)
 {}
 
@@ -146,8 +141,7 @@ SolverRelaxation<VectorType>::solve(const MatrixType &    A,
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(iter, r.l2_norm()));
+  AssertThrow(conv == SolverControl::success, SolverControl::NoConvergence(iter, r.l2_norm()));
   // otherwise exit as normal
 }
 

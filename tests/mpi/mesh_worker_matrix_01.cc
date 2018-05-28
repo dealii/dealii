@@ -171,18 +171,13 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
   MeshWorker::LoopControl lctrl;
   lctrl.cells_first = true;
   lctrl.own_faces   = MeshWorker::LoopControl::one;
-  MeshWorker::loop<dim,
-                   dim,
-                   MeshWorker::DoFInfo<dim>,
-                   MeshWorker::IntegrationInfoBox<dim>>(
+  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>>(
     cell,
     end,
     dof_info,
     info_box,
-    std::bind(
-      &Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
     std::bind(&Local<dim>::face,
               local,
               std::placeholders::_1,
@@ -217,9 +212,7 @@ test(const FiniteElement<dim> &fe)
   deallog << std::endl;
 
   unsigned int cn = 0;
-  for (typename Triangulation<dim>::cell_iterator cell = tr.begin();
-       cell != tr.end();
-       ++cell, ++cn)
+  for (typename Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end(); ++cell, ++cn)
     cell->set_user_index(cn);
 
   DoFHandler<dim> dofs(tr);
@@ -248,16 +241,14 @@ test(const FiniteElement<dim> &fe)
             }
         }
 
-      for (typename DoFHandler<dim>::active_cell_iterator cell =
-             dofs.begin_active();
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dofs.begin_active();
            cell != dofs.end();
            ++cell)
         {
           if (!cell->is_locally_owned())
             continue;
 
-          std::vector<types::global_dof_index> &renumbered =
-            dofmap[cell->id().to_string()];
+          std::vector<types::global_dof_index> &renumbered = dofmap[cell->id().to_string()];
           cell->set_dof_indices(renumbered);
           cell->update_cell_dof_indices_cache();
         }
@@ -273,13 +264,9 @@ test(const FiniteElement<dim> &fe)
           MPI_Barrier(MPI_COMM_WORLD);
           if (myid == i)
             {
-              std::ofstream                        f("ordering",
-                              (myid > 0) ? std::ofstream::app :
-                                           std::ofstream::out);
-              std::vector<types::global_dof_index> local_dof_indices(
-                fe.dofs_per_cell);
-              for (typename DoFHandler<dim>::active_cell_iterator cell =
-                     dofs.begin_active();
+              std::ofstream f("ordering", (myid > 0) ? std::ofstream::app : std::ofstream::out);
+              std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
+              for (typename DoFHandler<dim>::active_cell_iterator cell = dofs.begin_active();
                    cell != dofs.end();
                    ++cell)
                 {
@@ -310,9 +297,8 @@ test(const FiniteElement<dim> &fe)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
+  MPILogInitAll                    log;
 
   FE_DGP<2>                       p0(0);
   FE_Q<2>                         q1(1);

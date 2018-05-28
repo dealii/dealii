@@ -37,9 +37,8 @@ main(int argc, char **argv)
   const auto n_mpi_processes = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   constexpr types::global_dof_index dofs_per_process = 5;
-  IndexSet owned_indices(dofs_per_process * n_mpi_processes);
-  owned_indices.add_range(dofs_per_process * rank,
-                          dofs_per_process * (rank + 1));
+  IndexSet                          owned_indices(dofs_per_process * n_mpi_processes);
+  owned_indices.add_range(dofs_per_process * rank, dofs_per_process * (rank + 1));
   owned_indices.compress();
 
   deallog << "rank is: " << rank << std::endl;

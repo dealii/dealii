@@ -96,30 +96,27 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
       template void
-      DoFHandler<deal_II_dimension>::set_dof_index<1>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
+      DoFHandler<deal_II_dimension>::set_dof_index<1>(const unsigned int,
+                                                      const unsigned int,
+                                                      const unsigned int,
+                                                      const unsigned int,
+                                                      const types::global_dof_index) const;
 
 #if deal_II_dimension >= 2
       template void
-      DoFHandler<deal_II_dimension>::set_dof_index<2>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
+      DoFHandler<deal_II_dimension>::set_dof_index<2>(const unsigned int,
+                                                      const unsigned int,
+                                                      const unsigned int,
+                                                      const unsigned int,
+                                                      const types::global_dof_index) const;
 
 #  if deal_II_dimension >= 3
       template void
-      DoFHandler<deal_II_dimension>::set_dof_index<3>(
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const types::global_dof_index) const;
+      DoFHandler<deal_II_dimension>::set_dof_index<3>(const unsigned int,
+                                                      const unsigned int,
+                                                      const unsigned int,
+                                                      const unsigned int,
+                                                      const types::global_dof_index) const;
 #  endif
 #endif
     \}

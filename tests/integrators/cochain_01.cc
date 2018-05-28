@@ -56,36 +56,30 @@ const bool debugging = false;
 
 template <int dim>
 void
-cell_matrix(MeshWorker::DoFInfo<dim> &                      dinfo,
-            typename MeshWorker::IntegrationInfo<dim, dim> &info)
+cell_matrix(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim, dim> &info)
 {
   unsigned int dm = 0; // Matrix index
   unsigned int de = 0; // Element index
 
   L2::mass_matrix(dinfo.matrix(dm++, false).matrix, info.fe_values(de));
   Laplace::cell_matrix(dinfo.matrix(dm++, false).matrix, info.fe_values(de));
-  Divergence::gradient_matrix(dinfo.matrix(dm++, false).matrix,
-                              info.fe_values(de),
-                              info.fe_values(de + 1));
+  Divergence::gradient_matrix(
+    dinfo.matrix(dm++, false).matrix, info.fe_values(de), info.fe_values(de + 1));
 
 
   ++de;
   L2::mass_matrix(dinfo.matrix(dm++, false).matrix, info.fe_values(de));
-  Maxwell::curl_curl_matrix(dinfo.matrix(dm++, false).matrix,
-                            info.fe_values(de));
-  Maxwell::curl_matrix(dinfo.matrix(dm++, false).matrix,
-                       info.fe_values(de),
-                       info.fe_values(de + 1));
+  Maxwell::curl_curl_matrix(dinfo.matrix(dm++, false).matrix, info.fe_values(de));
+  Maxwell::curl_matrix(
+    dinfo.matrix(dm++, false).matrix, info.fe_values(de), info.fe_values(de + 1));
 
   if (dim > 2)
     {
       ++de;
       L2::mass_matrix(dinfo.matrix(dm++, false).matrix, info.fe_values(de));
-      GradDiv::cell_matrix(dinfo.matrix(dm++, false).matrix,
-                           info.fe_values(de));
-      Divergence::cell_matrix(dinfo.matrix(dm++, false).matrix,
-                              info.fe_values(de),
-                              info.fe_values(de + 1));
+      GradDiv::cell_matrix(dinfo.matrix(dm++, false).matrix, info.fe_values(de));
+      Divergence::cell_matrix(
+        dinfo.matrix(dm++, false).matrix, info.fe_values(de), info.fe_values(de + 1));
     }
 
   ++de;
@@ -114,10 +108,8 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   // Setup sparsity pattern for the
   // whole system
   BlockSparsityPattern sparsity;
-  sparsity.reinit(dof.block_info().global().size(),
-                  dof.block_info().global().size());
-  BlockDynamicSparsityPattern c_sparsity(dof.block_info().global(),
-                                         dof.block_info().global());
+  sparsity.reinit(dof.block_info().global().size(), dof.block_info().global().size());
+  BlockDynamicSparsityPattern c_sparsity(dof.block_info().global(), dof.block_info().global());
   DoFTools::make_flux_sparsity_pattern(dof, c_sparsity, constraints, false);
   sparsity.copy_from(c_sparsity);
 
@@ -149,15 +141,14 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   if (debugging)
     for (unsigned int i = 0; i < matrices.size(); ++i)
-      deallog << "Block " << '(' << matrices.block(i).row << ','
-              << matrices.block(i).column << ") " << std::setw(3) << std::right
-              << matrices.matrix(i).m() << std::left << 'x' << std::setw(3)
-              << matrices.matrix(i).n() << ' ' << matrices.name(i) << std::endl;
+      deallog << "Block " << '(' << matrices.block(i).row << ',' << matrices.block(i).column << ") "
+              << std::setw(3) << std::right << matrices.matrix(i).m() << std::left << 'x'
+              << std::setw(3) << matrices.matrix(i).n() << ' ' << matrices.name(i) << std::endl;
 
   // Build matrices
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  UpdateFlags update_flags = update_values | update_gradients;
+  UpdateFlags                         update_flags = update_values | update_gradients;
   info_box.add_update_flags_cell(update_flags);
   info_box.initialize(fe, mapping, &dof.block_info());
   if (debugging)
@@ -165,22 +156,19 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   MeshWorker::DoFInfo<dim> dof_info(dof.block_info());
 
-  MeshWorker::Assembler::MatrixLocalBlocksToGlobalBlocks<SparseMatrix<double>>
-    assembler;
+  MeshWorker::Assembler::MatrixLocalBlocksToGlobalBlocks<SparseMatrix<double>> assembler;
   assembler.initialize(&dof.block_info(), matrices);
   assembler.initialize(constraints);
 
-  MeshWorker::loop<dim,
-                   dim,
-                   MeshWorker::DoFInfo<dim>,
-                   MeshWorker::IntegrationInfoBox<dim>>(dof.begin_active(),
-                                                        dof.end(),
-                                                        dof_info,
-                                                        info_box,
-                                                        cell_matrix<dim>,
-                                                        nullptr,
-                                                        nullptr,
-                                                        assembler);
+  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>>(
+    dof.begin_active(),
+    dof.end(),
+    dof_info,
+    info_box,
+    cell_matrix<dim>,
+    nullptr,
+    nullptr,
+    assembler);
 
   for (unsigned int b = 0; b < matrices.size(); ++b)
     if (b % 3 == 0)
@@ -210,11 +198,9 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       if (d > 0)
         {
           matrices.matrix(m + 2).vmult(result2.block(d + 1), aux.block(d));
-          deallog << "d^2            " << result2.block(d + 1).l2_norm()
-                  << std::endl;
+          deallog << "d^2            " << result2.block(d + 1).l2_norm() << std::endl;
           matrices.matrix(m + 1).vmult(result2.block(d), aux.block(d));
-          deallog << "d*d^2          " << result2.block(d).l2_norm()
-                  << std::endl;
+          deallog << "d*d^2          " << result2.block(d).l2_norm() << std::endl;
         }
 
       matrices.matrix(m + 2).vmult(result1.block(d + 1), source.block(d));
@@ -222,22 +208,17 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       PreconditionSSOR<SparseMatrix<double>> precondition;
       precondition.initialize(matrices.matrix(m + 3), 1.2);
 
-      solver.solve(matrices.matrix(m + 3),
-                   aux.block(d + 1),
-                   result1.block(d + 1),
-                   precondition);
+      solver.solve(matrices.matrix(m + 3), aux.block(d + 1), result1.block(d + 1), precondition);
 
       matrices.matrix(m + 2).Tvmult(result1.block(d), aux.block(d + 1));
       matrices.matrix(m + 1).vmult(result2.block(d), source.block(d));
 
       if (debugging)
-        deallog << "u " << source.block(d).l2_norm() << ' '
-                << matrices.name(m + 2) << ' ' << result1.block(d + 1).l2_norm()
-                << ' ' << matrices.name(m + 3) << ' '
-                << aux.block(d + 1).l2_norm() << ' ' << matrices.name(m + 2)
-                << "^T " << result1.block(d).l2_norm() << ' '
-                << matrices.name(m + 1) << ' ' << result2.block(d).l2_norm()
-                << std::endl;
+        deallog << "u " << source.block(d).l2_norm() << ' ' << matrices.name(m + 2) << ' '
+                << result1.block(d + 1).l2_norm() << ' ' << matrices.name(m + 3) << ' '
+                << aux.block(d + 1).l2_norm() << ' ' << matrices.name(m + 2) << "^T "
+                << result1.block(d).l2_norm() << ' ' << matrices.name(m + 1) << ' '
+                << result2.block(d).l2_norm() << std::endl;
       result2.block(d) -= result1.block(d);
       deallog << "Difference d*d " << result2.block(d).l2_norm() << std::endl;
     }

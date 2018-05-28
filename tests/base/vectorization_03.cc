@@ -56,8 +56,8 @@ initialize(Evaluation &eval)
   eval.is_cartesian     = true;
   eval.cartesian_weight = random_value<double>();
   for (unsigned int i = 0; i < 4; ++i)
-    eval.cartesian_weight = std::max(
-      eval.cartesian_weight, eval.cartesian_weight * eval.cartesian_weight);
+    eval.cartesian_weight =
+      std::max(eval.cartesian_weight, eval.cartesian_weight * eval.cartesian_weight);
   eval.general_weight[0] = 0.2313342 * eval.cartesian_weight;
   eval.jac_weight[0]     = random_value<double>();
 }
@@ -77,8 +77,7 @@ test()
     vec[v] = random_value<double>();
 
   current.values[0] = vec;
-  old.values[0] =
-    vec * 1.112 - std::max(2. * vec - 1., VectorizedArray<double>());
+  old.values[0]     = vec * 1.112 - std::max(2. * vec - 1., VectorizedArray<double>());
 
   Vector<double> vector(200);
   vector = 1.2;
@@ -91,9 +90,9 @@ test()
 
   double error = 0;
   for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
-    error += std::abs(current.get_value(0)[v] / (current.cartesian_weight[v] *
-                                                 current.jac_weight[0][0]) -
-                      (2. * vec[v] - ol[v] - weight[v] * std::sin(vec[v])));
+    error +=
+      std::abs(current.get_value(0)[v] / (current.cartesian_weight[v] * current.jac_weight[0][0]) -
+               (2. * vec[v] - ol[v] - weight[v] * std::sin(vec[v])));
   deallog << "error: " << error << std::endl;
 }
 

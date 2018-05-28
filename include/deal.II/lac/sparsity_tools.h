@@ -210,11 +210,10 @@ namespace SparsityTools
    * part of the algorithm that chooses starting indices.
    */
   void
-  reorder_Cuthill_McKee(
-    const DynamicSparsityPattern &                        sparsity,
-    std::vector<DynamicSparsityPattern::size_type> &      new_indices,
-    const std::vector<DynamicSparsityPattern::size_type> &starting_indices =
-      std::vector<DynamicSparsityPattern::size_type>());
+  reorder_Cuthill_McKee(const DynamicSparsityPattern &                        sparsity,
+                        std::vector<DynamicSparsityPattern::size_type> &      new_indices,
+                        const std::vector<DynamicSparsityPattern::size_type> &starting_indices =
+                          std::vector<DynamicSparsityPattern::size_type>());
 
   /**
    * For a given sparsity pattern, compute a re-enumeration of row/column
@@ -238,9 +237,8 @@ namespace SparsityTools
    * the lowest number of nodes.
    */
   void
-  reorder_hierarchical(
-    const DynamicSparsityPattern &                  sparsity,
-    std::vector<DynamicSparsityPattern::size_type> &new_indices);
+  reorder_hierarchical(const DynamicSparsityPattern &                  sparsity,
+                       std::vector<DynamicSparsityPattern::size_type> &new_indices);
 
 #ifdef DEAL_II_WITH_MPI
   /**
@@ -268,11 +266,10 @@ namespace SparsityTools
    * computation.
    */
   void
-  distribute_sparsity_pattern(
-    DynamicSparsityPattern &                              dsp,
-    const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
-    const MPI_Comm &                                      mpi_comm,
-    const IndexSet &                                      myrange);
+  distribute_sparsity_pattern(DynamicSparsityPattern &                              dsp,
+                              const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
+                              const MPI_Comm &                                      mpi_comm,
+                              const IndexSet &                                      myrange);
 
   /**
    * Similar to the function above, but for BlockDynamicSparsityPattern
@@ -324,15 +321,13 @@ namespace SparsityTools
   DeclException2(ExcInvalidArraySize,
                  int,
                  int,
-                 << "The array has size " << arg1 << " but should have size "
-                 << arg2);
+                 << "The array has size " << arg1 << " but should have size " << arg2);
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcZOLTANNotInstalled,
-    "The function you called requires ZOLTAN, but you did not "
-    "configure deal.II with ZOLTAN or zoltan_cpp.h is not available.");
+  DeclExceptionMsg(ExcZOLTANNotInstalled,
+                   "The function you called requires ZOLTAN, but you did not "
+                   "configure deal.II with ZOLTAN or zoltan_cpp.h is not available.");
 } // namespace SparsityTools
 
 /**

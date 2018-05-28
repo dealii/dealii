@@ -50,8 +50,7 @@ main()
         }
       else
         {
-          std::ifstream input_stream(SOURCE_DIR
-                                     "/prm/parameter_handler_backslash_07.prm");
+          std::ifstream input_stream(SOURCE_DIR "/prm/parameter_handler_backslash_07.prm");
           prm.parse_input(input_stream);
         }
 

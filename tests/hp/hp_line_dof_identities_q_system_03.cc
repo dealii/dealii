@@ -38,29 +38,23 @@ test()
   for (unsigned int k = 1; k < 4; ++k)
     {
       for (unsigned int i = 1; i < 4; ++i)
-        fe_collection.push_back(
-          FESystem<dim>(FE_Q<dim>(k), 1, FE_DGQ<dim>(i), 1));
+        fe_collection.push_back(FESystem<dim>(FE_Q<dim>(k), 1, FE_DGQ<dim>(i), 1));
 
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         for (unsigned int j = 0; j < fe_collection.size(); ++j)
           {
-            const std::vector<std::pair<unsigned int, unsigned int>>
-              identities =
-                fe_collection[i].hp_line_dof_identities(fe_collection[j]);
+            const std::vector<std::pair<unsigned int, unsigned int>> identities =
+              fe_collection[i].hp_line_dof_identities(fe_collection[j]);
 
-            deallog << "Identities for " << fe_collection[i].get_name()
-                    << " and " << fe_collection[j].get_name() << ": "
-                    << identities.size() << std::endl;
+            deallog << "Identities for " << fe_collection[i].get_name() << " and "
+                    << fe_collection[j].get_name() << ": " << identities.size() << std::endl;
 
             for (unsigned int k = 0; k < identities.size(); ++k)
               {
-                Assert(identities[k].first < fe_collection[i].dofs_per_line,
-                       ExcInternalError());
-                Assert(identities[k].second < fe_collection[j].dofs_per_line,
-                       ExcInternalError());
+                Assert(identities[k].first < fe_collection[i].dofs_per_line, ExcInternalError());
+                Assert(identities[k].second < fe_collection[j].dofs_per_line, ExcInternalError());
 
-                deallog << identities[k].first << ' ' << identities[k].second
-                        << std::endl;
+                deallog << identities[k].first << ' ' << identities[k].second << std::endl;
               }
           }
     }

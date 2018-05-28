@@ -81,8 +81,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  */
 template <int dim, int spacedim = dim>
-class FE_Q_Bubbles
-  : public FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>
+class FE_Q_Bubbles : public FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>
 {
 public:
   /**
@@ -125,17 +124,15 @@ public:
    */
   virtual void
   get_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                           FullMatrix<double> &matrix) const override;
+                           FullMatrix<double> &                matrix) const override;
 
   virtual const FullMatrix<double> &
-  get_prolongation_matrix(
-    const unsigned int         child,
-    const RefinementCase<dim> &refinement_case) const override;
+  get_prolongation_matrix(const unsigned int         child,
+                          const RefinementCase<dim> &refinement_case) const override;
 
   virtual const FullMatrix<double> &
-  get_restriction_matrix(
-    const unsigned int         child,
-    const RefinementCase<dim> &refinement_case) const override;
+  get_restriction_matrix(const unsigned int         child,
+                         const RefinementCase<dim> &refinement_case) const override;
 
   /**
    * Check for non-zero values on a face.
@@ -146,8 +143,7 @@ public:
    * Implementation of the interface in FiniteElement
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;

@@ -80,9 +80,7 @@ ExceptionBase::ExceptionBase() :
   what_str("")
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  for (unsigned int i = 0;
-       i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]);
-       ++i)
+  for (unsigned int i = 0; i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]); ++i)
     raw_stacktrace[i] = nullptr;
 #endif
 }
@@ -95,16 +93,12 @@ ExceptionBase::ExceptionBase(const ExceptionBase &exc) :
   function(exc.function),
   cond(exc.cond),
   exc(exc.exc),
-  stacktrace(
-    nullptr), // don't copy stacktrace to avoid double de-allocation problem
+  stacktrace(nullptr), // don't copy stacktrace to avoid double de-allocation problem
   n_stacktrace_frames(0),
-  what_str(
-    "") // don't copy the error message, it gets generated dynamically by what()
+  what_str("") // don't copy the error message, it gets generated dynamically by what()
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  for (unsigned int i = 0;
-       i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]);
-       ++i)
+  for (unsigned int i = 0; i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]); ++i)
     raw_stacktrace[i] = nullptr;
 #endif
 }
@@ -177,8 +171,8 @@ void
 ExceptionBase::print_exc_data(std::ostream &out) const
 {
   // print a header for the exception
-  out << "An error occurred in line <" << line << "> of file <" << file
-      << "> in function" << std::endl
+  out << "An error occurred in line <" << line << "> of file <" << file << "> in function"
+      << std::endl
       << "    " << function << std::endl
       << "The violated condition was: " << std::endl
       << "    " << cond << std::endl;
@@ -232,10 +226,8 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
   // the place where the exception was triggered
   int frame = 0;
   while ((frame < n_stacktrace_frames) &&
-         ((std::string(stacktrace[frame]).find("ExceptionBase") !=
-           std::string::npos) ||
-          (std::string(stacktrace[frame]).find("deal_II_exceptions") !=
-           std::string::npos)))
+         ((std::string(stacktrace[frame]).find("ExceptionBase") != std::string::npos) ||
+          (std::string(stacktrace[frame]).find("deal_II_exceptions") != std::string::npos)))
     ++frame;
 
   // output the rest
@@ -250,8 +242,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       std::string        stacktrace_entry(stacktrace[frame]);
       const unsigned int pos_start = stacktrace_entry.find('('),
                          pos_end   = stacktrace_entry.find('+');
-      std::string functionname =
-        stacktrace_entry.substr(pos_start + 1, pos_end - pos_start - 1);
+      std::string functionname = stacktrace_entry.substr(pos_start + 1, pos_end - pos_start - 1);
 
       stacktrace_entry = stacktrace_entry.substr(0, pos_start);
       stacktrace_entry += ": ";
@@ -262,8 +253,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       // for unknown reasons :-) if we can, demangle the function name
 #ifdef DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
       int   status;
-      char *p =
-        abi::__cxa_demangle(functionname.c_str(), nullptr, nullptr, &status);
+      char *p = abi::__cxa_demangle(functionname.c_str(), nullptr, nullptr, &status);
 
       if ((status == 0) && (functionname != "main"))
         {
@@ -274,8 +264,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
           // tuples are actually unused boost::tuples::null_type, so we
           // should split them off if they are trailing a template argument
           // list
-          while (realname.find(", boost::tuples::null_type>") !=
-                 std::string::npos)
+          while (realname.find(", boost::tuples::null_type>") != std::string::npos)
             realname.erase(realname.find(", boost::tuples::null_type>"),
                            std::string(", boost::tuples::null_type").size());
 
@@ -313,8 +302,7 @@ ExceptionBase::generate_message() const
       std::ostringstream converter;
 
       converter << std::endl
-                << "--------------------------------------------------------"
-                << std::endl;
+                << "--------------------------------------------------------" << std::endl;
 
       // print out general data
       print_exc_data(converter);
@@ -324,14 +312,11 @@ ExceptionBase::generate_message() const
 
       if (!deal_II_exceptions::additional_assert_output.empty())
         {
-          converter
-            << "--------------------------------------------------------"
-            << std::endl
-            << deal_II_exceptions::additional_assert_output << std::endl;
+          converter << "--------------------------------------------------------" << std::endl
+                    << deal_II_exceptions::additional_assert_output << std::endl;
         }
 
-      converter << "--------------------------------------------------------"
-                << std::endl;
+      converter << "--------------------------------------------------------" << std::endl;
 
       what_str = converter.str();
     }
@@ -372,26 +357,22 @@ namespace StandardExceptions
         // function fails we should just print a less descriptive message.
         if (error_name_known)
           {
-            ierr = MPI_Error_string(error_class, error_name, &resulting_length);
+            ierr             = MPI_Error_string(error_class, error_name, &resulting_length);
             error_name_known = error_name_known && (ierr == MPI_SUCCESS);
           }
       }
 
-    out << "deal.II encountered an error while calling an MPI function."
-        << std::endl;
+    out << "deal.II encountered an error while calling an MPI function." << std::endl;
     if (error_name_known)
       {
-        out << "The description of the error provided by MPI is \""
-            << error_name << "\"." << std::endl;
+        out << "The description of the error provided by MPI is \"" << error_name << "\"."
+            << std::endl;
       }
     else
       {
-        out
-          << "This error code is not equal to any of the standard MPI error codes."
-          << std::endl;
+        out << "This error code is not equal to any of the standard MPI error codes." << std::endl;
       }
-    out << "The numerical value of the original error code is " << error_code
-        << "." << std::endl;
+    out << "The numerical value of the original error code is " << error_code << "." << std::endl;
   }
 } // namespace StandardExceptions
 #endif // DEAL_II_WITH_MPI
@@ -427,13 +408,12 @@ namespace
         MPI_Comm_size(MPI_COMM_WORLD, &n_proc);
         if (n_proc > 1)
           {
-            std::cerr
-              << "Calling MPI_Abort now.\n"
-              << "To break execution in a GDB session, execute 'break MPI_Abort' before "
-              << "running. You can also put the following into your ~/.gdbinit:\n"
-              << "  set breakpoint pending on\n"
-              << "  break MPI_Abort\n"
-              << "  set breakpoint pending auto" << std::endl;
+            std::cerr << "Calling MPI_Abort now.\n"
+                      << "To break execution in a GDB session, execute 'break MPI_Abort' before "
+                      << "running. You can also put the following into your ~/.gdbinit:\n"
+                      << "  set breakpoint pending on\n"
+                      << "  break MPI_Abort\n"
+                      << "  set breakpoint pending auto" << std::endl;
 
             MPI_Abort(MPI_COMM_WORLD,
                       /* return code = */ 255);

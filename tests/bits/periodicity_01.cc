@@ -44,10 +44,7 @@ test()
   std::vector<unsigned int> repetitions(dim, 1);
   repetitions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(
-    triangulation,
-    repetitions,
-    Point<dim>(),
-    (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2, 1, 1)));
+    triangulation, repetitions, Point<dim>(), (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2, 1, 1)));
 
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(triangulation);

@@ -81,7 +81,7 @@ main()
   // AD typedefs
   typedef Sacado::Fad::DFad<Sacado::Fad::DFad<double>> ADNumberType;
   typedef typename ADNumberType::value_type            ADDerivativeType;
-  typedef typename ADNumberType::scalar_type ADScalarType; // == double
+  typedef typename ADNumberType::scalar_type           ADScalarType; // == double
 
   // Compute function and derivative with AD
   const ADNumberType rfad = func(afad, bfad, cfad);
@@ -104,28 +104,21 @@ main()
   deallog.push("Extracted");
   {
     // Extract value and derivatives
-    const ADScalarType r =
-      AD::internal::ExtractData<ADNumberType>::value(rfad); // r
+    const ADScalarType     r = AD::internal::ExtractData<ADNumberType>::value(rfad); // r
     const ADDerivativeType drda_ad =
       AD::internal::ExtractData<ADNumberType>::directional_derivative(rfad, 0);
     const ADDerivativeType drdb_ad =
       AD::internal::ExtractData<ADNumberType>::directional_derivative(rfad, 1);
-    const ADScalarType drda =
-      AD::internal::ExtractData<ADDerivativeType>::value(drda_ad); // dr/da
-    const ADScalarType drdb =
-      AD::internal::ExtractData<ADDerivativeType>::value(drdb_ad); // dr/db
+    const ADScalarType drda = AD::internal::ExtractData<ADDerivativeType>::value(drda_ad); // dr/da
+    const ADScalarType drdb = AD::internal::ExtractData<ADDerivativeType>::value(drdb_ad); // dr/db
     const ADScalarType d2rda2 =
-      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(
-        drda_ad, 0); // d^2r/da^2
+      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(drda_ad, 0); // d^2r/da^2
     const ADScalarType d2rdadb =
-      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(
-        drda_ad, 1); // d^2r/dadb
+      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(drda_ad, 1); // d^2r/dadb
     const ADScalarType d2rdbda =
-      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(
-        drdb_ad, 0); // d^2r/dbda
+      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(drdb_ad, 0); // d^2r/dbda
     const ADScalarType d2rdb2 =
-      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(
-        drdb_ad, 1); // d^2/db^2
+      AD::internal::ExtractData<ADDerivativeType>::directional_derivative(drdb_ad, 1); // d^2/db^2
 
     print(r, drda, drdb, d2rda2, d2rdb2, d2rdadb, d2rdbda);
   }

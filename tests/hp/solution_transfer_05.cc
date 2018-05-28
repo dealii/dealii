@@ -80,8 +80,7 @@ main()
   solution = 1.0;
 
 
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(
-    dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
   triangulation.execute_coarsening_and_refinement();

@@ -52,18 +52,14 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria, -1, 1);
 
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         cell->face(f)->set_all_boundary_ids(f);
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   for (unsigned int d = 0; d < dim; ++d)
-    GridTools::collect_periodic_faces(
-      tria, 2 * d, 2 * d + 1, d, periodic_faces);
+    GridTools::collect_periodic_faces(tria, 2 * d, 2 * d + 1, d, periodic_faces);
   tria.add_periodicity(periodic_faces);
 
   tria.refine_global(3 - dim);
@@ -93,12 +89,9 @@ test()
       MatrixFree<dim, double>                          mf_data;
       const QGauss<1>                                  quad(fe_degree + 2);
       typename MatrixFree<dim, double>::AdditionalData data;
-      data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
-      data.mapping_update_flags_inner_faces =
-        (update_gradients | update_JxW_values);
-      data.mapping_update_flags_boundary_faces =
-        (update_gradients | update_JxW_values);
+      data.tasks_parallel_scheme               = MatrixFree<dim, double>::AdditionalData::none;
+      data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+      data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
       mf_data.reinit(dof_system, constraints, quad, data);
 
       mf_data.initialize_dof_vector(in);
@@ -134,8 +127,7 @@ test()
       out_dist -= out;
 
       double diff_norm = out_dist.linfty_norm() / out.linfty_norm();
-      deallog << "Norm of difference to no-gather:         " << diff_norm
-              << std::endl;
+      deallog << "Norm of difference to no-gather:         " << diff_norm << std::endl;
 
       // now compare the result to a scalar implementation on each of the dim
       // components, using vmult_add in subsequent steps
@@ -157,8 +149,7 @@ test()
 
       out_dist -= out;
       diff_norm = out_dist.linfty_norm() / out.linfty_norm();
-      deallog << "Norm of difference to sum of scalar:     " << diff_norm
-              << std::endl;
+      deallog << "Norm of difference to sum of scalar:     " << diff_norm << std::endl;
 
       if (dim == 3)
         {
@@ -181,8 +172,7 @@ test()
 
           out_dist -= out;
           diff_norm = out_dist.linfty_norm() / out.linfty_norm();
-          deallog << "Norm of difference to vector/scalar sum: " << diff_norm
-                  << std::endl;
+          deallog << "Norm of difference to vector/scalar sum: " << diff_norm << std::endl;
         }
       if (dim == 3)
         {
@@ -205,8 +195,7 @@ test()
 
           out_dist -= out;
           diff_norm = out_dist.linfty_norm() / out.linfty_norm();
-          deallog << "Norm of difference to scalar/vector sum: " << diff_norm
-                  << std::endl;
+          deallog << "Norm of difference to scalar/vector sum: " << diff_norm << std::endl;
         }
 
       // finally compare to a series of scalar problems
@@ -228,10 +217,8 @@ test()
 
       for (unsigned int d = 0; d < dim; ++d)
         {
-          std::vector<types::global_dof_index> dof_indices_system(
-            fe_system.dofs_per_cell);
-          std::vector<types::global_dof_index> dof_indices_scalar(
-            fe.dofs_per_cell);
+          std::vector<types::global_dof_index> dof_indices_system(fe_system.dofs_per_cell);
+          std::vector<types::global_dof_index> dof_indices_scalar(fe.dofs_per_cell);
           for (typename DoFHandler<dim>::active_cell_iterator
                  cell_scalar = dof.begin_active(),
                  cell_system = dof_system.begin_active();
@@ -244,13 +231,9 @@ test()
                 for (unsigned int i = 0; i < fe_system.dofs_per_cell; ++i)
                   if (fe_system.system_to_component_index(i).first == d)
                     {
-                      in_small(
-                        dof_indices_scalar
-                          [fe_system.system_to_component_index(i).second]) =
+                      in_small(dof_indices_scalar[fe_system.system_to_component_index(i).second]) =
                         in(dof_indices_system[i]);
-                      out_small(
-                        dof_indices_scalar
-                          [fe_system.system_to_component_index(i).second]) =
+                      out_small(dof_indices_scalar[fe_system.system_to_component_index(i).second]) =
                         out(dof_indices_system[i]);
                     }
               }
@@ -259,8 +242,7 @@ test()
 
           out_small -= ref_small;
           diff_norm = out_small.linfty_norm() / out.linfty_norm();
-          deallog << "Norm of difference to single scalar:     " << diff_norm
-                  << std::endl;
+          deallog << "Norm of difference to single scalar:     " << diff_norm << std::endl;
         }
     }
 }

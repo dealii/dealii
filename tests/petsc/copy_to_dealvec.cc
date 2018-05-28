@@ -49,8 +49,7 @@ test()
   PETScWrappers::MPI::Vector vb(local_active, MPI_COMM_WORLD);
   PETScWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
 
-  LinearAlgebra::distributed::Vector<double> copied(
-    local_active, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> copied(local_active, local_relevant, MPI_COMM_WORLD);
 
   // set local values
   vb(myid * 2)     = myid * 2.0;
@@ -104,7 +103,7 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int                     myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 

@@ -116,9 +116,8 @@ namespace Step36
     DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
     constraints.close();
 
-    sparsity_pattern.reinit(dof_handler.n_dofs(),
-                            dof_handler.n_dofs(),
-                            dof_handler.max_couplings_between_dofs());
+    sparsity_pattern.reinit(
+      dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
     constraints.condense(sparsity_pattern);
     sparsity_pattern.compress();
@@ -142,8 +141,8 @@ namespace Step36
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients | update_quadrature_points |
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -158,8 +157,7 @@ namespace Step36
     std::vector<double> potential_values(n_q_points);
 
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -167,32 +165,28 @@ namespace Step36
         cell_stiffness_matrix = 0;
         cell_mass_matrix      = 0;
 
-        potential.value_list(fe_values.get_quadrature_points(),
-                             potential_values);
+        potential.value_list(fe_values.get_quadrature_points(), potential_values);
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
                 cell_stiffness_matrix(i, j) +=
-                  (fe_values.shape_grad(i, q_point) *
-                     fe_values.shape_grad(j, q_point) +
-                   potential_values[q_point] *
-                     fe_values.shape_value(i, q_point) *
+                  (fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                   potential_values[q_point] * fe_values.shape_value(i, q_point) *
                      fe_values.shape_value(j, q_point)) *
                   fe_values.JxW(q_point);
 
-                cell_mass_matrix(i, j) += (fe_values.shape_value(i, q_point) *
-                                           fe_values.shape_value(j, q_point)) *
-                                          fe_values.JxW(q_point);
+                cell_mass_matrix(i, j) +=
+                  (fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                  fe_values.JxW(q_point);
               }
 
         cell->get_dof_indices(local_dof_indices);
 
         constraints.distribute_local_to_global(
           cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
-        constraints.distribute_local_to_global(
-          cell_mass_matrix, local_dof_indices, mass_matrix);
+        constraints.distribute_local_to_global(cell_mass_matrix, local_dof_indices, mass_matrix);
       }
 
     stiffness_matrix.compress(VectorOperation::add);
@@ -220,16 +214,12 @@ namespace Step36
     SolverControl       solver_control(dof_handler.n_dofs(), 1e-10);
     SparseDirectUMFPACK inverse;
     inverse.initialize(stiffness_matrix);
-    const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
+    const unsigned int           num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
     ArpackSolver::AdditionalData additional_data(
       num_arnoldi_vectors, ArpackSolver::largest_magnitude, true);
     ArpackSolver eigensolver(solver_control, additional_data);
-    eigensolver.solve(stiffness_matrix,
-                      mass_matrix,
-                      inverse,
-                      eigenvalues,
-                      eigenfunctions,
-                      eigenvalues.size());
+    eigensolver.solve(
+      stiffness_matrix, mass_matrix, inverse, eigenvalues, eigenfunctions, eigenvalues.size());
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
@@ -242,12 +232,11 @@ namespace Step36
 
           for (unsigned int j = 0; j < eigenfunctions.size(); j++)
             if (std::abs(eigenfunctions[j] * Bx - (i == j)) > 1e-8)
-              deallog << "Eigenvectors " + Utilities::int_to_string(i) +
-                           " and " + Utilities::int_to_string(j) +
+              deallog << "Eigenvectors " + Utilities::int_to_string(i) + " and " +
+                           Utilities::int_to_string(j) +
                            " are not orthonormal!"
                            " failing norm is " +
-                           Utilities::to_string(
-                             std::abs(eigenfunctions[j] * Bx - (i == j)))
+                           Utilities::to_string(std::abs(eigenfunctions[j] * Bx - (i == j)))
                       << std::endl;
 
           stiffness_matrix.vmult(Ax, eigenfunctions[i]);
@@ -263,8 +252,7 @@ namespace Step36
     for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       eigenfunctions[i] /= eigenfunctions[i].linfty_norm();
 
-    return std::make_pair(solver_control.last_step(),
-                          solver_control.last_value());
+    return std::make_pair(solver_control.last_step(), solver_control.last_value());
   }
 
 
@@ -279,8 +267,7 @@ namespace Step36
 
     for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       data_out.add_data_vector(eigenfunctions[i],
-                               std::string("eigenfunction_") +
-                                 Utilities::int_to_string(i));
+                               std::string("eigenfunction_") + Utilities::int_to_string(i));
 
     Vector<double> projected_potential(dof_handler.n_dofs());
     {
@@ -318,8 +305,7 @@ namespace Step36
     std::sort(eigenvalues.begin(), eigenvalues.end(), my_compare);
 
     for (unsigned int i = 0; i < 5 && i < eigenvalues.size(); ++i)
-      deallog << "      Eigenvalue " << i << " : " << eigenvalues[i]
-              << std::endl;
+      deallog << "      Eigenvalue " << i << " : " << eigenvalues[i] << std::endl;
   }
 } // namespace Step36
 
@@ -342,13 +328,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -356,12 +340,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

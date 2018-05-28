@@ -36,11 +36,7 @@ f(const NumberType &x, const NumberType &y, const NumberType2 &z)
 
 // The analytic derivative of f(x,y,z) with respect to x and y
 void
-df(const double &x,
-   const double &y,
-   const double &z,
-   double &      df_dx,
-   double &      df_dy)
+df(const double &x, const double &y, const double &z, double &df_dx, double &df_dy)
 {
   df_dx = z * (3.0 * x * x + 0.5 * y * y);
   df_dy = z * (2.0 * z * y + x * y);
@@ -100,8 +96,7 @@ main()
   d2f(x, y, z, d2f_dx_dx, d2f_dy_dy, d2f_dy_dx);
 
   // Compute function and derivative with AD
-  const Sacado::Fad::DFad<Sacado::Fad::DFad<double>> f_fad =
-    ::f(x_ad, y_ad, z_ad);
+  const Sacado::Fad::DFad<Sacado::Fad::DFad<double>> f_fad = ::f(x_ad, y_ad, z_ad);
 
   deallog << "f_fad: " << f_fad << std::endl;
 
@@ -118,8 +113,7 @@ main()
   Assert(std::fabs(f - f_ad) < tol, ExcMessage("Computation incorrect: Value"));
   Assert(std::fabs(df_dx - df_dx_ad) < tol && std::fabs(df_dy - df_dy_ad) < tol,
          ExcMessage("Computation incorrect: First derivative"));
-  Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol &&
-           std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol &&
+  Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol && std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol &&
            std::fabs(d2f_dy_dx - d2f_dy_dx_ad) < tol,
          ExcMessage("Computation incorrect: Second derivative"));
 

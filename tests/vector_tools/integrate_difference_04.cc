@@ -70,11 +70,10 @@ template <int dim>
 void
 test(VectorTools::NormType norm, double value, double exp = 2.0)
 {
-  parallel::shared::Triangulation<dim> tria(
-    MPI_COMM_WORLD,
-    ::Triangulation<dim>::none,
-    false,
-    parallel::shared::Triangulation<dim>::partition_metis);
+  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
+                                            ::Triangulation<dim>::none,
+                                            false,
+                                            parallel::shared::Triangulation<dim>::partition_metis);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(3);
 
@@ -82,8 +81,7 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
 
-  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-                                             MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
 
   VectorTools::interpolate(dofh, Ref<dim>(), interpolated);
 
@@ -96,21 +94,14 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
   QIterated<dim> quadrature(QTrapez<1>(), 5);
 
   const dealii::Function<dim, double> *w = nullptr;
-  VectorTools::integrate_difference(dofh,
-                                    solution,
-                                    Functions::ZeroFunction<dim>(dim),
-                                    cellwise_errors,
-                                    quadrature,
-                                    norm,
-                                    w,
-                                    exp);
+  VectorTools::integrate_difference(
+    dofh, solution, Functions::ZeroFunction<dim>(dim), cellwise_errors, quadrature, norm, w, exp);
 
-  const double error =
-    VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
+  const double error = VectorTools::compute_global_error(tria, cellwise_errors, norm, exp);
 
   const double difference = std::abs(error - value);
-  deallog << "computed: " << error << " expected: " << value
-          << " difference: " << difference << std::endl;
+  deallog << "computed: " << error << " expected: " << value << " difference: " << difference
+          << std::endl;
   Assert(difference < 2e-3, ExcMessage("Error in integrate_difference"));
 }
 

@@ -62,25 +62,21 @@ void
 test(const unsigned int size, const unsigned int block_size)
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
   // Create SPD matrices of requested size:
-  FullMatrix<NumberType> full_in(size), inverse(size), full_out(size),
-    diff(size);
+  FullMatrix<NumberType> full_in(size), inverse(size), full_out(size), diff(size);
 
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, size, size, block_size, block_size);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(
+    mpi_communicator, size, size, block_size, block_size);
   ScaLAPACKMatrix<NumberType> scalapack_matrix(
     size, grid, block_size, LAPACKSupport::Property::symmetric);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " "
+        << grid->get_process_grid_columns() << std::endl;
 
   create_spd(full_in);
 
@@ -117,8 +113,7 @@ test(const unsigned int size, const unsigned int block_size)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   test<double>(320, 64);
 }

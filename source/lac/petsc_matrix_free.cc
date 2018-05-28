@@ -45,24 +45,19 @@ namespace PETScWrappers
 
 
 
-  MatrixFree::MatrixFree(
-    const MPI_Comm &                 communicator,
-    const unsigned int               m,
-    const unsigned int               n,
-    const std::vector<unsigned int> &local_rows_per_process,
-    const std::vector<unsigned int> &local_columns_per_process,
-    const unsigned int               this_process) :
+  MatrixFree::MatrixFree(const MPI_Comm &                 communicator,
+                         const unsigned int               m,
+                         const unsigned int               n,
+                         const std::vector<unsigned int> &local_rows_per_process,
+                         const std::vector<unsigned int> &local_columns_per_process,
+                         const unsigned int               this_process) :
     communicator(communicator)
   {
     Assert(local_rows_per_process.size() == local_columns_per_process.size(),
-           ExcDimensionMismatch(local_rows_per_process.size(),
-                                local_columns_per_process.size()));
+           ExcDimensionMismatch(local_rows_per_process.size(), local_columns_per_process.size()));
     Assert(this_process < local_rows_per_process.size(), ExcInternalError());
 
-    do_reinit(m,
-              n,
-              local_rows_per_process[this_process],
-              local_columns_per_process[this_process]);
+    do_reinit(m, n, local_rows_per_process[this_process], local_columns_per_process[this_process]);
   }
 
 
@@ -78,23 +73,18 @@ namespace PETScWrappers
 
 
 
-  MatrixFree::MatrixFree(
-    const unsigned int               m,
-    const unsigned int               n,
-    const std::vector<unsigned int> &local_rows_per_process,
-    const std::vector<unsigned int> &local_columns_per_process,
-    const unsigned int               this_process) :
+  MatrixFree::MatrixFree(const unsigned int               m,
+                         const unsigned int               n,
+                         const std::vector<unsigned int> &local_rows_per_process,
+                         const std::vector<unsigned int> &local_columns_per_process,
+                         const unsigned int               this_process) :
     communicator(MPI_COMM_WORLD)
   {
     Assert(local_rows_per_process.size() == local_columns_per_process.size(),
-           ExcDimensionMismatch(local_rows_per_process.size(),
-                                local_columns_per_process.size()));
+           ExcDimensionMismatch(local_rows_per_process.size(), local_columns_per_process.size()));
     Assert(this_process < local_rows_per_process.size(), ExcInternalError());
 
-    do_reinit(m,
-              n,
-              local_rows_per_process[this_process],
-              local_columns_per_process[this_process]);
+    do_reinit(m, n, local_rows_per_process[this_process], local_columns_per_process[this_process]);
   }
 
 
@@ -126,18 +116,14 @@ namespace PETScWrappers
                      const unsigned int               this_process)
   {
     Assert(local_rows_per_process.size() == local_columns_per_process.size(),
-           ExcDimensionMismatch(local_rows_per_process.size(),
-                                local_columns_per_process.size()));
+           ExcDimensionMismatch(local_rows_per_process.size(), local_columns_per_process.size()));
     Assert(this_process < local_rows_per_process.size(), ExcInternalError());
 
     this->communicator        = communicator;
     const PetscErrorCode ierr = destroy_matrix(matrix);
     AssertThrow(ierr != 0, ExcPETScError(ierr));
 
-    do_reinit(m,
-              n,
-              local_rows_per_process[this_process],
-              local_columns_per_process[this_process]);
+    do_reinit(m, n, local_rows_per_process[this_process], local_columns_per_process[this_process]);
   }
 
 
@@ -160,12 +146,7 @@ namespace PETScWrappers
                      const std::vector<unsigned int> &local_columns_per_process,
                      const unsigned int               this_process)
   {
-    reinit(MPI_COMM_WORLD,
-           m,
-           n,
-           local_rows_per_process,
-           local_columns_per_process,
-           this_process);
+    reinit(MPI_COMM_WORLD, m, n, local_rows_per_process, local_columns_per_process, this_process);
   }
 
 
@@ -226,15 +207,13 @@ namespace PETScWrappers
     // create a PETSc MatShell matrix-type
     // object of dimension m x n and local size
     // local_rows x local_columns
-    PetscErrorCode ierr = MatCreateShell(
-      communicator, local_rows, local_columns, m, n, (void *)this, &matrix);
+    PetscErrorCode ierr =
+      MatCreateShell(communicator, local_rows, local_columns, m, n, (void *)this, &matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     // register the MatrixFree::matrix_free_mult function
     // as the matrix multiplication used by this matrix
     ierr = MatShellSetOperation(
-      matrix,
-      MATOP_MULT,
-      (void (*)(void)) & dealii::PETScWrappers::MatrixFree::matrix_free_mult);
+      matrix, MATOP_MULT, (void (*)(void)) & dealii::PETScWrappers::MatrixFree::matrix_free_mult);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = MatSetFromOptions(matrix);

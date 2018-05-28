@@ -57,8 +57,7 @@ void
 check_this(const DoFHandler<dim> &dof_handler)
 {
   // create sparsity pattern
-  SparsityPattern sp(dof_handler.n_dofs(),
-                     dof_handler.max_couplings_between_dofs() * 2);
+  SparsityPattern sp(dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs() * 2);
   DoFTools::make_flux_sparsity_pattern(dof_handler, sp, ConstraintMatrix());
   sp.compress();
 
@@ -80,9 +79,8 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   unsigned int hash = 0;
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
-    hash +=
-      l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
-           (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
+    hash += l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
+                 (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
   deallog << hash << std::endl;
 }
 
@@ -98,9 +96,7 @@ check_this()
   tr.refine_global(1);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
-  for (Triangulation<dim>::active_cell_iterator c = tr.begin_active(2);
-       c != tr.end_active(2);
-       ++c)
+  for (Triangulation<dim>::active_cell_iterator c = tr.begin_active(2); c != tr.end_active(2); ++c)
     c->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 
@@ -129,25 +125,21 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

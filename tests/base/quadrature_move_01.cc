@@ -50,8 +50,7 @@ check_quadrature_move(Args &&... args)
 {
   deallog << check_q_move<Quad<1>>(std::forward<Args>(args)...) << 1 << " "
           << check_q_move<Quad<2>>(std::forward<Args>(args)...) << 2 << " "
-          << check_q_move<Quad<3>>(std::forward<Args>(args)...) << 3
-          << std::endl;
+          << check_q_move<Quad<3>>(std::forward<Args>(args)...) << 3 << std::endl;
 }
 
 
@@ -76,8 +75,8 @@ main()
   for (unsigned int p = 2; p < 5; ++p)
     {
       deallog << "Gauss Log R: " << check_q_move<QGaussLogR<1>>(p) << std::endl;
-      deallog << "Gauss Radau Chebyshev: "
-              << check_q_move<QGaussRadauChebyshev<1>>(p, ep) << std::endl;
+      deallog << "Gauss Radau Chebyshev: " << check_q_move<QGaussRadauChebyshev<1>>(p, ep)
+              << std::endl;
     }
 
   return 0;

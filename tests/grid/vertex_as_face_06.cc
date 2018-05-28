@@ -57,8 +57,7 @@ test()
   tria.refine_global(2);
   dof_handler.distribute_dofs(fe);
 
-  for (typename DoFHandler<1, spacedim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename DoFHandler<1, spacedim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {

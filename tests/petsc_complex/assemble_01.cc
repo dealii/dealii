@@ -56,15 +56,13 @@ main(int argc, char **argv)
     for (unsigned int j = 0; j < n; ++j)
       cell_matrix(i, j) = i * n + j;
 
-  constraints.distribute_local_to_global(
-    cell_matrix, cell_rhs, gdi, serial_matrix, mpi_vector);
+  constraints.distribute_local_to_global(cell_matrix, cell_rhs, gdi, serial_matrix, mpi_vector);
   mpi_vector.compress(VectorOperation::add);
   serial_matrix.compress(VectorOperation::add);
   mpi_vector.print(deallog.get_file_stream());
   serial_matrix.print(deallog.get_file_stream());
 
-  constraints.distribute_local_to_global(
-    cell_matrix, cell_rhs, gdi, mpi_matrix, mpi_vector);
+  constraints.distribute_local_to_global(cell_matrix, cell_rhs, gdi, mpi_matrix, mpi_vector);
   mpi_vector.compress(VectorOperation::add);
   mpi_matrix.compress(VectorOperation::add);
   mpi_vector.print(deallog.get_file_stream());

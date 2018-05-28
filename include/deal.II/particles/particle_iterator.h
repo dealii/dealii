@@ -45,11 +45,9 @@ namespace Particles
      * Constructor of the iterator. Takes a reference to the particle
      * container, and an iterator to the cell-particle pair.
      */
-    ParticleIterator(
-      const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-      const typename std::multimap<internal::LevelInd,
-                                   Particle<dim, spacedim>>::iterator
-        &particle);
+    ParticleIterator(const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
+                     const typename std::multimap<internal::LevelInd,
+                                                  Particle<dim, spacedim>>::iterator & particle);
 
     /**
      * Dereferencing operator, returns a reference to an accessor. Usage is thus

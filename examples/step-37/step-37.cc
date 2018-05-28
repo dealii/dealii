@@ -93,16 +93,14 @@ namespace Step37
     Coefficient() : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     template <typename number>
-    number value(const Point<dim, number> &p,
-                 const unsigned int        component = 0) const;
+    number value(const Point<dim, number> &p, const unsigned int component = 0) const;
 
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
 
@@ -139,8 +137,7 @@ namespace Step37
 
 
   template <int dim>
-  double Coefficient<dim>::value(const Point<dim> & p,
-                                 const unsigned int component) const
+  double Coefficient<dim>::value(const Point<dim> &p, const unsigned int component) const
   {
     return value<double>(p, component);
   }
@@ -150,10 +147,9 @@ namespace Step37
   template <int dim>
   void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                                     std::vector<double> &          values,
-                                    const unsigned int component) const
+                                    const unsigned int             component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n_points = points.size();
@@ -240,8 +236,7 @@ namespace Step37
   // for some systems or suboptimal performance for other systems.
   template <int dim, int fe_degree, typename number>
   class LaplaceOperator
-    : public MatrixFreeOperators::
-        Base<dim, LinearAlgebra::distributed::Vector<number>>
+    : public MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>
   {
   public:
     typedef number value_type;
@@ -255,21 +250,18 @@ namespace Step37
     virtual void compute_diagonal() override;
 
   private:
-    virtual void apply_add(
-      LinearAlgebra::distributed::Vector<number> &      dst,
-      const LinearAlgebra::distributed::Vector<number> &src) const override;
+    virtual void apply_add(LinearAlgebra::distributed::Vector<number> &      dst,
+                           const LinearAlgebra::distributed::Vector<number> &src) const override;
 
-    void
-    local_apply(const MatrixFree<dim, number> &                   data,
-                LinearAlgebra::distributed::Vector<number> &      dst,
-                const LinearAlgebra::distributed::Vector<number> &src,
-                const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void local_apply(const MatrixFree<dim, number> &                   data,
+                     LinearAlgebra::distributed::Vector<number> &      dst,
+                     const LinearAlgebra::distributed::Vector<number> &src,
+                     const std::pair<unsigned int, unsigned int> &     cell_range) const;
 
-    void local_compute_diagonal(
-      const MatrixFree<dim, number> &              data,
-      LinearAlgebra::distributed::Vector<number> & dst,
-      const unsigned int &                         dummy,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void local_compute_diagonal(const MatrixFree<dim, number> &              data,
+                                LinearAlgebra::distributed::Vector<number> & dst,
+                                const unsigned int &                         dummy,
+                                const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     Table<2, VectorizedArray<number>> coefficient;
   };
@@ -292,8 +284,7 @@ namespace Step37
   void LaplaceOperator<dim, fe_degree, number>::clear()
   {
     coefficient.reinit(0, 0);
-    MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>::
-      clear();
+    MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>::clear();
   }
 
 
@@ -309,7 +300,7 @@ namespace Step37
   void LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int                                     n_cells = this->data->n_macro_cells();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
 
     coefficient.reinit(n_cells, phi.n_q_points);
@@ -317,8 +308,7 @@ namespace Step37
       {
         phi.reinit(cell);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          coefficient(cell, q) =
-            coefficient_function.value(phi.quadrature_point(q));
+          coefficient(cell, q) = coefficient_function.value(phi.quadrature_point(q));
       }
   }
 
@@ -569,8 +559,7 @@ namespace Step37
       this->inverse_diagonal_entries->get_vector();
     this->data->initialize_dof_vector(inverse_diagonal);
     unsigned int dummy = 0;
-    this->data->cell_loop(
-      &LaplaceOperator::local_compute_diagonal, this, inverse_diagonal, dummy);
+    this->data->cell_loop(&LaplaceOperator::local_compute_diagonal, this, inverse_diagonal, dummy);
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
@@ -579,8 +568,7 @@ namespace Step37
         Assert(inverse_diagonal.local_element(i) > 0.,
                ExcMessage("No diagonal entry in a positive definite operator "
                           "should be zero"));
-        inverse_diagonal.local_element(i) =
-          1. / inverse_diagonal.local_element(i);
+        inverse_diagonal.local_element(i) = 1. / inverse_diagonal.local_element(i);
       }
   }
 
@@ -657,8 +645,7 @@ namespace Step37
 
             phi.evaluate(false, true);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q),
-                                  q);
+              phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q), q);
             phi.integrate(false, true);
             diagonal[i] = phi.get_dof_value(i);
           }
@@ -713,12 +700,11 @@ namespace Step37
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
 
-    ConstraintMatrix constraints;
-    typedef LaplaceOperator<dim, degree_finite_element, double>
-                     SystemMatrixType;
-    SystemMatrixType system_matrix;
+    ConstraintMatrix                                            constraints;
+    typedef LaplaceOperator<dim, degree_finite_element, double> SystemMatrixType;
+    SystemMatrixType                                            system_matrix;
 
-    MGConstrainedDoFs mg_constrained_dofs;
+    MGConstrainedDoFs                                          mg_constrained_dofs;
     typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
     MGLevelObject<LevelMatrixType>                             mg_matrices;
 
@@ -744,10 +730,9 @@ namespace Step37
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem() :
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+    triangulation(MPI_COMM_WORLD,
+                  Triangulation<dim>::limit_level_difference_at_vertices,
+                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
 #else
     triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
 #endif
@@ -760,8 +745,7 @@ namespace Step37
     // time_details, is disabled by default through the @p false argument
     // specified here. For detailed timings, removing the @p false argument
     // prints all the details.
-    time_details(std::cout,
-                 false && Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    time_details(std::cout, false && Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
   {}
 
 
@@ -808,8 +792,7 @@ namespace Step37
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+    pcout << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
     IndexSet locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
@@ -821,18 +804,16 @@ namespace Step37
       dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
     constraints.close();
     setup_time += time.wall_time();
-    time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+    time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time() << "s/"
+                 << time.wall_time() << "s" << std::endl;
     time.restart();
 
     {
       typename MatrixFree<dim, double>::AdditionalData additional_data;
-      additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
+      additional_data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
       additional_data.mapping_update_flags =
         (update_gradients | update_JxW_values | update_quadrature_points);
-      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
-        new MatrixFree<dim, double>());
+      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(new MatrixFree<dim, double>());
       system_mf_storage->reinit(
         dof_handler, constraints, QGauss<1>(fe.degree + 1), additional_data);
       system_matrix.initialize(system_mf_storage);
@@ -844,8 +825,8 @@ namespace Step37
     system_matrix.initialize_dof_vector(system_rhs);
 
     setup_time += time.wall_time();
-    time_details << "Setup matrix-free system   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+    time_details << "Setup matrix-free system   (CPU/wall) " << time.cpu_time() << "s/"
+                 << time.wall_time() << "s" << std::endl;
     time.restart();
 
     // Next, initialize the matrices for the multigrid method on all the
@@ -863,40 +844,32 @@ namespace Step37
     std::set<types::boundary_id> dirichlet_boundary;
     dirichlet_boundary.insert(0);
     mg_constrained_dofs.initialize(dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, dirichlet_boundary);
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
         IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler, level, relevant_dofs);
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level, relevant_dofs);
         ConstraintMatrix level_constraints;
         level_constraints.reinit(relevant_dofs);
-        level_constraints.add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
+        level_constraints.add_lines(mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();
 
         typename MatrixFree<dim, float>::AdditionalData additional_data;
-        additional_data.tasks_parallel_scheme =
-          MatrixFree<dim, float>::AdditionalData::none;
+        additional_data.tasks_parallel_scheme = MatrixFree<dim, float>::AdditionalData::none;
         additional_data.mapping_update_flags =
           (update_gradients | update_JxW_values | update_quadrature_points);
         additional_data.level_mg_handler = level;
-        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
-          new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(dof_handler,
-                                    level_constraints,
-                                    QGauss<1>(fe.degree + 1),
-                                    additional_data);
+        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(new MatrixFree<dim, float>());
+        mg_mf_storage_level->reinit(
+          dof_handler, level_constraints, QGauss<1>(fe.degree + 1), additional_data);
 
-        mg_matrices[level].initialize(
-          mg_mf_storage_level, mg_constrained_dofs, level);
+        mg_matrices[level].initialize(mg_mf_storage_level, mg_constrained_dofs, level);
         mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
       }
     setup_time += time.wall_time();
-    time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+    time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time() << "s/"
+                 << time.wall_time() << "s" << std::endl;
   }
 
 
@@ -917,11 +890,8 @@ namespace Step37
     Timer time;
 
     system_rhs = 0;
-    FEEvaluation<dim, degree_finite_element> phi(
-      *system_matrix.get_matrix_free());
-    for (unsigned int cell = 0;
-         cell < system_matrix.get_matrix_free()->n_macro_cells();
-         ++cell)
+    FEEvaluation<dim, degree_finite_element> phi(*system_matrix.get_matrix_free());
+    for (unsigned int cell = 0; cell < system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
       {
         phi.reinit(cell);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
@@ -932,8 +902,8 @@ namespace Step37
     system_rhs.compress(VectorOperation::add);
 
     setup_time += time.wall_time();
-    time_details << "Assemble right hand side   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+    time_details << "Assemble right hand side   (CPU/wall) " << time.cpu_time() << "s/"
+                 << time.wall_time() << "s" << std::endl;
   }
 
 
@@ -952,8 +922,8 @@ namespace Step37
     MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
     setup_time += time.wall_time();
-    time_details << "MG build transfer time     (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s\n";
+    time_details << "MG build transfer time     (CPU/wall) " << time.cpu_time() << "s/"
+                 << time.wall_time() << "s\n";
     time.restart();
 
     // As a smoother, this tutorial program uses a Chebyshev iteration instead
@@ -999,16 +969,12 @@ namespace Step37
     // methods. The former involves only local communication between neighbors
     // in the (coarse) mesh, whereas the latter requires global communication
     // over all processors.
-    typedef PreconditionChebyshev<LevelMatrixType,
-                                  LinearAlgebra::distributed::Vector<float>>
-      SmootherType;
-    mg::SmootherRelaxation<SmootherType,
-                           LinearAlgebra::distributed::Vector<float>>
-                                                         mg_smoother;
-    MGLevelObject<typename SmootherType::AdditionalData> smoother_data;
+    typedef PreconditionChebyshev<LevelMatrixType, LinearAlgebra::distributed::Vector<float>>
+                                                                                    SmootherType;
+    mg::SmootherRelaxation<SmootherType, LinearAlgebra::distributed::Vector<float>> mg_smoother;
+    MGLevelObject<typename SmootherType::AdditionalData>                            smoother_data;
     smoother_data.resize(0, triangulation.n_global_levels() - 1);
-    for (unsigned int level = 0; level < triangulation.n_global_levels();
-         ++level)
+    for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       {
         if (level > 0)
           {
@@ -1018,18 +984,16 @@ namespace Step37
           }
         else
           {
-            smoother_data[0].smoothing_range = 1e-3;
-            smoother_data[0].degree          = numbers::invalid_unsigned_int;
+            smoother_data[0].smoothing_range     = 1e-3;
+            smoother_data[0].degree              = numbers::invalid_unsigned_int;
             smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
           }
         mg_matrices[level].compute_diagonal();
-        smoother_data[level].preconditioner =
-          mg_matrices[level].get_matrix_diagonal_inverse();
+        smoother_data[level].preconditioner = mg_matrices[level].get_matrix_diagonal_inverse();
       }
     mg_smoother.initialize(mg_matrices, smoother_data);
 
-    MGCoarseGridApplySmoother<LinearAlgebra::distributed::Vector<float>>
-      mg_coarse;
+    MGCoarseGridApplySmoother<LinearAlgebra::distributed::Vector<float>> mg_coarse;
     mg_coarse.initialize(mg_smoother);
 
     // The next step is to set up the interface matrices that are needed for the
@@ -1063,25 +1027,19 @@ namespace Step37
     // Once the interface matrix is created, we set up the remaining Multigrid
     // preconditioner infrastructure in complete analogy to step-16 to obtain
     // a @p preconditioner object that can be applied to a matrix.
-    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_matrix(
-      mg_matrices);
+    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_matrix(mg_matrices);
 
-    MGLevelObject<MatrixFreeOperators::MGInterfaceOperator<LevelMatrixType>>
-      mg_interface_matrices;
+    MGLevelObject<MatrixFreeOperators::MGInterfaceOperator<LevelMatrixType>> mg_interface_matrices;
     mg_interface_matrices.resize(0, triangulation.n_global_levels() - 1);
-    for (unsigned int level = 0; level < triangulation.n_global_levels();
-         ++level)
+    for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       mg_interface_matrices[level].initialize(mg_matrices[level]);
-    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_interface(
-      mg_interface_matrices);
+    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_interface(mg_interface_matrices);
 
     Multigrid<LinearAlgebra::distributed::Vector<float>> mg(
       mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface, mg_interface);
 
-    PreconditionMG<dim,
-                   LinearAlgebra::distributed::Vector<float>,
-                   MGTransferMatrixFree<dim, float>>
+    PreconditionMG<dim, LinearAlgebra::distributed::Vector<float>, MGTransferMatrixFree<dim, float>>
       preconditioner(dof_handler, mg, mg_transfer);
 
     // The setup of the multigrid routines is quite easy and one cannot see
@@ -1095,8 +1053,8 @@ namespace Step37
     SolverControl solver_control(100, 1e-12 * system_rhs.l2_norm());
     SolverCG<LinearAlgebra::distributed::Vector<double>> cg(solver_control);
     setup_time += time.wall_time();
-    time_details << "MG build smoother time     (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s\n";
+    time_details << "MG build smoother time     (CPU/wall) " << time.cpu_time() << "s/"
+                 << time.wall_time() << "s\n";
     pcout << "Total setup time               (wall) " << setup_time << "s\n";
 
     time.reset();
@@ -1106,9 +1064,8 @@ namespace Step37
 
     constraints.distribute(solution);
 
-    pcout << "Time solve (" << solver_control.last_step()
-          << " iterations)  (CPU/wall) " << time.cpu_time() << "s/"
-          << time.wall_time() << "s\n";
+    pcout << "Time solve (" << solver_control.last_step() << " iterations)  (CPU/wall) "
+          << time.cpu_time() << "s/" << time.wall_time() << "s\n";
   }
 
 
@@ -1134,23 +1091,18 @@ namespace Step37
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + std::to_string(cycle) + "." +
-      std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) +
-      ".vtu");
+    std::ofstream output("solution-" + std::to_string(cycle) + "." +
+                         std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) + ".vtu");
     data_out.write_vtu(output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.emplace_back("solution-" + std::to_string(cycle) + "." +
-                                 std::to_string(i) + ".vtu");
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+          filenames.emplace_back("solution-" + std::to_string(cycle) + "." + std::to_string(i) +
+                                 ".vtu");
 
-        std::string master_name =
-          "solution-" + Utilities::to_string(cycle) + ".pvtu";
+        std::string   master_name = "solution-" + Utilities::to_string(cycle) + ".pvtu";
         std::ofstream master_output(master_name);
         data_out.write_pvtu_record(master_output, filenames);
       }
@@ -1170,15 +1122,12 @@ namespace Step37
   void LaplaceProblem<dim>::run()
   {
     {
-      const unsigned int n_vect_doubles =
-        VectorizedArray<double>::n_array_elements;
-      const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
+      const unsigned int n_vect_doubles = VectorizedArray<double>::n_array_elements;
+      const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
 
-      pcout << "Vectorization over " << n_vect_doubles
-            << " doubles = " << n_vect_bits << " bits ("
+      pcout << "Vectorization over " << n_vect_doubles << " doubles = " << n_vect_bits << " bits ("
             << Utilities::System::get_current_vectorization_level()
-            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
-            << std::endl;
+            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL << std::endl;
     }
 
     for (unsigned int cycle = 0; cycle < 9 - dim; ++cycle)
@@ -1221,25 +1170,21 @@ int main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

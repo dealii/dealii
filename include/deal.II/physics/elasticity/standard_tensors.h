@@ -298,8 +298,7 @@ namespace Physics
 template <int dim>
 template <typename Number>
 inline SymmetricTensor<4, dim, Number>
-Physics::Elasticity::StandardTensors<dim>::Dev_P(
-  const Tensor<2, dim, Number> &F)
+Physics::Elasticity::StandardTensors<dim>::Dev_P(const Tensor<2, dim, Number> &F)
 {
   const Number det_F = determinant(F);
   Assert(numbers::value_is_greater_than(det_F, 0.0),
@@ -309,12 +308,10 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P(
   const SymmetricTensor<2, dim, Number> C_inv = symmetrize(invert(C_ns));
 
   // See Wriggers p46 equ 3.125 (but transpose indices)
-  SymmetricTensor<4, dim, Number> Dev_P =
-    outer_product(C, C_inv);                   // Dev_P = C_x_C_inv
-  Dev_P /= -dim;                               // Dev_P = -[1/dim]C_x_C_inv
-  Dev_P += SymmetricTensor<4, dim, Number>(S); // Dev_P = S - [1/dim]C_x_C_inv
-  Dev_P *=
-    std::pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_x_C_inv]
+  SymmetricTensor<4, dim, Number> Dev_P = outer_product(C, C_inv); // Dev_P = C_x_C_inv
+  Dev_P /= -dim;                                                   // Dev_P = -[1/dim]C_x_C_inv
+  Dev_P += SymmetricTensor<4, dim, Number>(S);                     // Dev_P = S - [1/dim]C_x_C_inv
+  Dev_P *= std::pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_x_C_inv]
 
   return Dev_P;
 }
@@ -324,8 +321,7 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P(
 template <int dim>
 template <typename Number>
 inline SymmetricTensor<4, dim, Number>
-Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
-  const Tensor<2, dim, Number> &F)
+Physics::Elasticity::StandardTensors<dim>::Dev_P_T(const Tensor<2, dim, Number> &F)
 {
   const Number det_F = determinant(F);
   Assert(numbers::value_is_greater_than(det_F, 0.0),
@@ -335,12 +331,10 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
   const SymmetricTensor<2, dim, Number> C_inv = symmetrize(invert(C_ns));
 
   // See Wriggers p46 equ 3.125 (not transposed)
-  SymmetricTensor<4, dim, Number> Dev_P_T =
-    outer_product(C_inv, C);                     // Dev_P = C_inv_x_C
-  Dev_P_T /= -dim;                               // Dev_P = -[1/dim]C_inv_x_C
-  Dev_P_T += SymmetricTensor<4, dim, Number>(S); // Dev_P = S - [1/dim]C_inv_x_C
-  Dev_P_T *=
-    std::pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_inv_x_C]
+  SymmetricTensor<4, dim, Number> Dev_P_T = outer_product(C_inv, C); // Dev_P = C_inv_x_C
+  Dev_P_T /= -dim;                                                   // Dev_P = -[1/dim]C_inv_x_C
+  Dev_P_T += SymmetricTensor<4, dim, Number>(S);                     // Dev_P = S - [1/dim]C_inv_x_C
+  Dev_P_T *= std::pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_inv_x_C]
 
   return Dev_P_T;
 }
@@ -350,8 +344,7 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
 template <int dim>
 template <typename Number>
 inline SymmetricTensor<2, dim, Number>
-Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
-  const Tensor<2, dim, Number> &F)
+Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(const Tensor<2, dim, Number> &F)
 {
   return Number(0.5) * determinant(F) * symmetrize(invert(transpose(F) * F));
 }
@@ -361,19 +354,16 @@ Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
 template <int dim>
 template <typename Number>
 inline SymmetricTensor<4, dim, Number>
-Physics::Elasticity::StandardTensors<dim>::dC_inv_dC(
-  const Tensor<2, dim, Number> &F)
+Physics::Elasticity::StandardTensors<dim>::dC_inv_dC(const Tensor<2, dim, Number> &F)
 {
-  const SymmetricTensor<2, dim, Number> C_inv =
-    symmetrize(invert(transpose(F) * F));
+  const SymmetricTensor<2, dim, Number> C_inv = symmetrize(invert(transpose(F) * F));
 
   SymmetricTensor<4, dim, Number> dC_inv_dC;
   for (unsigned int A = 0; A < dim; ++A)
     for (unsigned int B = A; B < dim; ++B)
       for (unsigned int C = 0; C < dim; ++C)
         for (unsigned int D = C; D < dim; ++D)
-          dC_inv_dC[A][B][C][D] -=
-            0.5 * (C_inv[A][C] * C_inv[B][D] + C_inv[A][D] * C_inv[B][C]);
+          dC_inv_dC[A][B][C][D] -= 0.5 * (C_inv[A][C] * C_inv[B][D] + C_inv[A][D] * C_inv[B][C]);
 
   return dC_inv_dC;
 }

@@ -45,16 +45,13 @@ test()
   dof_handler.distribute_dofs(fe);
 
   deallog << "Coarse mesh:" << std::endl;
-  deallog << "Left vertex=" << dof_handler.begin_active()->face(0)->vertex(0)
-          << std::endl;
-  deallog << "Right vertex=" << dof_handler.begin_active()->face(1)->vertex(0)
-          << std::endl;
+  deallog << "Left vertex=" << dof_handler.begin_active()->face(0)->vertex(0) << std::endl;
+  deallog << "Right vertex=" << dof_handler.begin_active()->face(1)->vertex(0) << std::endl;
 
   tria.refine_global(2);
   dof_handler.distribute_dofs(fe);
 
-  for (typename DoFHandler<1, spacedim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename DoFHandler<1, spacedim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {

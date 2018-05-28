@@ -71,13 +71,11 @@ test()
     {
       const QGauss<1>                                  quad(fe_degree + 1);
       typename MatrixFree<dim, double>::AdditionalData data;
-      data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
+      data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
       mf_data.reinit(dof, constraints, quad, data);
     }
 
-    MatrixFreeTest<dim, fe_degree, double, Vector<double>, fe_degree + 1> mf(
-      mf_data);
+    MatrixFreeTest<dim, fe_degree, double, Vector<double>, fe_degree + 1> mf(mf_data);
     mf.vmult(out, in);
     deallog << "Result norm: " << out.l2_norm() << std::endl;
   }
@@ -86,13 +84,11 @@ test()
     {
       const QGauss<1>                                  quad(fe_degree + 2);
       typename MatrixFree<dim, double>::AdditionalData data;
-      data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
+      data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
       mf_data.reinit(dof, constraints, quad, data);
     }
 
-    MatrixFreeTest<dim, fe_degree, double, Vector<double>, fe_degree + 2> mf(
-      mf_data);
+    MatrixFreeTest<dim, fe_degree, double, Vector<double>, fe_degree + 2> mf(mf_data);
     mf.vmult(out, in);
     deallog << "Result norm: " << out.l2_norm() << std::endl;
   }

@@ -121,8 +121,7 @@ namespace internal
  *
  */
 template <typename VectorType = Vector<double>>
-class SolverBicgstab : public Solver<VectorType>,
-                       protected internal::SolverBicgstabData
+class SolverBicgstab : public Solver<VectorType>, protected internal::SolverBicgstabData
 {
 public:
   /**
@@ -143,8 +142,7 @@ public:
      * The default is to perform an exact residual computation and breakdown
      * parameter 1e-10.
      */
-    explicit AdditionalData(const bool   exact_residual = true,
-                            const double breakdown      = 1.e-10) :
+    explicit AdditionalData(const bool exact_residual = true, const double breakdown = 1.e-10) :
       exact_residual(exact_residual),
       breakdown(breakdown)
     {}
@@ -169,8 +167,7 @@ public:
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverBicgstab(SolverControl &       cn,
-                 const AdditionalData &data = AdditionalData());
+  SolverBicgstab(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   /**
    * Virtual destructor.
@@ -297,11 +294,10 @@ private:
 
 
 template <typename VectorType>
-SolverBicgstab<VectorType>::IterationResult::IterationResult(
-  const bool                 breakdown,
-  const SolverControl::State state,
-  const unsigned int         last_step,
-  const double               last_residual) :
+SolverBicgstab<VectorType>::IterationResult::IterationResult(const bool                 breakdown,
+                                                             const SolverControl::State state,
+                                                             const unsigned int         last_step,
+                                                             const double last_residual) :
   breakdown(breakdown),
   state(state),
   last_step(last_step),
@@ -323,8 +319,7 @@ SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &           cn,
 
 
 template <typename VectorType>
-SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &       cn,
-                                           const AdditionalData &data) :
+SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &cn, const AdditionalData &data) :
   Solver<VectorType>(cn),
   Vx(nullptr),
   Vb(nullptr),
@@ -342,9 +337,7 @@ SolverBicgstab<VectorType>::~SolverBicgstab()
 template <typename VectorType>
 template <typename MatrixType>
 double
-SolverBicgstab<VectorType>::criterion(const MatrixType &A,
-                                      const VectorType &x,
-                                      const VectorType &b)
+SolverBicgstab<VectorType>::criterion(const MatrixType &A, const VectorType &x, const VectorType &b)
 {
   A.vmult(*Vt, x);
   Vt->add(-1., b);
@@ -382,8 +375,7 @@ SolverBicgstab<VectorType>::print_vectors(const unsigned int,
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 typename SolverBicgstab<VectorType>::IterationResult
-SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
-                                    const PreconditionerType &preconditioner)
+SolverBicgstab<VectorType>::iterate(const MatrixType &A, const PreconditionerType &preconditioner)
 {
   // TODO:[GK] Implement "use the length of the computed orthogonal residual" in
   // the BiCGStab method.
@@ -515,9 +507,8 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
   while (state.breakdown == true);
 
   // in case of failure: throw exception
-  AssertThrow(
-    state.state == SolverControl::success,
-    SolverControl::NoConvergence(state.last_step, state.last_residual));
+  AssertThrow(state.state == SolverControl::success,
+              SolverControl::NoConvergence(state.last_step, state.last_residual));
   // otherwise exit as normal
 }
 

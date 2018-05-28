@@ -87,8 +87,7 @@ namespace parallel
       void
       operator()(const Range &range) const
       {
-        for (typename Range::const_iterator p = range.begin(); p != range.end();
-             ++p)
+        for (typename Range::const_iterator p = range.begin(); p != range.end(); ++p)
           apply(f, *p);
       }
 
@@ -186,11 +185,10 @@ namespace parallel
     typedef std::tuple<InputIterator, OutputIterator> Iterators;
     typedef SynchronousIterators<Iterators>           SyncIterators;
     Iterators                                         x_begin(begin_in, out);
-    Iterators x_end(end_in, OutputIterator());
-    tbb::parallel_for(
-      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
-      internal::make_body(predicate),
-      tbb::auto_partitioner());
+    Iterators                                         x_end(end_in, OutputIterator());
+    tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
+                      internal::make_body(predicate),
+                      tbb::auto_partitioner());
 #endif
   }
 
@@ -239,15 +237,13 @@ namespace parallel
     for (OutputIterator in1 = begin_in1; in1 != end_in1;)
       *out++ = predicate(*in1++, *in2++);
 #else
-    typedef std::tuple<InputIterator1, InputIterator2, OutputIterator>
-                                            Iterators;
-    typedef SynchronousIterators<Iterators> SyncIterators;
-    Iterators                               x_begin(begin_in1, in2, out);
+    typedef std::tuple<InputIterator1, InputIterator2, OutputIterator> Iterators;
+    typedef SynchronousIterators<Iterators>                            SyncIterators;
+    Iterators                                                          x_begin(begin_in1, in2, out);
     Iterators x_end(end_in1, InputIterator2(), OutputIterator());
-    tbb::parallel_for(
-      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
-      internal::make_body(predicate),
-      tbb::auto_partitioner());
+    tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
+                      internal::make_body(predicate),
+                      tbb::auto_partitioner());
 #endif
   }
 
@@ -298,17 +294,13 @@ namespace parallel
     for (OutputIterator in1 = begin_in1; in1 != end_in1;)
       *out++ = predicate(*in1++, *in2++, *in3++);
 #else
-    typedef std::
-      tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>
-                                            Iterators;
+    typedef std::tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator> Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators                               x_begin(begin_in1, in2, in3, out);
-    Iterators                               x_end(
-      end_in1, InputIterator2(), InputIterator3(), OutputIterator());
-    tbb::parallel_for(
-      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
-      internal::make_body(predicate),
-      tbb::auto_partitioner());
+    Iterators x_end(end_in1, InputIterator2(), InputIterator3(), OutputIterator());
+    tbb::parallel_for(tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
+                      internal::make_body(predicate),
+                      tbb::auto_partitioner());
 #endif
   }
 
@@ -322,8 +314,7 @@ namespace parallel
      */
     template <typename RangeType, typename Function>
     void
-    apply_to_subranges(const tbb::blocked_range<RangeType> &range,
-                       const Function &                     f)
+    apply_to_subranges(const tbb::blocked_range<RangeType> &range, const Function &f)
     {
       f(range.begin(), range.end());
     }
@@ -423,12 +414,11 @@ namespace parallel
     ff(begin, end);
 #  endif
 #else
-    tbb::parallel_for(
-      tbb::blocked_range<RangeType>(begin, end, grainsize),
-      std::bind(&internal::apply_to_subranges<RangeType, Function>,
-                std::placeholders::_1,
-                std::cref(f)),
-      tbb::auto_partitioner());
+    tbb::parallel_for(tbb::blocked_range<RangeType>(begin, end, grainsize),
+                      std::bind(&internal::apply_to_subranges<RangeType, Function>,
+                                std::placeholders::_1,
+                                std::cref(f)),
+                      tbb::auto_partitioner());
 #endif
   }
 
@@ -663,11 +653,9 @@ namespace parallel
     return ff(begin, end);
 #  endif
 #else
-    internal::ReductionOnSubranges<ResultType, Function> reductor(
-      f, std::plus<ResultType>(), 0);
-    tbb::parallel_reduce(tbb::blocked_range<RangeType>(begin, end, grainsize),
-                         reductor,
-                         tbb::auto_partitioner());
+    internal::ReductionOnSubranges<ResultType, Function> reductor(f, std::plus<ResultType>(), 0);
+    tbb::parallel_reduce(
+      tbb::blocked_range<RangeType>(begin, end, grainsize), reductor, tbb::auto_partitioner());
     return reductor.result;
 #endif
   }
@@ -790,8 +778,7 @@ namespace parallel
      */
     struct ParallelForWrapper
     {
-      ParallelForWrapper(const parallel::ParallelForInteger &worker) :
-        worker_(worker)
+      ParallelForWrapper(const parallel::ParallelForInteger &worker) : worker_(worker)
       {}
 
       void
@@ -808,10 +795,9 @@ namespace parallel
 
 
   inline void
-  ParallelForInteger::apply_parallel(
-    const std::size_t begin,
-    const std::size_t end,
-    const std::size_t minimum_parallel_grain_size) const
+  ParallelForInteger::apply_parallel(const std::size_t begin,
+                                     const std::size_t end,
+                                     const std::size_t minimum_parallel_grain_size) const
   {
 #ifndef DEAL_II_WITH_THREADS
     // make sure we don't get compiler
@@ -821,10 +807,9 @@ namespace parallel
     apply_to_subrange(begin, end);
 #else
     internal::ParallelForWrapper worker(*this);
-    tbb::parallel_for(
-      tbb::blocked_range<std::size_t>(begin, end, minimum_parallel_grain_size),
-      worker,
-      tbb::auto_partitioner());
+    tbb::parallel_for(tbb::blocked_range<std::size_t>(begin, end, minimum_parallel_grain_size),
+                      worker,
+                      tbb::auto_partitioner());
 #endif
   }
 

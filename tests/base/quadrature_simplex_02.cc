@@ -36,9 +36,7 @@ test(int n)
 
   deallog << std::endl
           << "# Area: "
-          << std::accumulate(
-               quad.get_weights().begin(), quad.get_weights().end(), 0.0)
-          << std::endl
+          << std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0) << std::endl
           << std::endl;
 
   auto quad2 = quad.compute_affine_transformation(get_simplex<dim>());
@@ -49,8 +47,7 @@ test(int n)
 
   deallog << std::endl
           << "# Area 2: "
-          << std::accumulate(
-               quad2.get_weights().begin(), quad2.get_weights().end(), 0.0)
+          << std::accumulate(quad2.get_weights().begin(), quad2.get_weights().end(), 0.0)
           << std::endl
           << std::endl;
 }

@@ -104,8 +104,8 @@ test()
     requests);
 
   // ... finish exchange
-  tight_partitioner->export_to_ghosted_array_finish(
-    ArrayView<Number>(ghost.begin(), ghost.size()), requests);
+  tight_partitioner->export_to_ghosted_array_finish(ArrayView<Number>(ghost.begin(), ghost.size()),
+                                                    requests);
 
   auto print = [&]() {
     deallog << "owned:" << std::endl;
@@ -130,14 +130,12 @@ test()
       operation,
       counter,
       ArrayView<Number>(ghost.begin(), ghost.size()),
-      ArrayView<Number>(import_data.begin(),
-                        tight_partitioner->n_import_indices()),
+      ArrayView<Number>(import_data.begin(), tight_partitioner->n_import_indices()),
       compress_requests);
 
     tight_partitioner->import_from_ghosted_array_finish(
       operation,
-      ArrayView<const Number>(import_data.begin(),
-                              tight_partitioner->n_import_indices()),
+      ArrayView<const Number>(import_data.begin(), tight_partitioner->n_import_indices()),
       ArrayView<Number>(owned.begin(), owned.size()),
       ArrayView<Number>(ghost.begin(), ghost.size()),
       compress_requests);

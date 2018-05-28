@@ -48,8 +48,8 @@ test()
     }
 
   // apply function for tensor product
-  internal::EvaluatorTensorProduct<internal::evaluate_general, 1, M, N, double>
-    evaluator(shape, shape, shape);
+  internal::EvaluatorTensorProduct<internal::evaluate_general, 1, M, N, double> evaluator(
+    shape, shape, shape);
   if (type == 0)
     evaluator.template values<0, false, false>(x, x);
   if (type == 1)

@@ -113,8 +113,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat
  * @date 2000-2005, 2010
  */
-template <typename number          = double,
-          typename BlockVectorType = BlockVector<number>>
+template <typename number = double, typename BlockVectorType = BlockVector<number>>
 class DEAL_II_DEPRECATED BlockMatrixArray : public Subscriptor
 {
 public:
@@ -132,8 +131,7 @@ public:
   /**
    * Constructor fixing the dimensions.
    */
-  BlockMatrixArray(const unsigned int n_block_rows,
-                   const unsigned int n_block_cols);
+  BlockMatrixArray(const unsigned int n_block_rows, const unsigned int n_block_cols);
 
   /**
    * Initialize object completely. This is the function to call for an object
@@ -213,8 +211,7 @@ public:
    * matrix).
    */
   number
-  matrix_scalar_product(const BlockVectorType &u,
-                        const BlockVectorType &v) const;
+  matrix_scalar_product(const BlockVectorType &u, const BlockVectorType &v) const;
 
   /**
    * Compute $u^T M u$. This is the square of the norm induced by the matrix
@@ -284,11 +281,7 @@ protected:
      * generated for <tt>matrix</tt>.
      */
     template <typename MatrixType>
-    Entry(const MatrixType &matrix,
-          size_type         row,
-          size_type         col,
-          number            prefix,
-          bool              transpose);
+    Entry(const MatrixType &matrix, size_type row, size_type col, number prefix, bool transpose);
 
     /**
      * Copy constructor invalidating the old object. Since it is only used for
@@ -416,8 +409,7 @@ private:
  * @ingroup Preconditioners
  * @author Guido Kanschat, 2001, 2005
  */
-template <typename number          = double,
-          typename BlockVectorType = BlockVector<number>>
+template <typename number = double, typename BlockVectorType = BlockVector<number>>
 class DEAL_II_DEPRECATED BlockTrianglePrecondition
   : private BlockMatrixArray<number, BlockVectorType>
 {
@@ -509,9 +501,7 @@ public:
    * Each diagonal block must contain one and only one matrix. If this
    * exception is thrown, you did not enter a matrix here.
    */
-  DeclException1(ExcNoDiagonal,
-                 size_type,
-                 << "No diagonal entry was added for block " << arg1);
+  DeclException1(ExcNoDiagonal, size_type, << "No diagonal entry was added for block " << arg1);
 
   /**
    * Each diagonal block must contain one and only one matrix. If this
@@ -519,8 +509,7 @@ public:
    */
   DeclException1(ExcMultipleDiagonal,
                  size_type,
-                 << "Inverse diagonal entries may not be added in block "
-                 << arg1);
+                 << "Inverse diagonal entries may not be added in block " << arg1);
   //@}
 private:
   /**
@@ -542,19 +531,16 @@ private:
 
 template <typename number, typename BlockVectorType>
 template <typename MatrixType>
-inline BlockMatrixArray<number, BlockVectorType>::Entry::Entry(
-  const MatrixType &m,
-  size_type         row,
-  size_type         col,
-  number            prefix,
-  bool              transpose) :
+inline BlockMatrixArray<number, BlockVectorType>::Entry::Entry(const MatrixType &m,
+                                                               size_type         row,
+                                                               size_type         col,
+                                                               number            prefix,
+                                                               bool              transpose) :
   row(row),
   col(col),
   prefix(prefix),
   transpose(transpose),
-  matrix(new_pointer_matrix_base(m,
-                                 typename BlockVectorType::BlockType(),
-                                 typeid(*this).name()))
+  matrix(new_pointer_matrix_base(m, typename BlockVectorType::BlockType(), typeid(*this).name()))
 {}
 
 
@@ -579,14 +565,11 @@ template <class StreamType>
 inline void
 BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType &out) const
 {
-  out << "\\begin{array}{" << std::string(n_block_cols(), 'c') << "}"
-      << std::endl;
+  out << "\\begin{array}{" << std::string(n_block_cols(), 'c') << "}" << std::endl;
 
   Table<2, std::string> array(n_block_rows(), n_block_cols());
 
-  typedef std::map<
-    const PointerMatrixBase<typename BlockVectorType::BlockType> *,
-    std::string>
+  typedef std::map<const PointerMatrixBase<typename BlockVectorType::BlockType> *, std::string>
           NameMap;
   NameMap matrix_names;
 
@@ -599,9 +582,8 @@ BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType &out) const
       if (matrix_names.find(m->matrix) == matrix_names.end())
         {
           std::pair<typename NameMap::iterator, bool> x = matrix_names.insert(
-            std::pair<
-              const PointerMatrixBase<typename BlockVectorType::BlockType> *,
-              std::string>(m->matrix, std::string("M")));
+            std::pair<const PointerMatrixBase<typename BlockVectorType::BlockType> *, std::string>(
+              m->matrix, std::string("M")));
           std::ostringstream stream;
           stream << matrix_number++;
 
@@ -641,15 +623,13 @@ BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType &out) const
 template <typename number, typename BlockVectorType>
 template <typename MatrixType>
 inline void
-BlockTrianglePrecondition<number, BlockVectorType>::enter(
-  const MatrixType &matrix,
-  size_type         row,
-  size_type         col,
-  number            prefix,
-  bool              transpose)
+BlockTrianglePrecondition<number, BlockVectorType>::enter(const MatrixType &matrix,
+                                                          size_type         row,
+                                                          size_type         col,
+                                                          number            prefix,
+                                                          bool              transpose)
 {
-  BlockMatrixArray<number, BlockVectorType>::enter(
-    matrix, row, col, prefix, transpose);
+  BlockMatrixArray<number, BlockVectorType>::enter(matrix, row, col, prefix, transpose);
 }
 
 

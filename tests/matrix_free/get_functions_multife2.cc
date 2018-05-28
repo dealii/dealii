@@ -49,10 +49,7 @@
 std::ofstream logfile("output");
 
 
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d = fe_degree + 1,
-          typename Number   = double>
+template <int dim, int fe_degree, int n_q_points_1d = fe_degree + 1, typename Number = double>
 class MatrixFreeTest
 {
 public:
@@ -76,10 +73,9 @@ public:
              const VectorType &                           src,
              const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    FEEvaluation<dim, 0, 1, 1, Number>                     fe_eval0(data, 0, 0);
-    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval1(data, 1, 1);
-    FEEvaluation<dim, fe_degree + 1, fe_degree + 1, 1, Number> fe_eval2(
-      data, 2, 1);
+    FEEvaluation<dim, 0, 1, 1, Number>                         fe_eval0(data, 0, 0);
+    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number>     fe_eval1(data, 1, 1);
+    FEEvaluation<dim, fe_degree + 1, fe_degree + 1, 1, Number> fe_eval2(data, 2, 1);
     std::vector<double>         reference_values0(fe_eval0.n_q_points);
     std::vector<Tensor<1, dim>> reference_grads0(fe_eval0.n_q_points);
     std::vector<Tensor<2, dim>> reference_hess0(fe_eval0.n_q_points);
@@ -115,13 +111,10 @@ public:
 
             for (int q = 0; q < (int)fe_eval0.n_q_points; q++)
               {
-                errors[0] +=
-                  std::fabs(fe_eval0.get_value(q)[j] - reference_values0[q]);
+                errors[0] += std::fabs(fe_eval0.get_value(q)[j] - reference_values0[q]);
                 for (unsigned int d = 0; d < dim; ++d)
-                  errors[1] += std::fabs(fe_eval0.get_gradient(q)[d][j] -
-                                         reference_grads0[q][d]);
-                errors[2] += std::fabs(fe_eval0.get_laplacian(q)[j] -
-                                       trace(reference_hess0[q]));
+                  errors[1] += std::fabs(fe_eval0.get_gradient(q)[d][j] - reference_grads0[q][d]);
+                errors[2] += std::fabs(fe_eval0.get_laplacian(q)[j] - trace(reference_hess0[q]));
                 total[0] += std::fabs(reference_values0[q]);
                 for (unsigned int d = 0; d < dim; ++d)
                   total[1] += std::fabs(reference_grads0[q][d]);
@@ -136,13 +129,10 @@ public:
 
             for (int q = 0; q < (int)fe_eval1.n_q_points; q++)
               {
-                errors[3] +=
-                  std::fabs(fe_eval1.get_value(q)[j] - reference_values1[q]);
+                errors[3] += std::fabs(fe_eval1.get_value(q)[j] - reference_values1[q]);
                 for (unsigned int d = 0; d < dim; ++d)
-                  errors[4] += std::fabs(fe_eval1.get_gradient(q)[d][j] -
-                                         reference_grads1[q][d]);
-                errors[5] += std::fabs(fe_eval1.get_laplacian(q)[j] -
-                                       trace(reference_hess1[q]));
+                  errors[4] += std::fabs(fe_eval1.get_gradient(q)[d][j] - reference_grads1[q][d]);
+                errors[5] += std::fabs(fe_eval1.get_laplacian(q)[j] - trace(reference_hess1[q]));
                 total[3] += std::fabs(reference_values1[q]);
                 for (unsigned int d = 0; d < dim; ++d)
                   total[4] += std::fabs(reference_grads1[q][d]);
@@ -157,13 +147,10 @@ public:
 
             for (int q = 0; q < (int)fe_eval2.n_q_points; q++)
               {
-                errors[6] +=
-                  std::fabs(fe_eval2.get_value(q)[j] - reference_values2[q]);
+                errors[6] += std::fabs(fe_eval2.get_value(q)[j] - reference_values2[q]);
                 for (unsigned int d = 0; d < dim; ++d)
-                  errors[7] += std::fabs(fe_eval2.get_gradient(q)[d][j] -
-                                         reference_grads2[q][d]);
-                errors[8] += std::fabs(fe_eval2.get_laplacian(q)[j] -
-                                       trace(reference_hess2[q]));
+                  errors[7] += std::fabs(fe_eval2.get_gradient(q)[d][j] - reference_grads2[q][d]);
+                errors[8] += std::fabs(fe_eval2.get_laplacian(q)[j] - trace(reference_hess2[q]));
                 total[6] += std::fabs(reference_values2[q]);
                 for (unsigned int d = 0; d < dim; ++d)
                   total[7] += std::fabs(reference_grads2[q][d]);
@@ -183,10 +170,7 @@ public:
       }
     VectorType dst_dummy;
     data.cell_loop(
-      &MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::operator(),
-      this,
-      dst_dummy,
-      src);
+      &MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::operator(), this, dst_dummy, src);
 
     // avoid dividing by zero
     for (unsigned int i = 0; i < 9; ++i)
@@ -214,8 +198,7 @@ public:
             // need to check for division by 0, too.
             const double output2 =
               total[i * 3 + 2] == 0 ? 0. : errors[i * 3 + 2] / total[i * 3 + 2];
-            deallog << "Error function Laplacians FE " << i << ": " << output2
-                    << std::endl;
+            deallog << "Error function Laplacians FE " << i << ": " << output2 << std::endl;
           }
         else if (std::is_same<Number, float>::value == true)
           {
@@ -225,8 +208,7 @@ public:
                     << errors[i * 3 + 1] / total[i * 3 + 1] << std::endl;
             const double output2 =
               total[i * 3 + 2] == 0 ? 0. : errors[i * 3 + 2] / total[i * 3 + 2];
-            deallog << "Error function Laplacians FE " << i << ": " << output2
-                    << std::endl;
+            deallog << "Error function Laplacians FE " << i << ": " << output2 << std::endl;
           }
       }
   };
@@ -275,8 +257,8 @@ test()
   dof[1] = &dof1;
   dof[2] = &dof2;
 
-  deallog << "Testing " << fe0.get_name() << ", " << fe1.get_name() << ", and "
-          << fe1.get_name() << std::endl;
+  deallog << "Testing " << fe0.get_name() << ", " << fe1.get_name() << ", and " << fe1.get_name()
+          << std::endl;
   // std::cout << "Number of cells: " << tria.n_active_cells() << std::endl;
 
   std::vector<Vector<double>> src(dof.size());

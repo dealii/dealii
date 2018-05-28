@@ -83,10 +83,9 @@ check()
 
   for (unsigned int i = 0; i < size; ++i)
     {
-      const double mat_entry =
-        const_cast<const DiagonalMatrix<Vector<double>> &>(mat)(i, i);
-      mat(i, i) = in(i);
-      in(i)     = mat_entry;
+      const double mat_entry = const_cast<const DiagonalMatrix<Vector<double>> &>(mat)(i, i);
+      mat(i, i)              = in(i);
+      in(i)                  = mat_entry;
     }
   op.vmult(out, in);
   out -= exact;

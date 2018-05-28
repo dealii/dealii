@@ -48,8 +48,7 @@ print_dofs(const hp::DoFHandler<2>::active_cell_iterator &cell)
 {
   deallog << "DoFs on cell=" << cell << ": ";
 
-  std::vector<types::global_dof_index> dof_indices(
-    cell->get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices(cell->get_fe().dofs_per_cell);
   cell->get_dof_indices(dof_indices);
   for (unsigned int i = 0; i < dof_indices.size(); ++i)
     deallog << dof_indices[i] << ' ';
@@ -70,14 +69,10 @@ main()
   for (unsigned int i = 0; i < 2; ++i)
     {
       hp::FECollection<dim> fe_collection;
-      fe_collection.push_back(FESystem<dim>(
-        FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1, FE_Q<dim>(i + 1), 1));
-      fe_collection.push_back(FESystem<dim>(FE_RaviartThomasNodal<dim>(i),
-                                            1,
-                                            FE_DGQ<dim>(i),
-                                            1,
-                                            FE_Q<dim>(i + 2),
-                                            1));
+      fe_collection.push_back(
+        FESystem<dim>(FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1, FE_Q<dim>(i + 1), 1));
+      fe_collection.push_back(
+        FESystem<dim>(FE_RaviartThomasNodal<dim>(i), 1, FE_DGQ<dim>(i), 1, FE_Q<dim>(i + 2), 1));
 
       hp::DoFHandler<dim> dof_handler(triangulation);
 

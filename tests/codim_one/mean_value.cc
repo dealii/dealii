@@ -60,8 +60,7 @@ test()
   Vector<double>                      x(dof_handler.n_dofs());
   VectorTools::interpolate(dof_handler, cosine, x);
 
-  const double mean =
-    VectorTools::compute_mean_value(dof_handler, QGauss<dim>(2), x, 0);
+  const double mean = VectorTools::compute_mean_value(dof_handler, QGauss<dim>(2), x, 0);
   // we have a symmetric domain and a symmetric function. the result
   // should be close to zero
   AssertThrow(std::fabs(mean) < 1e-15, ExcInternalError());

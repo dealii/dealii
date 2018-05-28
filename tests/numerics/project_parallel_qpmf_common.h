@@ -59,9 +59,7 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const unsigned int n_components) :
-    Function<dim>(n_components),
-    q(q)
+  F(const unsigned int q, const unsigned int n_components) : Function<dim>(n_components), q(q)
   {}
 
   virtual double
@@ -113,8 +111,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
   deallog << "n_cells=" << triangulation.n_global_active_cells() << std::endl;
 
   std::vector<std::shared_ptr<DoFHandler<dim>>> dof_handlers(fes.size());
-  std::vector<IndexSet>         locally_relevant_dofs(fes.size());
-  std::vector<ConstraintMatrix> constraints(fes.size());
+  std::vector<IndexSet>                         locally_relevant_dofs(fes.size());
+  std::vector<ConstraintMatrix>                 constraints(fes.size());
 
   std::vector<const DoFHandler<dim> *>  dof_handlers_mf(fes.size());
   std::vector<const ConstraintMatrix *> constraints_mf(fes.size());
@@ -124,8 +122,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
       dof_handlers[i]->distribute_dofs(*fes[i]);
       deallog << "n_dofs=" << dof_handlers[i]->n_dofs() << std::endl;
 
-      DoFTools::extract_locally_relevant_dofs(*dof_handlers[i],
-                                              locally_relevant_dofs[i]);
+      DoFTools::extract_locally_relevant_dofs(*dof_handlers[i], locally_relevant_dofs[i]);
 
       constraints[i].reinit(locally_relevant_dofs[i]);
       DoFTools::make_hanging_node_constraints(*dof_handlers[i], constraints[i]);
@@ -140,13 +137,11 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
   Table<2, VectorizedArray<double>> qp_data;
 
   typename MatrixFree<dim, double>::AdditionalData additional_data;
-  additional_data.tasks_parallel_scheme =
-    MatrixFree<dim, double>::AdditionalData::partition_color;
+  additional_data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::partition_color;
   additional_data.mapping_update_flags =
     update_values | update_JxW_values | update_quadrature_points;
   std::shared_ptr<MatrixFree<dim, double>> data(new MatrixFree<dim, double>());
-  data->reinit(
-    dof_handlers_mf, constraints_mf, quadrature_formula_1d, additional_data);
+  data->reinit(dof_handlers_mf, constraints_mf, quadrature_formula_1d, additional_data);
 
   for (unsigned int q = 0; q <= p; ++q)
     {
@@ -155,10 +150,9 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
       // initialize a quadrature data
       {
-        FEEvaluation<dim, fe_degree, n_q_points_1d, 1, double> fe_eval(
-          *data, fe_index);
-        const unsigned int n_cells    = data->n_macro_cells();
-        const unsigned int n_q_points = fe_eval.n_q_points;
+        FEEvaluation<dim, fe_degree, n_q_points_1d, 1, double> fe_eval(*data, fe_index);
+        const unsigned int                                     n_cells    = data->n_macro_cells();
+        const unsigned int                                     n_q_points = fe_eval.n_q_points;
 
         qp_data.reinit(n_cells, n_q_points);
         for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -175,8 +169,9 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
         data,
         constraints[fe_index],
         n_q_points_1d,
-        [=](const unsigned int cell, const unsigned int q)
-          -> VectorizedArray<double> { return qp_data(cell, q); },
+        [=](const unsigned int cell, const unsigned int q) -> VectorizedArray<double> {
+          return qp_data(cell, q);
+        },
         field,
         fe_index);
 
@@ -190,16 +185,15 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
         QGauss<dim>   quadrature_formula_error(std::max(p, q) + 1);
         FEValues<dim> fe_values(*fes[fe_index],
                                 quadrature_formula_error,
-                                update_values | update_quadrature_points |
-                                  update_JxW_values);
+                                update_values | update_quadrature_points | update_JxW_values);
 
         const unsigned int  dofs_per_cell = fes[fe_index]->dofs_per_cell;
         const unsigned int  n_q_points    = quadrature_formula_error.size();
         std::vector<double> values(n_q_points);
 
-        typename DoFHandler<dim>::active_cell_iterator
-          cell = dof_handlers[fe_index]->begin_active(),
-          endc = dof_handlers[fe_index]->end();
+        typename DoFHandler<dim>::active_cell_iterator cell =
+                                                         dof_handlers[fe_index]->begin_active(),
+                                                       endc = dof_handlers[fe_index]->end();
         for (; cell != endc; ++cell)
           if (cell->is_locally_owned())
             {
@@ -208,9 +202,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 L2_norm +=
-                  Utilities::fixed_power<2>(
-                    values[q_point] -
-                    function.value(fe_values.quadrature_point(q_point))) *
+                  Utilities::fixed_power<2>(values[q_point] -
+                                            function.value(fe_values.quadrature_point(q_point))) *
                   fe_values.JxW(q_point);
             }
       }
@@ -223,8 +216,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
       if (q <= p)
         if (L2_norm > 1e-10 * field_l2_norm)
-          deallog << "Projection failed with relative error "
-                  << L2_norm / field_l2_norm << std::endl;
+          deallog << "Projection failed with relative error " << L2_norm / field_l2_norm
+                  << std::endl;
     }
 }
 

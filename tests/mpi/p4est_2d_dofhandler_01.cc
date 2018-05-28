@@ -57,15 +57,13 @@ test()
 
   if (myid == 0)
     {
-      deallog << "dofh.n_dofs() " << dofh.n_locally_owned_dofs_per_processor()
-              << std::endl;
-      deallog << "dofh.n_locally_owned_dofs() " << dofh.n_locally_owned_dofs()
-              << std::endl;
+      deallog << "dofh.n_dofs() " << dofh.n_locally_owned_dofs_per_processor() << std::endl;
+      deallog << "dofh.n_locally_owned_dofs() " << dofh.n_locally_owned_dofs() << std::endl;
     }
 
   typename DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active();
 
-  const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
+  const unsigned int                   dofs_per_cell = dofh.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
 

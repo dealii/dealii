@@ -34,8 +34,7 @@ public:
    * not be the same vector.
    */
   void
-  vmult(dealii::PETScWrappers::VectorBase &      dst,
-        const dealii::PETScWrappers::VectorBase &src) const;
+  vmult(dealii::PETScWrappers::VectorBase &dst, const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
    * Matrix-vector multiplication: let
@@ -125,10 +124,8 @@ PetscFDMatrix::vmult_add(dealii::PETScWrappers::VectorBase &      dst,
             }
           if (i > 0)
             {
-              dst(row - (nx - 1)) +=
-                -1. * src(row); // A.set(row-(nx-1), row, -1.);
-              dst(row) +=
-                -1. * src(row - (nx - 1)); // A.set(row, row-(nx-1), -1.);
+              dst(row - (nx - 1)) += -1. * src(row); // A.set(row-(nx-1), row, -1.);
+              dst(row) += -1. * src(row - (nx - 1)); // A.set(row, row-(nx-1), -1.);
             }
         }
     }

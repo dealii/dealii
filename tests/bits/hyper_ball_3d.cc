@@ -49,19 +49,16 @@ main()
   // some of them internal to the
   // ball
   unsigned int external_faces = 0;
-  for (Triangulation<3>::face_iterator face = tria.begin_face();
-       face != tria.end_face();
-       ++face)
+  for (Triangulation<3>::face_iterator face = tria.begin_face(); face != tria.end_face(); ++face)
     {
-      deallog << face << "   " << face->boundary_id() << "  "
-              << face->vertex_index(0) << " <" << face->vertex(0) << '>'
+      deallog << face << "   " << face->boundary_id() << "  " << face->vertex_index(0) << " <"
+              << face->vertex(0) << '>' << std::endl
+              << "           " << face->vertex_index(1) << "  <" << face->vertex(1) << '>'
               << std::endl
-              << "           " << face->vertex_index(1) << "  <"
-              << face->vertex(1) << '>' << std::endl
-              << "           " << face->vertex_index(2) << "  <"
-              << face->vertex(2) << '>' << std::endl
-              << "           " << face->vertex_index(3) << "  <"
-              << face->vertex(3) << '>' << std::endl;
+              << "           " << face->vertex_index(2) << "  <" << face->vertex(2) << '>'
+              << std::endl
+              << "           " << face->vertex_index(3) << "  <" << face->vertex(3) << '>'
+              << std::endl;
       if (face->at_boundary())
         ++external_faces;
     }

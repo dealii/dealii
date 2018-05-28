@@ -64,9 +64,8 @@ test(bool transpose = false)
   deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
 
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
 
@@ -88,8 +87,7 @@ test(bool transpose = false)
   // check that we've done it right
   for (SparseMatrix<double>::iterator p = B.begin(); p != B.end(); ++p)
     if (p->column() != p->row())
-      AssertThrow(B(p->row(), p->column()) != B(p->column(), p->row()),
-                  ExcInternalError());
+      AssertThrow(B(p->row(), p->column()) != B(p->column(), p->row()), ExcInternalError());
 
   // for a number of different solution
   // vectors, make up a matching rhs vector
@@ -112,10 +110,8 @@ test(bool transpose = false)
       SparseDirectUMFPACK().solve(B, x, transpose);
 
       x -= solution;
-      deallog << "relative norm distance = " << x.l2_norm() / solution.l2_norm()
-              << std::endl;
-      deallog << "absolute norms = " << x.l2_norm() << ' ' << solution.l2_norm()
-              << std::endl;
+      deallog << "relative norm distance = " << x.l2_norm() / solution.l2_norm() << std::endl;
+      deallog << "absolute norms = " << x.l2_norm() << ' ' << solution.l2_norm() << std::endl;
       Assert(x.l2_norm() / solution.l2_norm() < 1e-8, ExcInternalError());
     }
 }

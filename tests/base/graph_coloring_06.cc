@@ -37,11 +37,9 @@
 
 template <int dim>
 std::vector<types::global_dof_index>
-get_conflict_indices_cfem(
-  typename DoFHandler<dim>::active_cell_iterator const &it)
+get_conflict_indices_cfem(typename DoFHandler<dim>::active_cell_iterator const &it)
 {
-  std::vector<types::global_dof_index> local_dof_indices(
-    it->get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
 
   return local_dof_indices;
@@ -64,8 +62,7 @@ check()
   // Create an adapted mesh
   for (unsigned int l = 0; l < 11 - 2 * dim; ++l)
     {
-      typename DoFHandler<dim>::active_cell_iterator cell =
-        dof_handler.begin_active();
+      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
       for (; cell < dof_handler.end(); ++cell)
         if (cell->center().distance(Point<dim>()) < cell->diameter())
           cell->set_refine_flag();
@@ -73,17 +70,15 @@ check()
     }
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Total number of cells = " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Total number of cells = " << triangulation.n_active_cells() << std::endl;
 
   // Create the coloring
-  std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator>>
-    coloring = GraphColoring::make_graph_coloring(
+  std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator>> coloring =
+    GraphColoring::make_graph_coloring(
       dof_handler.begin_active(),
       dof_handler.end(),
       std::function<std::vector<types::global_dof_index>(
-        typename DoFHandler<dim>::active_cell_iterator const &)>(
-        &get_conflict_indices_cfem<dim>));
+        typename DoFHandler<dim>::active_cell_iterator const &)>(&get_conflict_indices_cfem<dim>));
 
   for (unsigned int color = 0; color < coloring.size(); ++color)
     deallog << coloring[color].size() << std::endl;

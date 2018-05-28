@@ -18,8 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-ConditionalOStream::ConditionalOStream(std::ostream &stream,
-                                       const bool    active) :
+ConditionalOStream::ConditionalOStream(std::ostream &stream, const bool active) :
   output_stream(stream),
   active_flag(active)
 {}

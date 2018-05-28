@@ -99,8 +99,7 @@ main()
   }
 
   {
-    deallog << "don't curve inner lines and don't output extra boundary lines"
-            << std::endl;
+    deallog << "don't curve inner lines and don't output extra boundary lines" << std::endl;
     GridOutFlags::Gnuplot flags;
     flags.n_extra_curved_line_points      = 1;
     flags.curved_inner_cells              = false;
@@ -112,8 +111,7 @@ main()
 
   {
     GridOutFlags::Gnuplot flags;
-    deallog << "don't curve inner lines but output extra boundary lines"
-            << std::endl;
+    deallog << "don't curve inner lines but output extra boundary lines" << std::endl;
     flags.n_extra_curved_line_points      = 1;
     flags.curved_inner_cells              = false;
     flags.write_additional_boundary_lines = true;

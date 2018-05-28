@@ -73,15 +73,11 @@ test()
 
   Vector<double> error(tria.n_active_cells());
   QGauss<dim>    quad(2);
-  VectorTools::integrate_difference(
-    dh, v1, ff, error, quad, VectorTools::H1_norm);
-  deallog << "H1 Interpolation error: " << abs_zero(error.l2_norm())
-          << std::endl;
+  VectorTools::integrate_difference(dh, v1, ff, error, quad, VectorTools::H1_norm);
+  deallog << "H1 Interpolation error: " << abs_zero(error.l2_norm()) << std::endl;
   error = 0;
-  VectorTools::integrate_difference(
-    dh, v1, fef, error, quad, VectorTools::H1_norm);
-  deallog << "H1 Interpolation error with fef: " << abs_zero(error.l2_norm())
-          << std::endl;
+  VectorTools::integrate_difference(dh, v1, fef, error, quad, VectorTools::H1_norm);
+  deallog << "H1 Interpolation error with fef: " << abs_zero(error.l2_norm()) << std::endl;
 }
 
 int

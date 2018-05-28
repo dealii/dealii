@@ -26,8 +26,7 @@ template <typename U, typename V>
 void
 compare(const U &u, const V &v)
 {
-  AssertThrow(static_cast<double>(u) == static_cast<double>(v),
-              ExcInternalError());
+  AssertThrow(static_cast<double>(u) == static_cast<double>(v), ExcInternalError());
 }
 
 

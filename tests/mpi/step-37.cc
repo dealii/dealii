@@ -98,12 +98,10 @@ namespace Step37
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
 
-    FE_Q<dim>       fe_euler;
-    FESystem<dim>   fe_system;
-    DoFHandler<dim> dof_euler;
-    std::shared_ptr<
-      MappingFEField<dim, dim, LinearAlgebra::distributed::Vector<double>>>
-                                               mapping;
+    FE_Q<dim>                                                                             fe_euler;
+    FESystem<dim>                                                                         fe_system;
+    DoFHandler<dim>                                                                       dof_euler;
+    std::shared_ptr<MappingFEField<dim, dim, LinearAlgebra::distributed::Vector<double>>> mapping;
     ConstraintMatrix                           constraints_euler;
     LinearAlgebra::distributed::Vector<double> euler_positions;
 
@@ -111,22 +109,20 @@ namespace Step37
 
     ConstraintMatrix constraints;
     ConstraintMatrix non_homogeneous_constraints;
-    typedef MatrixFreeOperators::LaplaceOperator<
-      dim,
-      degree_finite_element,
-      degree_finite_element + 1,
-      1,
-      LinearAlgebra::distributed::Vector<double>>
+    typedef MatrixFreeOperators::LaplaceOperator<dim,
+                                                 degree_finite_element,
+                                                 degree_finite_element + 1,
+                                                 1,
+                                                 LinearAlgebra::distributed::Vector<double>>
                      SystemMatrixType;
     SystemMatrixType system_matrix;
 
     MGConstrainedDoFs mg_constrained_dofs;
-    typedef MatrixFreeOperators::LaplaceOperator<
-      dim,
-      degree_finite_element,
-      degree_finite_element + 1,
-      1,
-      LinearAlgebra::distributed::Vector<float>>
+    typedef MatrixFreeOperators::LaplaceOperator<dim,
+                                                 degree_finite_element,
+                                                 degree_finite_element + 1,
+                                                 1,
+                                                 LinearAlgebra::distributed::Vector<float>>
                                    LevelMatrixType;
     MGLevelObject<LevelMatrixType> mg_matrices;
 
@@ -141,10 +137,9 @@ namespace Step37
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem() :
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+    triangulation(MPI_COMM_WORLD,
+                  Triangulation<dim>::limit_level_difference_at_vertices,
+                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
 #else
     triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
 #endif
@@ -180,8 +175,7 @@ namespace Step37
     dof_euler.distribute_dofs(fe_system);
     {
       IndexSet locally_relevant_euler;
-      DoFTools::extract_locally_relevant_dofs(dof_euler,
-                                              locally_relevant_euler);
+      DoFTools::extract_locally_relevant_dofs(dof_euler, locally_relevant_euler);
       euler_positions.reinit(
         dof_euler.locally_owned_dofs(), locally_relevant_euler, MPI_COMM_WORLD);
     }
@@ -200,12 +194,11 @@ namespace Step37
 
     euler_positions.update_ghost_values();
 
-    mapping = std::make_shared<
-      MappingFEField<dim, dim, LinearAlgebra::distributed::Vector<double>>>(
-      dof_euler, euler_positions);
+    mapping =
+      std::make_shared<MappingFEField<dim, dim, LinearAlgebra::distributed::Vector<double>>>(
+        dof_euler, euler_positions);
 
-    pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+    pcout << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
@@ -218,17 +211,12 @@ namespace Step37
 
     {
       typename MatrixFree<dim, double>::AdditionalData additional_data;
-      additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
+      additional_data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
       additional_data.mapping_update_flags =
         (update_gradients | update_JxW_values | update_quadrature_points);
-      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
-        new MatrixFree<dim, double>());
-      system_mf_storage->reinit(*mapping.get(),
-                                dof_handler,
-                                constraints,
-                                QGauss<1>(fe.degree + 1),
-                                additional_data);
+      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(new MatrixFree<dim, double>());
+      system_mf_storage->reinit(
+        *mapping.get(), dof_handler, constraints, QGauss<1>(fe.degree + 1), additional_data);
       system_matrix.initialize(system_mf_storage);
     }
 
@@ -243,35 +231,27 @@ namespace Step37
     std::set<types::boundary_id> dirichlet_boundary;
     dirichlet_boundary.insert(0);
     mg_constrained_dofs.initialize(dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, dirichlet_boundary);
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
         IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler, level, relevant_dofs);
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level, relevant_dofs);
         ConstraintMatrix level_constraints;
         level_constraints.reinit(relevant_dofs);
-        level_constraints.add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
+        level_constraints.add_lines(mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();
 
         typename MatrixFree<dim, float>::AdditionalData additional_data;
-        additional_data.tasks_parallel_scheme =
-          MatrixFree<dim, float>::AdditionalData::none;
+        additional_data.tasks_parallel_scheme = MatrixFree<dim, float>::AdditionalData::none;
         additional_data.mapping_update_flags =
           (update_gradients | update_JxW_values | update_quadrature_points);
         additional_data.level_mg_handler = level;
-        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
-          new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(dof_handler,
-                                    level_constraints,
-                                    QGauss<1>(fe.degree + 1),
-                                    additional_data);
+        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(new MatrixFree<dim, float>());
+        mg_mf_storage_level->reinit(
+          dof_handler, level_constraints, QGauss<1>(fe.degree + 1), additional_data);
 
-        mg_matrices[level].initialize(
-          mg_mf_storage_level, mg_constrained_dofs, level);
+        mg_matrices[level].initialize(mg_mf_storage_level, mg_constrained_dofs, level);
         mg_matrices[level].compute_diagonal();
       }
   }
@@ -316,22 +296,18 @@ namespace Step37
       ConstraintMatrix hanging_nodes_laplace_constraints;
       hanging_nodes_laplace_constraints.reinit(locally_relevant_dofs);
       non_homogeneous_constraints.reinit(locally_relevant_dofs);
-      DoFTools::make_hanging_node_constraints(
-        dof_handler, hanging_nodes_laplace_constraints);
+      DoFTools::make_hanging_node_constraints(dof_handler, hanging_nodes_laplace_constraints);
 
       std::set<types::boundary_id>    dirichlet_boundary_ids;
       typename FunctionMap<dim>::type dirichlet_boundary_functions;
       PotentialBCFunction<dim>        bc_func(240, Point<dim>());
       dirichlet_boundary_ids.insert(0);
       dirichlet_boundary_functions[0] = &bc_func;
-      VectorTools::interpolate_boundary_values(*mapping.get(),
-                                               dof_handler,
-                                               dirichlet_boundary_functions,
-                                               non_homogeneous_constraints);
+      VectorTools::interpolate_boundary_values(
+        *mapping.get(), dof_handler, dirichlet_boundary_functions, non_homogeneous_constraints);
       // make sure hanging nodes override Dirichlet
-      non_homogeneous_constraints.merge(
-        hanging_nodes_laplace_constraints,
-        ConstraintMatrix::MergeConflictBehavior::right_object_wins);
+      non_homogeneous_constraints.merge(hanging_nodes_laplace_constraints,
+                                        ConstraintMatrix::MergeConflictBehavior::right_object_wins);
       non_homogeneous_constraints.close();
     }
 
@@ -339,11 +315,8 @@ namespace Step37
     non_homogeneous_constraints.distribute(solution);
     system_rhs = 0;
     solution.update_ghost_values();
-    FEEvaluation<dim, degree_finite_element> phi(
-      *system_matrix.get_matrix_free());
-    for (unsigned int cell = 0;
-         cell < system_matrix.get_matrix_free()->n_macro_cells();
-         ++cell)
+    FEEvaluation<dim, degree_finite_element> phi(*system_matrix.get_matrix_free());
+    for (unsigned int cell = 0; cell < system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
       {
         phi.reinit(cell);
         phi.read_dof_values_plain(solution);
@@ -369,16 +342,12 @@ namespace Step37
     MGTransferMatrixFree<dim, float> mg_transfer(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
 
-    typedef PreconditionChebyshev<LevelMatrixType,
-                                  LinearAlgebra::distributed::Vector<float>>
-      SmootherType;
-    mg::SmootherRelaxation<SmootherType,
-                           LinearAlgebra::distributed::Vector<float>>
-                                                         mg_smoother;
-    MGLevelObject<typename SmootherType::AdditionalData> smoother_data;
+    typedef PreconditionChebyshev<LevelMatrixType, LinearAlgebra::distributed::Vector<float>>
+                                                                                    SmootherType;
+    mg::SmootherRelaxation<SmootherType, LinearAlgebra::distributed::Vector<float>> mg_smoother;
+    MGLevelObject<typename SmootherType::AdditionalData>                            smoother_data;
     smoother_data.resize(0, triangulation.n_global_levels() - 1);
-    for (unsigned int level = 0; level < triangulation.n_global_levels();
-         ++level)
+    for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       {
         if (level > 0)
           {
@@ -388,39 +357,31 @@ namespace Step37
           }
         else
           {
-            smoother_data[0].smoothing_range = 1e-3;
-            smoother_data[0].degree          = numbers::invalid_unsigned_int;
+            smoother_data[0].smoothing_range     = 1e-3;
+            smoother_data[0].degree              = numbers::invalid_unsigned_int;
             smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
           }
         mg_matrices[level].compute_diagonal();
-        smoother_data[level].preconditioner =
-          mg_matrices[level].get_matrix_diagonal_inverse();
+        smoother_data[level].preconditioner = mg_matrices[level].get_matrix_diagonal_inverse();
       }
     mg_smoother.initialize(mg_matrices, smoother_data);
 
-    MGCoarseGridApplySmoother<LinearAlgebra::distributed::Vector<float>>
-      mg_coarse;
+    MGCoarseGridApplySmoother<LinearAlgebra::distributed::Vector<float>> mg_coarse;
     mg_coarse.initialize(mg_smoother);
 
-    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_matrix(
-      mg_matrices);
+    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_matrix(mg_matrices);
 
-    MGLevelObject<MatrixFreeOperators::MGInterfaceOperator<LevelMatrixType>>
-      mg_interface_matrices;
+    MGLevelObject<MatrixFreeOperators::MGInterfaceOperator<LevelMatrixType>> mg_interface_matrices;
     mg_interface_matrices.resize(0, triangulation.n_global_levels() - 1);
-    for (unsigned int level = 0; level < triangulation.n_global_levels();
-         ++level)
+    for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       mg_interface_matrices[level].initialize(mg_matrices[level]);
-    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_interface(
-      mg_interface_matrices);
+    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_interface(mg_interface_matrices);
 
     Multigrid<LinearAlgebra::distributed::Vector<float>> mg(
       mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface, mg_interface);
 
-    PreconditionMG<dim,
-                   LinearAlgebra::distributed::Vector<float>,
-                   MGTransferMatrixFree<dim, float>>
+    PreconditionMG<dim, LinearAlgebra::distributed::Vector<float>, MGTransferMatrixFree<dim, float>>
       preconditioner(dof_handler, mg, mg_transfer);
 
 
@@ -432,11 +393,9 @@ namespace Step37
 
     non_homogeneous_constraints.distribute(solution);
 
-    const double linfty =
-      Utilities::MPI::max(solution.linfty_norm(), MPI_COMM_WORLD);
+    const double linfty = Utilities::MPI::max(solution.linfty_norm(), MPI_COMM_WORLD);
 
-    pcout << "Solved in " << solver_control.last_step() << " iterations"
-          << std::endl
+    pcout << "Solved in " << solver_control.last_step() << " iterations" << std::endl
           << "Linfty=" << linfty << std::endl;
   }
 
@@ -456,23 +415,18 @@ namespace Step37
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + std::to_string(cycle) + "." +
-      std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) +
-      ".vtu");
+    std::ofstream output("solution-" + std::to_string(cycle) + "." +
+                         std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)) + ".vtu");
     data_out.write_vtu(output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
-          filenames.emplace_back("solution-" + std::to_string(cycle) + "." +
-                                 std::to_string(i) + ".vtu");
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+          filenames.emplace_back("solution-" + std::to_string(cycle) + "." + std::to_string(i) +
+                                 ".vtu");
 
-        std::string master_name =
-          "solution-" + Utilities::to_string(cycle) + ".pvtu";
+        std::string   master_name = "solution-" + Utilities::to_string(cycle) + ".pvtu";
         std::ofstream master_output(master_name.c_str());
         data_out.write_pvtu_record(master_output, filenames);
       }
@@ -480,18 +434,15 @@ namespace Step37
     if (dim == 2 && Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1)
       {
         std::map<types::global_dof_index, Point<dim>> support_points;
-        MappingQ<dim> mapping(degree_finite_element);
-        DoFTools::map_dofs_to_support_points(
-          mapping, dof_handler, support_points);
+        MappingQ<dim>                                 mapping(degree_finite_element);
+        DoFTools::map_dofs_to_support_points(mapping, dof_handler, support_points);
 
-        const std::string base_filename =
-          "grid" + dealii::Utilities::int_to_string(dim) + "_" +
-          dealii::Utilities::int_to_string(cycle);
+        const std::string base_filename = "grid" + dealii::Utilities::int_to_string(dim) + "_" +
+                                          dealii::Utilities::int_to_string(cycle);
         const std::string filename = base_filename + ".gp";
         std::ofstream     f(filename.c_str());
 
-        f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
-          << std::endl
+        f << "set terminal png size 400,410 enhanced font \"Helvetica,8\"" << std::endl
           << "set output \"" << base_filename << ".png\"" << std::endl
           << "set size square" << std::endl
           << "set view equal xy" << std::endl
@@ -576,25 +527,21 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

@@ -70,8 +70,7 @@ check()
           deallog << mass_matrix.el(i, i) << std::endl;
           for (unsigned int j = 0; j < dh.n_dofs(); ++j)
             if (i != j)
-              Assert(std::fabs(mass_matrix.el(i, j) / mass_matrix.el(i, i)) <
-                       1e-14,
+              Assert(std::fabs(mass_matrix.el(i, j) / mass_matrix.el(i, i)) < 1e-14,
                      ExcInternalError());
         }
     }

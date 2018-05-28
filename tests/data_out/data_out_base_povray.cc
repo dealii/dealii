@@ -87,8 +87,7 @@ check_all(std::ostream &log)
 #if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
-      out << "==============================\n"
-          << name << "\n==============================\n";
+      out << "==============================\n" << name << "\n==============================\n";
 #endif
       check_cont<dim>(4, 4, flags, out);
     }
@@ -100,8 +99,7 @@ check_all(std::ostream &log)
 #if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
-      out << "==============================\n"
-          << name << "\n==============================\n";
+      out << "==============================\n" << name << "\n==============================\n";
 #endif
       check_cont<dim>(4, 4, flags, out);
     }
@@ -113,8 +111,7 @@ check_all(std::ostream &log)
 #if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
-      out << "==============================\n"
-          << name << "\n==============================\n";
+      out << "==============================\n" << name << "\n==============================\n";
 #endif
       check_cont<dim>(4, 4, flags, out);
     }
@@ -126,8 +123,7 @@ check_all(std::ostream &log)
 #if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
-      out << "==============================\n"
-          << name << "\n==============================\n";
+      out << "==============================\n" << name << "\n==============================\n";
 #endif
       check_cont<dim>(4, 3, flags, out);
     }

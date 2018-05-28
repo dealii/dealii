@@ -90,11 +90,9 @@ check()
     std::vector<types::global_dof_index> new_indices;
     if (mgdof.n_locally_owned_dofs() > 0)
       {
-        const types::global_dof_index first =
-          mgdof.locally_owned_dofs().nth_index_in_set(0);
-        const types::global_dof_index last =
-          first + mgdof.n_locally_owned_dofs();
-        const unsigned int stride = (last - first) / fe.dofs_per_cell;
+        const types::global_dof_index first  = mgdof.locally_owned_dofs().nth_index_in_set(0);
+        const types::global_dof_index last   = first + mgdof.n_locally_owned_dofs();
+        const unsigned int            stride = (last - first) / fe.dofs_per_cell;
         for (unsigned int j = 0; j < stride; ++j)
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
             new_indices.push_back(first + j + i * stride);
@@ -108,11 +106,9 @@ check()
       std::vector<types::global_dof_index> new_indices;
       if (mgdof.locally_owned_mg_dofs(l).n_elements() > 0)
         {
-          const types::global_dof_index first =
-            mgdof.locally_owned_mg_dofs(l).nth_index_in_set(0);
-          const types::global_dof_index last =
-            first + mgdof.locally_owned_mg_dofs(l).n_elements();
-          const unsigned int stride = (last - first) / fe.dofs_per_cell;
+          const types::global_dof_index first = mgdof.locally_owned_mg_dofs(l).nth_index_in_set(0);
+          const types::global_dof_index last  = first + mgdof.locally_owned_mg_dofs(l).n_elements();
+          const unsigned int            stride = (last - first) / fe.dofs_per_cell;
           for (unsigned int j = 0; j < stride; ++j)
             for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
               new_indices.push_back(first + j + i * stride);

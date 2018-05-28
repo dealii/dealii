@@ -53,10 +53,7 @@ check(DataOutBase::EpsFlags flags, std::ostream &out)
 
 template <int dim>
 void
-check_cont(unsigned int          ncells,
-           unsigned int          nsub,
-           DataOutBase::EpsFlags flags,
-           std::ostream &        out)
+check_cont(unsigned int ncells, unsigned int nsub, DataOutBase::EpsFlags flags, std::ostream &out)
 {
   std::vector<DataOutBase::Patch<dim, dim>> patches;
 
@@ -87,8 +84,7 @@ check_all(std::ostream &log)
 #if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
-      out << "==============================\n"
-          << name << "\n==============================\n";
+      out << "==============================\n" << name << "\n==============================\n";
 #endif
       check_cont<dim>(4, 4, flags, out);
     }
@@ -102,8 +98,7 @@ check_all(std::ostream &log)
 #if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
-      out << "==============================\n"
-          << name << "\n==============================\n";
+      out << "==============================\n" << name << "\n==============================\n";
 #endif
       check<dim, spacedim>(flags, out);
     }

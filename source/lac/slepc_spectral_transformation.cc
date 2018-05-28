@@ -61,12 +61,11 @@ namespace SLEPcWrappers
 
   /* ------------------- TransformationShift --------------------- */
 
-  TransformationShift::AdditionalData::AdditionalData(
-    const double shift_parameter) :
+  TransformationShift::AdditionalData::AdditionalData(const double shift_parameter) :
     shift_parameter(shift_parameter)
   {}
 
-  TransformationShift::TransformationShift(const MPI_Comm &mpi_communicator,
+  TransformationShift::TransformationShift(const MPI_Comm &      mpi_communicator,
                                            const AdditionalData &data) :
     TransformationBase(mpi_communicator),
     additional_data(data)
@@ -80,14 +79,12 @@ namespace SLEPcWrappers
 
   /* ---------------- TransformationShiftInvert ------------------ */
 
-  TransformationShiftInvert::AdditionalData::AdditionalData(
-    const double shift_parameter) :
+  TransformationShiftInvert::AdditionalData::AdditionalData(const double shift_parameter) :
     shift_parameter(shift_parameter)
   {}
 
-  TransformationShiftInvert::TransformationShiftInvert(
-    const MPI_Comm &      mpi_communicator,
-    const AdditionalData &data) :
+  TransformationShiftInvert::TransformationShiftInvert(const MPI_Comm &      mpi_communicator,
+                                                       const AdditionalData &data) :
     TransformationBase(mpi_communicator),
     additional_data(data)
   {
@@ -100,14 +97,12 @@ namespace SLEPcWrappers
 
   /* --------------- TransformationSpectrumFolding ----------------- */
 
-  TransformationSpectrumFolding::AdditionalData::AdditionalData(
-    const double shift_parameter) :
+  TransformationSpectrumFolding::AdditionalData::AdditionalData(const double shift_parameter) :
     shift_parameter(shift_parameter)
   {}
 
-  TransformationSpectrumFolding::TransformationSpectrumFolding(
-    const MPI_Comm &      mpi_communicator,
-    const AdditionalData &data) :
+  TransformationSpectrumFolding::TransformationSpectrumFolding(const MPI_Comm &mpi_communicator,
+                                                               const AdditionalData &data) :
     TransformationBase(mpi_communicator),
     additional_data(data)
   {
@@ -121,22 +116,20 @@ namespace SLEPcWrappers
     // PETSc/SLEPc version must be < 3.5.0.
     (void)st;
     Assert((false),
-           ExcMessage(
-             "Folding transformation has been removed in SLEPc 3.5.0 and newer."
-             "You cannot use this transformation anymore."));
+           ExcMessage("Folding transformation has been removed in SLEPc 3.5.0 and newer."
+                      "You cannot use this transformation anymore."));
 #  endif
   }
 
   /* ------------------- TransformationCayley --------------------- */
 
-  TransformationCayley::AdditionalData::AdditionalData(
-    const double shift_parameter,
-    const double antishift_parameter) :
+  TransformationCayley::AdditionalData::AdditionalData(const double shift_parameter,
+                                                       const double antishift_parameter) :
     shift_parameter(shift_parameter),
     antishift_parameter(antishift_parameter)
   {}
 
-  TransformationCayley::TransformationCayley(const MPI_Comm &mpi_communicator,
+  TransformationCayley::TransformationCayley(const MPI_Comm &      mpi_communicator,
                                              const AdditionalData &data) :
     TransformationBase(mpi_communicator),
     additional_data(data)

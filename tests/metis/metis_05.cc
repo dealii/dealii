@@ -45,16 +45,14 @@ void
 test(const bool with_weighting, const bool write_to_vtk = false)
 {
   deallog << "Dimension = " << dim << std::endl;
-  deallog << "With weighting = " << std::boolalpha << with_weighting
-          << std::endl;
+  deallog << "With weighting = " << std::boolalpha << with_weighting << std::endl;
 
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(4 - dim);
   for (unsigned int i = 0; i < 11 - 2 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-        triangulation.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
       for (unsigned int index = 0; cell != triangulation.end(); ++cell, ++index)
         if (index % (3 * dim) == 0)
           cell->set_refine_flag();
@@ -65,12 +63,10 @@ test(const bool with_weighting, const bool write_to_vtk = false)
   std::vector<unsigned int> cell_weighting;
   if (with_weighting)
     {
-      cell_weighting =
-        std::vector<unsigned int>(triangulation.n_active_cells(), 1u);
+      cell_weighting = std::vector<unsigned int>(triangulation.n_active_cells(), 1u);
 
       const Point<dim>                                  origin;
-      typename Triangulation<dim>::active_cell_iterator cell =
-        triangulation.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
       for (unsigned int index = 0; cell != triangulation.end(); ++cell, ++index)
         {
           if (origin.distance(cell->center()) < 0.5)
@@ -91,8 +87,7 @@ test(const bool with_weighting, const bool write_to_vtk = false)
   Vector<double> partitions(triangulation.n_active_cells());
   Vector<double> weights(triangulation.n_active_cells());
   {
-    typename Triangulation<dim>::active_cell_iterator cell =
-      triangulation.begin_active();
+    typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
     for (unsigned int index = 0; cell != triangulation.end(); ++cell, ++index)
       {
         partitions(index) = cell->subdomain_id();
@@ -111,8 +106,7 @@ test(const bool with_weighting, const bool write_to_vtk = false)
   if (write_to_vtk)
     {
       std::stringstream filename;
-      filename << "grid_" << dim << "d.with_weighting_" << with_weighting
-               << ".vtk";
+      filename << "grid_" << dim << "d.with_weighting_" << with_weighting << ".vtk";
       std::ofstream outfile(filename.str().c_str());
       data_out.write_vtk(outfile);
     }
@@ -141,13 +135,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -155,12 +147,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

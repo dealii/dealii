@@ -92,8 +92,7 @@ check()
   // Create a system element composed
   // of one RT1 and one DGQ1
   hp::FECollection<dim> element;
-  element.push_back(
-    FESystem<dim>(FE_RaviartThomasNodal<dim>(1), 1, FE_DGQ<dim>(1), 1));
+  element.push_back(FESystem<dim>(FE_RaviartThomasNodal<dim>(1), 1, FE_DGQ<dim>(1), 1));
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
@@ -109,21 +108,15 @@ check()
 
   SparsityPattern sparsity(dof.n_boundary_dofs(function_map),
                            dof.max_couplings_between_boundary_dofs());
-  DoFTools::make_boundary_sparsity_pattern(
-    dof, function_map, dof_to_boundary_mapping, sparsity);
+  DoFTools::make_boundary_sparsity_pattern(dof, function_map, dof_to_boundary_mapping, sparsity);
   sparsity.compress();
 
   SparseMatrix<double> matrix;
   matrix.reinit(sparsity);
 
   Vector<double> rhs(dof.n_boundary_dofs(function_map));
-  MatrixTools::create_boundary_mass_matrix(dof,
-                                           face_quadrature,
-                                           matrix,
-                                           function_map,
-                                           rhs,
-                                           dof_to_boundary_mapping,
-                                           &coefficient);
+  MatrixTools::create_boundary_mass_matrix(
+    dof, face_quadrature, matrix, function_map, rhs, dof_to_boundary_mapping, &coefficient);
 
   // Multiply matrix by 100 to
   // make test more sensitive

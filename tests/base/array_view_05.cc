@@ -26,9 +26,8 @@ test()
 {
   Table<2, int> v(8, 10);
 
-  ArrayView<int> a =
-    make_array_view(v, 4, 7, 3); // writable view to part of a row
-  a[2] = 42;
+  ArrayView<int> a = make_array_view(v, 4, 7, 3); // writable view to part of a row
+  a[2]             = 42;
 
   Assert(a[2] == 42, ExcInternalError());
   Assert(v[4][9] == 42, ExcInternalError());
@@ -38,8 +37,7 @@ test()
 
 
   // also check a different way of creating a readable view
-  ArrayView<const int> a3 =
-    make_array_view(const_cast<const Table<2, int> &>(v), 4, 7, 3);
+  ArrayView<const int> a3 = make_array_view(const_cast<const Table<2, int> &>(v), 4, 7, 3);
   Assert(a3[2] == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;

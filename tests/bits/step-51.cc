@@ -71,26 +71,23 @@ namespace Step51
 
 
   template <>
-  const Point<1>
-    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] = {
-      Point<1>(-1.0 / 3.0),
-      Point<1>(0.0),
-      Point<1>(+1.0 / 3.0)};
+  const Point<1> SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers] = {
+    Point<1>(-1.0 / 3.0),
+    Point<1>(0.0),
+    Point<1>(+1.0 / 3.0)};
 
 
   template <>
-  const Point<2>
-    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] = {
-      Point<2>(-0.5, +0.5),
-      Point<2>(-0.5, -0.5),
-      Point<2>(+0.5, -0.5)};
+  const Point<2> SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers] = {
+    Point<2>(-0.5, +0.5),
+    Point<2>(-0.5, -0.5),
+    Point<2>(+0.5, -0.5)};
 
   template <>
-  const Point<3>
-    SolutionBase<3>::source_centers[SolutionBase<3>::n_source_centers] = {
-      Point<3>(-0.5, +0.5, 0.25),
-      Point<3>(-0.6, -0.5, -0.125),
-      Point<3>(+0.5, -0.5, 0.5)};
+  const Point<3> SolutionBase<3>::source_centers[SolutionBase<3>::n_source_centers] = {
+    Point<3>(-0.5, +0.5, 0.25),
+    Point<3>(-0.6, -0.5, -0.125),
+    Point<3>(+0.5, -0.5, 0.5)};
 
   template <int dim>
   const double SolutionBase<dim>::width = 1. / 5.;
@@ -120,12 +117,10 @@ namespace Step51
     for (unsigned int i = 0; i < this->n_source_centers; ++i)
       {
         const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
-        return_value +=
-          std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
+        return_value += std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
       }
 
-    return return_value / Utilities::fixed_power<dim>(
-                            std::sqrt(2. * numbers::PI) * this->width);
+    return return_value / Utilities::fixed_power<dim>(std::sqrt(2. * numbers::PI) * this->width);
   }
 
 
@@ -142,12 +137,10 @@ namespace Step51
 
         return_value +=
           (-2 / (this->width * this->width) *
-           std::exp(-x_minus_xi.norm_square() / (this->width * this->width)) *
-           x_minus_xi);
+           std::exp(-x_minus_xi.norm_square() / (this->width * this->width)) * x_minus_xi);
       }
 
-    return return_value / Utilities::fixed_power<dim>(
-                            std::sqrt(2 * numbers::PI) * this->width);
+    return return_value / Utilities::fixed_power<dim>(std::sqrt(2 * numbers::PI) * this->width);
   }
 
 
@@ -165,8 +158,7 @@ namespace Step51
 
   template <int dim>
   void
-  SolutionAndGradient<dim>::vector_value(const Point<dim> &p,
-                                         Vector<double> &  v) const
+  SolutionAndGradient<dim>::vector_value(const Point<dim> &p, Vector<double> &v) const
   {
     AssertDimension(v.size(), dim + 1);
     Solution<dim>  solution;
@@ -243,15 +235,13 @@ namespace Step51
       {
         const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
 
-        return_value +=
-          ((2 * dim - 2 * convection * x_minus_xi -
-            4 * x_minus_xi.norm_square() / (this->width * this->width)) /
-           (this->width * this->width) *
-           std::exp(-x_minus_xi.norm_square() / (this->width * this->width)));
+        return_value += ((2 * dim - 2 * convection * x_minus_xi -
+                          4 * x_minus_xi.norm_square() / (this->width * this->width)) /
+                         (this->width * this->width) *
+                         std::exp(-x_minus_xi.norm_square() / (this->width * this->width)));
       }
 
-    return return_value / Utilities::fixed_power<dim>(
-                            std::sqrt(2 * numbers::PI) * this->width);
+    return return_value / Utilities::fixed_power<dim>(std::sqrt(2 * numbers::PI) * this->width);
   }
 
 
@@ -283,19 +273,17 @@ namespace Step51
     struct PostProcessScratchData;
 
     void
-    assemble_system_one_cell(
-      const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData &                                         scratch,
-      PerTaskData &                                         task_data);
+    assemble_system_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                             ScratchData &                                         scratch,
+                             PerTaskData &                                         task_data);
 
     void
     copy_local_to_global(const PerTaskData &data);
 
     void
-    postprocess_one_cell(
-      const typename DoFHandler<dim>::active_cell_iterator &cell,
-      PostProcessScratchData &                              scratch,
-      unsigned int &                                        empty_data);
+    postprocess_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                         PostProcessScratchData &                              scratch,
+                         unsigned int &                                        empty_data);
 
 
     Triangulation<dim> triangulation;
@@ -353,10 +341,8 @@ namespace Step51
     typename FunctionMap<dim>::type boundary_functions;
     Solution<dim>                   solution_function;
     boundary_functions[0] = &solution_function;
-    VectorTools::project_boundary_values(dof_handler,
-                                         boundary_functions,
-                                         QGauss<dim - 1>(fe.degree + 1),
-                                         constraints);
+    VectorTools::project_boundary_values(
+      dof_handler, boundary_functions, QGauss<dim - 1>(fe.degree + 1), constraints);
     constraints.close();
 
     {
@@ -441,8 +427,7 @@ namespace Step51
       fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell),
       fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         for (unsigned int i = 0; i < fe_local.dofs_per_cell; ++i)
           {
             if (fe_local.has_support_on_face(i, face))
@@ -451,8 +436,7 @@ namespace Step51
               }
           }
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
           {
             if (fe.has_support_on_face(i, face))
@@ -542,13 +526,13 @@ namespace Step51
     const QGauss<dim>     quadrature_formula(fe.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
-    const UpdateFlags local_flags(update_values | update_gradients |
-                                  update_JxW_values | update_quadrature_points);
+    const UpdateFlags local_flags(update_values | update_gradients | update_JxW_values |
+                                  update_quadrature_points);
 
     const UpdateFlags local_face_flags(update_values);
 
-    const UpdateFlags flags(update_values | update_normal_vectors |
-                            update_quadrature_points | update_JxW_values);
+    const UpdateFlags flags(update_values | update_normal_vectors | update_quadrature_points |
+                            update_JxW_values);
 
     PerTaskData task_data(fe.dofs_per_cell, trace_reconstruct);
     ScratchData scratch(fe,
@@ -572,21 +556,17 @@ namespace Step51
 
   template <int dim>
   void
-  HDG<dim>::assemble_system_one_cell(
-    const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData &                                         scratch,
-    PerTaskData &                                         task_data)
+  HDG<dim>::assemble_system_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                     ScratchData &                                         scratch,
+                                     PerTaskData &task_data)
   {
     typename DoFHandler<dim>::active_cell_iterator loc_cell(
       &triangulation, cell->level(), cell->index(), &dof_handler_local);
 
-    const unsigned int n_q_points =
-      scratch.fe_values_local.get_quadrature().size();
-    const unsigned int n_face_q_points =
-      scratch.fe_face_values_local.get_quadrature().size();
+    const unsigned int n_q_points      = scratch.fe_values_local.get_quadrature().size();
+    const unsigned int n_face_q_points = scratch.fe_face_values_local.get_quadrature().size();
 
-    const unsigned int loc_dofs_per_cell =
-      scratch.fe_values_local.get_fe().dofs_per_cell;
+    const unsigned int loc_dofs_per_cell = scratch.fe_values_local.get_fe().dofs_per_cell;
 
     const FEValuesExtractors::Vector fluxes(0);
     const FEValuesExtractors::Scalar scalar(dim);
@@ -604,26 +584,23 @@ namespace Step51
 
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
-        const double rhs_value = scratch.right_hand_side.value(
-          scratch.fe_values_local.quadrature_point(q));
-        const Tensor<1, dim> convection = scratch.convection_velocity.value(
-          scratch.fe_values_local.quadrature_point(q));
+        const double rhs_value =
+          scratch.right_hand_side.value(scratch.fe_values_local.quadrature_point(q));
+        const Tensor<1, dim> convection =
+          scratch.convection_velocity.value(scratch.fe_values_local.quadrature_point(q));
         const double JxW = scratch.fe_values_local.JxW(q);
         for (unsigned int k = 0; k < loc_dofs_per_cell; ++k)
           {
-            scratch.q_phi[k] = scratch.fe_values_local[fluxes].value(k, q);
-            scratch.q_phi_div[k] =
-              scratch.fe_values_local[fluxes].divergence(k, q);
-            scratch.u_phi[k] = scratch.fe_values_local[scalar].value(k, q);
-            scratch.u_phi_grad[k] =
-              scratch.fe_values_local[scalar].gradient(k, q);
+            scratch.q_phi[k]      = scratch.fe_values_local[fluxes].value(k, q);
+            scratch.q_phi_div[k]  = scratch.fe_values_local[fluxes].divergence(k, q);
+            scratch.u_phi[k]      = scratch.fe_values_local[scalar].value(k, q);
+            scratch.u_phi_grad[k] = scratch.fe_values_local[scalar].gradient(k, q);
           }
         for (unsigned int i = 0; i < loc_dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < loc_dofs_per_cell; ++j)
               scratch.ll_matrix(i, j) +=
-                (scratch.q_phi[i] * scratch.q_phi[j] -
-                 scratch.q_phi_div[i] * scratch.u_phi[j] +
+                (scratch.q_phi[i] * scratch.q_phi[j] - scratch.q_phi_div[i] * scratch.u_phi[j] +
                  scratch.u_phi[i] * scratch.q_phi_div[j] -
                  (scratch.u_phi_grad[i] * convection) * scratch.u_phi[j]) *
                 JxW;
@@ -631,58 +608,40 @@ namespace Step51
           }
       }
 
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
       {
         scratch.fe_face_values_local.reinit(loc_cell, face);
         scratch.fe_face_values.reinit(cell, face);
 
         if (task_data.trace_reconstruct)
-          scratch.fe_face_values.get_function_values(solution,
-                                                     scratch.trace_values);
+          scratch.fe_face_values.get_function_values(solution, scratch.trace_values);
 
         for (unsigned int q = 0; q < n_face_q_points; ++q)
           {
-            const double     JxW = scratch.fe_face_values.JxW(q);
-            const Point<dim> quadrature_point =
-              scratch.fe_face_values.quadrature_point(q);
-            const Tensor<1, dim> normal =
-              scratch.fe_face_values.normal_vector(q);
-            const Tensor<1, dim> convection =
-              scratch.convection_velocity.value(quadrature_point);
+            const double         JxW              = scratch.fe_face_values.JxW(q);
+            const Point<dim>     quadrature_point = scratch.fe_face_values.quadrature_point(q);
+            const Tensor<1, dim> normal           = scratch.fe_face_values.normal_vector(q);
+            const Tensor<1, dim> convection = scratch.convection_velocity.value(quadrature_point);
 
             const double tau_stab = (5. + std::abs(convection * normal));
 
-            for (unsigned int k = 0;
-                 k < scratch.fe_local_support_on_face[face].size();
-                 ++k)
+            for (unsigned int k = 0; k < scratch.fe_local_support_on_face[face].size(); ++k)
               {
-                const unsigned int kk =
-                  scratch.fe_local_support_on_face[face][k];
-                scratch.q_phi[k] =
-                  scratch.fe_face_values_local[fluxes].value(kk, q);
-                scratch.u_phi[k] =
-                  scratch.fe_face_values_local[scalar].value(kk, q);
+                const unsigned int kk = scratch.fe_local_support_on_face[face][k];
+                scratch.q_phi[k]      = scratch.fe_face_values_local[fluxes].value(kk, q);
+                scratch.u_phi[k]      = scratch.fe_face_values_local[scalar].value(kk, q);
               }
 
             if (!task_data.trace_reconstruct)
               {
-                for (unsigned int k = 0;
-                     k < scratch.fe_support_on_face[face].size();
-                     ++k)
-                  scratch.tr_phi[k] = scratch.fe_face_values.shape_value(
-                    scratch.fe_support_on_face[face][k], q);
-                for (unsigned int i = 0;
-                     i < scratch.fe_local_support_on_face[face].size();
-                     ++i)
-                  for (unsigned int j = 0;
-                       j < scratch.fe_support_on_face[face].size();
-                       ++j)
+                for (unsigned int k = 0; k < scratch.fe_support_on_face[face].size(); ++k)
+                  scratch.tr_phi[k] =
+                    scratch.fe_face_values.shape_value(scratch.fe_support_on_face[face][k], q);
+                for (unsigned int i = 0; i < scratch.fe_local_support_on_face[face].size(); ++i)
+                  for (unsigned int j = 0; j < scratch.fe_support_on_face[face].size(); ++j)
                     {
-                      const unsigned int ii =
-                        scratch.fe_local_support_on_face[face][i];
-                      const unsigned int jj =
-                        scratch.fe_support_on_face[face][j];
+                      const unsigned int ii = scratch.fe_local_support_on_face[face][i];
+                      const unsigned int jj = scratch.fe_support_on_face[face][j];
                       scratch.lf_matrix(ii, jj) +=
                         ((scratch.q_phi[i] * normal +
                           (convection * normal - tau_stab) * scratch.u_phi[i]) *
@@ -690,75 +649,49 @@ namespace Step51
                         JxW;
 
                       scratch.fl_matrix(jj, ii) -=
-                        ((scratch.q_phi[i] * normal +
-                          tau_stab * scratch.u_phi[i]) *
+                        ((scratch.q_phi[i] * normal + tau_stab * scratch.u_phi[i]) *
                          scratch.tr_phi[j]) *
                         JxW;
                     }
 
-                for (unsigned int i = 0;
-                     i < scratch.fe_support_on_face[face].size();
-                     ++i)
-                  for (unsigned int j = 0;
-                       j < scratch.fe_support_on_face[face].size();
-                       ++j)
+                for (unsigned int i = 0; i < scratch.fe_support_on_face[face].size(); ++i)
+                  for (unsigned int j = 0; j < scratch.fe_support_on_face[face].size(); ++j)
                     {
-                      const unsigned int ii =
-                        scratch.fe_support_on_face[face][i];
-                      const unsigned int jj =
-                        scratch.fe_support_on_face[face][j];
+                      const unsigned int ii = scratch.fe_support_on_face[face][i];
+                      const unsigned int jj = scratch.fe_support_on_face[face][j];
                       task_data.cell_matrix(ii, jj) +=
-                        ((convection * normal - tau_stab) * scratch.tr_phi[i] *
-                         scratch.tr_phi[j]) *
+                        ((convection * normal - tau_stab) * scratch.tr_phi[i] * scratch.tr_phi[j]) *
                         JxW;
                     }
 
-                if (cell->face(face)->at_boundary() &&
-                    (cell->face(face)->boundary_id() == 1))
+                if (cell->face(face)->at_boundary() && (cell->face(face)->boundary_id() == 1))
                   {
                     const double neumann_value =
-                      -scratch.exact_solution.gradient(quadrature_point) *
-                        normal +
-                      convection * normal *
-                        scratch.exact_solution.value(quadrature_point);
-                    for (unsigned int i = 0;
-                         i < scratch.fe_support_on_face[face].size();
-                         ++i)
+                      -scratch.exact_solution.gradient(quadrature_point) * normal +
+                      convection * normal * scratch.exact_solution.value(quadrature_point);
+                    for (unsigned int i = 0; i < scratch.fe_support_on_face[face].size(); ++i)
                       {
-                        const unsigned int ii =
-                          scratch.fe_support_on_face[face][i];
-                        task_data.cell_vector(ii) +=
-                          scratch.tr_phi[i] * neumann_value * JxW;
+                        const unsigned int ii = scratch.fe_support_on_face[face][i];
+                        task_data.cell_vector(ii) += scratch.tr_phi[i] * neumann_value * JxW;
                       }
                   }
               }
 
-            for (unsigned int i = 0;
-                 i < scratch.fe_local_support_on_face[face].size();
-                 ++i)
-              for (unsigned int j = 0;
-                   j < scratch.fe_local_support_on_face[face].size();
-                   ++j)
+            for (unsigned int i = 0; i < scratch.fe_local_support_on_face[face].size(); ++i)
+              for (unsigned int j = 0; j < scratch.fe_local_support_on_face[face].size(); ++j)
                 {
-                  const unsigned int ii =
-                    scratch.fe_local_support_on_face[face][i];
-                  const unsigned int jj =
-                    scratch.fe_local_support_on_face[face][j];
-                  scratch.ll_matrix(ii, jj) +=
-                    tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
+                  const unsigned int ii = scratch.fe_local_support_on_face[face][i];
+                  const unsigned int jj = scratch.fe_local_support_on_face[face][j];
+                  scratch.ll_matrix(ii, jj) += tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
                 }
 
             if (task_data.trace_reconstruct)
-              for (unsigned int i = 0;
-                   i < scratch.fe_local_support_on_face[face].size();
-                   ++i)
+              for (unsigned int i = 0; i < scratch.fe_local_support_on_face[face].size(); ++i)
                 {
-                  const unsigned int ii =
-                    scratch.fe_local_support_on_face[face][i];
-                  scratch.l_rhs(ii) -=
-                    (scratch.q_phi[i] * normal +
-                     scratch.u_phi[i] * (convection * normal - tau_stab)) *
-                    scratch.trace_values[q] * JxW;
+                  const unsigned int ii = scratch.fe_local_support_on_face[face][i];
+                  scratch.l_rhs(ii) -= (scratch.q_phi[i] * normal +
+                                        scratch.u_phi[i] * (convection * normal - tau_stab)) *
+                                       scratch.trace_values[q] * JxW;
                 }
           }
       }
@@ -769,8 +702,7 @@ namespace Step51
       {
         scratch.fl_matrix.mmult(scratch.tmp_matrix, scratch.ll_matrix);
         scratch.tmp_matrix.vmult_add(task_data.cell_vector, scratch.l_rhs);
-        scratch.tmp_matrix.mmult(
-          task_data.cell_matrix, scratch.lf_matrix, true);
+        scratch.tmp_matrix.mmult(task_data.cell_matrix, scratch.lf_matrix, true);
         cell->get_dof_indices(task_data.dof_indices);
       }
     else
@@ -787,11 +719,8 @@ namespace Step51
   HDG<dim>::copy_local_to_global(const PerTaskData &data)
   {
     if (data.trace_reconstruct == false)
-      constraints.distribute_local_to_global(data.cell_matrix,
-                                             data.cell_vector,
-                                             data.dof_indices,
-                                             system_matrix,
-                                             system_rhs);
+      constraints.distribute_local_to_global(
+        data.cell_matrix, data.cell_vector, data.dof_indices, system_matrix, system_rhs);
   }
 
 
@@ -800,8 +729,7 @@ namespace Step51
   void
   HDG<dim>::solve()
   {
-    SolverControl solver_control(system_matrix.m() * 10,
-                                 1e-12 * system_rhs.l2_norm());
+    SolverControl solver_control(system_matrix.m() * 10, 1e-12 * system_rhs.l2_norm());
     // do not output iteration numbers to log file because these are too
     // sensitive
     std::ostringstream stream;
@@ -826,11 +754,9 @@ namespace Step51
     {
       const QGauss<dim> quadrature_formula(fe_u_post.degree + 1);
       const UpdateFlags local_flags(update_values);
-      const UpdateFlags flags(update_values | update_gradients |
-                              update_JxW_values);
+      const UpdateFlags flags(update_values | update_gradients | update_JxW_values);
 
-      PostProcessScratchData scratch(
-        fe_u_post, fe_local, quadrature_formula, local_flags, flags);
+      PostProcessScratchData scratch(fe_u_post, fe_local, quadrature_formula, local_flags, flags);
 
       WorkStream::run(dof_handler_u_post.begin_active(),
                       dof_handler_u_post.end(),
@@ -856,8 +782,8 @@ namespace Step51
                                       &value_select);
     const double L2_error = difference_per_cell.l2_norm();
 
-    ComponentSelectFunction<dim> gradient_select(
-      std::pair<unsigned int, unsigned int>(0, dim), dim + 1);
+    ComponentSelectFunction<dim> gradient_select(std::pair<unsigned int, unsigned int>(0, dim),
+                                                 dim + 1);
     VectorTools::integrate_difference(dof_handler_local,
                                       solution_local,
                                       SolutionAndGradient<dim>(),
@@ -886,10 +812,9 @@ namespace Step51
 
   template <int dim>
   void
-  HDG<dim>::postprocess_one_cell(
-    const typename DoFHandler<dim>::active_cell_iterator &cell,
-    PostProcessScratchData &                              scratch,
-    unsigned int &)
+  HDG<dim>::postprocess_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                 PostProcessScratchData &                              scratch,
+                                 unsigned int &)
   {
     typename DoFHandler<dim>::active_cell_iterator loc_cell(
       &triangulation, cell->level(), cell->index(), &dof_handler_local);
@@ -900,13 +825,11 @@ namespace Step51
     FEValuesExtractors::Vector fluxes(0);
     FEValuesExtractors::Scalar scalar(dim);
 
-    const unsigned int n_q_points = scratch.fe_values.get_quadrature().size();
+    const unsigned int n_q_points    = scratch.fe_values.get_quadrature().size();
     const unsigned int dofs_per_cell = scratch.fe_values.dofs_per_cell;
 
-    scratch.fe_values_local[scalar].get_function_values(solution_local,
-                                                        scratch.u_values);
-    scratch.fe_values_local[fluxes].get_function_values(solution_local,
-                                                        scratch.u_gradients);
+    scratch.fe_values_local[scalar].get_function_values(solution_local, scratch.u_values);
+    scratch.fe_values_local[fluxes].get_function_values(solution_local, scratch.u_gradients);
 
     double sum = 0;
     for (unsigned int i = 1; i < dofs_per_cell; ++i)
@@ -915,8 +838,7 @@ namespace Step51
           {
             sum = 0;
             for (unsigned int q = 0; q < n_q_points; ++q)
-              sum += (scratch.fe_values.shape_grad(i, q) *
-                      scratch.fe_values.shape_grad(j, q)) *
+              sum += (scratch.fe_values.shape_grad(i, q) * scratch.fe_values.shape_grad(j, q)) *
                      scratch.fe_values.JxW(q);
             scratch.cell_matrix(i, j) = sum;
           }
@@ -969,8 +891,7 @@ namespace Step51
     typename Triangulation<dim>::cell_iterator cell = triangulation.begin(),
                                                endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->face(face)->at_boundary())
           for (unsigned int d = 0; d < dim; ++d)
             if ((std::fabs(cell->face(face)->center()(d) - (1)) < 1e-12))

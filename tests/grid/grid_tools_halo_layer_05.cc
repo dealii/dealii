@@ -31,9 +31,8 @@ void
 write_active_fe_index_to_file(const hp::DoFHandler<dim> &dof_handler)
 {
   int                                                count = 0;
-  typename hp::DoFHandler<dim>::active_cell_iterator cell  = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename hp::DoFHandler<dim>::active_cell_iterator cell  = dof_handler.begin_active(),
+                                                     endc  = dof_handler.end();
   for (; cell != endc; ++cell, ++count)
     {
       deallog << count << " " << cell->active_fe_index() << std::endl;
@@ -45,11 +44,9 @@ template <int dim>
 void
 write_vtk(const hp::DoFHandler<dim> &dof_handler, const std::string filename)
 {
-  Vector<double> active_fe_index(
-    dof_handler.get_triangulation().n_active_cells());
-  int                                                count = 0;
-  typename hp::DoFHandler<dim>::active_cell_iterator cell  = dof_handler
-                                                              .begin_active(),
+  Vector<double> active_fe_index(dof_handler.get_triangulation().n_active_cells());
+  int            count                                    = 0;
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
   for (; cell != endc; ++cell, ++count)
     {
@@ -57,8 +54,7 @@ write_vtk(const hp::DoFHandler<dim> &dof_handler, const std::string filename)
     }
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(
-      1, DataComponentInterpretation::component_is_scalar);
+                                 data_component_interpretation(1, DataComponentInterpretation::component_is_scalar);
   const std::vector<std::string> data_names(1, "active_fe_index");
 
   DataOut<dim, hp::DoFHandler<dim>> data_out;
@@ -114,8 +110,7 @@ test()
   write_active_fe_index_to_file(dof_handler);
   // Write to file to visually check result
   {
-    const std::string filename =
-      "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    const std::string filename = "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
     write_vtk(dof_handler, filename.c_str());
   }
 
@@ -129,8 +124,7 @@ test()
   std::vector<cell_iterator> active_halo_layer =
     GridTools::compute_active_cell_halo_layer(dof_handler, predicate);
   AssertThrow(active_halo_layer.size() > 0, ExcMessage("No halo layer found."));
-  for (typename std::vector<cell_iterator>::iterator it =
-         active_halo_layer.begin();
+  for (typename std::vector<cell_iterator>::iterator it = active_halo_layer.begin();
        it != active_halo_layer.end();
        ++it)
     {
@@ -141,8 +135,7 @@ test()
   write_active_fe_index_to_file(dof_handler);
   // Write to file to visually check result
   {
-    const std::string filename =
-      "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
+    const std::string filename = "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
     write_vtk(dof_handler, filename.c_str());
   }
 }

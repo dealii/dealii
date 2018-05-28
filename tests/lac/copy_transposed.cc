@@ -47,8 +47,7 @@ main()
   ez.set(4, 2, 13.);
   ez.set(4, 3, 14.);
 
-  deallog << "FullMatrix<float>::copy_transposed  SparseMatrixEZ<double>"
-          << std::endl;
+  deallog << "FullMatrix<float>::copy_transposed  SparseMatrixEZ<double>" << std::endl;
   FullMatrix<float> ff;
   ff.copy_transposed(ez);
   ff.print_formatted(logfile, 0, false, 5, "~");

@@ -230,15 +230,13 @@ namespace internal
        * object or not.
        */
       bool
-      fe_index_is_active(const unsigned int obj_index,
-                         const unsigned int fe_index) const;
+      fe_index_is_active(const unsigned int obj_index, const unsigned int fe_index) const;
 
       /**
        * Set the fe_index of the active finite element on this object.
        */
       void
-      set_active_fe_index(const unsigned int obj_index,
-                          const unsigned int fe_index);
+      set_active_fe_index(const unsigned int obj_index, const unsigned int fe_index);
 
       /**
        * Return a pointer to the beginning of the DoF indices cache for a
@@ -252,8 +250,7 @@ namespace internal
        * next dofs_per_cell indices are for the current cell.
        */
       const types::global_dof_index *
-      get_cell_cache_start(const unsigned int obj_index,
-                           const unsigned int dofs_per_cell) const;
+      get_cell_cache_start(const unsigned int obj_index, const unsigned int dofs_per_cell) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
@@ -281,8 +278,7 @@ namespace internal
        */
       template <int dim, int spacedim>
       void
-      compress_data(
-        const dealii::hp::FECollection<dim, spacedim> &fe_collection);
+      compress_data(const dealii::hp::FECollection<dim, spacedim> &fe_collection);
 
       /**
        * Uncompress the arrays that store dof indices by using a variant of
@@ -294,8 +290,7 @@ namespace internal
        */
       template <int dim, int spacedim>
       void
-      uncompress_data(
-        const dealii::hp::FECollection<dim, spacedim> &fe_collection);
+      uncompress_data(const dealii::hp::FECollection<dim, spacedim> &fe_collection);
 
 
       /**
@@ -325,10 +320,8 @@ namespace internal
        */
       template <int, int>
       friend class dealii::hp::DoFHandler;
-      friend struct dealii::internal::hp::DoFHandlerImplementation::
-        Implementation;
-      friend struct dealii::internal::DoFCellAccessorImplementation::
-        Implementation;
+      friend struct dealii::internal::hp::DoFHandlerImplementation::Implementation;
+      friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
     };
 
 
@@ -344,13 +337,11 @@ namespace internal
 
 
     inline DoFLevel::active_fe_index_type
-    DoFLevel::get_toggled_compression_state(
-      const active_fe_index_type active_fe_index)
+    DoFLevel::get_toggled_compression_state(const active_fe_index_type active_fe_index)
     {
       // convert the active_fe_index into a signed type, flip all
       // bits, and get the unsigned representation back
-      return (active_fe_index_type) ~(
-        signed_active_fe_index_type)active_fe_index;
+      return (active_fe_index_type) ~(signed_active_fe_index_type)active_fe_index;
     }
 
 
@@ -361,8 +352,7 @@ namespace internal
                             const unsigned int local_index) const
     {
       (void)fe_index;
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      Assert(obj_index < dof_offsets.size(), ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an object for which DoFs have been
       // allocated at all
@@ -371,10 +361,9 @@ namespace internal
                         "information for an object on which no such "
                         "information is available"));
 
-      Assert(fe_index ==
-               (is_compressed_entry(active_fe_indices[obj_index]) == false ?
-                  active_fe_indices[obj_index] :
-                  get_toggled_compression_state(active_fe_indices[obj_index])),
+      Assert(fe_index == (is_compressed_entry(active_fe_indices[obj_index]) == false ?
+                            active_fe_indices[obj_index] :
+                            get_toggled_compression_state(active_fe_indices[obj_index])),
              ExcMessage("FE index does not match that of the present cell"));
 
       // see if the dof_indices array has been compressed for this
@@ -394,8 +383,7 @@ namespace internal
                             const types::global_dof_index global_index)
     {
       (void)fe_index;
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      Assert(obj_index < dof_offsets.size(), ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an
       // object for which DoFs have
@@ -404,10 +392,9 @@ namespace internal
              ExcMessage("You are trying to access degree of freedom "
                         "information for an object on which no such "
                         "information is available"));
-      Assert(
-        is_compressed_entry(active_fe_indices[obj_index]) == false,
-        ExcMessage(
-          "This function can no longer be called after compressing the dof_indices array"));
+      Assert(is_compressed_entry(active_fe_indices[obj_index]) == false,
+             ExcMessage(
+               "This function can no longer be called after compressing the dof_indices array"));
       Assert(fe_index == active_fe_indices[obj_index],
              ExcMessage("FE index does not match that of the present cell"));
       dof_indices[dof_offsets[obj_index] + local_index] = global_index;
@@ -430,8 +417,7 @@ namespace internal
 
 
     inline bool
-    DoFLevel::fe_index_is_active(const unsigned int obj_index,
-                                 const unsigned int fe_index) const
+    DoFLevel::fe_index_is_active(const unsigned int obj_index, const unsigned int fe_index) const
     {
       return (fe_index == active_fe_index(obj_index));
     }
@@ -439,8 +425,7 @@ namespace internal
 
 
     inline void
-    DoFLevel::set_active_fe_index(const unsigned int obj_index,
-                                  const unsigned int fe_index)
+    DoFLevel::set_active_fe_index(const unsigned int obj_index, const unsigned int fe_index)
     {
       Assert(obj_index < active_fe_indices.size(),
              ExcIndexRange(obj_index, 0, active_fe_indices.size()));
@@ -450,11 +435,10 @@ namespace internal
       // the index is so large that we cannot accept it. (but this
       // will not likely happen because it requires someone using an
       // FECollection that has more than 32k entries.)
-      Assert(
-        is_compressed_entry(fe_index) == false,
-        ExcMessage("You are using an active_fe_index that is larger than an "
-                   "internal limitation for these objects. Try to work with "
-                   "hp::FECollection objects that have a more modest size."));
+      Assert(is_compressed_entry(fe_index) == false,
+             ExcMessage("You are using an active_fe_index that is larger than an "
+                        "internal limitation for these objects. Try to work with "
+                        "hp::FECollection objects that have a more modest size."));
 
       active_fe_indices[obj_index] = fe_index;
     }
@@ -466,16 +450,13 @@ namespace internal
                                    const unsigned int dofs_per_cell) const
     {
       (void)dofs_per_cell;
-      Assert(
-        (obj_index < cell_cache_offsets.size()) &&
-          (cell_cache_offsets[obj_index] + dofs_per_cell <=
-           cell_dof_indices_cache.size()),
-        ExcMessage(
-          "You are trying to access an element of the cache that stores "
-          "the indices of all degrees of freedom that live on one cell. "
-          "However, this element does not exist. Did you forget to call "
-          "DoFHandler::distribute_dofs(), or did you forget to call it "
-          "again after changing the active_fe_index of one of the cells?"));
+      Assert((obj_index < cell_cache_offsets.size()) &&
+               (cell_cache_offsets[obj_index] + dofs_per_cell <= cell_dof_indices_cache.size()),
+             ExcMessage("You are trying to access an element of the cache that stores "
+                        "the indices of all degrees of freedom that live on one cell. "
+                        "However, this element does not exist. Did you forget to call "
+                        "DoFHandler::distribute_dofs(), or did you forget to call it "
+                        "again after changing the active_fe_index of one of the cells?"));
 
       return &cell_dof_indices_cache[cell_cache_offsets[obj_index]];
     }

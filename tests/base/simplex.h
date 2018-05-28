@@ -51,10 +51,7 @@ template <>
 std::array<Point<3>, 4>
 get_simplex()
 {
-  return {{Point<3>(4, 2, 0),
-           Point<3>(3, 3, 0),
-           Point<3>(2, 2.5, 0),
-           Point<3>(4.5, 3, 2)}};
+  return {{Point<3>(4, 2, 0), Point<3>(3, 3, 0), Point<3>(2, 2.5, 0), Point<3>(4.5, 3, 2)}};
 }
 
 

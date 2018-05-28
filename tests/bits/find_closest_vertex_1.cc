@@ -34,9 +34,7 @@ void check(Triangulation<3> &tria)
 {
   const std::vector<Point<3>> &v = tria.get_vertices();
   for (unsigned i = 0; i < v.size(); i++)
-    deallog << "["
-            << GridTools::find_closest_vertex(
-                 tria, v[i] + Point<3>(0.01, -0.01, 0.01))
+    deallog << "[" << GridTools::find_closest_vertex(tria, v[i] + Point<3>(0.01, -0.01, 0.01))
             << "] ";
 
   deallog << std::endl;

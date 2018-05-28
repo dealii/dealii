@@ -59,10 +59,8 @@ test()
 
   GridOut().write_gnuplot(tria_3, logfile);
 
-  deallog << "     Total number of cells        = " << tria_3.n_cells()
-          << std::endl
-          << "     Total number of active cells = " << tria_3.n_active_cells()
-          << std::endl;
+  deallog << "     Total number of cells        = " << tria_3.n_cells() << std::endl
+          << "     Total number of active cells = " << tria_3.n_active_cells() << std::endl;
 }
 
 

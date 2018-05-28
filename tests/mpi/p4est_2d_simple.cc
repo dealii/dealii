@@ -51,18 +51,15 @@ test()
       Assert(tr.n_active_cells() == 1, ExcInternalError());
 
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-        deallog << "subdomainid = " << tr.begin_active()->subdomain_id()
-                << std::endl;
+        deallog << "subdomainid = " << tr.begin_active()->subdomain_id() << std::endl;
 
       if (myid == numproc - 1)
         {
-          Assert(tr.begin_active()->subdomain_id() == (unsigned int)myid,
-                 ExcInternalError());
+          Assert(tr.begin_active()->subdomain_id() == (unsigned int)myid, ExcInternalError());
         }
       else
         {
-          Assert(tr.begin_active()->subdomain_id() ==
-                   numbers::artificial_subdomain_id,
+          Assert(tr.begin_active()->subdomain_id() == numbers::artificial_subdomain_id,
                  ExcInternalError());
         }
 

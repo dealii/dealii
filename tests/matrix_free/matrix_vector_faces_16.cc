@@ -52,12 +52,10 @@ test()
   GridGenerator::hyper_cube(tria);
   for (unsigned int f = 0; f < GeometryInfo<mydim>::faces_per_cell; ++f)
     tria.begin_active()->face(f)->set_all_boundary_ids(f);
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<mydim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<mydim>::cell_iterator>>
     periodic_faces;
   for (unsigned int d = 0; d < mydim; ++d)
-    GridTools::collect_periodic_faces(
-      tria, 2 * d, 2 * d + 1, d, periodic_faces);
+    GridTools::collect_periodic_faces(tria, 2 * d, 2 * d + 1, d, periodic_faces);
   tria.add_periodicity(periodic_faces);
 
   tria.refine_global(4);
@@ -81,11 +79,9 @@ test()
   MatrixFree<mydim, double>                          mf_data;
   const QGauss<1>                                    quad(fe_degree + 1);
   typename MatrixFree<mydim, double>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<mydim, double>::AdditionalData::none;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
+  data.tasks_parallel_scheme               = MatrixFree<mydim, double>::AdditionalData::none;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
 
   mf_data.reinit(dof, constraints, quad, data);
   mf_data.initialize_dof_vector(in);
@@ -99,8 +95,7 @@ test()
       in.local_element(i) = entry;
     }
 
-  MatrixFreeTest<3, 1, 2, double, LinearAlgebra::distributed::Vector<double>>
-    mf(mf_data);
+  MatrixFreeTest<3, 1, 2, double, LinearAlgebra::distributed::Vector<double>> mf(mf_data);
   mf.vmult(out, in);
 
   std::vector<types::global_dof_index> renumbering;

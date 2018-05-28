@@ -55,14 +55,12 @@ check(const FiniteElement<dim> &fe)
   deallog << "  component pattern for each shape function:" << std::endl;
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {
-      deallog << "    shape function i=" << i << " ["
-              << fe.system_to_component_index(i).first << ','
-              << fe.system_to_component_index(i).second << "]: ";
+      deallog << "    shape function i=" << i << " [" << fe.system_to_component_index(i).first
+              << ',' << fe.system_to_component_index(i).second << "]: ";
 
       for (unsigned int j = 0; j < fe.n_components(); ++j)
         {
-          Assert(fe.get_nonzero_components(i).size() == fe.n_components(),
-                 ExcInternalError());
+          Assert(fe.get_nonzero_components(i).size() == fe.n_components(), ExcInternalError());
           deallog << (fe.get_nonzero_components(i)[j] ? 1 : 0);
         };
       deallog << std::endl;

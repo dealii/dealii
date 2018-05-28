@@ -131,8 +131,7 @@ public:
    * underlying the object to be copied is presently empty. Refinement flags
    * as well as the pointer to the coarse grid are copied, however.
    */
-  PersistentTriangulation(
-    const PersistentTriangulation<dim, spacedim> &old_tria);
+  PersistentTriangulation(const PersistentTriangulation<dim, spacedim> &old_tria);
 
   /**
    * Destructor.
@@ -200,7 +199,7 @@ public:
   virtual void
   create_triangulation(const std::vector<Point<spacedim>> &vertices,
                        const std::vector<CellData<dim>> &  cells,
-                       const SubCellData &subcelldata) override;
+                       const SubCellData &                 subcelldata) override;
 
   /**
    * An overload of the respective function of the base class.
@@ -209,10 +208,9 @@ public:
    * class.
    */
   virtual void
-  create_triangulation_compatibility(
-    const std::vector<Point<spacedim>> &vertices,
-    const std::vector<CellData<dim>> &  cells,
-    const SubCellData &                 subcelldata) override;
+  create_triangulation_compatibility(const std::vector<Point<spacedim>> &vertices,
+                                     const std::vector<CellData<dim>> &  cells,
+                                     const SubCellData &                 subcelldata) override;
 
   /**
    * Write all refine and coarsen flags to the ostream @p out.
@@ -254,8 +252,7 @@ private:
   /**
    * This grid shall be used as coarse grid.
    */
-  SmartPointer<const Triangulation<dim, spacedim>,
-               PersistentTriangulation<dim, spacedim>>
+  SmartPointer<const Triangulation<dim, spacedim>, PersistentTriangulation<dim, spacedim>>
     coarse_grid;
 
   /**

@@ -79,7 +79,7 @@ check(DataOutBase::GnuplotFlags flags, std::ostream &out)
   names[3] = "x4";
   names[4] = "i";
   std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
-  DataOutX<dim, spacedim> data_out(patches, names);
+  DataOutX<dim, spacedim>                                          data_out(patches, names);
   data_out.set_flags(flags);
   data_out.write_gnuplot(out);
 }
@@ -109,8 +109,7 @@ check_all(std::ostream &log)
 #if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
-      out << "==============================\n"
-          << name << "\n==============================\n";
+      out << "==============================\n" << name << "\n==============================\n";
 #endif
       check<dim, spacedim>(flags, out);
     }

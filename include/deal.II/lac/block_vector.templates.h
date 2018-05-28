@@ -28,8 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
-BlockVector<Number>::BlockVector(const unsigned int n_blocks,
-                                 const size_type    block_size)
+BlockVector<Number>::BlockVector(const unsigned int n_blocks, const size_type block_size)
 {
   reinit(n_blocks, block_size);
 }
@@ -51,8 +50,7 @@ BlockVector<Number>::BlockVector(const BlockIndices &n)
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector(const BlockVector<Number> &v) :
-  BlockVectorBase<Vector<Number>>()
+BlockVector<Number>::BlockVector(const BlockVector<Number> &v) : BlockVectorBase<Vector<Number>>()
 {
   this->components.resize(v.n_blocks());
   this->block_indices = v.block_indices;
@@ -117,8 +115,7 @@ BlockVector<Number>::reinit(const std::vector<size_type> &block_sizes,
 
 template <typename Number>
 void
-BlockVector<Number>::reinit(const BlockIndices &n,
-                            const bool          omit_zeroing_entries)
+BlockVector<Number>::reinit(const BlockIndices &n, const bool omit_zeroing_entries)
 {
   this->block_indices = n;
   if (this->components.size() != this->n_blocks())
@@ -132,8 +129,7 @@ BlockVector<Number>::reinit(const BlockIndices &n,
 template <typename Number>
 template <typename Number2>
 void
-BlockVector<Number>::reinit(const BlockVector<Number2> &v,
-                            const bool                  omit_zeroing_entries)
+BlockVector<Number>::reinit(const BlockVector<Number2> &v, const bool omit_zeroing_entries)
 {
   this->block_indices = v.get_block_indices();
   if (this->components.size() != this->n_blocks())

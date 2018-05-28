@@ -35,10 +35,8 @@ main()
 
       ParameterHandler prm;
       prm.enter_subsection("Testing");
-      prm.declare_entry("string list",
-                        "a",
-                        Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-                        "docs 1");
+      prm.declare_entry(
+        "string list", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")), "docs 1");
       prm.declare_entry("int_alias", "1", Patterns::Integer());
       prm.declare_entry("double", "3.1415926", Patterns::Double(), "docs 3");
       prm.declare_alias("int_alias", "int");
@@ -52,13 +50,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -66,12 +62,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 

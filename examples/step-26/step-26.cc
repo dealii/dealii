@@ -87,8 +87,7 @@ namespace Step26
     void setup_system();
     void solve_time_step();
     void output_results() const;
-    void refine_mesh(const unsigned int min_grid_level,
-                     const unsigned int max_grid_level);
+    void refine_mesh(const unsigned int min_grid_level, const unsigned int max_grid_level);
 
     Triangulation<dim> triangulation;
     FE_Q<dim>          fe;
@@ -129,8 +128,7 @@ namespace Step26
     RightHandSide() : Function<dim>(), period(0.2)
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
   private:
     const double period;
@@ -139,16 +137,14 @@ namespace Step26
 
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & p,
-                                   const unsigned int component) const
+  double RightHandSide<dim>::value(const Point<dim> &p, const unsigned int component) const
   {
     (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     Assert(dim == 2, ExcNotImplemented());
 
-    const double time = this->get_time();
-    const double point_within_period =
-      (time / period - std::floor(time / period));
+    const double time                = this->get_time();
+    const double point_within_period = (time / period - std::floor(time / period));
 
     if ((point_within_period >= 0.0) && (point_within_period <= 0.2))
       {
@@ -174,15 +170,13 @@ namespace Step26
   class BoundaryValues : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double BoundaryValues<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int component) const
+  double BoundaryValues<dim>::value(const Point<dim> & /*p*/, const unsigned int component) const
   {
     (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
@@ -230,10 +224,8 @@ namespace Step26
 
     std::cout << std::endl
               << "===========================================" << std::endl
-              << "Number of active cells: " << triangulation.n_active_cells()
-              << std::endl
-              << "Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl
+              << "Number of active cells: " << triangulation.n_active_cells() << std::endl
+              << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl
               << std::endl;
 
     constraints.clear();
@@ -251,10 +243,8 @@ namespace Step26
     laplace_matrix.reinit(sparsity_pattern);
     system_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(
-      dof_handler, QGauss<dim>(fe.degree + 1), mass_matrix);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler, QGauss<dim>(fe.degree + 1), laplace_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(fe.degree + 1), mass_matrix);
+    MatrixCreator::create_laplace_matrix(dof_handler, QGauss<dim>(fe.degree + 1), laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
     old_solution.reinit(dof_handler.n_dofs());
@@ -279,8 +269,7 @@ namespace Step26
 
     constraints.distribute(solution);
 
-    std::cout << "     " << solver_control.last_step() << " CG iterations."
-              << std::endl;
+    std::cout << "     " << solver_control.last_step() << " CG iterations." << std::endl;
   }
 
 
@@ -454,8 +443,7 @@ namespace Step26
     forcing_terms.reinit(solution.size());
 
 
-    VectorTools::interpolate(
-      dof_handler, Functions::ZeroFunction<dim>(), old_solution);
+    VectorTools::interpolate(dof_handler, Functions::ZeroFunction<dim>(), old_solution);
     solution = old_solution;
 
     output_results();
@@ -471,8 +459,7 @@ namespace Step26
         time += time_step;
         ++timestep_number;
 
-        std::cout << "Time step " << timestep_number << " at t=" << time
-                  << std::endl;
+        std::cout << "Time step " << timestep_number << " at t=" << time << std::endl;
 
         mass_matrix.vmult(system_rhs, old_solution);
 
@@ -526,8 +513,7 @@ namespace Step26
           VectorTools::interpolate_boundary_values(
             dof_handler, 0, boundary_values_function, boundary_values);
 
-          MatrixTools::apply_boundary_values(
-            boundary_values, system_matrix, solution, system_rhs);
+          MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
         }
 
         // With this out of the way, all we have to do is solve the
@@ -545,12 +531,10 @@ namespace Step26
         // The time loop and, indeed, the main part of the program ends
         // with starting into the next time step by setting old_solution
         // to the solution we have just computed.
-        if ((timestep_number == 1) &&
-            (pre_refinement_step < n_adaptive_pre_refinement_steps))
+        if ((timestep_number == 1) && (pre_refinement_step < n_adaptive_pre_refinement_steps))
           {
             refine_mesh(initial_global_refinement,
-                        initial_global_refinement +
-                          n_adaptive_pre_refinement_steps);
+                        initial_global_refinement + n_adaptive_pre_refinement_steps);
             ++pre_refinement_step;
 
             tmp.reinit(solution.size());
@@ -563,8 +547,7 @@ namespace Step26
         else if ((timestep_number > 0) && (timestep_number % 5 == 0))
           {
             refine_mesh(initial_global_refinement,
-                        initial_global_refinement +
-                          n_adaptive_pre_refinement_steps);
+                        initial_global_refinement + n_adaptive_pre_refinement_steps);
             tmp.reinit(solution.size());
             forcing_terms.reinit(solution.size());
           }
@@ -653,13 +636,11 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -667,12 +648,10 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

@@ -168,8 +168,8 @@ public:
    * be omitted and the result of size() is taken.
    */
   unsigned int
-  n_selected_components(const unsigned int overall_number_of_components =
-                          numbers::invalid_unsigned_int) const;
+  n_selected_components(
+    const unsigned int overall_number_of_components = numbers::invalid_unsigned_int) const;
 
   /**
    * Return the index of the first selected component. The argument is there
@@ -178,8 +178,8 @@ public:
    * The function throws an exception if no component is selected at all.
    */
   unsigned int
-  first_selected_component(const unsigned int overall_number_of_components =
-                             numbers::invalid_unsigned_int) const;
+  first_selected_component(
+    const unsigned int overall_number_of_components = numbers::invalid_unsigned_int) const;
 
   /**
    * Return true if this mask represents a default constructed mask that
@@ -262,8 +262,7 @@ inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask) :
 {}
 
 
-inline ComponentMask::ComponentMask(const unsigned int n_components,
-                                    const bool         initializer) :
+inline ComponentMask::ComponentMask(const unsigned int n_components, const bool initializer) :
   component_mask(n_components, initializer)
 {}
 

@@ -41,17 +41,15 @@ test(const std::pair<unsigned int, unsigned int> &size,
   const std::string filename("scalapack_10_b_test.h5");
 
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
   FullMatrix<NumberType> full(size.first, size.second);
   create_random(full);
 
   // create 2d process grid
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, size.first, size.second, block_size, block_size);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(
+    mpi_communicator, size.first, size.second, block_size, block_size);
 
   ScaLAPACKMatrix<NumberType> scalapack_matrix(
     size.first, size.second, grid, block_size, block_size);
@@ -66,9 +64,8 @@ test(const std::pair<unsigned int, unsigned int> &size,
   scalapack_matrix_copy.copy_to(copy);
   copy.add(-1, full);
 
-  pcout << size.first << "x" << size.second << " & " << block_size << " & "
-        << chunk_size.first << "x" << chunk_size.second << " & "
-        << grid->get_process_grid_rows() << "x"
+  pcout << size.first << "x" << size.second << " & " << block_size << " & " << chunk_size.first
+        << "x" << chunk_size.second << " & " << grid->get_process_grid_rows() << "x"
         << grid->get_process_grid_columns() << std::endl;
   AssertThrow(copy.frobenius_norm() < 1e-12, ExcInternalError());
   std::remove(filename.c_str());
@@ -79,8 +76,7 @@ test(const std::pair<unsigned int, unsigned int> &size,
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   std::vector<std::pair<unsigned int, unsigned int>> sizes;
   sizes.push_back(std::make_pair(300, 250));

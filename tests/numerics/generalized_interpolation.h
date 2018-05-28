@@ -34,9 +34,7 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int n_comp, const unsigned int q) :
-    Function<dim>(n_comp),
-    q(q)
+  F(const unsigned int n_comp, const unsigned int q) : Function<dim>(n_comp), q(q)
   {}
 
   virtual double
@@ -97,6 +95,5 @@ test(const FiniteElement<dim> &fe,
   VectorTools::interpolate(mapping, dof_handler, f2, interpolant2);
 
   interpolant2 -= interpolant;
-  deallog << "Check projection property: " << interpolant2.linfty_norm()
-          << std::endl;
+  deallog << "Check projection property: " << interpolant2.linfty_norm() << std::endl;
 }

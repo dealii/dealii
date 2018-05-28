@@ -45,11 +45,10 @@ test()
     tr1.save(oa, 0);
   }
 
-  parallel::shared::Triangulation<dim> tr2(
-    MPI_COMM_WORLD,
-    ::Triangulation<dim>::none,
-    false,
-    parallel::shared::Triangulation<dim>::partition_metis);
+  parallel::shared::Triangulation<dim> tr2(MPI_COMM_WORLD,
+                                           ::Triangulation<dim>::none,
+                                           false,
+                                           parallel::shared::Triangulation<dim>::partition_metis);
   {
     std::istringstream            iss(oss.str());
     boost::archive::text_iarchive ia(iss, boost::archive::no_header);
@@ -57,10 +56,8 @@ test()
   }
 
   deallog << " n_active_cells: " << tr2.n_active_cells() << "\n"
-          << " locally_owned_subdomain(): " << tr2.locally_owned_subdomain()
-          << "\n"
-          << " n_locally_owned_active_cells: "
-          << tr2.n_locally_owned_active_cells() << "\n"
+          << " locally_owned_subdomain(): " << tr2.locally_owned_subdomain() << "\n"
+          << " n_locally_owned_active_cells: " << tr2.n_locally_owned_active_cells() << "\n"
           << " n_global_active_cells: " << tr2.n_global_active_cells() << "\n"
           << std::endl;
 }

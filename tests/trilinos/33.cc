@@ -40,10 +40,9 @@ test(TrilinosWrappers::MPI::Vector &v)
   v.compress(VectorOperation::insert);
 
   // then check the norm
-  const double eps = typeid(TrilinosScalar) == typeid(double) ? 1e-14 : 1e-5;
+  const double eps        = typeid(TrilinosScalar) == typeid(double) ? 1e-14 : 1e-5;
   const double true_value = std::pow(sum, static_cast<TrilinosScalar>(1. / 3.));
-  AssertThrow(std::fabs(v.lp_norm(3) - true_value) < eps * true_value,
-              ExcInternalError());
+  AssertThrow(std::fabs(v.lp_norm(3) - true_value) < eps * true_value, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -55,8 +54,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
 
   try
@@ -71,13 +69,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -85,12 +81,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

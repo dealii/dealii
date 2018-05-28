@@ -60,8 +60,8 @@ test(const FiniteElement<dim> &fe)
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  deallog << fe.get_name() << ' ' << dof_handler.n_dofs() << ' '
-          << hp_dof_handler.n_dofs() << std::endl;
+  deallog << fe.get_name() << ' ' << dof_handler.n_dofs() << ' ' << hp_dof_handler.n_dofs()
+          << std::endl;
 
   Assert(dof_handler.n_dofs() == hp_dof_handler.n_dofs(), ExcInternalError());
 }
@@ -164,8 +164,7 @@ main()
   CHECK_SYS3(FE_DGQ<3>(1), 3, FE_DGP<3>(3), 1, FE_Q<3>(1), 3, 3);
 
   // systems of systems
-  CHECK_SYS3(
-    (FESystem<2>(FE_Q<2>(1), 3)), 3, FE_DGQ<2>(0), 1, FE_Q<2>(1), 3, 2);
+  CHECK_SYS3((FESystem<2>(FE_Q<2>(1), 3)), 3, FE_DGQ<2>(0), 1, FE_Q<2>(1), 3, 2);
   CHECK_SYS3(FE_DGQ<2>(3),
              1,
              FESystem<2>(FE_DGQ<2>(0), 3),

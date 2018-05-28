@@ -73,8 +73,7 @@ namespace hp
     /**
      * Copy constructor.
      */
-    MappingCollection(
-      const MappingCollection<dim, spacedim> &mapping_collection);
+    MappingCollection(const MappingCollection<dim, spacedim> &mapping_collection);
 
     /**
      * Adds a new mapping to the MappingCollection. Generally, you will

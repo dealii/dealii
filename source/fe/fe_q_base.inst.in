@@ -28,8 +28,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                              deal_II_dimension,
                              deal_II_space_dimension>;
     template class FE_Q_Base<
-      TensorProductPolynomials<deal_II_dimension,
-                               Polynomials::PiecewisePolynomial<double>>,
+      TensorProductPolynomials<deal_II_dimension, Polynomials::PiecewisePolynomial<double>>,
       deal_II_dimension,
       deal_II_space_dimension>;
 #endif

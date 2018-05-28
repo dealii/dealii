@@ -54,8 +54,7 @@ main()
   AD::ADNumberTraits<adtl::adouble>();
   AD::ADNumberTraits<std::complex<adtl::adouble>>();
   AD::NumberTraits<adtl::adouble, AD::NumberTypes::adolc_tapeless>();
-  AD::NumberTraits<std::complex<adtl::adouble>,
-                   AD::NumberTypes::adolc_tapeless>();
+  AD::NumberTraits<std::complex<adtl::adouble>, AD::NumberTypes::adolc_tapeless>();
   deallog << "Tapeless OK" << std::endl;
 
   deallog << "OK" << std::endl;

@@ -60,15 +60,13 @@ test()
 
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(2);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   // Now to the p-Method. Assign
   // random active_fe_indices to the
   // different cells.
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
   for (; cell != endc; ++cell)
     cell->set_active_fe_index(Testing::rand() % fe.size());
@@ -79,18 +77,16 @@ test()
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       {
-        deallog << "cell=" << cell << ", face=" << f
-                << ", fe_index=" << cell->active_fe_index() << ", dofs=";
-        std::vector<types::global_dof_index> dofs(
-          fe[cell->active_fe_index()].dofs_per_face);
+        deallog << "cell=" << cell << ", face=" << f << ", fe_index=" << cell->active_fe_index()
+                << ", dofs=";
+        std::vector<types::global_dof_index> dofs(fe[cell->active_fe_index()].dofs_per_face);
         cell->face(f)->get_dof_indices(dofs, cell->active_fe_index());
         for (unsigned int i = 0; i < dofs.size(); ++i)
           deallog << dofs[i] << ' ';
         deallog << std::endl;
       }
 
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          hanging_node_constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, hanging_node_constraints);
 
   hanging_node_constraints.print(deallog.get_file_stream());
 

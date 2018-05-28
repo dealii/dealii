@@ -73,17 +73,16 @@ test(unsigned int variant, unsigned int min_convergence_steps)
   data.max_n_tmp_vectors = 80;
 
   SolverGMRES<Vector<number>> solver(control, data);
-  auto print_re_orthogonalization = [](int accumulated_iterations) {
-    deallog.get_file_stream() << "Re-orthogonalization enabled at step "
-                              << accumulated_iterations << std::endl;
+  auto                        print_re_orthogonalization = [](int accumulated_iterations) {
+    deallog.get_file_stream() << "Re-orthogonalization enabled at step " << accumulated_iterations
+                              << std::endl;
   };
   solver.connect_re_orthogonalization_slot(print_re_orthogonalization);
 
-  check_solver_within_range(
-    solver.solve(matrix, sol, rhs, PreconditionIdentity()),
-    control.last_step(),
-    min_convergence_steps,
-    min_convergence_steps + 2);
+  check_solver_within_range(solver.solve(matrix, sol, rhs, PreconditionIdentity()),
+                            control.last_step(),
+                            min_convergence_steps,
+                            min_convergence_steps + 2);
 
   deallog.pop();
 }

@@ -102,8 +102,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2005, based on previous work by Wolfgang Bangerth.
  */
 template <int dim>
-class FE_RaviartThomas
-  : public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
+class FE_RaviartThomas : public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
 {
 public:
   /**
@@ -131,8 +130,7 @@ public:
    * always @p true.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   // documentation inherited from the base class
   virtual void
@@ -246,8 +244,7 @@ private:
  * @author Guido Kanschat, 2005, Zhu Liang, 2008
  */
 template <int dim>
-class FE_RaviartThomasNodal
-  : public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
+class FE_RaviartThomasNodal : public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
 {
 public:
   /**
@@ -274,12 +271,12 @@ public:
 
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix) const override;
 
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim> &source,
                                    const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &      matrix) const override;
   virtual bool
   hp_constraints_are_implemented() const override;
 
@@ -293,8 +290,7 @@ public:
   hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim> &fe_other) const override;
 
 private:
   /**
@@ -321,8 +317,7 @@ private:
    * always @p true.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from

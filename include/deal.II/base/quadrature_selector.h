@@ -67,8 +67,7 @@ public:
   DeclException1(ExcInvalidQGaussOrder,
                  int,
                  << "You tried to generate a QGauss object with an invalid "
-                 << "number " << arg1
-                 << " of quadrature points in each coordinate "
+                 << "number " << arg1 << " of quadrature points in each coordinate "
                  << "direction. This number must be greater than or equal "
                  << "to 1.");
   /**
@@ -78,8 +77,8 @@ public:
                  std::string,
                  unsigned int,
                  << "You tried to generate a " << arg1
-                 << " object; no order is needed for objects of this kind, but "
-                 << arg2 << " was given as argument.");
+                 << " object; no order is needed for objects of this kind, but " << arg2
+                 << " was given as argument.");
   /**
    * Exception
    */

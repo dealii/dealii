@@ -84,27 +84,24 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
     p2[0] = 1.0;
     std::vector<unsigned int> repetitoins(dim, 1);
     repetitoins[0] = 2;
-    GridGenerator::subdivided_hyper_rectangle(
-      triangulation, repetitoins, p1, p2);
+    GridGenerator::subdivided_hyper_rectangle(triangulation, repetitoins, p1, p2);
   }
 
   hp::DoFHandler<dim> dof_handler(triangulation);
 
   hp::FECollection<dim> fe_collection;
-  fe_collection.push_back(
-    FESystem<dim>(FE_Q<dim>(p1), 1, FE_Nothing<dim>(1, true), 1));
+  fe_collection.push_back(FESystem<dim>(FE_Q<dim>(p1), 1, FE_Nothing<dim>(1, true), 1));
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(p2), 1, FE_Q<dim>(1), 1));
   // push back to be able to resolve hp constrains no matter what:
-  fe_collection.push_back(
-    FESystem<dim>(FE_Q<dim>(p2), 1, FE_Nothing<dim>(1, true), 1));
+  fe_collection.push_back(FESystem<dim>(FE_Q<dim>(p2), 1, FE_Nothing<dim>(1, true), 1));
 
   hp::QCollection<dim - 1> q_face_collection;
   q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
   q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
   q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
 
-  deallog << "2cells: " << fe_collection[0].get_name() << " vs "
-          << fe_collection[1].get_name() << std::endl;
+  deallog << "2cells: " << fe_collection[0].get_name() << " vs " << fe_collection[1].get_name()
+          << std::endl;
 
   dof_handler.begin_active()->set_active_fe_index(1); // Q(p2)xQ(1)
 
@@ -131,13 +128,11 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
       // if the dof is constrained, first output unconstrained vector
       if (constraints.is_constrained(s))
         {
-          names.push_back(std::string("UN_") +
-                          dealii::Utilities::int_to_string(s, 2));
+          names.push_back(std::string("UN_") + dealii::Utilities::int_to_string(s, 2));
           shape_functions.push_back(shape_function);
         }
 
-      names.push_back(std::string("N_") +
-                      dealii::Utilities::int_to_string(s, 2));
+      names.push_back(std::string("N_") + dealii::Utilities::int_to_string(s, 2));
 
       // make continuous/constrain:
       constraints.distribute(shape_function);
@@ -148,9 +143,8 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
-  Vector<float> fe_index(triangulation.n_active_cells());
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  Vector<float>                                      fe_index(triangulation.n_active_cells());
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
@@ -162,8 +156,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(0);
-  std::string filename = "shape_functions_" +
-                         dealii::Utilities::int_to_string(counter, 1) + "_" +
+  std::string filename = "shape_functions_" + dealii::Utilities::int_to_string(counter, 1) + "_" +
                          dealii::Utilities::int_to_string(dim) + "D.vtu";
   std::ofstream output(filename.c_str());
   data_out.write_vtu(output);
@@ -183,8 +176,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 
   std::vector<unsigned int>   local_face_dof_indices;
   std::vector<Vector<double>> values;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
@@ -195,8 +187,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
           {
             deallog << "cell=" << cell << " face=" << f << std::endl;
             fe_face_values_hp.reinit(cell, f);
-            const FEFaceValues<dim> &fe_face_values =
-              fe_face_values_hp.get_present_fe_values();
+            const FEFaceValues<dim> &fe_face_values = fe_face_values_hp.get_present_fe_values();
 
             const unsigned int n_q_points = fe_face_values.n_quadrature_points;
             values.resize(n_q_points, Vector<double>(2));
@@ -207,8 +198,8 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
               fe_face_values.get_quadrature_points();
 
             for (unsigned int q = 0; q < n_q_points; q++)
-              deallog << "u[" << q_points[q] << "]={" << values[q][0] << ","
-                      << values[q][1] << "}" << std::endl;
+              deallog << "u[" << q_points[q] << "]={" << values[q][0] << "," << values[q][1] << "}"
+                      << std::endl;
           }
     }
 
@@ -225,26 +216,20 @@ main(int argc, char **argv)
 
   try
     {
-      test2cells<2>(
-        1, 2); // Q(1) x FE_Nothing vs Q(2) x Q(1) => common Q(1) x FE_Nothing
-      test2cells<2>(
-        2, 1); // Q(2) x FE_Nothing vs Q(1) x Q(1) => common Q(1) x FE_Nothing
-      test2cells<3>(
-        1, 2); // Q(1) x FE_Nothing vs Q(2) x Q(1) => common Q(1) x FE_Nothing
-      test2cells<3>(
-        2, 1); // Q(2) x FE_Nothing vs Q(1) x Q(1) => common Q(1) x FE_Nothing
+      test2cells<2>(1, 2); // Q(1) x FE_Nothing vs Q(2) x Q(1) => common Q(1) x FE_Nothing
+      test2cells<2>(2, 1); // Q(2) x FE_Nothing vs Q(1) x Q(1) => common Q(1) x FE_Nothing
+      test2cells<3>(1, 2); // Q(1) x FE_Nothing vs Q(2) x Q(1) => common Q(1) x FE_Nothing
+      test2cells<3>(2, 1); // Q(2) x FE_Nothing vs Q(1) x Q(1) => common Q(1) x FE_Nothing
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -252,12 +237,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

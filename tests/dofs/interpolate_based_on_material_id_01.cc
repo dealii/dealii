@@ -73,15 +73,13 @@ test()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(3);
   std::map<types::material_id, const Function<dim> *> functions;
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     {
       cell->set_material_id(cell->index() % 128);
       if (functions.find(cell->index() % 128) == functions.end())
-        functions[cell->index() % 128] =
-          new Functions::ConstantFunction<dim>(cell->index() % 128);
+        functions[cell->index() % 128] = new Functions::ConstantFunction<dim>(cell->index() % 128);
     }
 
   for (unsigned int p = 1; p < 7 - dim; ++p)
@@ -93,8 +91,7 @@ test()
       Vector<double> interpolant(dof_handler.n_dofs());
       VectorTools::interpolate_based_on_material_id(
         MappingQGeneric<dim>(1), dof_handler, functions, interpolant);
-      for (typename DoFHandler<dim>::active_cell_iterator cell =
-             dof_handler.begin_active();
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell)
         {
@@ -105,8 +102,7 @@ test()
         }
     }
 
-  for (typename std::map<types::material_id, const Function<dim> *>::iterator
-         p = functions.begin();
+  for (typename std::map<types::material_id, const Function<dim> *>::iterator p = functions.begin();
        p != functions.end();
        ++p)
     delete p->second;

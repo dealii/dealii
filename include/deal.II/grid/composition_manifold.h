@@ -114,103 +114,71 @@ private:
   /**
    * The first ChartManifold.
    */
-  SmartPointer<
-    const ChartManifold<dim1, intermediate_dim, chartdim>,
-    CompositionManifold<dim, spacedim, chartdim, dim1, dim2, intermediate_dim>>
+  SmartPointer<const ChartManifold<dim1, intermediate_dim, chartdim>,
+               CompositionManifold<dim, spacedim, chartdim, dim1, dim2, intermediate_dim>>
     F;
 
 
   /**
    * The second ChartManifold.
    */
-  SmartPointer<
-    const ChartManifold<dim2, spacedim, intermediate_dim>,
-    CompositionManifold<dim, spacedim, chartdim, dim1, dim2, intermediate_dim>>
+  SmartPointer<const ChartManifold<dim2, spacedim, intermediate_dim>,
+               CompositionManifold<dim, spacedim, chartdim, dim1, dim2, intermediate_dim>>
     G;
 };
 
 
 /*------------------Template Implementations------------------------*/
 
-template <int dim,
-          int spacedim,
-          int chartdim,
-          int intermediate_dim,
-          int dim1,
-          int dim2>
-CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
-  CompositionManifold(
-    const ChartManifold<dim1, intermediate_dim, chartdim> &F,
-    const ChartManifold<dim2, spacedim, intermediate_dim> &G) :
+template <int dim, int spacedim, int chartdim, int intermediate_dim, int dim1, int dim2>
+CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::CompositionManifold(
+  const ChartManifold<dim1, intermediate_dim, chartdim> &F,
+  const ChartManifold<dim2, spacedim, intermediate_dim> &G) :
   ChartManifold<dim, spacedim, chartdim>(F.get_periodicity()),
   F(&F),
   G(&G)
 {
   // We don't know what to do with a periodicity in the second manifold, so
   // throw an assertion if the second manifold is periodic
-  Assert(G.get_periodicity().norm() == 0.0,
-         ExcMessage("The second manifold cannot be periodic."));
+  Assert(G.get_periodicity().norm() == 0.0, ExcMessage("The second manifold cannot be periodic."));
 }
 
 
-template <int dim,
-          int spacedim,
-          int chartdim,
-          int intermediate_dim,
-          int dim1,
-          int dim2>
+template <int dim, int spacedim, int chartdim, int intermediate_dim, int dim1, int dim2>
 std::unique_ptr<Manifold<dim, spacedim>>
-CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
-  clone() const
+CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::clone() const
 {
   return std_cxx14::make_unique<
-    CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>>(
-    *F, *G);
+    CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>>(*F, *G);
 }
 
 
-template <int dim,
-          int spacedim,
-          int chartdim,
-          int intermediate_dim,
-          int dim1,
-          int dim2>
+template <int dim, int spacedim, int chartdim, int intermediate_dim, int dim1, int dim2>
 Point<chartdim>
-CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
-  pull_back(const Point<spacedim> &space_point) const
+CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::pull_back(
+  const Point<spacedim> &space_point) const
 {
   return F->pull_back(G->pull_back(space_point));
 }
 
 
 
-template <int dim,
-          int spacedim,
-          int chartdim,
-          int intermediate_dim,
-          int dim1,
-          int dim2>
+template <int dim, int spacedim, int chartdim, int intermediate_dim, int dim1, int dim2>
 Point<spacedim>
-CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
-  push_forward(const Point<chartdim> &chart_point) const
+CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::push_forward(
+  const Point<chartdim> &chart_point) const
 {
   return G->push_forward(F->push_forward(chart_point));
 }
 
 
 
-template <int dim,
-          int spacedim,
-          int chartdim,
-          int intermediate_dim,
-          int dim1,
-          int dim2>
+template <int dim, int spacedim, int chartdim, int intermediate_dim, int dim1, int dim2>
 DerivativeForm<1, chartdim, spacedim>
-CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::
-  push_forward_gradient(const Point<chartdim> &chart_point) const
+CompositionManifold<dim, spacedim, chartdim, intermediate_dim, dim1, dim2>::push_forward_gradient(
+  const Point<chartdim> &chart_point) const
 {
-  DerivativeForm<1, chartdim, intermediate_dim> DF =
-    F->push_forward_gradient(chart_point);
+  DerivativeForm<1, chartdim, intermediate_dim> DF = F->push_forward_gradient(chart_point);
 
   DerivativeForm<1, intermediate_dim, spacedim> DG =
     G->push_forward_gradient(F->push_forward(chart_point));

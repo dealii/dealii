@@ -72,8 +72,7 @@ test()
   const unsigned int local_index[n_entries] = {1, 1};
   const double       local_value[n_entries] = {1.0, 1.0};
 
-  TrilinosWrappers::SparsityPattern sp(
-    row_partitioning, col_partitioning, MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(row_partitioning, col_partitioning, MPI_COMM_WORLD);
   for (unsigned int i = 0; i < n_entries; ++i)
     if (row_partitioning.is_element(line[i]))
       sp.add(line[i], local_index[i]);
@@ -112,17 +111,13 @@ test()
     {
       if (my_id == 0)
         {
-          Assert(AtA.local_range().first == 0,
-                 ExcMessage("AtA Local Range is not as expected."));
-          Assert(AtA.local_range().second == 1,
-                 ExcMessage("AtA Local Range is not as expected."));
+          Assert(AtA.local_range().first == 0, ExcMessage("AtA Local Range is not as expected."));
+          Assert(AtA.local_range().second == 1, ExcMessage("AtA Local Range is not as expected."));
         }
       if (my_id == 1)
         {
-          Assert(AtA.local_range().first == 1,
-                 ExcMessage("AtA Local Range is not as expected."));
-          Assert(AtA.local_range().second == 2,
-                 ExcMessage("AtA Local Range is not as expected."));
+          Assert(AtA.local_range().first == 1, ExcMessage("AtA Local Range is not as expected."));
+          Assert(AtA.local_range().second == 2, ExcMessage("AtA Local Range is not as expected."));
         }
     }
 
@@ -153,8 +148,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

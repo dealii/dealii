@@ -27,8 +27,7 @@ using namespace Polynomials;
 
 
 void
-check_derivatives(const std::vector<Polynomial<double>> &p,
-                  const unsigned int                     n_deriv)
+check_derivatives(const std::vector<Polynomial<double>> &p, const unsigned int n_deriv)
 {
   // check whether the values and derivatives
   // are evaluated correctly some randomly
@@ -37,8 +36,7 @@ check_derivatives(const std::vector<Polynomial<double>> &p,
   // expanded form by adding a dummy polynomial;
   // addition of polynomials destroys the
   // product form in the current implementation)
-  deallog << "Representation of derivatives up to order " << n_deriv - 1
-          << std::endl;
+  deallog << "Representation of derivatives up to order " << n_deriv - 1 << std::endl;
   std::vector<double> values(n_deriv), values_ref(n_deriv);
   Monomial<double>    zero(0, 0);
   for (unsigned int j = 0; j < p.size(); ++j)
@@ -51,12 +49,10 @@ check_derivatives(const std::vector<Polynomial<double>> &p,
       for (unsigned int i = 0; i < n_deriv; ++i)
         {
           deallog << ".";
-          if (std::fabs(values[i] - values_ref[i]) >
-              std::max(1e-11, 1e-11 * std::fabs(values[i])))
-            deallog << "Error deriv" << i << "  lg y="
-                    << std::log10(std::fabs(values[i] - values_ref[i]))
-                    << ", is: " << values[i] << ", should be: " << values_ref[i]
-                    << std::endl;
+          if (std::fabs(values[i] - values_ref[i]) > std::max(1e-11, 1e-11 * std::fabs(values[i])))
+            deallog << "Error deriv" << i
+                    << "  lg y=" << std::log10(std::fabs(values[i] - values_ref[i]))
+                    << ", is: " << values[i] << ", should be: " << values_ref[i] << std::endl;
         }
     }
   deallog << std::endl;
@@ -68,8 +64,7 @@ void
 check_poly(const Quadrature<1> &q)
 {
   deallog << "Points: " << q.size() << std::endl;
-  std::vector<Polynomial<double>> p =
-    generate_complete_Lagrange_basis(q.get_points());
+  std::vector<Polynomial<double>> p = generate_complete_Lagrange_basis(q.get_points());
   for (unsigned int i = 1; i < 6; ++i)
     check_derivatives(p, i);
   deallog << std::endl;
@@ -81,8 +76,7 @@ void
 check_lge(unsigned int n)
 {
   deallog << "Points: " << n + 1 << std::endl;
-  std::vector<Polynomial<double>> p =
-    LagrangeEquidistant::generate_complete_basis(n);
+  std::vector<Polynomial<double>> p = LagrangeEquidistant::generate_complete_basis(n);
   for (unsigned int i = 1; i < 6; ++i)
     check_derivatives(p, i);
   deallog << std::endl;

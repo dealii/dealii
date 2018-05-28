@@ -32,40 +32,30 @@ main()
   {
     const auto &pattern = Patterns::Tuple(Patterns::Double());
 
-    deallog << pattern.description(Patterns::PatternBase::OutputStyle::Machine)
-            << '\n'
-            << pattern.description(Patterns::PatternBase::OutputStyle::Text)
-            << '\n'
-            << pattern.description(Patterns::PatternBase::OutputStyle::LaTeX)
-            << '\n'
+    deallog << pattern.description(Patterns::PatternBase::OutputStyle::Machine) << '\n'
+            << pattern.description(Patterns::PatternBase::OutputStyle::Text) << '\n'
+            << pattern.description(Patterns::PatternBase::OutputStyle::LaTeX) << '\n'
             << std::endl;
   }
 
   // two patterns
   {
-    const auto &pattern =
-      Patterns::Tuple(Patterns::Double(), Patterns::Anything());
+    const auto &pattern = Patterns::Tuple(Patterns::Double(), Patterns::Anything());
 
-    deallog << pattern.description(Patterns::PatternBase::OutputStyle::Machine)
-            << '\n'
-            << pattern.description(Patterns::PatternBase::OutputStyle::Text)
-            << '\n'
-            << pattern.description(Patterns::PatternBase::OutputStyle::LaTeX)
-            << '\n'
+    deallog << pattern.description(Patterns::PatternBase::OutputStyle::Machine) << '\n'
+            << pattern.description(Patterns::PatternBase::OutputStyle::Text) << '\n'
+            << pattern.description(Patterns::PatternBase::OutputStyle::LaTeX) << '\n'
             << std::endl;
   }
 
   // three patterns
   {
-    const auto &pattern = Patterns::Tuple(
-      Patterns::Double(), Patterns::Anything(), Patterns::Bool());
+    const auto &pattern =
+      Patterns::Tuple(Patterns::Double(), Patterns::Anything(), Patterns::Bool());
 
-    deallog << pattern.description(Patterns::PatternBase::OutputStyle::Machine)
-            << '\n'
-            << pattern.description(Patterns::PatternBase::OutputStyle::Text)
-            << '\n'
-            << pattern.description(Patterns::PatternBase::OutputStyle::LaTeX)
-            << '\n'
+    deallog << pattern.description(Patterns::PatternBase::OutputStyle::Machine) << '\n'
+            << pattern.description(Patterns::PatternBase::OutputStyle::Text) << '\n'
+            << pattern.description(Patterns::PatternBase::OutputStyle::LaTeX) << '\n'
             << std::endl;
   }
 }

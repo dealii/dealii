@@ -53,8 +53,7 @@ test()
   p2[0] = 2;
   for (unsigned int d = 1; d < dim; ++d)
     p2[d] = 1;
-  GridGenerator::subdivided_hyper_rectangle(
-    tria, refinements, Point<dim>(), p2);
+  GridGenerator::subdivided_hyper_rectangle(tria, refinements, Point<dim>(), p2);
 
   tria.begin()->face(0)->set_all_boundary_ids(10);
   tria.last()->face(1)->set_all_boundary_ids(11);
@@ -66,8 +65,7 @@ test()
       tria.last()->face(5)->set_all_boundary_ids(13);
     }
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   GridTools::collect_periodic_faces(tria, 10, 11, 0, periodic_faces);
   if (dim == 3)
@@ -86,42 +84,32 @@ test()
 
   const QGauss<1>                          quad(1);
   typename MatrixFree<dim>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
+  data.tasks_parallel_scheme               = MatrixFree<dim>::AdditionalData::none;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
 
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
     {
       MatrixFree<dim> mf_data;
       data.level_mg_handler = level;
       mf_data.reinit(dof, constraints, quad, data);
-      std::vector<unsigned int> n_inner_faces(2 * dim),
-        n_inner_other_faces(2 * dim), n_boundary_faces(2 * dim);
+      std::vector<unsigned int> n_inner_faces(2 * dim), n_inner_other_faces(2 * dim),
+        n_boundary_faces(2 * dim);
       for (unsigned int f = 0; f < mf_data.n_inner_face_batches(); ++f)
         {
-          for (unsigned int v = 0;
-               v < VectorizedArray<double>::n_array_elements;
-               ++v)
-            if (mf_data.get_face_info(f).cells_interior[v] !=
-                numbers::invalid_unsigned_int)
+          for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+            if (mf_data.get_face_info(f).cells_interior[v] != numbers::invalid_unsigned_int)
               {
                 n_inner_faces[mf_data.get_face_info(f).interior_face_no]++;
-                n_inner_other_faces[mf_data.get_face_info(f)
-                                      .exterior_face_no]++;
+                n_inner_other_faces[mf_data.get_face_info(f).exterior_face_no]++;
               }
         }
       for (unsigned int f = mf_data.n_inner_face_batches();
-           f <
-           mf_data.n_inner_face_batches() + mf_data.n_boundary_face_batches();
+           f < mf_data.n_inner_face_batches() + mf_data.n_boundary_face_batches();
            ++f)
         {
-          for (unsigned int v = 0;
-               v < VectorizedArray<double>::n_array_elements;
-               ++v)
-            if (mf_data.get_face_info(f).cells_interior[v] !=
-                numbers::invalid_unsigned_int)
+          for (unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+            if (mf_data.get_face_info(f).cells_interior[v] != numbers::invalid_unsigned_int)
               {
                 n_boundary_faces[mf_data.get_face_info(f).interior_face_no]++;
               }
@@ -146,9 +134,8 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, testing_max_num_threads());
+  MPILogInitAll                    log;
   deallog << std::setprecision(3);
 
   {

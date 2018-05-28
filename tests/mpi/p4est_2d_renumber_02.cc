@@ -48,7 +48,7 @@ template <int dim>
 void
 test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int                              myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   std::vector<unsigned int> sub(2);
@@ -83,9 +83,7 @@ test()
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         dof_set.print(deallog);
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-             ++i)
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
           {
             deallog << "Dofs owned by processor " << i << ": ";
             dofh.locally_owned_dofs_per_processor()[i].print(deallog);

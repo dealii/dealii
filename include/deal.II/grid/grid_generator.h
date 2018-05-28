@@ -118,8 +118,7 @@ namespace GridGenerator
    */
   template <int dim>
   void
-  simplex(Triangulation<dim, dim> &      tria,
-          const std::vector<Point<dim>> &vertices);
+  simplex(Triangulation<dim, dim> &tria, const std::vector<Point<dim>> &vertices);
 
   /**
    * Same as hyper_cube(), but with the difference that not only one cell is
@@ -256,7 +255,7 @@ namespace GridGenerator
                              const std::vector<std::vector<double>> &step_sizes,
                              const Point<dim> &                      p_1,
                              const Point<dim> &                      p_2,
-                             const bool colorize = false);
+                             const bool                              colorize = false);
 
   /**
    * Like the previous function, but with the following twist: the @p
@@ -273,8 +272,8 @@ namespace GridGenerator
   subdivided_hyper_rectangle(Triangulation<dim> &                    tria,
                              const std::vector<std::vector<double>> &spacing,
                              const Point<dim> &                      p,
-                             const Table<dim, types::material_id> &material_id,
-                             const bool colorize = false);
+                             const Table<dim, types::material_id> &  material_id,
+                             const bool                              colorize = false);
 
   /**
    * \brief Rectangular domain with rectangular pattern of holes
@@ -304,8 +303,7 @@ namespace GridGenerator
    */
   template <int dim, int spacedim>
   void
-  cheese(Triangulation<dim, spacedim> &   tria,
-         const std::vector<unsigned int> &holes);
+  cheese(Triangulation<dim, spacedim> &tria, const std::vector<unsigned int> &holes);
 
   /**
    * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
@@ -430,8 +428,8 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &              tria,
     const Point<spacedim> &                     origin,
     const std::array<Tensor<1, spacedim>, dim> &edges,
-    const std::vector<unsigned int> &subdivisions = std::vector<unsigned int>(),
-    const bool                       colorize     = false);
+    const std::vector<unsigned int> &           subdivisions = std::vector<unsigned int>(),
+    const bool                                  colorize     = false);
 
   /**
    * Hypercube with a layer of hypercubes around it. The first two parameters
@@ -494,9 +492,9 @@ namespace GridGenerator
   template <int dim>
   void
   hyper_ball(Triangulation<dim> &tria,
-             const Point<dim> &  center = Point<dim>(),
-             const double        radius = 1.,
-             const bool attach_spherical_manifold_on_boundary_cells = false);
+             const Point<dim> &  center                                      = Point<dim>(),
+             const double        radius                                      = 1.,
+             const bool          attach_spherical_manifold_on_boundary_cells = false);
 
   /**
    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
@@ -526,8 +524,8 @@ namespace GridGenerator
 
   template <int spacedim>
   void hyper_sphere(Triangulation<spacedim - 1, spacedim> &tria,
-                    const Point<spacedim> &center = Point<spacedim>(),
-                    const double           radius = 1.);
+                    const Point<spacedim> &                center = Point<spacedim>(),
+                    const double                           radius = 1.);
 
   /**
    * This class produces a hyper-ball intersected with the positive orthant
@@ -590,9 +588,7 @@ namespace GridGenerator
    */
   template <int dim>
   void
-  cylinder(Triangulation<dim> &tria,
-           const double        radius      = 1.,
-           const double        half_length = 1.);
+  cylinder(Triangulation<dim> &tria, const double radius = 1., const double half_length = 1.);
 
   /**
    * Create a cut cone around the x-axis.  The cone extends from
@@ -1033,10 +1029,9 @@ namespace GridGenerator
    */
   template <int dim, int spacedim>
   void
-  create_union_triangulation(
-    const Triangulation<dim, spacedim> &triangulation_1,
-    const Triangulation<dim, spacedim> &triangulation_2,
-    Triangulation<dim, spacedim> &      result);
+  create_union_triangulation(const Triangulation<dim, spacedim> &triangulation_1,
+                             const Triangulation<dim, spacedim> &triangulation_2,
+                             Triangulation<dim, spacedim> &      result);
 
   /**
    * This function creates a triangulation that consists of the same cells as
@@ -1077,9 +1072,8 @@ namespace GridGenerator
   void
   create_triangulation_with_removed_cells(
     const Triangulation<dim, spacedim> &input_triangulation,
-    const std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>
-      &                           cells_to_remove,
-    Triangulation<dim, spacedim> &result);
+    const std::set<typename Triangulation<dim, spacedim>::active_cell_iterator> &cells_to_remove,
+    Triangulation<dim, spacedim> &                                               result);
 
   /**
    * Take a 2d Triangulation that is being extruded in z direction by the
@@ -1265,10 +1259,10 @@ namespace GridGenerator
 #else
   typename ExtractBoundaryMesh<MeshType, dim, spacedim>::return_type
 #endif
-  extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
-                        MeshType<dim - 1, spacedim> &       surface_mesh,
-                        const std::set<types::boundary_id> &boundary_ids =
-                          std::set<types::boundary_id>());
+  extract_boundary_mesh(
+    const MeshType<dim, spacedim> &     volume_mesh,
+    MeshType<dim - 1, spacedim> &       surface_mesh,
+    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   ///@}
 
@@ -1294,8 +1288,7 @@ namespace GridGenerator
    */
   DeclException1(ExcInvalidRepetitionsDimension,
                  int,
-                 << "The vector of repetitions  must have " << arg1
-                 << " elements.");
+                 << "The vector of repetitions  must have " << arg1 << " elements.");
 
   /**
    * Exception for input that is not properly oriented.

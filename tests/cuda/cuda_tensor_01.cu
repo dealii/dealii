@@ -79,8 +79,7 @@ test_gpu()
   norm_kernel<<<1, 1>>>(t_dev, norm_dev);
 
   // Copy the result to the device
-  cuda_error =
-    cudaMemcpy(&norm_host, norm_dev, sizeof(double), cudaMemcpyDeviceToHost);
+  cuda_error = cudaMemcpy(&norm_host, norm_dev, sizeof(double), cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error);
 
   // Free memory

@@ -50,15 +50,12 @@ test()
     parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::subdivided_hyper_cube(tria, 1);
   // set periodic boundary conditions in x and z directions
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (typename Triangulation<dim>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (f / 2 != 1 && cell->at_boundary(f))
         cell->face(f)->set_all_boundary_ids(f + 10);
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   GridTools::collect_periodic_faces(tria, 0 + 10, 1 + 10, 0, periodic_faces);
   if (dim == 3)

@@ -103,8 +103,7 @@ namespace Utilities
    */
   template <typename number>
   std::string
-  to_string(const number       value,
-            const unsigned int digits = numbers::invalid_unsigned_int);
+  to_string(const number value, const unsigned int digits = numbers::invalid_unsigned_int);
 
   /**
    * Determine how many digits are needed to represent numbers at most as
@@ -248,9 +247,7 @@ namespace Utilities
    * @p to.
    */
   std::string
-  replace_in_string(const std::string &input,
-                    const std::string &from,
-                    const std::string &to);
+  replace_in_string(const std::string &input, const std::string &from, const std::string &to);
 
   /**
    * Return a string with all standard whitespace characters (including
@@ -440,9 +437,7 @@ namespace Utilities
    */
   template <typename T>
   size_t
-  pack(const T &          object,
-       std::vector<char> &dest_buffer,
-       const bool         allow_compression = true);
+  pack(const T &object, std::vector<char> &dest_buffer, const bool allow_compression = true);
 
   /**
    * Creates and returns a buffer solely for the given object, using the
@@ -923,9 +918,8 @@ namespace Utilities
     // verify that the two iterators are properly ordered. since
     // we need operator- for the iterator type anyway, do the
     // test as follows, rather than via 'last >= first'
-    Assert(
-      last - first >= 0,
-      ExcMessage("The given iterators do not satisfy the proper ordering."));
+    Assert(last - first >= 0,
+           ExcMessage("The given iterators do not satisfy the proper ordering."));
 
     unsigned int len = static_cast<unsigned int>(last - first);
 
@@ -1016,9 +1010,7 @@ namespace Utilities
 
   template <typename T>
   size_t
-  pack(const T &          object,
-       std::vector<char> &dest_buffer,
-       const bool         allow_compression)
+  pack(const T &object, std::vector<char> &dest_buffer, const bool allow_compression)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1054,9 +1046,8 @@ namespace Utilities
         if (allow_compression)
           {
             boost::iostreams::filtering_ostream out;
-            out.push(
-              boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                boost::iostreams::gzip::best_compression)));
+            out.push(boost::iostreams::gzip_compressor(
+              boost::iostreams::gzip_params(boost::iostreams::gzip::best_compression)));
             out.push(boost::iostreams::back_inserter(dest_buffer));
 
             boost::archive::binary_oarchive archive(out);
@@ -1130,8 +1121,7 @@ namespace Utilities
           {
             boost::iostreams::filtering_ostream decompressing_stream;
             decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
+            decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
             decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
           }
         else
@@ -1180,8 +1170,7 @@ namespace Utilities
 #endif
       && sizeof(T) * N < 256)
       {
-        Assert(std::distance(cbegin, cend) == sizeof(T) * N,
-               ExcInternalError());
+        Assert(std::distance(cbegin, cend) == sizeof(T) * N, ExcInternalError());
         std::memcpy(unpacked_object, &*cbegin, sizeof(T) * N);
       }
     else
@@ -1194,8 +1183,7 @@ namespace Utilities
           {
             boost::iostreams::filtering_ostream decompressing_stream;
             decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
+            decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
             decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
           }
         else

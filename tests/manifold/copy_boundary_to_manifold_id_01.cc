@@ -40,8 +40,7 @@ print_info(Triangulation<dim, spacedim> &tria)
         if (cell->face(f)->at_boundary())
           deallog << "face: " << cell->face(f)
                   << ", boundary_id: " << (int)cell->face(f)->boundary_id()
-                  << ", manifold_id: " << (int)cell->face(f)->manifold_id()
-                  << std::endl;
+                  << ", manifold_id: " << (int)cell->face(f)->manifold_id() << std::endl;
     }
 }
 

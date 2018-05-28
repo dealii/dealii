@@ -85,14 +85,10 @@ main()
   prm.set("A list of Point<2>", "3.0, 4.0;  5.0,6.0");
   prm.set("A list of Point<3>", "7.0, 8.0, 9.0;  10.0, 11.0, 12.0");
 
-  deallog << "After ParameterHandler::set =========================="
-          << std::endl
-          << std::endl;
+  deallog << "After ParameterHandler::set ==========================" << std::endl << std::endl;
   prm.log_parameters(deallog);
 
-  deallog << "Actual variables            =========================="
-          << std::endl
-          << std::endl;
+  deallog << "Actual variables            ==========================" << std::endl << std::endl;
 
   deallog << "Values: " << a0 << std::endl;
   deallog << "Values: " << a1 << std::endl;

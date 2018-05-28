@@ -42,17 +42,15 @@ test_vector(PETScWrappers::MPI::Vector &v)
   // check that is what we get by casting PetscScalar to std::real()
   // and std::imag()
   for (unsigned int k = 0; k < v.size(); ++k)
-    AssertThrow(
-      (static_cast<std::complex<double>>(v(k)).real() == k) &&
-        (static_cast<std::complex<double>>(v(k)).imag() == v.size() - k),
-      ExcInternalError());
+    AssertThrow((static_cast<std::complex<double>>(v(k)).real() == k) &&
+                  (static_cast<std::complex<double>>(v(k)).imag() == v.size() - k),
+                ExcInternalError());
 
   // check that is what we get by
   // dealii::internal::VectorReference::real() and
   // dealii::internal::VectorReference::imag()
   for (unsigned int k = 0; k < v.size(); ++k)
-    AssertThrow((v(k).real() == k) && (v(k).imag() == v.size() - k),
-                ExcInternalError());
+    AssertThrow((v(k).real() == k) && (v(k).imag() == v.size() - k), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -81,13 +79,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -95,12 +91,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

@@ -109,9 +109,8 @@ using namespace dealii;
 template <int dim>
 struct periodicity_tests
 {
-  typedef TriaIterator<CellAccessor<dim>> cell_iterator;
-  typedef
-    typename Triangulation<dim>::active_cell_iterator active_cell_iterator;
+  typedef TriaIterator<CellAccessor<dim>>                   cell_iterator;
+  typedef typename Triangulation<dim>::active_cell_iterator active_cell_iterator;
   periodicity_tests();
 
   unsigned                                  refn_cycle;
@@ -133,8 +132,7 @@ periodicity_tests<dim>::periodicity_tests() :
   mpi_comm(MPI_COMM_WORLD),
   the_grid(mpi_comm)
 {
-  Assert(dim == 2 || dim == 3,
-         ExcMessage("Only implemented for the 2D and 3D case!"));
+  Assert(dim == 2 || dim == 3, ExcMessage("Only implemented for the 2D and 3D case!"));
   comm_rank = Utilities::MPI::this_mpi_process(mpi_comm);
   comm_size = Utilities::MPI::n_mpi_processes(mpi_comm);
   std::vector<unsigned> repeats(dim, 2);
@@ -151,8 +149,7 @@ periodicity_tests<dim>::periodicity_tests() :
     }
   GridGenerator::subdivided_hyper_rectangle(the_grid, repeats, p1, p2, true);
   std::vector<GridTools::PeriodicFacePair<cell_iterator>> periodic_faces;
-  GridTools::collect_periodic_faces(
-    the_grid, 2, 3, 0, periodic_faces, periodic_transfer);
+  GridTools::collect_periodic_faces(the_grid, 2, 3, 0, periodic_faces, periodic_transfer);
   the_grid.add_periodicity(periodic_faces);
 }
 
@@ -177,8 +174,7 @@ periodicity_tests<dim>::refine_grid(const unsigned n)
           active_cell_iterator cell_it = the_grid.begin_active();
           for (; cell_it != the_grid.end(); ++cell_it)
             {
-              if (cell_it->is_locally_owned() &&
-                  cell_it->point_inside(refn_point))
+              if (cell_it->is_locally_owned() && cell_it->point_inside(refn_point))
                 {
                   cell_it->set_refine_flag();
                   break;
@@ -195,34 +191,31 @@ void
 periodicity_tests<dim>::write_grid()
 {
   GridOut           Grid1_Out;
-  GridOutFlags::Svg svg_flags(
-    1,                                       // line_thickness = 2,
-    2,                                       // boundary_line_thickness = 4,
-    false,                                   // margin = true,
-    dealii::GridOutFlags::Svg::transparent,  // background = white,
-    0,                                       // azimuth_angle = 0,
-    0,                                       // polar_angle = 0,
-    dealii::GridOutFlags::Svg::subdomain_id, // coloring = level_number,
-    false, // convert_level_number_to_height = false,
-    false, // label_level_number = true,
-    true,  // label_cell_index = true,
-    false, // label_material_id = false,
-    false, // label_subdomain_id = false,
-    true,  // draw_colorbar = true,
-    true); // draw_legend = true
+  GridOutFlags::Svg svg_flags(1,     // line_thickness = 2,
+                              2,     // boundary_line_thickness = 4,
+                              false, // margin = true,
+                              dealii::GridOutFlags::Svg::transparent,  // background = white,
+                              0,                                       // azimuth_angle = 0,
+                              0,                                       // polar_angle = 0,
+                              dealii::GridOutFlags::Svg::subdomain_id, // coloring = level_number,
+                              false, // convert_level_number_to_height = false,
+                              false, // label_level_number = true,
+                              true,  // label_cell_index = true,
+                              false, // label_material_id = false,
+                              false, // label_subdomain_id = false,
+                              true,  // draw_colorbar = true,
+                              true); // draw_legend = true
   Grid1_Out.set_flags(svg_flags);
   if (dim == 2)
     {
-      std::ofstream Grid1_OutFile(
-        "Grid1" + dealii::Utilities::to_string(refn_cycle) +
-        dealii::Utilities::to_string(comm_rank) + ".svg");
+      std::ofstream Grid1_OutFile("Grid1" + dealii::Utilities::to_string(refn_cycle) +
+                                  dealii::Utilities::to_string(comm_rank) + ".svg");
       Grid1_Out.write_svg(the_grid, Grid1_OutFile);
     }
   else
     {
-      std::ofstream Grid1_OutFile(
-        "Grid1" + dealii::Utilities::to_string(refn_cycle) +
-        dealii::Utilities::to_string(comm_rank) + ".msh");
+      std::ofstream Grid1_OutFile("Grid1" + dealii::Utilities::to_string(refn_cycle) +
+                                  dealii::Utilities::to_string(comm_rank) + ".msh");
       Grid1_Out.write_msh(the_grid, Grid1_OutFile);
     }
 }
@@ -231,40 +224,30 @@ template <int dim>
 void
 periodicity_tests<dim>::check_periodicity()
 {
-  typedef std::pair<cell_iterator, unsigned> cell_face_pair;
-  typedef typename std::map<cell_face_pair, cell_face_pair>::iterator
-    cell_face_map_it;
+  typedef std::pair<cell_iterator, unsigned>                          cell_face_pair;
+  typedef typename std::map<cell_face_pair, cell_face_pair>::iterator cell_face_map_it;
 
   for (int rank_i = 0; rank_i < comm_size; ++rank_i)
     {
       if (comm_rank == rank_i)
         {
-          deallog << "All of the cells with periodic neighbors on rank "
-                  << comm_rank << std::endl;
+          deallog << "All of the cells with periodic neighbors on rank " << comm_rank << std::endl;
           active_cell_iterator cell_it = the_grid.begin_active();
           for (; cell_it != the_grid.end(); ++cell_it)
             {
-              for (unsigned i_face = 0;
-                   i_face < GeometryInfo<dim>::faces_per_cell;
-                   ++i_face)
+              for (unsigned i_face = 0; i_face < GeometryInfo<dim>::faces_per_cell; ++i_face)
                 {
                   if (cell_it->has_periodic_neighbor(i_face))
                     {
-                      const cell_iterator &nb_it =
-                        cell_it->periodic_neighbor(i_face);
-                      unsigned nb_i_face =
-                        cell_it->periodic_neighbor_face_no(i_face);
-                      const cell_iterator &nb_of_nb_it =
-                        nb_it->periodic_neighbor(nb_i_face);
-                      unsigned nb_of_nb_i_face =
-                        nb_it->periodic_neighbor_face_no(nb_i_face);
-                      deallog << nb_it->face(nb_i_face)->center()
-                              << " is a periodic neighbor of "
+                      const cell_iterator &nb_it       = cell_it->periodic_neighbor(i_face);
+                      unsigned             nb_i_face   = cell_it->periodic_neighbor_face_no(i_face);
+                      const cell_iterator &nb_of_nb_it = nb_it->periodic_neighbor(nb_i_face);
+                      unsigned nb_of_nb_i_face = nb_it->periodic_neighbor_face_no(nb_i_face);
+                      deallog << nb_it->face(nb_i_face)->center() << " is a periodic neighbor of "
                               << cell_it->face(i_face)->center();
                       if (cell_it->periodic_neighbor_is_coarser(i_face))
                         {
-                          deallog << ". And periodic neighbor is coarser."
-                                  << std::endl;
+                          deallog << ". And periodic neighbor is coarser." << std::endl;
                           /*
                            * Now, we want to do the standard test of:
                            *
@@ -282,29 +265,23 @@ periodicity_tests<dim>::check_periodicity()
                            * faces.
                            */
                           std::pair<unsigned, unsigned> face_subface =
-                            cell_it
-                              ->periodic_neighbor_of_coarser_periodic_neighbor(
-                                i_face);
+                            cell_it->periodic_neighbor_of_coarser_periodic_neighbor(i_face);
                           Assert(nb_it->periodic_neighbor_child_on_subface(
-                                   face_subface.first, face_subface.second) ==
-                                   cell_it,
+                                   face_subface.first, face_subface.second) == cell_it,
                                  ExcInternalError());
                         }
                       else if (nb_it->face(nb_i_face)->has_children())
                         {
-                          deallog << ". And periodic neighbor is refined."
-                                  << std::endl;
+                          deallog << ". And periodic neighbor is refined." << std::endl;
                         }
                       else
-                        deallog << ". And periodic neighbor has the same level."
-                                << std::endl;
+                        deallog << ". And periodic neighbor has the same level." << std::endl;
                       deallog << "If the periodic neighbor is not coarser, "
                               << nb_of_nb_it->face(nb_of_nb_i_face)->center()
-                              << " should be equal to "
-                              << cell_it->face(i_face)->center() << std::endl;
-                      deallog
-                        << "-------------------------------------------------------"
-                        << std::endl;
+                              << " should be equal to " << cell_it->face(i_face)->center()
+                              << std::endl;
+                      deallog << "-------------------------------------------------------"
+                              << std::endl;
                       Assert((cell_it->face(i_face)->center() -
                               nb_of_nb_it->face(nb_of_nb_i_face)->center())
                                    .norm() < 1e-10 ||
@@ -336,18 +313,14 @@ main(int argc, char *argv[])
        * refined mesh.
        */
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-        deallog
-          << "First, we check the periodic faces on a uniformly refined mesh."
-          << std::endl;
+        deallog << "First, we check the periodic faces on a uniformly refined mesh." << std::endl;
       test_2D.refine_grid(1);
       //  test_2D.write_grid();
       test_2D.check_periodicity();
 
       /* Next, we want to check the case of nonuniform mesh */
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-        deallog
-          << "Next, we check the periodic faces on an adaptively refined mesh."
-          << std::endl;
+        deallog << "Next, we check the periodic faces on an adaptively refined mesh." << std::endl;
       test_2D.refine_grid(2);
       //  test_2D.write_grid();
       test_2D.check_periodicity();
@@ -358,18 +331,14 @@ main(int argc, char *argv[])
        * refined mesh.
        */
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-        deallog
-          << "First, we check the periodic faces on a uniformly refined mesh."
-          << std::endl;
+        deallog << "First, we check the periodic faces on a uniformly refined mesh." << std::endl;
       test_3D.refine_grid(1);
       //  test_3D.write_grid();
       test_3D.check_periodicity();
 
       /* Next, we want to check the case of nonuniform mesh */
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-        deallog
-          << "Next, we check the periodic faces on an adaptively refined mesh."
-          << std::endl;
+        deallog << "Next, we check the periodic faces on an adaptively refined mesh." << std::endl;
       test_3D.refine_grid(2);
       //  test_3D.write_grid();
       test_3D.check_periodicity();
@@ -378,13 +347,11 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -392,12 +359,10 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   return 0;

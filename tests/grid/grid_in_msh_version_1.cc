@@ -46,8 +46,7 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
   std::string source_dir(SOURCE_DIR "/");
   std::string relative_name(name.begin() + source_dir.size(), name.end());
 
-  deallog << relative_name << '\t' << tria.n_vertices() << '\t'
-          << tria.n_cells() << std::endl;
+  deallog << relative_name << '\t' << tria.n_vertices() << '\t' << tria.n_cells() << std::endl;
 
   GridOut grid_out;
   grid_out.write_gnuplot(tria, deallog.get_file_stream());
@@ -56,10 +55,8 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
 void
 filename_resolution()
 {
-  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v1"),
-                GridIn<2>::msh);
-  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v2"),
-                GridIn<2>::msh);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v1"), GridIn<2>::msh);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v2"), GridIn<2>::msh);
 }
 
 

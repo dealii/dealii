@@ -57,9 +57,7 @@ public:
     std::vector<std::tuple<unsigned int, unsigned int, std::string>> retval;
     if (get_dataset_names().size() >= dim)
       retval.push_back(std::tuple<unsigned int, unsigned int, std::string>(
-        get_dataset_names().size() - dim,
-        get_dataset_names().size() - 1,
-        "vector_data"));
+        get_dataset_names().size() - dim, get_dataset_names().size() - 1, "vector_data"));
     return retval;
   }
 };
@@ -116,19 +114,15 @@ check_this(const DoFHandler<dim> &dof_handler,
   // finally make sure that we have
   // read everything back in
   // correctly
-  Assert(data_out.get_dataset_names() == reader.get_dataset_names(),
-         ExcInternalError());
+  Assert(data_out.get_dataset_names() == reader.get_dataset_names(), ExcInternalError());
 
-  Assert(data_out.get_patches().size() == reader.get_patches().size(),
-         ExcInternalError());
+  Assert(data_out.get_patches().size() == reader.get_patches().size(), ExcInternalError());
 
   for (unsigned int i = 0; i < reader.get_patches().size(); ++i)
-    Assert(data_out.get_patches()[i] == reader.get_patches()[i],
-           ExcInternalError());
+    Assert(data_out.get_patches()[i] == reader.get_patches()[i], ExcInternalError());
 
   deallog << data_out.get_vector_data_ranges().size() << std::endl;
-  Assert(data_out.get_vector_data_ranges().size() ==
-           reader.get_vector_data_ranges().size(),
+  Assert(data_out.get_vector_data_ranges().size() == reader.get_vector_data_ranges().size(),
          ExcInternalError());
   for (unsigned int i = 0; i < data_out.get_vector_data_ranges().size(); ++i)
     {

@@ -456,7 +456,7 @@ public:
    */
   virtual void
   evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &input_data,
-                        std::vector<Vector<double>> &computed_quantities) const;
+                        std::vector<Vector<double>> &               computed_quantities) const;
 
   /**
    * Same as the evaluate_scalar_field() function, but this
@@ -465,7 +465,7 @@ public:
    */
   virtual void
   evaluate_vector_field(const DataPostprocessorInputs::Vector<dim> &input_data,
-                        std::vector<Vector<double>> &computed_quantities) const;
+                        std::vector<Vector<double>> &               computed_quantities) const;
 
   /**
    * Return the vector of strings describing the names of the computed
@@ -550,8 +550,7 @@ public:
    * be used in combination with DataOutFaces, you may also ask for a update
    * of normals via the @p update_normal_vectors flag.
    */
-  DataPostprocessorScalar(const std::string &name,
-                          const UpdateFlags  update_flags);
+  DataPostprocessorScalar(const std::string &name, const UpdateFlags update_flags);
 
   /**
    * Return the vector of strings describing the names of the computed
@@ -790,8 +789,7 @@ public:
    * be used in combination with DataOutFaces, you may also ask for a update
    * of normals via the @p update_normal_vectors flag.
    */
-  DataPostprocessorVector(const std::string &name,
-                          const UpdateFlags  update_flags);
+  DataPostprocessorVector(const std::string &name, const UpdateFlags update_flags);
 
   /**
    * Return the vector of strings describing the names of the computed
@@ -1034,8 +1032,7 @@ public:
    * be used in combination with DataOutFaces, you may also ask for a update
    * of normals via the @p update_normal_vectors flag.
    */
-  DataPostprocessorTensor(const std::string &name,
-                          const UpdateFlags  update_flags);
+  DataPostprocessorTensor(const std::string &name, const UpdateFlags update_flags);
 
   /**
    * Return the vector of strings describing the names of the computed
@@ -1081,8 +1078,7 @@ namespace DataPostprocessorInputs
   template <int spacedim>
   template <typename DoFHandlerType>
   void
-  CommonInputs<spacedim>::set_cell(
-    const typename DoFHandlerType::cell_iterator &new_cell)
+  CommonInputs<spacedim>::set_cell(const typename DoFHandlerType::cell_iterator &new_cell)
   {
     // see if we had previously already stored a cell that has the same
     // data type; if so, reuse the memory location and avoid calling 'new'
@@ -1103,22 +1099,19 @@ namespace DataPostprocessorInputs
   typename DoFHandlerType::cell_iterator
   CommonInputs<spacedim>::get_cell() const
   {
-    Assert(
-      cell.empty() == false,
-      ExcMessage("You are trying to access the cell associated with a "
-                 "DataPostprocessorInputs::Scalar object for which no cell has "
-                 "been set."));
-    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) !=
-             nullptr,
-           ExcMessage(
-             "You are trying to access the cell associated with a "
-             "DataPostprocessorInputs::Scalar with a DoFHandler type that "
-             "is different from the type with which it has been set. For "
-             "example, if the cell for which output is currently being "
-             "generated belongs to a hp::DoFHandler<2,3> object, then you can "
-             "only call the current function with a template argument "
-             "equal to hp::DoFHandler<2,3>, but not with any other class "
-             "type or dimension template argument."));
+    Assert(cell.empty() == false,
+           ExcMessage("You are trying to access the cell associated with a "
+                      "DataPostprocessorInputs::Scalar object for which no cell has "
+                      "been set."));
+    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) != nullptr,
+           ExcMessage("You are trying to access the cell associated with a "
+                      "DataPostprocessorInputs::Scalar with a DoFHandler type that "
+                      "is different from the type with which it has been set. For "
+                      "example, if the cell for which output is currently being "
+                      "generated belongs to a hp::DoFHandler<2,3> object, then you can "
+                      "only call the current function with a template argument "
+                      "equal to hp::DoFHandler<2,3>, but not with any other class "
+                      "type or dimension template argument."));
     return boost::any_cast<typename DoFHandlerType::cell_iterator>(cell);
   }
 } // namespace DataPostprocessorInputs

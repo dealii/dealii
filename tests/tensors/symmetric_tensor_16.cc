@@ -28,12 +28,10 @@ test()
   deallog << "dim=" << dim << std::endl;
 
   const SymmetricTensor<4, dim> T =
-    (identity_tensor<dim>() - 1. / dim *
-                                outer_product(unit_symmetric_tensor<dim>(),
-                                              unit_symmetric_tensor<dim>()));
+    (identity_tensor<dim>() -
+     1. / dim * outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>()));
 
-  AssertThrow((T - deviator_tensor<dim>()).norm() <= 1e-15 * T.norm(),
-              ExcInternalError());
+  AssertThrow((T - deviator_tensor<dim>()).norm() <= 1e-15 * T.norm(), ExcInternalError());
 }
 
 

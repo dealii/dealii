@@ -368,8 +368,7 @@ namespace SUNDIALS
         output_period(output_period),
         maximum_non_linear_iterations(maximum_non_linear_iterations),
         implicit_function_is_linear(implicit_function_is_linear),
-        implicit_function_is_time_independent(
-          implicit_function_is_time_independent)
+        implicit_function_is_time_independent(implicit_function_is_time_independent)
       {}
 
       /**
@@ -425,10 +424,8 @@ namespace SUNDIALS
         prm.add_parameter("Initial step size", initial_step_size);
         prm.add_parameter("Minimum step size", minimum_step_size);
         prm.add_parameter("Maximum order of ARK", maximum_order);
-        prm.add_parameter("Maximum number of nonlinear iterations",
-                          maximum_non_linear_iterations);
-        prm.add_parameter("Implicit function is linear",
-                          implicit_function_is_linear);
+        prm.add_parameter("Maximum number of nonlinear iterations", maximum_non_linear_iterations);
+        prm.add_parameter("Implicit function is linear", implicit_function_is_linear);
         prm.add_parameter("Implicit function is time independent",
                           implicit_function_is_time_independent);
         prm.leave_subsection();
@@ -508,8 +505,7 @@ namespace SUNDIALS
      * @param data ARKode configuration data
      * @param mpi_comm MPI communicator
      */
-    ARKode(const AdditionalData &data     = AdditionalData(),
-           const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
+    ARKode(const AdditionalData &data = AdditionalData(), const MPI_Comm mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
@@ -562,8 +558,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<
-      int(const double t, const VectorType &y, VectorType &explicit_f)>
+    std::function<int(const double t, const VectorType &y, VectorType &explicit_f)>
       explicit_function;
 
     /**
@@ -582,8 +577,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const double t, const VectorType &y, VectorType &res)>
-      implicit_function;
+    std::function<int(const double t, const VectorType &y, VectorType &res)> implicit_function;
 
     /**
      * A function object that users may supply and that is intended to
@@ -783,8 +777,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &rhs, VectorType &dst)>
-      solve_mass_system;
+    std::function<int(const VectorType &rhs, VectorType &dst)> solve_mass_system;
 
     /**
      * A function object that users may supply and that is intended to
@@ -800,9 +793,7 @@ namespace SUNDIALS
      * times this function is called and how many time steps have actually been
      * computed.
      */
-    std::function<void(const double       t,
-                       const VectorType & sol,
-                       const unsigned int step_number)>
+    std::function<void(const double t, const VectorType &sol, const unsigned int step_number)>
       output_step;
 
     /**
@@ -849,8 +840,7 @@ namespace SUNDIALS
      */
     DeclException1(ExcFunctionNotProvided,
                    std::string,
-                   << "Please provide an implementation for the function \""
-                   << arg1 << "\"");
+                   << "Please provide an implementation for the function \"" << arg1 << "\"");
 
     /**
      * This function is executed at construction time to set the
@@ -898,10 +888,9 @@ namespace SUNDIALS
                   "Sundials does not support complex scalar types, "
                   "but PETSc is configured to use a complex scalar type!");
 
-    static_assert(
-      !std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
-      "Sundials does not support complex scalar types, "
-      "but PETSc is configured to use a complex scalar type!");
+    static_assert(!std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
+                  "Sundials does not support complex scalar types, "
+                  "but PETSc is configured to use a complex scalar type!");
 #    endif // PETSC_USE_COMPLEX
 #  endif   // DEAL_II_WITH_PETSC
   };

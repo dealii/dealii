@@ -170,15 +170,13 @@ public:
   DeclException2(ExcIncompatibleArraySize,
                  int,
                  int,
-                 << "The two array sizes " << arg1 << " and " << arg2
-                 << " must match, but don't.");
+                 << "The two array sizes " << arg1 << " and " << arg2 << " must match, but don't.");
   /**
    * Exception.
    */
   DeclException1(ExcInvalidName,
                  std::string,
-                 << "The given name <" << arg1
-                 << "> does not match any of the known formats.");
+                 << "The given name <" << arg1 << "> does not match any of the known formats.");
 
 private:
   /**

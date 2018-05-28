@@ -56,9 +56,8 @@ test(const unsigned int n_blocks = 5)
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  cell                                                   = tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+  cell = tria.begin_active();
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm() < 0.2)
@@ -95,12 +94,10 @@ test(const unsigned int n_blocks = 5)
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
-  std::shared_ptr<MatrixFree<dim, number>> mf_data(
-    new MatrixFree<dim, number>());
+  std::shared_ptr<MatrixFree<dim, number>> mf_data(new MatrixFree<dim, number>());
   {
     const QGauss<1>                                  quad(fe_degree + 2);
     typename MatrixFree<dim, number>::AdditionalData data;
@@ -109,17 +106,13 @@ test(const unsigned int n_blocks = 5)
     mf_data->reinit(dof, constraints, quad, data);
   }
 
-  MatrixFreeOperators::MassOperator<dim,
-                                    fe_degree,
-                                    fe_degree + 2,
-                                    1,
-                                    LinearAlgebra::distributed::Vector<number>>
-    mf;
+  MatrixFreeOperators::
+    MassOperator<dim, fe_degree, fe_degree + 2, 1, LinearAlgebra::distributed::Vector<number>>
+      mf;
   mf.initialize(mf_data);
   mf.compute_diagonal();
 
-  LinearAlgebra::distributed::BlockVector<number> left(n_blocks),
-    right(n_blocks);
+  LinearAlgebra::distributed::BlockVector<number> left(n_blocks), right(n_blocks);
   for (unsigned int b = 0; b < n_blocks; ++b)
     {
       mf_data->initialize_dof_vector(left.block(b));
@@ -138,8 +131,7 @@ test(const unsigned int n_blocks = 5)
 
   {
     // general lapack matrices:
-    LAPACKFullMatrix<number> product(n_blocks, n_blocks),
-      diff(n_blocks, n_blocks);
+    LAPACKFullMatrix<number> product(n_blocks, n_blocks), diff(n_blocks, n_blocks);
 
     deallog << "Symmetric:" << std::endl;
 
@@ -175,8 +167,7 @@ test(const unsigned int n_blocks = 5)
           }
       }
 
-    LAPACKFullMatrix<number> product2(n_blocks_2, n_blocks),
-      diff2(n_blocks_2, n_blocks);
+    LAPACKFullMatrix<number> product2(n_blocks_2, n_blocks), diff2(n_blocks_2, n_blocks);
 
     deallog << "Non-Symmetric:" << std::endl;
 
@@ -196,8 +187,7 @@ test(const unsigned int n_blocks = 5)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

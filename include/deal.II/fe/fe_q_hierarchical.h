@@ -618,8 +618,7 @@ public:
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   /**
    * @name Functions to support hp
@@ -649,10 +648,9 @@ public:
    * Embedding matrix between grids. Only isotropic refinement is supported.
    */
   virtual const FullMatrix<double> &
-  get_prolongation_matrix(
-    const unsigned int         child,
-    const RefinementCase<dim> &refinement_case =
-      RefinementCase<dim>::isotropic_refinement) const override;
+  get_prolongation_matrix(const unsigned int         child,
+                          const RefinementCase<dim> &refinement_case =
+                            RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -699,7 +697,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -715,7 +713,7 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim> &source,
                                    const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &      matrix) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -727,8 +725,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -822,9 +819,8 @@ private:
    * Initialize the embedding matrices. Called from the constructor.
    */
   void
-  initialize_embedding_and_restriction(
-    const std::vector<FullMatrix<double>> &dofs_cell,
-    const std::vector<FullMatrix<double>> &dofs_subcell);
+  initialize_embedding_and_restriction(const std::vector<FullMatrix<double>> &dofs_cell,
+                                       const std::vector<FullMatrix<double>> &dofs_subcell);
 
   /**
    * Initialize the @p generalized_support_points field of the FiniteElement class.
@@ -865,13 +861,11 @@ FE_Q_Hierarchical<1>::initialize_generalized_face_support_points();
 
 template <>
 bool
-FE_Q_Hierarchical<1>::has_support_on_face(const unsigned int,
-                                          const unsigned int) const;
+FE_Q_Hierarchical<1>::has_support_on_face(const unsigned int, const unsigned int) const;
 
 template <>
 std::vector<unsigned int>
-FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering(
-  const unsigned int);
+FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering(const unsigned int);
 
 DEAL_II_NAMESPACE_CLOSE
 

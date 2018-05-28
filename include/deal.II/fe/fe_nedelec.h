@@ -135,8 +135,7 @@ public:
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -154,8 +153,7 @@ public:
    * argument.
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim> &fe_other) const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -202,7 +200,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &      matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -218,7 +216,7 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim> &source,
                                    const unsigned int        subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &      matrix) const override;
   /**
    * Projection from a fine grid space onto a coarse grid space. If this
    * projection operator is associated with a matrix @p P, then the
@@ -234,10 +232,9 @@ public:
    * respectively, consistent with the definition of the associated operator.
    */
   virtual const FullMatrix<double> &
-  get_restriction_matrix(
-    const unsigned int         child,
-    const RefinementCase<dim> &refinement_case =
-      RefinementCase<dim>::isotropic_refinement) const override;
+  get_restriction_matrix(const unsigned int         child,
+                         const RefinementCase<dim> &refinement_case =
+                           RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * Embedding matrix between grids.
@@ -260,10 +257,9 @@ public:
    * are discarded and will not fill up the transfer matrix.
    */
   virtual const FullMatrix<double> &
-  get_prolongation_matrix(
-    const unsigned int         child,
-    const RefinementCase<dim> &refinement_case =
-      RefinementCase<dim>::isotropic_refinement) const override;
+  get_prolongation_matrix(const unsigned int         child,
+                          const RefinementCase<dim> &refinement_case =
+                            RefinementCase<dim>::isotropic_refinement) const override;
 
   // documentation inherited from the base class
   virtual void
