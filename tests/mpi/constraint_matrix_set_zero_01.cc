@@ -58,7 +58,7 @@ test()
   local_active_together.add_range(myid, myid + 1);
   local_active_together.add_range(numproc + myid * 2, numproc + myid * 2 + 2);
 
-  ConstraintMatrix cm(local_active_together);
+  AffineConstraints<PetscScalar> cm(local_active_together);
   cm.add_line(numproc + myid * 2);
   cm.close();
 

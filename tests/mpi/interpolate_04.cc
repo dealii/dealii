@@ -60,9 +60,9 @@ test()
   dofh1.distribute_dofs(fe);
   dofh2.distribute_dofs(fe);
 
-  ConstraintMatrix cm1;
+  AffineConstraints<PetscScalar> cm1;
   cm1.close();
-  ConstraintMatrix cm2;
+  AffineConstraints<PetscScalar> cm2;
   cm2.close();
 
   IndexSet dof1_locally_owned_dofs = dofh1.locally_owned_dofs();
