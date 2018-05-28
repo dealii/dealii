@@ -158,7 +158,7 @@ check_fe(FiniteElement<dim> &fe)
     for (unsigned int i = 0; i < dofh.locally_owned_dofs().n_elements(); ++i)
       {
         unsigned int index = dofh.locally_owned_dofs().nth_index_in_set(i);
-        deallog << v[index] << " ";
+        deallog << static_cast<PetscScalar>(v(index)) << " ";
       }
   }
   // v.print(deallog.get_file_stream());
