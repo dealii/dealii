@@ -225,11 +225,12 @@ MatrixFree<dim, Number>::copy_from(const MatrixFree<dim, Number> &v)
 
 
 template <int dim, typename Number>
+template <typename number2>
 void
 MatrixFree<dim, Number>::internal_reinit(
   const Mapping<dim> &                                    mapping,
   const std::vector<const DoFHandler<dim> *> &            dof_handler,
-  const std::vector<const AffineConstraints<double> *> &  constraint,
+  const std::vector<const AffineConstraints<number2> *> & constraint,
   const std::vector<IndexSet> &                           locally_owned_set,
   const std::vector<hp::QCollection<1>> &                 quad,
   const typename MatrixFree<dim, Number>::AdditionalData &additional_data)
@@ -384,11 +385,12 @@ MatrixFree<dim, Number>::internal_reinit(
 
 
 template <int dim, typename Number>
+template <typename number2>
 void
 MatrixFree<dim, Number>::internal_reinit(
   const Mapping<dim> &                                    mapping,
   const std::vector<const hp::DoFHandler<dim> *> &        dof_handler,
-  const std::vector<const AffineConstraints<double> *> &  constraint,
+  const std::vector<const AffineConstraints<number2> *> & constraint,
   const std::vector<IndexSet> &                           locally_owned_set,
   const std::vector<hp::QCollection<1>> &                 quad,
   const typename MatrixFree<dim, Number>::AdditionalData &additional_data)
@@ -737,11 +739,12 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
 
 
 template <int dim, typename Number>
+template <typename number2>
 void
 MatrixFree<dim, Number>::initialize_indices(
-  const std::vector<const AffineConstraints<double> *> &constraint,
-  const std::vector<IndexSet> &                         locally_owned_set,
-  const AdditionalData &                                additional_data)
+  const std::vector<const AffineConstraints<number2> *> &constraint,
+  const std::vector<IndexSet> &                          locally_owned_set,
+  const AdditionalData &                                 additional_data)
 {
   // insert possible ghost cells and construct face topology
   const bool do_face_integrals =

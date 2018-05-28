@@ -30,8 +30,41 @@ for (deal_II_dimension : DIMENSIONS)
     MatrixFree<deal_II_dimension,
                float>::print_memory_consumption<std::ostream>(std::ostream &)
       const;
+
     template void MatrixFree<deal_II_dimension, float>::
       print_memory_consumption<ConditionalOStream>(ConditionalOStream &) const;
+
+    template void MatrixFree<deal_II_dimension, double>::internal_reinit<double>(
+      const Mapping<deal_II_dimension> &,
+      const std::vector<const DoFHandler<deal_II_dimension> *> &,
+      const std::vector<const AffineConstraints<double> *> &,
+      const std::vector<IndexSet> &,
+      const std::vector<hp::QCollection<1>> &,
+      const AdditionalData &);
+
+    template void MatrixFree<deal_II_dimension, double>::internal_reinit<double>(
+      const Mapping<deal_II_dimension> &,
+      const std::vector<const hp::DoFHandler<deal_II_dimension> *> &,
+      const std::vector<const AffineConstraints<double> *> &,
+      const std::vector<IndexSet> &,
+      const std::vector<hp::QCollection<1>> &,
+      const AdditionalData &);
+
+    template void MatrixFree<deal_II_dimension, float>::internal_reinit<double>(
+      const Mapping<deal_II_dimension> &,
+      const std::vector<const DoFHandler<deal_II_dimension> *> &,
+      const std::vector<const AffineConstraints<double> *> &,
+      const std::vector<IndexSet> &,
+      const std::vector<hp::QCollection<1>> &,
+      const AdditionalData &);
+
+    template void MatrixFree<deal_II_dimension, float>::internal_reinit<double>(
+      const Mapping<deal_II_dimension> &,
+      const std::vector<const hp::DoFHandler<deal_II_dimension> *> &,
+      const std::vector<const AffineConstraints<double> *> &,
+      const std::vector<IndexSet> &,
+      const std::vector<hp::QCollection<1>> &,
+      const AdditionalData &);
 
 #ifndef DEAL_II_MSVC
     template void
