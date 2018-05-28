@@ -27,46 +27,37 @@
 
 
 void
-check_matrix(SparseMatrix<double> const &        A,
-             CUDAWrappers::SparseMatrix<double> &A_dev)
+check_matrix(SparseMatrix<double> const &A, CUDAWrappers::SparseMatrix<double> &A_dev)
 {
   cudaError_t cuda_error_code;
-  double *    val_dev          = nullptr;
-  int *       column_index_dev = nullptr;
-  int *       row_ptr_dev      = nullptr;
-  std::tie(val_dev, column_index_dev, row_ptr_dev, std::ignore) =
-    A_dev.get_cusparse_matrix();
+  double *    val_dev                                           = nullptr;
+  int *       column_index_dev                                  = nullptr;
+  int *       row_ptr_dev                                       = nullptr;
+  std::tie(val_dev, column_index_dev, row_ptr_dev, std::ignore) = A_dev.get_cusparse_matrix();
 
   int                 nnz = A_dev.n_nonzero_elements();
   std::vector<double> val_host(nnz);
-  cuda_error_code = cudaMemcpy(
-    &val_host[0], val_dev, nnz * sizeof(double), cudaMemcpyDeviceToHost);
+  cuda_error_code = cudaMemcpy(&val_host[0], val_dev, nnz * sizeof(double), cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error_code);
 
   std::vector<int> column_index_host(nnz);
-  cuda_error_code = cudaMemcpy(&column_index_host[0],
-                               column_index_dev,
-                               nnz * sizeof(int),
-                               cudaMemcpyDeviceToHost);
+  cuda_error_code =
+    cudaMemcpy(&column_index_host[0], column_index_dev, nnz * sizeof(int), cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error_code);
 
   int const        n_rows = A_dev.m() + 1;
   std::vector<int> row_ptr_host(n_rows + 1);
-  cuda_error_code = cudaMemcpy(&row_ptr_host[0],
-                               row_ptr_dev,
-                               (A_dev.m() + 1) * sizeof(int),
-                               cudaMemcpyDeviceToHost);
+  cuda_error_code = cudaMemcpy(
+    &row_ptr_host[0], row_ptr_dev, (A_dev.m() + 1) * sizeof(int), cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error_code);
 
   for (int i = 0; i < n_rows; ++i)
     for (int j = row_ptr_host[i]; j < row_ptr_host[i + 1]; ++j)
-      AssertThrow(std::abs(val_host[j] - A(i, column_index_host[j])) < 1e-15,
-                  ExcInternalError());
+      AssertThrow(std::abs(val_host[j] - A(i, column_index_host[j])) < 1e-15, ExcInternalError());
 }
 
 void
-check_vector(Vector<double> const &                        a,
-             LinearAlgebra::ReadWriteVector<double> const &b)
+check_vector(Vector<double> const &a, LinearAlgebra::ReadWriteVector<double> const &b)
 {
   unsigned int size = a.size();
   for (unsigned int i = 0; i < size; ++i)

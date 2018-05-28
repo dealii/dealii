@@ -115,22 +115,11 @@ namespace internal
    *                 operator* with Number and produce Number as an output to
    *                 be a valid type
    */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<evaluate_general,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
+  struct EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number, Number2>
   {
-    static constexpr unsigned int n_rows_of_product =
-      Utilities::pow(n_rows, dim);
-    static constexpr unsigned int n_columns_of_product =
-      Utilities::pow(n_columns, dim);
+    static constexpr unsigned int n_rows_of_product    = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -158,15 +147,12 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
+      Assert(shape_values.size() == 0 || shape_values.size() == n_rows * n_columns ||
                shape_values.size() == 3 * n_rows,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
+      Assert(shape_gradients.size() == 0 || shape_gradients.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
+      Assert(shape_hessians.size() == 0 || shape_hessians.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
@@ -241,14 +227,9 @@ namespace internal
      * @param in Pointer to the start of the input data vector
      * @param out Pointer to the start of the output data vector
      */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              bool one_line = false>
+    template <int direction, bool contract_over_rows, bool add, bool one_line = false>
     static void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out);
+    apply(const Number2 *DEAL_II_RESTRICT shape_data, const Number *in, Number *out);
 
     /**
      * This function applies the tensor product operation to produce face values
@@ -276,13 +257,9 @@ namespace internal
      * @param in address of the input data vector
      * @param out address of the output data vector
      */
-    template <int  face_direction,
-              bool contract_onto_face,
-              bool add,
-              int  max_derivative>
+    template <int face_direction, bool contract_onto_face, bool add, int max_derivative>
     void
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT out) const;
+    apply_face(const Number *DEAL_II_RESTRICT in, Number *DEAL_II_RESTRICT out) const;
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -291,30 +268,19 @@ namespace internal
 
 
 
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   template <int direction, bool contract_over_rows, bool add, bool one_line>
   inline void
-  EvaluatorTensorProduct<evaluate_general,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply(const Number2 *DEAL_II_RESTRICT
-                                                        shape_data,
-                                         const Number * in,
-                                         Number *       out)
+  EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number, Number2>::apply(
+    const Number2 *DEAL_II_RESTRICT shape_data,
+    const Number *                  in,
+    Number *                        out)
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(
-      shape_data != nullptr,
-      ExcMessage("The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
+    Assert(shape_data != nullptr,
+           ExcMessage("The given array shape_data must not be the null pointer!"));
+    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns || in != out,
            ExcMessage("In-place operation only supported for "
                       "n_rows==n_columns or single-line interpolation"));
     AssertIndexRange(direction, dim);
@@ -371,38 +337,25 @@ namespace internal
 
 
 
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  template <int  face_direction,
-            bool contract_onto_face,
-            bool add,
-            int  max_derivative>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
+  template <int face_direction, bool contract_onto_face, bool add, int max_derivative>
   inline void
-  EvaluatorTensorProduct<evaluate_general,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply_face(const Number *DEAL_II_RESTRICT in,
-                                              Number *DEAL_II_RESTRICT
-                                                      out) const
+  EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number, Number2>::apply_face(
+    const Number *DEAL_II_RESTRICT in,
+    Number *DEAL_II_RESTRICT out) const
   {
     static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
     static_assert(max_derivative >= 0 && max_derivative < 3,
                   "Only derivative orders 0-2 implemented");
-    Assert(
-      shape_values != nullptr,
-      ExcMessage("The given array shape_values must not be the null pointer."));
+    Assert(shape_values != nullptr,
+           ExcMessage("The given array shape_values must not be the null pointer."));
 
     constexpr int n_blocks1 = dim > 1 ? n_rows : 1;
     constexpr int n_blocks2 = dim > 2 ? n_rows : 1;
 
     AssertIndexRange(face_direction, dim);
-    constexpr int stride     = Utilities::pow(n_rows, face_direction);
-    constexpr int out_stride = Utilities::pow(n_rows, dim - 1);
+    constexpr int stride                        = Utilities::pow(n_rows, face_direction);
+    constexpr int out_stride                    = Utilities::pow(n_rows, dim - 1);
     const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
 
     for (int i2 = 0; i2 < n_blocks2; ++i2)
@@ -451,11 +404,9 @@ namespace internal
                     else
                       out[col * stride] += shape_values[col] * in[0];
                     if (max_derivative > 0)
-                      out[col * stride] +=
-                        shape_values[col + n_rows] * in[out_stride];
+                      out[col * stride] += shape_values[col + n_rows] * in[out_stride];
                     if (max_derivative > 1)
-                      out[col * stride] +=
-                        shape_values[col + 2 * n_rows] * in[2 * out_stride];
+                      out[col * stride] += shape_values[col + 2 * n_rows] * in[2 * out_stride];
                   }
               }
 
@@ -525,10 +476,8 @@ namespace internal
   template <int dim, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>
   {
-    static constexpr unsigned int n_rows_of_product =
-      numbers::invalid_unsigned_int;
-    static constexpr unsigned int n_columns_of_product =
-      numbers::invalid_unsigned_int;
+    static constexpr unsigned int n_rows_of_product    = numbers::invalid_unsigned_int;
+    static constexpr unsigned int n_columns_of_product = numbers::invalid_unsigned_int;
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -560,15 +509,12 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
+      Assert(shape_values.size() == 0 || shape_values.size() == n_rows * n_columns ||
                shape_values.size() == n_rows * 3,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
+      Assert(shape_gradients.size() == 0 || shape_gradients.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
+      Assert(shape_hessians.size() == 0 || shape_hessians.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
     }
 
@@ -617,22 +563,13 @@ namespace internal
       apply<direction, contract_over_rows, add, true>(shape_hessians, in, out);
     }
 
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              bool one_line = false>
+    template <int direction, bool contract_over_rows, bool add, bool one_line = false>
     void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out) const;
+    apply(const Number2 *DEAL_II_RESTRICT shape_data, const Number *in, Number *out) const;
 
-    template <int  face_direction,
-              bool contract_onto_face,
-              bool add,
-              int  max_derivative>
+    template <int face_direction, bool contract_onto_face, bool add, int max_derivative>
     void
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT out) const;
+    apply_face(const Number *DEAL_II_RESTRICT in, Number *DEAL_II_RESTRICT out) const;
 
     const Number2 *    shape_values;
     const Number2 *    shape_gradients;
@@ -653,23 +590,19 @@ namespace internal
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(
-      shape_data != nullptr,
-      ExcMessage("The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
+    Assert(shape_data != nullptr,
+           ExcMessage("The given array shape_data must not be the null pointer!"));
+    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns || in != out,
            ExcMessage("In-place operation only supported for "
                       "n_rows==n_columns or single-line interpolation"));
     AssertIndexRange(direction, dim);
     const int mm = contract_over_rows ? n_rows : n_columns,
               nn = contract_over_rows ? n_columns : n_rows;
 
-    const int stride =
-      direction == 0 ? 1 : Utilities::fixed_power<direction>(n_columns);
+    const int stride    = direction == 0 ? 1 : Utilities::fixed_power<direction>(n_columns);
     const int n_blocks1 = one_line ? 1 : stride;
-    const int n_blocks2 = direction >= dim - 1 ?
-                            1 :
-                            Utilities::fixed_power<dim - direction - 1>(n_rows);
+    const int n_blocks2 =
+      direction >= dim - 1 ? 1 : Utilities::fixed_power<dim - direction - 1>(n_rows);
     Assert(n_rows <= 128, ExcNotImplemented());
 
     for (int i2 = 0; i2 < n_blocks2; ++i2)
@@ -718,27 +651,21 @@ namespace internal
 
 
   template <int dim, typename Number, typename Number2>
-  template <int  face_direction,
-            bool contract_onto_face,
-            bool add,
-            int  max_derivative>
+  template <int face_direction, bool contract_onto_face, bool add, int max_derivative>
   inline void
-  EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>::
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT out) const
+  EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>::apply_face(
+    const Number *DEAL_II_RESTRICT in,
+    Number *DEAL_II_RESTRICT out) const
   {
-    Assert(
-      shape_values != nullptr,
-      ExcMessage("The given array shape_data must not be the null pointer!"));
+    Assert(shape_values != nullptr,
+           ExcMessage("The given array shape_data must not be the null pointer!"));
     static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
     const int n_blocks1 = dim > 1 ? n_rows : 1;
     const int n_blocks2 = dim > 2 ? n_rows : 1;
 
     AssertIndexRange(face_direction, dim);
-    const int stride =
-      face_direction > 0 ? Utilities::fixed_power<face_direction>(n_rows) : 1;
-    const int out_stride =
-      dim > 1 ? Utilities::fixed_power<dim - 1>(n_rows) : 1;
+    const int stride     = face_direction > 0 ? Utilities::fixed_power<face_direction>(n_rows) : 1;
+    const int out_stride = dim > 1 ? Utilities::fixed_power<dim - 1>(n_rows) : 1;
 
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
@@ -786,11 +713,9 @@ namespace internal
                     else
                       out[col * stride] += shape_values[col] * in[0];
                     if (max_derivative > 0)
-                      out[col * stride] +=
-                        shape_values[col + n_rows] * in[out_stride];
+                      out[col * stride] += shape_values[col + n_rows] * in[out_stride];
                     if (max_derivative > 1)
-                      out[col * stride] +=
-                        shape_values[col + 2 * n_rows] * in[2 * out_stride];
+                      out[col * stride] += shape_values[col + 2 * n_rows] * in[2 * out_stride];
                   }
               }
 
@@ -864,22 +789,11 @@ namespace internal
    *                 operator* with Number and produce Number as an output to
    *                 be a valid type
    */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<evaluate_symmetric,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
+  struct EvaluatorTensorProduct<evaluate_symmetric, dim, n_rows, n_columns, Number, Number2>
   {
-    static constexpr unsigned int n_rows_of_product =
-      Utilities::pow(n_rows, dim);
-    static constexpr unsigned int n_columns_of_product =
-      Utilities::pow(n_columns, dim);
+    static constexpr unsigned int n_rows_of_product    = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Constructor, taking the data from ShapeInfo
@@ -893,14 +807,11 @@ namespace internal
       shape_gradients(shape_gradients.begin()),
       shape_hessians(shape_hessians.begin())
     {
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns,
+      Assert(shape_values.size() == 0 || shape_values.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
+      Assert(shape_gradients.size() == 0 || shape_gradients.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
+      Assert(shape_hessians.size() == 0 || shape_hessians.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
@@ -943,19 +854,12 @@ namespace internal
   // In these matrices, we want to use avoid computations involving zeros and
   // ones and in addition use the symmetry in entries to reduce the number of
   // read operations.
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   template <int direction, bool contract_over_rows, bool add>
   inline void
-  EvaluatorTensorProduct<evaluate_symmetric,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::values(const Number in[], Number out[]) const
+  EvaluatorTensorProduct<evaluate_symmetric, dim, n_rows, n_columns, Number, Number2>::values(
+    const Number in[],
+    Number       out[]) const
   {
     Assert(shape_values != nullptr, ExcNotInitialized());
     AssertIndexRange(direction, dim);
@@ -1005,8 +909,7 @@ namespace internal
                         else
                           {
                             val0 = shape_values[col * n_columns + ind];
-                            val1 =
-                              shape_values[(col + 1) * n_columns - 1 - ind];
+                            val1 = shape_values[(col + 1) * n_columns - 1 - ind];
                           }
                         in0 = in[stride * ind];
                         in1 = in[stride * (mm - 1 - ind)];
@@ -1066,8 +969,7 @@ namespace internal
                     for (int ind = 1; ind < mid; ++ind)
                       {
                         val0 = shape_values[ind * n_columns + n_cols];
-                        res0 += val0 * (in[stride * ind] +
-                                        in[stride * (mm - 1 - ind)]);
+                        res0 += val0 * (in[stride * ind] + in[stride * (mm - 1 - ind)]);
                       }
                   }
                 else
@@ -1087,8 +989,7 @@ namespace internal
                     for (int ind = 1; ind < mid; ++ind)
                       {
                         val0       = shape_values[n_cols * n_columns + ind];
-                        Number in1 = val0 * (in[stride * ind] +
-                                             in[stride * (mm - 1 - ind)]);
+                        Number in1 = val0 * (in[stride * ind] + in[stride * (mm - 1 - ind)]);
                         res0 += in1;
                       }
                     if (mm % 2)
@@ -1131,20 +1032,12 @@ namespace internal
   // In these matrices, we want to use avoid computations involving
   // zeros and ones and in addition use the symmetry in entries to
   // reduce the number of read operations.
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   template <int direction, bool contract_over_rows, bool add>
   inline void
-  EvaluatorTensorProduct<evaluate_symmetric,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::gradients(const Number in[],
-                                             Number       out[]) const
+  EvaluatorTensorProduct<evaluate_symmetric, dim, n_rows, n_columns, Number, Number2>::gradients(
+    const Number in[],
+    Number       out[]) const
   {
     Assert(shape_gradients != nullptr, ExcNotInitialized());
     AssertIndexRange(direction, dim);
@@ -1189,14 +1082,12 @@ namespace internal
                         if (contract_over_rows == true)
                           {
                             val0 = shape_gradients[ind * n_columns + col];
-                            val1 =
-                              shape_gradients[ind * n_columns + nn - 1 - col];
+                            val1 = shape_gradients[ind * n_columns + nn - 1 - col];
                           }
                         else
                           {
                             val0 = shape_gradients[col * n_columns + ind];
-                            val1 =
-                              shape_gradients[(nn - col - 1) * n_columns + ind];
+                            val1 = shape_gradients[(nn - col - 1) * n_columns + ind];
                           }
                         in0 = in[stride * ind];
                         in1 = in[stride * (mm - 1 - ind)];
@@ -1244,8 +1135,7 @@ namespace internal
                       val0 = shape_gradients[ind * n_columns + n_cols];
                     else
                       val0 = shape_gradients[n_cols * n_columns + ind];
-                    Number in1 =
-                      val0 * (in[stride * ind] - in[stride * (mm - 1 - ind)]);
+                    Number in1 = val0 * (in[stride * ind] - in[stride * (mm - 1 - ind)]);
                     res0 += in1;
                   }
                 if (add == false)
@@ -1267,20 +1157,12 @@ namespace internal
   // evaluates the given shape data in 1d-3d using the tensor product
   // form assuming the symmetries of unit cell shape hessians for
   // finite elements in FEEvaluation
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   template <int direction, bool contract_over_rows, bool add>
   inline void
-  EvaluatorTensorProduct<evaluate_symmetric,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::hessians(const Number in[],
-                                            Number       out[]) const
+  EvaluatorTensorProduct<evaluate_symmetric, dim, n_rows, n_columns, Number, Number2>::hessians(
+    const Number in[],
+    Number       out[]) const
   {
     Assert(shape_hessians != nullptr, ExcNotInitialized());
     AssertIndexRange(direction, dim);
@@ -1325,14 +1207,12 @@ namespace internal
                         if (contract_over_rows == true)
                           {
                             val0 = shape_hessians[ind * n_columns + col];
-                            val1 =
-                              shape_hessians[ind * n_columns + nn - 1 - col];
+                            val1 = shape_hessians[ind * n_columns + nn - 1 - col];
                           }
                         else
                           {
                             val0 = shape_hessians[col * n_columns + ind];
-                            val1 =
-                              shape_hessians[(col + 1) * n_columns - 1 - ind];
+                            val1 = shape_hessians[(col + 1) * n_columns - 1 - ind];
                           }
                         in0 = in[stride * ind];
                         in1 = in[stride * (mm - 1 - ind)];
@@ -1382,8 +1262,7 @@ namespace internal
                           val0 = shape_hessians[ind * n_columns + n_cols];
                         else
                           val0 = shape_hessians[n_cols * n_columns + ind];
-                        Number in1 = val0 * (in[stride * ind] +
-                                             in[stride * (mm - 1 - ind)]);
+                        Number in1 = val0 * (in[stride * ind] + in[stride * (mm - 1 - ind)]);
                         res0 += in1;
                       }
                   }
@@ -1444,22 +1323,11 @@ namespace internal
    *                 operator* with Number and produce Number as an output to
    *                 be a valid type
    */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<evaluate_evenodd,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
+  struct EvaluatorTensorProduct<evaluate_evenodd, dim, n_rows, n_columns, Number, Number2>
   {
-    static constexpr unsigned int n_rows_of_product =
-      Utilities::pow(n_rows, dim);
-    static constexpr unsigned int n_columns_of_product =
-      Utilities::pow(n_columns, dim);
+    static constexpr unsigned int n_rows_of_product    = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -1546,8 +1414,7 @@ namespace internal
     gradients_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1, true>(
-        shape_gradients, in, out);
+      apply<direction, contract_over_rows, add, 1, true>(shape_gradients, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -1555,8 +1422,7 @@ namespace internal
     hessians_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 2, true>(
-        shape_hessians, in, out);
+      apply<direction, contract_over_rows, add, 2, true>(shape_hessians, in, out);
     }
 
     /**
@@ -1587,15 +1453,9 @@ namespace internal
      * @param in Pointer to the start of the input data vector
      * @param out Pointer to the start of the output data vector
      */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  type,
-              bool one_line = false>
+    template <int direction, bool contract_over_rows, bool add, int type, bool one_line = false>
     static void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out);
+    apply(const Number2 *DEAL_II_RESTRICT shape_data, const Number *in, Number *out);
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -1604,31 +1464,18 @@ namespace internal
 
 
 
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  template <int  direction,
-            bool contract_over_rows,
-            bool add,
-            int  type,
-            bool one_line>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
+  template <int direction, bool contract_over_rows, bool add, int type, bool one_line>
   inline void
-  EvaluatorTensorProduct<evaluate_evenodd,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply(const Number2 *DEAL_II_RESTRICT shapes,
-                                         const Number *                  in,
-                                         Number *                        out)
+  EvaluatorTensorProduct<evaluate_evenodd, dim, n_rows, n_columns, Number, Number2>::apply(
+    const Number2 *DEAL_II_RESTRICT shapes,
+    const Number *                  in,
+    Number *                        out)
   {
     static_assert(type < 3, "Only three variants type=0,1,2 implemented");
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
+    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns || in != out,
            ExcMessage("In-place operation only supported for "
                       "n_rows==n_columns or single-line interpolation"));
 
@@ -1691,14 +1538,12 @@ namespace internal
                         if (contract_over_rows == true)
                           {
                             r0 += shapes[ind * offset + col] * xp[ind];
-                            r1 += shapes[(n_rows - 1 - ind) * offset + col] *
-                                  xm[ind];
+                            r1 += shapes[(n_rows - 1 - ind) * offset + col] * xm[ind];
                           }
                         else
                           {
                             r0 += shapes[col * offset + ind] * xp[ind];
-                            r1 += shapes[(n_rows - 1 - col) * offset + ind] *
-                                  xm[ind];
+                            r1 += shapes[(n_rows - 1 - col) * offset + ind] * xm[ind];
                           }
                       }
                   }
@@ -1731,8 +1576,7 @@ namespace internal
                       out[stride * (nn - 1 - col)] += r0 - r1;
                   }
               }
-            if (type == 0 && contract_over_rows == true && nn % 2 == 1 &&
-                mm % 2 == 1)
+            if (type == 0 && contract_over_rows == true && nn % 2 == 1 && mm % 2 == 1)
               {
                 if (add == false)
                   out[stride * n_cols] = shapes[mid * offset + n_cols] * xmid;
@@ -1831,11 +1675,7 @@ namespace internal
    *                 operator* with Number and produce Number as an output to
    *                 be a valid type
    */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_symmetric_hierarchical,
                                 dim,
                                 n_rows,
@@ -1843,10 +1683,8 @@ namespace internal
                                 Number,
                                 Number2>
   {
-    static constexpr unsigned int n_rows_of_product =
-      Utilities::pow(n_rows, dim);
-    static constexpr unsigned int n_columns_of_product =
-      Utilities::pow(n_columns, dim);
+    static constexpr unsigned int n_rows_of_product    = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -1923,8 +1761,7 @@ namespace internal
     gradients_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1, true>(
-        shape_gradients, in, out);
+      apply<direction, contract_over_rows, add, 1, true>(shape_gradients, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -1932,8 +1769,7 @@ namespace internal
     hessians_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0, true>(
-        shape_hessians, in, out);
+      apply<direction, contract_over_rows, add, 0, true>(shape_hessians, in, out);
     }
 
     /**
@@ -1963,15 +1799,9 @@ namespace internal
      * @param in Pointer to the start of the input data vector
      * @param out Pointer to the start of the output data vector
      */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  type,
-              bool one_line = false>
+    template <int direction, bool contract_over_rows, bool add, int type, bool one_line = false>
     static void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out);
+    apply(const Number2 *DEAL_II_RESTRICT shape_data, const Number *in, Number *out);
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -1980,33 +1810,17 @@ namespace internal
 
 
 
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  template <int  direction,
-            bool contract_over_rows,
-            bool add,
-            int  type,
-            bool one_line>
+  template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
+  template <int direction, bool contract_over_rows, bool add, int type, bool one_line>
   inline void
-  EvaluatorTensorProduct<evaluate_symmetric_hierarchical,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply(const Number2 *DEAL_II_RESTRICT shapes,
-                                         const Number *                  in,
-                                         Number *                        out)
+  EvaluatorTensorProduct<evaluate_symmetric_hierarchical, dim, n_rows, n_columns, Number, Number2>::
+    apply(const Number2 *DEAL_II_RESTRICT shapes, const Number *in, Number *out)
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    static_assert(
-      type == 0 || type == 1,
-      "Only types 0 and 1 implemented for evaluate_symmetric_hierarchical.");
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
+    static_assert(type == 0 || type == 1,
+                  "Only types 0 and 1 implemented for evaluate_symmetric_hierarchical.");
+    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns || in != out,
            ExcMessage("In-place operation only supported for "
                       "n_rows==n_columns or single-line interpolation"));
 
@@ -2046,10 +1860,8 @@ namespace internal
                         r1 = shapes[col + n_columns] * x[1];
                         for (unsigned int ind = 1; ind < mid; ++ind)
                           {
-                            r0 +=
-                              shapes[col + 2 * ind * n_columns] * x[2 * ind];
-                            r1 += shapes[col + (2 * ind + 1) * n_columns] *
-                                  x[2 * ind + 1];
+                            r0 += shapes[col + 2 * ind * n_columns] * x[2 * ind];
+                            r1 += shapes[col + (2 * ind + 1) * n_columns] * x[2 * ind + 1];
                           }
                       }
                     else
@@ -2081,8 +1893,7 @@ namespace internal
                       {
                         r0 = shapes[n_cols + shift * n_columns] * x[shift];
                         for (unsigned int ind = 1; ind < mid; ++ind)
-                          r0 += shapes[n_cols + (2 * ind + shift) * n_columns] *
-                                x[2 * ind + shift];
+                          r0 += shapes[n_cols + (2 * ind + shift) * n_columns] * x[2 * ind + shift];
                       }
                     else
                       r0 = 0;
@@ -2120,8 +1931,7 @@ namespace internal
                         for (unsigned int ind = 1; ind < mid; ++ind)
                           {
                             r0 += shapes[2 * col * n_columns + ind] * xp[ind];
-                            r1 +=
-                              shapes[(2 * col + 1) * n_columns + ind] * xm[ind];
+                            r1 += shapes[(2 * col + 1) * n_columns + ind] * xm[ind];
                           }
                       }
                     else
@@ -2129,8 +1939,7 @@ namespace internal
                     if (mm % 2 == 1)
                       {
                         if (type == 1)
-                          r1 +=
-                            shapes[(2 * col + 1) * n_columns + mid] * xp[mid];
+                          r1 += shapes[(2 * col + 1) * n_columns + mid] * xp[mid];
                         else
                           r0 += shapes[2 * col * n_columns + mid] * xp[mid];
                       }

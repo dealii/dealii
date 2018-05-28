@@ -82,8 +82,7 @@ public:
    * and the number of children of a cell in the current space dimension (i.e.,
    * GeometryInfo<dim>::max_children_per_cell).
    */
-  CellId(const unsigned int               coarse_cell_id,
-         const std::vector<std::uint8_t> &child_indices);
+  CellId(const unsigned int coarse_cell_id, const std::vector<std::uint8_t> &child_indices);
 
   /**
    * Construct a CellId object with a given @p coarse_cell_id and array of
@@ -181,8 +180,7 @@ private:
    * the array can be extended.
    */
 #ifdef DEAL_II_WITH_P4EST
-  std::array<std::uint8_t, internal::p4est::functions<2>::max_level>
-    child_indices;
+  std::array<std::uint8_t, internal::p4est::functions<2>::max_level> child_indices;
 #else
   std::array<std::uint8_t, 30> child_indices;
 #endif

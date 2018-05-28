@@ -42,8 +42,7 @@ private:
 class SecondClass : public ParameterAcceptor
 {
 public:
-  SecondClass(const std::string &name = "Second Class") :
-    ParameterAcceptor(name)
+  SecondClass(const std::string &name = "Second Class") : ParameterAcceptor(name)
   {
     add_parameter("Second int", s_i);
     add_parameter("Second double", s_d);
@@ -67,7 +66,6 @@ main()
   SecondClass s;
   std::string output_name = "used_parameter_acceptor_04.prm";
   ParameterAcceptor::initialize(
-    SOURCE_DIR "/parameter_acceptor_parameters/parameter_acceptor_04.prm",
-    output_name);
+    SOURCE_DIR "/parameter_acceptor_parameters/parameter_acceptor_04.prm", output_name);
   ParameterAcceptor::prm.log_parameters(deallog);
 }

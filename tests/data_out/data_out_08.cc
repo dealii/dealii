@@ -69,10 +69,8 @@ public:
   virtual typename DataOut<dim>::cell_iterator
   first_cell()
   {
-    typename DataOut<dim>::active_cell_iterator cell =
-      this->dofs->begin_active();
-    while ((cell != this->dofs->end()) &&
-           (cell->subdomain_id() != subdomain_id))
+    typename DataOut<dim>::active_cell_iterator cell = this->dofs->begin_active();
+    while ((cell != this->dofs->end()) && (cell->subdomain_id() != subdomain_id))
       ++cell;
 
     return cell;
@@ -85,8 +83,8 @@ public:
       {
         const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
 
-        return ++(FilteredIterator<typename DataOut<dim>::active_cell_iterator>(
-          predicate, old_cell));
+        return ++(
+          FilteredIterator<typename DataOut<dim>::active_cell_iterator>(predicate, old_cell));
       }
     else
       return old_cell;
@@ -125,8 +123,7 @@ check()
   FilteredDataOut<dim> data_out(0);
   data_out.attach_dof_handler(dof_handler);
 
-  data_out.add_data_vector(
-    cell_data, "cell_data", DataOut<dim>::type_cell_data);
+  data_out.add_data_vector(cell_data, "cell_data", DataOut<dim>::type_cell_data);
   data_out.build_patches();
 
   data_out.write_deal_II_intermediate(deallog.get_file_stream());

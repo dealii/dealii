@@ -136,9 +136,9 @@ namespace internal
        * calculations.
        */
       void
-      collect_boundary_cells(const unsigned int n_active_cells,
-                             const unsigned int n_active_and_ghost_cells,
-                             const unsigned int vectorization_length,
+      collect_boundary_cells(const unsigned int         n_active_cells,
+                             const unsigned int         n_active_and_ghost_cells,
+                             const unsigned int         vectorization_length,
                              std::vector<unsigned int> &boundary_cells);
 
       /**
@@ -178,14 +178,13 @@ namespace internal
        * according to the renumbering returned by this function.
        */
       void
-      create_blocks_serial(
-        const std::vector<unsigned int> &boundary_cells,
-        const std::vector<unsigned int> &cells_close_to_boundary,
-        const unsigned int               dofs_per_cell,
-        const std::vector<unsigned int> &cell_vectorization_categories,
-        const bool                       cell_vectorization_categories_strict,
-        std::vector<unsigned int> &      renumbering,
-        std::vector<unsigned char> &     incompletely_filled_vectorization);
+      create_blocks_serial(const std::vector<unsigned int> &boundary_cells,
+                           const std::vector<unsigned int> &cells_close_to_boundary,
+                           const unsigned int               dofs_per_cell,
+                           const std::vector<unsigned int> &cell_vectorization_categories,
+                           const bool                       cell_vectorization_categories_strict,
+                           std::vector<unsigned int> &      renumbering,
+                           std::vector<unsigned char> &     incompletely_filled_vectorization);
 
       /**
        * First step in the block creation for the task-parallel blocking setup.
@@ -205,10 +204,9 @@ namespace internal
        * according to the renumbering returned by this function.
        */
       void
-      initial_setup_blocks_tasks(
-        const std::vector<unsigned int> &boundary_cells,
-        std::vector<unsigned int> &      renumbering,
-        std::vector<unsigned char> &     incompletely_filled_vectorization);
+      initial_setup_blocks_tasks(const std::vector<unsigned int> &boundary_cells,
+                                 std::vector<unsigned int> &      renumbering,
+                                 std::vector<unsigned char> &incompletely_filled_vectorization);
 
       /**
        * This helper function determines a block size if the user decided not
@@ -251,11 +249,10 @@ namespace internal
        * @param hp_bool Defines whether we are in hp mode or not
        */
       void
-      make_thread_graph_partition_color(
-        DynamicSparsityPattern &    connectivity,
-        std::vector<unsigned int> & renumbering,
-        std::vector<unsigned char> &irregular_cells,
-        const bool                  hp_bool);
+      make_thread_graph_partition_color(DynamicSparsityPattern &    connectivity,
+                                        std::vector<unsigned int> & renumbering,
+                                        std::vector<unsigned char> &irregular_cells,
+                                        const bool                  hp_bool);
 
       /**
        * This function goes through all cells that have been filled into @p
@@ -290,12 +287,11 @@ namespace internal
        * @param hp_bool Defines whether we are in hp mode or not
        */
       void
-      make_thread_graph_partition_partition(
-        const std::vector<unsigned int> &cell_active_fe_index,
-        DynamicSparsityPattern &         connectivity,
-        std::vector<unsigned int> &      renumbering,
-        std::vector<unsigned char> &     irregular_cells,
-        const bool                       hp_bool);
+      make_thread_graph_partition_partition(const std::vector<unsigned int> &cell_active_fe_index,
+                                            DynamicSparsityPattern &         connectivity,
+                                            std::vector<unsigned int> &      renumbering,
+                                            std::vector<unsigned char> &     irregular_cells,
+                                            const bool                       hp_bool);
 
       /**
        * Either calls make_thread_graph_partition_color() or
@@ -332,23 +328,21 @@ namespace internal
        * the connectivity between the individual cells.
        */
       void
-      make_connectivity_cells_to_blocks(
-        const std::vector<unsigned char> &irregular_cells,
-        const DynamicSparsityPattern &    connectivity_cells,
-        DynamicSparsityPattern &          connectivity_blocks) const;
+      make_connectivity_cells_to_blocks(const std::vector<unsigned char> &irregular_cells,
+                                        const DynamicSparsityPattern &    connectivity_cells,
+                                        DynamicSparsityPattern &connectivity_blocks) const;
 
       /**
        * Function to create coloring on the second layer within each
        * partition.
        */
       void
-      make_coloring_within_partitions_pre_blocked(
-        const DynamicSparsityPattern &   connectivity,
-        const unsigned int               partition,
-        const std::vector<unsigned int> &cell_partition,
-        const std::vector<unsigned int> &partition_list,
-        const std::vector<unsigned int> &partition_size,
-        std::vector<unsigned int> &      partition_color_list);
+      make_coloring_within_partitions_pre_blocked(const DynamicSparsityPattern &   connectivity,
+                                                  const unsigned int               partition,
+                                                  const std::vector<unsigned int> &cell_partition,
+                                                  const std::vector<unsigned int> &partition_list,
+                                                  const std::vector<unsigned int> &partition_size,
+                                                  std::vector<unsigned int> &partition_color_list);
 
       /**
        * Function to create partitioning on the second layer within each

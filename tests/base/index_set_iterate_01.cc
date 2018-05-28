@@ -25,16 +25,14 @@ test(IndexSet &index_set)
 {
   index_set.print(deallog);
 
-  Assert((int)index_set.n_intervals() ==
-           index_set.end_intervals() - index_set.begin_intervals(),
+  Assert((int)index_set.n_intervals() == index_set.end_intervals() - index_set.begin_intervals(),
          ExcInternalError());
 
   IndexSet::IntervalIterator endit = index_set.end_intervals();
   Assert(!endit->is_valid(), ExcInternalError());
 
   // print intervals
-  for (IndexSet::IntervalIterator it = index_set.begin_intervals(); it != endit;
-       ++it)
+  for (IndexSet::IntervalIterator it = index_set.begin_intervals(); it != endit; ++it)
     {
       if (it->n_elements() == 1)
         deallog << *(it->begin()) << " ";
@@ -45,17 +43,14 @@ test(IndexSet &index_set)
 
   // print entries
   {
-    for (IndexSet::ElementIterator it = index_set.begin();
-         it != index_set.end();
-         ++it)
+    for (IndexSet::ElementIterator it = index_set.begin(); it != index_set.end(); ++it)
       deallog << *it << " ";
     deallog << std::endl;
   }
 
   // check comparison, distance, and n_elements:
   unsigned int c = 0;
-  for (IndexSet::IntervalIterator it = index_set.begin_intervals(); it != endit;
-       ++it, ++c)
+  for (IndexSet::IntervalIterator it = index_set.begin_intervals(); it != endit; ++it, ++c)
     {
       IndexSet::IntervalIterator it2 = it;
       Assert(it == it2, ExcInternalError());

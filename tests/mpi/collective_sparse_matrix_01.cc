@@ -40,9 +40,7 @@ test()
 
   SparseMatrix<double> matrix(sparsity);
   const double         val = std::pow(10, myid);
-  for (SparsityPattern::const_iterator it = sparsity.begin();
-       it != sparsity.end();
-       ++it)
+  for (SparsityPattern::const_iterator it = sparsity.begin(); it != sparsity.end(); ++it)
     {
       const auto i = (*it).row();
       const auto j = (*it).column();
@@ -62,16 +60,13 @@ test()
 
   Utilities::MPI::sum(full, MPI_COMM_WORLD, full);
 
-  for (SparsityPattern::const_iterator it = sparsity.begin();
-       it != sparsity.end();
-       ++it)
+  for (SparsityPattern::const_iterator it = sparsity.begin(); it != sparsity.end(); ++it)
     {
       const auto i = (*it).row();
       const auto j = (*it).column();
       AssertThrow(matrix(i, j) == full(i, j),
-                  ExcMessage(std::to_string(matrix(i, j)) +
-                             " != " + std::to_string(full(i, j)) + " for i=" +
-                             std::to_string(i) + " j=" + std::to_string(j)));
+                  ExcMessage(std::to_string(matrix(i, j)) + " != " + std::to_string(full(i, j)) +
+                             " for i=" + std::to_string(i) + " j=" + std::to_string(j)));
     }
 
   deallog << "Ok" << std::endl;
@@ -81,8 +76,7 @@ test()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   // MPILogInitAll log;
   // test();

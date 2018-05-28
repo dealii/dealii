@@ -99,8 +99,7 @@ test()
                                     VectorTools::L2_norm,
                                     &right_component_select);
 
-  double norm =
-    VectorTools::compute_global_error(tr, error, VectorTools::L2_norm);
+  double norm = VectorTools::compute_global_error(tr, error, VectorTools::L2_norm);
 
   if (myid == 0)
     deallog << dofh.n_locally_owned_dofs() << ' ' << dofh.n_dofs() << std::endl
@@ -129,8 +128,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;

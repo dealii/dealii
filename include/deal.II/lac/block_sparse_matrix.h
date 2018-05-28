@@ -221,8 +221,7 @@ public:
    */
   template <typename block_number>
   void
-  vmult(BlockVector<block_number> &      dst,
-        const BlockVector<block_number> &src) const;
+  vmult(BlockVector<block_number> &dst, const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -230,8 +229,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  vmult(BlockVector<block_number> &    dst,
-        const Vector<nonblock_number> &src) const;
+  vmult(BlockVector<block_number> &dst, const Vector<nonblock_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -239,8 +237,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  vmult(Vector<nonblock_number> &        dst,
-        const BlockVector<block_number> &src) const;
+  vmult(Vector<nonblock_number> &dst, const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -257,8 +254,7 @@ public:
    */
   template <typename block_number>
   void
-  Tvmult(BlockVector<block_number> &      dst,
-         const BlockVector<block_number> &src) const;
+  Tvmult(BlockVector<block_number> &dst, const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -266,8 +262,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  Tvmult(BlockVector<block_number> &    dst,
-         const Vector<nonblock_number> &src) const;
+  Tvmult(BlockVector<block_number> &dst, const Vector<nonblock_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -275,8 +270,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  Tvmult(Vector<nonblock_number> &        dst,
-         const BlockVector<block_number> &src) const;
+  Tvmult(Vector<nonblock_number> &dst, const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -284,8 +278,7 @@ public:
    */
   template <typename nonblock_number>
   void
-  Tvmult(Vector<nonblock_number> &      dst,
-         const Vector<nonblock_number> &src) const;
+  Tvmult(Vector<nonblock_number> &dst, const Vector<nonblock_number> &src) const;
   //@}
 
   /**
@@ -366,8 +359,7 @@ private:
    * guarantee that it is not deleted while still in use, we subscribe to it
    * using the SmartPointer class.
    */
-  SmartPointer<const BlockSparsityPattern, BlockSparseMatrix<number>>
-    sparsity_pattern;
+  SmartPointer<const BlockSparsityPattern, BlockSparseMatrix<number>> sparsity_pattern;
 };
 
 
@@ -485,7 +477,7 @@ template <class BlockVectorType>
 inline void
 BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType &      dst,
                                                const BlockVectorType &src,
-                                               const number omega) const
+                                               const number           omega) const
 {
   Assert(this->n_block_rows() == this->n_block_cols(), ExcNotQuadratic());
   Assert(dst.n_blocks() == this->n_block_rows(),
@@ -506,7 +498,7 @@ template <typename number2>
 inline void
 BlockSparseMatrix<number>::precondition_Jacobi(Vector<number2> &      dst,
                                                const Vector<number2> &src,
-                                               const number omega) const
+                                               const number           omega) const
 {
   // check number of blocks. the sizes of the
   // single block is checked in the function

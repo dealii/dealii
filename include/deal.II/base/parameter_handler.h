@@ -1007,7 +1007,7 @@ public:
   void
   declare_entry(const std::string &          entry,
                 const std::string &          default_value,
-                const Patterns::PatternBase &pattern = Patterns::Anything(),
+                const Patterns::PatternBase &pattern       = Patterns::Anything(),
                 const std::string &          documentation = std::string());
 
   /**
@@ -1054,8 +1054,7 @@ public:
    *  ParameterHandler::parse_input() for more information.
    */
   void
-  add_action(const std::string &                                  entry,
-             const std::function<void(const std::string &value)> &action);
+  add_action(const std::string &entry, const std::function<void(const std::string &value)> &action);
 
   /**
    * Declare a new entry name @p entry, set its default value to the content of
@@ -1068,11 +1067,11 @@ public:
    */
   template <class ParameterType>
   void
-  add_parameter(const std::string &          entry,
-                ParameterType &              parameter,
-                const std::string &          documentation = std::string(),
-                const Patterns::PatternBase &pattern =
-                  *Patterns::Tools::Convert<ParameterType>::to_pattern());
+  add_parameter(
+    const std::string &          entry,
+    ParameterType &              parameter,
+    const std::string &          documentation = std::string(),
+    const Patterns::PatternBase &pattern = *Patterns::Tools::Convert<ParameterType>::to_pattern());
 
   /**
    * Create an alias for an existing entry. This provides a way to refer to a
@@ -1314,7 +1313,7 @@ public:
   print_parameters_section(std::ostream &     out,
                            const OutputStyle  style,
                            const unsigned int indent_level,
-                           const bool include_top_level_elements = false);
+                           const bool         include_top_level_elements = false);
 
   /**
    * Print parameters to a logstream. This function allows to print all
@@ -1384,22 +1383,20 @@ public:
   DeclException2(ExcValueDoesNotMatchPattern,
                  std::string,
                  std::string,
-                 << "The string <" << arg1
-                 << "> does not match the given pattern <" << arg2 << ">.");
+                 << "The string <" << arg1 << "> does not match the given pattern <" << arg2
+                 << ">.");
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcAlreadyAtTopLevel,
-    "You can't leave a subsection if you are already at the top level "
-    "of the subsection hierarchy.");
+  DeclExceptionMsg(ExcAlreadyAtTopLevel,
+                   "You can't leave a subsection if you are already at the top level "
+                   "of the subsection hierarchy.");
   /**
    * Exception
    */
   DeclException1(ExcEntryUndeclared,
                  std::string,
-                 << "You can't ask for entry <" << arg1
-                 << "> you have not yet declared.");
+                 << "You can't ask for entry <" << arg1 << "> you have not yet declared.");
 
   /**
    * Exception for when there are an unequal number of 'subsection' and 'end'
@@ -1489,16 +1486,15 @@ public:
    * statement, current parameter file name, and the name of the file intended
    * for inclusion.
    */
-  DeclException3(
-    ExcCannotOpenIncludeStatementFile,
-    int,
-    std::string,
-    std::string,
-    << "Line <" << arg1 << "> of file <" << arg2
-    << ">: This line "
-       "contains an 'include' or 'INCLUDE' statement, but the given "
-       "file to include <"
-    << arg3 << "> cannot be opened.");
+  DeclException3(ExcCannotOpenIncludeStatementFile,
+                 int,
+                 std::string,
+                 std::string,
+                 << "Line <" << arg1 << "> of file <" << arg2
+                 << ">: This line "
+                    "contains an 'include' or 'INCLUDE' statement, but the given "
+                    "file to include <"
+                 << arg3 << "> cannot be opened.");
 
   //@}
 private:
@@ -1578,9 +1574,7 @@ private:
    * caller's variable is not changed.
    */
   void
-  scan_line(std::string        line,
-            const std::string &input_filename,
-            const unsigned int current_line_n);
+  scan_line(std::string line, const std::string &input_filename, const unsigned int current_line_n);
 
   /**
    * Print out the parameters of the subsection given by the
@@ -1594,11 +1588,10 @@ private:
    * sections.
    */
   void
-  recursively_print_parameters(
-    const std::vector<std::string> &target_subsection_path,
-    const OutputStyle               style,
-    const unsigned int              indent_level,
-    std::ostream &                  out) const;
+  recursively_print_parameters(const std::vector<std::string> &target_subsection_path,
+                               const OutputStyle               style,
+                               const unsigned int              indent_level,
+                               std::ostream &                  out) const;
 
   friend class MultipleParameterLoop;
 };
@@ -1939,9 +1932,7 @@ private:
      * splitting up into the different variants is done later by
      * <tt>split_different_values</tt>.
      */
-    Entry(const std::vector<std::string> &Path,
-          const std::string &             Name,
-          const std::string &             Value);
+    Entry(const std::vector<std::string> &Path, const std::string &Name, const std::string &Value);
 
     /**
      * Split the entry value into the different branches.
@@ -2068,18 +2059,16 @@ ParameterHandler::add_parameter(const std::string &          entry,
                 "that is const. Use a non-const type.");
 
   declare_entry(entry,
-                Patterns::Tools::Convert<ParameterType>::to_string(
-                  parameter, pattern.clone()),
+                Patterns::Tools::Convert<ParameterType>::to_string(parameter, pattern.clone()),
                 pattern,
                 documentation);
 
-  std::string        path = get_current_full_path(entry);
-  const unsigned int pattern_index =
-    entries->get<unsigned int>(path + path_separator + "pattern");
+  std::string        path          = get_current_full_path(entry);
+  const unsigned int pattern_index = entries->get<unsigned int>(path + path_separator + "pattern");
 
   auto action = [&, pattern_index](const std::string &val) {
-    parameter = Patterns::Tools::Convert<ParameterType>::to_value(
-      val, patterns[pattern_index]->clone());
+    parameter =
+      Patterns::Tools::Convert<ParameterType>::to_value(val, patterns[pattern_index]->clone());
   };
   add_action(entry, action);
 }

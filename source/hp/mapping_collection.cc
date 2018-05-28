@@ -24,11 +24,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace hp
 {
   template <int dim, int spacedim>
-  MappingCollection<dim, spacedim>::MappingCollection(
-    const Mapping<dim, spacedim> &mapping)
+  MappingCollection<dim, spacedim>::MappingCollection(const Mapping<dim, spacedim> &mapping)
   {
-    mappings.push_back(
-      std::shared_ptr<const Mapping<dim, spacedim>>(mapping.clone()));
+    mappings.push_back(std::shared_ptr<const Mapping<dim, spacedim>>(mapping.clone()));
   }
 
 
@@ -64,11 +62,9 @@ namespace hp
 
   template <int dim, int spacedim>
   void
-  MappingCollection<dim, spacedim>::push_back(
-    const Mapping<dim, spacedim> &new_mapping)
+  MappingCollection<dim, spacedim>::push_back(const Mapping<dim, spacedim> &new_mapping)
   {
-    mappings.push_back(
-      std::shared_ptr<const Mapping<dim, spacedim>>(new_mapping.clone()));
+    mappings.push_back(std::shared_ptr<const Mapping<dim, spacedim>>(new_mapping.clone()));
   }
 
   //---------------------------------------------------------------------------
@@ -95,9 +91,8 @@ namespace hp
   } // namespace
 
   template <int dim, int spacedim>
-  MappingCollection<dim, spacedim>
-    StaticMappingQ1<dim, spacedim>::mapping_collection =
-      MappingCollection<dim, spacedim>(get_static_mapping_q1<dim, spacedim>());
+  MappingCollection<dim, spacedim> StaticMappingQ1<dim, spacedim>::mapping_collection =
+    MappingCollection<dim, spacedim>(get_static_mapping_q1<dim, spacedim>());
 
 } // namespace hp
 

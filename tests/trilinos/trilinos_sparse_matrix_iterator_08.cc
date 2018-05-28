@@ -48,8 +48,7 @@ test()
       if (((i + 2 * j + 1) % 3 == 0) || (i == j))
         {
           deallog << i << ' ' << j << ' ' << m.el(i, j) << std::endl;
-          Assert(std::fabs(m.el(i, j) - (i * j / 2.)) < 1e-14,
-                 ExcInternalError());
+          Assert(std::fabs(m.el(i, j) - (i * j / 2.)) < 1e-14, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
@@ -62,8 +61,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   try
     {
@@ -73,13 +71,11 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -87,12 +83,10 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

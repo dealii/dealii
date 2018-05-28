@@ -61,19 +61,18 @@ template <int spacedim>
 template <typename InputVector, typename DoFHandlerType>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim> &mapping,
-  const DoFHandlerType &      dof_handler,
-  const Quadrature<0> &       quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    &                       neumann_bc,
-  const InputVector &       solution,
-  Vector<float> &           error,
-  const ComponentMask &     component_mask,
-  const Function<spacedim> *coefficients,
-  const unsigned int        n_threads,
-  const types::subdomain_id subdomain_id,
-  const types::material_id  material_id,
-  const Strategy            strategy)
+  const Mapping<1, spacedim> &                                                  mapping,
+  const DoFHandlerType &                                                        dof_handler,
+  const Quadrature<0> &                                                         quadrature,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type &neumann_bc,
+  const InputVector &                                                           solution,
+  Vector<float> &                                                               error,
+  const ComponentMask &                                                         component_mask,
+  const Function<spacedim> *                                                    coefficients,
+  const unsigned int                                                            n_threads,
+  const types::subdomain_id                                                     subdomain_id,
+  const types::material_id                                                      material_id,
+  const Strategy                                                                strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions(1, &solution);
@@ -98,18 +97,17 @@ template <int spacedim>
 template <typename InputVector, typename DoFHandlerType>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &dof_handler,
-  const Quadrature<0> & quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    &                       neumann_bc,
-  const InputVector &       solution,
-  Vector<float> &           error,
-  const ComponentMask &     component_mask,
-  const Function<spacedim> *coefficients,
-  const unsigned int        n_threads,
-  const types::subdomain_id subdomain_id,
-  const types::material_id  material_id,
-  const Strategy            strategy)
+  const DoFHandlerType &                                                        dof_handler,
+  const Quadrature<0> &                                                         quadrature,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type &neumann_bc,
+  const InputVector &                                                           solution,
+  Vector<float> &                                                               error,
+  const ComponentMask &                                                         component_mask,
+  const Function<spacedim> *                                                    coefficients,
+  const unsigned int                                                            n_threads,
+  const types::subdomain_id                                                     subdomain_id,
+  const types::material_id                                                      material_id,
+  const Strategy                                                                strategy)
 {
   estimate(StaticMappingQ1<1, spacedim>::mapping,
            dof_handler,
@@ -131,18 +129,17 @@ template <int spacedim>
 template <typename InputVector, typename DoFHandlerType>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &dof_handler,
-  const Quadrature<0> & quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    &                                     neumann_bc,
-  const std::vector<const InputVector *> &solutions,
-  std::vector<Vector<float> *> &          errors,
-  const ComponentMask &                   component_mask,
-  const Function<spacedim> *              coefficients,
-  const unsigned int                      n_threads,
-  const types::subdomain_id               subdomain_id,
-  const types::material_id                material_id,
-  const Strategy                          strategy)
+  const DoFHandlerType &                                                        dof_handler,
+  const Quadrature<0> &                                                         quadrature,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type &neumann_bc,
+  const std::vector<const InputVector *> &                                      solutions,
+  std::vector<Vector<float> *> &                                                errors,
+  const ComponentMask &                                                         component_mask,
+  const Function<spacedim> *                                                    coefficients,
+  const unsigned int                                                            n_threads,
+  const types::subdomain_id                                                     subdomain_id,
+  const types::material_id                                                      material_id,
+  const Strategy                                                                strategy)
 {
   estimate(StaticMappingQ1<1, spacedim>::mapping,
            dof_handler,
@@ -164,19 +161,18 @@ template <int spacedim>
 template <typename InputVector, typename DoFHandlerType>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim> &mapping,
-  const DoFHandlerType &      dof_handler,
-  const hp::QCollection<0> &  quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    &                       neumann_bc,
-  const InputVector &       solution,
-  Vector<float> &           error,
-  const ComponentMask &     component_mask,
-  const Function<spacedim> *coefficients,
-  const unsigned int        n_threads,
-  const types::subdomain_id subdomain_id,
-  const types::material_id  material_id,
-  const Strategy            strategy)
+  const Mapping<1, spacedim> &                                                  mapping,
+  const DoFHandlerType &                                                        dof_handler,
+  const hp::QCollection<0> &                                                    quadrature,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type &neumann_bc,
+  const InputVector &                                                           solution,
+  Vector<float> &                                                               error,
+  const ComponentMask &                                                         component_mask,
+  const Function<spacedim> *                                                    coefficients,
+  const unsigned int                                                            n_threads,
+  const types::subdomain_id                                                     subdomain_id,
+  const types::material_id                                                      material_id,
+  const Strategy                                                                strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions(1, &solution);
@@ -200,18 +196,17 @@ template <int spacedim>
 template <typename InputVector, typename DoFHandlerType>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &    dof_handler,
-  const hp::QCollection<0> &quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    &                       neumann_bc,
-  const InputVector &       solution,
-  Vector<float> &           error,
-  const ComponentMask &     component_mask,
-  const Function<spacedim> *coefficients,
-  const unsigned int        n_threads,
-  const types::subdomain_id subdomain_id,
-  const types::material_id  material_id,
-  const Strategy            strategy)
+  const DoFHandlerType &                                                        dof_handler,
+  const hp::QCollection<0> &                                                    quadrature,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type &neumann_bc,
+  const InputVector &                                                           solution,
+  Vector<float> &                                                               error,
+  const ComponentMask &                                                         component_mask,
+  const Function<spacedim> *                                                    coefficients,
+  const unsigned int                                                            n_threads,
+  const types::subdomain_id                                                     subdomain_id,
+  const types::material_id                                                      material_id,
+  const Strategy                                                                strategy)
 {
   estimate(StaticMappingQ1<1, spacedim>::mapping,
            dof_handler,
@@ -233,18 +228,17 @@ template <int spacedim>
 template <typename InputVector, typename DoFHandlerType>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const DoFHandlerType &    dof_handler,
-  const hp::QCollection<0> &quadrature,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    &                                     neumann_bc,
-  const std::vector<const InputVector *> &solutions,
-  std::vector<Vector<float> *> &          errors,
-  const ComponentMask &                   component_mask,
-  const Function<spacedim> *              coefficients,
-  const unsigned int                      n_threads,
-  const types::subdomain_id               subdomain_id,
-  const types::material_id                material_id,
-  const Strategy                          strategy)
+  const DoFHandlerType &                                                        dof_handler,
+  const hp::QCollection<0> &                                                    quadrature,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type &neumann_bc,
+  const std::vector<const InputVector *> &                                      solutions,
+  std::vector<Vector<float> *> &                                                errors,
+  const ComponentMask &                                                         component_mask,
+  const Function<spacedim> *                                                    coefficients,
+  const unsigned int                                                            n_threads,
+  const types::subdomain_id                                                     subdomain_id,
+  const types::material_id                                                      material_id,
+  const Strategy                                                                strategy)
 {
   estimate(StaticMappingQ1<1, spacedim>::mapping,
            dof_handler,
@@ -269,8 +263,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim> & /*mapping*/,
   const DoFHandlerType & /*dof_handler*/,
   const hp::QCollection<0> &,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    & /*neumann_bc*/,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type & /*neumann_bc*/,
   const std::vector<const InputVector *> & /*solutions*/,
   std::vector<Vector<float> *> & /*errors*/,
   const ComponentMask & /*component_mask_*/,
@@ -292,12 +285,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Mapping<1, spacedim> &mapping,
   const DoFHandlerType &      dof_handler,
   const Quadrature<0> &,
-  const typename FunctionMap<spacedim, typename InputVector::value_type>::type
-    &                                     neumann_bc,
-  const std::vector<const InputVector *> &solutions,
-  std::vector<Vector<float> *> &          errors,
-  const ComponentMask &                   component_mask,
-  const Function<spacedim> *              coefficient,
+  const typename FunctionMap<spacedim, typename InputVector::value_type>::type &neumann_bc,
+  const std::vector<const InputVector *> &                                      solutions,
+  std::vector<Vector<float> *> &                                                errors,
+  const ComponentMask &                                                         component_mask,
+  const Function<spacedim> *                                                    coefficient,
   const unsigned int,
   const types::subdomain_id subdomain_id_,
   const types::material_id  material_id,
@@ -310,10 +302,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
         &dof_handler.get_triangulation()) != nullptr)
     Assert(
       (subdomain_id_ == numbers::invalid_subdomain_id) ||
-        (subdomain_id_ ==
-         dynamic_cast<const parallel::distributed::Triangulation<1, spacedim>
-                        &>(dof_handler.get_triangulation())
-           .locally_owned_subdomain()),
+        (subdomain_id_ == dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> &>(
+                            dof_handler.get_triangulation())
+                            .locally_owned_subdomain()),
       ExcMessage("For parallel distributed triangulations, the only "
                  "valid subdomain_id that can be passed here is the "
                  "one that corresponds to the locally owned subdomain id."));
@@ -333,27 +324,22 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const unsigned int n_solution_vectors = solutions.size();
 
   // sanity checks
-  Assert(neumann_bc.find(numbers::internal_face_boundary_id) ==
-           neumann_bc.end(),
+  Assert(neumann_bc.find(numbers::internal_face_boundary_id) == neumann_bc.end(),
          ExcMessage("You are not allowed to list the special boundary "
                     "indicator for internal boundaries in your boundary "
                     "value map."));
 
-  for (typename FunctionMap<spacedim, typename InputVector::value_type>::type::
-         const_iterator i = neumann_bc.begin();
+  for (typename FunctionMap<spacedim, typename InputVector::value_type>::type::const_iterator i =
+         neumann_bc.begin();
        i != neumann_bc.end();
        ++i)
     Assert(i->second->n_components == n_components,
-           ExcInvalidBoundaryFunction(
-             i->first, i->second->n_components, n_components));
+           ExcInvalidBoundaryFunction(i->first, i->second->n_components, n_components));
 
-  Assert(component_mask.represents_n_components(n_components),
-         ExcInvalidComponentMask());
-  Assert(component_mask.n_selected_components(n_components) > 0,
-         ExcInvalidComponentMask());
+  Assert(component_mask.represents_n_components(n_components), ExcInvalidComponentMask());
+  Assert(component_mask.n_selected_components(n_components) > 0, ExcInvalidComponentMask());
 
-  Assert((coefficient == nullptr) ||
-           (coefficient->n_components == n_components) ||
+  Assert((coefficient == nullptr) || (coefficient->n_components == n_components) ||
            (coefficient->n_components == 1),
          ExcInvalidCoefficient());
 
@@ -364,18 +350,16 @@ KellyErrorEstimator<1, spacedim>::estimate(
     Assert(solutions[n]->size() == dof_handler.n_dofs(),
            ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
 
-  Assert((coefficient == nullptr) ||
-           (coefficient->n_components == n_components) ||
+  Assert((coefficient == nullptr) || (coefficient->n_components == n_components) ||
            (coefficient->n_components == 1),
          ExcInvalidCoefficient());
 
-  for (typename FunctionMap<spacedim, typename InputVector::value_type>::type::
-         const_iterator i = neumann_bc.begin();
+  for (typename FunctionMap<spacedim, typename InputVector::value_type>::type::const_iterator i =
+         neumann_bc.begin();
        i != neumann_bc.end();
        ++i)
     Assert(i->second->n_components == n_components,
-           ExcInvalidBoundaryFunction(
-             i->first, i->second->n_components, n_components));
+           ExcInvalidBoundaryFunction(i->first, i->second->n_components, n_components));
 
   // reserve one slot for each cell and set it to zero
   for (unsigned int n = 0; n < n_solution_vectors; ++n)
@@ -385,17 +369,14 @@ KellyErrorEstimator<1, spacedim>::estimate(
   //
   // for the neighbor gradient, we need several auxiliary fields, depending on
   // the way we get it (see below)
-  std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>>
-    gradients_here(
-      n_solution_vectors,
-      std::vector<std::vector<Tensor<1, spacedim, number>>>(
-        2, std::vector<Tensor<1, spacedim, number>>(n_components)));
-  std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>>
-    gradients_neighbor(gradients_here);
-  std::vector<Vector<typename ProductType<number, double>::type>>
-  grad_dot_n_neighbor(
+  std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>> gradients_here(
     n_solution_vectors,
-    Vector<typename ProductType<number, double>::type>(n_components));
+    std::vector<std::vector<Tensor<1, spacedim, number>>>(
+      2, std::vector<Tensor<1, spacedim, number>>(n_components)));
+  std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>> gradients_neighbor(
+    gradients_here);
+  std::vector<Vector<typename ProductType<number, double>::type>> grad_dot_n_neighbor(
+    n_solution_vectors, Vector<typename ProductType<number, double>::type>(n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it
@@ -415,30 +396,27 @@ KellyErrorEstimator<1, spacedim>::estimate(
   hp::MappingCollection<1, spacedim> mapping_collection;
   mapping_collection.push_back(mapping);
 
-  hp::FEValues<1, spacedim> fe_values(
-    mapping_collection, fe, q_collection, update_gradients);
+  hp::FEValues<1, spacedim>     fe_values(mapping_collection, fe, q_collection, update_gradients);
   hp::FEFaceValues<1, spacedim> fe_face_values(
     /*mapping_collection,*/ fe, q_face_collection, update_normal_vectors);
 
   // loop over all cells and do something on the cells which we're told to
   // work on. note that the error indicator is only a sum over the two
   // contributions from the two vertices of each cell.
-  for (typename DoFHandlerType::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     if (((subdomain_id == numbers::invalid_subdomain_id) ||
          (cell->subdomain_id() == subdomain_id)) &&
-        ((material_id == numbers::invalid_material_id) ||
-         (cell->material_id() == material_id)))
+        ((material_id == numbers::invalid_material_id) || (cell->material_id() == material_id)))
       {
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           (*errors[n])(cell->active_cell_index()) = 0;
 
         fe_values.reinit(cell);
         for (unsigned int s = 0; s < n_solution_vectors; ++s)
-          fe_values.get_present_fe_values().get_function_gradients(
-            *solutions[s], gradients_here[s]);
+          fe_values.get_present_fe_values().get_function_gradients(*solutions[s],
+                                                                   gradients_here[s]);
 
         // loop over the two points bounding this line. n==0 is left point,
         // n==1 is right point
@@ -451,29 +429,27 @@ KellyErrorEstimator<1, spacedim>::estimate(
                 neighbor = neighbor->child(n == 0 ? 1 : 0);
 
             fe_face_values.reinit(cell, n);
-            Tensor<1, spacedim> normal = fe_face_values.get_present_fe_values()
-                                           .get_all_normal_vectors()[0];
+            Tensor<1, spacedim> normal =
+              fe_face_values.get_present_fe_values().get_all_normal_vectors()[0];
 
             if (neighbor.state() == IteratorState::valid)
               {
                 fe_values.reinit(neighbor);
 
                 for (unsigned int s = 0; s < n_solution_vectors; ++s)
-                  fe_values.get_present_fe_values().get_function_gradients(
-                    *solutions[s], gradients_neighbor[s]);
+                  fe_values.get_present_fe_values().get_function_gradients(*solutions[s],
+                                                                           gradients_neighbor[s]);
 
                 fe_face_values.reinit(neighbor, n == 0 ? 1 : 0);
                 Tensor<1, spacedim> neighbor_normal =
-                  fe_face_values.get_present_fe_values()
-                    .get_all_normal_vectors()[0];
+                  fe_face_values.get_present_fe_values().get_all_normal_vectors()[0];
 
                 // extract the gradient in normal direction of all the
                 // components.
                 for (unsigned int s = 0; s < n_solution_vectors; ++s)
                   for (unsigned int c = 0; c < n_components; ++c)
                     grad_dot_n_neighbor[s](c) =
-                      -(gradients_neighbor[s][n == 0 ? 1 : 0][c] *
-                        neighbor_normal);
+                      -(gradients_neighbor[s][n == 0 ? 1 : 0][c] * neighbor_normal);
               }
             else if (neumann_bc.find(n) != neumann_bc.end())
               // if Neumann b.c., then fill the gradients field which will be
@@ -490,8 +466,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
                 else
                   {
                     Vector<typename InputVector::value_type> v(n_components);
-                    neumann_bc.find(n)->second->vector_value(cell->vertex(n),
-                                                             v);
+                    neumann_bc.find(n)->second->vector_value(cell->vertex(n), v);
 
                     for (unsigned int s = 0; s < n_solution_vectors; ++s)
                       grad_dot_n_neighbor[s] = v;
@@ -513,28 +488,24 @@ KellyErrorEstimator<1, spacedim>::estimate(
                       coefficient_values(c) = c_value;
                   }
                 else
-                  coefficient->vector_value(cell->vertex(n),
-                                            coefficient_values);
+                  coefficient->vector_value(cell->vertex(n), coefficient_values);
               }
 
 
             for (unsigned int s = 0; s < n_solution_vectors; ++s)
-              for (unsigned int component = 0; component < n_components;
-                   ++component)
+              for (unsigned int component = 0; component < n_components; ++component)
                 if (component_mask[component] == true)
                   {
                     // get gradient here
-                    const typename ProductType<number, double>::type
-                      grad_dot_n_here =
-                        gradients_here[s][n][component] * normal;
+                    const typename ProductType<number, double>::type grad_dot_n_here =
+                      gradients_here[s][n][component] * normal;
 
                     const typename ProductType<number, double>::type jump =
                       ((grad_dot_n_here - grad_dot_n_neighbor[s](component)) *
                        coefficient_values(component));
                     (*errors[s])(cell->active_cell_index()) +=
-                      numbers::NumberTraits<
-                        typename ProductType<number,
-                                             double>::type>::abs_square(jump) *
+                      numbers::NumberTraits<typename ProductType<number, double>::type>::abs_square(
+                        jump) *
                       cell->diameter();
                   }
           }

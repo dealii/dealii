@@ -32,7 +32,7 @@ void
 check_this(const DoFHandler<dim> &dof_handler)
 {
   // set up X-shape mask
-  const unsigned int n_components = dof_handler.get_fe().n_components();
+  const unsigned int           n_components = dof_handler.get_fe().n_components();
   Table<2, DoFTools::Coupling> mask(n_components, n_components);
   for (unsigned int i = 0; i < n_components; ++i)
     for (unsigned int j = 0; j < n_components; ++j)
@@ -55,9 +55,8 @@ check_this(const DoFHandler<dim> &dof_handler)
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
   for (unsigned int i = 0; i < n_components; ++i)
     for (unsigned int j = 0; j < n_components; ++j)
-      sp.block(i, j).reinit(dofs_per_component[i],
-                            dofs_per_component[j],
-                            dof_handler.max_couplings_between_dofs());
+      sp.block(i, j).reinit(
+        dofs_per_component[i], dofs_per_component[j], dof_handler.max_couplings_between_dofs());
   sp.collect_sizes();
 
   DoFTools::make_sparsity_pattern(dof_handler, mask, sp);
@@ -69,17 +68,13 @@ check_this(const DoFHandler<dim> &dof_handler)
   // would be in the range of 40 MB)
   for (unsigned int l = 0; l < 20; ++l)
     {
-      const unsigned int                    line = l * (sp.n_rows() / 20);
-      std::pair<unsigned int, unsigned int> block_row =
-        sp.get_row_indices().global_to_local(line);
+      const unsigned int                    line      = l * (sp.n_rows() / 20);
+      std::pair<unsigned int, unsigned int> block_row = sp.get_row_indices().global_to_local(line);
       for (unsigned int col = 0; col < n_components; ++col)
         {
-          for (unsigned int c = 0;
-               c < sp.block(block_row.first, col).row_length(block_row.second);
+          for (unsigned int c = 0; c < sp.block(block_row.first, col).row_length(block_row.second);
                ++c)
-            deallog << sp.block(block_row.first, col)
-                         .column_number(block_row.second, c)
-                    << " ";
+            deallog << sp.block(block_row.first, col).column_number(block_row.second, c) << " ";
           deallog << std::endl;
         }
     }

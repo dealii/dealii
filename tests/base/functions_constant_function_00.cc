@@ -35,9 +35,7 @@
 // Test a given TESTEE object f on n_points points
 template <int dim, typename Number>
 void
-test_one_object(const TESTEE<dim> &f,
-                const unsigned int n_points,
-                const unsigned int n_component)
+test_one_object(const TESTEE<dim> &f, const unsigned int n_points, const unsigned int n_component)
 {
   // Create a vector of random points
   std::vector<Point<dim>> points(n_points);
@@ -93,8 +91,7 @@ test_one_object(const TESTEE<dim> &f,
   // vector_value_list
   {
     deallog << std::endl;
-    std::vector<Vector<Number>> return_values(n_points,
-                                              Vector<Number>(n_component));
+    std::vector<Vector<Number>> return_values(n_points, Vector<Number>(n_component));
     f.vector_value_list(points, return_values);
     for (int p = 0; p < n_points; ++p)
       {
@@ -112,8 +109,7 @@ test_one_object(const TESTEE<dim> &f,
 // Construct TESTEE with different constructor and test them
 template <int dim, typename Number>
 void
-test_constructor(const unsigned int         n_component,
-                 const std::vector<NUMBER> &component_data)
+test_constructor(const unsigned int n_component, const std::vector<NUMBER> &component_data)
 {
   const unsigned int n_points(5);
 
@@ -125,10 +121,8 @@ test_constructor(const unsigned int         n_component,
             << " Constructed with single value and n_component" << std::endl;
     // Close file to let Test use it.
 
-    TESTEE<dim> constant_vector_function(
-      component_data[2 /*of MAX_N_COMPONENT*/], n_component);
-    test_one_object<dim, Number>(
-      constant_vector_function, n_points, n_component);
+    TESTEE<dim> constant_vector_function(component_data[2 /*of MAX_N_COMPONENT*/], n_component);
+    test_one_object<dim, Number>(constant_vector_function, n_points, n_component);
   }
 
   // Construct with std::vector<>
@@ -144,8 +138,7 @@ test_constructor(const unsigned int         n_component,
     // Close file to let Test use it.
 
     TESTEE<dim> constant_vector_function(v);
-    test_one_object<dim, Number>(
-      constant_vector_function, n_points, n_component);
+    test_one_object<dim, Number>(constant_vector_function, n_points, n_component);
   }
 
   // Construct with Vector
@@ -161,8 +154,7 @@ test_constructor(const unsigned int         n_component,
     // Close file to let Test use it.
 
     TESTEE<dim> constant_vector_function(v);
-    test_one_object<dim, Number>(
-      constant_vector_function, n_points, n_component);
+    test_one_object<dim, Number>(constant_vector_function, n_points, n_component);
   }
 
   // Construct with pointer and offset
@@ -174,8 +166,7 @@ test_constructor(const unsigned int         n_component,
     // Close file to let Test use it.
 
     TESTEE<dim> constant_vector_function(&component_data[0], n_component);
-    test_one_object<dim, Number>(
-      constant_vector_function, n_points, n_component);
+    test_one_object<dim, Number>(constant_vector_function, n_points, n_component);
   }
 
   return;

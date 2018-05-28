@@ -31,8 +31,7 @@ check()
     {
       const unsigned int size         = 17 + test * 1101;
       const IndexSet     complete_set = complete_index_set(size);
-      LinearAlgebra::distributed::Vector<std::complex<number>> v1(
-        complete_set, MPI_COMM_SELF),
+      LinearAlgebra::distributed::Vector<std::complex<number>> v1(complete_set, MPI_COMM_SELF),
         v2(complete_set, MPI_COMM_SELF), v3(complete_set, MPI_COMM_SELF),
         check(complete_set, MPI_COMM_SELF);
       for (unsigned int i = 0; i < size; ++i)
@@ -60,8 +59,8 @@ check()
           deallog << std::endl;
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot should be " << prod / static_cast<number>(size) << ", is "
+              << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 

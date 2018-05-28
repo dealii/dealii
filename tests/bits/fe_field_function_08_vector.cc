@@ -104,8 +104,8 @@ test()
   // cell, and the inverse mapping
   // does not converge
   Point<dim> point(-0.27999999999999992, -0.62999999999999989);
-  fe_function.set_active_cell(typename DoFHandler<dim>::active_cell_iterator(
-    &triangulation, 1, 4, &dof_handler));
+  fe_function.set_active_cell(
+    typename DoFHandler<dim>::active_cell_iterator(&triangulation, 1, 4, &dof_handler));
 
   Vector<double> m(2);
   fe_function.vector_laplacian(point, m);

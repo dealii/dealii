@@ -37,8 +37,7 @@ output_double_number(double input, const std::string &text)
 
 template <class NUMBER>
 void
-output_eigenvalues(const std::vector<NUMBER> &eigenvalues,
-                   const std::string &        text)
+output_eigenvalues(const std::vector<NUMBER> &eigenvalues, const std::string &text)
 {
   deallog << text;
   for (unsigned int j = 0; j < eigenvalues.size(); ++j)
@@ -49,10 +48,7 @@ output_eigenvalues(const std::vector<NUMBER> &eigenvalues,
 }
 
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType &        solver,
             const MatrixType &  A,
@@ -72,10 +68,7 @@ check_solve(SolverType &        solver,
     }
 }
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_Tsolve(SolverType &        solver,
              const MatrixType &  A,
@@ -107,12 +100,10 @@ main()
   SolverControl         control(100, 1.e-3);
   SolverControl         verbose_control(100, 1.e-3, true);
   SolverCG<>            cg(control, mem);
-  cg.connect_condition_number_slot(std::bind(output_double_number,
-                                             std::placeholders::_1,
-                                             "Condition number estimate: "),
-                                   true);
-  cg.connect_eigenvalues_slot(std::bind(
-    output_eigenvalues<double>, std::placeholders::_1, "Final Eigenvalues: "));
+  cg.connect_condition_number_slot(
+    std::bind(output_double_number, std::placeholders::_1, "Condition number estimate: "), true);
+  cg.connect_eigenvalues_slot(
+    std::bind(output_eigenvalues<double>, std::placeholders::_1, "Final Eigenvalues: "));
 
 
   for (unsigned int size = 4; size <= 30; size *= 3)

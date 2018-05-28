@@ -49,8 +49,8 @@ test()
   DoFTools::map_dofs_to_support_points(MappingQGeneric<dim>(1), dofh, points);
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      for (typename std::map<types::global_dof_index,
-                             Point<dim>>::const_iterator p = points.begin();
+      for (typename std::map<types::global_dof_index, Point<dim>>::const_iterator p =
+             points.begin();
            p != points.end();
            ++p)
         deallog << p->first << " -> " << p->second << std::endl;

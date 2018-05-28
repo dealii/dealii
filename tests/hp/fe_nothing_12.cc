@@ -72,9 +72,7 @@ test()
   hp::DoFHandler<dim> dof_handler(triangulation);
 
   dof_handler.begin_active()->set_active_fe_index(1);
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                       dof_handler.begin_active(
-                                                         1),
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(1),
                                                      endc = dof_handler.end();
   for (; cell != endc; ++cell)
     if (cell->index() % 2 == 0)
@@ -90,25 +88,20 @@ test()
 
   constraints.close();
 
-  deallog << "   Number of constraints:        " << constraints.n_constraints()
-          << std::endl;
+  deallog << "   Number of constraints:        " << constraints.n_constraints() << std::endl;
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                        endc = dof_handler.end();
 
     for (; cell != endc; cell++)
       {
         deallog << cell << ' ' << cell->active_fe_index() << std::endl << "   ";
-        std::vector<types::global_dof_index> local_dof_indices(
-          cell->get_fe().dofs_per_cell);
+        std::vector<types::global_dof_index> local_dof_indices(cell->get_fe().dofs_per_cell);
         cell->get_dof_indices(local_dof_indices);
 
         for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
           deallog << local_dof_indices[i]
-                  << (constraints.is_constrained(local_dof_indices[i]) ? "*" :
-                                                                         "")
-                  << ' ';
+                  << (constraints.is_constrained(local_dof_indices[i]) ? "*" : "") << ' ';
         deallog << std::endl;
       }
   }

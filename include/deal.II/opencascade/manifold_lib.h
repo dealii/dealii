@@ -73,8 +73,7 @@ namespace OpenCASCADE
      * The TopoDS_Shape can be arbitrary, i.e., a collection of shapes, faces,
      * edges or a single face or edge.
      */
-    NormalProjectionManifold(const TopoDS_Shape &sh,
-                             const double        tolerance = 1e-7);
+    NormalProjectionManifold(const TopoDS_Shape &sh, const double tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.
@@ -92,9 +91,8 @@ namespace OpenCASCADE
      * algorithms.
      */
     virtual Point<spacedim>
-    project_to_manifold(
-      const ArrayView<const Point<spacedim>> &surrounding_points,
-      const Point<spacedim> &                 candidate) const override;
+    project_to_manifold(const ArrayView<const Point<spacedim>> &surrounding_points,
+                        const Point<spacedim> &                 candidate) const override;
 
 
   protected:
@@ -161,9 +159,8 @@ namespace OpenCASCADE
      * projection algorithms.
      */
     virtual Point<spacedim>
-    project_to_manifold(
-      const ArrayView<const Point<spacedim>> &surrounding_points,
-      const Point<spacedim> &                 candidate) const override;
+    project_to_manifold(const ArrayView<const Point<spacedim>> &surrounding_points,
+                        const Point<spacedim> &                 candidate) const override;
 
   protected:
     /**
@@ -239,8 +236,7 @@ namespace OpenCASCADE
      * TopoDS_Shape @p sh, along a direction which is approximately normal to
      * the mesh cell.
      */
-    NormalToMeshProjectionManifold(const TopoDS_Shape &sh,
-                                   const double        tolerance = 1e-7);
+    NormalToMeshProjectionManifold(const TopoDS_Shape &sh, const double tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.
@@ -255,9 +251,8 @@ namespace OpenCASCADE
      * exception is thrown.
      */
     virtual Point<spacedim>
-    project_to_manifold(
-      const ArrayView<const Point<spacedim>> &surrounding_points,
-      const Point<spacedim> &                 candidate) const override;
+    project_to_manifold(const ArrayView<const Point<spacedim>> &surrounding_points,
+                        const Point<spacedim> &                 candidate) const override;
 
   protected:
     /**
@@ -300,8 +295,7 @@ namespace OpenCASCADE
     /**
      * Default constructor with a TopoDS_Edge.
      */
-    ArclengthProjectionLineManifold(const TopoDS_Shape &sh,
-                                    const double        tolerance = 1e-7);
+    ArclengthProjectionLineManifold(const TopoDS_Shape &sh, const double tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.

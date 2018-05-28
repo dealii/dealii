@@ -113,9 +113,8 @@ namespace Utilities
      * destination more than once in their destinations list.
      */
     std::vector<unsigned int>
-    compute_point_to_point_communication_pattern(
-      const MPI_Comm &                 mpi_comm,
-      const std::vector<unsigned int> &destinations);
+    compute_point_to_point_communication_pattern(const MPI_Comm &                 mpi_comm,
+                                                 const std::vector<unsigned int> &destinations);
 
     /**
      * Given a
@@ -162,10 +161,7 @@ namespace Utilities
      */
 #ifdef DEAL_II_WITH_MPI
     int
-    create_group(const MPI_Comm & comm,
-                 const MPI_Group &group,
-                 const int        tag,
-                 MPI_Comm *       new_comm);
+    create_group(const MPI_Comm &comm, const MPI_Group &group, const int tag, MPI_Comm *new_comm);
 #endif
 
     /**
@@ -226,8 +222,7 @@ namespace Utilities
      */
     template <int rank, int dim, typename Number>
     SymmetricTensor<rank, dim, Number>
-    sum(const SymmetricTensor<rank, dim, Number> &local,
-        const MPI_Comm &                          mpi_communicator);
+    sum(const SymmetricTensor<rank, dim, Number> &local, const MPI_Comm &mpi_communicator);
 
     /**
      * Perform an MPI sum of the entries of a tensor.
@@ -236,8 +231,7 @@ namespace Utilities
      */
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
-    sum(const Tensor<rank, dim, Number> &local,
-        const MPI_Comm &                 mpi_communicator);
+    sum(const Tensor<rank, dim, Number> &local, const MPI_Comm &mpi_communicator);
 
     /**
      * Perform an MPI sum of the entries of a SparseMatrix.
@@ -524,10 +518,9 @@ namespace Utilities
        * create an object of this type is also at or close to the top of
        * <code>main()</code>.
        */
-      MPI_InitFinalize(
-        int &              argc,
-        char **&           argv,
-        const unsigned int max_num_threads = numbers::invalid_unsigned_int);
+      MPI_InitFinalize(int &              argc,
+                       char **&           argv,
+                       const unsigned int max_num_threads = numbers::invalid_unsigned_int);
 
       /**
        * Destructor. Calls <tt>MPI_Finalize()</tt> in case this class owns the
@@ -568,8 +561,7 @@ namespace Utilities
      */
     template <typename T>
     std::map<unsigned int, T>
-    some_to_some(const MPI_Comm &                 comm,
-                 const std::map<unsigned int, T> &objects_to_send);
+    some_to_some(const MPI_Comm &comm, const std::map<unsigned int, T> &objects_to_send);
 
     /**
      * A generalization of the classic MPI_Allgather function, that accepts
@@ -609,9 +601,7 @@ namespace Utilities
      */
     template <typename T>
     std::vector<T>
-    gather(const MPI_Comm &   comm,
-           const T &          object_to_send,
-           const unsigned int root_process = 0);
+    gather(const MPI_Comm &comm, const T &object_to_send, const unsigned int root_process = 0);
 
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
@@ -630,43 +620,34 @@ namespace Utilities
     void
     sum(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&sums)[N])
     {
-      internal::all_reduce(MPI_SUM,
-                           ArrayView<const T>(values, N),
-                           mpi_communicator,
-                           ArrayView<T>(sums, N));
+      internal::all_reduce(
+        MPI_SUM, ArrayView<const T>(values, N), mpi_communicator, ArrayView<T>(sums, N));
     }
 
     template <typename T, unsigned int N>
     void
     max(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&maxima)[N])
     {
-      internal::all_reduce(MPI_MAX,
-                           ArrayView<const T>(values, N),
-                           mpi_communicator,
-                           ArrayView<T>(maxima, N));
+      internal::all_reduce(
+        MPI_MAX, ArrayView<const T>(values, N), mpi_communicator, ArrayView<T>(maxima, N));
     }
 
     template <typename T, unsigned int N>
     void
     min(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&minima)[N])
     {
-      internal::all_reduce(MPI_MIN,
-                           ArrayView<const T>(values, N),
-                           mpi_communicator,
-                           ArrayView<T>(minima, N));
+      internal::all_reduce(
+        MPI_MIN, ArrayView<const T>(values, N), mpi_communicator, ArrayView<T>(minima, N));
     }
 
     template <typename T>
     std::map<unsigned int, T>
-    some_to_some(const MPI_Comm &                 comm,
-                 const std::map<unsigned int, T> &objects_to_send)
+    some_to_some(const MPI_Comm &comm, const std::map<unsigned int, T> &objects_to_send)
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
-      Assert(objects_to_send.size() == 0,
-             ExcMessage("Cannot send to more than one processor."));
-      Assert(objects_to_send.find(0) != objects_to_send.end() ||
-               objects_to_send.size() == 0,
+      Assert(objects_to_send.size() == 0, ExcMessage("Cannot send to more than one processor."));
+      Assert(objects_to_send.find(0) != objects_to_send.end() || objects_to_send.size() == 0,
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #  else
@@ -680,8 +661,7 @@ namespace Utilities
       AssertDimension(send_to.size(), objects_to_send.size());
 
       const auto receive_from =
-        Utilities::MPI::compute_point_to_point_communication_pattern(comm,
-                                                                     send_to);
+        Utilities::MPI::compute_point_to_point_communication_pattern(comm, send_to);
 
       // Sending buffers
       std::vector<std::vector<char>> buffers_to_send(send_to.size());
@@ -726,19 +706,16 @@ namespace Utilities
             const unsigned int rank = status.MPI_SOURCE;
 
             // Actually receive the message
-            ierr = MPI_Recv(
-              buffer.data(), len, MPI_CHAR, rank, 21, comm, MPI_STATUS_IGNORE);
+            ierr = MPI_Recv(buffer.data(), len, MPI_CHAR, rank, 21, comm, MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
-            Assert(
-              received_objects.find(rank) == received_objects.end(),
-              ExcInternalError("I should not receive again from this rank"));
+            Assert(received_objects.find(rank) == received_objects.end(),
+                   ExcInternalError("I should not receive again from this rank"));
             received_objects[rank] = Utilities::unpack<T>(buffer);
           }
       }
 
       // Wait to have sent all objects.
-      MPI_Waitall(
-        send_to.size(), buffer_send_requests.data(), MPI_STATUSES_IGNORE);
+      MPI_Waitall(send_to.size(), buffer_send_requests.data(), MPI_STATUSES_IGNORE);
 
       return received_objects;
 #  endif // deal.II with MPI
@@ -763,8 +740,7 @@ namespace Utilities
       std::vector<int> size_all_data(n_procs, 0);
 
       // Exchanging the size of each buffer
-      MPI_Allgather(
-        &n_local_data, 1, MPI_INT, &(size_all_data[0]), 1, MPI_INT, comm);
+      MPI_Allgather(&n_local_data, 1, MPI_INT, &(size_all_data[0]), 1, MPI_INT, comm);
 
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer
@@ -774,8 +750,7 @@ namespace Utilities
         rdispls[i] = rdispls[i - 1] + size_all_data[i - 1];
 
       // Step 3: exchange the buffer:
-      std::vector<char> received_unrolled_buffer(rdispls.back() +
-                                                 size_all_data.back());
+      std::vector<char> received_unrolled_buffer(rdispls.back() + size_all_data.back());
 
       MPI_Allgatherv(buffer.data(),
                      n_local_data,
@@ -789,9 +764,9 @@ namespace Utilities
       std::vector<T> received_objects(n_procs);
       for (unsigned int i = 0; i < n_procs; ++i)
         {
-          std::vector<char> local_buffer(
-            received_unrolled_buffer.begin() + rdispls[i],
-            received_unrolled_buffer.begin() + rdispls[i] + size_all_data[i]);
+          std::vector<char> local_buffer(received_unrolled_buffer.begin() + rdispls[i],
+                                         received_unrolled_buffer.begin() + rdispls[i] +
+                                           size_all_data[i]);
           received_objects[i] = Utilities::unpack<T>(local_buffer);
         }
 
@@ -801,9 +776,7 @@ namespace Utilities
 
     template <typename T>
     std::vector<T>
-    gather(const MPI_Comm &   comm,
-           const T &          object_to_send,
-           const unsigned int root_process)
+    gather(const MPI_Comm &comm, const T &object_to_send, const unsigned int root_process)
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
@@ -826,14 +799,8 @@ namespace Utilities
         size_all_data.resize(n_procs, 0);
 
       // Exchanging the size of each buffer
-      int ierr = MPI_Gather(&n_local_data,
-                            1,
-                            MPI_INT,
-                            size_all_data.data(),
-                            1,
-                            MPI_INT,
-                            root_process,
-                            comm);
+      int ierr =
+        MPI_Gather(&n_local_data, 1, MPI_INT, size_all_data.data(), 1, MPI_INT, root_process, comm);
       AssertThrowMPI(ierr);
 
       // Now computing the displacement, relative to recvbuf,
@@ -869,10 +836,9 @@ namespace Utilities
 
           for (unsigned int i = 0; i < n_procs; ++i)
             {
-              const std::vector<char> local_buffer(
-                received_unrolled_buffer.begin() + rdispls[i],
-                received_unrolled_buffer.begin() + rdispls[i] +
-                  size_all_data[i]);
+              const std::vector<char> local_buffer(received_unrolled_buffer.begin() + rdispls[i],
+                                                   received_unrolled_buffer.begin() + rdispls[i] +
+                                                     size_all_data[i]);
               received_objects[i] = Utilities::unpack<T>(local_buffer);
             }
         }

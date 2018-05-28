@@ -38,8 +38,7 @@ main()
     x(i) = i;
 
   // set y=2*x
-  parallel::transform(
-    x.begin(), x.end(), y.begin(), (2 * boost::lambda::_1), 10);
+  parallel::transform(x.begin(), x.end(), y.begin(), (2 * boost::lambda::_1), 10);
 
   // compute y=0 from the previous result
   y -= x;

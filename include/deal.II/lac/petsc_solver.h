@@ -944,7 +944,7 @@ namespace PETScWrappers
      */
     SparseDirectMUMPS(SolverControl &       cn,
                       const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
-                      const AdditionalData &data = AdditionalData());
+                      const AdditionalData &data             = AdditionalData());
 
     /**
      * The method to solve the linear system.

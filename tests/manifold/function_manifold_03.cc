@@ -53,8 +53,7 @@ test(unsigned int ref = 1)
         Assert(false, ExcInternalError());
     }
 
-  FunctionManifold<dim, spacedim, 1> manifold(push_forward_expression,
-                                              pull_back_expression);
+  FunctionManifold<dim, spacedim, 1> manifold(push_forward_expression, pull_back_expression);
 
   // Two points and two weights
   std::vector<Point<spacedim>> p(2);
@@ -71,13 +70,11 @@ test(unsigned int ref = 1)
       w[0] = 1.0 - (double)i / ((double)n_intermediates);
       w[1] = 1.0 - w[0];
 
-      Point<spacedim> ip =
-        manifold.get_new_point(make_array_view(p), make_array_view(w));
+      Point<spacedim>     ip = manifold.get_new_point(make_array_view(p), make_array_view(w));
       Tensor<1, spacedim> t1 = manifold.get_tangent_vector(ip, p[0]);
       Tensor<1, spacedim> t2 = manifold.get_tangent_vector(ip, p[1]);
 
-      deallog << "P: " << ip << ", T(P, P0): " << t1 << ", T(P, P1): " << t2
-              << std::endl;
+      deallog << "P: " << ip << ", T(P, P0): " << t1 << ", T(P, P1): " << t2 << std::endl;
     }
 }
 

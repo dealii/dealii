@@ -24,8 +24,7 @@
 using namespace Polynomials;
 
 void
-check_interpolation(const std::vector<Polynomial<double>> &p,
-                    const std::vector<Point<1>> &          x)
+check_interpolation(const std::vector<Polynomial<double>> &p, const std::vector<Point<1>> &x)
 {
   for (unsigned int i = 0; i < p.size(); ++i)
     {
@@ -37,14 +36,12 @@ check_interpolation(const std::vector<Polynomial<double>> &p,
           if (i == k)
             {
               if (std::fabs(y - 1.) > 2.e-10)
-                deallog << "Error1  lg y=" << std::log10(std::fabs(y - 1.))
-                        << std::endl;
+                deallog << "Error1  lg y=" << std::log10(std::fabs(y - 1.)) << std::endl;
             }
           else
             {
               if (std::fabs(y) > 3.e-10)
-                deallog << "Error0  lg y=" << std::log10(std::fabs(y))
-                        << std::endl;
+                deallog << "Error0  lg y=" << std::log10(std::fabs(y)) << std::endl;
             }
         }
       deallog << std::endl;
@@ -56,8 +53,7 @@ void
 check_poly(const Quadrature<1> &q)
 {
   deallog << "Points: " << q.size() << std::endl;
-  std::vector<Polynomial<double>> p =
-    generate_complete_Lagrange_basis(q.get_points());
+  std::vector<Polynomial<double>> p = generate_complete_Lagrange_basis(q.get_points());
   check_interpolation(p, q.get_points());
 }
 
@@ -66,10 +62,9 @@ void
 check_lge(unsigned int n)
 {
   deallog << "Points: " << n + 1 << std::endl;
-  std::vector<Polynomial<double>> p =
-    LagrangeEquidistant::generate_complete_basis(n);
-  std::vector<Point<1>> x(n + 1);
-  const double          h = 1. / n;
+  std::vector<Polynomial<double>> p = LagrangeEquidistant::generate_complete_basis(n);
+  std::vector<Point<1>>           x(n + 1);
+  const double                    h = 1. / n;
   for (unsigned int i = 0; i <= n; ++i)
     x[i](0) = h * i;
   check_interpolation(p, x);

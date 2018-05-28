@@ -83,11 +83,9 @@ main()
     std::vector<Point<3>> spoints(dh.n_dofs());
     DoFTools::map_dofs_to_support_points(mapping2, dh, spoints);
 
-    std::sort(spoints.begin(),
-              spoints.end(),
-              [&](const Point<3> &p1, const Point<3> &p2) {
-                return OpenCASCADE::point_compare(p1, p2, direction, tolerance);
-              });
+    std::sort(spoints.begin(), spoints.end(), [&](const Point<3> &p1, const Point<3> &p2) {
+      return OpenCASCADE::point_compare(p1, p2, direction, tolerance);
+    });
 
     for (auto p : spoints)
       deallog << p << std::endl;
@@ -100,14 +98,11 @@ main()
     DoFHandler<2, 3> dh(tria);
     dh.distribute_dofs(fe);
     std::vector<Point<3>> spoints(dh.n_dofs());
-    DoFTools::map_dofs_to_support_points(
-      StaticMappingQ1<2, 3>::mapping, dh, spoints);
+    DoFTools::map_dofs_to_support_points(StaticMappingQ1<2, 3>::mapping, dh, spoints);
 
-    std::sort(spoints.begin(),
-              spoints.end(),
-              [&](const Point<3> &p1, const Point<3> &p2) {
-                return OpenCASCADE::point_compare(p1, p2, direction, tolerance);
-              });
+    std::sort(spoints.begin(), spoints.end(), [&](const Point<3> &p1, const Point<3> &p2) {
+      return OpenCASCADE::point_compare(p1, p2, direction, tolerance);
+    });
 
     for (auto p : spoints)
       deallog << p << std::endl;

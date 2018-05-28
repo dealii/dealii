@@ -86,8 +86,7 @@ test(Triangulation<dim> &triangulation)
       for (unsigned int q = 0; q <= p + 2; ++q)
         {
           // interpolate the function
-          VectorTools::interpolate(
-            mapping, dof_handler, F<dim>(q), interpolant);
+          VectorTools::interpolate(mapping, dof_handler, F<dim>(q), interpolant);
 
           // then compute the interpolation error
           VectorTools::integrate_difference(mapping,
@@ -98,11 +97,9 @@ test(Triangulation<dim> &triangulation)
                                             QGauss<dim>(q + 2),
                                             VectorTools::L2_norm);
           deallog << fe.get_name() << ", P_" << q
-                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
-                  << std::endl;
+                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm() << std::endl;
           if (q <= p)
-            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
-                   ExcInternalError());
+            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(), ExcInternalError());
         }
     }
 }

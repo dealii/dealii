@@ -71,8 +71,7 @@ namespace internal
       T
       from_seconds(const double time)
       {
-        static_assert(is_duration<T>::value,
-                      "The template type should be a duration type.");
+        static_assert(is_duration<T>::value, "The template type should be a duration type.");
         return T(std::lround(T::period::den * (time / T::period::num)));
       }
 
@@ -112,14 +111,12 @@ CPUClock::now() noexcept
   double system_cpu_duration = 0.0;
 #ifdef DEAL_II_MSVC
   FILETIME   cpuTime, sysTime, createTime, exitTime;
-  const auto succeeded = GetProcessTimes(
-    GetCurrentProcess(), &createTime, &exitTime, &sysTime, &cpuTime);
+  const auto succeeded =
+    GetProcessTimes(GetCurrentProcess(), &createTime, &exitTime, &sysTime, &cpuTime);
   if (succeeded)
     {
       system_cpu_duration =
-        (double)(((unsigned long long)cpuTime.dwHighDateTime << 32) |
-                 cpuTime.dwLowDateTime) /
-        1e7;
+        (double)(((unsigned long long)cpuTime.dwHighDateTime << 32) | cpuTime.dwLowDateTime) / 1e7;
     }
     // keep the zero value if GetProcessTimes didn't work
 #elif defined(DEAL_II_HAVE_SYS_RESOURCE_H)
@@ -129,8 +126,7 @@ CPUClock::now() noexcept
 #else
 #  warning "Unsupported platform. Porting not finished."
 #endif
-  return time_point(
-    internal::TimerImplementation::from_seconds<duration>(system_cpu_duration));
+  return time_point(internal::TimerImplementation::from_seconds<duration>(system_cpu_duration));
 }
 
 
@@ -195,33 +191,27 @@ Timer::stop()
     {
       running = false;
 
-      wall_times.last_lap_time =
-        wall_clock_type::now() - wall_times.current_lap_start_time;
-      cpu_times.last_lap_time =
-        cpu_clock_type::now() - cpu_times.current_lap_start_time;
+      wall_times.last_lap_time = wall_clock_type::now() - wall_times.current_lap_start_time;
+      cpu_times.last_lap_time  = cpu_clock_type::now() - cpu_times.current_lap_start_time;
 
       last_lap_wall_time_data = Utilities::MPI::min_max_avg(
-        internal::TimerImplementation::to_seconds(wall_times.last_lap_time),
-        mpi_communicator);
+        internal::TimerImplementation::to_seconds(wall_times.last_lap_time), mpi_communicator);
       if (sync_lap_times)
         {
           wall_times.last_lap_time =
-            internal::TimerImplementation::from_seconds<decltype(
-              wall_times)::duration_type>(last_lap_wall_time_data.max);
+            internal::TimerImplementation::from_seconds<decltype(wall_times)::duration_type>(
+              last_lap_wall_time_data.max);
           cpu_times.last_lap_time =
-            internal::TimerImplementation::from_seconds<decltype(
-              cpu_times)::duration_type>(
+            internal::TimerImplementation::from_seconds<decltype(cpu_times)::duration_type>(
               Utilities::MPI::min_max_avg(
-                internal::TimerImplementation::to_seconds(
-                  cpu_times.last_lap_time),
+                internal::TimerImplementation::to_seconds(cpu_times.last_lap_time),
                 mpi_communicator)
                 .max);
         }
       wall_times.accumulated_time += wall_times.last_lap_time;
       cpu_times.accumulated_time += cpu_times.last_lap_time;
       accumulated_wall_time_data = Utilities::MPI::min_max_avg(
-        internal::TimerImplementation::to_seconds(wall_times.accumulated_time),
-        mpi_communicator);
+        internal::TimerImplementation::to_seconds(wall_times.accumulated_time), mpi_communicator);
     }
   return internal::TimerImplementation::to_seconds(cpu_times.accumulated_time);
 }
@@ -234,15 +224,13 @@ Timer::cpu_time() const
   if (running)
     {
       const double running_time = internal::TimerImplementation::to_seconds(
-        cpu_clock_type::now() - cpu_times.current_lap_start_time +
-        cpu_times.accumulated_time);
+        cpu_clock_type::now() - cpu_times.current_lap_start_time + cpu_times.accumulated_time);
       return Utilities::MPI::sum(running_time, mpi_communicator);
     }
   else
     {
       return Utilities::MPI::sum(
-        internal::TimerImplementation::to_seconds(cpu_times.accumulated_time),
-        mpi_communicator);
+        internal::TimerImplementation::to_seconds(cpu_times.accumulated_time), mpi_communicator);
     }
 }
 
@@ -277,9 +265,8 @@ Timer::wall_time() const
 {
   wall_clock_type::duration current_elapsed_wall_time;
   if (running)
-    current_elapsed_wall_time = wall_clock_type::now() -
-                                wall_times.current_lap_start_time +
-                                wall_times.accumulated_time;
+    current_elapsed_wall_time =
+      wall_clock_type::now() - wall_times.current_lap_start_time + wall_times.accumulated_time;
   else
     current_elapsed_wall_time = wall_times.accumulated_time;
 
@@ -368,8 +355,7 @@ TimerOutput::~TimerOutput()
         while (active_sections.size() > 0)
           leave_subsection();
         // don't print unless we leave all subsections
-        if ((output_frequency == summary ||
-             output_frequency == every_call_and_summary) &&
+        if ((output_frequency == summary || output_frequency == every_call_and_summary) &&
             output_is_enabled == true)
           print_summary();
       }
@@ -382,18 +368,13 @@ TimerOutput::~TimerOutput()
 #ifdef DEAL_II_WITH_MPI
   if (std::uncaught_exception() && mpi_communicator != MPI_COMM_SELF)
     {
-      std::cerr << "---------------------------------------------------------"
-                << std::endl
-                << "TimerOutput objects finalize timed values printed to the"
-                << std::endl
-                << "screen by communicating over MPI in their destructors."
-                << std::endl
+      std::cerr << "---------------------------------------------------------" << std::endl
+                << "TimerOutput objects finalize timed values printed to the" << std::endl
+                << "screen by communicating over MPI in their destructors." << std::endl
                 << "Since an exception is currently uncaught, this" << std::endl
-                << "synchronization (and subsequent output) will be skipped to"
-                << std::endl
+                << "synchronization (and subsequent output) will be skipped to" << std::endl
                 << "avoid a possible deadlock." << std::endl
-                << "---------------------------------------------------------"
-                << std::endl;
+                << "---------------------------------------------------------" << std::endl;
     }
   else
     {
@@ -413,11 +394,10 @@ TimerOutput::enter_subsection(const std::string &section_name)
 
   Assert(section_name.empty() == false, ExcMessage("Section string is empty."));
 
-  Assert(std::find(active_sections.begin(),
-                   active_sections.end(),
-                   section_name) == active_sections.end(),
-         ExcMessage(std::string("Cannot enter the already active section <") +
-                    section_name + ">."));
+  Assert(
+    std::find(active_sections.begin(), active_sections.end(), section_name) ==
+      active_sections.end(),
+    ExcMessage(std::string("Cannot enter the already active section <") + section_name + ">."));
 
   if (sections.find(section_name) == sections.end())
     {
@@ -460,9 +440,8 @@ TimerOutput::leave_subsection(const std::string &section_name)
     {
       Assert(sections.find(section_name) != sections.end(),
              ExcMessage("Cannot delete a section that was never created."));
-      Assert(std::find(active_sections.begin(),
-                       active_sections.end(),
-                       section_name) != active_sections.end(),
+      Assert(std::find(active_sections.begin(), active_sections.end(), section_name) !=
+               active_sections.end(),
              ExcMessage("Cannot delete a section that has not been entered."));
     }
 
@@ -483,8 +462,7 @@ TimerOutput::leave_subsection(const std::string &section_name)
   sections[actual_section_name].total_cpu_time += cpu_time;
 
   // in case we have to print out something, do that here...
-  if ((output_frequency == every_call ||
-       output_frequency == every_call_and_summary) &&
+  if ((output_frequency == every_call || output_frequency == every_call_and_summary) &&
       output_is_enabled == true)
     {
       std::string        output_time;
@@ -497,16 +475,15 @@ TimerOutput::leave_subsection(const std::string &section_name)
       else if (output_type == wall_times)
         output_time = ", wall time: " + wall.str() + ".";
       else
-        output_time =
-          ", CPU/wall time: " + cpu.str() + " / " + wall.str() + ".";
+        output_time = ", CPU/wall time: " + cpu.str() + " / " + wall.str() + ".";
 
       out_stream << actual_section_name << output_time << std::endl;
     }
 
   // delete the index from the list of
   // active ones
-  active_sections.erase(std::find(
-    active_sections.begin(), active_sections.end(), actual_section_name));
+  active_sections.erase(
+    std::find(active_sections.begin(), active_sections.end(), actual_section_name));
 }
 
 
@@ -544,15 +521,14 @@ TimerOutput::print_summary() const
   // precision and width of output
   // below. store the old values so we
   // can restore it later on
-  const std::istream::fmtflags old_flags = out_stream.get_stream().flags();
-  const std::streamsize old_precision    = out_stream.get_stream().precision();
-  const std::streamsize old_width        = out_stream.get_stream().width();
+  const std::istream::fmtflags old_flags     = out_stream.get_stream().flags();
+  const std::streamsize        old_precision = out_stream.get_stream().precision();
+  const std::streamsize        old_width     = out_stream.get_stream().width();
 
   // in case we want to write CPU times
   if (output_type != wall_times)
     {
-      double total_cpu_time =
-        Utilities::MPI::sum(timer_all(), mpi_communicator);
+      double total_cpu_time = Utilities::MPI::sum(timer_all(), mpi_communicator);
 
       // check that the sum of all times is
       // less or equal than the total
@@ -560,8 +536,7 @@ TimerOutput::print_summary() const
       // generated a lot of overhead in this
       // function.
       double check_time = 0.;
-      for (std::map<std::string, Section>::const_iterator i = sections.begin();
-           i != sections.end();
+      for (std::map<std::string, Section>::const_iterator i = sections.begin(); i != sections.end();
            ++i)
         check_time += i->second.total_cpu_time;
 
@@ -570,26 +545,22 @@ TimerOutput::print_summary() const
         total_cpu_time = check_time;
 
       // generate a nice table
-      out_stream
-        << "\n\n"
-        << "+---------------------------------------------+------------"
-        << "+------------+\n"
-        << "| Total CPU time elapsed since start          |";
+      out_stream << "\n\n"
+                 << "+---------------------------------------------+------------"
+                 << "+------------+\n"
+                 << "| Total CPU time elapsed since start          |";
       out_stream << std::setw(10) << std::setprecision(3) << std::right;
       out_stream << total_cpu_time << "s |            |\n";
-      out_stream
-        << "|                                             |            "
-        << "|            |\n";
+      out_stream << "|                                             |            "
+                 << "|            |\n";
       out_stream << "| Section                         | no. calls |";
       out_stream << std::setw(10);
       out_stream << std::setprecision(3);
       out_stream << "  CPU time "
                  << " | % of total |\n";
-      out_stream
-        << "+---------------------------------+-----------+------------"
-        << "+------------+";
-      for (std::map<std::string, Section>::const_iterator i = sections.begin();
-           i != sections.end();
+      out_stream << "+---------------------------------+-----------+------------"
+                 << "+------------+";
+      for (std::map<std::string, Section>::const_iterator i = sections.begin(); i != sections.end();
            ++i)
         {
           std::string name_out = i->first;
@@ -633,12 +604,11 @@ TimerOutput::print_summary() const
                  << std::endl;
 
       if (time_gap > 0.0)
-        out_stream
-          << std::endl
-          << "Note: The sum of counted times is " << time_gap
-          << " seconds larger than the total time.\n"
-          << "(Timer function may have introduced too much overhead, or different\n"
-          << "section timers may have run at the same time.)" << std::endl;
+        out_stream << std::endl
+                   << "Note: The sum of counted times is " << time_gap
+                   << " seconds larger than the total time.\n"
+                   << "(Timer function may have introduced too much overhead, or different\n"
+                   << "section timers may have run at the same time.)" << std::endl;
     }
 
   // in case we want to write out wallclock times
@@ -647,25 +617,21 @@ TimerOutput::print_summary() const
       double total_wall_time = timer_all.wall_time();
 
       // now generate a nice table
-      out_stream
-        << "\n\n"
-        << "+---------------------------------------------+------------"
-        << "+------------+\n"
-        << "| Total wallclock time elapsed since start    |";
+      out_stream << "\n\n"
+                 << "+---------------------------------------------+------------"
+                 << "+------------+\n"
+                 << "| Total wallclock time elapsed since start    |";
       out_stream << std::setw(10) << std::setprecision(3) << std::right;
       out_stream << total_wall_time << "s |            |\n";
-      out_stream
-        << "|                                             |            "
-        << "|            |\n";
+      out_stream << "|                                             |            "
+                 << "|            |\n";
       out_stream << "| Section                         | no. calls |";
       out_stream << std::setw(10);
       out_stream << std::setprecision(3);
       out_stream << "  wall time | % of total |\n";
-      out_stream
-        << "+---------------------------------+-----------+------------"
-        << "+------------+";
-      for (std::map<std::string, Section>::const_iterator i = sections.begin();
-           i != sections.end();
+      out_stream << "+---------------------------------+-----------+------------"
+                 << "+------------+";
+      for (std::map<std::string, Section>::const_iterator i = sections.begin(); i != sections.end();
            ++i)
         {
           std::string name_out = i->first;
@@ -690,8 +656,7 @@ TimerOutput::print_summary() const
               // if run time was less than 0.1%, just print a zero to avoid
               // printing silly things such as "2.45e-6%". otherwise print
               // the actual percentage
-              const double fraction =
-                i->second.total_wall_time / total_wall_time;
+              const double fraction = i->second.total_wall_time / total_wall_time;
               if (fraction > 0.001)
                 {
                   out_stream << std::setprecision(2);

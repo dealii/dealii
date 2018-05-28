@@ -58,8 +58,7 @@ check()
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert(0);
   no_normal_flux_boundaries.insert(1);
-  VectorTools::compute_no_normal_flux_constraints(
-    dofh, 0, no_normal_flux_boundaries, cm, mapping);
+  VectorTools::compute_no_normal_flux_constraints(dofh, 0, no_normal_flux_boundaries, cm, mapping);
 
   cm.print(deallog.get_file_stream());
 }

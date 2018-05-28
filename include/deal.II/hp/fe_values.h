@@ -68,22 +68,19 @@ namespace internal
        * the parameters to the constructor.
        */
       FEValuesBase(
-        const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>
-          &mapping_collection,
-        const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
-          &                                   fe_collection,
-        const dealii::hp::QCollection<q_dim> &q_collection,
-        const dealii::UpdateFlags             update_flags);
+        const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension> &mapping_collection,
+        const dealii::hp::FECollection<dim, FEValuesType::space_dimension> &     fe_collection,
+        const dealii::hp::QCollection<q_dim> &                                   q_collection,
+        const dealii::UpdateFlags                                                update_flags);
       /**
        * Constructor. This constructor is equivalent to the other one except
        * that it makes the object use a $Q_1$ mapping (i.e., an object of type
        * MappingQGeneric(1)) implicitly.
        */
       FEValuesBase(
-        const dealii::hp::FECollection<dim, FEValuesType::space_dimension>
-          &                                   fe_collection,
-        const dealii::hp::QCollection<q_dim> &q_collection,
-        const UpdateFlags                     update_flags);
+        const dealii::hp::FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+        const dealii::hp::QCollection<q_dim> &                              q_collection,
+        const UpdateFlags                                                   update_flags);
 
       /**
        * Get a reference to the collection of finite element objects used
@@ -136,17 +133,15 @@ namespace internal
       /**
        * A pointer to the collection of finite elements to be used.
        */
-      const SmartPointer<
-        const dealii::hp::FECollection<dim, FEValuesType::space_dimension>,
-        FEValuesBase<dim, q_dim, FEValuesType>>
+      const SmartPointer<const dealii::hp::FECollection<dim, FEValuesType::space_dimension>,
+                         FEValuesBase<dim, q_dim, FEValuesType>>
         fe_collection;
 
       /**
        * A pointer to the collection of mappings to be used.
        */
-      const SmartPointer<
-        const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>,
-        FEValuesBase<dim, q_dim, FEValuesType>>
+      const SmartPointer<const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension>,
+                         FEValuesBase<dim, q_dim, FEValuesType>>
         mapping_collection;
 
       /**
@@ -236,8 +231,8 @@ namespace hp
    * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int spacedim = dim>
-  class FEValues : public dealii::internal::hp::
-                     FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>
+  class FEValues
+    : public dealii::internal::hp::FEValuesBase<dim, dim, dealii::FEValues<dim, spacedim>>
   {
   public:
     static const unsigned int dimension = dim;
@@ -253,11 +248,10 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the DoFHandler::get_fe() function.
      */
-    FEValues(
-      const dealii::hp::MappingCollection<dim, spacedim> &mapping_collection,
-      const dealii::hp::FECollection<dim, spacedim> &     fe_collection,
-      const dealii::hp::QCollection<dim> &                q_collection,
-      const UpdateFlags                                   update_flags);
+    FEValues(const dealii::hp::MappingCollection<dim, spacedim> &mapping_collection,
+             const dealii::hp::FECollection<dim, spacedim> &     fe_collection,
+             const dealii::hp::QCollection<dim> &                q_collection,
+             const UpdateFlags                                   update_flags);
 
 
     /**
@@ -377,8 +371,7 @@ namespace hp
    */
   template <int dim, int spacedim = dim>
   class FEFaceValues
-    : public dealii::internal::hp::
-        FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>
+    : public dealii::internal::hp::FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>
   {
   public:
     /**
@@ -496,9 +489,8 @@ namespace hp
    * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int spacedim = dim>
-  class FESubfaceValues
-    : public dealii::internal::hp::
-        FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>
+  class FESubfaceValues : public dealii::internal::hp::
+                            FEValuesBase<dim, dim - 1, dealii::FESubfaceValues<dim, spacedim>>
   {
   public:
     /**
@@ -510,11 +502,10 @@ namespace hp
      * respective parameter in that function also being the return value of
      * the <tt>DoFHandler::get_fe()</tt> function.
      */
-    FESubfaceValues(
-      const hp::MappingCollection<dim, spacedim> &mapping_collection,
-      const hp::FECollection<dim, spacedim> &     fe_collection,
-      const hp::QCollection<dim - 1> &            q_collection,
-      const UpdateFlags                           update_flags);
+    FESubfaceValues(const hp::MappingCollection<dim, spacedim> &mapping_collection,
+                    const hp::FECollection<dim, spacedim> &     fe_collection,
+                    const hp::QCollection<dim - 1> &            q_collection,
+                    const UpdateFlags                           update_flags);
 
 
     /**
@@ -593,7 +584,7 @@ namespace hp
     void
     reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
            const unsigned int                                          face_no,
-           const unsigned int subface_no,
+           const unsigned int                                          subface_no,
            const unsigned int q_index       = numbers::invalid_unsigned_int,
            const unsigned int mapping_index = numbers::invalid_unsigned_int,
            const unsigned int fe_index      = numbers::invalid_unsigned_int);
@@ -627,8 +618,7 @@ namespace internal
 
 
     template <int dim, int q_dim, class FEValuesType>
-    inline const dealii::hp::MappingCollection<dim,
-                                               FEValuesType::space_dimension> &
+    inline const dealii::hp::MappingCollection<dim, FEValuesType::space_dimension> &
     FEValuesBase<dim, q_dim, FEValuesType>::get_mapping_collection() const
     {
       return *mapping_collection;

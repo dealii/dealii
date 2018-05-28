@@ -27,8 +27,7 @@ namespace GridTools
     tria(&tria),
     mapping(&mapping)
   {
-    tria_signal =
-      tria.signals.any_change.connect([&]() { mark_for_update(update_all); });
+    tria_signal = tria.signals.any_change.connect([&]() { mark_for_update(update_all); });
   }
 
   template <int dim, int spacedim>
@@ -52,8 +51,7 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
-  const std::vector<
-    std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>> &
+  const std::vector<std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_vertex_to_cell_map() const
   {
     if (update_flags & update_vertex_to_cell_map)
@@ -72,8 +70,8 @@ namespace GridTools
   {
     if (update_flags & update_vertex_to_cell_centers_directions)
       {
-        vertex_to_cell_centers = GridTools::vertex_to_cell_centers_directions(
-          *tria, get_vertex_to_cell_map());
+        vertex_to_cell_centers =
+          GridTools::vertex_to_cell_centers_directions(*tria, get_vertex_to_cell_map());
         update_flags = update_flags & ~update_vertex_to_cell_centers_directions;
       }
     return vertex_to_cell_centers;

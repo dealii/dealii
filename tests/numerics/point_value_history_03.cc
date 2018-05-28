@@ -58,7 +58,7 @@ class Postprocess : public DataPostprocessor<dim>
 public:
   void
   evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &inputs,
-                        std::vector<Vector<double>> &computed_quantities) const;
+                        std::vector<Vector<double>> &               computed_quantities) const;
 
   std::vector<std::string>
   get_names() const;
@@ -95,23 +95,19 @@ Postprocess<dim>::n_output_variables() const
 
 template <int dim>
 void
-Postprocess<dim>::evaluate_scalar_field(
-  const DataPostprocessorInputs::Scalar<dim> &inputs,
-  std::vector<Vector<double>> &               computed_quantities) const
+Postprocess<dim>::evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &inputs,
+                                        std::vector<Vector<double>> &computed_quantities) const
 {
   Assert(computed_quantities.size() == inputs.solution_values.size(),
-         ExcDimensionMismatch(computed_quantities.size(),
-                              inputs.solution_values.size()));
+         ExcDimensionMismatch(computed_quantities.size(), inputs.solution_values.size()));
 
   for (unsigned int i = 0; i < computed_quantities.size(); i++)
     {
       Assert(computed_quantities[i].size() == 2,
              ExcDimensionMismatch(computed_quantities[i].size(), 2));
 
-      computed_quantities[i](0) =
-        inputs.solution_gradients[i][0]; // norm of x gradient
-      computed_quantities[i](1) =
-        inputs.solution_hessians[i][0].norm(); // norm of x hessian
+      computed_quantities[i](0) = inputs.solution_gradients[i][0];       // norm of x gradient
+      computed_quantities[i](1) = inputs.solution_hessians[i][0].norm(); // norm of x hessian
     }
 }
 
@@ -139,9 +135,7 @@ private:
 
 
 template <int dim>
-TestPointValueHistory<dim>::TestPointValueHistory() :
-  finite_element(2),
-  dof_handler(triangulation)
+TestPointValueHistory<dim>::TestPointValueHistory() : finite_element(2), dof_handler(triangulation)
 {}
 
 
@@ -176,17 +170,15 @@ TestPointValueHistory<dim>::run()
   // and this is not corrected for. The code used in this test is simplified
   // from point_value_history_01.
   {
-    Quadrature<dim> quadrature_formula(
-      finite_element.get_unit_support_points());
-    FEValues<dim> fe_values(
-      finite_element,
-      quadrature_formula,
-      update_values | update_quadrature_points); // just need local_dof_indices
-                                                 // and quadrature_points
+    Quadrature<dim> quadrature_formula(finite_element.get_unit_support_points());
+    FEValues<dim>   fe_values(finite_element,
+                            quadrature_formula,
+                            update_values |
+                              update_quadrature_points); // just need local_dof_indices
+                                                           // and quadrature_points
 
-    std::vector<types::global_dof_index> local_dof_indices(
-      finite_element.dofs_per_cell);
-    std::vector<Point<dim>> dof_locations(finite_element.dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(finite_element.dofs_per_cell);
+    std::vector<Point<dim>>              dof_locations(finite_element.dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator cell, endc;
     cell = dof_handler.begin_active();
@@ -199,13 +191,11 @@ TestPointValueHistory<dim>::run()
 
         for (unsigned int dof = 0; dof != finite_element.dofs_per_cell; dof++)
           {
-            unsigned int dof_component =
-              finite_element.system_to_component_index(dof).first;
+            unsigned int dof_component = finite_element.system_to_component_index(dof).first;
             // The line above will always evaluate to 1,
             // simplifying the remaining lines
 
-            poles(local_dof_indices[dof]) =
-              -dof_locations[dof](dof_component % dim);
+            poles(local_dof_indices[dof]) = -dof_locations[dof](dof_component % dim);
 
             if (dof_component == dim) // components start numbering at 0
               poles(local_dof_indices[dof]) =
@@ -247,8 +237,7 @@ TestPointValueHistory<dim>::run()
     std::vector<std::string> solution_names;
     solution_names.push_back("Solution");
     node_monitor.add_component_names("Solution", solution_names);
-    node_monitor.add_field_name(
-      "Post Processed Vector"); // not sensitive to spaces
+    node_monitor.add_field_name("Post Processed Vector"); // not sensitive to spaces
     node_monitor.add_field_name("Pressure", 1);
     std::vector<bool> component_mask(1, true);
     node_monitor.add_field_name("Req_sol", component_mask);
@@ -265,8 +254,7 @@ TestPointValueHistory<dim>::run()
     // two alternatives here, adding a point at a time or a vector of points
     // 2d points
     std::vector<Point<2>> point_vector(5, Point<2>());
-    point_vector[0] =
-      Point<2>(0, 0); // some of these points will hit a node, others won't
+    point_vector[0] = Point<2>(0, 0); // some of these points will hit a node, others won't
     point_vector[1] = Point<2>(0.25, 0);
     point_vector[2] = Point<2>(0.25, 0.45);
     point_vector[3] = Point<2>(0.45, 0.45);
@@ -284,8 +272,7 @@ TestPointValueHistory<dim>::run()
     node_monitor.get_support_locations(selected_locations);
     Vector<double> node_locations = node_monitor.mark_support_locations();
     QGauss<dim>    postprocess_quadrature(2);
-    node_monitor.get_postprocessor_locations(postprocess_quadrature,
-                                             postprocessor_locations);
+    node_monitor.get_postprocessor_locations(postprocess_quadrature, postprocessor_locations);
   }
 
   double       delta_t = 0.000001;
@@ -312,8 +299,7 @@ TestPointValueHistory<dim>::run()
       std::vector<std::string> names;
       names.push_back("X_gradient");
       names.push_back("X_hessian");
-      node_monitor.evaluate_field(
-        names, solution, postprocessor, postprocess_quadrature);
+      node_monitor.evaluate_field(names, solution, postprocessor, postprocess_quadrature);
 
       //        output_results (step, solution);
       step++;
@@ -323,8 +309,7 @@ TestPointValueHistory<dim>::run()
       post_processed.add(2.0); // simple post processing, giving it a dc offset
     }
   node_monitor.write_gnuplot("node", postprocessor_locations);
-  no_dof_handler.write_gnuplot(
-    "no_dof"); // no point in adding postprocessor_locations
+  no_dof_handler.write_gnuplot("no_dof"); // no point in adding postprocessor_locations
 
   node_monitor.status(deallog.get_file_stream());
   no_dof_handler.status(deallog.get_file_stream());
@@ -366,8 +351,7 @@ TestPointValueHistory<dim>::run()
 
 template <int dim>
 void
-TestPointValueHistory<dim>::output_results(unsigned int   step,
-                                           Vector<double> solution) const
+TestPointValueHistory<dim>::output_results(unsigned int step, Vector<double> solution) const
 {
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);

@@ -51,34 +51,29 @@ test_with_wrong_face_orientation()
 
   deallog << "cell=" << cell << std::endl;
   deallog << "cell->neighbor(3)=" << cell->neighbor(3) << std::endl;
-  deallog << "cell->face_orientation(3)="
-          << (cell->face_orientation(3) ? "true" : "false") << std::endl;
+  deallog << "cell->face_orientation(3)=" << (cell->face_orientation(3) ? "true" : "false")
+          << std::endl;
 
   const Triangulation<3>::active_cell_iterator neighbor_child =
     cell->neighbor_child_on_subface(3, 1);
 
-  deallog << "cell->neighbor_child_on_subface(3,1)=" << neighbor_child
+  deallog << "cell->neighbor_child_on_subface(3,1)=" << neighbor_child << std::endl;
+  deallog << "cell->neighbor_child_on_subface(3,1)->neighbor(5)=" << neighbor_child->neighbor(5)
           << std::endl;
-  deallog << "cell->neighbor_child_on_subface(3,1)->neighbor(5)="
-          << neighbor_child->neighbor(5) << std::endl;
 
   deallog << "cell->neighbor_child_on_subface(3,1)->face_orientation(5)="
-          << (neighbor_child->face_orientation(5) ? "true" : "false")
-          << std::endl;
+          << (neighbor_child->face_orientation(5) ? "true" : "false") << std::endl;
 
   deallog << "cell->face(3)=" << cell->face(3) << std::endl;
   for (unsigned int i = 0; i < 4; ++i)
-    deallog << "cell->face(3)->child(" << i << ")=" << cell->face(3)->child(i)
-            << std::endl;
+    deallog << "cell->face(3)->child(" << i << ")=" << cell->face(3)->child(i) << std::endl;
 
   for (unsigned int i = 0; i < 6; ++i)
-    deallog << "cell->neighbor(3)->face(" << i
-            << ")=" << cell->neighbor(3)->face(i) << std::endl;
+    deallog << "cell->neighbor(3)->face(" << i << ")=" << cell->neighbor(3)->face(i) << std::endl;
 
   for (unsigned int i = 0; i < 6; ++i)
     deallog << "cell->neighbor_child_on_subface(3,1)->face(" << i
-            << ")=" << cell->neighbor_child_on_subface(3, 1)->face(i)
-            << std::endl;
+            << ")=" << cell->neighbor_child_on_subface(3, 1)->face(i) << std::endl;
 
   // The following assertion was originally in
   // make_hanging_node_constraints and
@@ -95,8 +90,7 @@ test_with_wrong_face_orientation()
   // CellAccessor::neighbor_child_on_subface it
   // should work. let's make sure we get the
   // status we expect.
-  AssertThrow(cell->face(3)->child(1) ==
-                neighbor_child->face(cell->neighbor_of_neighbor(3)),
+  AssertThrow(cell->face(3)->child(1) == neighbor_child->face(cell->neighbor_of_neighbor(3)),
               ExcInternalError());
 }
 

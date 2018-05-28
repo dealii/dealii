@@ -72,8 +72,7 @@ test_reset_vector_values(const bool reset_values, const int tape_index)
 
   deallog << "Function values:" << std::endl;
   for (unsigned int j = 0; j < m; ++j)
-    deallog << "  f[" << j << "]: " << f[j] << "  y[" << j << "]: " << yp[j]
-            << std::endl;
+    deallog << "  f[" << j << "]: " << f[j] << "  y[" << j << "]: " << yp[j] << std::endl;
 
   // --- Jacobian ---
 
@@ -111,7 +110,6 @@ main(void)
   deallog << "Setting dependent variables a priori" << std::endl;
   test_reset_vector_values(false, 1); // This works
   deallog << std::endl;
-  deallog << "Setting dependent variables after function definition"
-          << std::endl;
+  deallog << "Setting dependent variables after function definition" << std::endl;
   test_reset_vector_values(true, 2); // This doesn't
 }

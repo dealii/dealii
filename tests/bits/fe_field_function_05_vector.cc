@@ -96,8 +96,8 @@ test()
   // cell, and the inverse mapping
   // does not converge
   points.push_back(Point<dim>(-0.27999999999999992, -0.62999999999999989));
-  fe_function.set_active_cell(typename DoFHandler<dim>::active_cell_iterator(
-    &triangulation, 1, 4, &dof_handler));
+  fe_function.set_active_cell(
+    typename DoFHandler<dim>::active_cell_iterator(&triangulation, 1, 4, &dof_handler));
 
   std::vector<Vector<double>> m(points.size(), Vector<double>(2));
   fe_function.vector_value_list(points, m);

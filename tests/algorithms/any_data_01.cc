@@ -44,8 +44,7 @@ extract(const AnyData &data)
   deallog << data.name(0) << '\t' << data.entry<int>(0) << std::endl;
   deallog << data.name(1) << '\t' << data.entry<double>(1) << std::endl;
   deallog << data.name(2) << '\t' << *data.entry<double *>(2) << std::endl;
-  deallog << data.name(3) << '\t' << *data.entry<const double *>(3)
-          << std::endl;
+  deallog << data.name(3) << '\t' << *data.entry<const double *>(3) << std::endl;
 
   // From here on keep after deprecation
   int           i1 = data.entry<int>(" i  7");

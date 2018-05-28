@@ -80,8 +80,7 @@ output_matrix(const FullMatrix<double> &m)
 
 template <int dim, int spacedim>
 void
-check_this(const FiniteElement<dim, spacedim> &fe,
-           const FiniteElement<dim, spacedim> & /*fe2*/)
+check_this(const FiniteElement<dim, spacedim> &fe, const FiniteElement<dim, spacedim> & /*fe2*/)
 {
   // only check if both elements have
   // support points. otherwise,
@@ -111,13 +110,11 @@ check_this(const FiniteElement<dim, spacedim> &fe,
   if (fe.dofs_per_cell < q_rhs.size())
     return;
 
-  deallog << "dofs_per_cell=" << fe.dofs_per_cell
-          << ", n_q_points=" << q_rhs.size() << std::endl;
+  deallog << "dofs_per_cell=" << fe.dofs_per_cell << ", n_q_points=" << q_rhs.size() << std::endl;
 
   FullMatrix<double> X(fe.dofs_per_cell, q_rhs.size());
 
-  FETools::compute_projection_from_quadrature_points_matrix(
-    fe, q_lhs, q_rhs, X);
+  FETools::compute_projection_from_quadrature_points_matrix(fe, q_lhs, q_rhs, X);
 
   // then compute the matrix that
   // interpolates back to the quadrature
@@ -145,8 +142,7 @@ check(const FiniteElement<dim, spacedim> &fe1,
       const FiniteElement<dim, spacedim> &fe2,
       const std::string &                 name)
 {
-  deallog << "Checking " << name << " in " << dim << "d and spacedim "
-          << spacedim << std::endl;
+  deallog << "Checking " << name << " in " << dim << "d and spacedim " << spacedim << std::endl;
 
   // call main function in .cc files
   check_this(fe1, fe2);
@@ -215,25 +211,21 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
 }

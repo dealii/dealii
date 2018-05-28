@@ -28,8 +28,7 @@ main()
 
   {
     // create one pattern and a copy of it
-    Patterns::Map map(
-      Patterns::Integer(-1, 42), Patterns::Double(-1e9, 1e9), 2, 3);
+    Patterns::Map map(Patterns::Integer(-1, 42), Patterns::Double(-1e9, 1e9), 2, 3);
     Patterns::Map map2(map);
 
     // both now go out of scope -- ensure that their destruction does

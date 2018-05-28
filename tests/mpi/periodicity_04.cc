@@ -40,8 +40,7 @@ using namespace dealii;
 
 template <int dim>
 void
-set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
-                bool                                       reverse)
+set_periodicity(parallel::distributed::Triangulation<dim> &triangulation, bool reverse)
 {
   typename Triangulation<dim>::cell_iterator cell_1 = triangulation.begin();
   typename Triangulation<dim>::cell_iterator cell_2 = cell_1++;
@@ -59,16 +58,14 @@ set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
   face_1->set_boundary_id(42);
   face_2->set_boundary_id(43);
 
-  std::vector<GridTools::PeriodicFacePair<
-    typename parallel::distributed::Triangulation<dim>::cell_iterator>>
+  std::vector<
+    GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator>>
     periodicity_vector;
 
   if (reverse)
-    GridTools::collect_periodic_faces(
-      triangulation, 43, 42, dim - 1, periodicity_vector);
+    GridTools::collect_periodic_faces(triangulation, 43, 42, dim - 1, periodicity_vector);
   else
-    GridTools::collect_periodic_faces(
-      triangulation, 42, 43, dim - 1, periodicity_vector);
+    GridTools::collect_periodic_faces(triangulation, 42, 43, dim - 1, periodicity_vector);
 
   triangulation.add_periodicity(periodicity_vector);
 
@@ -76,8 +73,7 @@ set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
 }
 
 /* The 2D case */
-void generate_grid(parallel::distributed::Triangulation<2> &triangulation,
-                   int                                      orientation)
+void generate_grid(parallel::distributed::Triangulation<2> &triangulation, int orientation)
 {
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
@@ -116,8 +112,7 @@ void generate_grid(parallel::distributed::Triangulation<2> &triangulation,
 
 
 /* The 3D case */
-void generate_grid(parallel::distributed::Triangulation<3> &triangulation,
-                   int                                      orientation)
+void generate_grid(parallel::distributed::Triangulation<3> &triangulation, int orientation)
 {
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
                            Point<3>(+1., -1., -3.),
@@ -140,8 +135,7 @@ void generate_grid(parallel::distributed::Triangulation<3> &triangulation,
   std::vector<CellData<3>> cells(2, CellData<3>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {
-    0, 1, 2, 3, 4, 5, 6, 7};
+  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {0, 1, 2, 3, 4, 5, 6, 7};
 
   /* cell 1 */
   int cell_vertices_1[8][GeometryInfo<3>::vertices_per_cell] = {
@@ -171,8 +165,7 @@ template <int dim>
 void
 check(const unsigned int orientation, bool reverse)
 {
-  dealii::parallel::distributed::Triangulation<dim> triangulation(
-    MPI_COMM_WORLD);
+  dealii::parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
   generate_grid(triangulation, orientation);
   set_periodicity(triangulation, reverse);
@@ -190,15 +183,12 @@ check(const unsigned int orientation, bool reverse)
 
   constraints.reinit(locally_relevant_dofs);
   {
-    std::vector<
-      GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
+    std::vector<GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
       periodicity_vector;
 
-    GridTools::collect_periodic_faces(
-      dof_handler, 42, 43, dim - 1, periodicity_vector);
+    GridTools::collect_periodic_faces(dof_handler, 42, 43, dim - 1, periodicity_vector);
 
-    DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vector,
-                                                            constraints);
+    DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vector, constraints);
   }
   constraints.close();
 
@@ -208,8 +198,7 @@ check(const unsigned int orientation, bool reverse)
   unsigned int n_local_constraints = 0;
 
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(
-    MappingQGeneric<dim>(1), dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points(MappingQGeneric<dim>(1), dof_handler, support_points);
   IndexSet constraints_lines = constraints.get_local_lines();
 
   for (unsigned int i = 0; i < constraints_lines.n_elements(); ++i)
@@ -217,8 +206,8 @@ check(const unsigned int orientation, bool reverse)
       const unsigned int line = constraints_lines.nth_index_in_set(i);
       if (constraints.is_constrained(line))
         {
-          const std::vector<std::pair<types::global_dof_index, double>>
-            *entries = constraints.get_constraint_entries(line);
+          const std::vector<std::pair<types::global_dof_index, double>> *entries =
+            constraints.get_constraint_entries(line);
           Assert(entries->size() == 1, ExcInternalError());
           const Point<dim> point1     = support_points[line];
           const Point<dim> point2     = support_points[(*entries)[0].first];
@@ -229,14 +218,11 @@ check(const unsigned int orientation, bool reverse)
             ++n_local_constraints;
         }
     }
-  const unsigned int n_constraints =
-    Utilities::MPI::sum(n_local_constraints, MPI_COMM_WORLD);
-  const unsigned int n_expected_constraints =
-    Utilities::fixed_int_power<9, dim - 1>::value;
+  const unsigned int n_constraints = Utilities::MPI::sum(n_local_constraints, MPI_COMM_WORLD);
+  const unsigned int n_expected_constraints = Utilities::fixed_int_power<9, dim - 1>::value;
   if (myid == 0)
     deallog << "n_constraints: " << n_constraints
-            << " n_expected_constraints: " << n_expected_constraints
-            << std::endl;
+            << " n_expected_constraints: " << n_expected_constraints << std::endl;
   AssertThrow(n_constraints == n_expected_constraints,
               ExcDimensionMismatch(n_constraints, n_expected_constraints));
 
@@ -248,12 +234,10 @@ check(const unsigned int orientation, bool reverse)
 
   triangulation.execute_coarsening_and_refinement();
 
-  typedef std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>
-    CellFace;
-  const typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>
-    &face_map = triangulation.get_periodic_face_map();
-  typename std::map<CellFace,
-                    std::pair<CellFace, std::bitset<3>>>::const_iterator it;
+  typedef std::pair<typename Triangulation<dim>::cell_iterator, unsigned int> CellFace;
+  const typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>> &    face_map =
+    triangulation.get_periodic_face_map();
+  typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>::const_iterator it;
   int sum_of_pairs_local = face_map.size();
   int sum_of_pairs_global;
   MPI_Allreduce(&sum_of_pairs_local,
@@ -265,13 +249,12 @@ check(const unsigned int orientation, bool reverse)
   Assert(sum_of_pairs_global > 0, ExcInternalError());
   for (it = face_map.begin(); it != face_map.end(); ++it)
     {
-      const typename Triangulation<dim>::cell_iterator cell_1 = it->first.first;
-      const unsigned int face_no_1 = it->first.second;
-      const typename Triangulation<dim>::cell_iterator cell_2 =
-        it->second.first.first;
-      const unsigned int face_no_2     = it->second.first.second;
-      const Point<dim>   face_center_1 = cell_1->face(face_no_1)->center();
-      const Point<dim>   face_center_2 = cell_2->face(face_no_2)->center();
+      const typename Triangulation<dim>::cell_iterator cell_1    = it->first.first;
+      const unsigned int                               face_no_1 = it->first.second;
+      const typename Triangulation<dim>::cell_iterator cell_2    = it->second.first.first;
+      const unsigned int                               face_no_2 = it->second.first.second;
+      const Point<dim> face_center_1 = cell_1->face(face_no_1)->center();
+      const Point<dim> face_center_2 = cell_2->face(face_no_2)->center();
       Assert(std::min(std::abs(face_center_1(dim - 1) - 3.),
                       std::abs(face_center_1(dim - 1) + 3.)) < 1.e-8,
              ExcInternalError());
@@ -284,15 +267,13 @@ check(const unsigned int orientation, bool reverse)
             {
               std::cout << "face_center_1: " << face_center_1 << std::endl;
               std::cout << "face_center_2: " << face_center_2 << std::endl;
-              typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>::
-                const_iterator it;
+              typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>::const_iterator it;
               for (it = triangulation.get_periodic_face_map().begin();
                    it != triangulation.get_periodic_face_map().end();
                    ++it)
                 {
-                  std::cout << "The cell with center "
-                            << it->first.first->center() << " has on face "
-                            << it->first.second
+                  std::cout << "The cell with center " << it->first.first->center()
+                            << " has on face " << it->first.second
                             << " as neighbor the cell with center "
                             << it->second.first.first->center() << " on face "
                             << it->second.first.second << std::endl;
@@ -336,13 +317,11 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -350,12 +329,10 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

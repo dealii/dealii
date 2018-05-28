@@ -44,8 +44,7 @@ check()
 
   // store which cells we have here
   std::vector<typename Triangulation<dim>::active_cell_iterator> cells;
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     cells.push_back(cell);
@@ -57,8 +56,7 @@ check()
   // it again globally
   tria.refine_global(1);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     cell->set_coarsen_flag();
@@ -71,8 +69,7 @@ check()
   Assert(tria.n_active_cells() == n_cells, ExcInternalError());
 
   unsigned int index = 0;
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell, ++index)
     AssertThrow(cells[index] == cell, ExcInternalError());

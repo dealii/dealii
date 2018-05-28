@@ -61,9 +61,7 @@ LogStream::Prefix::~Prefix()
     }
   catch (...)
     {
-      AssertNothrow(
-        false,
-        ExcMessage("An exception occurred in LogStream::Prefix::~Prefix."));
+      AssertNothrow(false, ExcMessage("An exception occurred in LogStream::Prefix::~Prefix."));
     }
 }
 
@@ -387,8 +385,8 @@ LogStream::get_prefixes() const
 
       // The thread that created this LogStream object should be the first
       // in tbb's enumerable_thread_specific container.
-      const tbb::enumerable_thread_specific<
-        std::stack<std::string>>::const_iterator first_elem = impl.begin();
+      const tbb::enumerable_thread_specific<std::stack<std::string>>::const_iterator first_elem =
+        impl.begin();
 
       if (first_elem != impl.end())
         {

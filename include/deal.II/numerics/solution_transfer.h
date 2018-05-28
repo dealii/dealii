@@ -291,9 +291,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, 1999, Oliver Kayser-Herold and Wolfgang Bangerth,
  * 2006, Wolfgang Bangerth 2014
  */
-template <int dim,
-          typename VectorType     = Vector<double>,
-          typename DoFHandlerType = DoFHandler<dim>>
+template <int dim, typename VectorType = Vector<double>, typename DoFHandlerType = DoFHandler<dim>>
 class SolutionTransfer
 {
 #  ifndef DEAL_II_MSVC
@@ -379,8 +377,7 @@ public:
    * thrown.
    */
   void
-  interpolate(const std::vector<VectorType> &all_in,
-              std::vector<VectorType> &      all_out) const;
+  interpolate(const std::vector<VectorType> &all_in, std::vector<VectorType> &all_out) const;
 
   /**
    * Same as the previous function. It interpolates only one function. It
@@ -414,30 +411,26 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcAlreadyPrepForRef,
-    "You are attempting to call one of the prepare_*() functions "
-    "of this object to prepare it for an operation for which it "
-    "is already prepared. Specifically, the object was "
-    "previously prepared for pure refinement.");
+  DeclExceptionMsg(ExcAlreadyPrepForRef,
+                   "You are attempting to call one of the prepare_*() functions "
+                   "of this object to prepare it for an operation for which it "
+                   "is already prepared. Specifically, the object was "
+                   "previously prepared for pure refinement.");
 
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcAlreadyPrepForCoarseAndRef,
-    "You are attempting to call one of the prepare_*() functions "
-    "of this object to prepare it for an operation for which it "
-    "is already prepared. Specifically, the object was "
-    "previously prepared for both coarsening and refinement.");
+  DeclExceptionMsg(ExcAlreadyPrepForCoarseAndRef,
+                   "You are attempting to call one of the prepare_*() functions "
+                   "of this object to prepare it for an operation for which it "
+                   "is already prepared. Specifically, the object was "
+                   "previously prepared for both coarsening and refinement.");
 
 private:
   /**
    * Pointer to the degree of freedom handler to work with.
    */
-  SmartPointer<const DoFHandlerType,
-               SolutionTransfer<dim, VectorType, DoFHandlerType>>
-    dof_handler;
+  SmartPointer<const DoFHandlerType, SolutionTransfer<dim, VectorType, DoFHandlerType>> dof_handler;
 
   /**
    * Stores the number of DoFs before the refinement and/or coarsening.
@@ -491,20 +484,16 @@ private:
    */
   struct Pointerstruct
   {
-    Pointerstruct() :
-      indices_ptr(nullptr),
-      dof_values_ptr(nullptr),
-      active_fe_index(0)
+    Pointerstruct() : indices_ptr(nullptr), dof_values_ptr(nullptr), active_fe_index(0)
     {}
     Pointerstruct(std::vector<types::global_dof_index> *indices_ptr_in,
-                  const unsigned int active_fe_index_in = 0) :
+                  const unsigned int                    active_fe_index_in = 0) :
       indices_ptr(indices_ptr_in),
       dof_values_ptr(nullptr),
       active_fe_index(active_fe_index_in)
     {}
-    Pointerstruct(
-      std::vector<Vector<typename VectorType::value_type>> *dof_values_ptr_in,
-      const unsigned int active_fe_index_in = 0) :
+    Pointerstruct(std::vector<Vector<typename VectorType::value_type>> *dof_values_ptr_in,
+                  const unsigned int                                    active_fe_index_in = 0) :
       indices_ptr(nullptr),
       dof_values_ptr(dof_values_ptr_in),
       active_fe_index(active_fe_index_in)
@@ -529,8 +518,7 @@ private:
    * Is used for @p prepare_for_refining_and_coarsening The interpolated dof
    * values of all cells that'll be coarsened will be stored in this vector.
    */
-  std::vector<std::vector<Vector<typename VectorType::value_type>>>
-    dof_values_on_cell;
+  std::vector<std::vector<Vector<typename VectorType::value_type>>> dof_values_on_cell;
 };
 
 

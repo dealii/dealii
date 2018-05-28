@@ -43,12 +43,10 @@ check_this(const DoFHandler<dim> &dof_handler)
   // check for these elements,
   // everything else is handled in
   // dof_tools_19
-  if (dof_handler.get_fe().get_name().find("RaviartThomas") ==
-      std::string::npos)
+  if (dof_handler.get_fe().get_name().find("RaviartThomas") == std::string::npos)
     return;
 
-  Functions::ConstantFunction<dim> test_func(
-    1, dof_handler.get_fe().n_components());
+  Functions::ConstantFunction<dim> test_func(1, dof_handler.get_fe().n_components());
 
   // don't run this test if hanging
   // nodes are not implemented
@@ -76,14 +74,9 @@ check_this(const DoFHandler<dim> &dof_handler)
     Assert(std::fabs(solution(i) - 1) < 1e-6, ExcInternalError());
 
   // Evaluate error
-  Vector<double> cellwise_errors(
-    dof_handler.get_triangulation().n_active_cells());
-  VectorTools::integrate_difference(dof_handler,
-                                    solution,
-                                    test_func,
-                                    cellwise_errors,
-                                    quadrature,
-                                    VectorTools::L2_norm);
+  Vector<double> cellwise_errors(dof_handler.get_triangulation().n_active_cells());
+  VectorTools::integrate_difference(
+    dof_handler, solution, test_func, cellwise_errors, quadrature, VectorTools::L2_norm);
   const double p_l2_error = cellwise_errors.l2_norm();
 
   deallog << "L2_Error : " << p_l2_error << std::endl;

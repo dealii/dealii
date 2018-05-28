@@ -133,8 +133,8 @@ Step6<dim>::assemble_system()
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -144,8 +144,7 @@ Step6<dim>::assemble_system()
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -158,12 +157,10 @@ Step6<dim>::assemble_system()
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_grad(i, q_index) *
-                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+              cell_matrix(i, j) += (fe_values.shape_grad(i, q_index) *
+                                    fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
-            cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
-                            fe_values.JxW(q_index));
+            cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 * fe_values.JxW(q_index));
           }
 
       cell->get_dof_indices(local_dof_indices);
@@ -185,21 +182,18 @@ Step6<dim>::solve()
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  check_solver_within_range(
-    solver.solve(system_matrix, solution, system_rhs, preconditioner),
-    solver_control.last_step(),
-    10,
-    60);
+  check_solver_within_range(solver.solve(system_matrix, solution, system_rhs, preconditioner),
+                            solver_control.last_step(),
+                            10,
+                            60);
   constraints.distribute(solution);
 
   const auto A   = linear_operator(system_matrix_lo);
   const auto M   = constrained_linear_operator(constraints, A);
   const auto rhs = constrained_right_hand_side(constraints, A, system_rhs_lo);
 
-  check_solver_within_range(solver.solve(M, solution_lo, rhs, preconditioner),
-                            solver_control.last_step(),
-                            10,
-                            60);
+  check_solver_within_range(
+    solver.solve(M, solution_lo, rhs, preconditioner), solver_control.last_step(), 10, 60);
   constraints.distribute(solution_lo);
 }
 

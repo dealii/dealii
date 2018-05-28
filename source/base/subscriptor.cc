@@ -84,37 +84,26 @@ Subscriptor::check_no_subscribers() const noexcept
       if (std::uncaught_exception() == false)
         {
           std::string infostring;
-          for (map_iterator it = counter_map.begin(); it != counter_map.end();
-               ++it)
+          for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
             {
               if (it->second > 0)
-                infostring +=
-                  std::string("\n  from Subscriber ") + std::string(it->first);
+                infostring += std::string("\n  from Subscriber ") + std::string(it->first);
             }
 
           if (infostring == "")
             infostring = "<none>";
 
-          AssertNothrow(
-            counter == 0,
-            ExcInUse(counter.load(), object_info->name(), infostring));
+          AssertNothrow(counter == 0, ExcInUse(counter.load(), object_info->name(), infostring));
         }
       else
         {
-          std::cerr
-            << "---------------------------------------------------------"
-            << std::endl
-            << "An object pointed to by a SmartPointer is being destroyed."
-            << std::endl
-            << "Under normal circumstances, this would abort the program."
-            << std::endl
-            << "However, another exception is being processed at the"
-            << std::endl
-            << "moment, so the program will continue to run to allow"
-            << std::endl
-            << "this exception to be processed." << std::endl
-            << "---------------------------------------------------------"
-            << std::endl;
+          std::cerr << "---------------------------------------------------------" << std::endl
+                    << "An object pointed to by a SmartPointer is being destroyed." << std::endl
+                    << "Under normal circumstances, this would abort the program." << std::endl
+                    << "However, another exception is being processed at the" << std::endl
+                    << "moment, so the program will continue to run to allow" << std::endl
+                    << "this exception to be processed." << std::endl
+                    << "---------------------------------------------------------" << std::endl;
         }
     }
 #endif
@@ -188,8 +177,7 @@ Subscriptor::unsubscribe(const char *id) const
   // documentation of this class.
 #  ifndef DEAL_II_WITH_THREADS
   map_iterator it = counter_map.find(name);
-  AssertNothrow(it != counter_map.end(),
-                ExcNoSubscriber(object_info->name(), name));
+  AssertNothrow(it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
   AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
 
   it->second--;
@@ -214,8 +202,8 @@ Subscriptor::list_subscribers() const
 {
 #ifndef DEAL_II_WITH_THREADS
   for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
-    deallog << it->second << '/' << counter << " subscriptions from \""
-            << it->first << '\"' << std::endl;
+    deallog << it->second << '/' << counter << " subscriptions from \"" << it->first << '\"'
+            << std::endl;
 #else
   deallog << "No subscriber listing with multithreading" << std::endl;
 #endif

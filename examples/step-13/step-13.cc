@@ -176,17 +176,15 @@ namespace Step13
     class PointValueEvaluation : public EvaluationBase<dim>
     {
     public:
-      PointValueEvaluation(const Point<dim> &evaluation_point,
-                           TableHandler &    results_table);
+      PointValueEvaluation(const Point<dim> &evaluation_point, TableHandler &results_table);
 
       virtual void operator()(const DoFHandler<dim> &dof_handler,
                               const Vector<double> & solution) const override;
 
-      DeclException1(
-        ExcEvaluationPointNotFound,
-        Point<dim>,
-        << "The evaluation point " << arg1
-        << " was not found among the vertices of the present grid.");
+      DeclException1(ExcEvaluationPointNotFound,
+                     Point<dim>,
+                     << "The evaluation point " << arg1
+                     << " was not found among the vertices of the present grid.");
 
     private:
       const Point<dim> evaluation_point;
@@ -197,9 +195,8 @@ namespace Step13
     // As for the definition, the constructor is trivial, just taking data and
     // storing it in object-local ones:
     template <int dim>
-    PointValueEvaluation<dim>::PointValueEvaluation(
-      const Point<dim> &evaluation_point,
-      TableHandler &    results_table) :
+    PointValueEvaluation<dim>::PointValueEvaluation(const Point<dim> &evaluation_point,
+                                                    TableHandler &    results_table) :
       evaluation_point(evaluation_point),
       results_table(results_table)
     {}
@@ -209,9 +206,8 @@ namespace Step13
     // Now for the function that is mainly of interest in this class, the
     // computation of the point value:
     template <int dim>
-    void PointValueEvaluation<dim>::
-         operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+    void PointValueEvaluation<dim>::operator()(const DoFHandler<dim> &dof_handler,
+                                               const Vector<double> & solution) const
     {
       // First allocate a variable that will hold the point value. Initialize
       // it with a value that is clearly bogus, so that if we fail to set it
@@ -225,14 +221,11 @@ namespace Step13
       // vertex matches the evaluation point. If this is the case, then
       // extract the point value, set a flag that we have found the point of
       // interest, and exit the loop.
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
       bool evaluation_point_found                         = false;
       for (; (cell != endc) && !evaluation_point_found; ++cell)
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell; ++vertex)
           if (cell->vertex(vertex) == evaluation_point)
             {
               // In order to extract the point value from the global solution
@@ -289,8 +282,7 @@ namespace Step13
       // has), you will catch all exceptions that are not caught somewhere in
       // between and thus already handled, and this additional information
       // will help you find out what happened and where it went wrong.
-      AssertThrow(evaluation_point_found,
-                  ExcEvaluationPointNotFound(evaluation_point));
+      AssertThrow(evaluation_point_found, ExcEvaluationPointNotFound(evaluation_point));
       // Note that we have used the <code>Assert</code> macro in other example
       // programs as well. It differed from the <code>AssertThrow</code> macro
       // used here in that it simply aborts the program, rather than throwing
@@ -381,9 +373,8 @@ namespace Step13
 
 
     template <int dim>
-    SolutionOutput<dim>::SolutionOutput(
-      const std::string &             output_name_base,
-      const DataOutBase::OutputFormat output_format) :
+    SolutionOutput<dim>::SolutionOutput(const std::string &             output_name_base,
+                                        const DataOutBase::OutputFormat output_format) :
       output_name_base(output_name_base),
       output_format(output_format)
     {}
@@ -414,8 +405,7 @@ namespace Step13
       data_out.add_data_vector(solution, "solution");
       data_out.build_patches();
 
-      std::ofstream out(output_name_base + "-" +
-                        std::to_string(this->refinement_cycle) +
+      std::ofstream out(output_name_base + "-" + std::to_string(this->refinement_cycle) +
                         data_out.default_suffix(output_format));
 
       data_out.write(out, output_format);
@@ -509,11 +499,10 @@ namespace Step13
       Base(Triangulation<dim> &coarse_grid);
       virtual ~Base();
 
-      virtual void solve_problem() = 0;
-      virtual void postprocess(
-        const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
-      virtual void         refine_grid()                            = 0;
-      virtual unsigned int n_dofs() const                           = 0;
+      virtual void solve_problem()                                                         = 0;
+      virtual void postprocess(const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
+      virtual void refine_grid()                                                           = 0;
+      virtual unsigned int n_dofs() const                                                  = 0;
 
     protected:
       const SmartPointer<Triangulation<dim>> triangulation;
@@ -523,8 +512,7 @@ namespace Step13
     // The implementation of the only two non-abstract functions is then
     // rather boring:
     template <int dim>
-    Base<dim>::Base(Triangulation<dim> &coarse_grid) :
-      triangulation(&coarse_grid)
+    Base<dim>::Base(Triangulation<dim> &coarse_grid) : triangulation(&coarse_grid)
     {}
 
 
@@ -584,8 +572,7 @@ namespace Step13
 
       virtual void solve_problem() override;
 
-      virtual void postprocess(
-        const Evaluation::EvaluationBase<dim> &postprocessor) const override;
+      virtual void postprocess(const Evaluation::EvaluationBase<dim> &postprocessor) const override;
 
       virtual unsigned int n_dofs() const override;
 
@@ -635,8 +622,7 @@ namespace Step13
       // calls the virtual function assembling the right hand side.
       struct AssemblyScratchData
       {
-        AssemblyScratchData(const FiniteElement<dim> &fe,
-                            const Quadrature<dim> &   quadrature);
+        AssemblyScratchData(const FiniteElement<dim> &fe, const Quadrature<dim> &quadrature);
         AssemblyScratchData(const AssemblyScratchData &scratch_data);
 
         FEValues<dim> fe_values;
@@ -650,10 +636,9 @@ namespace Step13
 
       void assemble_linear_system(LinearSystem &linear_system);
 
-      void local_assemble_matrix(
-        const typename DoFHandler<dim>::active_cell_iterator &cell,
-        AssemblyScratchData &                                 scratch_data,
-        AssemblyCopyData &                                    copy_data) const;
+      void local_assemble_matrix(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                 AssemblyScratchData &                                 scratch_data,
+                                 AssemblyCopyData &copy_data) const;
 
       void copy_local_to_global(const AssemblyCopyData &copy_data,
                                 LinearSystem &          linear_system) const;
@@ -712,8 +697,7 @@ namespace Step13
     // function may be called multiply, once for each evaluation of the
     // solution which the user required.
     template <int dim>
-    void Solver<dim>::postprocess(
-      const Evaluation::EvaluationBase<dim> &postprocessor) const
+    void Solver<dim>::postprocess(const Evaluation::EvaluationBase<dim> &postprocessor) const
     {
       postprocessor(dof_handler, solution);
     }
@@ -754,19 +738,18 @@ namespace Step13
       Threads::Task<> rhs_task =
         Threads::new_task(&Solver<dim>::assemble_rhs, *this, linear_system.rhs);
 
-      WorkStream::run(dof_handler.begin_active(),
-                      dof_handler.end(),
-                      std::bind(&Solver<dim>::local_assemble_matrix,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::bind(&Solver<dim>::copy_local_to_global,
-                                this,
-                                std::placeholders::_1,
-                                std::ref(linear_system)),
-                      AssemblyScratchData(*fe, *quadrature),
-                      AssemblyCopyData());
+      WorkStream::run(
+        dof_handler.begin_active(),
+        dof_handler.end(),
+        std::bind(&Solver<dim>::local_assemble_matrix,
+                  this,
+                  std::placeholders::_1,
+                  std::placeholders::_2,
+                  std::placeholders::_3),
+        std::bind(
+          &Solver<dim>::copy_local_to_global, this, std::placeholders::_1, std::ref(linear_system)),
+        AssemblyScratchData(*fe, *quadrature),
+        AssemblyCopyData());
       linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
       // The syntax above using <code>std::bind</code> requires
@@ -902,16 +885,14 @@ namespace Step13
     // global matrix object. This works in exactly the same way as
     // described in step-9:
     template <int dim>
-    Solver<dim>::AssemblyScratchData::AssemblyScratchData(
-      const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature) :
+    Solver<dim>::AssemblyScratchData::AssemblyScratchData(const FiniteElement<dim> &fe,
+                                                          const Quadrature<dim> &   quadrature) :
       fe_values(fe, quadrature, update_gradients | update_JxW_values)
     {}
 
 
     template <int dim>
-    Solver<dim>::AssemblyScratchData::AssemblyScratchData(
-      const AssemblyScratchData &scratch_data) :
+    Solver<dim>::AssemblyScratchData::AssemblyScratchData(const AssemblyScratchData &scratch_data) :
       fe_values(scratch_data.fe_values.get_fe(),
                 scratch_data.fe_values.get_quadrature(),
                 update_gradients | update_JxW_values)
@@ -919,10 +900,10 @@ namespace Step13
 
 
     template <int dim>
-    void Solver<dim>::local_assemble_matrix(
-      const typename DoFHandler<dim>::active_cell_iterator &cell,
-      AssemblyScratchData &                                 scratch_data,
-      AssemblyCopyData &                                    copy_data) const
+    void
+    Solver<dim>::local_assemble_matrix(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                       AssemblyScratchData &scratch_data,
+                                       AssemblyCopyData &   copy_data) const
     {
       const unsigned int dofs_per_cell = fe->dofs_per_cell;
       const unsigned int n_q_points    = quadrature->size();
@@ -938,8 +919,7 @@ namespace Step13
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             copy_data.cell_matrix(i, j) +=
               (scratch_data.fe_values.shape_grad(i, q_point) *
-               scratch_data.fe_values.shape_grad(j, q_point) *
-               scratch_data.fe_values.JxW(q_point));
+               scratch_data.fe_values.shape_grad(j, q_point) * scratch_data.fe_values.JxW(q_point));
 
       cell->get_dof_indices(copy_data.local_dof_indices);
     }
@@ -948,7 +928,7 @@ namespace Step13
 
     template <int dim>
     void Solver<dim>::copy_local_to_global(const AssemblyCopyData &copy_data,
-                                           LinearSystem &linear_system) const
+                                           LinearSystem &          linear_system) const
     {
       for (unsigned int i = 0; i < copy_data.local_dof_indices.size(); ++i)
         for (unsigned int j = 0; j < copy_data.local_dof_indices.size(); ++j)
@@ -997,8 +977,7 @@ namespace Step13
         &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
-      Threads::Task<> side_task =
-        Threads::new_task(mhnc_p, dof_handler, hanging_node_constraints);
+      Threads::Task<> side_task = Threads::new_task(mhnc_p, dof_handler, hanging_node_constraints);
 
       DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
       DoFTools::make_sparsity_pattern(dof_handler, dsp);
@@ -1070,7 +1049,7 @@ namespace Step13
 
     protected:
       const SmartPointer<const Function<dim>> rhs_function;
-      virtual void assemble_rhs(Vector<double> &rhs) const override;
+      virtual void                            assemble_rhs(Vector<double> &rhs) const override;
     };
 
 
@@ -1095,10 +1074,8 @@ namespace Step13
     template <int dim>
     void PrimalSolver<dim>::assemble_rhs(Vector<double> &rhs) const
     {
-      FEValues<dim> fe_values(*this->fe,
-                              *this->quadrature,
-                              update_values | update_quadrature_points |
-                                update_JxW_values);
+      FEValues<dim> fe_values(
+        *this->fe, *this->quadrature, update_values | update_quadrature_points | update_JxW_values);
 
       const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
       const unsigned int n_q_points    = this->quadrature->size();
@@ -1107,21 +1084,18 @@ namespace Step13
       std::vector<double>                  rhs_values(n_q_points);
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-      typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler
-                                                              .begin_active(),
-                                                     endc =
-                                                       this->dof_handler.end();
+      typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler.begin_active(),
+                                                     endc = this->dof_handler.end();
       for (; cell != endc; ++cell)
         {
           cell_rhs = 0;
           fe_values.reinit(cell);
-          rhs_function->value_list(fe_values.get_quadrature_points(),
-                                   rhs_values);
+          rhs_function->value_list(fe_values.get_quadrature_points(), rhs_values);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] * fe_values.JxW(q_point));
+              cell_rhs(i) +=
+                (fe_values.shape_value(i, q_point) * rhs_values[q_point] * fe_values.JxW(q_point));
 
           cell->get_dof_indices(local_dof_indices);
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -1165,18 +1139,13 @@ namespace Step13
 
 
     template <int dim>
-    RefinementGlobal<dim>::RefinementGlobal(
-      Triangulation<dim> &      coarse_grid,
-      const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature,
-      const Function<dim> &     rhs_function,
-      const Function<dim> &     boundary_values) :
+    RefinementGlobal<dim>::RefinementGlobal(Triangulation<dim> &      coarse_grid,
+                                            const FiniteElement<dim> &fe,
+                                            const Quadrature<dim> &   quadrature,
+                                            const Function<dim> &     rhs_function,
+                                            const Function<dim> &     boundary_values) :
       Base<dim>(coarse_grid),
-      PrimalSolver<dim>(coarse_grid,
-                        fe,
-                        quadrature,
-                        rhs_function,
-                        boundary_values)
+      PrimalSolver<dim>(coarse_grid, fe, quadrature, rhs_function, boundary_values)
     {}
 
 
@@ -1215,18 +1184,13 @@ namespace Step13
 
 
     template <int dim>
-    RefinementKelly<dim>::RefinementKelly(
-      Triangulation<dim> &      coarse_grid,
-      const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature,
-      const Function<dim> &     rhs_function,
-      const Function<dim> &     boundary_values) :
+    RefinementKelly<dim>::RefinementKelly(Triangulation<dim> &      coarse_grid,
+                                          const FiniteElement<dim> &fe,
+                                          const Quadrature<dim> &   quadrature,
+                                          const Function<dim> &     rhs_function,
+                                          const Function<dim> &     boundary_values) :
       Base<dim>(coarse_grid),
-      PrimalSolver<dim>(coarse_grid,
-                        fe,
-                        quadrature,
-                        rhs_function,
-                        boundary_values)
+      PrimalSolver<dim>(coarse_grid, fe, quadrature, rhs_function, boundary_values)
     {}
 
 
@@ -1234,8 +1198,7 @@ namespace Step13
     template <int dim>
     void RefinementKelly<dim>::refine_grid()
     {
-      Vector<float> estimated_error_per_cell(
-        this->triangulation->n_active_cells());
+      Vector<float> estimated_error_per_cell(this->triangulation->n_active_cells());
       KellyErrorEstimator<dim>::estimate(this->dof_handler,
                                          QGauss<dim - 1>(3),
                                          typename FunctionMap<dim>::type(),
@@ -1277,14 +1240,12 @@ namespace Step13
     Solution() : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component) const override;
   };
 
 
   template <int dim>
-  double Solution<dim>::value(const Point<dim> &p,
-                              const unsigned int /*component*/) const
+  double Solution<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
   {
     double q = p(0);
     for (unsigned int i = 1; i < dim; ++i)
@@ -1302,14 +1263,12 @@ namespace Step13
     RightHandSide() : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component) const override;
+    virtual double value(const Point<dim> &p, const unsigned int component) const override;
   };
 
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> &p,
-                                   const unsigned int /*component*/) const
+  double RightHandSide<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
   {
     double q = p(0);
     for (unsigned int i = 1; i < dim; ++i)
@@ -1321,8 +1280,7 @@ namespace Step13
         t1 += std::cos(10 * p(i) + 5 * p(0) * p(0)) * 10 * p(0);
         t2 += 10 * std::cos(10 * p(i) + 5 * p(0) * p(0)) -
               100 * std::sin(10 * p(i) + 5 * p(0) * p(0)) * p(0) * p(0);
-        t3 += 100 * std::cos(10 * p(i) + 5 * p(0) * p(0)) *
-                std::cos(10 * p(i) + 5 * p(0) * p(0)) -
+        t3 += 100 * std::cos(10 * p(i) + 5 * p(0) * p(0)) * std::cos(10 * p(i) + 5 * p(0) * p(0)) -
               100 * std::sin(10 * p(i) + 5 * p(0) * p(0));
       };
     t1 = t1 * t1;
@@ -1342,9 +1300,8 @@ namespace Step13
   // list of postprocessing (evaluation) objects, and runs them with
   // intermittent mesh refinement:
   template <int dim>
-  void run_simulation(
-    LaplaceSolver::Base<dim> &                          solver,
-    const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
+  void run_simulation(LaplaceSolver::Base<dim> &                          solver,
+                      const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
   {
     // We will give an indicator of the step we are presently computing, in
     // order to keep the user informed that something is still happening, and
@@ -1368,8 +1325,7 @@ namespace Step13
         // annoying, but could be shortened by a typedef, if so desired.
         solver.solve_problem();
 
-        for (typename std::list<
-               Evaluation::EvaluationBase<dim> *>::const_iterator i =
+        for (typename std::list<Evaluation::EvaluationBase<dim> *>::const_iterator i =
                postprocessor_list.begin();
              i != postprocessor_list.end();
              ++i)
@@ -1409,10 +1365,8 @@ namespace Step13
     // First minor task: tell the user what is going to happen. Thus write a
     // header line, and a line with all '-' characters of the same length as
     // the first one right below.
-    const std::string header =
-      "Running tests with \"" + solver_name + "\" refinement criterion:";
-    std::cout << header << std::endl
-              << std::string(header.size(), '-') << std::endl;
+    const std::string header = "Running tests with \"" + solver_name + "\" refinement criterion:";
+    std::cout << header << std::endl << std::string(header.size(), '-') << std::endl;
 
     // Then set up triangulation, finite element, etc.
     Triangulation<dim> triangulation;
@@ -1439,12 +1393,11 @@ namespace Step13
     // solution at the point (0.5,0.5) will be stored, and create a respective
     // evaluation object:
     TableHandler                          results_table;
-    Evaluation::PointValueEvaluation<dim> postprocessor1(Point<dim>(0.5, 0.5),
-                                                         results_table);
+    Evaluation::PointValueEvaluation<dim> postprocessor1(Point<dim>(0.5, 0.5), results_table);
 
     // Also generate an evaluator which writes out the solution:
-    Evaluation::SolutionOutput<dim> postprocessor2(
-      std::string("solution-") + solver_name, DataOutBase::gnuplot);
+    Evaluation::SolutionOutput<dim> postprocessor2(std::string("solution-") + solver_name,
+                                                   DataOutBase::gnuplot);
 
     // Take these two evaluation objects and put them in a list...
     std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;
@@ -1482,25 +1435,21 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 

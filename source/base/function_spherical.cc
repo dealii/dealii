@@ -139,9 +139,8 @@ namespace Functions
      * calculates out[i][j] += v*in[i]in[j]
      */
     template <int dim>
-    void add_outer_product(SymmetricTensor<2, dim> &out,
-                           const double &           val,
-                           const Tensor<1, dim> &   in)
+    void
+      add_outer_product(SymmetricTensor<2, dim> &out, const double &val, const Tensor<1, dim> &in)
     {
       if (val != 0.)
         for (unsigned int i = 0; i < dim; i++)
@@ -153,8 +152,7 @@ namespace Functions
 
 
   template <int dim>
-  Spherical<dim>::Spherical(const Point<dim> & p,
-                            const unsigned int n_components) :
+  Spherical<dim>::Spherical(const Point<dim> &p, const unsigned int n_components) :
     Function<dim>(n_components),
     coordinate_system_offset(p)
   {
@@ -165,12 +163,10 @@ namespace Functions
 
   template <int dim>
   double
-  Spherical<dim>::value(const Point<dim> & p_,
-                        const unsigned int component) const
+  Spherical<dim>::value(const Point<dim> &p_, const unsigned int component) const
   {
-    const Point<dim>              p = p_ - coordinate_system_offset;
-    const std::array<double, dim> sp =
-      GeometricUtilities::Coordinates::to_spherical(p);
+    const Point<dim>              p  = p_ - coordinate_system_offset;
+    const std::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
     return svalue(sp, component);
   }
 
@@ -178,8 +174,7 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  Spherical<dim>::gradient(const Point<dim> & /*p_*/,
-                           const unsigned int /*component*/) const
+  Spherical<dim>::gradient(const Point<dim> & /*p_*/, const unsigned int /*component*/) const
 
   {
     Assert(false, ExcNotImplemented());
@@ -194,9 +189,8 @@ namespace Functions
   {
     constexpr int                 dim = 3;
     const Point<dim>              p   = p_ - coordinate_system_offset;
-    const std::array<double, dim> sp =
-      GeometricUtilities::Coordinates::to_spherical(p);
-    const std::array<double, dim> sg = sgradient(sp, component);
+    const std::array<double, dim> sp  = GeometricUtilities::Coordinates::to_spherical(p);
+    const std::array<double, dim> sg  = sgradient(sp, component);
 
     // somewhat backwards, but we need cos/sin's for unit vectors
     const double cos_theta = std::cos(sp[1]);
@@ -205,8 +199,7 @@ namespace Functions
     const double sin_phi   = std::sin(sp[2]);
 
     Tensor<1, dim> unit_r, unit_theta, unit_phi;
-    set_unit_vectors(
-      cos_theta, sin_theta, cos_phi, sin_phi, unit_r, unit_theta, unit_phi);
+    set_unit_vectors(cos_theta, sin_theta, cos_phi, sin_phi, unit_r, unit_theta, unit_phi);
 
     Tensor<1, dim> res;
 
@@ -234,8 +227,7 @@ namespace Functions
 
   template <int dim>
   SymmetricTensor<2, dim>
-  Spherical<dim>::hessian(const Point<dim> & /*p*/,
-                          const unsigned int /*component*/) const
+  Spherical<dim>::hessian(const Point<dim> & /*p*/, const unsigned int /*component*/) const
   {
     Assert(false, ExcNotImplemented());
     return {};
@@ -250,10 +242,9 @@ namespace Functions
   {
     constexpr int                 dim = 3;
     const Point<dim>              p   = p_ - coordinate_system_offset;
-    const std::array<double, dim> sp =
-      GeometricUtilities::Coordinates::to_spherical(p);
-    const std::array<double, dim> sg = sgradient(sp, component);
-    const std::array<double, 6>   sh = shessian(sp, component);
+    const std::array<double, dim> sp  = GeometricUtilities::Coordinates::to_spherical(p);
+    const std::array<double, dim> sg  = sgradient(sp, component);
+    const std::array<double, 6>   sh  = shessian(sp, component);
 
     // somewhat backwards, but we need cos/sin's for unit vectors
     const double cos_theta = std::cos(sp[1]);
@@ -263,22 +254,18 @@ namespace Functions
     const double r         = sp[0];
 
     Tensor<1, dim> unit_r, unit_theta, unit_phi;
-    set_unit_vectors(
-      cos_theta, sin_theta, cos_phi, sin_phi, unit_r, unit_theta, unit_phi);
+    set_unit_vectors(cos_theta, sin_theta, cos_phi, sin_phi, unit_r, unit_theta, unit_phi);
 
     const double sin_phi2 = sin_phi * sin_phi;
     const double r2       = r * r;
     Assert(r != 0., ExcDivideByZero());
 
     const double c_utheta2 =
-      sg[0] / r + ((sin_phi != 0.) ? (cos_phi * sg[2]) / (r2 * sin_phi) +
-                                       sh[1] / (r2 * sin_phi2) :
-                                     0.);
-    const double c_utheta_ur =
-      ((sin_phi != 0.) ? (r * sh[3] - sg[1]) / (r2 * sin_phi) : 0.);
+      sg[0] / r +
+      ((sin_phi != 0.) ? (cos_phi * sg[2]) / (r2 * sin_phi) + sh[1] / (r2 * sin_phi2) : 0.);
+    const double c_utheta_ur = ((sin_phi != 0.) ? (r * sh[3] - sg[1]) / (r2 * sin_phi) : 0.);
     const double c_utheta_uphi =
-      ((sin_phi != 0.) ? (sh[5] * sin_phi - cos_phi * sg[1]) / (r2 * sin_phi2) :
-                         0.);
+      ((sin_phi != 0.) ? (sh[5] * sin_phi - cos_phi * sg[1]) / (r2 * sin_phi2) : 0.);
     const double c_ur2     = sh[0];
     const double c_ur_uphi = (r * sh[4] - sg[2]) / r2;
     const double c_uphi2   = (sh[2] + r * sg[0]) / r2;

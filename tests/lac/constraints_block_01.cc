@@ -91,8 +91,7 @@ main()
   // lower left hand corner of a 2x2 grid
   // the rest is fluid/mesh (1)
 
-  for (Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
-       cell != tria.end();
+  for (Triangulation<dim>::active_cell_iterator cell = tria.begin_active(); cell != tria.end();
        ++cell)
     {
       real_cell_center = cell->center();
@@ -107,14 +106,11 @@ main()
 
   std::string solid_fe_name =
     "FESystem[FE_Q(2)^2-FE_Q(2)^2-FE_Nothing()^2-FE_Nothing()-FE_Nothing()^2]";
-  std::string fluid_fe_name =
-    "FESystem[FE_Nothing()^2-FE_Nothing()^2-FE_Q(2)^2-FE_Q(1)-FE_Q(2)^2]";
+  std::string fluid_fe_name = "FESystem[FE_Nothing()^2-FE_Nothing()^2-FE_Q(2)^2-FE_Q(1)-FE_Q(2)^2]";
 
   hp::FECollection<dim>               fe_collection;
-  std::unique_ptr<FiniteElement<dim>> solid_fe(
-    FETools::get_fe_by_name<dim, dim>(solid_fe_name));
-  std::unique_ptr<FiniteElement<dim>> fluid_fe(
-    FETools::get_fe_by_name<dim, dim>(fluid_fe_name));
+  std::unique_ptr<FiniteElement<dim>> solid_fe(FETools::get_fe_by_name<dim, dim>(solid_fe_name));
+  std::unique_ptr<FiniteElement<dim>> fluid_fe(FETools::get_fe_by_name<dim, dim>(fluid_fe_name));
 
   deallog << "Solid FE Space: " << solid_fe->get_name() << std::endl;
   deallog << "Fluid/Mesh FE Space: " << fluid_fe->get_name() << std::endl;
@@ -124,9 +120,7 @@ main()
 
   hp::DoFHandler<dim> dh(tria);
 
-  for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
-       cell != dh.end();
-       ++cell)
+  for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active(); cell != dh.end(); ++cell)
     {
       if (int(cell->material_id()) == 0)
         cell->set_active_fe_index(0);
@@ -147,10 +141,8 @@ main()
         block_component[comp] = 2;
     } // comp
 
-  std::vector<types::global_dof_index> dofs_per_block(
-    3, 0); // 3 blocks, count dofs:
-  DoFTools::count_dofs_per_component(
-    dh, dofs_per_block, false, block_component);
+  std::vector<types::global_dof_index> dofs_per_block(3, 0); // 3 blocks, count dofs:
+  DoFTools::count_dofs_per_component(dh, dofs_per_block, false, block_component);
 
   DoFRenumbering::component_wise(dh, block_component);
 
@@ -184,23 +176,17 @@ main()
       {
         for (unsigned int d = 0; d < fe_collection.n_components(); ++d)
           {
-            if (((c < solid_dim) &&
-                 (d < solid_dim)) // couples solid dims with solid dims
-                ||
-                (((c >= solid_dim) &&
-                  (d >= solid_dim)) // couples fluid dims and mesh dims
-                 &&
-                 !((c == solid_dim + dim) &&
-                   (d == solid_dim +
-                           dim)))) // fluid pressure does not couple with itself
+            if (((c < solid_dim) && (d < solid_dim))       // couples solid dims with solid dims
+                || (((c >= solid_dim) && (d >= solid_dim)) // couples fluid dims and mesh dims
+                    && !((c == solid_dim + dim) &&
+                         (d == solid_dim + dim)))) // fluid pressure does not couple with itself
               {
                 cell_coupling[c][d] = DoFTools::always;
                 cell_coupling[d][c] = DoFTools::always;
               } // cell_coupling
 
-            if ((c < solid_dim) &&
-                (d >= solid_dim)) // couples solid dims with fluid and mesh dims
-                                  // on the interface
+            if ((c < solid_dim) && (d >= solid_dim)) // couples solid dims with fluid and mesh dims
+                                                     // on the interface
               {
                 face_coupling[c][d] = DoFTools::always;
                 face_coupling[d][c] = DoFTools::always;
@@ -229,18 +215,15 @@ main()
 
   ConstraintMatrix constraints;
 
-  const unsigned int dofs_per_fl_msh_face = fluid_fe->dofs_per_face;
-  const unsigned int dofs_per_solid_face  = solid_fe->dofs_per_face;
-  std::vector<types::global_dof_index> fl_msh_face_dof_indices(
-    dofs_per_fl_msh_face);
-  std::vector<types::global_dof_index> solid_face_dof_indices(
-    dofs_per_solid_face);
+  const unsigned int                   dofs_per_fl_msh_face = fluid_fe->dofs_per_face;
+  const unsigned int                   dofs_per_solid_face  = solid_fe->dofs_per_face;
+  std::vector<types::global_dof_index> fl_msh_face_dof_indices(dofs_per_fl_msh_face);
+  std::vector<types::global_dof_index> solid_face_dof_indices(dofs_per_solid_face);
 
   std::vector<std::pair<unsigned int, unsigned int>> solid_fluid_pairs;
   std::vector<std::pair<unsigned int, unsigned int>> solid_mesh_pairs;
 
-  for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
-       cell != dh.end();
+  for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active(); cell != dh.end();
        ++cell) // loops over the cells
     {
       if (int(cell->material_id()) == 1)
@@ -257,17 +240,15 @@ main()
 
                   if (face_is_on_interface)
                     {
-                      std::vector<unsigned int> solid_disp_dof, solid_vel_dof,
-                        fluid_vel_dof, mesh_disp_dof;
+                      std::vector<unsigned int> solid_disp_dof, solid_vel_dof, fluid_vel_dof,
+                        mesh_disp_dof;
 
                       cell->face(f)->get_dof_indices(solid_face_dof_indices, 0);
-                      cell->face(f)->get_dof_indices(fl_msh_face_dof_indices,
-                                                     1);
+                      cell->face(f)->get_dof_indices(fl_msh_face_dof_indices, 1);
 
                       for (unsigned int i = 0; i < dofs_per_solid_face; ++i)
                         {
-                          unsigned int comp =
-                            solid_fe->face_system_to_component_index(i).first;
+                          unsigned int comp = solid_fe->face_system_to_component_index(i).first;
                           if (comp < dim)
                             solid_disp_dof.push_back(i);
                           if (comp >= dim && comp < solid_dim)
@@ -275,8 +256,7 @@ main()
                         } // i
                       for (unsigned int i = 0; i < dofs_per_fl_msh_face; ++i)
                         {
-                          unsigned int comp =
-                            fluid_fe->face_system_to_component_index(i).first;
+                          unsigned int comp = fluid_fe->face_system_to_component_index(i).first;
                           if (comp >= solid_dim && comp < solid_dim + dim)
                             fluid_vel_dof.push_back(i);
                           if (comp >= solid_dim + fluid_dim)
@@ -287,31 +267,25 @@ main()
                         {
                           // in this example
                           // solid_vel_dof.size()==fluid_vel_dof.size()
-                          constraints.add_line(
-                            fl_msh_face_dof_indices[fluid_vel_dof[i]]);
-                          constraints.add_entry(
-                            fl_msh_face_dof_indices[fluid_vel_dof[i]],
-                            solid_face_dof_indices[solid_vel_dof[i]],
-                            1.0);
+                          constraints.add_line(fl_msh_face_dof_indices[fluid_vel_dof[i]]);
+                          constraints.add_entry(fl_msh_face_dof_indices[fluid_vel_dof[i]],
+                                                solid_face_dof_indices[solid_vel_dof[i]],
+                                                1.0);
 
-                          solid_fluid_pairs.push_back(
-                            std::pair<unsigned int, unsigned int>(
-                              solid_face_dof_indices[solid_vel_dof[i]],
-                              fl_msh_face_dof_indices[fluid_vel_dof[i]]));
+                          solid_fluid_pairs.push_back(std::pair<unsigned int, unsigned int>(
+                            solid_face_dof_indices[solid_vel_dof[i]],
+                            fl_msh_face_dof_indices[fluid_vel_dof[i]]));
                         } // i
                       for (unsigned int i = 0; i < solid_disp_dof.size(); ++i)
                         {
-                          constraints.add_line(
-                            fl_msh_face_dof_indices[mesh_disp_dof[i]]);
-                          constraints.add_entry(
-                            fl_msh_face_dof_indices[mesh_disp_dof[i]],
-                            solid_face_dof_indices[solid_disp_dof[i]],
-                            1.0);
+                          constraints.add_line(fl_msh_face_dof_indices[mesh_disp_dof[i]]);
+                          constraints.add_entry(fl_msh_face_dof_indices[mesh_disp_dof[i]],
+                                                solid_face_dof_indices[solid_disp_dof[i]],
+                                                1.0);
 
-                          solid_mesh_pairs.push_back(
-                            std::pair<unsigned int, unsigned int>(
-                              solid_face_dof_indices[solid_disp_dof[i]],
-                              fl_msh_face_dof_indices[mesh_disp_dof[i]]));
+                          solid_mesh_pairs.push_back(std::pair<unsigned int, unsigned int>(
+                            solid_face_dof_indices[solid_disp_dof[i]],
+                            fl_msh_face_dof_indices[mesh_disp_dof[i]]));
                         }
                     } // at interface check
                 }     // not at boundary check
@@ -346,8 +320,7 @@ main()
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
-         cell != dh.end();
+    for (hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active(); cell != dh.end();
          ++cell) // loops over the cells
       {
         if (int(cell->material_id()) == 1) // are we in the fluid region?
@@ -358,14 +331,10 @@ main()
             // to the cell matrix and right hand side here
 
             deallog << "I am about to distribute cell: " << cell << std::endl;
-            deallog << "Cell: " << cell << " has it's center at "
-                    << cell->center() << std::endl;
+            deallog << "Cell: " << cell << " has it's center at " << cell->center() << std::endl;
 
-            constraints.distribute_local_to_global(cell_matrix,
-                                                   cell_rhs,
-                                                   local_dof_indices,
-                                                   system_matrix,
-                                                   system_rhs);
+            constraints.distribute_local_to_global(
+              cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
 
           } // is this in the fluid material region?
 

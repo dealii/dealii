@@ -112,16 +112,13 @@ namespace Step53
   // access any member variables of the class, and (ii) because they are
   // called at a time when the object is not initialized fully anyway.
   AfricaTopography::AfricaTopography() :
-    topography_data(get_endpoints(),
-                    n_intervals(),
-                    Table<2, double>(380, 220, get_data().begin()))
+    topography_data(get_endpoints(), n_intervals(), Table<2, double>(380, 220, get_data().begin()))
   {}
 
 
   double AfricaTopography::value(const double lon, const double lat) const
   {
-    return topography_data.value(
-      Point<2>(-lat * 180 / numbers::PI, lon * 180 / numbers::PI));
+    return topography_data.value(Point<2>(-lat * 180 / numbers::PI, lon * 180 / numbers::PI));
   }
 
 
@@ -274,28 +271,26 @@ namespace Step53
     const double theta = phi_theta_d[1];
     const double d     = phi_theta_d[2];
 
-    const double R_bar = R / std::sqrt(1 - (ellipticity * ellipticity *
-                                            std::sin(theta) * std::sin(theta)));
+    const double R_bar =
+      R / std::sqrt(1 - (ellipticity * ellipticity * std::sin(theta) * std::sin(theta)));
 
     return Point<3>((R_bar + d) * std::cos(phi) * std::cos(theta),
                     (R_bar + d) * std::sin(phi) * std::cos(theta),
-                    ((1 - ellipticity * ellipticity) * R_bar + d) *
-                      std::sin(theta));
+                    ((1 - ellipticity * ellipticity) * R_bar + d) * std::sin(theta));
   }
 
   Point<3> AfricaGeometry::pull_back_wgs84(const Point<3> &x) const
   {
-    const double b     = std::sqrt(R * R * (1 - ellipticity * ellipticity));
-    const double ep    = std::sqrt((R * R - b * b) / (b * b));
-    const double p     = std::sqrt(x(0) * x(0) + x(1) * x(1));
-    const double th    = std::atan2(R * x(2), b * p);
-    const double phi   = std::atan2(x(1), x(0));
-    const double theta = std::atan2(
-      x(2) + ep * ep * b * std::pow(std::sin(th), 3),
-      (p - (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
+    const double b   = std::sqrt(R * R * (1 - ellipticity * ellipticity));
+    const double ep  = std::sqrt((R * R - b * b) / (b * b));
+    const double p   = std::sqrt(x(0) * x(0) + x(1) * x(1));
+    const double th  = std::atan2(R * x(2), b * p);
+    const double phi = std::atan2(x(1), x(0));
+    const double theta =
+      std::atan2(x(2) + ep * ep * b * std::pow(std::sin(th), 3),
+                 (p - (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
     const double R_bar =
-      R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) *
-                           std::sin(theta)));
+      R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) * std::sin(theta)));
     const double R_plus_d = p / std::cos(theta);
 
     Point<3> phi_theta_d;
@@ -314,12 +309,11 @@ namespace Step53
   // In contrast, the topography transformations follow exactly the
   // description in the introduction. There is not consequently not
   // much to add:
-  Point<3>
-  AfricaGeometry::push_forward_topo(const Point<3> &phi_theta_d_hat) const
+  Point<3> AfricaGeometry::push_forward_topo(const Point<3> &phi_theta_d_hat) const
   {
     const double   d_hat = phi_theta_d_hat[2];
-    const double   h = topography.value(phi_theta_d_hat[0], phi_theta_d_hat[1]);
-    const double   d = d_hat + (d_hat + 500000) / 500000 * h;
+    const double   h     = topography.value(phi_theta_d_hat[0], phi_theta_d_hat[1]);
+    const double   d     = d_hat + (d_hat + 500000) / 500000 * h;
     const Point<3> phi_theta_d(phi_theta_d_hat[0], phi_theta_d_hat[1], d);
     return phi_theta_d;
   }
@@ -377,10 +371,9 @@ namespace Step53
       GridGenerator::subdivided_hyper_rectangle(
         triangulation, subdivisions, corner_points[0], corner_points[1], true);
 
-      GridTools::transform(std::bind(&AfricaGeometry::push_forward,
-                                     std::cref(geometry),
-                                     std::placeholders::_1),
-                           triangulation);
+      GridTools::transform(
+        std::bind(&AfricaGeometry::push_forward, std::cref(geometry), std::placeholders::_1),
+        triangulation);
     }
 
     // The next step is to explain to the triangulation to use our geometry
@@ -393,8 +386,7 @@ namespace Step53
     // mother to children, this also happens after several recursive
     // refinement steps.
     triangulation.set_manifold(0, geometry);
-    for (Triangulation<3>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       cell->set_all_manifold_ids(0);
@@ -412,8 +404,7 @@ namespace Step53
     // the boundaries by assigning each boundary a unique boundary indicator).
     for (unsigned int i = 0; i < 6; ++i)
       {
-        for (Triangulation<3>::active_cell_iterator cell =
-               triangulation.begin_active();
+        for (Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
              cell != triangulation.end();
              ++cell)
           for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
@@ -424,9 +415,8 @@ namespace Step53
               }
         triangulation.execute_coarsening_and_refinement();
 
-        std::cout << "Refinement step " << i + 1 << ": "
-                  << triangulation.n_active_cells() << " cells, "
-                  << GridTools::minimal_cell_diameter(triangulation) / 1000
+        std::cout << "Refinement step " << i + 1 << ": " << triangulation.n_active_cells()
+                  << " cells, " << GridTools::minimal_cell_diameter(triangulation) / 1000
                   << "km minimal cell diameter" << std::endl;
       }
 
@@ -455,13 +445,11 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -469,12 +457,10 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 }

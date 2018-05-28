@@ -33,7 +33,7 @@ test_mpi()
 {
   Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
-  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int       myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (myid == 0)
@@ -62,8 +62,7 @@ test_mpi()
 
   if (myid == 0)
     {
-      deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
-              << std::endl;
+      deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols() << std::endl;
       deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
     }
 
@@ -113,8 +112,7 @@ test_mpi()
 
   std::vector<IndexSet> locally_owned_dofs_per_cpu2(numprocs, IndexSet(n));
   for (unsigned int i = 0; i < numprocs; ++i)
-    locally_owned_dofs_per_cpu2[i].add_range((i)*num_local,
-                                             (i + 1) * num_local);
+    locally_owned_dofs_per_cpu2[i].add_range((i)*num_local, (i + 1) * num_local);
 
 
   SparsityTools::distribute_sparsity_pattern(
@@ -122,8 +120,7 @@ test_mpi()
 
   if (myid == 0)
     {
-      deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
-              << std::endl;
+      deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols() << std::endl;
       deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
     }
 
@@ -157,8 +154,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;

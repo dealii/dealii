@@ -59,14 +59,12 @@ test()
   counter = 0;
   tr.refine_global(1);
   if (myid == 0)
-    deallog << "refine_global(1) results in a total of " << counter
-            << std::endl;
+    deallog << "refine_global(1) results in a total of " << counter << std::endl;
 
   counter = 0;
   tr.refine_global(3);
   if (myid == 0)
-    deallog << "refine_global(3) results in a total of " << counter
-            << std::endl;
+    deallog << "refine_global(3) results in a total of " << counter << std::endl;
 
 
   // now also find the bottom left corner of the domain and, on the processor
@@ -81,8 +79,7 @@ test()
         cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
       if (myid == 0)
-        deallog << "local refinement results in a total of " << counter
-                << std::endl;
+        deallog << "local refinement results in a total of " << counter << std::endl;
     }
 }
 

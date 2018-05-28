@@ -36,8 +36,7 @@ test(PETScWrappers::MPI::Vector &v)
       v(k)           = el;
 
       // norm += el*PetscConj (el);
-      norm += std::fabs(1. * k * 1. * k /*+ 1.*k*2*ki - 1.*k*2*ki*/ +
-                        2 * k * 2. * k /*i*/);
+      norm += std::fabs(1. * k * 1. * k /*+ 1.*k*2*ki - 1.*k*2*ki*/ + 2 * k * 2. * k /*i*/);
     }
 
   v.compress(VectorOperation::insert);
@@ -69,13 +68,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -83,12 +80,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

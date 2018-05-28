@@ -389,11 +389,11 @@ public:
    * @param prm The ParameterHandler to use
    */
   static void
-  initialize(const std::string &                 filename        = "",
-             const std::string &                 output_filename = "",
-             const ParameterHandler::OutputStyle output_style_for_prm_format =
-               ParameterHandler::ShortText,
-             ParameterHandler &prm = ParameterAcceptor::prm);
+  initialize(
+    const std::string &                 filename                    = "",
+    const std::string &                 output_filename             = "",
+    const ParameterHandler::OutputStyle output_style_for_prm_format = ParameterHandler::ShortText,
+    ParameterHandler &                  prm                         = ParameterAcceptor::prm);
 
   /**
    * Call declare_all_parameters(), read the parameters from the `input_stream`
@@ -405,8 +405,7 @@ public:
    * @param prm The ParameterHandler to use
    */
   static void
-  initialize(std::istream &    input_stream,
-             ParameterHandler &prm = ParameterAcceptor::prm);
+  initialize(std::istream &input_stream, ParameterHandler &prm = ParameterAcceptor::prm);
 
 
   /**
@@ -493,12 +492,12 @@ public:
    */
   template <class ParameterType>
   void
-  add_parameter(const std::string &          entry,
-                ParameterType &              parameter,
-                const std::string &          documentation = std::string(),
-                ParameterHandler &           prm_          = prm,
-                const Patterns::PatternBase &pattern =
-                  *Patterns::Tools::Convert<ParameterType>::to_pattern());
+  add_parameter(
+    const std::string &          entry,
+    ParameterType &              parameter,
+    const std::string &          documentation = std::string(),
+    ParameterHandler &           prm_          = prm,
+    const Patterns::PatternBase &pattern = *Patterns::Tools::Convert<ParameterType>::to_pattern());
 
   /**
    * The global parameter handler.
@@ -638,9 +637,8 @@ ParameterAcceptor::add_parameter(const std::string &          entry,
 
 template <class SourceClass>
 template <typename... Args>
-ParameterAcceptorProxy<SourceClass>::ParameterAcceptorProxy(
-  const std::string section_name,
-  Args... args) :
+ParameterAcceptorProxy<SourceClass>::ParameterAcceptorProxy(const std::string section_name,
+                                                            Args... args) :
   SourceClass(args...),
   ParameterAcceptor(section_name)
 {}

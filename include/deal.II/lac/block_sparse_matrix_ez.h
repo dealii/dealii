@@ -72,8 +72,7 @@ public:
    * Constructor setting up an object with given number of block rows and
    * columns. The blocks themselves still have zero dimension.
    */
-  BlockSparseMatrixEZ(const unsigned int block_rows,
-                      const unsigned int block_cols);
+  BlockSparseMatrixEZ(const unsigned int block_rows, const unsigned int block_cols);
 
   /**
    * Copy constructor. This is needed for some container classes. It creates
@@ -210,8 +209,7 @@ public:
    */
   template <typename somenumber>
   void
-  Tvmult(BlockVector<somenumber> &      dst,
-         const BlockVector<somenumber> &src) const;
+  Tvmult(BlockVector<somenumber> &dst, const BlockVector<somenumber> &src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
@@ -219,8 +217,7 @@ public:
    */
   template <typename somenumber>
   void
-  vmult_add(BlockVector<somenumber> &      dst,
-            const BlockVector<somenumber> &src) const;
+  vmult_add(BlockVector<somenumber> &dst, const BlockVector<somenumber> &src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add $M^T*src$ to $dst$ with $M$
@@ -229,8 +226,7 @@ public:
    */
   template <typename somenumber>
   void
-  Tvmult_add(BlockVector<somenumber> &      dst,
-             const BlockVector<somenumber> &src) const;
+  Tvmult_add(BlockVector<somenumber> &dst, const BlockVector<somenumber> &src) const;
 
 
   /**
@@ -285,8 +281,7 @@ BlockSparseMatrixEZ<Number>::n_block_cols() const
 
 template <typename Number>
 inline SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block(const unsigned int row,
-                                   const unsigned int column)
+BlockSparseMatrixEZ<Number>::block(const unsigned int row, const unsigned int column)
 {
   Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
   Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
@@ -298,8 +293,7 @@ BlockSparseMatrixEZ<Number>::block(const unsigned int row,
 
 template <typename Number>
 inline const SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block(const unsigned int row,
-                                   const unsigned int column) const
+BlockSparseMatrixEZ<Number>::block(const unsigned int row, const unsigned int column) const
 {
   Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
   Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
@@ -329,36 +323,26 @@ BlockSparseMatrixEZ<Number>::n() const
 
 template <typename Number>
 inline void
-BlockSparseMatrixEZ<Number>::set(const size_type i,
-                                 const size_type j,
-                                 const Number    value)
+BlockSparseMatrixEZ<Number>::set(const size_type i, const size_type j, const Number value)
 {
   AssertIsFinite(value);
 
-  const std::pair<size_type, size_type> row_index =
-                                          row_indices.global_to_local(i),
-                                        col_index =
-                                          column_indices.global_to_local(j);
-  block(row_index.first, col_index.first)
-    .set(row_index.second, col_index.second, value);
+  const std::pair<size_type, size_type> row_index = row_indices.global_to_local(i),
+                                        col_index = column_indices.global_to_local(j);
+  block(row_index.first, col_index.first).set(row_index.second, col_index.second, value);
 }
 
 
 
 template <typename Number>
 inline void
-BlockSparseMatrixEZ<Number>::add(const size_type i,
-                                 const size_type j,
-                                 const Number    value)
+BlockSparseMatrixEZ<Number>::add(const size_type i, const size_type j, const Number value)
 {
   AssertIsFinite(value);
 
-  const std::pair<unsigned int, size_type> row_index =
-                                             row_indices.global_to_local(i),
-                                           col_index =
-                                             column_indices.global_to_local(j);
-  block(row_index.first, col_index.first)
-    .add(row_index.second, col_index.second, value);
+  const std::pair<unsigned int, size_type> row_index = row_indices.global_to_local(i),
+                                           col_index = column_indices.global_to_local(j);
+  block(row_index.first, col_index.first).add(row_index.second, col_index.second, value);
 }
 
 
@@ -368,10 +352,8 @@ void
 BlockSparseMatrixEZ<Number>::vmult(BlockVector<somenumber> &      dst,
                                    const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+  Assert(dst.n_blocks() == n_block_rows(), ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  Assert(src.n_blocks() == n_block_cols(), ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   dst = 0.;
 
@@ -388,10 +370,8 @@ void
 BlockSparseMatrixEZ<Number>::vmult_add(BlockVector<somenumber> &      dst,
                                        const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+  Assert(dst.n_blocks() == n_block_rows(), ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  Assert(src.n_blocks() == n_block_cols(), ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
     for (unsigned int col = 0; col < n_block_cols(); ++col)
@@ -406,10 +386,8 @@ void
 BlockSparseMatrixEZ<Number>::Tvmult(BlockVector<somenumber> &      dst,
                                     const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
+  Assert(dst.n_blocks() == n_block_cols(), ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
+  Assert(src.n_blocks() == n_block_rows(), ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   dst = 0.;
 
@@ -423,14 +401,11 @@ BlockSparseMatrixEZ<Number>::Tvmult(BlockVector<somenumber> &      dst,
 template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrixEZ<Number>::Tvmult_add(
-  BlockVector<somenumber> &      dst,
-  const BlockVector<somenumber> &src) const
+BlockSparseMatrixEZ<Number>::Tvmult_add(BlockVector<somenumber> &      dst,
+                                        const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
+  Assert(dst.n_blocks() == n_block_cols(), ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
+  Assert(src.n_blocks() == n_block_rows(), ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
     for (unsigned int col = 0; col < n_block_cols(); ++col)
@@ -458,8 +433,7 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
       {
         used_by_line.clear();
         out << "block:\t" << i << '\t' << j << std::endl;
-        block(i, j).compute_statistics(
-          used, allocated, reserved, used_by_line, full);
+        block(i, j).compute_statistics(used, allocated, reserved, used_by_line, full);
 
         out << "used:" << used << std::endl
             << "allocated:" << allocated << std::endl
@@ -475,8 +449,7 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
             for (size_type i = 0; i < used_by_line.size(); ++i)
               if (used_by_line[i] != 0)
                 {
-                  out << "row-entries\t" << i << "\trows\t" << used_by_line[i]
-                      << std::endl;
+                  out << "row-entries\t" << i << "\trows\t" << used_by_line[i] << std::endl;
                   used_by_line_total[i] += used_by_line[i];
                 }
           }
@@ -488,8 +461,7 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
   for (size_type i = 0; i < used_by_line_total.size(); ++i)
     if (used_by_line_total[i] != 0)
       {
-        out << "row-entries\t" << i << "\trows\t" << used_by_line_total[i]
-            << std::endl;
+        out << "row-entries\t" << i << "\trows\t" << used_by_line_total[i] << std::endl;
       }
 }
 

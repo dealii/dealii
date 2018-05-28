@@ -132,8 +132,7 @@ namespace hp
      * @pre @p index must be between zero and the number of elements of the
      * collection.
      */
-    const FiniteElement<dim, spacedim> &
-    operator[](const unsigned int index) const;
+    const FiniteElement<dim, spacedim> &operator[](const unsigned int index) const;
 
     /**
      * Return the number of finite element objects stored in this collection.
@@ -323,8 +322,7 @@ namespace hp
      * ones that corresponds to the argument.
      */
     ComponentMask
-    component_mask(
-      const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+    component_mask(const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
     /**
      * Given a block mask (see
@@ -470,8 +468,7 @@ namespace hp
     /**
      * Array of pointers to the finite elements stored by this collection.
      */
-    std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>
-      finite_elements;
+    std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>> finite_elements;
   };
 
 
@@ -482,10 +479,9 @@ namespace hp
   template <class... FETypes>
   FECollection<dim, spacedim>::FECollection(const FETypes &... fes)
   {
-    static_assert(
-      is_base_of_all<FiniteElement<dim, spacedim>, FETypes...>::value,
-      "Not all of the input arguments of this function "
-      "are derived from FiniteElement<dim,spacedim>!");
+    static_assert(is_base_of_all<FiniteElement<dim, spacedim>, FETypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from FiniteElement<dim,spacedim>!");
 
     // loop over all of the given arguments and add the finite elements to
     // this collection. Inlining the definition of fe_pointers causes internal
@@ -525,8 +521,7 @@ namespace hp
 
   template <int dim, int spacedim>
   inline bool
-  FECollection<dim, spacedim>::
-  operator==(const FECollection<dim, spacedim> &fe_collection) const
+  FECollection<dim, spacedim>::operator==(const FECollection<dim, spacedim> &fe_collection) const
   {
     const unsigned int n_elements = size();
     if (n_elements != fe_collection.size())
@@ -543,8 +538,7 @@ namespace hp
 
   template <int dim, int spacedim>
   inline bool
-  FECollection<dim, spacedim>::
-  operator!=(const FECollection<dim, spacedim> &fe_collection) const
+  FECollection<dim, spacedim>::operator!=(const FECollection<dim, spacedim> &fe_collection) const
   {
     return !(*this == fe_collection);
   }
@@ -555,8 +549,7 @@ namespace hp
   inline const FiniteElement<dim, spacedim> &FECollection<dim, spacedim>::
                                              operator[](const unsigned int index) const
   {
-    Assert(index < finite_elements.size(),
-           ExcIndexRange(index, 0, finite_elements.size()));
+    Assert(index < finite_elements.size(), ExcIndexRange(index, 0, finite_elements.size()));
     return *finite_elements[index];
   }
 
@@ -665,8 +658,7 @@ namespace hp
 
     bool hp_constraints = true;
     for (unsigned int i = 0; i < finite_elements.size(); ++i)
-      hp_constraints =
-        hp_constraints && finite_elements[i]->hp_constraints_are_implemented();
+      hp_constraints = hp_constraints && finite_elements[i]->hp_constraints_are_implemented();
 
     return hp_constraints;
   }

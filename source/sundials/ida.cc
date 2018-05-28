@@ -54,13 +54,9 @@ namespace SUNDIALS
   {
     template <typename VectorType>
     int
-    t_dae_residual(realtype tt,
-                   N_Vector yy,
-                   N_Vector yp,
-                   N_Vector rr,
-                   void *   user_data)
+    t_dae_residual(realtype tt, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data)
     {
-      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
+      IDA<VectorType> &               solver = *static_cast<IDA<VectorType> *>(user_data);
       GrowingVectorMemory<VectorType> mem;
 
       typename VectorMemory<VectorType>::Pointer src_yy(mem);
@@ -98,8 +94,7 @@ namespace SUNDIALS
       (void)tmp2;
       (void)tmp3;
       (void)resp;
-      IDA<VectorType> &solver =
-        *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
+      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
       GrowingVectorMemory<VectorType> mem;
 
       typename VectorMemory<VectorType>::Pointer src_yy(mem);
@@ -111,8 +106,7 @@ namespace SUNDIALS
       copy(*src_yy, yy);
       copy(*src_yp, yp);
 
-      int err = solver.setup_jacobian(
-        IDA_mem->ida_tn, *src_yy, *src_yp, IDA_mem->ida_cj);
+      int err = solver.setup_jacobian(IDA_mem->ida_tn, *src_yy, *src_yp, IDA_mem->ida_cj);
 
       return err;
     }
@@ -131,8 +125,7 @@ namespace SUNDIALS
       (void)yy;
       (void)yp;
       (void)resp;
-      IDA<VectorType> &solver =
-        *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
+      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
       GrowingVectorMemory<VectorType> mem;
 
       typename VectorMemory<VectorType>::Pointer src(mem);
@@ -211,15 +204,13 @@ namespace SUNDIALS
 
         diff_id = N_VNew_Parallel(communicator, local_system_size, system_size);
 
-        abs_tolls =
-          N_VNew_Parallel(communicator, local_system_size, system_size);
+        abs_tolls = N_VNew_Parallel(communicator, local_system_size, system_size);
       }
     else
 #  endif
       {
         Assert(is_serial_vector<VectorType>::value,
-               ExcInternalError(
-                 "Trying to use a serial code with a parallel vector."));
+               ExcInternalError("Trying to use a serial code with a parallel vector."));
         yy        = N_VNew_Serial(system_size);
         yp        = N_VNew_Serial(system_size);
         diff_id   = N_VNew_Serial(system_size);
@@ -325,8 +316,7 @@ namespace SUNDIALS
 
         diff_id = N_VNew_Parallel(communicator, local_system_size, system_size);
 
-        abs_tolls =
-          N_VNew_Parallel(communicator, local_system_size, system_size);
+        abs_tolls = N_VNew_Parallel(communicator, local_system_size, system_size);
       }
     else
 #  endif
@@ -351,8 +341,7 @@ namespace SUNDIALS
       }
     else
       {
-        status = IDASStolerances(
-          ida_mem, data.relative_tolerance, data.absolute_tolerance);
+        status = IDASStolerances(ida_mem, data.relative_tolerance, data.absolute_tolerance);
         AssertIDA(status);
       }
 
@@ -363,8 +352,7 @@ namespace SUNDIALS
     AssertIDA(status);
 
     if (data.ic_type == AdditionalData::use_y_diff ||
-        data.reset_type == AdditionalData::use_y_diff ||
-        data.ignore_algebraic_terms_for_errors)
+        data.reset_type == AdditionalData::use_y_diff || data.ignore_algebraic_terms_for_errors)
       {
         VectorType diff_comp_vector(solution);
         diff_comp_vector = 0.0;
@@ -406,15 +394,13 @@ namespace SUNDIALS
     else
       type = data.reset_type;
 
-    status =
-      IDASetMaxNumItersIC(ida_mem, data.maximum_non_linear_iterations_ic);
+    status = IDASetMaxNumItersIC(ida_mem, data.maximum_non_linear_iterations_ic);
     AssertIDA(status);
 
     if (type == AdditionalData::use_y_dot)
       {
         // (re)initialization of the vectors
-        status =
-          IDACalcIC(ida_mem, IDA_Y_INIT, current_time + current_time_step);
+        status = IDACalcIC(ida_mem, IDA_Y_INIT, current_time + current_time_step);
         AssertIDA(status);
 
         status = IDAGetConsistentIC(ida_mem, yy, yp);
@@ -425,8 +411,7 @@ namespace SUNDIALS
       }
     else if (type == AdditionalData::use_y_diff)
       {
-        status =
-          IDACalcIC(ida_mem, IDA_YA_YDP_INIT, current_time + current_time_step);
+        status = IDACalcIC(ida_mem, IDA_YA_YDP_INIT, current_time + current_time_step);
         AssertIDA(status);
 
         status = IDAGetConsistentIC(ida_mem, yy, yp);
@@ -445,19 +430,13 @@ namespace SUNDIALS
       AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
 
-    residual = [](const double,
-                  const VectorType &,
-                  const VectorType &,
-                  VectorType &) -> int {
+    residual = [](const double, const VectorType &, const VectorType &, VectorType &) -> int {
       int ret = 0;
       AssertThrow(false, ExcFunctionNotProvided("residual"));
       return ret;
     };
 
-    setup_jacobian = [](const double,
-                        const VectorType &,
-                        const VectorType &,
-                        const double) -> int {
+    setup_jacobian = [](const double, const VectorType &, const VectorType &, const double) -> int {
       int ret = 0;
       AssertThrow(false, ExcFunctionNotProvided("setup_jacobian"));
       return ret;
@@ -469,13 +448,11 @@ namespace SUNDIALS
       return ret;
     };
 
-    output_step = [](const double,
-                     const VectorType &,
-                     const VectorType &,
-                     const unsigned int) { return; };
+    output_step = [](const double, const VectorType &, const VectorType &, const unsigned int) {
+      return;
+    };
 
-    solver_should_restart =
-      [](const double, VectorType &, VectorType &) -> bool { return false; };
+    solver_should_restart = [](const double, VectorType &, VectorType &) -> bool { return false; };
 
     differential_components = [&]() -> IndexSet {
       GrowingVectorMemory<VectorType>            mem;

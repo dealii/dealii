@@ -48,15 +48,12 @@ FullMatrix<number>::FullMatrix(const size_type n) : Table<2, number>(n, n)
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix(const size_type m, const size_type n) :
-  Table<2, number>(m, n)
+FullMatrix<number>::FullMatrix(const size_type m, const size_type n) : Table<2, number>(m, n)
 {}
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix(const size_type m,
-                               const size_type n,
-                               const number *  entries) :
+FullMatrix<number>::FullMatrix(const size_type m, const size_type n, const number *entries) :
   Table<2, number>(m, n)
 {
   this->fill(entries);
@@ -65,8 +62,7 @@ FullMatrix<number>::FullMatrix(const size_type m,
 
 
 template <typename number>
-FullMatrix<number>::FullMatrix(const IdentityMatrix &id) :
-  Table<2, number>(id.m(), id.n())
+FullMatrix<number>::FullMatrix(const IdentityMatrix &id) : Table<2, number>(id.m(), id.n())
 {
   for (size_type i = 0; i < id.m(); ++i)
     (*this)(i, i) = 1;
@@ -171,9 +167,7 @@ FullMatrix<number>::operator/=(const number factor)
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::vmult(Vector<number2> &      dst,
-                          const Vector<number2> &src,
-                          const bool             adding) const
+FullMatrix<number>::vmult(Vector<number2> &dst, const Vector<number2> &src, const bool adding) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
@@ -266,8 +260,7 @@ FullMatrix<number>::residual(Vector<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::forward(Vector<number2> &      dst,
-                            const Vector<number2> &src) const
+FullMatrix<number>::forward(Vector<number2> &dst, const Vector<number2> &src) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
@@ -280,8 +273,7 @@ FullMatrix<number>::forward(Vector<number2> &      dst,
     {
       typename ProductType<number, number2>::type s = src(i);
       for (j = 0; j < i; ++j)
-        s -=
-          typename ProductType<number, number2>::type(dst(j)) * (*this)(i, j);
+        s -= typename ProductType<number, number2>::type(dst(j)) * (*this)(i, j);
       dst(i) = number2(s) / number2((*this)(i, i));
       AssertIsFinite(dst(i));
     }
@@ -292,8 +284,7 @@ FullMatrix<number>::forward(Vector<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::backward(Vector<number2> &      dst,
-                             const Vector<number2> &src) const
+FullMatrix<number>::backward(Vector<number2> &dst, const Vector<number2> &src) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
@@ -303,8 +294,7 @@ FullMatrix<number>::backward(Vector<number2> &      dst,
     {
       typename ProductType<number, number2>::type s = src(i);
       for (j = i + 1; j < nu; ++j)
-        s -=
-          typename ProductType<number, number2>::type(dst(j)) * (*this)(i, j);
+        s -= typename ProductType<number, number2>::type(dst(j)) * (*this)(i, j);
       dst(i) = number2(s) / number2((*this)(i, i));
       AssertIsFinite(dst(i));
     }
@@ -332,8 +322,7 @@ FullMatrix<number>::fill(const FullMatrix<number2> &src,
 
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < cols; ++j)
-      (*this)(dst_offset_i + i, dst_offset_j + j) =
-        src(src_offset_i + i, src_offset_j + j);
+      (*this)(dst_offset_i + i, dst_offset_j + j) = src(src_offset_i + i, src_offset_j + j);
 }
 
 
@@ -344,10 +333,8 @@ FullMatrix<number>::fill_permutation(const FullMatrix<number2> &   src,
                                      const std::vector<size_type> &p_rows,
                                      const std::vector<size_type> &p_cols)
 {
-  Assert(p_rows.size() == this->n_rows(),
-         ExcDimensionMismatch(p_rows.size(), this->n_rows()));
-  Assert(p_cols.size() == this->n_cols(),
-         ExcDimensionMismatch(p_cols.size(), this->n_cols()));
+  Assert(p_rows.size() == this->n_rows(), ExcDimensionMismatch(p_rows.size(), this->n_rows()));
+  Assert(p_cols.size() == this->n_cols(), ExcDimensionMismatch(p_cols.size(), this->n_cols()));
 
   for (size_type i = 0; i < this->n_rows(); ++i)
     for (size_type j = 0; j < this->n_cols(); ++j)
@@ -358,9 +345,7 @@ FullMatrix<number>::fill_permutation(const FullMatrix<number2> &   src,
 
 template <typename number>
 void
-FullMatrix<number>::add_row(const size_type i,
-                            const number    s,
-                            const size_type j)
+FullMatrix<number>::add_row(const size_type i, const number s, const size_type j)
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
@@ -387,9 +372,7 @@ FullMatrix<number>::add_row(const size_type i,
 
 template <typename number>
 void
-FullMatrix<number>::add_col(const size_type i,
-                            const number    s,
-                            const size_type j)
+FullMatrix<number>::add_col(const size_type i, const number s, const size_type j)
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
@@ -506,8 +489,7 @@ FullMatrix<number>::equ(const number               a,
 
   for (size_type i = 0; i < m(); ++i)
     for (size_type j = 0; j < n(); ++j)
-      (*this)(i, j) =
-        a * number(A(i, j)) + b * number(B(i, j)) + c * number(C(i, j));
+      (*this)(i, j) = a * number(A(i, j)) + b * number(B(i, j)) + c * number(C(i, j));
 }
 
 
@@ -528,8 +510,7 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
+  if ((std::is_same<number, double>::value || std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
     if (this->n() * this->m() * src.n() > 300 &&
         src.n() <= std::numeric_limits<types::blas_int>::max() &&
@@ -611,8 +592,7 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
+  if ((std::is_same<number, double>::value || std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
     if (this->n() * this->m() * src.n() > 300 &&
         src.n() <= std::numeric_limits<types::blas_int>::max() &&
@@ -714,8 +694,7 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
+  if ((std::is_same<number, double>::value || std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
     if (this->n() * this->m() * src.m() > 300 &&
         src.m() <= std::numeric_limits<types::blas_int>::max() &&
@@ -815,8 +794,7 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
+  if ((std::is_same<number, double>::value || std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
     if (this->n() * this->m() * src.m() > 300 &&
         src.m() <= std::numeric_limits<types::blas_int>::max() &&
@@ -970,8 +948,7 @@ FullMatrix<number>::matrix_norm_square(const Vector<number2> &v) const
 template <typename number>
 template <typename number2>
 number2
-FullMatrix<number>::matrix_scalar_product(const Vector<number2> &u,
-                                          const Vector<number2> &v) const
+FullMatrix<number>::matrix_scalar_product(const Vector<number2> &u, const Vector<number2> &v) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
@@ -1119,8 +1096,7 @@ FullMatrix<number>::add(const number               a,
 
   for (size_type i = 0; i < m(); ++i)
     for (size_type j = 0; j < n(); ++j)
-      (*this)(i, j) +=
-        a * number(A(i, j)) + b * number(B(i, j)) + c * number(C(i, j));
+      (*this)(i, j) += a * number(A(i, j)) + b * number(B(i, j)) + c * number(C(i, j));
 }
 
 
@@ -1227,10 +1203,9 @@ namespace internal
     // LAPACKFullMatrix is only implemented for
     // floats and doubles
     template <typename number>
-    struct Determinant<
-      number,
-      typename std::enable_if<std::is_same<number, float>::value ||
-                              std::is_same<number, double>::value>::type>
+    struct Determinant<number,
+                       typename std::enable_if<std::is_same<number, float>::value ||
+                                               std::is_same<number, double>::value>::type>
     {
 #ifdef DEAL_II_WITH_LAPACK
       static number
@@ -1239,8 +1214,7 @@ namespace internal
         using s_type = typename LAPACKFullMatrix<number>::size_type;
         AssertIndexRange(A.m() - 1, std::numeric_limits<s_type>::max());
         AssertIndexRange(A.n() - 1, std::numeric_limits<s_type>::max());
-        LAPACKFullMatrix<number> lp_A(static_cast<s_type>(A.m()),
-                                      static_cast<s_type>(A.n()));
+        LAPACKFullMatrix<number> lp_A(static_cast<s_type>(A.m()), static_cast<s_type>(A.n()));
         lp_A = A;
         lp_A.compute_lu_factorization();
         return lp_A.determinant();
@@ -1265,8 +1239,7 @@ FullMatrix<number>::determinant() const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(this->n_cols() == this->n_rows(),
-         ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+  Assert(this->n_cols() == this->n_rows(), ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
   switch (this->n_cols())
     {
@@ -1294,8 +1267,7 @@ FullMatrix<number>::trace() const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(this->n_cols() == this->n_rows(),
-         ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+  Assert(this->n_cols() == this->n_rows(), ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
   number tr = 0;
   for (size_type i = 0; i < this->n_rows(); ++i)
@@ -1353,10 +1325,8 @@ FullMatrix<number>::invert(const FullMatrix<number2> &M)
   Assert(!this->empty(), ExcEmptyMatrix());
 
   Assert(this->n_cols() == this->n_rows(), ExcNotQuadratic());
-  Assert(this->n_cols() == M.n_cols(),
-         ExcDimensionMismatch(this->n_cols(), M.n_cols()));
-  Assert(this->n_rows() == M.n_rows(),
-         ExcDimensionMismatch(this->n_rows(), M.n_rows()));
+  Assert(this->n_cols() == M.n_cols(), ExcDimensionMismatch(this->n_cols(), M.n_cols()));
+  Assert(this->n_rows() == M.n_rows(), ExcDimensionMismatch(this->n_rows(), M.n_rows()));
 
   if (PointerComparison::equal(&M, this))
     {
@@ -1375,32 +1345,29 @@ FullMatrix<number>::invert(const FullMatrix<number2> &M)
           // this is Maple output,
           // thus a bit unstructured
           {
-            const number2 t4 =
-              number2(1.0) / (M(0, 0) * M(1, 1) - M(0, 1) * M(1, 0));
-            (*this)(0, 0) = M(1, 1) * t4;
-            (*this)(0, 1) = -M(0, 1) * t4;
-            (*this)(1, 0) = -M(1, 0) * t4;
-            (*this)(1, 1) = M(0, 0) * t4;
+            const number2 t4 = number2(1.0) / (M(0, 0) * M(1, 1) - M(0, 1) * M(1, 0));
+            (*this)(0, 0)    = M(1, 1) * t4;
+            (*this)(0, 1)    = -M(0, 1) * t4;
+            (*this)(1, 0)    = -M(1, 0) * t4;
+            (*this)(1, 1)    = M(0, 0) * t4;
             return;
           };
 
         case 3:
           {
-            const number2 t4 = M(0, 0) * M(1, 1), t6 = M(0, 0) * M(1, 2),
-                          t8 = M(0, 1) * M(1, 0), t00 = M(0, 2) * M(1, 0),
-                          t01 = M(0, 1) * M(2, 0), t04 = M(0, 2) * M(2, 0),
-                          t07 = number2(1.0) /
-                                (t4 * M(2, 2) - t6 * M(2, 1) - t8 * M(2, 2) +
-                                 t00 * M(2, 1) + t01 * M(1, 2) - t04 * M(1, 1));
-            (*this)(0, 0) = (M(1, 1) * M(2, 2) - M(1, 2) * M(2, 1)) * t07;
-            (*this)(0, 1) = -(M(0, 1) * M(2, 2) - M(0, 2) * M(2, 1)) * t07;
-            (*this)(0, 2) = -(-M(0, 1) * M(1, 2) + M(0, 2) * M(1, 1)) * t07;
-            (*this)(1, 0) = -(M(1, 0) * M(2, 2) - M(1, 2) * M(2, 0)) * t07;
-            (*this)(1, 1) = (M(0, 0) * M(2, 2) - t04) * t07;
-            (*this)(1, 2) = -(t6 - t00) * t07;
-            (*this)(2, 0) = -(-M(1, 0) * M(2, 1) + M(1, 1) * M(2, 0)) * t07;
-            (*this)(2, 1) = -(M(0, 0) * M(2, 1) - t01) * t07;
-            (*this)(2, 2) = (t4 - t8) * t07;
+            const number2 t4 = M(0, 0) * M(1, 1), t6 = M(0, 0) * M(1, 2), t8 = M(0, 1) * M(1, 0),
+                          t00 = M(0, 2) * M(1, 0), t01 = M(0, 1) * M(2, 0), t04 = M(0, 2) * M(2, 0),
+                          t07 = number2(1.0) / (t4 * M(2, 2) - t6 * M(2, 1) - t8 * M(2, 2) +
+                                                t00 * M(2, 1) + t01 * M(1, 2) - t04 * M(1, 1));
+            (*this)(0, 0)     = (M(1, 1) * M(2, 2) - M(1, 2) * M(2, 1)) * t07;
+            (*this)(0, 1)     = -(M(0, 1) * M(2, 2) - M(0, 2) * M(2, 1)) * t07;
+            (*this)(0, 2)     = -(-M(0, 1) * M(1, 2) + M(0, 2) * M(1, 1)) * t07;
+            (*this)(1, 0)     = -(M(1, 0) * M(2, 2) - M(1, 2) * M(2, 0)) * t07;
+            (*this)(1, 1)     = (M(0, 0) * M(2, 2) - t04) * t07;
+            (*this)(1, 2)     = -(t6 - t00) * t07;
+            (*this)(2, 0)     = -(-M(1, 0) * M(2, 1) + M(1, 1) * M(2, 0)) * t07;
+            (*this)(2, 1)     = -(M(0, 0) * M(2, 1) - t01) * t07;
+            (*this)(2, 2)     = (t4 - t8) * t07;
             return;
           };
 
@@ -1429,9 +1396,9 @@ FullMatrix<number>::invert(const FullMatrix<number2> &M)
             const number2 t37 = M(1, 0) * M(3, 1);
             const number2 t38 = M(0, 2) * M(2, 3);
             const number2 t40 = M(0, 3) * M(2, 2);
-            const number2 t42 = t14 * t15 - t14 * t17 - t19 * t20 + t19 * t22 +
-                                t24 * t25 - t24 * t27 - t29 * t15 + t29 * t17 +
-                                t32 * t33 - t32 * t35 - t37 * t38 + t37 * t40;
+            const number2 t42 = t14 * t15 - t14 * t17 - t19 * t20 + t19 * t22 + t24 * t25 -
+                                t24 * t27 - t29 * t15 + t29 * t17 + t32 * t33 - t32 * t35 -
+                                t37 * t38 + t37 * t40;
             const number2 t43 = M(2, 0) * M(0, 1);
             const number2 t46 = M(2, 0) * M(1, 1);
             const number2 t49 = M(2, 0) * M(3, 1);
@@ -1440,9 +1407,9 @@ FullMatrix<number>::invert(const FullMatrix<number2> &M)
             const number2 t54 = M(3, 0) * M(0, 1);
             const number2 t57 = M(3, 0) * M(1, 1);
             const number2 t60 = M(3, 0) * M(2, 1);
-            const number2 t63 = t43 * t20 - t43 * t22 - t46 * t33 + t46 * t35 +
-                                t49 * t50 - t49 * t52 - t54 * t25 + t54 * t27 +
-                                t57 * t38 - t57 * t40 - t60 * t50 + t60 * t52;
+            const number2 t63 = t43 * t20 - t43 * t22 - t46 * t33 + t46 * t35 + t49 * t50 -
+                                t49 * t52 - t54 * t25 + t54 * t27 + t57 * t38 - t57 * t40 -
+                                t60 * t50 + t60 * t52;
             const number2 t65  = number2(1.) / (t42 + t63);
             const number2 t71  = M(0, 2) * M(2, 1);
             const number2 t73  = M(0, 3) * M(2, 1);
@@ -1468,58 +1435,54 @@ FullMatrix<number>::invert(const FullMatrix<number2> &M)
             const number2 t131 = M(0, 0) * M(1, 3);
             const number2 t133 = M(1, 0) * M(0, 2);
             const number2 t135 = M(1, 0) * M(0, 3);
-            (*this)(0, 0) =
-              (M(1, 1) * M(2, 2) * M(3, 3) - M(1, 1) * M(2, 3) * M(3, 2) -
-               M(2, 1) * M(1, 2) * M(3, 3) + M(2, 1) * M(1, 3) * M(3, 2) +
-               M(3, 1) * M(1, 2) * M(2, 3) - M(3, 1) * M(1, 3) * M(2, 2)) *
-              t65;
-            (*this)(0, 1) =
-              -(M(0, 1) * M(2, 2) * M(3, 3) - M(0, 1) * M(2, 3) * M(3, 2) -
-                t71 * M(3, 3) + t73 * M(3, 2) + t75 * M(2, 3) - t77 * M(2, 2)) *
-              t65;
-            (*this)(0, 2) = (t81 * M(3, 3) - t83 * M(3, 2) - t85 * M(3, 3) +
-                             t87 * M(3, 2) + t75 * M(1, 3) - t77 * M(1, 2)) *
+            (*this)(0, 0)      = (M(1, 1) * M(2, 2) * M(3, 3) - M(1, 1) * M(2, 3) * M(3, 2) -
+                             M(2, 1) * M(1, 2) * M(3, 3) + M(2, 1) * M(1, 3) * M(3, 2) +
+                             M(3, 1) * M(1, 2) * M(2, 3) - M(3, 1) * M(1, 3) * M(2, 2)) *
                             t65;
-            (*this)(0, 3) = -(t81 * M(2, 3) - t83 * M(2, 2) - t85 * M(2, 3) +
-                              t87 * M(2, 2) + t71 * M(1, 3) - t73 * M(1, 2)) *
+            (*this)(0, 1) = -(M(0, 1) * M(2, 2) * M(3, 3) - M(0, 1) * M(2, 3) * M(3, 2) -
+                              t71 * M(3, 3) + t73 * M(3, 2) + t75 * M(2, 3) - t77 * M(2, 2)) *
                             t65;
-            (*this)(1, 0) =
-              -(t101 * M(3, 3) - t103 * M(3, 2) - t105 * M(3, 3) +
-                t107 * M(3, 2) + t109 * M(2, 3) - t111 * M(2, 2)) *
-              t65;
-            (*this)(1, 1) = (t115 * M(3, 3) - t117 * M(3, 2) - t119 * M(3, 3) +
-                             t121 * M(3, 2) + t123 * M(2, 3) - t125 * M(2, 2)) *
+            (*this)(0, 2) = (t81 * M(3, 3) - t83 * M(3, 2) - t85 * M(3, 3) + t87 * M(3, 2) +
+                             t75 * M(1, 3) - t77 * M(1, 2)) *
                             t65;
-            (*this)(1, 2) =
-              -(t129 * M(3, 3) - t131 * M(3, 2) - t133 * M(3, 3) +
-                t135 * M(3, 2) + t123 * M(1, 3) - t125 * M(1, 2)) *
-              t65;
-            (*this)(1, 3) = (t129 * M(2, 3) - t131 * M(2, 2) - t133 * M(2, 3) +
-                             t135 * M(2, 2) + t119 * M(1, 3) - t121 * M(1, 2)) *
+            (*this)(0, 3) = -(t81 * M(2, 3) - t83 * M(2, 2) - t85 * M(2, 3) + t87 * M(2, 2) +
+                              t71 * M(1, 3) - t73 * M(1, 2)) *
                             t65;
-            (*this)(2, 0) = (t32 * M(3, 3) - t103 * M(3, 1) - t46 * M(3, 3) +
-                             t107 * M(3, 1) + t57 * M(2, 3) - t111 * M(2, 1)) *
+            (*this)(1, 0) = -(t101 * M(3, 3) - t103 * M(3, 2) - t105 * M(3, 3) + t107 * M(3, 2) +
+                              t109 * M(2, 3) - t111 * M(2, 2)) *
                             t65;
-            (*this)(2, 1) = -(t19 * M(3, 3) - t117 * M(3, 1) - t43 * M(3, 3) +
-                              t121 * M(3, 1) + t54 * M(2, 3) - t125 * M(2, 1)) *
+            (*this)(1, 1) = (t115 * M(3, 3) - t117 * M(3, 2) - t119 * M(3, 3) + t121 * M(3, 2) +
+                             t123 * M(2, 3) - t125 * M(2, 2)) *
                             t65;
-            (*this)(2, 2) = (t14 * M(3, 3) - t131 * M(3, 1) - t29 * M(3, 3) +
-                             t135 * M(3, 1) + t54 * M(1, 3) - t125 * M(1, 1)) *
+            (*this)(1, 2) = -(t129 * M(3, 3) - t131 * M(3, 2) - t133 * M(3, 3) + t135 * M(3, 2) +
+                              t123 * M(1, 3) - t125 * M(1, 2)) *
                             t65;
-            (*this)(2, 3) = -(t14 * M(2, 3) - t131 * M(2, 1) - t29 * M(2, 3) +
-                              t135 * M(2, 1) + t43 * M(1, 3) - t121 * M(1, 1)) *
+            (*this)(1, 3) = (t129 * M(2, 3) - t131 * M(2, 2) - t133 * M(2, 3) + t135 * M(2, 2) +
+                             t119 * M(1, 3) - t121 * M(1, 2)) *
                             t65;
-            (*this)(3, 0) = -(t32 * M(3, 2) - t101 * M(3, 1) - t46 * M(3, 2) +
-                              t105 * M(3, 1) + t57 * M(2, 2) - t109 * M(2, 1)) *
+            (*this)(2, 0) = (t32 * M(3, 3) - t103 * M(3, 1) - t46 * M(3, 3) + t107 * M(3, 1) +
+                             t57 * M(2, 3) - t111 * M(2, 1)) *
                             t65;
-            (*this)(3, 1) = (t19 * M(3, 2) - t115 * M(3, 1) - t43 * M(3, 2) +
-                             t119 * M(3, 1) + t54 * M(2, 2) - t123 * M(2, 1)) *
+            (*this)(2, 1) = -(t19 * M(3, 3) - t117 * M(3, 1) - t43 * M(3, 3) + t121 * M(3, 1) +
+                              t54 * M(2, 3) - t125 * M(2, 1)) *
                             t65;
-            (*this)(3, 2) = -(t14 * M(3, 2) - t129 * M(3, 1) - t29 * M(3, 2) +
-                              t133 * M(3, 1) + t54 * M(1, 2) - t123 * M(1, 1)) *
+            (*this)(2, 2) = (t14 * M(3, 3) - t131 * M(3, 1) - t29 * M(3, 3) + t135 * M(3, 1) +
+                             t54 * M(1, 3) - t125 * M(1, 1)) *
                             t65;
-            (*this)(3, 3) = (t14 * M(2, 2) - t129 * M(2, 1) - t29 * M(2, 2) +
-                             t133 * M(2, 1) + t43 * M(1, 2) - t119 * M(1, 1)) *
+            (*this)(2, 3) = -(t14 * M(2, 3) - t131 * M(2, 1) - t29 * M(2, 3) + t135 * M(2, 1) +
+                              t43 * M(1, 3) - t121 * M(1, 1)) *
+                            t65;
+            (*this)(3, 0) = -(t32 * M(3, 2) - t101 * M(3, 1) - t46 * M(3, 2) + t105 * M(3, 1) +
+                              t57 * M(2, 2) - t109 * M(2, 1)) *
+                            t65;
+            (*this)(3, 1) = (t19 * M(3, 2) - t115 * M(3, 1) - t43 * M(3, 2) + t119 * M(3, 1) +
+                             t54 * M(2, 2) - t123 * M(2, 1)) *
+                            t65;
+            (*this)(3, 2) = -(t14 * M(3, 2) - t129 * M(3, 1) - t29 * M(3, 2) + t133 * M(3, 1) +
+                              t54 * M(1, 2) - t123 * M(1, 1)) *
+                            t65;
+            (*this)(3, 3) = (t14 * M(2, 2) - t129 * M(2, 1) - t29 * M(2, 2) + t133 * M(2, 1) +
+                             t43 * M(1, 2) - t119 * M(1, 1)) *
                             t65;
 
             break;
@@ -1545,8 +1508,7 @@ FullMatrix<number>::cholesky(const FullMatrix<number2> &A)
   Assert(!A.empty(), ExcEmptyMatrix());
   Assert(A.n() == A.m(), ExcNotQuadratic());
   // Matrix must be symmetric.
-  Assert(A.relative_symmetry_norm2() < 1.0e-10,
-         ExcMessage("A must be symmetric."));
+  Assert(A.relative_symmetry_norm2() < 1.0e-10, ExcMessage("A must be symmetric."));
 
   if (PointerComparison::equal(&A, this))
     {
@@ -1584,11 +1546,9 @@ FullMatrix<number>::cholesky(const FullMatrix<number2> &A)
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::outer_product(const Vector<number2> &V,
-                                  const Vector<number2> &W)
+FullMatrix<number>::outer_product(const Vector<number2> &V, const Vector<number2> &W)
 {
-  Assert(V.size() == W.size(),
-         ExcMessage("Vectors V, W must be the same size."));
+  Assert(V.size() == W.size(), ExcMessage("Vectors V, W must be the same size."));
   this->reinit(V.size(), V.size());
 
   for (size_type i = 0; i < this->n(); i++)
@@ -1730,7 +1690,7 @@ void FullMatrix<number>::copy_to(Tensor<2, dim> &   T,
       {
         const unsigned int dst_r_index = static_cast<unsigned int>(i + dst_r);
         const unsigned int dst_c_index = static_cast<unsigned int>(j + dst_c);
-        T[dst_r_index][dst_c_index] = double((*this)(i + src_r_i, j + src_c_i));
+        T[dst_r_index][dst_c_index]    = double((*this)(i + src_r_i, j + src_c_i));
       }
 }
 
@@ -1769,8 +1729,7 @@ FullMatrix<number>::print_formatted(std::ostream &     out,
 {
   unsigned int width = width_;
 
-  Assert((!this->empty()) || (this->n_cols() + this->n_rows() == 0),
-         ExcInternalError());
+  Assert((!this->empty()) || (this->n_cols() + this->n_rows() == 0), ExcInternalError());
 
   // set output format, but store old
   // state
@@ -1825,8 +1784,7 @@ FullMatrix<number>::gauss_jordan()
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   if (std::is_same<number, double>::value || std::is_same<number, float>::value)
-    if (this->n_cols() > 15 &&
-        this->n_cols() <= std::numeric_limits<types::blas_int>::max())
+    if (this->n_cols() > 15 && this->n_cols() <= std::numeric_limits<types::blas_int>::max())
       {
         // In case we have the LAPACK functions
         // getrf and getri detected by CMake,
@@ -1866,8 +1824,7 @@ FullMatrix<number>::gauss_jordan()
         // Use the LAPACK function getri for
         // calculating the actual inverse using
         // the LU factorization.
-        getri(
-          &nn, &this->values[0], &nn, ipiv.data(), inv_work.data(), &nn, &info);
+        getri(&nn, &this->values[0], &nn, ipiv.data(), inv_work.data(), &nn, &info);
 
         Assert(info >= 0, ExcInternalError());
         Assert(info == 0, LACExceptions::ExcSingular());
@@ -1970,8 +1927,7 @@ template <typename number>
 std::size_t
 FullMatrix<number>::memory_consumption() const
 {
-  return (sizeof(*this) - sizeof(Table<2, number>) +
-          Table<2, number>::memory_consumption());
+  return (sizeof(*this) - sizeof(Table<2, number>) + Table<2, number>::memory_consumption());
 }
 
 

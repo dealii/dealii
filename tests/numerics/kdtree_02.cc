@@ -52,12 +52,10 @@ main()
           auto res = kdtree.get_closest_points(p, i);
 
           deallog << std::endl
-                  << "The first " << i << " closest points to " << p
-                  << " are:" << std::endl;
+                  << "The first " << i << " closest points to " << p << " are:" << std::endl;
           for (unsigned int j = 0; j < i; ++j)
             {
-              deallog << "points[" << res[j].first
-                      << "] = " << points[res[j].first]
+              deallog << "points[" << res[j].first << "] = " << points[res[j].first]
                       << ", distance: " << res[j].second << std::endl;
             }
         }

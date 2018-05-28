@@ -48,10 +48,8 @@ test()
   deallog << "||dF||: " << dF.norm() << std::endl;
   deallog << "||ddF||: " << ddF.norm() << std::endl;
 
-  Assert(std::fabs(dF.norm() - std::sqrt(dF_norm_sqr)) < 1e-12,
-         ExcInternalError());
-  Assert(std::fabs(ddF.norm() - std::sqrt(ddF_norm_sqr)) < 1e-12,
-         ExcInternalError());
+  Assert(std::fabs(dF.norm() - std::sqrt(dF_norm_sqr)) < 1e-12, ExcInternalError());
+  Assert(std::fabs(ddF.norm() - std::sqrt(ddF_norm_sqr)) < 1e-12, ExcInternalError());
 }
 
 int

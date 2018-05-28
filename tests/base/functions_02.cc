@@ -134,8 +134,7 @@ check_vector_gradient_list(const Function<dim> &f)
         p[i] = j + 1;
       point_vector[j] = p;
     }
-  std::vector<std::vector<Tensor<1, dim>>> gradients(
-    max_points, std::vector<Tensor<1, dim>>(1));
+  std::vector<std::vector<Tensor<1, dim>>> gradients(max_points, std::vector<Tensor<1, dim>>(1));
   f.vector_gradient_list(point_vector, gradients);
   for (unsigned int j = 0; j < max_points; ++j)
     deallog << gradients[j][0] << std::endl;

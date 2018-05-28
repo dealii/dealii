@@ -65,8 +65,7 @@ check()
   const FE_DGQ<dim>  fe_constant(0);
   const FE_Q<dim>    fe_quadratic(2);
   const FE_DGQ<dim>  fe_dq_linear(1);
-  const FE_DGQ<dim> *fe_dq_quadratic =
-    (dim != 3 ? new FE_DGQ<dim>(2) : nullptr);
+  const FE_DGQ<dim> *fe_dq_quadratic = (dim != 3 ? new FE_DGQ<dim>(2) : nullptr);
 
   // define composed finite
   // elements. to limit memory
@@ -74,14 +73,12 @@ check()
   // values, use simpler finite
   // elements there
   const FESystem<dim> *fe_1 =
-    (dim != 3 ? new FESystem<dim>(
-                  fe_quadratic, 4, *fe_dq_quadratic, 2, fe_constant, 12) :
+    (dim != 3 ? new FESystem<dim>(fe_quadratic, 4, *fe_dq_quadratic, 2, fe_constant, 12) :
                 new FESystem<dim>(fe_dq_linear, 1, fe_constant, 1));
 
   const FESystem<dim> *fe_2 =
-    (dim != 3 ?
-       new FESystem<dim>(fe_constant, 1, *fe_dq_quadratic, 2, fe_quadratic, 5) :
-       new FESystem<dim>(fe_constant, 1, fe_dq_linear, 1));
+    (dim != 3 ? new FESystem<dim>(fe_constant, 1, *fe_dq_quadratic, 2, fe_quadratic, 5) :
+                new FESystem<dim>(fe_constant, 1, fe_dq_linear, 1));
 
   // make several loops to refine the
   // two grids
@@ -107,10 +104,10 @@ check()
           DoFRenumbering::Cuthill_McKee(dof_2);
         };
 
-      deallog << "  Grid 1: " << tria_1.n_active_cells() << " cells, "
-              << dof_1.n_dofs() << " dofs" << std::endl;
-      deallog << "  Grid 2: " << tria_2.n_active_cells() << " cells, "
-              << dof_2.n_dofs() << " dofs" << std::endl;
+      deallog << "  Grid 1: " << tria_1.n_active_cells() << " cells, " << dof_1.n_dofs() << " dofs"
+              << std::endl;
+      deallog << "  Grid 2: " << tria_2.n_active_cells() << " cells, " << dof_2.n_dofs() << " dofs"
+              << std::endl;
 
       // now compute intergrid constraints
       InterGridMap<DoFHandler<dim>> intergrid_map;

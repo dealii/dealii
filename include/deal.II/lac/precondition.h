@@ -106,8 +106,7 @@ public:
    */
   template <typename MatrixType>
   void
-  initialize(const MatrixType &    matrix,
-             const AdditionalData &additional_data = AdditionalData());
+  initialize(const MatrixType &matrix, const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Apply preconditioner.
@@ -359,16 +358,14 @@ private:
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
-template <typename MatrixType = SparseMatrix<double>,
-          class VectorType    = Vector<double>>
+template <typename MatrixType = SparseMatrix<double>, class VectorType = Vector<double>>
 class PreconditionUseMatrix : public Subscriptor
 {
 public:
   /**
    * Type of the preconditioning function of the matrix.
    */
-  typedef void (MatrixType::*function_ptr)(VectorType &,
-                                           const VectorType &) const;
+  typedef void (MatrixType::*function_ptr)(VectorType &, const VectorType &) const;
 
   /**
    * Constructor.  This constructor stores a reference to the matrix object
@@ -438,8 +435,7 @@ public:
    * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
   void
-  initialize(const MatrixType &    A,
-             const AdditionalData &parameters = AdditionalData());
+  initialize(const MatrixType &A, const AdditionalData &parameters = AdditionalData());
 
   /**
    * Release the matrix and reset its pointer.
@@ -510,8 +506,7 @@ public:
   /**
    * A typedef to the base class AdditionalData.
    */
-  typedef
-    typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+  typedef typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
 
   /**
    * Apply preconditioner.
@@ -598,8 +593,7 @@ public:
   /**
    * A typedef to the base class AdditionalData.
    */
-  typedef
-    typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+  typedef typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
 
   /**
    * Apply preconditioner.
@@ -667,8 +661,7 @@ public:
   /**
    * A typedef to the base class AdditionalData.
    */
-  typedef
-    typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
+  typedef typename PreconditionRelaxation<MatrixType>::AdditionalData AdditionalData;
 
   /**
    * Declare type for container size.
@@ -687,9 +680,9 @@ public:
    * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
   void
-  initialize(const MatrixType &                        A,
-             const typename BaseClass::AdditionalData &parameters =
-               typename BaseClass::AdditionalData());
+  initialize(
+    const MatrixType &                        A,
+    const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
 
   /**
    * Apply preconditioner.
@@ -787,12 +780,10 @@ public:
      * The relaxation parameter should be larger than zero and smaller than 2
      * for numerical reasons. It defaults to 1.
      */
-    AdditionalData(
-      const std::vector<size_type> &permutation,
-      const std::vector<size_type> &inverse_permutation,
-      const typename PreconditionRelaxation<MatrixType>::AdditionalData
-        &parameters =
-          typename PreconditionRelaxation<MatrixType>::AdditionalData());
+    AdditionalData(const std::vector<size_type> &permutation,
+                   const std::vector<size_type> &inverse_permutation,
+                   const typename PreconditionRelaxation<MatrixType>::AdditionalData &parameters =
+                     typename PreconditionRelaxation<MatrixType>::AdditionalData());
 
     /**
      * Storage for the permutation vector.
@@ -820,12 +811,11 @@ public:
    * for numerical reasons. It defaults to 1.
    */
   void
-  initialize(const MatrixType &            A,
-             const std::vector<size_type> &permutation,
-             const std::vector<size_type> &inverse_permutation,
-             const typename PreconditionRelaxation<MatrixType>::AdditionalData
-               &parameters =
-                 typename PreconditionRelaxation<MatrixType>::AdditionalData());
+  initialize(const MatrixType &                                                 A,
+             const std::vector<size_type> &                                     permutation,
+             const std::vector<size_type> &                                     inverse_permutation,
+             const typename PreconditionRelaxation<MatrixType>::AdditionalData &parameters =
+               typename PreconditionRelaxation<MatrixType>::AdditionalData());
 
   /**
    * Initialize matrix and relaxation parameter. The matrix is just stored in
@@ -1072,8 +1062,7 @@ public:
    * given number of iterations is positive.
    */
   void
-  initialize(const MatrixType &    matrix,
-             const AdditionalData &additional_data = AdditionalData());
+  initialize(const MatrixType &matrix, const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Compute the action of the preconditioner on <tt>src</tt>, storing the
@@ -1125,9 +1114,7 @@ private:
   /**
    * A pointer to the underlying matrix.
    */
-  SmartPointer<
-    const MatrixType,
-    PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>>
+  SmartPointer<const MatrixType, PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>>
     matrix_ptr;
 
   /**
@@ -1268,16 +1255,12 @@ PreconditionIdentity::n() const
 
 //---------------------------------------------------------------------------
 
-inline PreconditionRichardson::AdditionalData::AdditionalData(
-  const double relaxation) :
+inline PreconditionRichardson::AdditionalData::AdditionalData(const double relaxation) :
   relaxation(relaxation)
 {}
 
 
-inline PreconditionRichardson::PreconditionRichardson() :
-  relaxation(0),
-  n_rows(0),
-  n_columns(0)
+inline PreconditionRichardson::PreconditionRichardson() : relaxation(0), n_rows(0), n_columns(0)
 {
   AdditionalData add_data;
   relaxation = add_data.relaxation;
@@ -1286,8 +1269,7 @@ inline PreconditionRichardson::PreconditionRichardson() :
 
 
 inline void
-PreconditionRichardson::initialize(
-  const PreconditionRichardson::AdditionalData &parameters)
+PreconditionRichardson::initialize(const PreconditionRichardson::AdditionalData &parameters)
 {
   relaxation = parameters.relaxation;
 }
@@ -1296,9 +1278,8 @@ PreconditionRichardson::initialize(
 
 template <typename MatrixType>
 inline void
-PreconditionRichardson::initialize(
-  const MatrixType &                            matrix,
-  const PreconditionRichardson::AdditionalData &parameters)
+PreconditionRichardson::initialize(const MatrixType &                            matrix,
+                                   const PreconditionRichardson::AdditionalData &parameters)
 {
   relaxation = parameters.relaxation;
   n_rows     = matrix.m();
@@ -1311,9 +1292,8 @@ template <class VectorType>
 inline void
 PreconditionRichardson::vmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
-    "PreconditionRichardson and VectorType must have the same size_type.");
+  static_assert(std::is_same<size_type, typename VectorType::size_type>::value,
+                "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.equ(relaxation, src);
 }
@@ -1324,9 +1304,8 @@ template <class VectorType>
 inline void
 PreconditionRichardson::Tvmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
-    "PreconditionRichardson and VectorType must have the same size_type.");
+  static_assert(std::is_same<size_type, typename VectorType::size_type>::value,
+                "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.equ(relaxation, src);
 }
@@ -1335,9 +1314,8 @@ template <class VectorType>
 inline void
 PreconditionRichardson::vmult_add(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
-    "PreconditionRichardson and VectorType must have the same size_type.");
+  static_assert(std::is_same<size_type, typename VectorType::size_type>::value,
+                "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.add(relaxation, src);
 }
@@ -1348,9 +1326,8 @@ template <class VectorType>
 inline void
 PreconditionRichardson::Tvmult_add(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
-    "PreconditionRichardson and VectorType must have the same size_type.");
+  static_assert(std::is_same<size_type, typename VectorType::size_type>::value,
+                "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.add(relaxation, src);
 }
@@ -1409,13 +1386,11 @@ PreconditionRelaxation<MatrixType>::n() const
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionJacobi<MatrixType>::vmult(VectorType &      dst,
-                                      const VectorType &src) const
+PreconditionJacobi<MatrixType>::vmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionJacobi and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionJacobi and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_Jacobi(dst, src, this->relaxation);
@@ -1426,13 +1401,11 @@ PreconditionJacobi<MatrixType>::vmult(VectorType &      dst,
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionJacobi<MatrixType>::Tvmult(VectorType &      dst,
-                                       const VectorType &src) const
+PreconditionJacobi<MatrixType>::Tvmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionJacobi and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionJacobi and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_Jacobi(dst, src, this->relaxation);
@@ -1443,13 +1416,11 @@ PreconditionJacobi<MatrixType>::Tvmult(VectorType &      dst,
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionJacobi<MatrixType>::step(VectorType &      dst,
-                                     const VectorType &src) const
+PreconditionJacobi<MatrixType>::step(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionJacobi and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionJacobi and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   this->A->Jacobi_step(dst, src, this->relaxation);
@@ -1460,13 +1431,11 @@ PreconditionJacobi<MatrixType>::step(VectorType &      dst,
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionJacobi<MatrixType>::Tstep(VectorType &      dst,
-                                      const VectorType &src) const
+PreconditionJacobi<MatrixType>::Tstep(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionJacobi and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionJacobi<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionJacobi and VectorType must have the same size_type.");
 
   step(dst, src);
 }
@@ -1493,8 +1462,7 @@ PreconditionSOR<MatrixType>::vmult(VectorType &dst, const VectorType &src) const
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionSOR<MatrixType>::Tvmult(VectorType &      dst,
-                                    const VectorType &src) const
+PreconditionSOR<MatrixType>::Tvmult(VectorType &dst, const VectorType &src) const
 {
   static_assert(std::is_same<typename PreconditionSOR<MatrixType>::size_type,
                              typename VectorType::size_type>::value,
@@ -1540,17 +1508,15 @@ PreconditionSOR<MatrixType>::Tstep(VectorType &dst, const VectorType &src) const
 
 template <typename MatrixType>
 inline void
-PreconditionSSOR<MatrixType>::initialize(
-  const MatrixType &                        rA,
-  const typename BaseClass::AdditionalData &parameters)
+PreconditionSSOR<MatrixType>::initialize(const MatrixType &                        rA,
+                                         const typename BaseClass::AdditionalData &parameters)
 {
   this->PreconditionRelaxation<MatrixType>::initialize(rA, parameters);
 
   // in case we have a SparseMatrix class, we can extract information about
   // the diagonal.
   const SparseMatrix<typename MatrixType::value_type> *mat =
-    dynamic_cast<const SparseMatrix<typename MatrixType::value_type> *>(
-      &*this->A);
+    dynamic_cast<const SparseMatrix<typename MatrixType::value_type> *>(&*this->A);
 
   // calculate the positions first after the diagonal.
   if (mat != nullptr)
@@ -1563,8 +1529,8 @@ PreconditionSSOR<MatrixType>::initialize(
           // diagonal.  we need to precondition with the elements on the left
           // only. note: the first entry in each line denotes the diagonal
           // element, which we need not check.
-          typename SparseMatrix<typename MatrixType::value_type>::const_iterator
-            it = mat->begin(row) + 1;
+          typename SparseMatrix<typename MatrixType::value_type>::const_iterator it =
+            mat->begin(row) + 1;
           for (; it < mat->end(row); ++it)
             if (it->column() > row)
               break;
@@ -1577,13 +1543,11 @@ PreconditionSSOR<MatrixType>::initialize(
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionSSOR<MatrixType>::vmult(VectorType &      dst,
-                                    const VectorType &src) const
+PreconditionSSOR<MatrixType>::vmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionSSOR and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionSSOR and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_SSOR(dst, src, this->relaxation, pos_right_of_diagonal);
@@ -1594,13 +1558,11 @@ PreconditionSSOR<MatrixType>::vmult(VectorType &      dst,
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionSSOR<MatrixType>::Tvmult(VectorType &      dst,
-                                     const VectorType &src) const
+PreconditionSSOR<MatrixType>::Tvmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionSSOR and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionSSOR and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_SSOR(dst, src, this->relaxation, pos_right_of_diagonal);
@@ -1613,10 +1575,9 @@ template <class VectorType>
 inline void
 PreconditionSSOR<MatrixType>::step(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionSSOR and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionSSOR and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   this->A->SSOR_step(dst, src, this->relaxation);
@@ -1627,13 +1588,11 @@ PreconditionSSOR<MatrixType>::step(VectorType &dst, const VectorType &src) const
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionSSOR<MatrixType>::Tstep(VectorType &      dst,
-                                    const VectorType &src) const
+PreconditionSSOR<MatrixType>::Tstep(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionSSOR and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionSSOR<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionSSOR and VectorType must have the same size_type.");
 
   step(dst, src);
 }
@@ -1658,8 +1617,7 @@ PreconditionPSOR<MatrixType>::initialize(
 
 template <typename MatrixType>
 inline void
-PreconditionPSOR<MatrixType>::initialize(const MatrixType &    A,
-                                         const AdditionalData &additional_data)
+PreconditionPSOR<MatrixType>::initialize(const MatrixType &A, const AdditionalData &additional_data)
 {
   initialize(A,
              additional_data.permutation,
@@ -1671,13 +1629,11 @@ PreconditionPSOR<MatrixType>::initialize(const MatrixType &    A,
 template <typename MatrixType>
 template <typename VectorType>
 inline void
-PreconditionPSOR<MatrixType>::vmult(VectorType &      dst,
-                                    const VectorType &src) const
+PreconditionPSOR<MatrixType>::vmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionPSOR<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionPSOR and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionPSOR<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionPSOR and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   dst = src;
@@ -1689,13 +1645,11 @@ PreconditionPSOR<MatrixType>::vmult(VectorType &      dst,
 template <typename MatrixType>
 template <class VectorType>
 inline void
-PreconditionPSOR<MatrixType>::Tvmult(VectorType &      dst,
-                                     const VectorType &src) const
+PreconditionPSOR<MatrixType>::Tvmult(VectorType &dst, const VectorType &src) const
 {
-  static_assert(
-    std::is_same<typename PreconditionPSOR<MatrixType>::size_type,
-                 typename VectorType::size_type>::value,
-    "PreconditionPSOR and VectorType must have the same size_type.");
+  static_assert(std::is_same<typename PreconditionPSOR<MatrixType>::size_type,
+                             typename VectorType::size_type>::value,
+                "PreconditionPSOR and VectorType must have the same size_type.");
 
   Assert(this->A != nullptr, ExcNotInitialized());
   dst = src;
@@ -1704,10 +1658,9 @@ PreconditionPSOR<MatrixType>::Tvmult(VectorType &      dst,
 
 template <typename MatrixType>
 PreconditionPSOR<MatrixType>::AdditionalData::AdditionalData(
-  const std::vector<size_type> &permutation,
-  const std::vector<size_type> &inverse_permutation,
-  const typename PreconditionRelaxation<MatrixType>::AdditionalData
-    &parameters) :
+  const std::vector<size_type> &                                     permutation,
+  const std::vector<size_type> &                                     inverse_permutation,
+  const typename PreconditionRelaxation<MatrixType>::AdditionalData &parameters) :
   permutation(permutation),
   inverse_permutation(inverse_permutation),
   parameters(parameters)
@@ -1718,9 +1671,8 @@ PreconditionPSOR<MatrixType>::AdditionalData::AdditionalData(
 
 
 template <typename MatrixType, class VectorType>
-PreconditionUseMatrix<MatrixType, VectorType>::PreconditionUseMatrix(
-  const MatrixType & M,
-  const function_ptr method) :
+PreconditionUseMatrix<MatrixType, VectorType>::PreconditionUseMatrix(const MatrixType & M,
+                                                                     const function_ptr method) :
   matrix(M),
   precondition(method)
 {}
@@ -1729,9 +1681,7 @@ PreconditionUseMatrix<MatrixType, VectorType>::PreconditionUseMatrix(
 
 template <typename MatrixType, class VectorType>
 void
-PreconditionUseMatrix<MatrixType, VectorType>::vmult(
-  VectorType &      dst,
-  const VectorType &src) const
+PreconditionUseMatrix<MatrixType, VectorType>::vmult(VectorType &dst, const VectorType &src) const
 {
   (matrix.*precondition)(dst, src);
 }
@@ -1739,8 +1689,7 @@ PreconditionUseMatrix<MatrixType, VectorType>::vmult(
 //---------------------------------------------------------------------------
 
 template <typename MatrixType>
-inline PreconditionRelaxation<MatrixType>::AdditionalData::AdditionalData(
-  const double relaxation) :
+inline PreconditionRelaxation<MatrixType>::AdditionalData::AdditionalData(const double relaxation) :
   relaxation(relaxation)
 {}
 
@@ -1832,11 +1781,9 @@ namespace internal
                 dst[i]     = factor2 * src[i] * matrix_diagonal_inverse[i];
                 update1[i] = -dst[i];
               }
-            else DEAL_II_OPENMP_SIMD_PRAGMA for (std::size_t i = begin; i < end;
-                                                 ++i)
+            else DEAL_II_OPENMP_SIMD_PRAGMA for (std::size_t i = begin; i < end; ++i)
             {
-              update1[i] =
-                ((update2[i] - src[i]) * factor2 * matrix_diagonal_inverse[i]);
+              update1[i] = ((update2[i] - src[i]) * factor2 * matrix_diagonal_inverse[i]);
               dst[i] -= update1[i];
             }
           }
@@ -1845,8 +1792,7 @@ namespace internal
         for (std::size_t i = begin; i < end; ++i)
           {
             const Number update =
-              factor1 * update1[i] +
-              factor2 * ((update2[i] - src[i]) * matrix_diagonal_inverse[i]);
+              factor1 * update1[i] + factor2 * ((update2[i] - src[i]) * matrix_diagonal_inverse[i]);
             update1[i] = update;
             dst[i] -= update;
           }
@@ -1866,24 +1812,19 @@ namespace internal
     template <typename Number>
     struct VectorUpdatesRange : public parallel::ParallelForInteger
     {
-      VectorUpdatesRange(const VectorUpdater<Number> &updater,
-                         const std::size_t            size) :
+      VectorUpdatesRange(const VectorUpdater<Number> &updater, const std::size_t size) :
         updater(updater)
       {
         if (size < internal::VectorImplementation::minimum_parallel_grain_size)
           apply_to_subrange(0, size);
         else
-          apply_parallel(
-            0,
-            size,
-            internal::VectorImplementation::minimum_parallel_grain_size);
+          apply_parallel(0, size, internal::VectorImplementation::minimum_parallel_grain_size);
       }
 
       ~VectorUpdatesRange() override = default;
 
       virtual void
-      apply_to_subrange(const std::size_t begin,
-                        const std::size_t end) const override
+      apply_to_subrange(const std::size_t begin, const std::size_t end) const override
       {
         updater.apply_to_subrange(begin, end);
       }
@@ -1918,16 +1859,15 @@ namespace internal
     // selection for diagonal matrix around parallel deal.II vector
     template <typename Number>
     inline void
-    vector_updates(
-      const LinearAlgebra::distributed::Vector<Number> &                src,
-      const DiagonalMatrix<LinearAlgebra::distributed::Vector<Number>> &jacobi,
-      const bool                                  start_zero,
-      const double                                factor1,
-      const double                                factor2,
-      LinearAlgebra::distributed::Vector<Number> &update1,
-      LinearAlgebra::distributed::Vector<Number> &update2,
-      LinearAlgebra::distributed::Vector<Number> &,
-      LinearAlgebra::distributed::Vector<Number> &dst)
+    vector_updates(const LinearAlgebra::distributed::Vector<Number> &                src,
+                   const DiagonalMatrix<LinearAlgebra::distributed::Vector<Number>> &jacobi,
+                   const bool                                                        start_zero,
+                   const double                                                      factor1,
+                   const double                                                      factor2,
+                   LinearAlgebra::distributed::Vector<Number> &                      update1,
+                   LinearAlgebra::distributed::Vector<Number> &                      update2,
+                   LinearAlgebra::distributed::Vector<Number> &,
+                   LinearAlgebra::distributed::Vector<Number> &dst)
     {
       VectorUpdater<Number> upd(src.begin(),
                                 jacobi.get_vector().begin(),
@@ -1940,14 +1880,11 @@ namespace internal
       VectorUpdatesRange<Number>(upd, src.local_size());
     }
 
-    template <typename MatrixType,
-              typename VectorType,
-              typename PreconditionerType>
+    template <typename MatrixType, typename VectorType, typename PreconditionerType>
     inline void
-    initialize_preconditioner(
-      const MatrixType &                   matrix,
-      std::shared_ptr<PreconditionerType> &preconditioner,
-      VectorType &)
+    initialize_preconditioner(const MatrixType &                   matrix,
+                              std::shared_ptr<PreconditionerType> &preconditioner,
+                              VectorType &)
     {
       (void)matrix;
       (void)preconditioner;
@@ -1956,20 +1893,17 @@ namespace internal
 
     template <typename MatrixType, typename VectorType>
     inline void
-    initialize_preconditioner(
-      const MatrixType &                           matrix,
-      std::shared_ptr<DiagonalMatrix<VectorType>> &preconditioner,
-      VectorType &                                 diagonal_inverse)
+    initialize_preconditioner(const MatrixType &                           matrix,
+                              std::shared_ptr<DiagonalMatrix<VectorType>> &preconditioner,
+                              VectorType &                                 diagonal_inverse)
     {
       if (preconditioner.get() == nullptr || preconditioner->m() != matrix.m())
         {
           if (preconditioner.get() == nullptr)
             preconditioner = std::make_shared<DiagonalMatrix<VectorType>>();
 
-          Assert(
-            preconditioner->m() == 0,
-            ExcMessage(
-              "Preconditioner appears to be initialized but not sized correctly"));
+          Assert(preconditioner->m() == 0,
+                 ExcMessage("Preconditioner appears to be initialized but not sized correctly"));
 
           // Check if we can initialize from vector that then gets set to zero
           // as the matrix will own the memory
@@ -2015,8 +1949,7 @@ namespace internal
 
     template <typename Number>
     void
-    set_initial_guess(
-      ::dealii::LinearAlgebra::distributed::Vector<Number> &vector)
+    set_initial_guess(::dealii::LinearAlgebra::distributed::Vector<Number> &vector)
     {
       // Choose a high-frequency mode consisting of numbers between 0 and 1
       // that is cheap to compute (cheaper than random numbers) but avoids
@@ -2053,13 +1986,13 @@ namespace internal
 // avoid warning about deprecated variable nonzero_starting
 
 template <typename MatrixType, class VectorType, typename PreconditionerType>
-inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  AdditionalData::AdditionalData(const unsigned int degree,
-                                 const double       smoothing_range,
-                                 const bool         nonzero_starting,
-                                 const unsigned int eig_cg_n_iterations,
-                                 const double       eig_cg_residual,
-                                 const double       max_eigenvalue) :
+inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::AdditionalData::
+  AdditionalData(const unsigned int degree,
+                 const double       smoothing_range,
+                 const bool         nonzero_starting,
+                 const unsigned int eig_cg_n_iterations,
+                 const double       eig_cg_residual,
+                 const double       max_eigenvalue) :
   degree(degree),
   smoothing_range(smoothing_range),
   nonzero_starting(nonzero_starting),
@@ -2071,15 +2004,13 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
-inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  PreconditionChebyshev() :
+inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::PreconditionChebyshev() :
   theta(1.),
   delta(1.),
   eigenvalues_are_initialized(false)
 {
-  static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
-    "PreconditionChebyshev and VectorType must have the same size_type.");
+  static_assert(std::is_same<size_type, typename VectorType::size_type>::value,
+                "PreconditionChebyshev and VectorType must have the same size_type.");
 }
 
 
@@ -2122,8 +2053,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::clear()
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
-PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  estimate_eigenvalues(const VectorType &src) const
+PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::estimate_eigenvalues(
+  const VectorType &src) const
 {
   Assert(eigenvalues_are_initialized == false, ExcInternalError());
   Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
@@ -2137,26 +2068,23 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   double max_eigenvalue, min_eigenvalue;
   if (data.eig_cg_n_iterations > 0)
     {
-      Assert(
-        data.eig_cg_n_iterations > 2,
-        ExcMessage("Need to set at least two iterations to find eigenvalues."));
+      Assert(data.eig_cg_n_iterations > 2,
+             ExcMessage("Need to set at least two iterations to find eigenvalues."));
 
       // set a very strict tolerance to force at least two iterations
       ReductionControl control(
         data.eig_cg_n_iterations,
-        std::sqrt(
-          std::numeric_limits<typename VectorType::value_type>::epsilon()),
+        std::sqrt(std::numeric_limits<typename VectorType::value_type>::epsilon()),
         1e-10,
         false,
         false);
 
-      internal::PreconditionChebyshevImplementation::EigenvalueTracker
-                           eigenvalue_tracker;
-      SolverCG<VectorType> solver(control);
-      solver.connect_eigenvalues_slot(std::bind(
-        &internal::PreconditionChebyshevImplementation::EigenvalueTracker::slot,
-        &eigenvalue_tracker,
-        std::placeholders::_1));
+      internal::PreconditionChebyshevImplementation::EigenvalueTracker eigenvalue_tracker;
+      SolverCG<VectorType>                                             solver(control);
+      solver.connect_eigenvalues_slot(
+        std::bind(&internal::PreconditionChebyshevImplementation::EigenvalueTracker::slot,
+                  &eigenvalue_tracker,
+                  std::placeholders::_1));
 
       // set an initial guess which is close to the constant vector but where
       // one entry is different to trigger high frequencies
@@ -2187,9 +2115,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       min_eigenvalue = data.max_eigenvalue / data.smoothing_range;
     }
 
-  const double alpha = (data.smoothing_range > 1. ?
-                          max_eigenvalue / data.smoothing_range :
-                          std::min(0.9 * max_eigenvalue, min_eigenvalue));
+  const double alpha = (data.smoothing_range > 1. ? max_eigenvalue / data.smoothing_range :
+                                                    std::min(0.9 * max_eigenvalue, min_eigenvalue));
 
   // in case the user set the degree to invalid unsigned int, we have to
   // determine the number of necessary iterations from the Chebyshev error
@@ -2199,37 +2126,29 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   if (data.degree == numbers::invalid_unsigned_int)
     {
       const double actual_range = max_eigenvalue / alpha;
-      const double sigma        = (1. - std::sqrt(1. / actual_range)) /
-                           (1. + std::sqrt(1. / actual_range));
+      const double sigma =
+        (1. - std::sqrt(1. / actual_range)) / (1. + std::sqrt(1. / actual_range));
       const double eps = data.smoothing_range;
-      const_cast<
-        PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(
-        this)
-        ->data.degree = 1 + std::log(1. / eps + std::sqrt(1. / eps / eps - 1)) /
-                              std::log(1. / sigma);
+      const_cast<PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
+        ->data.degree =
+        1 + std::log(1. / eps + std::sqrt(1. / eps / eps - 1)) / std::log(1. / sigma);
     }
 
-  const_cast<
-    PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
-    ->delta = (max_eigenvalue - alpha) * 0.5;
-  const_cast<
-    PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
-    ->theta = (max_eigenvalue + alpha) * 0.5;
+  const_cast<PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)->delta =
+    (max_eigenvalue - alpha) * 0.5;
+  const_cast<PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)->theta =
+    (max_eigenvalue + alpha) * 0.5;
 
   // We do not need the third auxiliary vector in case we have a
   // DiagonalMatrix as preconditioner and use deal.II's own vectors
-  if (std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value ==
-        false ||
-      (std::is_same<VectorType,
-                    dealii::Vector<typename VectorType::value_type>>::value ==
-         false &&
+  if (std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value == false ||
+      (std::is_same<VectorType, dealii::Vector<typename VectorType::value_type>>::value == false &&
        std::is_same<VectorType,
-                    LinearAlgebra::distributed::Vector<
-                      typename VectorType::value_type>>::value == false))
+                    LinearAlgebra::distributed::Vector<typename VectorType::value_type>>::value ==
+         false))
     update3.reinit(src, true);
 
-  const_cast<
-    PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
+  const_cast<PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
     ->eigenvalues_are_initialized = true;
 }
 
@@ -2237,8 +2156,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
-PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  do_chebyshev_loop(VectorType &dst, const VectorType &src) const
+PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::do_chebyshev_loop(
+  VectorType &      dst,
+  const VectorType &src) const
 {
   // if delta is zero, we do not need to iterate because the updates will be
   // zero
@@ -2253,15 +2173,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
       rhok = rhokp;
       internal::PreconditionChebyshevImplementation::vector_updates(
-        src,
-        *data.preconditioner,
-        false,
-        factor1,
-        factor2,
-        update1,
-        update2,
-        update3,
-        dst);
+        src, *data.preconditioner, false, factor1, factor2, update1, update2, update3, dst);
     }
 }
 
@@ -2269,8 +2181,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
-PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  do_transpose_chebyshev_loop(VectorType &dst, const VectorType &src) const
+PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::do_transpose_chebyshev_loop(
+  VectorType &      dst,
+  const VectorType &src) const
 {
   double rhok = delta / theta, sigma = theta / delta;
   for (unsigned int k = 0; k < data.degree; ++k)
@@ -2280,15 +2193,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
       rhok = rhokp;
       internal::PreconditionChebyshevImplementation::vector_updates(
-        src,
-        *data.preconditioner,
-        false,
-        factor1,
-        factor2,
-        update1,
-        update2,
-        update3,
-        dst);
+        src, *data.preconditioner, false, factor1, factor2, update1, update2, update3, dst);
     }
 }
 
@@ -2305,15 +2210,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
     estimate_eigenvalues(src);
 
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
-    *data.preconditioner,
-    true,
-    0.,
-    1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    src, *data.preconditioner, true, 0., 1. / theta, update1, update2, update3, dst);
 
   do_chebyshev_loop(dst, src);
 }
@@ -2331,15 +2228,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
     estimate_eigenvalues(src);
 
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
-    *data.preconditioner,
-    true,
-    0.,
-    1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    src, *data.preconditioner, true, 0., 1. / theta, update1, update2, update3, dst);
 
   do_transpose_chebyshev_loop(dst, src);
 }
@@ -2348,9 +2237,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
-PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
-  VectorType &      dst,
-  const VectorType &src) const
+PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(VectorType &      dst,
+                                                                        const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
   if (eigenvalues_are_initialized == false)
@@ -2358,15 +2246,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
 
   matrix_ptr->vmult(update2, dst);
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
-    *data.preconditioner,
-    false,
-    0.,
-    1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    src, *data.preconditioner, false, 0., 1. / theta, update1, update2, update3, dst);
 
   do_chebyshev_loop(dst, src);
 }
@@ -2385,15 +2265,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tstep(
 
   matrix_ptr->Tvmult(update2, dst);
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
-    *data.preconditioner,
-    false,
-    0.,
-    1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    src, *data.preconditioner, false, 0., 1. / theta, update1, update2, update3, dst);
 
   do_transpose_chebyshev_loop(dst, src);
 }
@@ -2401,9 +2273,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tstep(
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
-inline typename PreconditionChebyshev<MatrixType,
-                                      VectorType,
-                                      PreconditionerType>::size_type
+inline typename PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::size_type
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::m() const
 {
   Assert(matrix_ptr != nullptr, ExcNotInitialized());
@@ -2413,9 +2283,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::m() const
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
-inline typename PreconditionChebyshev<MatrixType,
-                                      VectorType,
-                                      PreconditionerType>::size_type
+inline typename PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::size_type
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::n() const
 {
   Assert(matrix_ptr != nullptr, ExcNotInitialized());

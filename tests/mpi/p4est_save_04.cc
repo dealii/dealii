@@ -54,14 +54,12 @@ test()
   // write with small com
   if (myid < 3)
     {
-      deallog << "writing with " << Utilities::MPI::n_mpi_processes(com_small)
-              << std::endl;
+      deallog << "writing with " << Utilities::MPI::n_mpi_processes(com_small) << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(com_small);
       GridGenerator::hyper_cube(tr);
       tr.refine_global(2);
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             tr.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
            cell != tr.end();
            ++cell)
         if (!cell->is_ghost() && !cell->is_artificial())
@@ -81,18 +79,15 @@ test()
       DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
 
       PETScWrappers::MPI::Vector x(locally_owned_dofs, com_small);
-      PETScWrappers::MPI::Vector rel_x(
-        locally_owned_dofs, locally_relevant_dofs, com_small);
+      PETScWrappers::MPI::Vector rel_x(locally_owned_dofs, locally_relevant_dofs, com_small);
 
-      parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-        soltrans(dh);
+      parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans(dh);
 
       for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
         {
           unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
           x(idx)           = idx;
-          deallog << '[' << idx << ']' << ' '
-                  << get_real_assert_zero_imag(x(idx)) << std::endl;
+          deallog << '[' << idx << ']' << ' ' << get_real_assert_zero_imag(x(idx)) << std::endl;
         }
 
 
@@ -103,15 +98,13 @@ test()
 
       tr.save("file");
       //    tr.write_mesh_vtk("before");
-      deallog << "#cells = " << tr.n_global_active_cells()
-              << " norm= " << x.l2_norm() << std::endl;
+      deallog << "#cells = " << tr.n_global_active_cells() << " norm= " << x.l2_norm() << std::endl;
       deallog << "Checksum: " << tr.get_checksum() << std::endl;
     }
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  deallog << "reading with " << Utilities::MPI::n_mpi_processes(com_all)
-          << std::endl;
+  deallog << "reading with " << Utilities::MPI::n_mpi_processes(com_all) << std::endl;
 
   {
     parallel::distributed::Triangulation<dim> tr(com_all);
@@ -130,15 +123,14 @@ test()
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, com_all);
     solution = PetscScalar();
 
-    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
-      soltrans(dh);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans(dh);
     soltrans.deserialize(solution);
 
     for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
-        deallog << '[' << idx << ']' << ' '
-                << get_real_assert_zero_imag(solution(idx)) << std::endl;
+        deallog << '[' << idx << ']' << ' ' << get_real_assert_zero_imag(solution(idx))
+                << std::endl;
       }
 
     deallog << "#cells = " << tr.n_global_active_cells() << std::endl;

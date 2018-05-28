@@ -45,8 +45,7 @@ test(PETScWrappers::SparseMatrix &m)
       if ((i + 2 * j + 1) % 3 == 0)
         {
           AssertThrow(m(i, j) == (i * j * .5 + .5) / 4 * 3, ExcInternalError());
-          AssertThrow(m.el(i, j) == (i * j * .5 + .5) / 4 * 3,
-                      ExcInternalError());
+          AssertThrow(m.el(i, j) == (i * j * .5 + .5) / 4 * 3, ExcInternalError());
         }
       else
         {
@@ -76,13 +75,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -90,12 +87,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -47,15 +47,13 @@ class Ball : public FlatManifold<dim>
 {
 public:
   virtual Point<dim>
-  get_new_point_on_line(
-    const typename Triangulation<dim>::line_iterator &line) const
+  get_new_point_on_line(const typename Triangulation<dim>::line_iterator &line) const
   {
     Point<dim> middle = FlatManifold<dim>::get_new_point_on_line(line);
 
     for (int i = 0; i < dim; ++i)
       middle(i) -= .5;
-    middle *=
-      std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
+    middle *= std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
     for (int i = 0; i < dim; ++i)
       middle(i) += .5;
 
@@ -64,15 +62,13 @@ public:
 
 
   virtual Point<dim>
-  get_new_point_on_quad(
-    const typename Triangulation<dim>::quad_iterator &quad) const
+  get_new_point_on_quad(const typename Triangulation<dim>::quad_iterator &quad) const
   {
     Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad(quad);
 
     for (int i = 0; i < dim; ++i)
       middle(i) -= .5;
-    middle *=
-      std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
+    middle *= std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
     for (int i = 0; i < dim; ++i)
       middle(i) += .5;
 
@@ -86,19 +82,16 @@ class CurvedLine : public FlatManifold<dim>
 {
 public:
   virtual Point<dim>
-  get_new_point_on_line(
-    const typename Triangulation<dim>::line_iterator &line) const;
+  get_new_point_on_line(const typename Triangulation<dim>::line_iterator &line) const;
 
   virtual Point<dim>
-  get_new_point_on_quad(
-    const typename Triangulation<dim>::quad_iterator &quad) const;
+  get_new_point_on_quad(const typename Triangulation<dim>::quad_iterator &quad) const;
 };
 
 
 template <int dim>
 Point<dim>
-CurvedLine<dim>::get_new_point_on_line(
-  const typename Triangulation<dim>::line_iterator &line) const
+CurvedLine<dim>::get_new_point_on_line(const typename Triangulation<dim>::line_iterator &line) const
 {
   Point<dim> middle = FlatManifold<dim>::get_new_point_on_line(line);
 
@@ -146,8 +139,7 @@ CurvedLine<dim>::get_new_point_on_line(
 
 template <int dim>
 Point<dim>
-CurvedLine<dim>::get_new_point_on_quad(
-  const typename Triangulation<dim>::quad_iterator &quad) const
+CurvedLine<dim>::get_new_point_on_quad(const typename Triangulation<dim>::quad_iterator &quad) const
 {
   Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad(quad);
 
@@ -237,8 +229,7 @@ template <int dim>
 void
 TestCases<dim>::run(const unsigned int test_case)
 {
-  deallog << "Dimension = " << dim << ", Test case = " << test_case << std::endl
-          << std::endl;
+  deallog << "Dimension = " << dim << ", Test case = " << test_case << std::endl << std::endl;
 
   deallog << "    Making grid..." << std::endl;
 
@@ -279,9 +270,8 @@ TestCases<dim>::run(const unsigned int test_case)
             };
 
           // set the boundary function
-          tria->set_manifold(1,
-                             (test_case == 2) ? ((Manifold<dim> &)ball) :
-                                                ((Manifold<dim> &)curved_line));
+          tria->set_manifold(
+            1, (test_case == 2) ? ((Manifold<dim> &)ball) : ((Manifold<dim> &)curved_line));
 
           // refine once
           tria->begin_active()->set_refine_flag();
@@ -336,18 +326,12 @@ TestCases<dim>::run(const unsigned int test_case)
 
 
   deallog << std::endl
-          << "    Total number of cells         = " << tria->n_cells()
-          << std::endl
-          << "    Total number of active cells  = " << tria->n_active_cells()
-          << std::endl
-          << "    Number of DoFs                = " << dof->n_dofs()
-          << std::endl
-          << "    Number of constraints         = "
-          << constraints.n_constraints() << std::endl
-          << "    Unconstrained matrix bandwidth= " << unconstrained_bandwidth
-          << std::endl
-          << "    Constrained matrix bandwidth  = " << sparsity.bandwidth()
-          << std::endl
+          << "    Total number of cells         = " << tria->n_cells() << std::endl
+          << "    Total number of active cells  = " << tria->n_active_cells() << std::endl
+          << "    Number of DoFs                = " << dof->n_dofs() << std::endl
+          << "    Number of constraints         = " << constraints.n_constraints() << std::endl
+          << "    Unconstrained matrix bandwidth= " << unconstrained_bandwidth << std::endl
+          << "    Constrained matrix bandwidth  = " << sparsity.bandwidth() << std::endl
           << std::endl;
 
   // release the lock that dof has to the

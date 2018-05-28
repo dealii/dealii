@@ -41,17 +41,12 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
     template class TriaActiveIterator<DoFAccessor<2, DoFHandler<3>, lda>>;
 #endif
 
-    template class DoFAccessor<deal_II_dimension,
-                               DoFHandler<deal_II_dimension>,
-                               lda>;
+    template class DoFAccessor<deal_II_dimension, DoFHandler<deal_II_dimension>, lda>;
     template class DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>;
 
-    template class TriaRawIterator<
-      DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>>;
-    template class TriaIterator<
-      DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>>;
-    template class TriaActiveIterator<
-      DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>>;
+    template class TriaRawIterator<DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>>;
+    template class TriaIterator<DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>>;
+    template class TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>>;
 
 
     // --------------------------------------------------------------------------
@@ -78,17 +73,12 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
     template class TriaActiveIterator<DoFAccessor<2, hp::DoFHandler<3>, lda>>;
 #endif
 
-    template class DoFAccessor<deal_II_dimension,
-                               hp::DoFHandler<deal_II_dimension>,
-                               lda>;
+    template class DoFAccessor<deal_II_dimension, hp::DoFHandler<deal_II_dimension>, lda>;
     template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>;
 
-    template class TriaRawIterator<
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>>;
-    template class TriaIterator<
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>>;
-    template class TriaActiveIterator<
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>>;
+    template class TriaRawIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>>;
+    template class TriaIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>>;
+    template class TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>>;
 
 
 
@@ -111,19 +101,14 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
 
 
 #if deal_II_dimension != 3
-    template class DoFCellAccessor<
-      DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-      lda>;
+    template class DoFCellAccessor<DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>;
 
     template class TriaRawIterator<
-      DoFCellAccessor<DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-                      lda>>;
+      DoFCellAccessor<DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>>;
     template class TriaIterator<
-      DoFCellAccessor<DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-                      lda>>;
+      DoFCellAccessor<DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>>;
     template class TriaActiveIterator<
-      DoFCellAccessor<DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-                      lda>>;
+      DoFCellAccessor<DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>>;
 #endif
 
 
@@ -150,24 +135,18 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
 
     template class TriaRawIterator<DoFAccessor<1, hp::DoFHandler<2, 3>, lda>>;
     template class TriaIterator<DoFAccessor<1, hp::DoFHandler<2, 3>, lda>>;
-    template class TriaActiveIterator<
-      DoFAccessor<1, hp::DoFHandler<2, 3>, lda>>;
+    template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2, 3>, lda>>;
 #endif
 
 #if deal_II_dimension != 3
-    template class DoFCellAccessor<
-      hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-      lda>;
+    template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>;
 
     template class TriaRawIterator<
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-                      lda>>;
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>>;
     template class TriaIterator<
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-                      lda>>;
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>>;
     template class TriaActiveIterator<
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>,
-                      lda>>;
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension, deal_II_dimension + 1>, lda>>;
 #endif
 
 
@@ -176,8 +155,7 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
 
     template class TriaRawIterator<DoFCellAccessor<hp::DoFHandler<1, 3>, lda>>;
     template class TriaIterator<DoFCellAccessor<hp::DoFHandler<1, 3>, lda>>;
-    template class TriaActiveIterator<
-      DoFCellAccessor<hp::DoFHandler<1, 3>, lda>>;
+    template class TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<1, 3>, lda>>;
 #endif
   }
 

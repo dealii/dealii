@@ -48,8 +48,8 @@ main()
     std::array<std::array<decltype(op_a), 2>, 2> temp{{a, a}};
 
     BlockLinearOperator<> op_b(temp);
-    auto op_c = block_operator<2, 2, BlockVector<double>>(temp);
-    op_c      = temp;
+    auto                  op_c = block_operator<2, 2, BlockVector<double>>(temp);
+    op_c                       = temp;
 
     auto op_d = block_operator(temp);
     op_d      = temp;

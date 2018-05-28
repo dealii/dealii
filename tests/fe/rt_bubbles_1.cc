@@ -46,9 +46,8 @@ plot_shape_functions(const unsigned int degree)
         for (unsigned int mx = 0; mx <= div; ++mx)
           {
             const Point<dim> p =
-              (dim == 2 ?
-                 Point<dim>(1. * mx / div, 1. * my / div) :
-                 Point<dim>(1. * mx / div, 1. * my / div, 1. * mz / div));
+              (dim == 2 ? Point<dim>(1. * mx / div, 1. * my / div) :
+                          Point<dim>(1. * mx / div, 1. * my / div, 1. * mz / div));
 
             // Lines with function
             // values contain
@@ -59,8 +58,7 @@ plot_shape_functions(const unsigned int degree)
             for (unsigned int i = 0; i < fe_rt_bubbles.dofs_per_cell; ++i)
               {
                 for (unsigned int c = 0; c < dim; ++c)
-                  deallog << " "
-                          << fe_rt_bubbles.shape_value_component(i, p, c);
+                  deallog << " " << fe_rt_bubbles.shape_value_component(i, p, c);
                 deallog << "  ";
               }
             deallog << std::endl << "grad " << p;
@@ -70,8 +68,7 @@ plot_shape_functions(const unsigned int degree)
                   {
                     deallog << ' ';
                     for (unsigned int d = 0; d < dim; ++d)
-                      deallog << ' '
-                              << fe_rt_bubbles.shape_grad_component(i, p, c)[d];
+                      deallog << ' ' << fe_rt_bubbles.shape_grad_component(i, p, c)[d];
                   }
               }
             deallog << std::endl;

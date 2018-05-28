@@ -47,7 +47,7 @@ main()
 {
   std::ofstream logfile("output");
 
-  TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/wigley.iges", 0.001);
+  TopoDS_Shape               sh = read_IGES(SOURCE_DIR "/iges_files/wigley.iges", 0.001);
   std::vector<TopoDS_Face>   faces;
   std::vector<TopoDS_Edge>   edges;
   std::vector<TopoDS_Vertex> vertices;

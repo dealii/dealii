@@ -71,11 +71,9 @@ test()
       if (test == 1)
         {
           IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
-          std::vector<types::global_dof_index> new_numbers(
-            locally_owned_dofs.n_elements());
+          std::vector<types::global_dof_index> new_numbers(locally_owned_dofs.n_elements());
           for (auto i : locally_owned_dofs)
-            new_numbers[locally_owned_dofs.index_within_set(i)] =
-              dof_handler.n_dofs() - i - 1;
+            new_numbers[locally_owned_dofs.index_within_set(i)] = dof_handler.n_dofs() - i - 1;
           dof_handler.renumber_dofs(new_numbers);
         }
 
@@ -86,8 +84,7 @@ test()
       DoFRenumbering::hierarchical(dof_handler);
 
       // output DoF indices
-      deallog << (test == 0 ? "Without " : "With ")
-              << "prior reordering:" << std::endl;
+      deallog << (test == 0 ? "Without " : "With ") << "prior reordering:" << std::endl;
       const unsigned int                   dofs_per_cell = fe.dofs_per_cell;
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
       DoFHandler<2>::active_cell_iterator  cell = dof_handler.begin_active(),

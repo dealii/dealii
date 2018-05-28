@@ -96,12 +96,10 @@ namespace Step39
 
 
   template <int dim>
-  InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(
-    const FiniteElement<dim> &fe) :
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+  InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(const FiniteElement<dim> &fe) :
+    triangulation(MPI_COMM_WORLD,
+                  Triangulation<dim>::limit_level_difference_at_vertices,
+                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
     mapping(1),
     fe(fe),
     dof_handler(triangulation)
@@ -119,11 +117,9 @@ namespace Step39
 
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
 
-    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(),
-                                      dof_handler.n_dofs());
+    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity);
-    matrix.reinit(
-      dof_handler.locally_owned_dofs(), c_sparsity, MPI_COMM_WORLD, true);
+    matrix.reinit(dof_handler.locally_owned_dofs(), c_sparsity, MPI_COMM_WORLD, true);
 
     const unsigned int n_levels = triangulation.n_global_levels();
     mg_matrix.resize(0, n_levels - 1);
@@ -133,9 +129,7 @@ namespace Step39
     mg_matrix_dg_down.resize(0, n_levels - 1);
     mg_matrix_dg_down.clear_elements();
 
-    for (unsigned int level = mg_matrix.min_level();
-         level <= mg_matrix.max_level();
-         ++level)
+    for (unsigned int level = mg_matrix.min_level(); level <= mg_matrix.max_level(); ++level)
       {
         DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(level));
         MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
@@ -148,23 +142,19 @@ namespace Step39
         if (level > 0)
           {
             DynamicSparsityPattern ci_sparsity;
-            ci_sparsity.reinit(dof_handler.n_dofs(level - 1),
-                               dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(
-              dof_handler, ci_sparsity, level);
+            ci_sparsity.reinit(dof_handler.n_dofs(level - 1), dof_handler.n_dofs(level));
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
 
-            mg_matrix_dg_up[level].reinit(
-              dof_handler.locally_owned_mg_dofs(level - 1),
-              dof_handler.locally_owned_mg_dofs(level),
-              ci_sparsity,
-              MPI_COMM_WORLD,
-              true);
-            mg_matrix_dg_down[level].reinit(
-              dof_handler.locally_owned_mg_dofs(level - 1),
-              dof_handler.locally_owned_mg_dofs(level),
-              ci_sparsity,
-              MPI_COMM_WORLD,
-              true);
+            mg_matrix_dg_up[level].reinit(dof_handler.locally_owned_mg_dofs(level - 1),
+                                          dof_handler.locally_owned_mg_dofs(level),
+                                          ci_sparsity,
+                                          MPI_COMM_WORLD,
+                                          true);
+            mg_matrix_dg_down[level].reinit(dof_handler.locally_owned_mg_dofs(level - 1),
+                                            dof_handler.locally_owned_mg_dofs(level),
+                                            ci_sparsity,
+                                            MPI_COMM_WORLD,
+                                            true);
           }
       }
   }
@@ -183,15 +173,13 @@ namespace Step39
         else
           {
             if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-              triangulation.begin_active(triangulation.n_levels() - 1)
-                ->set_refine_flag();
+              triangulation.begin_active(triangulation.n_levels() - 1)->set_refine_flag();
 
             triangulation.execute_coarsening_and_refinement();
           }
 
-        deallog << "Triangulation " << triangulation.n_active_cells()
-                << " cells, " << triangulation.n_levels() << " levels"
-                << std::endl;
+        deallog << "Triangulation " << triangulation.n_active_cells() << " cells, "
+                << triangulation.n_levels() << " levels" << std::endl;
 
         setup_system();
         deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, level dofs";
@@ -210,8 +198,7 @@ main(int argc, char *argv[])
   using namespace dealii;
   using namespace Step39;
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
   mpi_initlog(true);
 
   try
@@ -224,25 +211,21 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

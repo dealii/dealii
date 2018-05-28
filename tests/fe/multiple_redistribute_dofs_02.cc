@@ -42,8 +42,7 @@ template <int dim, int spacedim>
 void
 test()
 {
-  deallog << "Testing for dim = " << dim << ", spacedim = " << spacedim
-          << std::endl;
+  deallog << "Testing for dim = " << dim << ", spacedim = " << spacedim << std::endl;
 
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria);
@@ -53,9 +52,8 @@ test()
   dh.distribute_dofs(fe_collection);
 
   // This stores a pointer to the fe in dh.
-  hp::FEValues<dim, spacedim> fe_v(dh.get_fe_collection(),
-                                   hp::QCollection<dim>(QGauss<dim>(1)),
-                                   update_values);
+  hp::FEValues<dim, spacedim> fe_v(
+    dh.get_fe_collection(), hp::QCollection<dim>(QGauss<dim>(1)), update_values);
   fe_v.reinit(dh.begin_active());
 
   tria.refine_global(1);

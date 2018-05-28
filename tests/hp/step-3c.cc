@@ -97,8 +97,7 @@ LaplaceProblem::make_grid_and_dofs()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(4);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
@@ -108,30 +107,26 @@ LaplaceProblem::make_grid_and_dofs()
   for (; cell != endc; ++cell)
     {
       cell->set_active_fe_index(Testing::rand() % fe.size());
-      deallog << "Cell " << cell << " has fe_index=" << cell->active_fe_index()
-              << std::endl;
+      deallog << "Cell " << cell << " has fe_index=" << cell->active_fe_index() << std::endl;
       ++cell_no;
     }
 
   dof_handler.distribute_dofs(fe);
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
 
   // Create sparsity pattern.
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
 
   // Create constraints which stem from
   // the different polynomial degrees on
   // the different elements.
   hanging_node_constraints.clear();
-  DoFTools::make_hanging_node_constraints(dof_handler,
-                                          hanging_node_constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, hanging_node_constraints);
 
   hanging_node_constraints.print(deallog.get_file_stream());
 
@@ -152,10 +147,8 @@ LaplaceProblem::assemble_system()
   for (unsigned int p = 0; p < fe.size(); ++p)
     quadrature_formula.push_back(QGauss<2>(p + 2));
 
-  hp::FEValues<2> x_fe_values(fe,
-                              quadrature_formula,
-                              update_values | update_gradients |
-                                update_JxW_values);
+  hp::FEValues<2> x_fe_values(
+    fe, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
   const unsigned int max_dofs_per_cell = fe.max_dofs_per_cell();
 
@@ -176,27 +169,23 @@ LaplaceProblem::assemble_system()
       cell_rhs    = 0;
 
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-      const unsigned int n_q_points =
-        quadrature_formula[cell->active_fe_index()].size();
+      const unsigned int n_q_points    = quadrature_formula[cell->active_fe_index()].size();
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-            cell_matrix(i, j) +=
-              (fe_values.shape_grad(i, q_point) *
-               fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+            cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                  fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          cell_rhs(i) +=
-            (fe_values.shape_value(i, q_point) * 1 * fe_values.JxW(q_point));
+          cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1 * fe_values.JxW(q_point));
 
       local_dof_indices.resize(dofs_per_cell);
       cell->get_dof_indices(local_dof_indices);
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
@@ -209,8 +198,7 @@ LaplaceProblem::assemble_system()
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(
     dof_handler, 0, Functions::ZeroFunction<2>(), boundary_values);
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 }
 
 
@@ -221,11 +209,10 @@ LaplaceProblem::solve()
   SolverControl solver_control(1000, 1e-6);
   SolverCG<>    cg(solver_control);
 
-  check_solver_within_range(
-    cg.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
-    solver_control.last_step(),
-    625,
-    635);
+  check_solver_within_range(cg.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
+                            solver_control.last_step(),
+                            625,
+                            635);
 
   solution.print(deallog.get_file_stream(), 7);
 

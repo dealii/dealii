@@ -65,18 +65,17 @@ void EvaluateDerivative(DoFHandler<3> &dof_handler, Vector<double> &solution)
   // This quadrature rule determines the points, where the
   // derivative will be evaluated.
   QGauss<3>   quad(3);
-  FEValues<3> fe_values(dof_handler.get_fe(),
-                        quad,
-                        UpdateFlags(update_values | update_quadrature_points |
-                                    update_gradients | update_JxW_values));
+  FEValues<3> fe_values(
+    dof_handler.get_fe(),
+    quad,
+    UpdateFlags(update_values | update_quadrature_points | update_gradients | update_JxW_values));
 
   const unsigned int n_q_points    = quad.size();
   const unsigned int n_components  = dof_handler.get_fe().n_components();
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
   // Cell iterators
-  DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active(),
-                                      endc = dof_handler.end();
+  DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
 
   double err_l2 = 0, err_hdiv = 0;
 
@@ -89,13 +88,12 @@ void EvaluateDerivative(DoFHandler<3> &dof_handler, Vector<double> &solution)
       fe_values.reinit(cell);
 
       // Get function values
-      std::vector<Vector<double>> this_value(n_q_points,
-                                             Vector<double>(n_components));
+      std::vector<Vector<double>> this_value(n_q_points, Vector<double>(n_components));
       fe_values.get_function_values(solution, this_value);
 
       // Get values from solution vector (For Trap.Rule)
-      std::vector<std::vector<Tensor<1, 3>>> grads_here(
-        n_q_points, std::vector<Tensor<1, 3>>(n_components));
+      std::vector<std::vector<Tensor<1, 3>>> grads_here(n_q_points,
+                                                        std::vector<Tensor<1, 3>>(n_components));
       fe_values.get_function_gradients(solution, grads_here);
 
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
@@ -107,12 +105,12 @@ void EvaluateDerivative(DoFHandler<3> &dof_handler, Vector<double> &solution)
           // evaluate the values of the solution at the quadrature point
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              u0 += (solution(local_dof_indices[i]) *
-                     fe_values.shape_value_component(i, q_point, 0));
-              v0 += (solution(local_dof_indices[i]) *
-                     fe_values.shape_value_component(i, q_point, 1));
-              w0 += (solution(local_dof_indices[i]) *
-                     fe_values.shape_value_component(i, q_point, 2));
+              u0 +=
+                (solution(local_dof_indices[i]) * fe_values.shape_value_component(i, q_point, 0));
+              v0 +=
+                (solution(local_dof_indices[i]) * fe_values.shape_value_component(i, q_point, 1));
+              w0 +=
+                (solution(local_dof_indices[i]) * fe_values.shape_value_component(i, q_point, 2));
             }
 
           // subtract from it the exact solution
@@ -128,8 +126,7 @@ void EvaluateDerivative(DoFHandler<3> &dof_handler, Vector<double> &solution)
           double dvdy = grads_here[q_point][1][1];
           double dwdz = grads_here[q_point][2][2];
 
-          err_hdiv += (dudx + dvdy + dwdz) * (dudx + dvdy + dwdz) *
-                      fe_values.JxW(q_point);
+          err_hdiv += (dudx + dvdy + dwdz) * (dudx + dvdy + dwdz) * fe_values.JxW(q_point);
         }
     }
 
@@ -169,16 +166,13 @@ create_mass_matrix(const Mapping<dim> &       mapping,
   FullMatrix<double>          cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>              cell_vector(dofs_per_cell);
   std::vector<double>         coefficient_values(n_q_points);
-  std::vector<Vector<double>> coefficient_vector_values(
-    n_q_points, Vector<double>(n_components));
+  std::vector<Vector<double>> coefficient_vector_values(n_q_points, Vector<double>(n_components));
 
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
 
-  std::vector<Vector<double>> rhs_values(n_q_points,
-                                         Vector<double>(n_components));
+  std::vector<Vector<double>> rhs_values(n_q_points, Vector<double>(n_components));
 
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                 endc = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
   for (; cell != endc; ++cell)
     {
       fe_values.reinit(cell);
@@ -187,16 +181,14 @@ create_mass_matrix(const Mapping<dim> &       mapping,
       cell->get_dof_indices(dof_indices);
 
       const std::vector<double> &weights = fe_values.get_JxW_values();
-      rhs_function.vector_value_list(fe_values.get_quadrature_points(),
-                                     rhs_values);
+      rhs_function.vector_value_list(fe_values.get_quadrature_points(), rhs_values);
       cell_vector = 0;
 
       if (coefficient != nullptr)
         {
           if (coefficient->n_components == 1)
             {
-              coefficient->value_list(fe_values.get_quadrature_points(),
-                                      coefficient_values);
+              coefficient->value_list(fe_values.get_quadrature_points(), coefficient_values);
               for (unsigned int point = 0; point < n_q_points; ++point)
                 {
                   const double weight = fe_values.JxW(point);
@@ -207,11 +199,9 @@ create_mass_matrix(const Mapping<dim> &       mapping,
                         {
                           const double u = fe_values.shape_value(j, point);
 
-                          if ((n_components == 1) ||
-                              (fe.system_to_component_index(i).first ==
-                               fe.system_to_component_index(j).first))
-                            cell_matrix(i, j) +=
-                              (u * v * weight * coefficient_values[point]);
+                          if ((n_components == 1) || (fe.system_to_component_index(i).first ==
+                                                      fe.system_to_component_index(j).first))
+                            cell_matrix(i, j) += (u * v * weight * coefficient_values[point]);
                         }
                     }
                 }
@@ -225,18 +215,15 @@ create_mass_matrix(const Mapping<dim> &       mapping,
                   const double weight = fe_values.JxW(point);
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
-                      const double       v = fe_values.shape_value(i, point);
-                      const unsigned int component_i =
-                        fe.system_to_component_index(i).first;
+                      const double       v           = fe_values.shape_value(i, point);
+                      const unsigned int component_i = fe.system_to_component_index(i).first;
                       for (unsigned int j = 0; j < dofs_per_cell; ++j)
                         {
                           const double u = fe_values.shape_value(j, point);
                           if ((n_components == 1) ||
-                              (fe.system_to_component_index(j).first ==
-                               component_i))
+                              (fe.system_to_component_index(j).first == component_i))
                             cell_matrix(i, j) +=
-                              (u * v * weight *
-                               coefficient_vector_values[point](component_i));
+                              (u * v * weight * coefficient_vector_values[point](component_i));
                         }
                     }
                 }
@@ -255,29 +242,23 @@ create_mass_matrix(const Mapping<dim> &       mapping,
               const double weight = fe_values.JxW(point);
               //      const double weight = q.weight(point);
 
-              std::vector<Vector<double>> val_vector(
-                dofs_per_cell, Vector<double>(n_components));
+              std::vector<Vector<double>> val_vector(dofs_per_cell, Vector<double>(n_components));
 
               // Precompute the component values
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                for (unsigned int comp_i = 0; comp_i < fe.n_components();
-                     ++comp_i)
+                for (unsigned int comp_i = 0; comp_i < fe.n_components(); ++comp_i)
                   {
                     val_vector[i](comp_i) =
-                      sign_change[i] *
-                      fe_values.shape_value_component(i, point, comp_i);
+                      sign_change[i] * fe_values.shape_value_component(i, point, comp_i);
                   }
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                for (unsigned int comp_i = 0; comp_i < fe.n_components();
-                     ++comp_i)
+                for (unsigned int comp_i = 0; comp_i < fe.n_components(); ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i] == true)
                     {
                       const double v = val_vector[i](comp_i);
                       for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                        for (unsigned int comp_j = 0;
-                             comp_j < fe.n_components();
-                             ++comp_j)
+                        for (unsigned int comp_j = 0; comp_j < fe.n_components(); ++comp_j)
                           if (fe.get_nonzero_components(j)[comp_j] == true)
                             {
                               const double u = val_vector[j](comp_j);
@@ -287,12 +268,11 @@ create_mass_matrix(const Mapping<dim> &       mapping,
                     }
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                for (unsigned int comp_i = 0; comp_i < fe.n_components();
-                     ++comp_i)
+                for (unsigned int comp_i = 0; comp_i < fe.n_components(); ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i] == true)
                     {
-                      cell_vector(i) += rhs_values[point](comp_i) *
-                                        val_vector[i](comp_i) * weights[point];
+                      cell_vector(i) +=
+                        rhs_values[point](comp_i) * val_vector[i](comp_i) * weights[point];
                     }
             }
         }
@@ -327,14 +307,12 @@ create_right_hand_side(const Mapping<dim> &   mapping,
   FEValues<dim> fe_values(mapping, fe, quadrature, update_flags);
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-                     n_q_points    = fe_values.n_quadrature_points,
-                     n_components  = fe.n_components();
+                     n_q_points = fe_values.n_quadrature_points, n_components = fe.n_components();
 
   std::vector<unsigned int> dofs(dofs_per_cell);
   Vector<double>            cell_vector(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
 
   if (n_components == 1)
@@ -346,15 +324,13 @@ create_right_hand_side(const Mapping<dim> &   mapping,
           fe_values.reinit(cell);
 
           const std::vector<double> &weights = fe_values.get_JxW_values();
-          rhs_function.value_list(fe_values.get_quadrature_points(),
-                                  rhs_values);
+          rhs_function.value_list(fe_values.get_quadrature_points(), rhs_values);
 
           cell_vector = 0;
           for (unsigned int point = 0; point < n_q_points; ++point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_vector(i) += rhs_values[point] *
-                                fe_values.shape_value(i, point) *
-                                weights[point];
+              cell_vector(i) +=
+                rhs_values[point] * fe_values.shape_value(i, point) * weights[point];
 
           cell->get_dof_indices(dofs);
 
@@ -364,30 +340,26 @@ create_right_hand_side(const Mapping<dim> &   mapping,
     }
   else
     {
-      std::vector<Vector<double>> rhs_values(n_q_points,
-                                             Vector<double>(n_components));
+      std::vector<Vector<double>> rhs_values(n_q_points, Vector<double>(n_components));
 
       for (; cell != endc; ++cell)
         {
           fe_values.reinit(cell);
 
           const std::vector<double> &weights = fe_values.get_JxW_values();
-          rhs_function.vector_value_list(fe_values.get_quadrature_points(),
-                                         rhs_values);
+          rhs_function.vector_value_list(fe_values.get_quadrature_points(), rhs_values);
 
           cell_vector = 0;
           for (unsigned int point = 0; point < n_q_points; ++point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              for (unsigned int comp_i = 0; comp_i < fe.n_components();
-                   ++comp_i)
+              for (unsigned int comp_i = 0; comp_i < fe.n_components(); ++comp_i)
                 //        if (fe.get_nonzero_components(i)[comp_i] == true)
                 {
                   double det = weights[point] / quadrature.weight(point);
 
-                  cell_vector(i) +=
-                    rhs_values[point](comp_i) *
-                    fe_values.shape_value_component(i, point, comp_i) *
-                    weights[point];
+                  cell_vector(i) += rhs_values[point](comp_i) *
+                                    fe_values.shape_value_component(i, point, comp_i) *
+                                    weights[point];
                 }
 
           cell->get_dof_indices(dofs);
@@ -417,8 +389,7 @@ project(const Mapping<dim> &    mapping,
         const Quadrature<dim - 1> &                   = QGauss<dim - 1>(2),
         const bool project_to_boundary_first          = false)
 {
-  Assert(dof.get_fe().n_components() == function.n_components,
-         ExcInternalError());
+  Assert(dof.get_fe().n_components() == function.n_components, ExcInternalError());
 
   const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -452,9 +423,8 @@ project(const Mapping<dim> &    mapping,
       // that is actually wholly on
       // the boundary, not only by
       // one line or one vertex
-      typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                     endc = dof.end();
-      std::vector<types::global_dof_index> face_dof_indices(fe.dofs_per_face);
+      typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
+      std::vector<types::global_dof_index>           face_dof_indices(fe.dofs_per_face);
       for (; cell != endc; ++cell)
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->face(f)->at_boundary())
@@ -474,8 +444,7 @@ project(const Mapping<dim> &    mapping,
 
   // set up mass matrix and right hand side
   vec.reinit(dof.n_dofs());
-  SparsityPattern sparsity(
-    dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
+  SparsityPattern sparsity(dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, sparsity);
   constraints.condense(sparsity);
 
@@ -487,8 +456,7 @@ project(const Mapping<dim> &    mapping,
   constraints.condense(mass_matrix);
   constraints.condense(tmp);
   if (boundary_values.size() != 0)
-    MatrixTools::apply_boundary_values(
-      boundary_values, mass_matrix, vec, tmp, true);
+    MatrixTools::apply_boundary_values(boundary_values, mass_matrix, vec, tmp, true);
 
   SolverControl           control(1000, 1e-16, false, false);
   PrimitiveVectorMemory<> memory;
@@ -525,8 +493,7 @@ main()
 
 
   FE_ABF<3> fe(0);
-  deallog << "Dofs/cell " << fe.dofs_per_cell << ", Dofs/face "
-          << fe.dofs_per_face << std::endl;
+  deallog << "Dofs/cell " << fe.dofs_per_cell << ", Dofs/face " << fe.dofs_per_face << std::endl;
 
   DoFHandler<3> dof_handler(tria_test);
   dof_handler.distribute_dofs(fe);

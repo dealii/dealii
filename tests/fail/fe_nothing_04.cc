@@ -57,11 +57,9 @@ test()
   // in multicomponent systems (for, e.g., solving
   // Stokes' equations).
 
-  fe_collection.push_back(
-    FESystem<dim>(FE_RaviartThomas<dim>(0), 1, FE_DGQ<dim>(0), 1));
+  fe_collection.push_back(FESystem<dim>(FE_RaviartThomas<dim>(0), 1, FE_DGQ<dim>(0), 1));
 
-  fe_collection.push_back(
-    FESystem<dim>(FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1));
+  fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1));
 
 
   hp::DoFHandler<dim> dof_handler(triangulation);
@@ -71,8 +69,7 @@ test()
   // FE_Nothing, while outside the
   // circle to be of type RT(0)/DG(0)
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
 
   for (; cell != endc; cell++)
@@ -88,10 +85,8 @@ test()
 
   dof_handler.distribute_dofs(fe_collection);
 
-  deallog << "   Number of active cells:       "
-          << triangulation.n_active_cells() << std::endl
-          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "   Number of active cells:       " << triangulation.n_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 }
 
 

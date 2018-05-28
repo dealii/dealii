@@ -192,17 +192,15 @@ TensorProductPolynomialsConst<0>::n() const
 template <int dim>
 template <int order>
 Tensor<order, dim>
-TensorProductPolynomialsConst<dim>::compute_derivative(
-  const unsigned int i,
-  const Point<dim> & p) const
+TensorProductPolynomialsConst<dim>::compute_derivative(const unsigned int i,
+                                                       const Point<dim> & p) const
 {
   const unsigned int max_indices = this->n_tensor_pols;
   Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_indices)
-    return this
-      ->TensorProductPolynomials<dim>::template compute_derivative<order>(i, p);
+    return this->TensorProductPolynomials<dim>::template compute_derivative<order>(i, p);
   else
     // this is for the constant function
     return Tensor<order, dim>();

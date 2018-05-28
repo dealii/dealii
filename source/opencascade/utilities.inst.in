@@ -26,16 +26,14 @@ for (deal_II_dimension : DIMENSIONS)
                                 const Tensor<1, deal_II_dimension> &direction,
                                 const double                        tolerance);
 
-    template Point<deal_II_dimension> point(const gp_Pnt &p,
-                                            const double &tolerance);
+    template Point<deal_II_dimension> point(const gp_Pnt &p, const double &tolerance);
 
     template gp_Pnt point(const Point<deal_II_dimension> &p);
 
-    template TopoDS_Edge interpolation_curve(
-      std::vector<Point<deal_II_dimension>> & curve_points,
-      const Tensor<1, deal_II_dimension> &direction,
-      const bool                          closed,
-      const double                        tolerance);
+    template TopoDS_Edge interpolation_curve(std::vector<Point<deal_II_dimension>> & curve_points,
+                                             const Tensor<1, deal_II_dimension> &direction,
+                                             const bool                          closed,
+                                             const double                        tolerance);
 
     template Point<deal_II_dimension> push_forward(
       const TopoDS_Shape &in_shape, const double u, const double v);
@@ -46,18 +44,15 @@ for (deal_II_dimension : DIMENSIONS)
       const Tensor<1, deal_II_dimension> &direction,
       const double                        tolerance);
 
-    template void create_triangulation(
-      const TopoDS_Face &face, Triangulation<2, deal_II_dimension> &tria);
+    template void create_triangulation(const TopoDS_Face &                  face,
+                                       Triangulation<2, deal_II_dimension> &tria);
 
     template std::tuple<Point<deal_II_dimension>, TopoDS_Shape, double, double>
-    project_point_and_pull_back(const TopoDS_Shape &            in_shape,
-                                const Point<deal_II_dimension> &origin,
-                                const double                    tolerance);
+    project_point_and_pull_back(
+      const TopoDS_Shape &in_shape, const Point<deal_II_dimension> &origin, const double tolerance);
 
     template Point<deal_II_dimension> closest_point(
-      const TopoDS_Shape &            in_shape,
-      const Point<deal_II_dimension> &origin,
-      const double                    tolerance);
+      const TopoDS_Shape &in_shape, const Point<deal_II_dimension> &origin, const double tolerance);
 
 #endif
   }

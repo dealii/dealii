@@ -33,8 +33,7 @@ main()
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  const std::vector<Polynomial<double>> p =
-    Hierarchical::generate_complete_basis(10);
+  const std::vector<Polynomial<double>> p = Hierarchical::generate_complete_basis(10);
 
   const unsigned int div = 30;
   for (unsigned int i = 0; i <= div; ++i)

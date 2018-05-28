@@ -41,10 +41,9 @@ do_test(const Triangulation<dim, spacedim> &tria)
       MappingQGeneric<dim, spacedim> mapping(degree);
       FE_Nothing<dim, spacedim>      fe;
       QGauss<dim>                    gauss(degree + 1);
-      FEValues<dim, spacedim> fe_values(mapping, fe, gauss, update_JxW_values);
-      double                  volume = 0;
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             tria.begin_active();
+      FEValues<dim, spacedim>        fe_values(mapping, fe, gauss, update_JxW_values);
+      double                         volume = 0;
+      for (typename Triangulation<dim, spacedim>::cell_iterator cell = tria.begin_active();
            cell != tria.end();
            ++cell)
         {
@@ -53,9 +52,8 @@ do_test(const Triangulation<dim, spacedim> &tria)
             volume += fe_values.JxW(q);
         }
 
-      deallog << std::setw(4) << tria.n_active_cells()
-              << " cells, degree=" << degree << ": " << std::setprecision(12)
-              << std::setw(14) << volume << std::endl;
+      deallog << std::setw(4) << tria.n_active_cells() << " cells, degree=" << degree << ": "
+              << std::setprecision(12) << std::setw(14) << volume << std::endl;
     }
   deallog << std::endl;
 }
@@ -64,8 +62,7 @@ template <int dim, int spacedim>
 void
 test_polar()
 {
-  deallog << "Testing with PolarManifold dim=" << dim
-          << ", spacedim=" << spacedim << std::endl;
+  deallog << "Testing with PolarManifold dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
   PolarManifold<dim, spacedim>                    polar_manifold;
   TransfiniteInterpolationManifold<dim, spacedim> manifold;
@@ -88,8 +85,7 @@ template <int dim, int spacedim>
 void
 test_spherical()
 {
-  deallog << "Testing with SphericalManifold dim=" << dim
-          << ", spacedim=" << spacedim << std::endl;
+  deallog << "Testing with SphericalManifold dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
   SphericalManifold<dim, spacedim>                spherical_manifold;
   TransfiniteInterpolationManifold<dim, spacedim> manifold;
@@ -119,20 +115,16 @@ test_cylinder(unsigned int ref = 1)
   GridGenerator::cylinder(tria);
 
   tria.set_all_manifold_ids(1);
-  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     {
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->at_boundary(face))
           {
             bool cell_at_surfaces = true;
-            for (unsigned int i = 1; i < GeometryInfo<dim>::vertices_per_face;
-                 ++i)
-              if (std::abs(cell->face(face)->vertex(i)[0] -
-                           cell->face(face)->vertex(0)[0]) > 1e-10)
+            for (unsigned int i = 1; i < GeometryInfo<dim>::vertices_per_face; ++i)
+              if (std::abs(cell->face(face)->vertex(i)[0] - cell->face(face)->vertex(0)[0]) > 1e-10)
                 cell_at_surfaces = false;
             if (cell_at_surfaces == false)
               cell->face(face)->set_all_manifold_ids(0);

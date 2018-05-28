@@ -37,9 +37,7 @@
 
 template <int dim>
 inline void
-plot_derivatives(Mapping<dim> &      mapping,
-                 FiniteElement<dim> &finel,
-                 const char *        name)
+plot_derivatives(Mapping<dim> &mapping, FiniteElement<dim> &finel, const char *name)
 {
   deallog.push(name);
 
@@ -53,8 +51,7 @@ plot_derivatives(Mapping<dim> &      mapping,
 
   QTrapez<dim> q;
   //  QIterated<dim> q(q_trapez, div);
-  FEValues<dim> fe(
-    mapping, finel, q, UpdateFlags(update_gradients | update_hessians));
+  FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_gradients | update_hessians));
   fe.reinit(c);
 
   unsigned int k = 0;

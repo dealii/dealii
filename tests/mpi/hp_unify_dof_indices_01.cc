@@ -54,8 +54,7 @@ test()
   Point<dim> top_right;
   for (unsigned int d = 0; d < dim; ++d)
     top_right[d] = (d == 0 ? 2 : 1);
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, reps, Point<dim>(), top_right);
+  GridGenerator::subdivided_hyper_rectangle(triangulation, reps, Point<dim>(), top_right);
   Assert(triangulation.n_global_active_cells() == 2, ExcInternalError());
   Assert(triangulation.n_active_cells() == 2, ExcInternalError());
 
@@ -70,14 +69,12 @@ test()
     (++dof_handler.begin_active())->set_active_fe_index(1);
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-          << std::endl;
+  deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) << std::endl;
   for (auto cell : dof_handler.active_cell_iterators())
     {
       deallog << "  Cell: " << cell << std::endl;
 
-      std::vector<types::global_dof_index> dof_indices(
-        cell->get_fe().dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices(cell->get_fe().dofs_per_cell);
       cell->get_dof_indices(dof_indices);
       deallog << "    ";
       for (auto i : dof_indices)

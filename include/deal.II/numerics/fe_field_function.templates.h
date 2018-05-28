@@ -42,12 +42,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
   template <int dim, typename DoFHandlerType, typename VectorType>
-  FEFieldFunction<dim, DoFHandlerType, VectorType>::FEFieldFunction(
-    const DoFHandlerType &mydh,
-    const VectorType &    myv,
-    const Mapping<dim> &  mymapping) :
-    Function<dim, typename VectorType::value_type>(
-      mydh.get_fe(0).n_components()),
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::FEFieldFunction(const DoFHandlerType &mydh,
+                                                                    const VectorType &    myv,
+                                                                    const Mapping<dim> &mymapping) :
+    Function<dim, typename VectorType::value_type>(mydh.get_fe(0).n_components()),
     dh(&mydh, "FEFieldFunction"),
     data_vector(myv),
     mapping(mymapping),
@@ -82,12 +80,11 @@ namespace Functions
     boost::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
-        const std::pair<typename dealii::internal::
-                          ActiveCellIterator<dim, dim, DoFHandlerType>::type,
-                        Point<dim>>
+        const std::pair<
+          typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type,
+          Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        AssertThrow(!my_pair.first->is_artificial(), VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp   = my_pair.second;
@@ -96,8 +93,7 @@ namespace Functions
     cell_hint.get() = cell;
 
     // check that the current cell is available:
-    AssertThrow(!cell->is_artificial(),
-                VectorTools::ExcPointNotAvailableHere());
+    AssertThrow(!cell->is_artificial(), VectorTools::ExcPointNotAvailableHere());
 
     // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
@@ -113,9 +109,8 @@ namespace Functions
 
   template <int dim, typename DoFHandlerType, typename VectorType>
   typename VectorType::value_type
-  FEFieldFunction<dim, DoFHandlerType, VectorType>::value(
-    const Point<dim> & p,
-    const unsigned int comp) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::value(const Point<dim> & p,
+                                                          const unsigned int comp) const
   {
     Vector<typename VectorType::value_type> values(this->n_components);
     vector_value(p, values);
@@ -128,8 +123,7 @@ namespace Functions
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::vector_gradient(
     const Point<dim> &                                            p,
-    std::vector<Tensor<1, dim, typename VectorType::value_type>> &gradients)
-    const
+    std::vector<Tensor<1, dim, typename VectorType::value_type>> &gradients) const
   {
     typedef typename VectorType::value_type number;
     Assert(gradients.size() == this->n_components,
@@ -141,20 +135,18 @@ namespace Functions
     boost::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
-        const std::pair<typename dealii::internal::
-                          ActiveCellIterator<dim, dim, DoFHandlerType>::type,
-                        Point<dim>>
+        const std::pair<
+          typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type,
+          Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        AssertThrow(!my_pair.first->is_artificial(), VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp   = my_pair.second;
       }
 
     // check that the current cell is available:
-    AssertThrow(!cell->is_artificial(),
-                VectorTools::ExcPointNotAvailableHere());
+    AssertThrow(!cell->is_artificial(), VectorTools::ExcPointNotAvailableHere());
 
     cell_hint.get() = cell;
 
@@ -187,12 +179,10 @@ namespace Functions
 
   template <int dim, typename DoFHandlerType, typename VectorType>
   Tensor<1, dim, typename VectorType::value_type>
-  FEFieldFunction<dim, DoFHandlerType, VectorType>::gradient(
-    const Point<dim> & p,
-    const unsigned int comp) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::gradient(const Point<dim> & p,
+                                                             const unsigned int comp) const
   {
-    std::vector<Tensor<1, dim, typename VectorType::value_type>> grads(
-      this->n_components);
+    std::vector<Tensor<1, dim, typename VectorType::value_type>> grads(this->n_components);
     vector_gradient(p, grads);
     return grads[comp];
   }
@@ -214,20 +204,18 @@ namespace Functions
     boost::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
-        const std::pair<typename dealii::internal::
-                          ActiveCellIterator<dim, dim, DoFHandlerType>::type,
-                        Point<dim>>
+        const std::pair<
+          typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type,
+          Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        AssertThrow(!my_pair.first->is_artificial(), VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp   = my_pair.second;
       }
 
     // check that the current cell is available:
-    AssertThrow(!cell->is_artificial(),
-                VectorTools::ExcPointNotAvailableHere());
+    AssertThrow(!cell->is_artificial(), VectorTools::ExcPointNotAvailableHere());
 
     cell_hint.get() = cell;
 
@@ -245,9 +233,8 @@ namespace Functions
 
   template <int dim, typename DoFHandlerType, typename VectorType>
   typename VectorType::value_type
-  FEFieldFunction<dim, DoFHandlerType, VectorType>::laplacian(
-    const Point<dim> & p,
-    const unsigned int comp) const
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::laplacian(const Point<dim> & p,
+                                                              const unsigned int comp) const
   {
     Vector<typename VectorType::value_type> lap(this->n_components);
     vector_laplacian(p, lap);
@@ -264,15 +251,13 @@ namespace Functions
     const std::vector<Point<dim>> &                       points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    Assert(points.size() == values.size(), ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
     std::vector<std::vector<Point<dim>>>                       qpoints;
     std::vector<std::vector<unsigned int>>                     maps;
 
-    const unsigned int n_cells =
-      compute_point_locations(points, cells, qpoints, maps);
+    const unsigned int           n_cells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim>   mapping_collection(mapping);
     const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim>         quadrature_collection;
@@ -287,15 +272,13 @@ namespace Functions
         quadrature_collection.push_back(Quadrature<dim>(qpoints[i], ww));
       }
     // Get a function value object
-    hp::FEValues<dim> fe_v(
-      mapping_collection, fe_collection, quadrature_collection, update_values);
+    hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection, update_values);
     // Now gather all the information we need
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        AssertThrow(!cells[i]->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        AssertThrow(!cells[i]->is_artificial(), VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
-        const unsigned int nq = qpoints[i].size();
+        const unsigned int                                   nq = qpoints[i].size();
         std::vector<Vector<typename VectorType::value_type>> vvalues(
           nq, Vector<typename VectorType::value_type>(this->n_components));
         fe_v.get_present_fe_values().get_function_values(data_vector, vvalues);
@@ -313,11 +296,9 @@ namespace Functions
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    Assert(points.size() == values.size(), ExcDimensionMismatch(points.size(), values.size()));
     std::vector<Vector<typename VectorType::value_type>> vvalues(
-      points.size(),
-      Vector<typename VectorType::value_type>(this->n_components));
+      points.size(), Vector<typename VectorType::value_type>(this->n_components));
     vector_value_list(points, vvalues);
     for (unsigned int q = 0; q < points.size(); ++q)
       values[q] = vvalues[q](component);
@@ -328,19 +309,16 @@ namespace Functions
   template <int dim, typename DoFHandlerType, typename VectorType>
   void
   FEFieldFunction<dim, DoFHandlerType, VectorType>::vector_gradient_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
-      &values) const
+    const std::vector<Point<dim>> &                                            points,
+    std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>> &values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    Assert(points.size() == values.size(), ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
     std::vector<std::vector<Point<dim>>>                       qpoints;
     std::vector<std::vector<unsigned int>>                     maps;
 
-    const unsigned int n_cells =
-      compute_point_locations(points, cells, qpoints, maps);
+    const unsigned int           n_cells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim>   mapping_collection(mapping);
     const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim>         quadrature_collection;
@@ -355,24 +333,17 @@ namespace Functions
         quadrature_collection.push_back(Quadrature<dim>(qpoints[i], ww));
       }
     // Get a function value object
-    hp::FEValues<dim> fe_v(mapping_collection,
-                           fe_collection,
-                           quadrature_collection,
-                           update_gradients);
+    hp::FEValues<dim> fe_v(
+      mapping_collection, fe_collection, quadrature_collection, update_gradients);
     // Now gather all the information we need
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        AssertThrow(!cells[i]->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        AssertThrow(!cells[i]->is_artificial(), VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector<
-          std::vector<Tensor<1, dim, typename VectorType::value_type>>>
-          vgrads(nq,
-                 std::vector<Tensor<1, dim, typename VectorType::value_type>>(
-                   this->n_components));
-        fe_v.get_present_fe_values().get_function_gradients(data_vector,
-                                                            vgrads);
+        std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>> vgrads(
+          nq, std::vector<Tensor<1, dim, typename VectorType::value_type>>(this->n_components));
+        fe_v.get_present_fe_values().get_function_gradients(data_vector, vgrads);
         for (unsigned int q = 0; q < nq; ++q)
           {
             const unsigned int s = vgrads[q].size();
@@ -388,14 +359,12 @@ namespace Functions
   FEFieldFunction<dim, DoFHandlerType, VectorType>::gradient_list(
     const std::vector<Point<dim>> &                               points,
     std::vector<Tensor<1, dim, typename VectorType::value_type>> &values,
-    const unsigned int component) const
+    const unsigned int                                            component) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
-    std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
-      vvalues(points.size(),
-              std::vector<Tensor<1, dim, typename VectorType::value_type>>(
-                this->n_components));
+    Assert(points.size() == values.size(), ExcDimensionMismatch(points.size(), values.size()));
+    std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>> vvalues(
+      points.size(),
+      std::vector<Tensor<1, dim, typename VectorType::value_type>>(this->n_components));
     vector_gradient_list(points, vvalues);
     for (unsigned int q = 0; q < points.size(); ++q)
       values[q] = vvalues[q][component];
@@ -408,15 +377,13 @@ namespace Functions
     const std::vector<Point<dim>> &                       points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    Assert(points.size() == values.size(), ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
     std::vector<std::vector<Point<dim>>>                       qpoints;
     std::vector<std::vector<unsigned int>>                     maps;
 
-    const unsigned int n_cells =
-      compute_point_locations(points, cells, qpoints, maps);
+    const unsigned int           n_cells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim>   mapping_collection(mapping);
     const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim>         quadrature_collection;
@@ -431,21 +398,17 @@ namespace Functions
         quadrature_collection.push_back(Quadrature<dim>(qpoints[i], ww));
       }
     // Get a function value object
-    hp::FEValues<dim> fe_v(mapping_collection,
-                           fe_collection,
-                           quadrature_collection,
-                           update_hessians);
+    hp::FEValues<dim> fe_v(
+      mapping_collection, fe_collection, quadrature_collection, update_hessians);
     // Now gather all the information we need
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        AssertThrow(!cells[i]->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        AssertThrow(!cells[i]->is_artificial(), VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
-        const unsigned int nq = qpoints[i].size();
+        const unsigned int                                   nq = qpoints[i].size();
         std::vector<Vector<typename VectorType::value_type>> vvalues(
           nq, Vector<typename VectorType::value_type>(this->n_components));
-        fe_v.get_present_fe_values().get_function_laplacians(data_vector,
-                                                             vvalues);
+        fe_v.get_present_fe_values().get_function_laplacians(data_vector, vvalues);
         for (unsigned int q = 0; q < nq; ++q)
           values[maps[i][q]] = vvalues[q];
       }
@@ -458,11 +421,9 @@ namespace Functions
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    Assert(points.size() == values.size(), ExcDimensionMismatch(points.size(), values.size()));
     std::vector<Vector<typename VectorType::value_type>> vvalues(
-      points.size(),
-      Vector<typename VectorType::value_type>(this->n_components));
+      points.size(), Vector<typename VectorType::value_type>(this->n_components));
     vector_laplacian_list(points, vvalues);
     for (unsigned int q = 0; q < points.size(); ++q)
       values[q] = vvalues[q](component);
@@ -479,8 +440,7 @@ namespace Functions
     std::vector<std::vector<unsigned int>> &                    maps) const
   {
     // Calling the GridTools routine and preparing output
-    auto cell_qpoint_map =
-      GridTools::compute_point_locations(cache, points, cell_hint.get());
+    auto cell_qpoint_map   = GridTools::compute_point_locations(cache, points, cell_hint.get());
     const auto &tria_cells = std::get<0>(cell_qpoint_map);
     cells.resize(tria_cells.size());
     unsigned int i = 0;

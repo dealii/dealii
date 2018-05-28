@@ -33,12 +33,9 @@ main()
   initlog();
 
   deallog << std::endl
-          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]"
-          << std::endl
-          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being"
-          << std::endl
-          << "the distance from (x,y) to four vertices of the square."
-          << std::endl
+          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]" << std::endl
+          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being" << std::endl
+          << "the distance from (x,y) to four vertices of the square." << std::endl
           << std::endl;
 
   double eps = 1e-10;
@@ -64,9 +61,8 @@ main()
                   {
                     double x = quad.point(q)[0];
                     double y = quad.point(q)[1];
-                    approx_integral +=
-                      (pow(x, (double)i) * pow(y, (double)j) * quad.weight(q) /
-                       (quad.point(q) - split_point).norm());
+                    approx_integral += (pow(x, (double)i) * pow(y, (double)j) * quad.weight(q) /
+                                        (quad.point(q) - split_point).norm());
                   }
                 error[index][m][i][j] = approx_integral - exact_integral;
               }
@@ -85,8 +81,7 @@ main()
             deallog << "======= f(x,y) = x^" << i << " y^" << j << std::endl;
 
             for (unsigned int m = 0; m < 6; ++m)
-              deallog << "Order[" << m + 1
-                      << "], error = " << error[index][m][i][j] << std::endl;
+              deallog << "Order[" << m + 1 << "], error = " << error[index][m][i][j] << std::endl;
           }
     }
 }

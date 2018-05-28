@@ -57,30 +57,24 @@ test(std::string filename)
   const FE_Q<dim, spacedim> dummy_fe(1);
   DoFHandler<dim, spacedim> dof_handler(triangulation);
 
-  FEValues<dim, spacedim> fe_values(dummy_fe,
-                                    quadrature,
-                                    update_JxW_values | update_normal_vectors |
-                                      update_quadrature_points);
+  FEValues<dim, spacedim> fe_values(
+    dummy_fe, quadrature, update_JxW_values | update_normal_vectors | update_quadrature_points);
 
   dof_handler.distribute_dofs(dummy_fe);
 
   double area    = 0;
   double normals = 0;
 
-  typename DoFHandler<dim, spacedim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  typename DoFHandler<dim, spacedim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                           endc = dof_handler.end();
 
-  std::vector<Point<spacedim>> expectedcellnormals(
-    fe_values.n_quadrature_points);
+  std::vector<Point<spacedim>> expectedcellnormals(fe_values.n_quadrature_points);
 
   for (; cell != endc; ++cell)
     {
       fe_values.reinit(cell);
-      const std::vector<Tensor<1, spacedim>> &cellnormals =
-        fe_values.get_all_normal_vectors();
-      const std::vector<Point<spacedim>> &quad_points =
-        fe_values.get_quadrature_points();
+      const std::vector<Tensor<1, spacedim>> &cellnormals = fe_values.get_all_normal_vectors();
+      const std::vector<Point<spacedim>> &    quad_points = fe_values.get_quadrature_points();
 
       for (unsigned int i = 0; i < fe_values.n_quadrature_points; ++i)
         {

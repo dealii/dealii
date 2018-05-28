@@ -30,10 +30,8 @@ void
 test()
 {
   // test for an initialized mask
-  AssertThrow(BlockMask(12, false).represents_n_blocks(12) == true,
-              ExcInternalError());
-  AssertThrow(BlockMask(12, false).represents_n_blocks(13) == false,
-              ExcInternalError());
+  AssertThrow(BlockMask(12, false).represents_n_blocks(12) == true, ExcInternalError());
+  AssertThrow(BlockMask(12, false).represents_n_blocks(13) == false, ExcInternalError());
   // test for an empty mask
   AssertThrow(BlockMask().represents_n_blocks(12) == true, ExcInternalError());
   AssertThrow(BlockMask().represents_n_blocks(13) == true, ExcInternalError());

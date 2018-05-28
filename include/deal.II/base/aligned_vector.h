@@ -362,8 +362,7 @@ namespace internal
   template <typename T>
   class AlignedVectorCopy : private parallel::ParallelForInteger
   {
-    static const std::size_t minimum_parallel_grain_size =
-      160000 / sizeof(T) + 1;
+    static const std::size_t minimum_parallel_grain_size = 160000 / sizeof(T) + 1;
 
   public:
     /**
@@ -382,8 +381,7 @@ namespace internal
       destination_(destination)
     {
       Assert(source_end >= source_begin, ExcInternalError());
-      Assert(source_end == source_begin || destination != nullptr,
-             ExcInternalError());
+      Assert(source_end == source_begin || destination != nullptr, ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
         apply_to_subrange(0, size);
@@ -396,8 +394,7 @@ namespace internal
      * the constructor on a subrange given by two integers.
      */
     virtual void
-    apply_to_subrange(const std::size_t begin,
-                      const std::size_t end) const override
+    apply_to_subrange(const std::size_t begin, const std::size_t end) const override
     {
       if (end == begin)
         return;
@@ -407,9 +404,8 @@ namespace internal
       // never arrive here because they are non-trivial).
 
       if (std::is_trivial<T>::value == true)
-        std::memcpy((void *)(destination_ + begin),
-                    (void *)(source_ + begin),
-                    (end - begin) * sizeof(T));
+        std::memcpy(
+          (void *)(destination_ + begin), (void *)(source_ + begin), (end - begin) * sizeof(T));
       else
         for (std::size_t i = begin; i < end; ++i)
           new (&destination_[i]) T(source_[i]);
@@ -429,8 +425,7 @@ namespace internal
   template <typename T>
   class AlignedVectorMove : private parallel::ParallelForInteger
   {
-    static const std::size_t minimum_parallel_grain_size =
-      160000 / sizeof(T) + 1;
+    static const std::size_t minimum_parallel_grain_size = 160000 / sizeof(T) + 1;
 
   public:
     /**
@@ -442,15 +437,12 @@ namespace internal
      * The data is moved between the two arrays by invoking the destructor on
      * the source range (preparing for a subsequent call to free).
      */
-    AlignedVectorMove(T *const source_begin,
-                      T *const source_end,
-                      T *const destination) :
+    AlignedVectorMove(T *const source_begin, T *const source_end, T *const destination) :
       source_(source_begin),
       destination_(destination)
     {
       Assert(source_end >= source_begin, ExcInternalError());
-      Assert(source_end == source_begin || destination != nullptr,
-             ExcInternalError());
+      Assert(source_end == source_begin || destination != nullptr, ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
         apply_to_subrange(0, size);
@@ -463,8 +455,7 @@ namespace internal
      * the constructor on a subrange given by two integers.
      */
     virtual void
-    apply_to_subrange(const std::size_t begin,
-                      const std::size_t end) const override
+    apply_to_subrange(const std::size_t begin, const std::size_t end) const override
     {
       if (end == begin)
         return;
@@ -474,9 +465,8 @@ namespace internal
       // never arrive here because they are non-trivial).
 
       if (std::is_trivial<T>::value == true)
-        std::memcpy((void *)(destination_ + begin),
-                    (void *)(source_ + begin),
-                    (end - begin) * sizeof(T));
+        std::memcpy(
+          (void *)(destination_ + begin), (void *)(source_ + begin), (end - begin) * sizeof(T));
       else
         for (std::size_t i = begin; i < end; ++i)
           {
@@ -507,17 +497,14 @@ namespace internal
   template <typename T, bool initialize_memory>
   class AlignedVectorSet : private parallel::ParallelForInteger
   {
-    static const std::size_t minimum_parallel_grain_size =
-      160000 / sizeof(T) + 1;
+    static const std::size_t minimum_parallel_grain_size = 160000 / sizeof(T) + 1;
 
   public:
     /**
      * Constructor. Issues a parallel call if there are sufficiently many
      * elements, otherwise work in serial.
      */
-    AlignedVectorSet(const std::size_t size,
-                     const T &         element,
-                     T *const          destination) :
+    AlignedVectorSet(const std::size_t size, const T &element, T *const destination) :
       element_(element),
       destination_(destination),
       trivial_element(false)
@@ -529,8 +516,7 @@ namespace internal
       // do not use memcmp for long double because on some systems it does not
       // completely fill its memory and may lead to false positives in
       // e.g. valgrind
-      if (std::is_trivial<T>::value == true &&
-          std::is_same<T, long double>::value == false)
+      if (std::is_trivial<T>::value == true && std::is_same<T, long double>::value == false)
         {
           const unsigned char zero[sizeof(T)] = {};
           // cast element to (void*) to silence compiler warning for virtual
@@ -549,19 +535,16 @@ namespace internal
      * This sets elements on a subrange given by two integers.
      */
     virtual void
-    apply_to_subrange(const std::size_t begin,
-                      const std::size_t end) const override
+    apply_to_subrange(const std::size_t begin, const std::size_t end) const override
     {
       // for classes with trivial assignment of zero can use memset. cast
       // element to (void*) to silence compiler warning for virtual
       // classes (they will never arrive here because they are
       // non-trivial).
       if (std::is_trivial<T>::value == true && trivial_element)
-        std::memset(
-          (void *)(destination_ + begin), 0, (end - begin) * sizeof(T));
+        std::memset((void *)(destination_ + begin), 0, (end - begin) * sizeof(T));
       else
-        copy_construct_or_assign(
-          begin, end, std::integral_constant<bool, initialize_memory>());
+        copy_construct_or_assign(begin, end, std::integral_constant<bool, initialize_memory>());
     }
 
   private:
@@ -606,16 +589,14 @@ namespace internal
   template <typename T, bool initialize_memory>
   class AlignedVectorDefaultInitialize : private parallel::ParallelForInteger
   {
-    static const std::size_t minimum_parallel_grain_size =
-      160000 / sizeof(T) + 1;
+    static const std::size_t minimum_parallel_grain_size = 160000 / sizeof(T) + 1;
 
   public:
     /**
      * Constructor. Issues a parallel call if there are sufficiently many
      * elements, otherwise work in serial.
      */
-    AlignedVectorDefaultInitialize(const std::size_t size,
-                                   T *const          destination) :
+    AlignedVectorDefaultInitialize(const std::size_t size, T *const destination) :
       destination_(destination)
     {
       if (size == 0)
@@ -632,19 +613,16 @@ namespace internal
      * This initializes elements on a subrange given by two integers.
      */
     virtual void
-    apply_to_subrange(const std::size_t begin,
-                      const std::size_t end) const override
+    apply_to_subrange(const std::size_t begin, const std::size_t end) const override
     {
       // for classes with trivial assignment of zero can use memset. cast
       // element to (void*) to silence compiler warning for virtual
       // classes (they will never arrive here because they are
       // non-trivial).
       if (std::is_trivial<T>::value == true)
-        std::memset(
-          (void *)(destination_ + begin), 0, (end - begin) * sizeof(T));
+        std::memset((void *)(destination_ + begin), 0, (end - begin) * sizeof(T));
       else
-        default_construct_or_assign(
-          begin, end, std::integral_constant<bool, initialize_memory>());
+        default_construct_or_assign(begin, end, std::integral_constant<bool, initialize_memory>());
     }
 
   private:
@@ -783,8 +761,7 @@ AlignedVector<T>::resize_fast(const size_type size_in)
   // need to still set the values in case the class is non-trivial because
   // virtual classes etc. need to run their (default) constructor
   if (std::is_trivial<T>::value == false && size_in > old_size)
-    dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, _data + old_size);
+    dealii::internal::AlignedVectorDefaultInitialize<T, true>(size_in - old_size, _data + old_size);
 }
 
 
@@ -807,8 +784,7 @@ AlignedVector<T>::resize(const size_type size_in)
 
   // finally set the desired init values
   if (size_in > old_size)
-    dealii::internal::AlignedVectorDefaultInitialize<T, true>(
-      size_in - old_size, _data + old_size);
+    dealii::internal::AlignedVectorDefaultInitialize<T, true>(size_in - old_size, _data + old_size);
 }
 
 
@@ -831,8 +807,7 @@ AlignedVector<T>::resize(const size_type size_in, const T &init)
 
   // finally set the desired init values
   if (size_in > old_size)
-    dealii::internal::AlignedVectorSet<T, true>(
-      size_in - old_size, init, _data + old_size);
+    dealii::internal::AlignedVectorSet<T, true>(size_in - old_size, init, _data + old_size);
 }
 
 
@@ -857,8 +832,7 @@ AlignedVector<T>::reserve(const size_type size_alloc)
       // allocate and align along 64-byte boundaries (this is enough for all
       // levels of vectorization currently supported by deal.II)
       T *new_data;
-      Utilities::System::posix_memalign(
-        (void **)&new_data, 64, size_actual_allocate);
+      Utilities::System::posix_memalign((void **)&new_data, 64, size_actual_allocate);
 
       // copy data in case there was some content before and release the old
       // memory with the function corresponding to the one used for allocating
@@ -867,8 +841,7 @@ AlignedVector<T>::reserve(const size_type size_alloc)
       _end_allocated = _data + new_size;
       if (_end_data != _data)
         {
-          dealii::internal::AlignedVectorMove<T>(
-            new_data, new_data + old_size, _data);
+          dealii::internal::AlignedVectorMove<T>(new_data, new_data + old_size, _data);
           free(new_data);
         }
       else
@@ -1010,8 +983,7 @@ AlignedVector<T>::capacity() const
 
 
 template <class T>
-inline typename AlignedVector<T>::reference AlignedVector<T>::
-                                            operator[](const size_type index)
+inline typename AlignedVector<T>::reference AlignedVector<T>::operator[](const size_type index)
 {
   AssertIndexRange(index, size());
   return _data[index];
@@ -1122,8 +1094,7 @@ operator==(const AlignedVector<T> &lhs, const AlignedVector<T> &rhs)
 {
   if (lhs.size() != rhs.size())
     return false;
-  for (typename AlignedVector<T>::const_iterator lit = lhs.begin(),
-                                                 rit = rhs.begin();
+  for (typename AlignedVector<T>::const_iterator lit = lhs.begin(), rit = rhs.begin();
        lit != lhs.end();
        ++lit, ++rit)
     if (*lit != *rit)

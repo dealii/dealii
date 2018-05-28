@@ -37,8 +37,7 @@ test()
   const unsigned int N = 200;
 
   // build the sparse matrix
-  PETScWrappers::MPI::SparseMatrix matrix(
-    PETSC_COMM_WORLD, N * N, N * N, N * N, N * N, 5);
+  PETScWrappers::MPI::SparseMatrix matrix(PETSC_COMM_WORLD, N * N, N * N, N * N, N * N, 5);
   for (unsigned int i = 0; i < N; i++)
     for (unsigned int j = 0; j < N; j++)
       {
@@ -97,13 +96,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -111,12 +108,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

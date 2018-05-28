@@ -49,11 +49,10 @@ test(std::string filename)
   grid_out.set_flags(GridOutFlags::Ucd(true));
   grid_out.write_ucd(tria, logfile);
 
-  QTrapez<dim>                   quad;
-  MappingQGeneric<dim, spacedim> mapping(1);
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
+  QTrapez<dim>                                                quad;
+  MappingQGeneric<dim, spacedim>                              mapping(1);
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active(),
+                                                              endc = tria.end();
   Point<spacedim> real;
   Point<dim>      unit;
   double          eps = 1e-10;
@@ -66,8 +65,7 @@ test(std::string filename)
           unit = mapping.transform_real_to_unit_cell(cell, real);
           deallog << quad.point(q) << " -> " << real << std::endl;
           if ((unit - quad.point(q)).norm() > eps)
-            deallog << "Error: " << quad.point(q) << " != " << unit
-                    << std::endl;
+            deallog << "Error: " << quad.point(q) << " != " << unit << std::endl;
         }
     }
 }

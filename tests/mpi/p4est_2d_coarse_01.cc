@@ -49,8 +49,7 @@ test()
         {
           gi.read_xda(in);
         }
-      catch (
-        const typename Triangulation<dim>::DistortedCellList &distorted_cells)
+      catch (const typename Triangulation<dim>::DistortedCellList &distorted_cells)
         {
           // ignore distorted cells
           deallog << distorted_cells.distorted_cells.size()
@@ -58,8 +57,7 @@ test()
         }
 
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-        deallog << "subdomainid = " << tr.begin_active()->subdomain_id()
-                << std::endl;
+        deallog << "subdomainid = " << tr.begin_active()->subdomain_id() << std::endl;
 
       //      std::vector<types::subdomain_id> cell_subd(tr.n_active_cells());
 
@@ -72,8 +70,7 @@ test()
         {
           deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 
-          Assert(tr.n_global_active_cells() == tr.n_active_cells(),
-                 ExcInternalError());
+          Assert(tr.n_global_active_cells() == tr.n_active_cells(), ExcInternalError());
         }
 
       const unsigned int checksum = tr.get_checksum();

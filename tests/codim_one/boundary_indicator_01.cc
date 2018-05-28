@@ -68,8 +68,7 @@ main()
     // exclude one of the 6 faces
     // from the surface mesh
     // extraction
-    for (Triangulation<dim>::active_cell_iterator cell =
-           volume_mesh.begin_active();
+    for (Triangulation<dim>::active_cell_iterator cell = volume_mesh.begin_active();
          cell != volume_mesh.end();
          ++cell)
       {
@@ -93,8 +92,7 @@ main()
     // surface faces
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
-    GridGenerator::extract_boundary_mesh(
-      volume_mesh, boundary_mesh, boundary_ids);
+    GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh, boundary_ids);
     deallog << volume_mesh.n_active_cells() << std::endl;
     deallog << boundary_mesh.n_active_cells() << std::endl;
 
@@ -105,8 +103,7 @@ main()
     // of the mesh to 1 to force
     // straight line refinement, then
     // refine
-    for (Triangulation<dim - 1, dim>::active_cell_iterator cell =
-           boundary_mesh.begin_active();
+    for (Triangulation<dim - 1, dim>::active_cell_iterator cell = boundary_mesh.begin_active();
          cell != boundary_mesh.end();
          ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim - 1>::faces_per_cell; ++f)

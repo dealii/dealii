@@ -215,15 +215,12 @@ protected:
   /* NOTE: The following function has its definition inlined into the class
      declaration because we otherwise run into a compiler error with MS Visual
      Studio. */
-  virtual std::unique_ptr<
-    typename FiniteElement<dim, spacedim>::InternalDataBase>
-  get_data(
-    const UpdateFlags update_flags,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim> &quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      & /*output_data*/) const override
+  virtual std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+  get_data(const UpdateFlags update_flags,
+           const Mapping<dim, spacedim> & /*mapping*/,
+           const Quadrature<dim> &quadrature,
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+             & /*output_data*/) const override
   {
     // generate a new data object and
     // initialize some fields
@@ -259,10 +256,8 @@ protected:
         data->shape_grads.reinit(this->dofs_per_cell, n_q_points);
         data->transformed_shape_grads.resize(n_q_points);
 
-        if ((mapping_type == mapping_raviart_thomas) ||
-            (mapping_type == mapping_piola) ||
-            (mapping_type == mapping_nedelec) ||
-            (mapping_type == mapping_contravariant))
+        if ((mapping_type == mapping_raviart_thomas) || (mapping_type == mapping_piola) ||
+            (mapping_type == mapping_nedelec) || (mapping_type == mapping_contravariant))
           data->untransformed_shape_grads.resize(n_q_points);
       }
 
@@ -285,12 +280,8 @@ protected:
     if (update_flags & (update_values | update_gradients))
       for (unsigned int k = 0; k < n_q_points; ++k)
         {
-          poly_space.compute(quadrature.point(k),
-                             values,
-                             grads,
-                             grad_grads,
-                             third_derivatives,
-                             fourth_derivatives);
+          poly_space.compute(
+            quadrature.point(k), values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
           if (update_flags & update_values)
             {
@@ -332,8 +323,7 @@ protected:
                   {
                     Tensor<3, dim> add_grad_grads;
                     for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
-                      add_grad_grads +=
-                        inverse_node_matrix(j, i) * grad_grads[j];
+                      add_grad_grads += inverse_node_matrix(j, i) * grad_grads[j];
                     data->shape_grad_grads[i][k] = add_grad_grads;
                   }
             }
@@ -347,14 +337,11 @@ protected:
     const CellSimilarity::Similarity                            cell_similarity,
     const Quadrature<dim> &                                     quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_face_values(
@@ -362,14 +349,11 @@ protected:
     const unsigned int                                          face_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_subface_values(
@@ -378,14 +362,11 @@ protected:
     const unsigned int                                          sub_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   /**
    * Fields of cell-independent data for FE_PolyTensor. Stores the values of
@@ -429,7 +410,7 @@ protected:
     mutable std::vector<Tensor<2, dim>>      untransformed_shape_grads;
     // for shape_hessian computations
     mutable std::vector<Tensor<3, spacedim>> transformed_shape_hessians;
-    mutable std::vector<Tensor<3, dim>> untransformed_shape_hessian_tensors;
+    mutable std::vector<Tensor<3, dim>>      untransformed_shape_hessian_tensors;
   };
 
 

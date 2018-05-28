@@ -37,8 +37,7 @@ public:
   {
     std::string name = myname;
 
-    std::unique_ptr<FiniteElement<dim, spacedim>> fe =
-      FETools::get_fe_by_name<dim, spacedim>(name);
+    std::unique_ptr<FiniteElement<dim, spacedim>> fe = FETools::get_fe_by_name<dim, spacedim>(name);
 
     deallog << "Read " << name << std::endl;
     deallog << "Generated :" << std::endl;
@@ -138,15 +137,12 @@ main()
 
   // systems
   gen.generate_all_dim("FESystem[FE_Q_Hierarchical(1)^2-FE_Q_Hierarchical(1)]");
-  gen.generate_all_dim(
-    "FESystem[FE_DGPNonparametric(1)^2-FE_Q_Hierarchical(1)]");
+  gen.generate_all_dim("FESystem[FE_DGPNonparametric(1)^2-FE_Q_Hierarchical(1)]");
   gen.generate_all_dim("FESystem[FE_DGQ(1)^2-FE_Q_Hierarchical(1)]");
   gen.generate_all_dim("FESystem[FE_Q(1)^2-FE_Q_Hierarchical(1)]");
 
-  gen.generate_all_dim(
-    "FESystem[FE_Q_Hierarchical(1)^2-FE_DGPNonparametric(1)]");
-  gen.generate_all_dim(
-    "FESystem[FE_DGPNonparametric(1)^2-FE_DGPNonparametric(1)]");
+  gen.generate_all_dim("FESystem[FE_Q_Hierarchical(1)^2-FE_DGPNonparametric(1)]");
+  gen.generate_all_dim("FESystem[FE_DGPNonparametric(1)^2-FE_DGPNonparametric(1)]");
   gen.generate_all_dim("FESystem[FE_DGQ(1)^2-FE_DGPNonparametric(1)]");
   gen.generate_all_dim("FESystem[FE_Q(1)^2-FE_DGPNonparametric(1)]");
 

@@ -47,25 +47,21 @@ main()
   ez.set(4, 2, 13.);
   ez.set(4, 3, 14.);
 
-  deallog << "FullMatrix<float>::copy_from  SparseMatrixEZ<double>"
-          << std::endl;
+  deallog << "FullMatrix<float>::copy_from  SparseMatrixEZ<double>" << std::endl;
   FullMatrix<float> ff;
   ff.copy_from(ez);
   ff.print_formatted(logfile, 0, false, 5, "~");
 
-  deallog << "LAPACKFullMatrix<double>::copy_from  SparseMatrixEZ<double>"
-          << std::endl;
+  deallog << "LAPACKFullMatrix<double>::copy_from  SparseMatrixEZ<double>" << std::endl;
   LAPACKFullMatrix<double> lfd;
   lfd.copy_from(ez);
   lfd.print_formatted(logfile, 0, false, 5, "~");
 
   lfd.reinit(2, 3);
-  deallog << "LAPACKFullMatrix<double>::fill  SparseMatrixEZ<double>"
-          << std::endl;
+  deallog << "LAPACKFullMatrix<double>::fill  SparseMatrixEZ<double>" << std::endl;
   lfd.fill(ez, 0, 0, 2, 1);
   lfd.print_formatted(logfile, 0, false, 5, "~");
-  deallog << "LAPACKFullMatrix<double>::fill  SparseMatrixEZ<double>"
-          << std::endl;
+  deallog << "LAPACKFullMatrix<double>::fill  SparseMatrixEZ<double>" << std::endl;
   lfd.fill(ez, 1, 1, 4, 2);
   lfd.print_formatted(logfile, 0, false, 5, "~");
 }

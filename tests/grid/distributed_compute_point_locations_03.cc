@@ -45,11 +45,10 @@ void
 test_distributed_cpt(unsigned int ref_cube)
 {
   MPI_Comm     mpi_communicator = MPI_COMM_WORLD;
-  unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
-  unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_communicator);
+  unsigned int n_procs          = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  unsigned int my_rank          = Utilities::MPI::this_mpi_process(mpi_communicator);
 
-  deallog << "Testing for dim = " << dim << " on " << n_procs << " processes"
-          << std::endl;
+  deallog << "Testing for dim = " << dim << " on " << n_procs << " processes" << std::endl;
   deallog << "Cube refinements: " << ref_cube << std::endl;
 
   // Creeating the cube on which to run distributed cpt loc
@@ -69,15 +68,13 @@ test_distributed_cpt(unsigned int ref_cube)
 
   // Computing bounding boxes describing the locally owned part of the mesh
   IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
-  std::vector<BoundingBox<dim>>     local_bbox =
-    GridTools::compute_mesh_predicate_bounding_box(
-      cube_d,
-      std::function<bool(
-        const typename Triangulation<dim>::active_cell_iterator &)>(
-        locally_owned_cell_predicate),
-      1,
-      false,
-      4);
+  std::vector<BoundingBox<dim>>     local_bbox = GridTools::compute_mesh_predicate_bounding_box(
+    cube_d,
+    std::function<bool(const typename Triangulation<dim>::active_cell_iterator &)>(
+      locally_owned_cell_predicate),
+    1,
+    false,
+    4);
 
   // Obtaining the global mesh description through an all to all communication
   std::vector<std::vector<BoundingBox<dim>>> global_bboxes;
@@ -85,8 +82,7 @@ test_distributed_cpt(unsigned int ref_cube)
 
   // Initializing the cache
   GridTools::Cache<dim, dim> cache_d(cube_d);
-  auto                       output_tuple =
-    distributed_compute_point_locations(cache_d, test_points, global_bboxes);
+  auto output_tuple  = distributed_compute_point_locations(cache_d, test_points, global_bboxes);
   const auto &maps   = std::get<2>(output_tuple);
   const auto &points = std::get<3>(output_tuple);
   const auto &ranks  = std::get<4>(output_tuple);
@@ -100,8 +96,7 @@ test_distributed_cpt(unsigned int ref_cube)
       for (unsigned int j = 0; j < maps[i].size(); ++j)
         if ((test_points[maps[i][j]] - points[i][j]).norm() > 1e-10)
           {
-            deallog << " Error in cell " << i << " with position " << j
-                    << std::endl;
+            deallog << " Error in cell " << i << " with position " << j << std::endl;
             deallog << " Received map was: " << maps[i][j] << std::endl;
             deallog << " From rank: " << ranks[i][j] << std::endl;
             test_passed = false;
@@ -120,8 +115,7 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
 
-  deallog << "Deal.II GridTools::distributed_compute_point_locations"
-          << std::endl;
+  deallog << "Deal.II GridTools::distributed_compute_point_locations" << std::endl;
   deallog << "Test 3: maps values" << std::endl;
   deallog << "2D tests:" << std::endl;
   test_distributed_cpt<2>(3);

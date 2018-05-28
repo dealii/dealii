@@ -118,8 +118,7 @@ check1<FE_Nedelec>(const unsigned int min_degree, const unsigned int max_degree)
 // former is also not implemented in 3d
 template <>
 void
-check1<FE_RaviartThomas>(const unsigned int min_degree,
-                         const unsigned int max_degree)
+check1<FE_RaviartThomas>(const unsigned int min_degree, const unsigned int max_degree)
 {
   for (unsigned int degree = min_degree; degree <= max_degree; ++degree)
     {
@@ -129,8 +128,7 @@ check1<FE_RaviartThomas>(const unsigned int min_degree,
 
 template <>
 void
-check1<FE_RaviartThomasNodal>(const unsigned int min_degree,
-                              const unsigned int max_degree)
+check1<FE_RaviartThomasNodal>(const unsigned int min_degree, const unsigned int max_degree)
 {
   for (unsigned int degree = min_degree; degree <= max_degree; ++degree)
     {

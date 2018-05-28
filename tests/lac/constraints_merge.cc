@@ -35,8 +35,7 @@ merge_check()
   // objects, once with open ones
   for (unsigned int run = 0; run < 2; ++run)
     {
-      deallog << "Checking with " << (run == 0 ? "open" : "closed")
-              << " objects" << std::endl;
+      deallog << "Checking with " << (run == 0 ? "open" : "closed") << " objects" << std::endl;
 
       // check that the `merge' function
       // works correctly

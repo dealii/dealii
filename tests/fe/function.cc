@@ -60,11 +60,10 @@ vector_values(const FiniteElement<dim> &fe)
     v(i) = i;
 
   FEValues<dim>              feval(fe, quadrature, update_values);
-  std::vector<Vector<float>> local(quadrature.size(),
-                                   Vector<float>(fe.n_components()));
+  std::vector<Vector<float>> local(quadrature.size(), Vector<float>(fe.n_components()));
 
-  typename DoFHandler<dim>::active_cell_iterator cell      = dof.begin_active();
-  const typename DoFHandler<dim>::active_cell_iterator end = dof.end();
+  typename DoFHandler<dim>::active_cell_iterator       cell = dof.begin_active();
+  const typename DoFHandler<dim>::active_cell_iterator end  = dof.end();
 
   unsigned int cell_no = 0;
   while (cell != end)

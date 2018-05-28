@@ -56,15 +56,13 @@ test(VectorType &vector)
   std::vector<typename VectorType::value_type> values1(indices.size());
   vector.extract_subvector_to(indices, values1);
   for (unsigned int j = 0; j < vector.size() / 2; ++j)
-    AssertThrow(get_real_assert_zero_imag(values1[j]) == 2 * j,
-                ExcInternalError());
+    AssertThrow(get_real_assert_zero_imag(values1[j]) == 2 * j, ExcInternalError());
 
   // do the same with the version of the function that takes iterators
   std::vector<typename VectorType::value_type> values2(indices.size());
   vector.extract_subvector_to(indices.begin(), indices.end(), values2.begin());
   for (unsigned int j = 0; j < vector.size() / 2; ++j)
-    AssertThrow(get_real_assert_zero_imag(values2[j]) == 2 * j,
-                ExcInternalError());
+    AssertThrow(get_real_assert_zero_imag(values2[j]) == 2 * j, ExcInternalError());
 
   // done
   if (myid == 0)
@@ -78,7 +76,7 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int               myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   {
     IndexSet local(10);
     if (myid == 0)
@@ -93,8 +91,7 @@ main(int argc, char **argv)
       deallog.push("deal.II");
       LinearAlgebra::distributed::Vector<double> w(local, MPI_COMM_WORLD);
       set(w);
-      LinearAlgebra::distributed::Vector<double> v(
-        local, dense_local, MPI_COMM_WORLD);
+      LinearAlgebra::distributed::Vector<double> v(local, dense_local, MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
       test(v);
       deallog.pop();
@@ -154,8 +151,7 @@ main(int argc, char **argv)
 
     {
       deallog.push("deal.II");
-      LinearAlgebra::distributed::BlockVector<double> w(partitioning,
-                                                        MPI_COMM_WORLD);
+      LinearAlgebra::distributed::BlockVector<double> w(partitioning, MPI_COMM_WORLD);
       set(w);
       LinearAlgebra::distributed::BlockVector<double> v(
         partitioning, dense_partitioning, MPI_COMM_WORLD);
@@ -168,8 +164,7 @@ main(int argc, char **argv)
       deallog.push("PETSc");
       PETScWrappers::MPI::BlockVector w(partitioning, MPI_COMM_WORLD);
       set(w);
-      PETScWrappers::MPI::BlockVector v(
-        partitioning, dense_partitioning, MPI_COMM_WORLD);
+      PETScWrappers::MPI::BlockVector v(partitioning, dense_partitioning, MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
       test(v);
       deallog.pop();
@@ -179,8 +174,7 @@ main(int argc, char **argv)
       deallog.push("Trilinos");
       TrilinosWrappers::MPI::BlockVector w(partitioning, MPI_COMM_WORLD);
       set(w);
-      TrilinosWrappers::MPI::BlockVector v(
-        partitioning, dense_partitioning, MPI_COMM_WORLD);
+      TrilinosWrappers::MPI::BlockVector v(partitioning, dense_partitioning, MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
       test(v);
       deallog.pop();

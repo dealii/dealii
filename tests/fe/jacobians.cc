@@ -53,9 +53,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   {
     deallog << dim << "D Jacobians:" << std::endl;
     FEValues<dim> fe_val(mapping, dummy, quad, update_jacobians);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -70,9 +68,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   {
     deallog << dim << "D inverse Jacobians:" << std::endl;
     FEValues<dim> fe_val(mapping, dummy, quad, update_inverse_jacobians);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -87,9 +83,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   {
     deallog << dim << "D Jacobian gradients:" << std::endl;
     FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_grads);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -104,11 +98,8 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   }
   {
     deallog << dim << "D Jacobian pushed forward gradients:" << std::endl;
-    FEValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_grads);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_grads);
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -124,9 +115,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   {
     deallog << dim << "D Jacobian hessians:" << std::endl;
     FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_2nd_derivatives);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -142,11 +131,8 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   }
   {
     deallog << dim << "D Jacobian pushed forward hessians:" << std::endl;
-    FEValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -155,9 +141,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
           for (unsigned int e = 0; e < dim; ++e)
             for (unsigned int f = 0; f < dim; ++f)
               for (unsigned int g = 0; g < dim; ++g)
-                deallog << fe_val.jacobian_pushed_forward_2nd_derivative(
-                             0)[d][e][f][g]
-                        << " ";
+                deallog << fe_val.jacobian_pushed_forward_2nd_derivative(0)[d][e][f][g] << " ";
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -165,9 +149,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   {
     deallog << dim << "D Jacobian hessian gradients:" << std::endl;
     FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_3rd_derivatives);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -177,20 +159,15 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
             for (unsigned int f = 0; f < dim; ++f)
               for (unsigned int g = 0; g < dim; ++g)
                 for (unsigned int h = 0; h < dim; ++h)
-                  deallog << fe_val.jacobian_3rd_derivative(0)[d][e][f][g][h]
-                          << " ";
+                  deallog << fe_val.jacobian_3rd_derivative(0)[d][e][f][g][h] << " ";
         deallog << std::endl;
       }
     deallog << std::endl;
   }
   {
-    deallog << dim
-            << "D Jacobian pushed forward hessian gradients:" << std::endl;
-    FEValues<dim> fe_val(
-      mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
-    typename Triangulation<dim>::active_cell_iterator cell =
-                                                        tria.begin_active(),
-                                                      endc = tria.end();
+    deallog << dim << "D Jacobian pushed forward hessian gradients:" << std::endl;
+    FEValues<dim> fe_val(mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
+    typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
     for (; cell != endc; ++cell)
       {
         fe_val.reinit(cell);
@@ -200,9 +177,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
             for (unsigned int f = 0; f < dim; ++f)
               for (unsigned int g = 0; g < dim; ++g)
                 for (unsigned int h = 0; h < dim; ++h)
-                  deallog << fe_val.jacobian_pushed_forward_3rd_derivative(
-                               0)[d][e][f][g][h]
-                          << " ";
+                  deallog << fe_val.jacobian_pushed_forward_3rd_derivative(0)[d][e][f][g][h] << " ";
         deallog << std::endl;
       }
     deallog << std::endl;

@@ -52,12 +52,11 @@ test(unsigned int ref = 1)
   Triangulation<dim, spacedim> tria;
   tria.create_triangulation(vertices, cells, SubCellData());
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-    tria.begin_active();
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
 
   Point<dim> p1(0.5, 0, 0);
-  deallog << "Normal vector of face 4: "
-          << cell->get_manifold().normal_vector(cell->face(4), p1) << std::endl;
+  deallog << "Normal vector of face 4: " << cell->get_manifold().normal_vector(cell->face(4), p1)
+          << std::endl;
   deallog << "Center of face 4: " << cell->face(4)->center() << std::endl;
 }
 

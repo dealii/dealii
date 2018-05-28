@@ -36,8 +36,7 @@ test()
   GridGenerator::hyper_cube(volume_mesh);
   volume_mesh.refine_global(1);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         volume_mesh.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = volume_mesh.begin_active();
        cell != volume_mesh.end();
        ++cell)
     AssertThrow(cell->direction_flag() == true, ExcInternalError());

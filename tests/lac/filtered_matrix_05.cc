@@ -21,9 +21,7 @@
 
 template <typename number>
 void
-checkApply_Constraints(FullMatrix<number> &A,
-                       Vector<number> &    V,
-                       bool                matrix_is_symmetric = false)
+checkApply_Constraints(FullMatrix<number> &A, Vector<number> &V, bool matrix_is_symmetric = false)
 {
   deallog << "apply_constraints" << std::endl;
 

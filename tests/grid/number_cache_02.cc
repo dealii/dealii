@@ -92,8 +92,7 @@ test(const char *filename)
       // ignore the exception that we
       // get because the mesh has
       // distorted cells
-      deallog << dcv.distorted_cells.size() << " cells are distorted."
-              << std::endl;
+      deallog << dcv.distorted_cells.size() << " cells are distorted." << std::endl;
     }
   catch (std::exception &exc)
     {
@@ -106,8 +105,7 @@ test(const char *filename)
   // now refine a few cells and output again
   deallog << "  Refining..." << std::endl;
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
-  for (unsigned int i = 0; i <= std::min(tria.n_active_cells() / 3, 10U);
-       ++i, ++cell)
+  for (unsigned int i = 0; i <= std::min(tria.n_active_cells() / 3, 10U); ++i, ++cell)
     cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 

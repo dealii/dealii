@@ -54,9 +54,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    cell_matrix(FullMatrix<double> &     M,
-                const FEValuesBase<dim> &fe,
-                const double             factor = 1.)
+    cell_matrix(FullMatrix<double> &M, const FEValuesBase<dim> &fe, const double factor = 1.)
     {
       const unsigned int n_dofs       = fe.dofs_per_cell;
       const unsigned int n_components = fe.get_fe().n_components();
@@ -68,8 +66,7 @@ namespace LocalIntegrators
             {
               double Mii = 0.0;
               for (unsigned int d = 0; d < n_components; ++d)
-                Mii += dx * (fe.shape_grad_component(i, k, d) *
-                             fe.shape_grad_component(i, k, d));
+                Mii += dx * (fe.shape_grad_component(i, k, d) * fe.shape_grad_component(i, k, d));
 
               M(i, i) += Mii;
 
@@ -77,8 +74,8 @@ namespace LocalIntegrators
                 {
                   double Mij = 0.0;
                   for (unsigned int d = 0; d < n_components; ++d)
-                    Mij += dx * (fe.shape_grad_component(j, k, d) *
-                                 fe.shape_grad_component(i, k, d));
+                    Mij +=
+                      dx * (fe.shape_grad_component(j, k, d) * fe.shape_grad_component(i, k, d));
 
                   M(i, j) += Mij;
                   M(j, i) += Mij;
@@ -102,8 +99,7 @@ namespace LocalIntegrators
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
       Assert(input.size() == nq, ExcDimensionMismatch(input.size(), nq));
-      Assert(result.size() == n_dofs,
-             ExcDimensionMismatch(result.size(), n_dofs));
+      Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
 
       for (unsigned int k = 0; k < nq; ++k)
         {
@@ -121,19 +117,17 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    cell_residual(
-      Vector<double> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      double factor = 1.)
+    cell_residual(Vector<double> &                                                   result,
+                  const FEValuesBase<dim> &                                          fe,
+                  const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
+                  double                                                             factor = 1.)
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      Assert(result.size() == n_dofs,
-             ExcDimensionMismatch(result.size(), n_dofs));
+      Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
 
       for (unsigned int k = 0; k < nq; ++k)
         {
@@ -141,8 +135,7 @@ namespace LocalIntegrators
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int d = 0; d < n_comp; ++d)
               {
-                result(i) +=
-                  dx * (input[d][k] * fe.shape_grad_component(i, k, d));
+                result(i) += dx * (input[d][k] * fe.shape_grad_component(i, k, d));
               }
         }
     }
@@ -181,12 +174,11 @@ namespace LocalIntegrators
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               for (unsigned int d = 0; d < n_comp; ++d)
-                M(i, j) += dx * (2. * fe.shape_value_component(i, k, d) *
-                                   penalty * fe.shape_value_component(j, k, d) -
-                                 (n * fe.shape_grad_component(i, k, d)) *
-                                   fe.shape_value_component(j, k, d) -
-                                 (n * fe.shape_grad_component(j, k, d)) *
-                                   fe.shape_value_component(i, k, d));
+                M(i, j) +=
+                  dx * (2. * fe.shape_value_component(i, k, d) * penalty *
+                          fe.shape_value_component(j, k, d) -
+                        (n * fe.shape_grad_component(i, k, d)) * fe.shape_value_component(j, k, d) -
+                        (n * fe.shape_grad_component(j, k, d)) * fe.shape_value_component(i, k, d));
         }
     }
 
@@ -239,17 +231,12 @@ namespace LocalIntegrators
 
                 for (unsigned int d = 0; d < dim; ++d)
                   {
-                    const double v_t =
-                      fe.shape_value_component(i, k, d) - vdotn * n[d];
-                    const double dnv_t =
-                      n * fe.shape_grad_component(i, k, d) - ngradvn * n[d];
-                    const double u_t =
-                      fe.shape_value_component(j, k, d) - udotn * n[d];
-                    const double dnu_t =
-                      n * fe.shape_grad_component(j, k, d) - ngradun * n[d];
+                    const double v_t   = fe.shape_value_component(i, k, d) - vdotn * n[d];
+                    const double dnv_t = n * fe.shape_grad_component(i, k, d) - ngradvn * n[d];
+                    const double u_t   = fe.shape_value_component(j, k, d) - udotn * n[d];
+                    const double dnu_t = n * fe.shape_grad_component(j, k, d) - ngradun * n[d];
 
-                    M(i, j) += dx * (2. * penalty * u_t * v_t - dnu_t * v_t -
-                                     dnv_t * u_t);
+                    M(i, j) += dx * (2. * penalty * u_t * v_t - dnu_t * v_t - dnv_t * u_t);
                   }
               }
         }
@@ -298,8 +285,7 @@ namespace LocalIntegrators
               const double u   = input[k];
               const double g   = data[k];
 
-              result(i) +=
-                dx * (2. * penalty * (u - g) * v - dnv * (u - g) - dnu * v);
+              result(i) += dx * (2. * penalty * (u - g) * v - dnv * (u - g) - dnu * v);
             }
         }
     }
@@ -323,14 +309,13 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    nitsche_residual(
-      Vector<double> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<double>>> &        input,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput,
-      const VectorSlice<const std::vector<std::vector<double>>> &        data,
-      double penalty,
-      double factor = 1.)
+    nitsche_residual(Vector<double> &                                                   result,
+                     const FEValuesBase<dim> &                                          fe,
+                     const VectorSlice<const std::vector<std::vector<double>>> &        input,
+                     const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput,
+                     const VectorSlice<const std::vector<std::vector<double>>> &        data,
+                     double                                                             penalty,
+                     double                                                             factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
@@ -351,8 +336,7 @@ namespace LocalIntegrators
                 const double u   = input[d][k];
                 const double g   = data[d][k];
 
-                result(i) +=
-                  dx * (2. * penalty * (u - g) * v - dnv * (u - g) - dnu * v);
+                result(i) += dx * (2. * penalty * (u - g) * v - dnv * (u - g) - dnu * v);
               }
         }
     }
@@ -420,18 +404,14 @@ namespace LocalIntegrators
                       const double dnui = n * fe1.shape_grad_component(j, k, d);
                       const double ue   = fe2.shape_value_component(j, k, d);
                       const double dnue = n * fe2.shape_grad_component(j, k, d);
-                      M11(i, j) +=
-                        dx * (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
-                              nu * penalty * ui * vi);
+                      M11(i, j) += dx * (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
+                                         nu * penalty * ui * vi);
                       M12(i, j) +=
-                        dx * (.5 * nui * dnvi * ue - .5 * nue * dnue * vi -
-                              nu * penalty * vi * ue);
-                      M21(i, j) +=
-                        dx * (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
-                              nu * penalty * ui * ve);
+                        dx * (.5 * nui * dnvi * ue - .5 * nue * dnue * vi - nu * penalty * vi * ue);
+                      M21(i, j) += dx * (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
+                                         nu * penalty * ui * ve);
                       M22(i, j) +=
-                        dx * (.5 * nue * dnve * ue + .5 * nue * dnue * ve +
-                              nu * penalty * ue * ve);
+                        dx * (.5 * nue * dnve * ue + .5 * nue * dnue * ve + nu * penalty * ue * ve);
                     }
                 }
             }
@@ -519,38 +499,26 @@ namespace LocalIntegrators
                   // below denote tangential components.
                   for (unsigned int d = 0; d < dim; ++d)
                     {
-                      const double vi =
-                        fe1.shape_value_component(i, k, d) - v1dotn * n[d];
-                      const double dnvi =
-                        n * fe1.shape_grad_component(i, k, d) - ngradv1n * n[d];
+                      const double vi   = fe1.shape_value_component(i, k, d) - v1dotn * n[d];
+                      const double dnvi = n * fe1.shape_grad_component(i, k, d) - ngradv1n * n[d];
 
-                      const double ve =
-                        fe2.shape_value_component(i, k, d) - v2dotn * n[d];
-                      const double dnve =
-                        n * fe2.shape_grad_component(i, k, d) - ngradv2n * n[d];
+                      const double ve   = fe2.shape_value_component(i, k, d) - v2dotn * n[d];
+                      const double dnve = n * fe2.shape_grad_component(i, k, d) - ngradv2n * n[d];
 
-                      const double ui =
-                        fe1.shape_value_component(j, k, d) - u1dotn * n[d];
-                      const double dnui =
-                        n * fe1.shape_grad_component(j, k, d) - ngradu1n * n[d];
+                      const double ui   = fe1.shape_value_component(j, k, d) - u1dotn * n[d];
+                      const double dnui = n * fe1.shape_grad_component(j, k, d) - ngradu1n * n[d];
 
-                      const double ue =
-                        fe2.shape_value_component(j, k, d) - u2dotn * n[d];
-                      const double dnue =
-                        n * fe2.shape_grad_component(j, k, d) - ngradu2n * n[d];
+                      const double ue   = fe2.shape_value_component(j, k, d) - u2dotn * n[d];
+                      const double dnue = n * fe2.shape_grad_component(j, k, d) - ngradu2n * n[d];
 
-                      M11(i, j) +=
-                        dx * (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
-                              nu * penalty * ui * vi);
+                      M11(i, j) += dx * (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
+                                         nu * penalty * ui * vi);
                       M12(i, j) +=
-                        dx * (.5 * nui * dnvi * ue - .5 * nue * dnue * vi -
-                              nu * penalty * vi * ue);
-                      M21(i, j) +=
-                        dx * (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
-                              nu * penalty * ui * ve);
+                        dx * (.5 * nui * dnvi * ue - .5 * nue * dnue * vi - nu * penalty * vi * ue);
+                      M21(i, j) += dx * (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
+                                         nu * penalty * ui * ve);
                       M22(i, j) +=
-                        dx * (.5 * nue * dnve * ue + .5 * nue * dnue * ve +
-                              nu * penalty * ue * ve);
+                        dx * (.5 * nue * dnve * ue + .5 * nue * dnue * ve + nu * penalty * ue * ve);
                     }
                 }
             }
@@ -613,14 +581,10 @@ namespace LocalIntegrators
               const Tensor<1, dim> &Due  = Dinput2[k];
               const double          dnue = Due * n;
 
-              result1(i) += dx * (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
-                                  penalty * ui * vi);
-              result1(i) += dx * (.5 * nui * dnvi * ue - .5 * nue * dnue * vi -
-                                  penalty * vi * ue);
-              result2(i) += dx * (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
-                                  penalty * ui * ve);
-              result2(i) += dx * (.5 * nue * dnve * ue + .5 * nue * dnue * ve +
-                                  penalty * ue * ve);
+              result1(i) += dx * (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi + penalty * ui * vi);
+              result1(i) += dx * (.5 * nui * dnvi * ue - .5 * nue * dnue * vi - penalty * vi * ue);
+              result2(i) += dx * (-.5 * nue * dnve * ui + .5 * nui * dnui * ve - penalty * ui * ve);
+              result2(i) += dx * (.5 * nue * dnve * ue + .5 * nue * dnue * ve + penalty * ue * ve);
             }
         }
     }
@@ -639,20 +603,17 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    ip_residual(
-      Vector<double> &                                           result1,
-      Vector<double> &                                           result2,
-      const FEValuesBase<dim> &                                  fe1,
-      const FEValuesBase<dim> &                                  fe2,
-      const VectorSlice<const std::vector<std::vector<double>>> &input1,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>>
-        &                                                        Dinput1,
-      const VectorSlice<const std::vector<std::vector<double>>> &input2,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>>
-        &    Dinput2,
-      double pen,
-      double int_factor = 1.,
-      double ext_factor = -1.)
+    ip_residual(Vector<double> &                                                   result1,
+                Vector<double> &                                                   result2,
+                const FEValuesBase<dim> &                                          fe1,
+                const FEValuesBase<dim> &                                          fe2,
+                const VectorSlice<const std::vector<std::vector<double>>> &        input1,
+                const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput1,
+                const VectorSlice<const std::vector<std::vector<double>>> &        input2,
+                const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput2,
+                double                                                             pen,
+                double                                                             int_factor = 1.,
+                double                                                             ext_factor = -1.)
     {
       const unsigned int n_comp = fe1.get_fe().n_components();
       const unsigned int n1     = fe1.dofs_per_cell;
@@ -689,14 +650,14 @@ namespace LocalIntegrators
                 const Tensor<1, dim> &Due  = Dinput2[d][k];
                 const double          dnue = Due * n;
 
-                result1(i) += dx * (-.5 * nui * dnvi * ui -
-                                    .5 * nui * dnui * vi + penalty * ui * vi);
-                result1(i) += dx * (.5 * nui * dnvi * ue -
-                                    .5 * nue * dnue * vi - penalty * vi * ue);
-                result2(i) += dx * (-.5 * nue * dnve * ui +
-                                    .5 * nui * dnui * ve - penalty * ui * ve);
-                result2(i) += dx * (.5 * nue * dnve * ue +
-                                    .5 * nue * dnue * ve + penalty * ue * ve);
+                result1(i) +=
+                  dx * (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi + penalty * ui * vi);
+                result1(i) +=
+                  dx * (.5 * nui * dnvi * ue - .5 * nue * dnue * vi - penalty * vi * ue);
+                result2(i) +=
+                  dx * (-.5 * nue * dnve * ui + .5 * nui * dnui * ve - penalty * ui * ve);
+                result2(i) +=
+                  dx * (.5 * nue * dnve * ue + .5 * nue * dnue * ve + penalty * ue * ve);
               }
         }
     }
@@ -724,12 +685,10 @@ namespace LocalIntegrators
                     unsigned int                                      deg1,
                     unsigned int                                      deg2)
     {
-      const unsigned int normal1 =
-        GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
-      const unsigned int normal2 =
-        GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
-      const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1 + 1);
-      const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2 + 1);
+      const unsigned int normal1 = GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
+      const unsigned int normal2 = GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
+      const unsigned int deg1sq  = (deg1 == 0) ? 1 : deg1 * (deg1 + 1);
+      const unsigned int deg2sq  = (deg2 == 0) ? 1 : deg2 * (deg2 + 1);
 
       double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
       double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);

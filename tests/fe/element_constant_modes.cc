@@ -61,8 +61,7 @@ test()
   print_constant_modes(FE_FaceQ<dim>(1));
   print_constant_modes(FE_FaceP<dim>(1));
   print_constant_modes(FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(2), 1));
-  print_constant_modes(
-    FESystem<dim>(FE_DGP<dim>(1), 1, FE_Q_iso_Q1<dim>(2), 1));
+  print_constant_modes(FESystem<dim>(FE_DGP<dim>(1), 1, FE_Q_iso_Q1<dim>(2), 1));
   print_constant_modes(FE_Q_DG0<dim>(1));
   print_constant_modes(FESystem<dim>(FE_Q_DG0<dim>(2), 1, FE_Q<dim>(1), 2));
   print_constant_modes(FESystem<dim>(FE_Q<dim>(1), 2, FE_Q_DG0<dim>(1), 2));

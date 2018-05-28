@@ -28,8 +28,6 @@ template <int dim>
 void
 check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 {
-  deallog << (fe1.hp_constraints_are_implemented() ? "true" : "false")
-          << std::endl;
-  deallog << (fe2.hp_constraints_are_implemented() ? "true" : "false")
-          << std::endl;
+  deallog << (fe1.hp_constraints_are_implemented() ? "true" : "false") << std::endl;
+  deallog << (fe2.hp_constraints_are_implemented() ? "true" : "false") << std::endl;
 }

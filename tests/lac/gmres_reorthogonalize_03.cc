@@ -72,9 +72,9 @@ test(unsigned int variant)
   data.force_re_orthogonalization = true;
 
   SolverGMRES<Vector<number>> solver(control, data);
-  auto print_re_orthogonalization = [](int accumulated_iterations) {
-    deallog.get_file_stream() << "Re-orthogonalization enabled at step "
-                              << accumulated_iterations << std::endl;
+  auto                        print_re_orthogonalization = [](int accumulated_iterations) {
+    deallog.get_file_stream() << "Re-orthogonalization enabled at step " << accumulated_iterations
+                              << std::endl;
   };
   solver.connect_re_orthogonalization_slot(print_re_orthogonalization);
   solver.solve(matrix, sol, rhs, PreconditionIdentity());

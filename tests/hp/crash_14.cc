@@ -50,19 +50,16 @@ test()
     {
       hp::FECollection<dim> fe_collection;
       for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
-        fe_collection.push_back(
-          FESystem<dim>(FE_Q<dim>(k), 1, FE_DGQ<dim>(i % 4), 1));
+        fe_collection.push_back(FESystem<dim>(FE_Q<dim>(k), 1, FE_DGQ<dim>(i % 4), 1));
 
       hp::DoFHandler<dim> dof_handler(tria);
 
       unsigned int fe_index = 0;
-      for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-             dof_handler.begin_active();
+      for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell, ++fe_index)
         {
-          deallog << "Setting fe_index=" << fe_index << " on cell " << cell
-                  << std::endl;
+          deallog << "Setting fe_index=" << fe_index << " on cell " << cell << std::endl;
           cell->set_active_fe_index(fe_index);
         }
 
@@ -70,39 +67,31 @@ test()
 
       std::vector<types::global_dof_index> face_dof_indices;
       std::vector<types::global_dof_index> neighbor_face_dof_indices;
-      for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-             dof_handler.begin_active();
+      for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell)
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           if (!cell->at_boundary(face))
             {
-              Assert(cell->get_fe().dofs_per_face ==
-                       cell->neighbor(face)->get_fe().dofs_per_face,
+              Assert(cell->get_fe().dofs_per_face == cell->neighbor(face)->get_fe().dofs_per_face,
                      ExcInternalError());
 
               face_dof_indices.resize(cell->get_fe().dofs_per_face);
-              neighbor_face_dof_indices.resize(
-                cell->neighbor(face)->get_fe().dofs_per_face);
+              neighbor_face_dof_indices.resize(cell->neighbor(face)->get_fe().dofs_per_face);
 
-              cell->face(face)->get_dof_indices(face_dof_indices,
-                                                cell->active_fe_index());
-              cell->face(face)->get_dof_indices(
-                neighbor_face_dof_indices,
-                cell->neighbor(face)->active_fe_index());
+              cell->face(face)->get_dof_indices(face_dof_indices, cell->active_fe_index());
+              cell->face(face)->get_dof_indices(neighbor_face_dof_indices,
+                                                cell->neighbor(face)->active_fe_index());
 
               deallog << "cell=" << cell << ", face=" << face << std::endl;
               deallog << "fe1=" << cell->get_fe().get_name()
-                      << ", fe2=" << cell->neighbor(face)->get_fe().get_name()
-                      << std::endl;
+                      << ", fe2=" << cell->neighbor(face)->get_fe().get_name() << std::endl;
 
               for (unsigned int i = 0; i < face_dof_indices.size(); ++i)
                 {
                   deallog << face_dof_indices[i] << std::endl;
 
-                  Assert(face_dof_indices[i] == neighbor_face_dof_indices[i],
-                         ExcInternalError());
+                  Assert(face_dof_indices[i] == neighbor_face_dof_indices[i], ExcInternalError());
                 }
 
               deallog << std::endl;

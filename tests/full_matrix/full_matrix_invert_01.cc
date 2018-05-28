@@ -116,8 +116,7 @@ check()
     }
 
   if (nFails > 0)
-    deallog << nFails << " out of " << maxDim * maxDim
-            << " calls with wrong result" << std::endl;
+    deallog << nFails << " out of " << maxDim * maxDim << " calls with wrong result" << std::endl;
   else
     deallog << "OK" << std::endl;
 }

@@ -90,7 +90,7 @@ public:
    * will likely be wrong.
    */
   KDTree(const unsigned int &           max_leaf_size = 10,
-         const std::vector<Point<dim>> &pts = std::vector<Point<dim>>());
+         const std::vector<Point<dim>> &pts           = std::vector<Point<dim>>());
 
 
   /**
@@ -131,9 +131,7 @@ public:
      * Return the L2 distance between points
      */
     coord_t
-    kdtree_distance(const coord_t *p1,
-                    const size_t   idx_p2,
-                    const size_t   size) const;
+    kdtree_distance(const coord_t *p1, const size_t idx_p2, const size_t size) const;
 
 
     /**
@@ -228,8 +226,7 @@ public:
    * @return A vector of pairs of indices and distances of the matching points
    */
   std::vector<std::pair<unsigned int, double>>
-  get_closest_points(const Point<dim> & target,
-                     const unsigned int n_points) const;
+  get_closest_points(const Point<dim> &target, const unsigned int n_points) const;
 
 private:
   /**
@@ -276,8 +273,7 @@ inline const Point<dim> &KDTree<dim>::operator[](const unsigned int i) const
 
 
 template <int dim>
-KDTree<dim>::PointCloudAdaptor::PointCloudAdaptor(
-  const std::vector<Point<dim>> &_points) :
+KDTree<dim>::PointCloudAdaptor::PointCloudAdaptor(const std::vector<Point<dim>> &_points) :
   points(_points)
 {}
 

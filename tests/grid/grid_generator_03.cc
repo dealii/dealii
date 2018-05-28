@@ -111,8 +111,7 @@ test(std::ostream &out)
       for (unsigned int i = 0; i < dim; ++i)
         sub[i] = std::vector<double>(i + 2, (p2[i] - p1[i]) / (i + 2));
 
-      GridGenerator::subdivided_hyper_rectangle(
-        tr, sub, p1, material_ids<dim>(), dim != 1);
+      GridGenerator::subdivided_hyper_rectangle(tr, sub, p1, material_ids<dim>(), dim != 1);
       if (tr.n_cells() > 0)
         go.write_gnuplot(tr, out);
     }
@@ -131,8 +130,7 @@ test(std::ostream &out)
           sub[i].back() *= 1.5;
         }
 
-      GridGenerator::subdivided_hyper_rectangle(
-        tr, sub, p1, material_ids<dim>(), dim != 1);
+      GridGenerator::subdivided_hyper_rectangle(tr, sub, p1, material_ids<dim>(), dim != 1);
       if (tr.n_cells() > 0)
         go.write_gnuplot(tr, out);
     }

@@ -35,8 +35,7 @@ check_at_one(const std::vector<Polynomial<double>> &p)
       deallog << '.';
       const double y = p[i].value(1.);
       if (std::fabs(y - std::sqrt(2 * i + 1)) > 1e-13 * std::sqrt(2 * i + 1))
-        deallog << "Error1  lg y=" << std::log10(std::fabs(y - 1.))
-                << std::endl;
+        deallog << "Error1  lg y=" << std::log10(std::fabs(y - 1.)) << std::endl;
     }
   deallog << std::endl;
 }

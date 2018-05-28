@@ -28,8 +28,7 @@
 
 #include "../tests.h"
 
-#define PRINTME(name, var) \
-  deallog << "Solution vector: " << name << ": " << var;
+#define PRINTME(name, var) deallog << "Solution vector: " << name << ": " << var;
 
 using namespace dealii;
 
@@ -86,16 +85,16 @@ main()
       const auto lo_C = linear_operator(C);
       const auto lo_D = linear_operator(D);
 
-      SolverControl            solver_control_A(1, 1.0e-10, false, false);
-      SolverCG<Vector<double>> solver_A(solver_control_A);
+      SolverControl                            solver_control_A(1, 1.0e-10, false, false);
+      SolverCG<Vector<double>>                 solver_A(solver_control_A);
       PreconditionJacobi<SparseMatrix<double>> preconditioner_A;
       preconditioner_A.initialize(A);
       const auto lo_A_inv = inverse_operator(lo_A, solver_A, preconditioner_A);
 
       const auto lo_S = schur_complement(lo_A_inv, lo_B, lo_C, lo_D);
 
-      SolverControl            solver_control_S(1, 1.0e-10, false, false);
-      SolverCG<Vector<double>> solver_S(solver_control_S);
+      SolverControl                            solver_control_S(1, 1.0e-10, false, false);
+      SolverCG<Vector<double>>                 solver_S(solver_control_S);
       PreconditionJacobi<SparseMatrix<double>> preconditioner_S;
       preconditioner_S.initialize(D); // Same space as S
       const auto lo_S_inv = inverse_operator(lo_S, solver_S, preconditioner_S);
@@ -181,8 +180,8 @@ main()
       Vector<double> &    x = s.block(1);
       Vector<double> &    y = s.block(0);
 
-      SolverControl            solver_control_A(1, 1.0e-10, false, false);
-      SolverCG<Vector<double>> solver_A(solver_control_A);
+      SolverControl                            solver_control_A(1, 1.0e-10, false, false);
+      SolverCG<Vector<double>>                 solver_A(solver_control_A);
       PreconditionJacobi<SparseMatrix<double>> preconditioner_A;
       preconditioner_A.initialize(A.block(1, 1));
       const auto lo_A_inv = inverse_operator(lo_A, solver_A, preconditioner_A);
@@ -191,12 +190,11 @@ main()
 
       // Preconditinoed by D
       {
-        SolverControl            solver_control_S(11, 1.0e-10, false, false);
-        SolverCG<Vector<double>> solver_S(solver_control_S);
+        SolverControl                            solver_control_S(11, 1.0e-10, false, false);
+        SolverCG<Vector<double>>                 solver_S(solver_control_S);
         PreconditionJacobi<SparseMatrix<double>> preconditioner_S;
         preconditioner_S.initialize(A.block(0, 0)); // Same space as S
-        const auto lo_S_inv =
-          inverse_operator(lo_S, solver_S, preconditioner_S);
+        const auto lo_S_inv = inverse_operator(lo_S, solver_S, preconditioner_S);
 
         auto rhs = condense_schur_rhs(lo_A_inv, lo_C, f, g);
         check_solver_within_range(y = lo_S_inv * rhs, // Solve for y
@@ -213,22 +211,21 @@ main()
       // Preconditinoed by S_approx_inv
       {
         const auto lo_A_inv_approx = linear_operator(preconditioner_A);
-        const auto lo_S_approx =
-          schur_complement(lo_A_inv_approx, lo_B, lo_C, lo_D);
+        const auto lo_S_approx     = schur_complement(lo_A_inv_approx, lo_B, lo_C, lo_D);
 
         // Setup inner solver: Approximation of inverse of Schur complement
         IterationNumberControl solver_control_S_approx(
           1, 1.0e-10, false, false); // Perform only a limited number of sweeps
-        SolverCG<Vector<double>> solver_S_approx(solver_control_S_approx);
+        SolverCG<Vector<double>>                 solver_S_approx(solver_control_S_approx);
         PreconditionJacobi<SparseMatrix<double>> preconditioner_S_approx;
         preconditioner_S_approx.initialize(A.block(0, 0)); // Same space as S
-        const auto lo_S_inv_approx = inverse_operator(
-          lo_S_approx, solver_S_approx, preconditioner_S_approx);
+        const auto lo_S_inv_approx =
+          inverse_operator(lo_S_approx, solver_S_approx, preconditioner_S_approx);
 
         // Setup outer solver: Exact inverse of Schur complement
         SolverControl            solver_control_S(11, 1.0e-10, false, false);
         SolverCG<Vector<double>> solver_S(solver_control_S);
-        const auto lo_S_inv = inverse_operator(lo_S, solver_S, lo_S_inv_approx);
+        const auto               lo_S_inv = inverse_operator(lo_S, solver_S, lo_S_inv_approx);
 
         auto rhs = condense_schur_rhs(lo_A_inv, lo_C, f, g);
         check_solver_within_range(y = lo_S_inv * rhs, // Solve for y

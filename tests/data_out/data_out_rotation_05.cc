@@ -26,9 +26,7 @@
 
 
 void
-my_check_this(const DoFHandler<3> &,
-              const Vector<double> &,
-              const Vector<double> &)
+my_check_this(const DoFHandler<3> &, const Vector<double> &, const Vector<double> &)
 {
   // nothing to check in 3d
 }

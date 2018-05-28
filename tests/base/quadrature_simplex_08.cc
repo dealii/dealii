@@ -35,10 +35,8 @@ main()
   initlog();
 
   deallog << std::endl
-          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]"
-          << std::endl
-          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being"
-          << std::endl
+          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]" << std::endl
+          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being" << std::endl
           << "the distance from (x,y) to [0.5,0.5]." << std::endl
           << std::endl;
 
@@ -67,18 +65,16 @@ main()
               {
                 double x = quad.point(q)[0];
                 double y = quad.point(q)[1];
-                approx_integral +=
-                  (pow(x, (double)i) * pow(y, (double)j) * quad.weight(q) /
-                   (quad.point(q) - split_point).norm());
+                approx_integral += (pow(x, (double)i) * pow(y, (double)j) * quad.weight(q) /
+                                    (quad.point(q) - split_point).norm());
               }
 
             for (unsigned int q = 0; q < quad_de.size(); ++q)
               {
                 double x = quad_de.point(q)[0];
                 double y = quad_de.point(q)[1];
-                approx_integral_de +=
-                  (pow(x, (double)i) * pow(y, (double)j) * quad_de.weight(q) /
-                   (quad_de.point(q) - split_point).norm());
+                approx_integral_de += (pow(x, (double)i) * pow(y, (double)j) * quad_de.weight(q) /
+                                       (quad_de.point(q) - split_point).norm());
               }
 
             error[m][i][j][0] = approx_integral - exact_integral;
@@ -92,10 +88,8 @@ main()
         deallog << "======= f(x,y) = x^" << i << " y^" << j << std::endl;
 
         for (unsigned int m = 0; m < max_order; ++m)
-          deallog << "Order[" << m + 1
-                  << "], QTrianglePolar error = " << std::setw(15)
-                  << error[m][i][j][0]
-                  << " QLachatWatson error  = " << error[m][i][j][1]
+          deallog << "Order[" << m + 1 << "], QTrianglePolar error = " << std::setw(15)
+                  << error[m][i][j][0] << " QLachatWatson error  = " << error[m][i][j][1]
                   << std::endl;
       }
 }

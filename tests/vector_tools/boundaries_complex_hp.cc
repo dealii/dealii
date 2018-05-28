@@ -54,8 +54,7 @@ public:
   virtual std::complex<double>
   value(const Point<dim> &p, const unsigned int component) const
   {
-    return std::complex<double>(
-      100 * (component + 1) * p.square() * std::sin(p.square()), 0);
+    return std::complex<double>(100 * (component + 1) * p.square() * std::sin(p.square()), 0);
   }
 
   virtual void
@@ -79,8 +78,7 @@ boundary_q(const hp::DoFHandler<dim> &)
 void
 write_map(const std::map<types::global_dof_index, std::complex<double>> &bv)
 {
-  for (std::map<types::global_dof_index, std::complex<double>>::const_iterator
-         i = bv.begin();
+  for (std::map<types::global_dof_index, std::complex<double>>::const_iterator i = bv.begin();
        i != bv.end();
        ++i)
     deallog << i->first << ' ' << i->second << std::endl;
@@ -98,9 +96,8 @@ check()
       GridGenerator::hyper_ball(tr, Point<dim>(), 1);
     }
   else
-    GridGenerator::hyper_cube(tr,
-                              -1. / std::sqrt(static_cast<double>(dim)),
-                              1. / std::sqrt(static_cast<double>(dim)));
+    GridGenerator::hyper_cube(
+      tr, -1. / std::sqrt(static_cast<double>(dim)), 1. / std::sqrt(static_cast<double>(dim)));
   GridTools::copy_boundary_to_manifold_id(tr);
   static const SphericalManifold<dim> boundary;
   if (dim != 1)
@@ -136,8 +133,7 @@ check()
   // things simple
   fe_list.push_back(new FE_Q<dim>(1));
   function_list.push_back(
-    new Functions::ConstantFunction<dim, std::complex<double>>(
-      std::complex<double>(1, 0)));
+    new Functions::ConstantFunction<dim, std::complex<double>>(std::complex<double>(1, 0)));
 
   // check all of them
   for (unsigned int i = 0; i < fe_list.size(); ++i)

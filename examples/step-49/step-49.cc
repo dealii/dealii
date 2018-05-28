@@ -58,8 +58,7 @@ using namespace dealii;
 // Finally, the function outputs the mesh in encapsulated postscript (EPS)
 // format that can easily be visualized in the same way as was done in step-1.
 template <int dim>
-void print_mesh_info(const Triangulation<dim> &triangulation,
-                     const std::string &       filename)
+void print_mesh_info(const Triangulation<dim> &triangulation, const std::string &filename)
 {
   std::cout << "Mesh info:" << std::endl
             << " dimension: " << dim << std::endl
@@ -74,8 +73,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
     std::map<types::boundary_id, unsigned int> boundary_count;
     for (auto cell : triangulation.active_cell_iterators())
       {
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;
@@ -83,8 +81,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
       }
 
     std::cout << " boundary indicators: ";
-    for (const std::pair<const types::boundary_id, unsigned int> &pair :
-         boundary_count)
+    for (const std::pair<const types::boundary_id, unsigned int> &pair : boundary_count)
       {
         std::cout << pair.first << "(" << pair.second << " times) ";
       }
@@ -333,13 +330,11 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -347,12 +342,10 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 }

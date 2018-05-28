@@ -64,11 +64,11 @@ show_values(FiniteElement<dim> &fe, const char *name)
 
   QGauss<dim> quadrature_formula(2);
 
-  FEValues<dim>                           fe_values(mapping,
-                          fe,
-                          quadrature_formula,
-                          UpdateFlags(update_values | update_JxW_values |
-                                      update_gradients | update_hessians));
+  FEValues<dim> fe_values(
+    mapping,
+    fe,
+    quadrature_formula,
+    UpdateFlags(update_values | update_JxW_values | update_gradients | update_hessians));
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
   fe_values.reinit(c);
 

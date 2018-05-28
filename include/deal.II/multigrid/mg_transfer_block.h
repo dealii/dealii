@@ -96,8 +96,7 @@ protected:
    */
   template <int dim, int spacedim>
   void
-  build_matrices(const DoFHandler<dim, spacedim> &dof,
-                 const DoFHandler<dim, spacedim> &mg_dof);
+  build_matrices(const DoFHandler<dim, spacedim> &dof, const DoFHandler<dim, spacedim> &mg_dof);
 
   /**
    * Flag of selected blocks.
@@ -161,15 +160,13 @@ protected:
    * is first the global index inside the block, then the level index inside
    * the block.
    */
-  std::vector<std::vector<std::vector<std::pair<unsigned int, unsigned int>>>>
-    copy_indices;
+  std::vector<std::vector<std::vector<std::pair<unsigned int, unsigned int>>>> copy_indices;
 
   /**
    * The mg_constrained_dofs of the level systems.
    */
 
-  SmartPointer<const MGConstrainedDoFs, MGTransferBlockBase>
-    mg_constrained_dofs;
+  SmartPointer<const MGConstrainedDoFs, MGTransferBlockBase> mg_constrained_dofs;
 };
 
 /**
@@ -192,8 +189,7 @@ protected:
  * @author Guido Kanschat, 2001, 2002
  */
 template <typename number>
-class MGTransferBlock : public MGTransferBase<BlockVector<number>>,
-                        private MGTransferBlockBase
+class MGTransferBlock : public MGTransferBase<BlockVector<number>>, private MGTransferBlockBase
 {
 public:
   /**
@@ -211,8 +207,7 @@ public:
    * blocks is to be weighted differently.
    */
   void
-  initialize(const std::vector<number> &   factors,
-             VectorMemory<Vector<number>> &memory);
+  initialize(const std::vector<number> &factors, VectorMemory<Vector<number>> &memory);
 
   /**
    * Build the prolongation matrices for each level.
@@ -308,8 +303,7 @@ private:
  * @author Guido Kanschat, 2001, 2002, 2003
  */
 template <typename number>
-class MGTransferBlockSelect : public MGTransferBase<Vector<number>>,
-                              private MGTransferBlockBase
+class MGTransferBlockSelect : public MGTransferBase<Vector<number>>, private MGTransferBlockBase
 {
 public:
   /**

@@ -40,8 +40,7 @@ test()
     for (unsigned int j = 0; j < dim; ++j)
       for (unsigned int k = 0; k < dim; ++k)
         {
-          ddF[i][j][k] =
-            std::complex<double>(i + 2 * j + 3 * k + 1, i + 2 * j + 3 * k + 1);
+          ddF[i][j][k] = std::complex<double>(i + 2 * j + 3 * k + 1, i + 2 * j + 3 * k + 1);
           ddF_norm_sqr += (i + 2 * j + 3 * k + 1) * (i + 2 * j + 3 * k + 1) * 2;
         }
 
@@ -49,10 +48,8 @@ test()
   deallog << "||dF||: " << dF.norm() << std::endl;
   deallog << "||ddF||: " << ddF.norm() << std::endl;
 
-  Assert(std::fabs(dF.norm() - std::sqrt(dF_norm_sqr)) < 1e-12,
-         ExcInternalError());
-  Assert(std::fabs(ddF.norm() - std::sqrt(ddF_norm_sqr)) < 1e-12,
-         ExcInternalError());
+  Assert(std::fabs(dF.norm() - std::sqrt(dF_norm_sqr)) < 1e-12, ExcInternalError());
+  Assert(std::fabs(ddF.norm() - std::sqrt(ddF_norm_sqr)) < 1e-12, ExcInternalError());
 }
 
 int

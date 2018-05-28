@@ -53,9 +53,8 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  cell                                                   = tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+  cell = tria.begin_active();
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm() < 0.2)
@@ -92,8 +91,7 @@ test()
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -111,12 +109,8 @@ test()
     mf_data.reinit(dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 number,
-                 LinearAlgebra::distributed::Vector<number>>
-                                             mf(mf_data);
-  LinearAlgebra::distributed::Vector<number> in, out, ref;
+  MatrixFreeTest<dim, fe_degree, number, LinearAlgebra::distributed::Vector<number>> mf(mf_data);
+  LinearAlgebra::distributed::Vector<number>                                         in, out, ref;
   mf_data.initialize_dof_vector(in);
   out.reinit(in);
   ref.reinit(in);
@@ -137,30 +131,24 @@ test()
       typename MatrixFree<dim, number>::AdditionalData data;
       if (parallel_option == 0)
         {
-          data.tasks_parallel_scheme =
-            MatrixFree<dim, number>::AdditionalData::partition_partition;
+          data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_partition;
           deallog << "Parallel option: partition partition" << std::endl;
         }
       else if (parallel_option == 1)
         {
-          data.tasks_parallel_scheme =
-            MatrixFree<dim, number>::AdditionalData::partition_color;
+          data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_color;
           deallog << "Parallel option: partition color" << std::endl;
         }
       else if (parallel_option == 2)
         {
-          data.tasks_parallel_scheme =
-            MatrixFree<dim, number>::AdditionalData::color;
+          data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::color;
           deallog << "Parallel option: color" << std::endl;
         }
 
       data.tasks_block_size = 3;
       mf_data.reinit(dof, constraints, quad, data);
-      MatrixFreeTest<dim,
-                     fe_degree,
-                     number,
-                     LinearAlgebra::distributed::Vector<number>>
-        mf(mf_data);
+      MatrixFreeTest<dim, fe_degree, number, LinearAlgebra::distributed::Vector<number>> mf(
+        mf_data);
       deallog << "Norm of difference:";
 
       // run 10 times to make a possible error more
@@ -181,8 +169,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

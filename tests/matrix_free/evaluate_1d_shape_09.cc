@@ -79,10 +79,8 @@ test()
   for (unsigned int i = 0; i < M; ++i)
     {
       deallog << y[i][0] - y_ref[i][0] << " ";
-      for (unsigned int v = 1; v < VectorizedArray<double>::n_array_elements;
-           ++v)
-        AssertThrow(std::abs(y[i][v] - y_ref[i][v]) < 1e-12,
-                    ExcInternalError());
+      for (unsigned int v = 1; v < VectorizedArray<double>::n_array_elements; ++v)
+        AssertThrow(std::abs(y[i][v] - y_ref[i][v]) < 1e-12, ExcInternalError());
     }
   deallog << std::endl;
 
@@ -112,10 +110,8 @@ test()
   for (unsigned int i = 0; i < N; ++i)
     {
       deallog << x[i][0] - x_ref[i][0] << " ";
-      for (unsigned int v = 1; v < VectorizedArray<double>::n_array_elements;
-           ++v)
-        AssertThrow(std::abs(x[i][v] - x_ref[i][v]) < 1e-12,
-                    ExcInternalError());
+      for (unsigned int v = 1; v < VectorizedArray<double>::n_array_elements; ++v)
+        AssertThrow(std::abs(x[i][v] - x_ref[i][v]) < 1e-12, ExcInternalError());
     }
   deallog << std::endl;
 }

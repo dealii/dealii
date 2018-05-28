@@ -32,7 +32,7 @@ void
 check_this(const DoFHandler<dim> &dof_handler)
 {
   // set up X-shape mask
-  const unsigned int n_components = dof_handler.get_fe().n_components();
+  const unsigned int           n_components = dof_handler.get_fe().n_components();
   Table<2, DoFTools::Coupling> mask(n_components, n_components);
   for (unsigned int i = 0; i < n_components; ++i)
     for (unsigned int j = 0; j < n_components; ++j)

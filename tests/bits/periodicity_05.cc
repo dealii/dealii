@@ -111,8 +111,7 @@ Deal2PeriodicBug::make_periodicity_constraints()
   // specified by the direction integer which here is 0) Since we wanted to only
   // specify the director and electric components for periodicity we use a
   // component mask as well
-  DoFTools::make_periodicity_constraints(
-    dof_handler, 2, 0, 0, constraints, cmask);
+  DoFTools::make_periodicity_constraints(dof_handler, 2, 0, 0, constraints, cmask);
 }
 
 void
@@ -147,8 +146,7 @@ Deal2PeriodicBug::makeGrid()
   triangulation.prepare_coarsening_and_refinement();
   triangulation.execute_coarsening_and_refinement();
 
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   GridOut grid_out;
   grid_out.write_eps(triangulation, deallog.get_file_stream());
   deallog << "Grid construction complete..." << std::endl;

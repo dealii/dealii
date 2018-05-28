@@ -54,9 +54,7 @@ ones()
 
 template <int dim>
 void
-test(const Triangulation<dim> &tr,
-     const FiniteElement<dim> &fe,
-     const double              tolerance)
+test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe, const double tolerance)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -66,10 +64,8 @@ test(const Triangulation<dim> &tr,
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(4);
-  FEValues<dim>     fe_values(fe,
-                          quadrature,
-                          update_gradients | update_quadrature_points |
-                            update_JxW_values);
+  FEValues<dim>     fe_values(
+    fe, quadrature, update_gradients | update_quadrature_points | update_JxW_values);
 
   const QGauss<dim - 1> face_quadrature(4);
   FEFaceValues<dim>     fe_face_values(fe,
@@ -77,8 +73,7 @@ test(const Triangulation<dim> &tr,
                                    update_values | update_quadrature_points |
                                      update_normal_vectors | update_JxW_values);
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();
        ++cell)
     {
       fe_values.reinit(cell);
@@ -105,23 +100,17 @@ test(const Triangulation<dim> &tr,
               Tensor<1, dim> bulk_integral;
               for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
                 {
-                  bulk_integral += fe_values[single_component].gradient(i, q) *
-                                   fe_values.JxW(q);
+                  bulk_integral += fe_values[single_component].gradient(i, q) * fe_values.JxW(q);
                 }
 
               Tensor<1, dim> boundary_integral;
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell;
-                   ++face)
+              for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
                 {
                   fe_face_values.reinit(cell, face);
-                  for (unsigned int q = 0;
-                       q < fe_face_values.n_quadrature_points;
-                       ++q)
+                  for (unsigned int q = 0; q < fe_face_values.n_quadrature_points; ++q)
                     {
-                      boundary_integral +=
-                        fe_face_values[single_component].value(i, q) *
-                        fe_face_values.normal_vector(q) * fe_face_values.JxW(q);
+                      boundary_integral += fe_face_values[single_component].value(i, q) *
+                                           fe_face_values.normal_vector(q) * fe_face_values.JxW(q);
                     }
                 }
 
@@ -131,12 +120,10 @@ test(const Triangulation<dim> &tr,
                   deallog << "Failed:" << std::endl;
                   deallog << ss.str() << std::endl;
                   deallog << "    bulk integral=" << bulk_integral << std::endl;
-                  deallog << "boundary integral=" << boundary_integral
+                  deallog << "boundary integral=" << boundary_integral << std::endl;
+                  deallog << "Error! difference between bulk and surface integrals is greater than "
+                          << tolerance << "!\n\n"
                           << std::endl;
-                  deallog
-                    << "Error! difference between bulk and surface integrals is greater than "
-                    << tolerance << "!\n\n"
-                    << std::endl;
                   cell_ok = false;
                 }
 

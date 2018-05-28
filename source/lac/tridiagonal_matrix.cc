@@ -130,8 +130,7 @@ TridiagonalMatrix<number>::vmult(Vector<number> &      w,
 
 template <typename number>
 void
-TridiagonalMatrix<number>::vmult_add(Vector<number> &      w,
-                                     const Vector<number> &v) const
+TridiagonalMatrix<number>::vmult_add(Vector<number> &w, const Vector<number> &v) const
 {
   vmult(w, v, true);
 }
@@ -185,8 +184,7 @@ TridiagonalMatrix<number>::Tvmult(Vector<number> &      w,
 
 template <typename number>
 void
-TridiagonalMatrix<number>::Tvmult_add(Vector<number> &      w,
-                                      const Vector<number> &v) const
+TridiagonalMatrix<number>::Tvmult_add(Vector<number> &w, const Vector<number> &v) const
 {
   Tvmult(w, v, true);
 }

@@ -52,8 +52,7 @@ test()
 
     Particles::Particle<dim> particle(position, reference_position, index);
     particle.set_property_pool(pool);
-    particle.set_properties(
-      ArrayView<double>(&properties[0], properties.size()));
+    particle.set_properties(ArrayView<double>(&properties[0], properties.size()));
 
     std::multimap<Particles::internal::LevelInd, Particles::Particle<dim>> map;
 
@@ -68,8 +67,7 @@ test()
 
     for (; particle_it != particle_end; ++particle_it)
       {
-        deallog << "Particle position: " << (*particle_it).get_location()
-                << std::endl
+        deallog << "Particle position: " << (*particle_it).get_location() << std::endl
                 << "Particle properties: "
                 << std::vector<double>(particle_it->get_properties().begin(),
                                        particle_it->get_properties().end())

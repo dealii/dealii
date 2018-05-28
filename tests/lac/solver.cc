@@ -31,10 +31,7 @@
 #include "../testmatrix.h"
 #include "../tests.h"
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType &        solver,
             const MatrixType &  A,
@@ -54,10 +51,7 @@ check_solve(SolverType &        solver,
     }
 }
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_Tsolve(SolverType &        solver,
              const MatrixType &  A,

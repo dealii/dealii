@@ -149,8 +149,7 @@ namespace Step50
   {
     const unsigned int n_points = points.size();
 
-    Assert(values.size() == n_points,
-           ExcDimensionMismatch(values.size(), n_points));
+    Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
 
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
@@ -160,10 +159,9 @@ namespace Step50
 
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+    triangulation(MPI_COMM_WORLD,
+                  Triangulation<dim>::limit_level_difference_at_vertices,
+                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
     fe(degree),
     mg_dof_handler(triangulation),
     degree(degree)
@@ -196,16 +194,12 @@ namespace Step50
     Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values(
-      static_cast<const DoFHandler<dim> &>(mg_dof_handler),
-      dirichlet_boundary,
-      constraints);
+      static_cast<const DoFHandler<dim> &>(mg_dof_handler), dirichlet_boundary, constraints);
     constraints.close();
 
-    DynamicSparsityPattern csp(mg_dof_handler.n_dofs(),
-                               mg_dof_handler.n_dofs());
+    DynamicSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(mg_dof_handler, csp, constraints);
-    system_matrix.reinit(
-      mg_dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
+    system_matrix.reinit(mg_dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
 
     mg_constrained_dofs.clear();
     mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
@@ -229,12 +223,11 @@ namespace Step50
                                   MPI_COMM_WORLD,
                                   true);
 
-        mg_interface_matrices[level].reinit(
-          mg_dof_handler.locally_owned_mg_dofs(level),
-          mg_dof_handler.locally_owned_mg_dofs(level),
-          csp,
-          MPI_COMM_WORLD,
-          true);
+        mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
+                                            mg_dof_handler.locally_owned_mg_dofs(level),
+                                            csp,
+                                            MPI_COMM_WORLD,
+                                            true);
       }
   }
 
@@ -246,8 +239,8 @@ namespace Step50
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients | update_quadrature_points |
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -260,8 +253,7 @@ namespace Step50
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler
-                                                            .begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler.begin_active(),
                                                    endc = mg_dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -271,28 +263,22 @@ namespace Step50
 
           fe_values.reinit(cell);
 
-          coefficient.value_list(fe_values.get_quadrature_points(),
-                                 coefficient_values);
+          coefficient.value_list(fe_values.get_quadrature_points(), coefficient_values);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   cell_matrix(i, j) +=
-                    (coefficient_values[q_point] *
-                     fe_values.shape_grad(i, q_point) *
+                    (coefficient_values[q_point] * fe_values.shape_grad(i, q_point) *
                      fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
-                cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 *
-                                fe_values.JxW(q_point));
+                cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 * fe_values.JxW(q_point));
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
-                                                 cell_rhs,
-                                                 local_dof_indices,
-                                                 system_matrix,
-                                                 system_rhs);
+          constraints.distribute_local_to_global(
+            cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
         }
 
     system_matrix.compress(VectorOperation::add);
@@ -307,8 +293,8 @@ namespace Step50
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients | update_quadrature_points |
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -320,16 +306,13 @@ namespace Step50
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values(n_q_points);
 
-    std::vector<ConstraintMatrix> boundary_constraints(
-      triangulation.n_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints(
-      triangulation.n_levels());
+    std::vector<ConstraintMatrix> boundary_constraints(triangulation.n_levels());
+    std::vector<ConstraintMatrix> boundary_interface_constraints(triangulation.n_levels());
     for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
       {
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
+        boundary_constraints[level].add_lines(mg_constrained_dofs.get_boundary_indices(level));
         boundary_constraints[level].close();
 
         boundary_interface_constraints[level].add_lines(
@@ -346,15 +329,13 @@ namespace Step50
           cell_matrix = 0;
           fe_values.reinit(cell);
 
-          coefficient.value_list(fe_values.get_quadrature_points(),
-                                 coefficient_values);
+          coefficient.value_list(fe_values.get_quadrature_points(), coefficient_values);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i, j) +=
-                  (coefficient_values[q_point] *
-                   fe_values.shape_grad(i, q_point) *
+                  (coefficient_values[q_point] * fe_values.shape_grad(i, q_point) *
                    fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
           cell->get_mg_dof_indices(local_dof_indices);
@@ -364,16 +345,12 @@ namespace Step50
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              if (!mg_constrained_dofs.at_refinement_edge(
-                    cell->level(), local_dof_indices[i]) ||
-                  mg_constrained_dofs.at_refinement_edge(cell->level(),
-                                                         local_dof_indices[j]))
+              if (!mg_constrained_dofs.at_refinement_edge(cell->level(), local_dof_indices[i]) ||
+                  mg_constrained_dofs.at_refinement_edge(cell->level(), local_dof_indices[j]))
                 cell_matrix(i, j) = 0;
 
-          boundary_interface_constraints[cell->level()]
-            .distribute_local_to_global(cell_matrix,
-                                        local_dof_indices,
-                                        mg_interface_matrices[cell->level()]);
+          boundary_interface_constraints[cell->level()].distribute_local_to_global(
+            cell_matrix, local_dof_indices, mg_interface_matrices[cell->level()]);
         }
 
     for (unsigned int i = 0; i < triangulation.n_global_levels(); ++i)
@@ -395,8 +372,8 @@ namespace Step50
     SolverControl         coarse_solver_control(1000, 1e-10, false, false);
     SolverGMRES<vector_t> coarse_solver(coarse_solver_control);
     PreconditionIdentity  id;
-    MGCoarseGridLACIteration<SolverGMRES<vector_t>, vector_t>
-      coarse_grid_solver(coarse_solver, coarse_matrix, id);
+    MGCoarseGridLACIteration<SolverGMRES<vector_t>, vector_t> coarse_grid_solver(
+      coarse_solver, coarse_matrix, id);
 
     typedef TrilinosWrappers::PreconditionJacobi         Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
@@ -409,12 +386,8 @@ namespace Step50
     // Now, we are ready to set up the
     // V-cycle operator and the
     // multilevel preconditioner.
-    Multigrid<vector_t> mg(mg_dof_handler,
-                           mg_matrix,
-                           coarse_grid_solver,
-                           mg_transfer,
-                           mg_smoother,
-                           mg_smoother);
+    Multigrid<vector_t> mg(
+      mg_dof_handler, mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_debug(2);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
@@ -439,12 +412,11 @@ namespace Step50
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate(
-      static_cast<DoFHandler<dim> &>(mg_dof_handler),
-      QGauss<dim - 1>(3),
-      typename FunctionMap<dim>::type(),
-      solution,
-      estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim> &>(mg_dof_handler),
+                                       QGauss<dim - 1>(3),
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       estimated_error_per_cell);
     GridRefinement::refine_and_coarsen_fixed_number(
       triangulation, estimated_error_per_cell, 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement();
@@ -472,15 +444,14 @@ namespace Step50
         // refine_grid ();
 
 
-        deallog << "   Number of active cells:       "
-                << triangulation.n_global_active_cells() << std::endl;
+        deallog << "   Number of active cells:       " << triangulation.n_global_active_cells()
+                << std::endl;
 
         MPI_Barrier(MPI_COMM_WORLD);
         setup_system();
         MPI_Barrier(MPI_COMM_WORLD);
 
-        deallog << "   Number of degrees of freedom: "
-                << mg_dof_handler.n_dofs() << " (by level: ";
+        deallog << "   Number of degrees of freedom: " << mg_dof_handler.n_dofs() << " (by level: ";
         for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
           deallog << mg_dof_handler.n_dofs(level)
                   << (level == triangulation.n_levels() - 1 ? ")" : ", ");
@@ -506,8 +477,7 @@ main(int argc, char *argv[])
 {
   using namespace dealii;
   using namespace Step50;
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
   mpi_initlog();
 
   try
@@ -519,13 +489,11 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -533,12 +501,10 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

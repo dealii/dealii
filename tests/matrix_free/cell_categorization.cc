@@ -73,17 +73,14 @@ test()
 
   MatrixFree<dim>                          mf_data;
   typename MatrixFree<dim>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
+  data.tasks_parallel_scheme               = MatrixFree<dim>::AdditionalData::none;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
 
   data.cell_vectorization_category.resize(tria.n_active_cells());
   for (const auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
-      data.cell_vectorization_category[cell->active_cell_index()] =
-        cell->center()[1] * 10.;
+      data.cell_vectorization_category[cell->active_cell_index()] = cell->center()[1] * 10.;
 
   data.cell_vectorization_categories_strict = false;
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);
@@ -91,8 +88,8 @@ test()
   deallog << "Number of cell batches: " << mf_data.n_macro_cells() << std::endl;
   for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
     for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
-      deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
-              << mf_data.get_cell_category(i) << std::endl;
+      deallog << mf_data.get_cell_iterator(i, c)->id() << " with " << mf_data.get_cell_category(i)
+              << std::endl;
   deallog << std::endl;
 
   data.cell_vectorization_categories_strict = true;
@@ -100,23 +97,22 @@ test()
   deallog << "Number of cell batches: " << mf_data.n_macro_cells() << std::endl;
   for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
     for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
-      deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
-              << mf_data.get_cell_category(i) << std::endl;
+      deallog << mf_data.get_cell_iterator(i, c)->id() << " with " << mf_data.get_cell_category(i)
+              << std::endl;
   deallog << std::endl;
 
   // set all categories to a fixed large number to make sure the memory
   // allocation does not depend on the actual number
-  std::fill(data.cell_vectorization_category.begin(),
-            data.cell_vectorization_category.end(),
-            100000000);
+  std::fill(
+    data.cell_vectorization_category.begin(), data.cell_vectorization_category.end(), 100000000);
 
   data.cell_vectorization_categories_strict = false;
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);
   deallog << "Number of cell batches: " << mf_data.n_macro_cells() << std::endl;
   for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
     for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
-      deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
-              << mf_data.get_cell_category(i) << std::endl;
+      deallog << mf_data.get_cell_iterator(i, c)->id() << " with " << mf_data.get_cell_category(i)
+              << std::endl;
   deallog << std::endl;
 }
 
@@ -124,9 +120,8 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, testing_max_num_threads());
+  MPILogInitAll                    log;
   test<2>();
   test<3>();
 }

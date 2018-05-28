@@ -56,8 +56,7 @@ test()
   tria.refine_global(1);
 
   // refine some of the cells.
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (unsigned int counter = 0; cell != endc; ++cell, ++counter)
     if (counter % 5 == 0)
       cell->set_refine_flag();
@@ -90,18 +89,15 @@ test()
         if (!correct_constraints.is_constrained(boundary_value->first))
           {
             correct_constraints.add_line(boundary_value->first);
-            correct_constraints.set_inhomogeneity(boundary_value->first,
-                                                  boundary_value->second);
+            correct_constraints.set_inhomogeneity(boundary_value->first, boundary_value->second);
           }
       }
   }
   correct_constraints.close();
 
   deallog << "Number of DoFs: " << dof.n_dofs() << std::endl
-          << "Number of hanging nodes: " << library_constraints.n_constraints()
-          << std::endl
-          << "Total number of constraints: "
-          << correct_constraints.n_constraints() << std::endl;
+          << "Number of hanging nodes: " << library_constraints.n_constraints() << std::endl
+          << "Total number of constraints: " << correct_constraints.n_constraints() << std::endl;
 
   VectorTools::interpolate_boundary_values(
     dof, 0, Functions::ConstantFunction<dim>(1.), library_constraints);
@@ -112,29 +108,22 @@ test()
   deallog << "Check that both constraint matrices are identical... ";
   for (unsigned int i = 0; i < dof.n_dofs(); ++i)
     {
-      AssertThrow(correct_constraints.is_constrained(i) ==
-                    library_constraints.is_constrained(i),
+      AssertThrow(correct_constraints.is_constrained(i) == library_constraints.is_constrained(i),
                   ExcInternalError());
-      typedef const std::vector<std::pair<types::global_dof_index, double>>
-        &constraint_format;
+      typedef const std::vector<std::pair<types::global_dof_index, double>> &constraint_format;
       if (correct_constraints.is_constrained(i))
         {
-          constraint_format correct =
-            *correct_constraints.get_constraint_entries(i);
-          constraint_format library =
-            *library_constraints.get_constraint_entries(i);
+          constraint_format correct = *correct_constraints.get_constraint_entries(i);
+          constraint_format library = *library_constraints.get_constraint_entries(i);
           AssertThrow(correct.size() == library.size(), ExcInternalError());
           for (unsigned int q = 0; q < correct.size(); ++q)
             {
-              AssertThrow(correct[q].first == library[q].first,
-                          ExcInternalError());
-              AssertThrow(std::fabs(correct[q].second - library[q].second) <
-                            1e-14,
+              AssertThrow(correct[q].first == library[q].first, ExcInternalError());
+              AssertThrow(std::fabs(correct[q].second - library[q].second) < 1e-14,
                           ExcInternalError());
             }
           AssertThrow(std::fabs(correct_constraints.get_inhomogeneity(i) -
-                                library_constraints.get_inhomogeneity(i)) <
-                        1e-14,
+                                library_constraints.get_inhomogeneity(i)) < 1e-14,
                       ExcInternalError());
         }
     }

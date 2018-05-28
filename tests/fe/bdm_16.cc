@@ -38,8 +38,7 @@ test(const unsigned int degree)
 {
   FE_BDM<dim> fe_bdm(degree);
 
-  deallog << "Degree=" << degree
-          << ", restriction is additive flags:" << std::endl;
+  deallog << "Degree=" << degree << ", restriction is additive flags:" << std::endl;
 
   for (unsigned int i = 0; i < fe_bdm.dofs_per_cell; ++i)
     deallog << fe_bdm.restriction_is_additive(i) << " ";

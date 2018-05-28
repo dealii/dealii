@@ -54,31 +54,21 @@ test()
         position(i) = 0.525;
 
     Particles::Particle<dim, spacedim> particle(
-      position,
-      reference_position,
-      Utilities::MPI::this_mpi_process(tr.get_communicator()));
-    typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-      tr.begin_active();
+      position, reference_position, Utilities::MPI::this_mpi_process(tr.get_communicator()));
+    typename Triangulation<dim, spacedim>::active_cell_iterator cell = tr.begin_active();
     particle_handler.insert_particle(particle, cell);
 
     particle_handler.sort_particles_into_subdomains_and_cells();
     particle_handler.exchange_ghost_particles();
 
-    for (auto particle = particle_handler.begin();
-         particle != particle_handler.end();
-         ++particle)
-      deallog << "Particle id " << particle->get_id()
-              << " is local particle on process "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
-              << std::endl;
+    for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
+      deallog << "Particle id " << particle->get_id() << " is local particle on process "
+              << Utilities::MPI::this_mpi_process(tr.get_communicator()) << std::endl;
 
-    for (auto particle = particle_handler.begin_ghost();
-         particle != particle_handler.end_ghost();
+    for (auto particle = particle_handler.begin_ghost(); particle != particle_handler.end_ghost();
          ++particle)
-      deallog << "Particle id " << particle->get_id()
-              << " is ghost particle on process "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
-              << std::endl;
+      deallog << "Particle id " << particle->get_id() << " is ghost particle on process "
+              << Utilities::MPI::this_mpi_process(tr.get_communicator()) << std::endl;
   }
 
   deallog << "OK" << std::endl;

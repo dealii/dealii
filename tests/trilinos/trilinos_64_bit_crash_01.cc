@@ -49,8 +49,7 @@ main(int argc, char **argv)
   initlog();
   deallog << std::setprecision(4);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   deallog << "32bit" << std::endl;
   test<int>();

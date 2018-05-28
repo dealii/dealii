@@ -76,11 +76,10 @@ namespace Step54
     };
 
 
-    TriangulationOnCAD(
-      const std::string &  initial_mesh_filename,
-      const std::string &  cad_file_name,
-      const std::string &  output_filename,
-      const ProjectionType surface_projection_kind = NormalProjection);
+    TriangulationOnCAD(const std::string &  initial_mesh_filename,
+                       const std::string &  cad_file_name,
+                       const std::string &  output_filename,
+                       const ProjectionType surface_projection_kind = NormalProjection);
 
 
     ~TriangulationOnCAD();
@@ -112,11 +111,10 @@ namespace Step54
   // surface projector is used in the mesh refinement cycles (see
   // below for details).
 
-  TriangulationOnCAD::TriangulationOnCAD(
-    const std::string &  initial_mesh_filename,
-    const std::string &  cad_file_name,
-    const std::string &  output_filename,
-    const ProjectionType surface_projection_kind) :
+  TriangulationOnCAD::TriangulationOnCAD(const std::string &  initial_mesh_filename,
+                                         const std::string &  cad_file_name,
+                                         const std::string &  output_filename,
+                                         const ProjectionType surface_projection_kind) :
     initial_mesh_filename(initial_mesh_filename),
     cad_file_name(cad_file_name),
     output_filename(output_filename),
@@ -212,8 +210,7 @@ namespace Step54
     std::vector<TopoDS_Shell>     shells;
     std::vector<TopoDS_Wire>      wires;
 
-    OpenCASCADE::extract_compound_shapes(
-      bow_surface, compounds, compsolids, solids, shells, wires);
+    OpenCASCADE::extract_compound_shapes(bow_surface, compounds, compsolids, solids, shells, wires);
 
     // The next few steps are more familiar, and allow us to import an existing
     // mesh from an external VTK file, and convert it to a deal triangulation.
@@ -256,13 +253,10 @@ namespace Step54
     //
     // Once the projector is created, we then assign it to all the parts of
     // the triangulation with manifold_id = 2:
-    Assert(
-      wires.size() > 0,
-      ExcMessage(
-        "I could not find any wire in the CAD file you gave me. Bailing out."));
+    Assert(wires.size() > 0,
+           ExcMessage("I could not find any wire in the CAD file you gave me. Bailing out."));
 
-    OpenCASCADE::ArclengthProjectionLineManifold<2, 3> line_projector(
-      wires[0], tolerance);
+    OpenCASCADE::ArclengthProjectionLineManifold<2, 3> line_projector(wires[0], tolerance);
 
     tria.set_manifold(2, line_projector);
 
@@ -279,8 +273,7 @@ namespace Step54
       {
         case NormalProjection:
           {
-            OpenCASCADE::NormalProjectionBoundary<2, 3> normal_projector(
-              bow_surface, tolerance);
+            OpenCASCADE::NormalProjectionBoundary<2, 3> normal_projector(bow_surface, tolerance);
             tria.set_manifold(1, normal_projector);
 
             break;
@@ -295,9 +288,8 @@ namespace Step54
         // the projection is done along the y-axis.
         case DirectionalProjection:
           {
-            OpenCASCADE::DirectionalProjectionBoundary<2, 3>
-              directional_projector(
-                bow_surface, Point<3>(0.0, 1.0, 0.0), tolerance);
+            OpenCASCADE::DirectionalProjectionBoundary<2, 3> directional_projector(
+              bow_surface, Point<3>(0.0, 1.0, 0.0), tolerance);
             tria.set_manifold(1, directional_projector);
 
             break;
@@ -314,8 +306,8 @@ namespace Step54
         // tolerance.
         case NormalToMeshProjection:
           {
-            OpenCASCADE::NormalToMeshProjectionBoundary<2, 3>
-              normal_to_mesh_projector(bow_surface, tolerance);
+            OpenCASCADE::NormalToMeshProjectionBoundary<2, 3> normal_to_mesh_projector(bow_surface,
+                                                                                       tolerance);
             tria.set_manifold(1, normal_to_mesh_projector);
 
             break;
@@ -357,10 +349,9 @@ namespace Step54
   // before:
   void TriangulationOnCAD::output_results(const unsigned int cycle)
   {
-    const std::string filename =
-      (output_filename + "_" + Utilities::int_to_string(cycle) + ".vtk");
-    std::ofstream logfile(filename);
-    GridOut       grid_out;
+    const std::string filename = (output_filename + "_" + Utilities::int_to_string(cycle) + ".vtk");
+    std::ofstream     logfile(filename);
+    GridOut           grid_out;
     grid_out.write_vtk(tria, logfile);
   }
 
@@ -398,53 +389,40 @@ int main()
       const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";
       const std::string cad_file_name    = "input/DTMB-5415_bulbous_bow.iges";
 
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       cout << "Testing projection in direction normal to CAD surface" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       std::string        out_mesh_filename = ("3d_mesh_normal_projection");
-      TriangulationOnCAD tria_on_cad_norm(in_mesh_filename,
-                                          cad_file_name,
-                                          out_mesh_filename,
-                                          TriangulationOnCAD::NormalProjection);
+      TriangulationOnCAD tria_on_cad_norm(
+        in_mesh_filename, cad_file_name, out_mesh_filename, TriangulationOnCAD::NormalProjection);
       tria_on_cad_norm.run();
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       cout << endl;
       cout << endl;
 
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       cout << "Testing projection in y-axis direction" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       out_mesh_filename = ("3d_mesh_directional_projection");
-      TriangulationOnCAD tria_on_cad_dir(
-        in_mesh_filename,
-        cad_file_name,
-        out_mesh_filename,
-        TriangulationOnCAD::DirectionalProjection);
+      TriangulationOnCAD tria_on_cad_dir(in_mesh_filename,
+                                         cad_file_name,
+                                         out_mesh_filename,
+                                         TriangulationOnCAD::DirectionalProjection);
       tria_on_cad_dir.run();
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       cout << endl;
       cout << endl;
 
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       cout << "Testing projection in direction normal to mesh elements" << endl;
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       out_mesh_filename = ("3d_mesh_normal_to_mesh_projection");
-      TriangulationOnCAD tria_on_cad_norm_to_mesh(
-        in_mesh_filename,
-        cad_file_name,
-        out_mesh_filename,
-        TriangulationOnCAD::NormalToMeshProjection);
+      TriangulationOnCAD tria_on_cad_norm_to_mesh(in_mesh_filename,
+                                                  cad_file_name,
+                                                  out_mesh_filename,
+                                                  TriangulationOnCAD::NormalToMeshProjection);
       tria_on_cad_norm_to_mesh.run();
-      cout << "----------------------------------------------------------"
-           << endl;
+      cout << "----------------------------------------------------------" << endl;
       cout << endl;
       cout << endl;
     }
@@ -452,13 +430,11 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -466,12 +442,10 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

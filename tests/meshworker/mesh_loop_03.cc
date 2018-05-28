@@ -63,8 +63,7 @@ test()
 
   auto boundary_worker =
     [](const Iterator &cell, const unsigned int &f, ScratchData &, CopyData &) {
-      deallog << "Boundary worker on : " << cell << ", Face : " << f
-              << std::endl;
+      deallog << "Boundary worker on : " << cell << ", Face : " << f << std::endl;
     };
 
   auto face_worker = [](const Iterator &    cell,
@@ -75,9 +74,8 @@ test()
                         const unsigned int &nsf,
                         ScratchData &       s,
                         CopyData &          c) {
-    deallog << "Face worker on : " << cell << ", Neighbor cell : " << ncell
-            << ", Face : " << f << ", Neighbor Face : " << nf
-            << ", Subface: " << sf << ", Neighbor Subface: " << nsf
+    deallog << "Face worker on : " << cell << ", Neighbor cell : " << ncell << ", Face : " << f
+            << ", Neighbor Face : " << nf << ", Subface: " << sf << ", Neighbor Subface: " << nsf
             << std::endl;
   };
 

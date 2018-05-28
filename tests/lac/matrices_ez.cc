@@ -47,8 +47,7 @@ main()
   ez.set(4, 2, 13.);
   ez.set(4, 3, 14.);
 
-  deallog << "SparseMatrixEZ<float>::copy_from  SparseMatrixEZ<double>"
-          << std::endl;
+  deallog << "SparseMatrixEZ<float>::copy_from  SparseMatrixEZ<double>" << std::endl;
   SparseMatrixEZ<float> ff;
   ff.copy_from(ez);
   ff.print_formatted(logfile, 0, false, 5, "~");

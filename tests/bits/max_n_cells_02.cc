@@ -43,15 +43,13 @@ test()
 
   for (unsigned int cycle = 0; cycle < 7 * (4 - dim) * (4 - dim); ++cycle)
     {
-      deallog << "cycle=" << cycle << ", n_cells=" << tria.n_active_cells()
-              << std::endl;
+      deallog << "cycle=" << cycle << ", n_cells=" << tria.n_active_cells() << std::endl;
 
       Vector<float> criteria(tria.n_active_cells());
       for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
         criteria(i) = i;
 
-      GridRefinement::refine_and_coarsen_fixed_fraction(
-        tria, criteria, 0.8, 0.03, 10000);
+      GridRefinement::refine_and_coarsen_fixed_fraction(tria, criteria, 0.8, 0.03, 10000);
       tria.execute_coarsening_and_refinement();
     }
 }

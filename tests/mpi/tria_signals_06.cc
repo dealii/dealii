@@ -48,9 +48,7 @@ public:
     //                   std::placeholders::_1));
 
     tria_in.signals.pre_coarsening_on_cell.connect(
-      std::bind(&SignalListener<dim, spacedim>::count_on_coarsen,
-                this,
-                std::placeholders::_1));
+      std::bind(&SignalListener<dim, spacedim>::count_on_coarsen, this, std::placeholders::_1));
   }
 
   int
@@ -61,8 +59,7 @@ public:
 
 private:
   void
-  count_on_refine(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  count_on_refine(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     n_active_cells += cell->n_children();
     --n_active_cells;
@@ -71,8 +68,7 @@ private:
   }
 
   void
-  count_on_coarsen(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  count_on_coarsen(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     ++n_active_cells;
     n_active_cells -= cell->n_children();
@@ -92,18 +88,17 @@ test()
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;
 
   {
-    const std::string prefix = Utilities::int_to_string(dim, 1) + "d-" +
-                               Utilities::int_to_string(spacedim, 1) + "d";
+    const std::string prefix =
+      Utilities::int_to_string(dim, 1) + "d-" + Utilities::int_to_string(spacedim, 1) + "d";
     deallog.push(prefix.c_str());
   }
 
   // Option dealii::Triangulation<dim, spacedim>::maximum_smoothing can't
   // run in parallel at the time that this test is created.
-  TriaType tria(
-    MPI_COMM_WORLD,
-    typename dealii::Triangulation<dim, spacedim>::MeshSmoothing(
-      dealii::Triangulation<dim, spacedim>::smoothing_on_refinement |
-      dealii::Triangulation<dim, spacedim>::smoothing_on_coarsening));
+  TriaType tria(MPI_COMM_WORLD,
+                typename dealii::Triangulation<dim, spacedim>::MeshSmoothing(
+                  dealii::Triangulation<dim, spacedim>::smoothing_on_refinement |
+                  dealii::Triangulation<dim, spacedim>::smoothing_on_coarsening));
 
 
   GridGenerator::hyper_cube(tria);
@@ -136,8 +131,7 @@ test()
       unsigned int index  = 0;
       unsigned int locals = 0;
 
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             tria.begin_active();
+      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
            cell != tria.end();
            ++cell, ++index)
         if (flags[index])
@@ -159,8 +153,8 @@ test()
             }
 
           index = 0;
-          for (typename Triangulation<dim, spacedim>::active_cell_iterator
-                 cell = tria.begin_active();
+          for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
+                 tria.begin_active();
                cell != tria.end();
                ++cell, ++index)
             if (flags[index] && !cell->refine_flag_set())
@@ -172,8 +166,7 @@ test()
       tria.execute_coarsening_and_refinement();
 
       deallog << "n_loop: " << n_loop
-              << ", n_cell_gap: " << count_cell_via_signal.n_active_cell_gap()
-              << std::endl;
+              << ", n_cell_gap: " << count_cell_via_signal.n_active_cell_gap() << std::endl;
     }
 
   deallog.pop();
@@ -183,9 +176,8 @@ test()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, /* int max_num_threads */ 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, /* int max_num_threads */ 1);
+  MPILogInitAll                    log;
 
   // parallel::distributed::Triangulation<1, spacedim> is not valid.
   {

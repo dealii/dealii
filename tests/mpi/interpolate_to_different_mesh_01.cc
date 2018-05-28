@@ -44,10 +44,7 @@ public:
 
 template <int dim>
 void
-setup(DoFHandler<dim> &dh,
-      FE_Q<dim> &      fe,
-      LA::MPI::Vector &vec,
-      LA::MPI::Vector &lr_vec)
+setup(DoFHandler<dim> &dh, FE_Q<dim> &fe, LA::MPI::Vector &vec, LA::MPI::Vector &lr_vec)
 {
   dh.distribute_dofs(fe);
   vec.reinit(dh.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -58,10 +55,7 @@ setup(DoFHandler<dim> &dh,
 
 template <int dim>
 void
-output(DoFHandler<dim> & dh,
-       LA::MPI::Vector & v,
-       unsigned int      loop,
-       const std::string filename_)
+output(DoFHandler<dim> &dh, LA::MPI::Vector &v, unsigned int loop, const std::string filename_)
 {
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
@@ -77,11 +71,9 @@ output(DoFHandler<dim> & dh,
   if (myid)
     {
       std::vector<std::string> filenames;
-      for (unsigned int i = 0;
-           i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-           ++i)
-        filenames.push_back(filename_ + Utilities::int_to_string(loop, 2) +
-                            "." + Utilities::int_to_string(i, 2) + ".vtu");
+      for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+        filenames.push_back(filename_ + Utilities::int_to_string(loop, 2) + "." +
+                            Utilities::int_to_string(i, 2) + ".vtu");
       const std::string pvtu_master_filename =
         (filename_ + Utilities::int_to_string(loop, 2) + ".pvtu");
       std::ofstream pvtu_master(pvtu_master_filename.c_str());
@@ -139,8 +131,8 @@ test()
       tr.load_refine_flags(r_flags);
 
       tr.execute_coarsening_and_refinement();
-      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-              << " / " << tr.n_global_active_cells() << std::endl;
+      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells() << " / "
+              << tr.n_global_active_cells() << std::endl;
 
 
       LA::MPI::Vector vec1;
@@ -161,15 +153,11 @@ test()
 
       {
         Vector<double> local_errors(tr.n_active_cells());
-        VectorTools::integrate_difference(dh,
-                                          lr_vec1,
-                                          func,
-                                          local_errors,
-                                          QGauss<dim>(3),
-                                          VectorTools::L2_norm);
-        double       total_local_error  = local_errors.l2_norm();
-        const double total_global_error = std::sqrt(Utilities::MPI::sum(
-          total_local_error * total_local_error, MPI_COMM_WORLD));
+        VectorTools::integrate_difference(
+          dh, lr_vec1, func, local_errors, QGauss<dim>(3), VectorTools::L2_norm);
+        double       total_local_error = local_errors.l2_norm();
+        const double total_global_error =
+          std::sqrt(Utilities::MPI::sum(total_local_error * total_local_error, MPI_COMM_WORLD));
         if (myid == 0)
           deallog << "err: " << total_global_error << std::endl;
       }

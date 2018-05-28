@@ -55,8 +55,7 @@ main(int argc, char **argv)
 {
   std::ofstream out("output");
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   typedef Vector<double> VectorType;
 
@@ -81,16 +80,14 @@ main(int argc, char **argv)
 
   double kappa = 1.0;
 
-  ode.explicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = y[1];
     ydot[1] = -kappa * kappa * y[0];
     return 0;
   };
 
-  ode.output_step = [&](const double       t,
-                        const VectorType & sol,
-                        const unsigned int step_number) -> int {
+  ode.output_step =
+    [&](const double t, const VectorType &sol, const unsigned int step_number) -> int {
     out << t << " " << sol[0] << " " << sol[1] << std::endl;
     return 0;
   };

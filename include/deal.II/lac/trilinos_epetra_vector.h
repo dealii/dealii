@@ -74,8 +74,7 @@ namespace LinearAlgebra
        * includes information about the size of the vector, this is all we
        * need to generate a %parallel vector.
        */
-      explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm &communicator);
+      explicit Vector(const IndexSet &parallel_partitioner, const MPI_Comm &communicator);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -93,8 +92,7 @@ namespace LinearAlgebra
        * copied.
        */
       virtual void
-      reinit(const VectorSpaceVector<double> &V,
-             const bool omit_zeroing_entries = false) override;
+      reinit(const VectorSpaceVector<double> &V, const bool omit_zeroing_entries = false) override;
 
       /**
        * Copy function. This function takes a Vector and copies all the
@@ -121,11 +119,10 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
-      import(
-        const ReadWriteVector<double> &                 V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const ReadWriteVector<double> &                 V,
+             VectorOperation::values                         operation,
+             std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+               std::shared_ptr<const CommunicationPatternBase>()) override;
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -155,8 +152,7 @@ namespace LinearAlgebra
        * Return the scalar product of two vectors. The vectors need to have the
        * same layout.
        */
-      virtual double
-      operator*(const VectorSpaceVector<double> &V) const override;
+      virtual double operator*(const VectorSpaceVector<double> &V) const override;
 
       /**
        * Add @p a to all components. Note that @p is a scalar not a vector.
@@ -186,9 +182,7 @@ namespace LinearAlgebra
        * = s*(*this)+a*V</tt>.
        */
       virtual void
-      sadd(const double                     s,
-           const double                     a,
-           const VectorSpaceVector<double> &V) override;
+      sadd(const double s, const double a, const VectorSpaceVector<double> &V) override;
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -357,8 +351,7 @@ namespace LinearAlgebra
        * on the communicator @p mpi_comm.
        */
       void
-      create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                 const MPI_Comm &mpi_comm);
+      create_epetra_comm_pattern(const IndexSet &source_index_set, const MPI_Comm &mpi_comm);
 
       /**
        * Pointer to the actual Epetra vector object.

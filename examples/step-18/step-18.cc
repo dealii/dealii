@@ -115,17 +115,16 @@ namespace Step18
   // implementing its creation for given values of the Lame constants $\lambda$
   // and $\mu$ is straightforward:
   template <int dim>
-  SymmetricTensor<4, dim> get_stress_strain_tensor(const double lambda,
-                                                   const double mu)
+  SymmetricTensor<4, dim> get_stress_strain_tensor(const double lambda, const double mu)
   {
     SymmetricTensor<4, dim> tmp;
     for (unsigned int i = 0; i < dim; ++i)
       for (unsigned int j = 0; j < dim; ++j)
         for (unsigned int k = 0; k < dim; ++k)
           for (unsigned int l = 0; l < dim; ++l)
-            tmp[i][j][k][l] = (((i == k) && (j == l) ? mu : 0.0) +
-                               ((i == l) && (j == k) ? mu : 0.0) +
-                               ((i == j) && (k == l) ? lambda : 0.0));
+            tmp[i][j][k][l] =
+              (((i == k) && (j == l) ? mu : 0.0) + ((i == l) && (j == k) ? mu : 0.0) +
+               ((i == j) && (k == l) ? lambda : 0.0));
     return tmp;
   }
 
@@ -208,10 +207,9 @@ namespace Step18
     // good:
     for (unsigned int i = 0; i < dim; ++i)
       for (unsigned int j = i + 1; j < dim; ++j)
-        tmp[i][j] =
-          (fe_values.shape_grad_component(shape_func, q_point, i)[j] +
-           fe_values.shape_grad_component(shape_func, q_point, j)[i]) /
-          2;
+        tmp[i][j] = (fe_values.shape_grad_component(shape_func, q_point, i)[j] +
+                     fe_values.shape_grad_component(shape_func, q_point, j)[i]) /
+                    2;
 
     return tmp;
   }
@@ -237,8 +235,7 @@ namespace Step18
   // direction. We test this with the <code>Assert</code> macro that will
   // simply abort our program if the condition is not met.
   template <int dim>
-  inline SymmetricTensor<2, dim>
-  get_strain(const std::vector<Tensor<1, dim>> &grad)
+  inline SymmetricTensor<2, dim> get_strain(const std::vector<Tensor<1, dim>> &grad)
   {
     Assert(grad.size() == dim, ExcInternalError());
 
@@ -295,9 +292,8 @@ namespace Step18
   {
     // Again first compute the curl of the velocity field. This time, it is a
     // real vector:
-    const Point<3> curl(grad_u[2][1] - grad_u[1][2],
-                        grad_u[0][2] - grad_u[2][0],
-                        grad_u[1][0] - grad_u[0][1]);
+    const Point<3> curl(
+      grad_u[2][1] - grad_u[1][2], grad_u[0][2] - grad_u[2][0], grad_u[1][0] - grad_u[0][1]);
 
     // From this vector, using its magnitude, compute the tangent of the angle
     // of rotation, and from it the actual angle of rotation with respect to
@@ -317,7 +313,7 @@ namespace Step18
     // small:
     if (std::abs(angle) < 1e-9)
       {
-        static const double rotation[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        static const double       rotation[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
         static const Tensor<2, 3> rot(rotation);
         return rot;
       }
@@ -326,8 +322,7 @@ namespace Step18
     // a predefined function to compute the rotation matrix of the local
     // coordinate system.
     const Point<3> axis = curl / tan_angle;
-    return Physics::Transformations::Rotations::rotation_matrix_3d(axis,
-                                                                   -angle);
+    return Physics::Transformations::Rotations::rotation_matrix_3d(axis, -angle);
   }
 
 
@@ -558,12 +553,10 @@ namespace Step18
   public:
     BodyForce();
 
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  values) const override;
+    virtual void vector_value(const Point<dim> &p, Vector<double> &values) const override;
 
-    virtual void
-    vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override;
+    virtual void vector_value_list(const std::vector<Point<dim>> &points,
+                                   std::vector<Vector<double>> &  value_list) const override;
   };
 
 
@@ -573,8 +566,7 @@ namespace Step18
 
 
   template <int dim>
-  inline void BodyForce<dim>::vector_value(const Point<dim> & /*p*/,
-                                           Vector<double> &values) const
+  inline void BodyForce<dim>::vector_value(const Point<dim> & /*p*/, Vector<double> &values) const
   {
     Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
 
@@ -588,14 +580,12 @@ namespace Step18
 
 
   template <int dim>
-  void BodyForce<dim>::vector_value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
+  void BodyForce<dim>::vector_value_list(const std::vector<Point<dim>> &points,
+                                         std::vector<Vector<double>> &  value_list) const
   {
     const unsigned int n_points = points.size();
 
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
+    Assert(value_list.size() == n_points, ExcDimensionMismatch(value_list.size(), n_points));
 
     for (unsigned int p = 0; p < n_points; ++p)
       BodyForce<dim>::vector_value(points[p], value_list[p]);
@@ -634,15 +624,12 @@ namespace Step18
   class IncrementalBoundaryValues : public Function<dim>
   {
   public:
-    IncrementalBoundaryValues(const double present_time,
-                              const double present_timestep);
+    IncrementalBoundaryValues(const double present_time, const double present_timestep);
 
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  values) const override;
+    virtual void vector_value(const Point<dim> &p, Vector<double> &values) const override;
 
-    virtual void
-    vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override;
+    virtual void vector_value_list(const std::vector<Point<dim>> &points,
+                                   std::vector<Vector<double>> &  value_list) const override;
 
   private:
     const double velocity;
@@ -652,9 +639,8 @@ namespace Step18
 
 
   template <int dim>
-  IncrementalBoundaryValues<dim>::IncrementalBoundaryValues(
-    const double present_time,
-    const double present_timestep) :
+  IncrementalBoundaryValues<dim>::IncrementalBoundaryValues(const double present_time,
+                                                            const double present_timestep) :
     Function<dim>(dim),
     velocity(.08),
     present_time(present_time),
@@ -663,9 +649,8 @@ namespace Step18
 
 
   template <int dim>
-  void
-  IncrementalBoundaryValues<dim>::vector_value(const Point<dim> & /*p*/,
-                                               Vector<double> &values) const
+  void IncrementalBoundaryValues<dim>::vector_value(const Point<dim> & /*p*/,
+                                                    Vector<double> &values) const
   {
     Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
 
@@ -676,14 +661,13 @@ namespace Step18
 
 
   template <int dim>
-  void IncrementalBoundaryValues<dim>::vector_value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
+  void
+  IncrementalBoundaryValues<dim>::vector_value_list(const std::vector<Point<dim>> &points,
+                                                    std::vector<Vector<double>> &  value_list) const
   {
     const unsigned int n_points = points.size();
 
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
+    Assert(value_list.size() == n_points, ExcDimensionMismatch(value_list.size(), n_points));
 
     for (unsigned int p = 0; p < n_points; ++p)
       IncrementalBoundaryValues<dim>::vector_value(points[p], value_list[p]);
@@ -697,9 +681,9 @@ namespace Step18
   // stress-strain tensor, which we have declared as a static const
   // variable. We chose Lame constants that are appropriate for steel:
   template <int dim>
-  const SymmetricTensor<4, dim> TopLevel<dim>::stress_strain_tensor =
-    get_stress_strain_tensor<dim>(/*lambda = */ 9.695e10,
-                                  /*mu     = */ 7.617e10);
+  const SymmetricTensor<4, dim>
+    TopLevel<dim>::stress_strain_tensor = get_stress_strain_tensor<dim>(/*lambda = */ 9.695e10,
+                                                                        /*mu     = */ 7.617e10);
 
 
 
@@ -773,8 +757,7 @@ namespace Step18
   {
     const double inner_radius = 0.8, outer_radius = 1;
     GridGenerator::cylinder_shell(triangulation, 3, inner_radius, outer_radius);
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -786,8 +769,7 @@ namespace Step18
               cell->face(f)->set_boundary_id(0);
             else if (face_center[2] == 3)
               cell->face(f)->set_boundary_id(1);
-            else if (std::sqrt(face_center[0] * face_center[0] +
-                               face_center[1] * face_center[1]) <
+            else if (std::sqrt(face_center[0] * face_center[0] + face_center[1] * face_center[1]) <
                      (inner_radius + outer_radius) / 2)
               cell->face(f)->set_boundary_id(2);
             else
@@ -836,8 +818,7 @@ namespace Step18
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
     hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
+    DoFTools::make_hanging_node_constraints(dof_handler, hanging_node_constraints);
     hanging_node_constraints.close();
 
     // And then we have to set up the matrix. Here we deviate from step-17, in
@@ -861,10 +842,8 @@ namespace Step18
                                     sparsity_pattern,
                                     hanging_node_constraints,
                                     /*keep constrained dofs*/ false);
-    SparsityTools::distribute_sparsity_pattern(sparsity_pattern,
-                                               local_dofs_per_process,
-                                               mpi_communicator,
-                                               locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(
+      sparsity_pattern, local_dofs_per_process, mpi_communicator, locally_relevant_dofs);
     // Note that we have used the <code>DynamicSparsityPattern</code> class
     // here that was already introduced in step-11, rather than the
     // <code>SparsityPattern</code> class that we have used in all other
@@ -907,10 +886,8 @@ namespace Step18
     //
     // With this data structure, we can then go to the PETSc sparse matrix and
     // tell it to preallocate all the entries we will later want to write to:
-    system_matrix.reinit(locally_owned_dofs,
-                         locally_owned_dofs,
-                         sparsity_pattern,
-                         mpi_communicator);
+    system_matrix.reinit(
+      locally_owned_dofs, locally_owned_dofs, sparsity_pattern, mpi_communicator);
     // After this point, no further explicit knowledge of the sparsity pattern
     // is required any more and we can let the <code>sparsity_pattern</code>
     // variable go out of scope without any problem.
@@ -947,8 +924,8 @@ namespace Step18
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients | update_quadrature_points |
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -959,13 +936,11 @@ namespace Step18
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     BodyForce<dim>              body_force;
-    std::vector<Vector<double>> body_force_values(n_q_points,
-                                                  Vector<double>(dim));
+    std::vector<Vector<double>> body_force_values(n_q_points, Vector<double>(dim));
 
     // As in step-17, we only need to loop over all cells that belong to the
     // present processor:
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -988,13 +963,11 @@ namespace Step18
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 {
-                  const SymmetricTensor<2, dim> eps_phi_i = get_strain(
-                                                  fe_values, i, q_point),
-                                                eps_phi_j = get_strain(
-                                                  fe_values, j, q_point);
+                  const SymmetricTensor<2, dim> eps_phi_i = get_strain(fe_values, i, q_point),
+                                                eps_phi_j = get_strain(fe_values, j, q_point);
 
-                  cell_matrix(i, j) += (eps_phi_i * stress_strain_tensor *
-                                        eps_phi_j * fe_values.JxW(q_point));
+                  cell_matrix(i, j) +=
+                    (eps_phi_i * stress_strain_tensor * eps_phi_j * fe_values.JxW(q_point));
                 }
 
 
@@ -1009,14 +982,12 @@ namespace Step18
             reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
           // In addition, we need the values of the external body forces at
           // the quadrature points on this cell:
-          body_force.vector_value_list(fe_values.get_quadrature_points(),
-                                       body_force_values);
+          body_force.vector_value_list(fe_values.get_quadrature_points(), body_force_values);
           // Then we can loop over all degrees of freedom on this cell and
           // compute local contributions to the right hand side:
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const unsigned int component_i =
-                fe.system_to_component_index(i).first;
+              const unsigned int component_i = fe.system_to_component_index(i).first;
 
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 {
@@ -1024,8 +995,7 @@ namespace Step18
                     local_quadrature_points_data[q_point].old_stress;
 
                   cell_rhs(i) +=
-                    (body_force_values[q_point](component_i) *
-                       fe_values.shape_value(i, q_point) -
+                    (body_force_values[q_point](component_i) * fe_values.shape_value(i, q_point) -
                      old_stress * get_strain(fe_values, i, q_point)) *
                     fe_values.JxW(q_point);
                 }
@@ -1036,11 +1006,8 @@ namespace Step18
           // as in step-17:
           cell->get_dof_indices(local_dof_indices);
 
-          hanging_node_constraints.distribute_local_to_global(cell_matrix,
-                                                              cell_rhs,
-                                                              local_dof_indices,
-                                                              system_matrix,
-                                                              system_rhs);
+          hanging_node_constraints.distribute_local_to_global(
+            cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
         }
 
     // Now compress the vector and the system matrix:
@@ -1096,8 +1063,7 @@ namespace Step18
       fe.component_mask(z_component));
 
     PETScWrappers::MPI::Vector tmp(locally_owned_dofs, mpi_communicator);
-    MatrixTools::apply_boundary_values(
-      boundary_values, system_matrix, tmp, system_rhs, false);
+    MatrixTools::apply_boundary_values(boundary_values, system_matrix, tmp, system_rhs, false);
     incremental_displacement = tmp;
   }
 
@@ -1117,8 +1083,7 @@ namespace Step18
 
     const unsigned int n_iterations = solve_linear_problem();
 
-    pcout << "    Solver converged in " << n_iterations << " iterations."
-          << std::endl;
+    pcout << "    Solver converged in " << n_iterations << " iterations." << std::endl;
 
     pcout << "    Updating quadrature point data..." << std::flush;
     update_quadrature_point_history();
@@ -1144,20 +1109,16 @@ namespace Step18
   template <int dim>
   unsigned int TopLevel<dim>::solve_linear_problem()
   {
-    PETScWrappers::MPI::Vector distributed_incremental_displacement(
-      locally_owned_dofs, mpi_communicator);
+    PETScWrappers::MPI::Vector distributed_incremental_displacement(locally_owned_dofs,
+                                                                    mpi_communicator);
     distributed_incremental_displacement = incremental_displacement;
 
-    SolverControl           solver_control(dof_handler.n_dofs(),
-                                 1e-16 * system_rhs.l2_norm());
+    SolverControl           solver_control(dof_handler.n_dofs(), 1e-16 * system_rhs.l2_norm());
     PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 
-    cg.solve(system_matrix,
-             distributed_incremental_displacement,
-             system_rhs,
-             preconditioner);
+    cg.solve(system_matrix, distributed_incremental_displacement, system_rhs, preconditioner);
 
     incremental_displacement = distributed_incremental_displacement;
 
@@ -1228,9 +1189,8 @@ namespace Step18
     Vector<double> norm_of_stress(triangulation.n_active_cells());
     {
       // Loop over all the cells...
-      typename Triangulation<dim>::active_cell_iterator
-        cell = triangulation.begin_active(),
-        endc = triangulation.end();
+      typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active(),
+                                                        endc = triangulation.end();
       for (; cell != endc; ++cell)
         if (cell->is_locally_owned())
           {
@@ -1239,8 +1199,7 @@ namespace Step18
             SymmetricTensor<2, dim> accumulated_stress;
             for (unsigned int q = 0; q < quadrature_formula.size(); ++q)
               accumulated_stress +=
-                reinterpret_cast<PointHistory<dim> *>(cell->user_pointer())[q]
-                  .old_stress;
+                reinterpret_cast<PointHistory<dim> *>(cell->user_pointer())[q].old_stress;
 
             // ...then write the norm of the average to their destination:
             norm_of_stress(cell->active_cell_index()) =
@@ -1261,11 +1220,9 @@ namespace Step18
     // As a last piece of data, let us also add the partitioning of the domain
     // into subdomains associated with the processors if this is a parallel
     // job. This works in the exact same way as in the step-17 program:
-    std::vector<types::subdomain_id> partition_int(
-      triangulation.n_active_cells());
+    std::vector<types::subdomain_id> partition_int(triangulation.n_active_cells());
     GridTools::get_subdomain_association(triangulation, partition_int);
-    const Vector<double> partitioning(partition_int.begin(),
-                                      partition_int.end());
+    const Vector<double> partitioning(partition_int.begin(), partition_int.end());
     data_out.add_data_vector(partitioning, "partitioning");
 
     // Finally, with all this data, we can instruct deal.II to munge the
@@ -1278,9 +1235,8 @@ namespace Step18
     // compose it of the prefix <code>solution-</code>, followed by the time
     // step number, and finally the processor id (encoded as a three digit
     // number):
-    std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_no, 4) + "." +
-      Utilities::int_to_string(this_mpi_process, 3) + ".vtu";
+    std::string filename = "solution-" + Utilities::int_to_string(timestep_no, 4) + "." +
+                           Utilities::int_to_string(this_mpi_process, 3) + ".vtu";
 
     // The following assertion makes sure that there are less than 1000
     // processes (a very conservative check, but worth having anyway) as our
@@ -1309,8 +1265,7 @@ namespace Step18
         // above)
         std::vector<std::string> filenames;
         for (unsigned int i = 0; i < n_mpi_processes; ++i)
-          filenames.push_back("solution-" +
-                              Utilities::int_to_string(timestep_no, 4) + "." +
+          filenames.push_back("solution-" + Utilities::int_to_string(timestep_no, 4) + "." +
                               Utilities::int_to_string(i, 3) + ".vtu");
 
         // Now we write the .visit file. The naming is similar to the .vtu
@@ -1363,8 +1318,7 @@ namespace Step18
   {
     present_time += present_timestep;
     ++timestep_no;
-    pcout << "Timestep " << timestep_no << " at time " << present_time
-          << std::endl;
+    pcout << "Timestep " << timestep_no << " at time " << present_time << std::endl;
 
     for (unsigned int cycle = 0; cycle < 2; ++cycle)
       {
@@ -1375,22 +1329,19 @@ namespace Step18
         else
           refine_initial_grid();
 
-        pcout << "    Number of active cells:       "
-              << triangulation.n_active_cells() << " (by partition:";
+        pcout << "    Number of active cells:       " << triangulation.n_active_cells()
+              << " (by partition:";
         for (unsigned int p = 0; p < n_mpi_processes; ++p)
           pcout << (p == 0 ? ' ' : '+')
-                << (GridTools::count_cells_with_subdomain_association(
-                     triangulation, p));
+                << (GridTools::count_cells_with_subdomain_association(triangulation, p));
         pcout << ")" << std::endl;
 
         setup_system();
 
-        pcout << "    Number of degrees of freedom: " << dof_handler.n_dofs()
-              << " (by partition:";
+        pcout << "    Number of degrees of freedom: " << dof_handler.n_dofs() << " (by partition:";
         for (unsigned int p = 0; p < n_mpi_processes; ++p)
           pcout << (p == 0 ? ' ' : '+')
-                << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
-                                                                    p));
+                << (DoFTools::count_dofs_with_subdomain_association(dof_handler, p));
         pcout << ")" << std::endl;
 
         solve_timestep();
@@ -1413,8 +1364,7 @@ namespace Step18
   {
     present_time += present_timestep;
     ++timestep_no;
-    pcout << "Timestep " << timestep_no << " at time " << present_time
-          << std::endl;
+    pcout << "Timestep " << timestep_no << " at time " << present_time << std::endl;
     if (present_time > end_time)
       {
         present_timestep -= (present_time - end_time);
@@ -1454,8 +1404,7 @@ namespace Step18
 
     // Then set up a global vector into which we merge the local indicators
     // from each of the %parallel processes:
-    const unsigned int n_local_cells =
-      triangulation.n_locally_owned_active_cells();
+    const unsigned int n_local_cells = triangulation.n_locally_owned_active_cells();
 
     PETScWrappers::MPI::Vector distributed_error_per_cell(
       mpi_communicator, triangulation.n_active_cells(), n_local_cells);
@@ -1468,8 +1417,7 @@ namespace Step18
     // Once we have that, copy it back into local copies on all processors and
     // refine the mesh accordingly:
     error_per_cell = distributed_error_per_cell;
-    GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, error_per_cell, 0.35, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation, error_per_cell, 0.35, 0.03);
     triangulation.execute_coarsening_and_refinement();
 
     // Finally, set up quadrature point data again on the new mesh, and only
@@ -1573,8 +1521,7 @@ namespace Step18
     pcout << "    Moving mesh..." << std::endl;
 
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
+    for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -1584,8 +1531,7 @@ namespace Step18
 
             Point<dim> vertex_displacement;
             for (unsigned int d = 0; d < dim; ++d)
-              vertex_displacement[d] =
-                incremental_displacement(cell->vertex_dof_index(v, d));
+              vertex_displacement[d] = incremental_displacement(cell->vertex_dof_index(v, d));
 
             cell->vertex(v) += vertex_displacement;
           }
@@ -1621,8 +1567,7 @@ namespace Step18
     // pointer of a cell which we should not have accessed, a segmentation
     // fault will let us know that this should not have happened:
     unsigned int our_cells = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       if (cell->is_locally_owned())
@@ -1654,8 +1599,7 @@ namespace Step18
     // quadrature point objects corresponding to this cell in the vector of
     // such objects:
     unsigned int history_index = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       if (cell->is_locally_owned())
@@ -1673,8 +1617,7 @@ namespace Step18
     // time. Recall that constructs using the <code>Assert</code> macro are
     // optimized away in optimized mode, so do not affect the run time of
     // optimized runs:
-    Assert(history_index == quadrature_point_history.size(),
-           ExcInternalError());
+    Assert(history_index == quadrature_point_history.size(), ExcInternalError());
   }
 
 
@@ -1731,15 +1674,13 @@ namespace Step18
     // the incremental displacements and the gradients thereof at the
     // quadrature points, together with a vector that will hold this
     // information:
-    FEValues<dim> fe_values(
-      fe, quadrature_formula, update_values | update_gradients);
+    FEValues<dim> fe_values(fe, quadrature_formula, update_values | update_gradients);
     std::vector<std::vector<Tensor<1, dim>>> displacement_increment_grads(
       quadrature_formula.size(), std::vector<Tensor<1, dim>>(dim));
 
     // Then loop over all cells and do the job in the cells that belong to our
     // subdomain:
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
+    for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
       if (cell->is_locally_owned())
@@ -1749,19 +1690,16 @@ namespace Step18
           // this pointer is within the bounds of the global array:
           PointHistory<dim> *local_quadrature_points_history =
             reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
-          Assert(local_quadrature_points_history >=
-                   &quadrature_point_history.front(),
+          Assert(local_quadrature_points_history >= &quadrature_point_history.front(),
                  ExcInternalError());
-          Assert(local_quadrature_points_history <
-                   &quadrature_point_history.back(),
+          Assert(local_quadrature_points_history < &quadrature_point_history.back(),
                  ExcInternalError());
 
           // Then initialize the <code>FEValues</code> object on the present
           // cell, and extract the gradients of the displacement at the
           // quadrature points for later computation of the strains
           fe_values.reinit(cell);
-          fe_values.get_function_gradients(incremental_displacement,
-                                           displacement_increment_grads);
+          fe_values.get_function_gradients(incremental_displacement, displacement_increment_grads);
 
           // Then loop over the quadrature points of this cell:
           for (unsigned int q = 0; q < quadrature_formula.size(); ++q)
@@ -1772,16 +1710,14 @@ namespace Step18
               // existing strain at this point:
               const SymmetricTensor<2, dim> new_stress =
                 (local_quadrature_points_history[q].old_stress +
-                 (stress_strain_tensor *
-                  get_strain(displacement_increment_grads[q])));
+                 (stress_strain_tensor * get_strain(displacement_increment_grads[q])));
 
               // Finally, we have to rotate the result. For this, we first
               // have to compute a rotation matrix at the present quadrature
               // point from the incremental displacements. In fact, it can be
               // computed from the gradients, and we already have a function
               // for that purpose:
-              const Tensor<2, dim> rotation =
-                get_rotation_matrix(displacement_increment_grads[q]);
+              const Tensor<2, dim> rotation = get_rotation_matrix(displacement_increment_grads[q]);
               // Note that the result, a rotation matrix, is in general an
               // antisymmetric tensor of rank 2, so we must store it as a full
               // tensor.
@@ -1789,9 +1725,8 @@ namespace Step18
               // With this rotation matrix, we can compute the rotated tensor
               // by contraction from the left and right, after we expand the
               // symmetric tensor <code>new_stress</code> into a full tensor:
-              const SymmetricTensor<2, dim> rotated_new_stress =
-                symmetrize(transpose(rotation) *
-                           static_cast<Tensor<2, dim>>(new_stress) * rotation);
+              const SymmetricTensor<2, dim> rotated_new_stress = symmetrize(
+                transpose(rotation) * static_cast<Tensor<2, dim>>(new_stress) * rotation);
               // Note that while the result of the multiplication of these
               // three matrices should be symmetric, it is not due to floating
               // point round off: we get an asymmetry on the order of 1e-16 of
@@ -1804,8 +1739,7 @@ namespace Step18
 
               // The result of all these operations is then written back into
               // the original place:
-              local_quadrature_points_history[q].old_stress =
-                rotated_new_stress;
+              local_quadrature_points_history[q].old_stress = rotated_new_stress;
             }
         }
   }
@@ -1834,13 +1768,11 @@ int main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -1848,12 +1780,10 @@ int main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

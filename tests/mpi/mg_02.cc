@@ -63,8 +63,7 @@ test()
     for (unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)
       {
         deallog << "level " << lvl << ": ";
-        typename DoFHandler<dim>::cell_iterator cell = dofh.begin(lvl),
-                                                endc = dofh.end(lvl);
+        typename DoFHandler<dim>::cell_iterator cell = dofh.begin(lvl), endc = dofh.end(lvl);
 
         for (; cell != endc; ++cell)
           {
@@ -95,9 +94,7 @@ test()
     std::cout << "Levels: " << tr.n_global_levels() << std::endl;
 
     deallog << "n_locally_owned_dofs_per_processor:" << std::endl;
-    for (unsigned int i = 0;
-         i < dofh.n_locally_owned_dofs_per_processor().size();
-         ++i)
+    for (unsigned int i = 0; i < dofh.n_locally_owned_dofs_per_processor().size(); ++i)
       deallog << dofh.n_locally_owned_dofs_per_processor()[i] << std::endl;
 
     deallog << "locally_owned_mg_dofs_per_processor:" << std::endl;
@@ -105,8 +102,7 @@ test()
       {
         deallog << "level " << lvl << ":" << std::endl;
 
-        const std::vector<IndexSet> &vec =
-          dofh.locally_owned_mg_dofs_per_processor(lvl);
+        const std::vector<IndexSet> &vec = dofh.locally_owned_mg_dofs_per_processor(lvl);
 
         for (unsigned int i = 0; i < vec.size(); ++i)
           deallog << vec[i].n_elements() << std::endl;

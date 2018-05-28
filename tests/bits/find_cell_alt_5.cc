@@ -44,8 +44,7 @@ void check(Triangulation<3> &tria)
   deallog << "[ " << cell.second << "] ";
   deallog << std::endl;
 
-  Assert(GeometryInfo<3>::distance_to_unit_cell(cell.second) < 1e-10,
-         ExcInternalError());
+  Assert(GeometryInfo<3>::distance_to_unit_cell(cell.second) < 1e-10, ExcInternalError());
 }
 
 

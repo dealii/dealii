@@ -87,8 +87,7 @@ public:
 
 template <int dim>
 double
-RightHandSide<dim>::value(const Point<dim> & p,
-                          const unsigned int component) const
+RightHandSide<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   Assert(component == 0, ExcNotImplemented());
 
@@ -113,8 +112,7 @@ public:
 
 template <int dim>
 double
-BoundaryValues<dim>::value(const Point<dim> & p,
-                           const unsigned int component) const
+BoundaryValues<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   Assert(component == 0, ExcNotImplemented());
 
@@ -139,8 +137,7 @@ public:
 
 template <int dim>
 double
-FluxBoundaryValues<dim>::value(const Point<dim> & p,
-                               const unsigned int component) const
+FluxBoundaryValues<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   double val = 1; // g = 1
   return val;
@@ -181,11 +178,9 @@ class SystemIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   void
-  cell(MeshWorker::DoFInfo<dim> &                 dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
   face(MeshWorker::DoFInfo<dim> &                 dinfo1,
        MeshWorker::DoFInfo<dim> &                 dinfo2,
@@ -195,9 +190,8 @@ public:
 
 template <int dim>
 void
-SystemIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+SystemIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+                            typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   // Matrix
   const FEValuesBase<dim> &fe = info.fe_values();
@@ -209,14 +203,13 @@ SystemIntegrator<dim>::cell(
 
   for (unsigned int k = 0; k < n_points; ++k)
     {
-      const Tensor<1, dim> advection_directions =
-        advection.value(fe.quadrature_point(k));
+      const Tensor<1, dim> advection_directions = advection.value(fe.quadrature_point(k));
       for (unsigned int i = 0; i < n_dofs; ++i)
         for (unsigned int j = 0; j < n_dofs; ++j)
-          local_matrix(i, j) += (fe.shape_grad(i, k) * fe.shape_grad(j, k) +
-                                 fe.shape_value(i, k) * (advection_directions *
-                                                         fe.shape_grad(j, k))) *
-                                fe.JxW(k);
+          local_matrix(i, j) +=
+            (fe.shape_grad(i, k) * fe.shape_grad(j, k) +
+             fe.shape_value(i, k) * (advection_directions * fe.shape_grad(j, k))) *
+            fe.JxW(k);
     }
 
   // RHS
@@ -234,9 +227,8 @@ SystemIntegrator<dim>::cell(
 
 template <int dim>
 void
-SystemIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+SystemIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+                                typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const FEValuesBase<dim> &     fe       = info.fe_values();
   const unsigned int            n_points = fe.n_quadrature_points;
@@ -255,11 +247,10 @@ SystemIntegrator<dim>::boundary(
 
 template <int dim>
 void
-SystemIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim> &                 dinfo1,
-  MeshWorker::DoFInfo<dim> &                 dinfo2,
-  typename MeshWorker::IntegrationInfo<dim> &info1,
-  typename MeshWorker::IntegrationInfo<dim> &info2) const
+SystemIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &                 dinfo1,
+                            MeshWorker::DoFInfo<dim> &                 dinfo2,
+                            typename MeshWorker::IntegrationInfo<dim> &info1,
+                            typename MeshWorker::IntegrationInfo<dim> &info2) const
 {
   FullMatrix<double> &     A11      = dinfo1.matrix(0, false).matrix;
   FullMatrix<double> &     A12      = dinfo1.matrix(0, true).matrix;
@@ -309,11 +300,9 @@ class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   void
-  cell(MeshWorker::DoFInfo<dim> &                 dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
   face(MeshWorker::DoFInfo<dim> &                 dinfo1,
        MeshWorker::DoFInfo<dim> &                 dinfo2,
@@ -323,9 +312,8 @@ public:
 
 template <int dim>
 void
-MatrixIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+                            typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const FEValuesBase<dim> &fe           = info.fe_values();
   FullMatrix<double> &     local_matrix = dinfo.matrix(0).matrix;
@@ -336,33 +324,30 @@ MatrixIntegrator<dim>::cell(
 
   for (unsigned int k = 0; k < n_points; ++k)
     {
-      const Tensor<1, dim> advection_directions =
-        advection.value(fe.quadrature_point(k));
+      const Tensor<1, dim> advection_directions = advection.value(fe.quadrature_point(k));
       for (unsigned int i = 0; i < n_dofs; ++i)
         for (unsigned int j = 0; j < n_dofs; ++j)
-          local_matrix(i, j) += (fe.shape_grad(i, k) * fe.shape_grad(j, k) +
-                                 fe.shape_value(i, k) * (advection_directions *
-                                                         fe.shape_grad(j, k))) *
-                                fe.JxW(k);
+          local_matrix(i, j) +=
+            (fe.shape_grad(i, k) * fe.shape_grad(j, k) +
+             fe.shape_value(i, k) * (advection_directions * fe.shape_grad(j, k))) *
+            fe.JxW(k);
     }
 }
 
 
 template <int dim>
 void
-MatrixIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+MatrixIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+                                typename MeshWorker::IntegrationInfo<dim> &info) const
 {}
 
 
 template <int dim>
 void
-MatrixIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim> &                 dinfo1,
-  MeshWorker::DoFInfo<dim> &                 dinfo2,
-  typename MeshWorker::IntegrationInfo<dim> &info1,
-  typename MeshWorker::IntegrationInfo<dim> &info2) const
+MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &                 dinfo1,
+                            MeshWorker::DoFInfo<dim> &                 dinfo2,
+                            typename MeshWorker::IntegrationInfo<dim> &info1,
+                            typename MeshWorker::IntegrationInfo<dim> &info2) const
 {
   FullMatrix<double> &     A11      = dinfo1.matrix(0, false).matrix;
   FullMatrix<double> &     A12      = dinfo1.matrix(0, true).matrix;
@@ -412,11 +397,9 @@ class RHSIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   void
-  cell(MeshWorker::DoFInfo<dim> &                 dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
   face(MeshWorker::DoFInfo<dim> &                 dinfo1,
        MeshWorker::DoFInfo<dim> &                 dinfo2,
@@ -447,9 +430,8 @@ RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &                 dinfo,
 
 template <int dim>
 void
-RHSIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+                             typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const FEValuesBase<dim> &     fe       = info.fe_values();
   const unsigned int            n_points = fe.n_quadrature_points;
@@ -519,8 +501,7 @@ private:
 
 
 template <int dim>
-MeshWorkerConstraintMatrixTest<dim>::MeshWorkerConstraintMatrixTest(
-  const FiniteElement<dim> &fe) :
+MeshWorkerConstraintMatrixTest<dim>::MeshWorkerConstraintMatrixTest(const FiniteElement<dim> &fe) :
   mapping(),
   dof_handler(triangulation),
   fe(fe)
@@ -562,11 +543,9 @@ MeshWorkerConstraintMatrixTest<dim>::setup_system()
   std::string fe_name = fe.get_name();
   std::size_t found   = fe_name.find(str);
   if (found != std::string::npos)
-    DoFTools::make_flux_sparsity_pattern(
-      dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, constraints, false);
   else
-    DoFTools::make_sparsity_pattern(
-      dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_sparsity_pattern(dof_handler, c_sparsity, constraints, false);
 
   sparsity_pattern.copy_from(c_sparsity);
 
@@ -585,18 +564,15 @@ MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
   MeshWorker::IntegrationInfoBox<dim> info_box;
 
   const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
 
-  UpdateFlags update_flags =
-    update_quadrature_points | update_values | update_gradients;
+  UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
 
   info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
 
-  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
-  MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>>
-    assembler;
+  MeshWorker::DoFInfo<dim>                                                  dof_info(dof_handler);
+  MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>> assembler;
 
   assembler.initialize(system_matrix, system_rhs);
   assembler.initialize(constraintsAll);
@@ -620,16 +596,14 @@ MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()
   MeshWorker::IntegrationInfoBox<dim> info_box;
 
   const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
 
-  UpdateFlags update_flags =
-    update_quadrature_points | update_values | update_gradients;
+  UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
 
   info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
 
-  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+  MeshWorker::DoFInfo<dim>                                  dof_info(dof_handler);
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>> assemblerMatrix;
   assemblerMatrix.initialize(constraints);
   assemblerMatrix.initialize(matrix);
@@ -666,10 +640,8 @@ MeshWorkerConstraintMatrixTest<dim>::createInhomConstraints()
     this->dof_handler, 0, BoundaryValues<dim>(), this->constraintsInhom);
   // constraint of the origin
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(
-    this->mapping, this->dof_handler, support_points);
-  for (unsigned int dof_index = 0; dof_index < this->dof_handler.n_dofs();
-       ++dof_index)
+  DoFTools::map_dofs_to_support_points(this->mapping, this->dof_handler, support_points);
+  for (unsigned int dof_index = 0; dof_index < this->dof_handler.n_dofs(); ++dof_index)
     {
       if (!this->constraints.is_constrained(dof_index) &&
           !this->constraintsInhom.is_constrained(dof_index))

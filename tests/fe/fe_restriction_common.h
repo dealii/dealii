@@ -47,16 +47,13 @@
 
 template <typename number>
 void
-print_formatted(const FullMatrix<number> &A,
-                const unsigned int        precision,
-                const unsigned int        width)
+print_formatted(const FullMatrix<number> &A, const unsigned int precision, const unsigned int width)
 {
   for (unsigned int i = 0; i < A.m(); ++i)
     {
       for (unsigned int j = 0; j < A.n(); ++j)
         {
-          deallog << std::setw(width) << std::setprecision(precision)
-                  << A(i, j);
+          deallog << std::setw(width) << std::setprecision(precision) << A(i, j);
           deallog << ' ';
         };
       deallog << std::endl;

@@ -42,15 +42,13 @@ mpi_check(const std::set<types::subdomain_id> &s)
 {
   MPI_Barrier(MPI_COMM_WORLD);
   unsigned int tag = 1234;
-  for (std::set<types::subdomain_id>::iterator it = s.begin(); it != s.end();
-       ++it)
+  for (std::set<types::subdomain_id>::iterator it = s.begin(); it != s.end(); ++it)
     MPI_Send(nullptr, 0, MPI_INT, *it, tag, MPI_COMM_WORLD);
 
   for (unsigned int i = 0; i < s.size(); ++i)
     {
       MPI_Status status;
-      MPI_Recv(
-        nullptr, 0, MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
+      MPI_Recv(nullptr, 0, MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
       if ((s.end() == s.find(status.MPI_SOURCE)))
         deallog << status.MPI_SOURCE << " NOTOKAY" << std::endl;
       Assert(s.end() != s.find(status.MPI_SOURCE), ExcInternalError());
@@ -88,10 +86,8 @@ test()
       mpi_check(ghost_owners);
 
       deallog << "level ghost owners: ";
-      std::set<types::subdomain_id> level_ghost_owners =
-        tr.level_ghost_owners();
-      for (std::set<types::subdomain_id>::iterator it =
-             level_ghost_owners.begin();
+      std::set<types::subdomain_id> level_ghost_owners = tr.level_ghost_owners();
+      for (std::set<types::subdomain_id>::iterator it = level_ghost_owners.begin();
            it != level_ghost_owners.end();
            ++it)
         deallog << *it << " ";
@@ -109,8 +105,7 @@ test()
       Vector<float>                 indicators(tr.n_active_cells());
       std::set<types::subdomain_id> neighbors;
       {
-        for (typename Triangulation<dim>::active_cell_iterator cell =
-               tr.begin_active();
+        for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
              cell != tr.end();
              ++cell)
           if (!cell->is_artificial())
@@ -127,8 +122,7 @@ test()
         tr, indicators, 0.3, 0.0);
       tr.execute_coarsening_and_refinement();
       if (myid == 0)
-        deallog << "total active cells = " << tr.n_global_active_cells()
-                << std::endl;
+        deallog << "total active cells = " << tr.n_global_active_cells() << std::endl;
     }
 
   deallog << "OK" << std::endl;

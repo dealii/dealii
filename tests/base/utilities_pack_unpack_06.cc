@@ -45,23 +45,17 @@ check(const double (&array)[N], const Point<dim>(&point))
 
   // check if compression has been invoked by comparing sizes
   deallog << "check packed array with compression: "
-          << (sizeof(array) > sizeof(char) * array_compressed.size() ? "OK" :
-                                                                       "Failed")
+          << (sizeof(array) > sizeof(char) * array_compressed.size() ? "OK" : "Failed")
           << std::endl;
   deallog << "check packed point with compression: "
-          << (sizeof(point) > sizeof(char) * point_compressed.size() ? "OK" :
-                                                                       "Failed")
+          << (sizeof(point) > sizeof(char) * point_compressed.size() ? "OK" : "Failed")
           << std::endl;
 
   deallog << "check packed array without compression: "
-          << (sizeof(array) <= sizeof(char) * array_uncompressed.size() ?
-                "OK" :
-                "Failed")
+          << (sizeof(array) <= sizeof(char) * array_uncompressed.size() ? "OK" : "Failed")
           << std::endl;
   deallog << "check packed point without compression: "
-          << (sizeof(point) <= sizeof(char) * point_uncompressed.size() ?
-                "OK" :
-                "Failed")
+          << (sizeof(point) <= sizeof(char) * point_uncompressed.size() ? "OK" : "Failed")
           << std::endl;
 
 
@@ -69,19 +63,15 @@ check(const double (&array)[N], const Point<dim>(&point))
   // ----- UNPACK -----
   // default option should work for compression
   double unpacked_array_compressed[N];
-  Utilities::unpack(array_compressed.cbegin(),
-                    array_compressed.cend(),
-                    unpacked_array_compressed);
-  Point<dim> unpacked_point_compressed = Utilities::unpack<Point<dim>>(
-    point_compressed.cbegin(), point_compressed.cend());
+  Utilities::unpack(array_compressed.cbegin(), array_compressed.cend(), unpacked_array_compressed);
+  Point<dim> unpacked_point_compressed =
+    Utilities::unpack<Point<dim>>(point_compressed.cbegin(), point_compressed.cend());
 
   double unpacked_array_uncompressed[N];
-  Utilities::unpack(array_uncompressed.cbegin(),
-                    array_uncompressed.cend(),
-                    unpacked_array_uncompressed,
-                    false);
-  Point<dim> unpacked_point_uncompressed = Utilities::unpack<Point<dim>>(
-    point_uncompressed.cbegin(), point_uncompressed.cend(), false);
+  Utilities::unpack(
+    array_uncompressed.cbegin(), array_uncompressed.cend(), unpacked_array_uncompressed, false);
+  Point<dim> unpacked_point_uncompressed =
+    Utilities::unpack<Point<dim>>(point_uncompressed.cbegin(), point_uncompressed.cend(), false);
 
   // check if unpacked results are okay
   bool equal_array = true;
@@ -91,12 +81,10 @@ check(const double (&array)[N], const Point<dim>(&point))
         equal_array = false;
         break;
       }
-  deallog << "check unpacked array with compression: "
-          << (equal_array ? "OK" : "Failed") << std::endl;
-  deallog << "check unpacked point with compression: "
-          << (point.distance(unpacked_point_compressed) < 1e-12 ? "OK" :
-                                                                  "Failed")
+  deallog << "check unpacked array with compression: " << (equal_array ? "OK" : "Failed")
           << std::endl;
+  deallog << "check unpacked point with compression: "
+          << (point.distance(unpacked_point_compressed) < 1e-12 ? "OK" : "Failed") << std::endl;
 
   equal_array = true;
   for (unsigned int i = 0; i < N; ++i)
@@ -105,60 +93,50 @@ check(const double (&array)[N], const Point<dim>(&point))
         equal_array = false;
         break;
       }
-  deallog << "check unpacked array without compression: "
-          << (equal_array ? "OK" : "Failed") << std::endl;
-  deallog << "check unpacked point without compression: "
-          << (point.distance(unpacked_point_uncompressed) < 1e-12 ? "OK" :
-                                                                    "Failed")
+  deallog << "check unpacked array without compression: " << (equal_array ? "OK" : "Failed")
           << std::endl;
+  deallog << "check unpacked point without compression: "
+          << (point.distance(unpacked_point_uncompressed) < 1e-12 ? "OK" : "Failed") << std::endl;
 
 
 
   // try something nasty
   try
     {
-      Point<dim> forbidden = Utilities::unpack<Point<dim>>(
-        point_compressed.cbegin(), point_compressed.cend(), false);
+      Point<dim> forbidden =
+        Utilities::unpack<Point<dim>>(point_compressed.cbegin(), point_compressed.cend(), false);
     }
   catch (boost::archive::archive_exception)
     {
-      deallog << "unpacking compressed point without decompression failed!"
-              << std::endl;
+      deallog << "unpacking compressed point without decompression failed!" << std::endl;
     }
   try
     {
       double forbidden[N];
-      Utilities::unpack(
-        array_compressed.cbegin(), array_compressed.cend(), forbidden, false);
+      Utilities::unpack(array_compressed.cbegin(), array_compressed.cend(), forbidden, false);
     }
   catch (boost::archive::archive_exception)
     {
-      deallog << "unpacking compressed array without decompression failed!"
-              << std::endl;
+      deallog << "unpacking compressed array without decompression failed!" << std::endl;
     }
 
   try
     {
-      Point<dim> forbidden = Utilities::unpack<Point<dim>>(
-        point_uncompressed.cbegin(), point_uncompressed.cend(), true);
+      Point<dim> forbidden =
+        Utilities::unpack<Point<dim>>(point_uncompressed.cbegin(), point_uncompressed.cend(), true);
     }
   catch (boost::archive::archive_exception)
     {
-      deallog << "unpacking uncompressed point with decompression failed!"
-              << std::endl;
+      deallog << "unpacking uncompressed point with decompression failed!" << std::endl;
     }
   try
     {
       double forbidden[N];
-      Utilities::unpack(array_uncompressed.cbegin(),
-                        array_uncompressed.cend(),
-                        forbidden,
-                        true);
+      Utilities::unpack(array_uncompressed.cbegin(), array_uncompressed.cend(), forbidden, true);
     }
   catch (boost::archive::archive_exception)
     {
-      deallog << "unpacking uncompressed array with decompression failed!"
-              << std::endl;
+      deallog << "unpacking uncompressed array with decompression failed!" << std::endl;
     }
 }
 

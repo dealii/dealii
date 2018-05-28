@@ -35,8 +35,7 @@ test()
 {
   hp::FECollection<dim> fe_collection;
   for (unsigned int i = 1; i < 8 - dim; ++i)
-    fe_collection.push_back(
-      FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)), 3));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)), 3));
 
   for (unsigned int i = 0; i < fe_collection.size(); ++i)
     for (unsigned int j = 0; j < fe_collection.size(); ++j)
@@ -45,18 +44,14 @@ test()
           fe_collection[i].hp_line_dof_identities(fe_collection[j]);
 
         deallog << "Identities for " << fe_collection[i].get_name() << " and "
-                << fe_collection[j].get_name() << ": " << identities.size()
-                << std::endl;
+                << fe_collection[j].get_name() << ": " << identities.size() << std::endl;
 
         for (unsigned int k = 0; k < identities.size(); ++k)
           {
-            Assert(identities[k].first < fe_collection[i].dofs_per_line,
-                   ExcInternalError());
-            Assert(identities[k].second < fe_collection[j].dofs_per_line,
-                   ExcInternalError());
+            Assert(identities[k].first < fe_collection[i].dofs_per_line, ExcInternalError());
+            Assert(identities[k].second < fe_collection[j].dofs_per_line, ExcInternalError());
 
-            deallog << identities[k].first << ' ' << identities[k].second
-                    << std::endl;
+            deallog << identities[k].first << ' ' << identities[k].second << std::endl;
           }
       }
 }

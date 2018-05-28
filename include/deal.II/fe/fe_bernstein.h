@@ -64,8 +64,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 template <int dim, int spacedim = dim>
-class FE_Bernstein
-  : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
+class FE_Bernstein : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
 {
 public:
   /**
@@ -82,7 +81,7 @@ public:
    */
   virtual void
   get_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                           FullMatrix<double> &matrix) const override;
+                           FullMatrix<double> &                matrix) const override;
 
   /**
    * FE_Bernstein is not interpolatory in the element interior, which prevents
@@ -92,10 +91,9 @@ public:
    * This function overrides the implementation from FE_Q_Base.
    */
   virtual const FullMatrix<double> &
-  get_restriction_matrix(
-    const unsigned int         child,
-    const RefinementCase<dim> &refinement_case =
-      RefinementCase<dim>::isotropic_refinement) const override;
+  get_restriction_matrix(const unsigned int         child,
+                         const RefinementCase<dim> &refinement_case =
+                           RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * FE_Bernstein is not interpolatory in the element interior, which prevents
@@ -105,10 +103,9 @@ public:
    * This function overrides the implementation from FE_Q_Base.
    */
   virtual const FullMatrix<double> &
-  get_prolongation_matrix(
-    const unsigned int         child,
-    const RefinementCase<dim> &refinement_case =
-      RefinementCase<dim>::isotropic_refinement) const override;
+  get_prolongation_matrix(const unsigned int         child,
+                          const RefinementCase<dim> &refinement_case =
+                            RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -121,7 +118,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -135,7 +132,7 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                    const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &                matrix) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -160,24 +157,21 @@ public:
    * corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_vertex_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_vertex_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on lines.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_line_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_line_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on quads.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -189,8 +183,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim, spacedim> &fe_other) const override;
 
 
   /**

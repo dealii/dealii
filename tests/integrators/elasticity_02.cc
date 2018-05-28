@@ -43,8 +43,7 @@ test_boundary(const FEValuesBase<dim> &fev)
   }
 
   Vector<double>                   u(n), v(n), w(n);
-  std::vector<std::vector<double>> uval(
-    d, std::vector<double>(fev.n_quadrature_points)),
+  std::vector<std::vector<double>> uval(d, std::vector<double>(fev.n_quadrature_points)),
     null_val(d, std::vector<double>(fev.n_quadrature_points, 0.));
   std::vector<std::vector<Tensor<1, dim>>> ugrad(
     d, std::vector<Tensor<1, dim>>(fev.n_quadrature_points));
@@ -61,21 +60,11 @@ test_boundary(const FEValuesBase<dim> &fev)
         u(i) = 1.;
         w    = 0.;
         fev.get_function_values(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<double>>>(uval),
-          true);
+          u, indices, VectorSlice<std::vector<std::vector<double>>>(uval), true);
         fev.get_function_gradients(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<Tensor<1, dim>>>>(ugrad),
-          true);
-        nitsche_tangential_residual(w,
-                                    fev,
-                                    make_slice(uval),
-                                    make_slice(ugrad),
-                                    make_slice(null_val),
-                                    17);
+          u, indices, VectorSlice<std::vector<std::vector<Tensor<1, dim>>>>(ugrad), true);
+        nitsche_tangential_residual(
+          w, fev, make_slice(uval), make_slice(ugrad), make_slice(null_val), 17);
         M.vmult(v, u);
         w.add(-1., v);
         deallog << ' ' << w.l2_norm();
@@ -95,8 +84,8 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
   QGauss<dim - 1>   face_quadrature(fe.tensor_degree() + 1);
   FEFaceValues<dim> fef1(fe,
                          face_quadrature,
-                         update_values | update_gradients |
-                           update_normal_vectors | update_JxW_values);
+                         update_values | update_gradients | update_normal_vectors |
+                           update_JxW_values);
   for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
       deallog << "boundary_matrix " << i << std::endl;

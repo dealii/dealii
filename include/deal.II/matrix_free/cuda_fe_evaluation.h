@@ -84,18 +84,14 @@ namespace CUDAWrappers
     typedef typename MatrixFree<dim, Number>::Data data_type;
     static constexpr unsigned int                  dimension    = dim;
     static constexpr unsigned int                  n_components = n_components_;
-    static constexpr unsigned int                  n_q_points =
-      Utilities::pow(n_q_points_1d, dim);
-    static constexpr unsigned int tensor_dofs_per_cell =
-      Utilities::pow(fe_degree + 1, dim);
+    static constexpr unsigned int                  n_q_points = Utilities::pow(n_q_points_1d, dim);
+    static constexpr unsigned int tensor_dofs_per_cell        = Utilities::pow(fe_degree + 1, dim);
 
     /**
      * Constructor.
      */
     __device__
-    FEEvaluation(int                      cell_id,
-                 const data_type *        data,
-                 SharedData<dim, Number> *shdata);
+    FEEvaluation(int cell_id, const data_type *data, SharedData<dim, Number> *shdata);
 
     /**
      * For the vector @p src, read out the values on the degrees of freedom of
@@ -191,16 +187,12 @@ namespace CUDAWrappers
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   __device__
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(int                      cell_id,
-                 const data_type *        data,
-                 SharedData<dim, Number> *shdata) :
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::FEEvaluation(
+    int                      cell_id,
+    const data_type *        data,
+    SharedData<dim, Number> *shdata) :
     n_cells(data->n_cells),
     padding_length(data->padding_length),
     constraint_mask(data->constraint_mask[cell_id]),
@@ -216,55 +208,43 @@ namespace CUDAWrappers
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   __device__ void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    read_dof_values(const Number *src)
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::read_dof_values(
+    const Number *src)
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
-    const unsigned int idx =
-      (threadIdx.x % n_q_points_1d) +
-      (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
-      (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
+    const unsigned int idx = (threadIdx.x % n_q_points_1d) +
+                             (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
+                             (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
 
     const unsigned int src_idx = local_to_global[idx];
     // Use the read-only data cache.
     values[idx] = __ldg(&src[src_idx]);
 
     if (constraint_mask)
-      internal::resolve_hanging_nodes_shmem<dim, fe_degree, false>(
-        values, constraint_mask);
+      internal::resolve_hanging_nodes_shmem<dim, fe_degree, false>(values, constraint_mask);
 
     __syncthreads();
   }
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   __device__ void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    distribute_local_to_global(Number *dst) const
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::distribute_local_to_global(
+    Number *dst) const
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
     if (constraint_mask)
-      internal::resolve_hanging_nodes_shmem<dim, fe_degree, true>(
-        values, constraint_mask);
+      internal::resolve_hanging_nodes_shmem<dim, fe_degree, true>(values, constraint_mask);
 
 
-    const unsigned int idx =
-      (threadIdx.x % n_q_points_1d) +
-      (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
-      (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
+    const unsigned int idx = (threadIdx.x % n_q_points_1d) +
+                             (dim > 1 ? threadIdx.y : 0) * n_q_points_1d +
+                             (dim > 2 ? threadIdx.z : 0) * n_q_points_1d * n_q_points_1d;
     const unsigned int destination_idx = local_to_global[idx];
 
     dst[destination_idx] += values[idx];
@@ -272,11 +252,7 @@ namespace CUDAWrappers
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   __device__ void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::evaluate(
     const bool evaluate_val,
@@ -284,12 +260,11 @@ namespace CUDAWrappers
   {
     // First evaluate the gradients because it requires values that will be
     // changed if evaluate_val is true
-    internal::EvaluatorTensorProduct<
-      internal::EvaluatorVariant::evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>
+    internal::EvaluatorTensorProduct<internal::EvaluatorVariant::evaluate_general,
+                                     dim,
+                                     fe_degree,
+                                     n_q_points_1d,
+                                     Number>
       evaluator_tensor_product;
     if (evaluate_grad == true)
       {
@@ -306,22 +281,17 @@ namespace CUDAWrappers
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   __device__ void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::integrate(
     const bool integrate_val,
     const bool integrate_grad)
   {
-    internal::EvaluatorTensorProduct<
-      internal::EvaluatorVariant::evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>
+    internal::EvaluatorTensorProduct<internal::EvaluatorVariant::evaluate_general,
+                                     dim,
+                                     fe_degree,
+                                     n_q_points_1d,
+                                     Number>
       evaluator_tensor_product;
     if (integrate_val == true)
       {
@@ -329,8 +299,7 @@ namespace CUDAWrappers
         __syncthreads();
         if (integrate_grad == true)
           {
-            evaluator_tensor_product.integrate_gradient<true>(values,
-                                                              gradients);
+            evaluator_tensor_product.integrate_gradient<true>(values, gradients);
             __syncthreads();
           }
       }
@@ -343,16 +312,8 @@ namespace CUDAWrappers
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
-  __device__ typename FEEvaluation<dim,
-                                   fe_degree,
-                                   n_q_points_1d,
-                                   n_components_,
-                                   Number>::value_type
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
+  __device__ typename FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::value_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::get_value(
     const unsigned int q_point) const
   {
@@ -361,32 +322,22 @@ namespace CUDAWrappers
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   __device__ void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_value(const value_type &val_in, const unsigned int q_point)
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::submit_value(
+    const value_type & val_in,
+    const unsigned int q_point)
   {
     values[q_point] = val_in * JxW[q_point];
   }
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
-  __device__ typename FEEvaluation<dim,
-                                   fe_degree,
-                                   n_q_points_1d,
-                                   n_components_,
-                                   Number>::gradient_type
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_gradient(const unsigned int q_point) const
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
+  __device__
+    typename FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::gradient_type
+    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::get_gradient(
+      const unsigned int q_point) const
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
@@ -397,8 +348,8 @@ namespace CUDAWrappers
       {
         Number tmp = 0.;
         for (int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jacobian[padding_length * n_cells * (dim * d_2 + d_1)] *
-                 gradients[d_2][q_point];
+          tmp +=
+            inv_jacobian[padding_length * n_cells * (dim * d_2 + d_1)] * gradients[d_2][q_point];
         grad[d_1] = tmp;
       }
 
@@ -407,14 +358,11 @@ namespace CUDAWrappers
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   __device__ void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_gradient(const gradient_type &grad_in, const unsigned int q_point)
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::submit_gradient(
+    const gradient_type &grad_in,
+    const unsigned int   q_point)
   {
     // TODO optimize if the mesh is uniform
     const Number *inv_jacobian = &inv_jac[q_point];
@@ -422,31 +370,24 @@ namespace CUDAWrappers
       {
         Number tmp = 0.;
         for (int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jacobian[n_cells * padding_length * (dim * d_1 + d_2)] *
-                 grad_in[d_2];
+          tmp += inv_jacobian[n_cells * padding_length * (dim * d_1 + d_2)] * grad_in[d_2];
         gradients[d_1][q_point] = tmp * JxW[q_point];
       }
   }
 
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
+  template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename Number>
   template <typename functor>
   __device__ void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    apply_quad_point_operations(const functor &func)
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::apply_quad_point_operations(
+    const functor &func)
   {
     const unsigned int q_point =
-      (dim == 1 ?
-         threadIdx.x % n_q_points_1d :
-         dim == 2 ?
-         threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
-         threadIdx.x % n_q_points_1d +
-             n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
+      (dim == 1 ? threadIdx.x % n_q_points_1d :
+                  dim == 2 ? threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
+                             threadIdx.x % n_q_points_1d +
+                               n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
     func(this, q_point);
 
     __syncthreads();

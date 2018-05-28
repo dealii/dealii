@@ -64,8 +64,7 @@ test()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
-  deallog << "Number of constraints: " << constraints.n_constraints()
-          << std::endl;
+  deallog << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   Vector<double> b(dof_handler.n_dofs());
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
@@ -89,8 +88,7 @@ test()
         }
       else
         {
-          AssertThrow(std::fabs(b(i) - (1. + 1. * i * i) / 3) <
-                        1e-14 * std::fabs(b(i)),
+          AssertThrow(std::fabs(b(i) - (1. + 1. * i * i) / 3) < 1e-14 * std::fabs(b(i)),
                       ExcInternalError());
         }
     }
@@ -113,13 +111,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -127,12 +123,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

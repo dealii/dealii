@@ -118,8 +118,7 @@ namespace internal
         {
           case 1:
             {
-              Tensor<1, dim> &grad =
-                *reinterpret_cast<Tensor<1, dim> *>(&derivative);
+              Tensor<1, dim> &grad = *reinterpret_cast<Tensor<1, dim> *>(&derivative);
               if (i == 0)
                 {
                   grad[0] = -2.5 + 3 * p(0);
@@ -148,8 +147,7 @@ namespace internal
             }
           case 2:
             {
-              Tensor<2, dim> &grad_grad =
-                *reinterpret_cast<Tensor<2, dim> *>(&derivative);
+              Tensor<2, dim> &grad_grad = *reinterpret_cast<Tensor<2, dim> *>(&derivative);
               if (i == 0)
                 {
                   grad_grad[0][0] = 3;
@@ -196,11 +194,9 @@ namespace internal
 template <int dim>
 template <int order>
 Tensor<order, dim>
-PolynomialsRannacherTurek<dim>::compute_derivative(const unsigned int i,
-                                                   const Point<dim> & p) const
+PolynomialsRannacherTurek<dim>::compute_derivative(const unsigned int i, const Point<dim> &p) const
 {
-  return internal::PolynomialsRannacherTurekImplementation::compute_derivative<
-    order>(i, p);
+  return internal::PolynomialsRannacherTurekImplementation::compute_derivative<order>(i, p);
 }
 
 

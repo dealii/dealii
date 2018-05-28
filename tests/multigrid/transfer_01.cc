@@ -89,8 +89,7 @@ check_simple(const FiniteElement<dim> &fe)
   u[0] = 0.;
   transfer.restrict_and_add(2, u[1], u[2]);
   transfer.restrict_and_add(1, u[0], u[1]);
-  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl
-          << "u0\t" << (u[0] * u[0] + .5) << std::endl;
+  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl << "u0\t" << (u[0] * u[0] + .5) << std::endl;
 
   // Now the same for a non-constant
   // vector
@@ -106,8 +105,7 @@ check_simple(const FiniteElement<dim> &fe)
   u[0] = 0.;
   transfer.restrict_and_add(2, u[1], u[2]);
   transfer.restrict_and_add(1, u[0], u[1]);
-  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl
-          << "u0\t" << (u[0] * u[0] + .5) << std::endl;
+  deallog << "u1\t" << (u[1] * u[1] + .5) << std::endl << "u0\t" << (u[0] * u[0] + .5) << std::endl;
 
   // Fill a global vector by counting
   // from one up

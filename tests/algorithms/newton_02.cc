@@ -65,9 +65,8 @@ public:
   virtual void
   operator()(AnyData &out, const AnyData &in)
   {
-    const Vector<double> &in_vector =
-      *in.entry<const Vector<double> *>("Newton iterate");
-    Vector<double> &out_vector = *out.entry<Vector<double> *>(0);
+    const Vector<double> &in_vector  = *in.entry<const Vector<double> *>("Newton iterate");
+    Vector<double> &      out_vector = *out.entry<Vector<double> *>(0);
     out_vector.reinit(in_vector.size());
   }
 };
@@ -78,10 +77,9 @@ public:
   virtual void
   operator()(AnyData &out, const AnyData &in)
   {
-    const Vector<double> &in_vector =
-      *in.entry<const Vector<double> *>("Newton residual");
-    Vector<double> &out_vector = *out.entry<Vector<double> *>(0);
-    out_vector                 = in_vector;
+    const Vector<double> &in_vector  = *in.entry<const Vector<double> *>("Newton residual");
+    Vector<double> &      out_vector = *out.entry<Vector<double> *>(0);
+    out_vector                       = in_vector;
   }
 };
 

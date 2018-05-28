@@ -31,8 +31,7 @@ test()
     for (unsigned int j = 0; j < dim; ++j)
       for (unsigned int k = 0; k < dim; ++k)
         for (unsigned int l = 0; l < dim; ++l)
-          t[i][j][k][l] =
-            (((i == k) && (j == l) ? 1 : 0) + ((i == l) && (j == k) ? 1 : 0));
+          t[i][j][k][l] = (((i == k) && (j == l) ? 1 : 0) + ((i == l) && (j == k) ? 1 : 0));
 
   SymmetricTensor<2, dim> a, b;
   a[0][0] = 1;
@@ -46,8 +45,8 @@ test()
         for (unsigned int k = 0; k < dim; ++k)
           for (unsigned int l = 0; l < dim; ++l)
             {
-              deallog << i << ' ' << j << ' ' << k << ' ' << l << ": "
-                      << t[i][j][k][l] << ' ' << a[k][l] << std::endl;
+              deallog << i << ' ' << j << ' ' << k << ' ' << l << ": " << t[i][j][k][l] << ' '
+                      << a[k][l] << std::endl;
               tmp_ij += t[i][j][k][l] * a[k][l];
             }
         b[i][j] = tmp_ij;

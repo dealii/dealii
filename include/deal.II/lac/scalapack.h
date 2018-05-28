@@ -116,24 +116,21 @@ public:
    * Constructor for a rectangular matrix with @p n_rows and @p n_cols
    * and distributed using the grid @p process_grid.
    */
-  ScaLAPACKMatrix(
-    const size_type                                           n_rows,
-    const size_type                                           n_columns,
-    const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
-    const size_type               row_block_size    = 32,
-    const size_type               column_block_size = 32,
-    const LAPACKSupport::Property property = LAPACKSupport::Property::general);
+  ScaLAPACKMatrix(const size_type                                           n_rows,
+                  const size_type                                           n_columns,
+                  const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+                  const size_type                                           row_block_size    = 32,
+                  const size_type                                           column_block_size = 32,
+                  const LAPACKSupport::Property property = LAPACKSupport::Property::general);
 
   /**
    * Constructor for a square matrix of size @p size, and distributed
    * using the process grid in @p process_grid.
    */
-  ScaLAPACKMatrix(
-    const size_type                                          size,
-    const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
-    const size_type                                          block_size = 32,
-    const LAPACKSupport::Property                            property =
-      LAPACKSupport::Property::symmetric);
+  ScaLAPACKMatrix(const size_type                                          size,
+                  const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+                  const size_type                                          block_size = 32,
+                  const LAPACKSupport::Property property = LAPACKSupport::Property::symmetric);
 
   /**
    * Destructor
@@ -145,13 +142,12 @@ public:
    * and distributed using the grid @p process_grid.
    */
   void
-  reinit(
-    const size_type                                           n_rows,
-    const size_type                                           n_columns,
-    const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
-    const size_type               row_block_size    = 32,
-    const size_type               column_block_size = 32,
-    const LAPACKSupport::Property property = LAPACKSupport::Property::general);
+  reinit(const size_type                                           n_rows,
+         const size_type                                           n_columns,
+         const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+         const size_type                                           row_block_size    = 32,
+         const size_type                                           column_block_size = 32,
+         const LAPACKSupport::Property property = LAPACKSupport::Property::general);
 
   /**
    * Initialize the square matrix of size @p size and distributed using the grid @p process_grid.
@@ -159,9 +155,8 @@ public:
   void
   reinit(const size_type                                          size,
          const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
-         const size_type               block_size = 32,
-         const LAPACKSupport::Property property =
-           LAPACKSupport::Property::symmetric);
+         const size_type                                          block_size = 32,
+         const LAPACKSupport::Property property = LAPACKSupport::Property::symmetric);
 
   /**
    * Assign @p property to this matrix.
@@ -436,8 +431,7 @@ public:
   void
   save(const char *                                 filename,
        const std::pair<unsigned int, unsigned int> &chunk_size =
-         std::make_pair(numbers::invalid_unsigned_int,
-                        numbers::invalid_unsigned_int)) const;
+         std::make_pair(numbers::invalid_unsigned_int, numbers::invalid_unsigned_int)) const;
 
   /**
    * Loads the distributed matrix from file @p filename using HDF5.
@@ -499,9 +493,8 @@ public:
    * eigenvalues/eigenvectors are desired.
    */
   std::vector<NumberType>
-  eigenpairs_symmetric_by_index(
-    const std::pair<unsigned int, unsigned int> &index_limits,
-    const bool                                   compute_eigenvectors);
+  eigenpairs_symmetric_by_index(const std::pair<unsigned int, unsigned int> &index_limits,
+                                const bool                                   compute_eigenvectors);
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors.
@@ -512,9 +505,8 @@ public:
    * overwriting the original content of the matrix.
    */
   std::vector<NumberType>
-  eigenpairs_symmetric_by_value(
-    const std::pair<NumberType, NumberType> &value_limits,
-    const bool                               compute_eigenvectors);
+  eigenpairs_symmetric_by_value(const std::pair<NumberType, NumberType> &value_limits,
+                                const bool                               compute_eigenvectors);
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors of the
@@ -533,9 +525,8 @@ public:
    * eigenvalues/eigenvectors are desired.
    */
   std::vector<NumberType>
-  eigenpairs_symmetric_by_index_MRRR(
-    const std::pair<unsigned int, unsigned int> &index_limits,
-    const bool                                   compute_eigenvectors);
+  eigenpairs_symmetric_by_index_MRRR(const std::pair<unsigned int, unsigned int> &index_limits,
+                                     const bool compute_eigenvectors);
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors of the
@@ -548,9 +539,8 @@ public:
    * overwriting the original content of the matrix.
    */
   std::vector<NumberType>
-  eigenpairs_symmetric_by_value_MRRR(
-    const std::pair<NumberType, NumberType> &value_limits,
-    const bool                               compute_eigenvectors);
+  eigenpairs_symmetric_by_value_MRRR(const std::pair<NumberType, NumberType> &value_limits,
+                                     const bool                               compute_eigenvectors);
 
   /**
    * Computing the singular value decomposition (SVD) of a
@@ -581,8 +571,7 @@ public:
    * for @p U and/or @p VT.
    */
   std::vector<NumberType>
-  compute_SVD(ScaLAPACKMatrix<NumberType> *U  = nullptr,
-              ScaLAPACKMatrix<NumberType> *VT = nullptr);
+  compute_SVD(ScaLAPACKMatrix<NumberType> *U = nullptr, ScaLAPACKMatrix<NumberType> *VT = nullptr);
 
   /**
    * Solving overdetermined or underdetermined real linear
@@ -790,14 +779,13 @@ private:
    * matrix.
    */
   std::vector<NumberType>
-  eigenpairs_symmetric(
-    const bool                                   compute_eigenvectors,
-    const std::pair<unsigned int, unsigned int> &index_limits =
-      std::make_pair(numbers::invalid_unsigned_int,
-                     numbers::invalid_unsigned_int),
-    const std::pair<NumberType, NumberType> &value_limits =
-      std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),
-                     std::numeric_limits<NumberType>::quiet_NaN()));
+  eigenpairs_symmetric(const bool                                   compute_eigenvectors,
+                       const std::pair<unsigned int, unsigned int> &index_limits =
+                         std::make_pair(numbers::invalid_unsigned_int,
+                                        numbers::invalid_unsigned_int),
+                       const std::pair<NumberType, NumberType> &value_limits =
+                         std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),
+                                        std::numeric_limits<NumberType>::quiet_NaN()));
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors of the
@@ -820,22 +808,20 @@ private:
    * Therefore, the input @p index_limits has to be set accordingly. Using Intel-MKL this restriction is not required.
    */
   std::vector<NumberType>
-  eigenpairs_symmetric_MRRR(
-    const bool                                   compute_eigenvectors,
-    const std::pair<unsigned int, unsigned int> &index_limits =
-      std::make_pair(numbers::invalid_unsigned_int,
-                     numbers::invalid_unsigned_int),
-    const std::pair<NumberType, NumberType> &value_limits =
-      std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),
-                     std::numeric_limits<NumberType>::quiet_NaN()));
+  eigenpairs_symmetric_MRRR(const bool                                   compute_eigenvectors,
+                            const std::pair<unsigned int, unsigned int> &index_limits =
+                              std::make_pair(numbers::invalid_unsigned_int,
+                                             numbers::invalid_unsigned_int),
+                            const std::pair<NumberType, NumberType> &value_limits =
+                              std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),
+                                             std::numeric_limits<NumberType>::quiet_NaN()));
 
   /*
    * Stores the distributed matrix in @p filename
    * using serial routines
    */
   void
-  save_serial(const char *                                 filename,
-              const std::pair<unsigned int, unsigned int> &chunk_size) const;
+  save_serial(const char *filename, const std::pair<unsigned int, unsigned int> &chunk_size) const;
 
   /*
    * Loads the distributed matrix from file @p filename
@@ -981,8 +967,7 @@ ScaLAPACKMatrix<NumberType>::local_el(const unsigned int loc_row,
 
 template <typename NumberType>
 inline NumberType &
-ScaLAPACKMatrix<NumberType>::local_el(const unsigned int loc_row,
-                                      const unsigned int loc_column)
+ScaLAPACKMatrix<NumberType>::local_el(const unsigned int loc_row, const unsigned int loc_column)
 {
   return (*this)(loc_row, loc_column);
 }

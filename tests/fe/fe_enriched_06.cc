@@ -72,8 +72,7 @@ public:
   gradient(const Point<dim> &point, const unsigned int component = 0) const
   {
     Tensor<1, dim> res = point;
-    Assert(point.norm() > 0,
-           dealii::ExcMessage("gradient is not defined at zero"));
+    Assert(point.norm() > 0, dealii::ExcMessage("gradient is not defined at zero"));
     res *= -value(point) / point.norm();
     return res;
   }
@@ -121,12 +120,11 @@ test5()
     const unsigned int  n_q_points = quadrature.size();
     std::vector<double> solution_values(n_q_points);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int                           dofs_per_cell = fe.dofs_per_cell;
     std::vector<dealii::types::global_dof_index> local_dof_indices;
     local_dof_indices.resize(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -139,8 +137,7 @@ test5()
           if (local_dof_indices[local_dof] == global_dof)
             break;
 
-        const std::vector<dealii::Point<dim>> &q_points =
-          fe_values.get_quadrature_points();
+        const std::vector<dealii::Point<dim>> &q_points = fe_values.get_quadrature_points();
         fe_values.get_function_values(solution, solution_values);
 
         deallog << " cell=" << cell->center() << std::endl;
@@ -152,8 +149,7 @@ test5()
 
             // if the cell contains our global dof:
             if (local_dof < dofs_per_cell)
-              deallog << " N(" << local_dof
-                      << ",qp)=" << fe_values.shape_value(local_dof, q_point);
+              deallog << " N(" << local_dof << ",qp)=" << fe_values.shape_value(local_dof, q_point);
 
             deallog << " U(qp)=" << solution_values[q_point] << std::endl;
           }
@@ -169,8 +165,7 @@ test5()
 
   data_out.build_patches(patches);
 
-  std::string filename =
-    "4cell_functions_" + dealii::Utilities::int_to_string(dim) + "D.vtu";
+  std::string   filename = "4cell_functions_" + dealii::Utilities::int_to_string(dim) + "D.vtu";
   std::ofstream output(filename.c_str());
   data_out.write_vtu(output);
 #endif
@@ -196,13 +191,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -210,12 +203,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

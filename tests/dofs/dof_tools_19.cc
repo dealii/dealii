@@ -53,12 +53,10 @@ check_this(const DoFHandler<dim> &dof_handler)
   // check this element for that
   // reason. this case is covered in
   // rt_crash_01, however
-  if (dof_handler.get_fe().get_name().find("RaviartThomas") !=
-      std::string::npos)
+  if (dof_handler.get_fe().get_name().find("RaviartThomas") != std::string::npos)
     return;
 
-  Functions::ConstantFunction<dim> test_func(
-    1, dof_handler.get_fe().n_components());
+  Functions::ConstantFunction<dim> test_func(1, dof_handler.get_fe().n_components());
 
   // don't run this test if hanging
   // nodes are not implemented
@@ -80,14 +78,9 @@ check_this(const DoFHandler<dim> &dof_handler)
   cm.distribute(solution);
 
   // Evaluate error
-  Vector<double> cellwise_errors(
-    dof_handler.get_triangulation().n_active_cells());
-  VectorTools::integrate_difference(dof_handler,
-                                    solution,
-                                    test_func,
-                                    cellwise_errors,
-                                    quadrature,
-                                    VectorTools::L2_norm);
+  Vector<double> cellwise_errors(dof_handler.get_triangulation().n_active_cells());
+  VectorTools::integrate_difference(
+    dof_handler, solution, test_func, cellwise_errors, quadrature, VectorTools::L2_norm);
   const double p_l2_error = cellwise_errors.l2_norm();
 
   Assert(p_l2_error < 1e-11, ExcInternalError());

@@ -101,11 +101,8 @@ test()
   // now create a matrix with this sparsity
   // pattern
   PETScWrappers::MPI::SparseMatrix m;
-  m.reinit(MPI_COMM_WORLD,
-           csp,
-           local_rows_per_process,
-           local_rows_per_process,
-           get_this_mpi_process());
+  m.reinit(
+    MPI_COMM_WORLD, csp, local_rows_per_process, local_rows_per_process, get_this_mpi_process());
 
   // no write into the exact same matrix
   // entries as have been created by the
@@ -135,13 +132,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -149,12 +144,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

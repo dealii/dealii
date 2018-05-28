@@ -58,10 +58,9 @@ check()
     DoFRenumbering::component_wise(mgdof, l);
 
 
-  typename DoFHandler<dim>::level_cell_iterator cell = mgdof.begin_mg(),
-                                                endc = mgdof.end_mg();
-  std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
-  std::vector<types::global_dof_index> mg_dof_indices(fe.dofs_per_cell);
+  typename DoFHandler<dim>::level_cell_iterator cell = mgdof.begin_mg(), endc = mgdof.end_mg();
+  std::vector<types::global_dof_index>          local_dof_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index>          mg_dof_indices(fe.dofs_per_cell);
   for (; cell != endc; ++cell)
     {
       if (!cell->has_children())
@@ -86,17 +85,13 @@ check()
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         for (unsigned int j = i + 1; j < fe.dofs_per_cell; ++j)
           {
-            if (fe.system_to_component_index(i).first <
-                fe.system_to_component_index(j).first)
+            if (fe.system_to_component_index(i).first < fe.system_to_component_index(j).first)
               {
-                AssertThrow(mg_dof_indices[i] < mg_dof_indices[j],
-                            ExcInternalError());
+                AssertThrow(mg_dof_indices[i] < mg_dof_indices[j], ExcInternalError());
               }
-            else if (fe.system_to_component_index(i).first >
-                     fe.system_to_component_index(j).first)
+            else if (fe.system_to_component_index(i).first > fe.system_to_component_index(j).first)
               {
-                AssertThrow(mg_dof_indices[i] > mg_dof_indices[j],
-                            ExcInternalError());
+                AssertThrow(mg_dof_indices[i] > mg_dof_indices[j], ExcInternalError());
               }
           }
     }

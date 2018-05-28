@@ -47,9 +47,9 @@ test()
   data.max_n_tmp_vectors = 202;
 
   SolverGMRES<Vector<number>> solver(control, data);
-  auto print_re_orthogonalization = [](int accumulated_iterations) {
-    deallog.get_file_stream() << "Re-orthogonalization enabled at step "
-                              << accumulated_iterations << std::endl;
+  auto                        print_re_orthogonalization = [](int accumulated_iterations) {
+    deallog.get_file_stream() << "Re-orthogonalization enabled at step " << accumulated_iterations
+                              << std::endl;
   };
   solver.connect_re_orthogonalization_slot(print_re_orthogonalization);
   solver.solve(matrix, sol, rhs, PreconditionIdentity());

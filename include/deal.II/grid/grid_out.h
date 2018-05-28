@@ -1155,8 +1155,7 @@ public:
    */
   template <int dim, int spacedim>
   void
-  write_mathgl(const Triangulation<dim, spacedim> &tria,
-               std::ostream &                      out) const;
+  write_mathgl(const Triangulation<dim, spacedim> &tria, std::ostream &out) const;
 
   /**
    * Write triangulation in VTK format.
@@ -1233,9 +1232,9 @@ public:
   template <int dim, int spacedim>
   void
   write_mesh_per_processor_as_vtu(const Triangulation<dim, spacedim> &tria,
-                                  const std::string &filename_without_extension,
-                                  const bool         view_levels = false,
-                                  const bool include_artificial  = false) const;
+                                  const std::string &                 filename_without_extension,
+                                  const bool                          view_levels = false,
+                                  const bool include_artificial                   = false) const;
 
   /**
    * Write grid to @p out according to the given data format. This function

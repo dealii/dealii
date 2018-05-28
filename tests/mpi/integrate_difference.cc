@@ -67,8 +67,7 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-                                             MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   VectorTools::interpolate(dofh, LinearFunction<dim>(), interpolated);
 
   IndexSet relevant_set;
@@ -82,14 +81,9 @@ test()
   // compute the exact values by hand. the
   // ones printed in the output are correct
   Vector<float> results(tr.n_active_cells());
-  VectorTools::integrate_difference(dofh,
-                                    x_rel,
-                                    Functions::ZeroFunction<dim>(),
-                                    results,
-                                    QGauss<dim>(3),
-                                    VectorTools::L2_norm);
-  double global =
-    VectorTools::compute_global_error(tr, results, VectorTools::L2_norm);
+  VectorTools::integrate_difference(
+    dofh, x_rel, Functions::ZeroFunction<dim>(), results, QGauss<dim>(3), VectorTools::L2_norm);
+  double global = VectorTools::compute_global_error(tr, results, VectorTools::L2_norm);
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "difference = " << global << std::endl;

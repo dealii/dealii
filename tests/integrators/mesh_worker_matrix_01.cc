@@ -138,12 +138,11 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
   SparseMatrix<double> matrix;
 
   const FiniteElement<dim> &fe = dofs.get_fe();
-  pattern.reinit(dofs.n_dofs(),
-                 dofs.n_dofs(),
-                 (GeometryInfo<dim>::faces_per_cell *
-                    GeometryInfo<dim>::max_children_per_face +
-                  1) *
-                   fe.dofs_per_cell);
+  pattern.reinit(
+    dofs.n_dofs(),
+    dofs.n_dofs(),
+    (GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::max_children_per_face + 1) *
+      fe.dofs_per_cell);
   DoFTools::make_flux_sparsity_pattern(dofs, pattern);
   pattern.compress();
   matrix.reinit(pattern);
@@ -167,18 +166,13 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
   MeshWorker::LoopControl lctrl;
   lctrl.cells_first = true;
   lctrl.own_faces   = MeshWorker::LoopControl::one;
-  MeshWorker::loop<dim,
-                   dim,
-                   MeshWorker::DoFInfo<dim>,
-                   MeshWorker::IntegrationInfoBox<dim>>(
+  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>>(
     dofs.begin_active(),
     dofs.end(),
     dof_info,
     info_box,
-    std::bind(
-      &Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
     std::bind(&Local<dim>::face,
               local,
               std::placeholders::_1,
@@ -211,9 +205,7 @@ test(const FiniteElement<dim> &fe)
   deallog << std::endl;
 
   unsigned int cn = 0;
-  for (typename Triangulation<dim>::cell_iterator cell = tr.begin();
-       cell != tr.end();
-       ++cell, ++cn)
+  for (typename Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end(); ++cell, ++cn)
     cell->set_user_index(cn);
 
   DoFHandler<dim> dofs(tr);

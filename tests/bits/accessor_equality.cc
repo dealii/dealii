@@ -44,8 +44,7 @@ test()
 
   // test a few comparison operators
   {
-    const typename Triangulation<dim>::active_cell_iterator cell =
-      tria.begin_active();
+    const typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
     AssertThrow(cell == cell, ExcInternalError());
     AssertThrow(!(cell != cell), ExcInternalError());
     AssertThrow(!(cell < cell), ExcInternalError());
@@ -66,8 +65,7 @@ test()
   // now do the same tests with the
   // DoFHandler iterators
   {
-    const typename DoFHandler<dim>::active_cell_iterator cell =
-      dof_handler.begin_active();
+    const typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
     AssertThrow(cell == cell, ExcInternalError());
     AssertThrow(!(cell != cell), ExcInternalError());
     AssertThrow(!(cell < cell), ExcInternalError());

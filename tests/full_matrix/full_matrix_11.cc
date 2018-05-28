@@ -43,8 +43,7 @@ test()
   C.add(-1., D);
 
   deallog << "Difference: "
-          << filter_out_small_numbers(
-               C.l1_norm(), 100. * std::numeric_limits<Number>::epsilon())
+          << filter_out_small_numbers(C.l1_norm(), 100. * std::numeric_limits<Number>::epsilon())
           << std::endl;
 }
 

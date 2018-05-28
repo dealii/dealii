@@ -56,9 +56,7 @@ private:
 
 // --------------- inline and template functions -----------------
 
-inline FDDiagMatrix::FDDiagMatrix(unsigned int nx, unsigned int ny) :
-  nx(nx),
-  ny(ny)
+inline FDDiagMatrix::FDDiagMatrix(unsigned int nx, unsigned int ny) : nx(nx), ny(ny)
 {}
 
 
@@ -104,8 +102,7 @@ FDDiagMatrix::gnuplot_print(std::ostream &s, const Vector<number> &V) const
         {
           // Number of the row to be entered
           unsigned int row = j + (nx - 1) * i;
-          s << (j + 1) / (float)nx << '\t' << (i + 1) / (float)ny << '\t'
-            << V(row) << std::endl;
+          s << (j + 1) / (float)nx << '\t' << (i + 1) / (float)ny << '\t' << V(row) << std::endl;
         }
       s << std::endl;
     }

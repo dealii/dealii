@@ -214,18 +214,14 @@ public:
    * @relatesalso EnableIfScalar
    */
   template <typename OtherNumber>
-  Point<dim,
-        typename ProductType<Number,
-                             typename EnableIfScalar<OtherNumber>::type>::type>
+  Point<dim, typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
   operator*(const OtherNumber) const;
 
   /**
    * Divide the current point by a factor.
    */
   template <typename OtherNumber>
-  Point<dim,
-        typename ProductType<Number,
-                             typename EnableIfScalar<OtherNumber>::type>::type>
+  Point<dim, typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
   operator/(const OtherNumber) const;
 
   /**
@@ -287,8 +283,7 @@ inline Point<dim, Number>::Point()
 
 
 template <int dim, typename Number>
-inline Point<dim, Number>::Point(const Tensor<1, dim, Number> &t) :
-  Tensor<1, dim, Number>(t)
+inline Point<dim, Number>::Point(const Tensor<1, dim, Number> &t) : Tensor<1, dim, Number>(t)
 {}
 
 
@@ -296,12 +291,11 @@ inline Point<dim, Number>::Point(const Tensor<1, dim, Number> &t) :
 template <int dim, typename Number>
 inline Point<dim, Number>::Point(const Number x)
 {
-  Assert(
-    dim == 1,
-    ExcMessage("You can only initialize Point<1> objects using the constructor "
-               "that takes only one argument. Point<dim> objects with dim!=1 "
-               "require initialization with the constructor that takes 'dim' "
-               "arguments."));
+  Assert(dim == 1,
+         ExcMessage("You can only initialize Point<1> objects using the constructor "
+                    "that takes only one argument. Point<dim> objects with dim!=1 "
+                    "require initialization with the constructor that takes 'dim' "
+                    "arguments."));
 
   // we can only get here if we pass the assertion. use the switch anyway so
   // as to avoid compiler warnings about uninitialized elements or writing
@@ -321,12 +315,11 @@ inline Point<dim, Number>::Point(const Number x)
 template <int dim, typename Number>
 inline Point<dim, Number>::Point(const Number x, const Number y)
 {
-  Assert(
-    dim == 2,
-    ExcMessage("You can only initialize Point<2> objects using the constructor "
-               "that takes two arguments. Point<dim> objects with dim!=2 "
-               "require initialization with the constructor that takes 'dim' "
-               "arguments."));
+  Assert(dim == 2,
+         ExcMessage("You can only initialize Point<2> objects using the constructor "
+                    "that takes two arguments. Point<dim> objects with dim!=2 "
+                    "require initialization with the constructor that takes 'dim' "
+                    "arguments."));
   // we can only get here if we pass the assertion. use the indirection anyway
   // so as to avoid compiler warnings about uninitialized elements or writing
   // beyond the end of the 'values' array
@@ -340,12 +333,11 @@ inline Point<dim, Number>::Point(const Number x, const Number y)
 template <int dim, typename Number>
 inline Point<dim, Number>::Point(const Number x, const Number y, const Number z)
 {
-  Assert(
-    dim == 3,
-    ExcMessage("You can only initialize Point<3> objects using the constructor "
-               "that takes three arguments. Point<dim> objects with dim!=3 "
-               "require initialization with the constructor that takes 'dim' "
-               "arguments."));
+  Assert(dim == 3,
+         ExcMessage("You can only initialize Point<3> objects using the constructor "
+                    "that takes three arguments. Point<dim> objects with dim!=3 "
+                    "require initialization with the constructor that takes 'dim' "
+                    "arguments."));
 
   // we can only get here if we pass the assertion. use the indirection anyway
   // so as to avoid compiler warnings about uninitialized elements or writing
@@ -433,10 +425,7 @@ Point<dim, Number>::operator-() const
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-inline Point<
-  dim,
-  typename ProductType<Number,
-                       typename EnableIfScalar<OtherNumber>::type>::type>
+inline Point<dim, typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
   Point<dim, Number>::operator*(const OtherNumber factor) const
 {
   Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
@@ -449,10 +438,7 @@ inline Point<
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-inline Point<
-  dim,
-  typename ProductType<Number,
-                       typename EnableIfScalar<OtherNumber>::type>::type>
+inline Point<dim, typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 Point<dim, Number>::operator/(const OtherNumber factor) const
 {
   Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
@@ -464,8 +450,7 @@ Point<dim, Number>::operator/(const OtherNumber factor) const
 
 
 template <int dim, typename Number>
-inline Number Point<dim, Number>::
-              operator*(const Tensor<1, dim, Number> &p) const
+inline Number Point<dim, Number>::operator*(const Tensor<1, dim, Number> &p) const
 {
   Number res = Number();
   for (unsigned int i = 0; i < dim; ++i)
@@ -531,10 +516,7 @@ Point<dim, Number>::serialize(Archive &ar, const unsigned int)
  * @relatesalso EnableIfScalar
  */
 template <int dim, typename Number, typename OtherNumber>
-inline Point<
-  dim,
-  typename ProductType<Number,
-                       typename EnableIfScalar<OtherNumber>::type>::type>
+inline Point<dim, typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 operator*(const OtherNumber factor, const Point<dim, Number> &p)
 {
   return p * factor;

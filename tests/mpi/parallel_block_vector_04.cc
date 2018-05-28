@@ -53,10 +53,9 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
-  std::vector<types::global_dof_index> indices;
-  std::vector<double>                  values;
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  std::vector<types::global_dof_index>       indices;
+  std::vector<double>                        values;
 
   // set local values
   if (myid < 8)
@@ -97,8 +96,7 @@ test()
     const double l2_norm = w.l2_norm();
     if (myid == 0)
       deallog << "l2 norm: " << l2_norm << std::endl;
-    AssertThrow(std::abs(v.l2_norm() * std::sqrt(3.) - w.l2_norm()) < 1e-13,
-                ExcInternalError());
+    AssertThrow(std::abs(v.l2_norm() * std::sqrt(3.) - w.l2_norm()) < 1e-13, ExcInternalError());
   }
 
   // check l1 norm
@@ -106,8 +104,7 @@ test()
     const double l1_norm = w.l1_norm();
     if (myid == 0)
       deallog << "l1 norm: " << l1_norm << std::endl;
-    AssertThrow(std::abs(v.l1_norm() * 3. - w.l1_norm()) < 1e-14,
-                ExcInternalError());
+    AssertThrow(std::abs(v.l1_norm() * 3. - w.l1_norm()) < 1e-14, ExcInternalError());
   }
 
   // check linfty norm
@@ -124,8 +121,7 @@ test()
     if (myid == 0)
       deallog << "l2.2 norm: " << lp_norm << std::endl;
 
-    AssertThrow(std::fabs(w.l2_norm() - w.lp_norm(2.0)) < 1e-14,
-                ExcInternalError());
+    AssertThrow(std::fabs(w.l2_norm() - w.lp_norm(2.0)) < 1e-14, ExcInternalError());
   }
 
   // check mean value (should be equal to l1
@@ -136,8 +132,7 @@ test()
     if (myid == 0)
       deallog << "Mean value: " << mean << std::endl;
 
-    AssertThrow(std::fabs(mean * w.size() - w.l1_norm()) < 1e-15,
-                ExcInternalError());
+    AssertThrow(std::fabs(mean * w.size() - w.l1_norm()) < 1e-15, ExcInternalError());
   }
   // check inner product
   {
@@ -182,8 +177,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

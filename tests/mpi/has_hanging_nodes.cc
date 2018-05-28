@@ -69,13 +69,10 @@ void
 test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
-  ConditionalOStream pcout(
-    std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0));
+  ConditionalOStream pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0));
 
 
   parallel::distributed::Triangulation<dim> tria_distrib(mpi_communicator);
@@ -86,17 +83,13 @@ test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
   {
     Triangulation<dim> triangulation1;
     Triangulation<dim> triangulation2;
-    GridGenerator::hyper_cube(
-      triangulation1, -1, 0); // create a square [-1,0]^d domain
-    GridGenerator::hyper_cube(
-      triangulation2, -1, 0); // create a square [-1,0]^d domain
+    GridGenerator::hyper_cube(triangulation1, -1, 0); // create a square [-1,0]^d domain
+    GridGenerator::hyper_cube(triangulation2, -1, 0); // create a square [-1,0]^d domain
     Point<dim> shift_vector;
     shift_vector[0] = 1.0;
     GridTools::shift(shift_vector, triangulation2);
-    GridGenerator::merge_triangulations(
-      triangulation1, triangulation2, tria_distrib);
-    GridGenerator::merge_triangulations(
-      triangulation1, triangulation2, tria_sequential);
+    GridGenerator::merge_triangulations(triangulation1, triangulation2, tria_distrib);
+    GridGenerator::merge_triangulations(triangulation1, triangulation2, tria_sequential);
   }
 
   tria_distrib.refine_global(n_global);
@@ -109,8 +102,7 @@ test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
       // triangulation happens to be on processor 0
       if (this_mpi_process == 0)
         {
-          for (typename Triangulation<dim>::active_cell_iterator cell =
-                 tria_distrib.begin_active();
+          for (typename Triangulation<dim>::active_cell_iterator cell = tria_distrib.begin_active();
                cell != tria_distrib.end();
                ++cell)
             if (cell->is_locally_owned())
@@ -131,8 +123,7 @@ test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
       tria_sequential.execute_coarsening_and_refinement();
     }
 
-  deallog << n_global << " " << n_local
-          << " distrib=" << tria_distrib.has_hanging_nodes()
+  deallog << n_global << " " << n_local << " distrib=" << tria_distrib.has_hanging_nodes()
           << "; shared=" << tria_sequential.has_hanging_nodes() << std::endl;
 }
 
@@ -142,8 +133,7 @@ main(int argc, char *argv[])
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
   test_int<2>(0, 0);
   test_int<2>(2, 0);
   test_int<2>(3, 1);

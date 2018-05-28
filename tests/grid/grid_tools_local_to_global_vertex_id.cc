@@ -38,8 +38,7 @@ test()
   unsigned int rank = Utilities::MPI::this_mpi_process(mpi_comm);
   if (rank == 0)
     {
-      typename Triangulation<2>::active_cell_iterator cell =
-                                                        tria.begin_active(),
+      typename Triangulation<2>::active_cell_iterator cell     = tria.begin_active(),
                                                       end_cell = tria.end();
       for (; cell != end_cell; ++cell)
         if (cell->is_locally_owned())
@@ -53,18 +52,15 @@ test()
     GridTools::compute_local_to_global_vertex_index_map(tria);
 
   std::vector<types::global_vertex_index>         vertex_global_index;
-  typename Triangulation<2>::active_cell_iterator cell = tria.begin_active(),
-                                                  endc = tria.end();
+  typename Triangulation<2>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     {
       if (cell->is_locally_owned())
         {
           for (unsigned int i = 0; i < GeometryInfo<2>::lines_per_cell; ++i)
             {
-              vertex_global_index.push_back(
-                local_to_global_id[cell->line(i)->vertex_index(0)]);
-              vertex_global_index.push_back(
-                local_to_global_id[cell->line(i)->vertex_index(1)]);
+              vertex_global_index.push_back(local_to_global_id[cell->line(i)->vertex_index(0)]);
+              vertex_global_index.push_back(local_to_global_id[cell->line(i)->vertex_index(1)]);
               if (cell->line(i)->has_children())
                 vertex_global_index.push_back(
                   local_to_global_id[cell->line(i)->child(0)->vertex_index(1)]);
@@ -82,8 +78,7 @@ test()
       for (unsigned int i = 0; i < 31; ++i)
         reference.push_back(i);
       for (unsigned int i = 0; i < vertex_global_index.size(); ++i)
-        AssertThrow(reference[i] == vertex_global_index[i],
-                    ExcMessage("Wrong global index"));
+        AssertThrow(reference[i] == vertex_global_index[i], ExcMessage("Wrong global index"));
     }
   if (rank == 1)
     {
@@ -98,8 +93,7 @@ test()
       for (unsigned int i = 27; i < 55; ++i)
         reference.push_back(i);
       for (unsigned int i = 0; i < vertex_global_index.size(); ++i)
-        AssertThrow(reference[i] == vertex_global_index[i],
-                    ExcMessage("Wrong global index"));
+        AssertThrow(reference[i] == vertex_global_index[i], ExcMessage("Wrong global index"));
     }
 }
 

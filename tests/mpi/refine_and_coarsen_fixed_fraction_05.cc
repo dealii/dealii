@@ -51,15 +51,14 @@ test()
   {
     unsigned int cell_index    = 0;
     unsigned int my_cell_index = 0;
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
          ++cell, ++cell_index)
       if (cell->subdomain_id() == myid)
         {
           ++my_cell_index;
           indicators(cell_index) = std::pow(2., (int)my_cell_index / 4);
-          min_indicator = std::min(min_indicator, indicators(cell_index));
-          max_indicator = std::max(max_indicator, indicators(cell_index));
+          min_indicator          = std::min(min_indicator, indicators(cell_index));
+          max_indicator          = std::max(max_indicator, indicators(cell_index));
         }
   }
 
@@ -69,11 +68,9 @@ test()
   parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_fraction(
     tr, indicators, 2. / 3, 1. / 6);
   {
-    float coarsen_indicator = min_indicator - 1,
-          refine_indicator  = max_indicator + 1;
+    float        coarsen_indicator = min_indicator - 1, refine_indicator = max_indicator + 1;
     unsigned int cell_index = 0;
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
          ++cell, ++cell_index)
       if (cell->refine_flag_set())
         refine_indicator = std::min(refine_indicator, indicators(cell_index));
@@ -81,13 +78,10 @@ test()
         coarsen_indicator = std::max(coarsen_indicator, indicators(cell_index));
     if (myid == 0)
       {
-        deallog << "thresholds = " << refine_indicator << ' '
-                << coarsen_indicator << std::endl;
+        deallog << "thresholds = " << refine_indicator << ' ' << coarsen_indicator << std::endl;
       }
 
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
-         ++cell)
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end(); ++cell)
       {
         cell->clear_coarsen_flag();
         cell->clear_refine_flag();
@@ -100,14 +94,11 @@ test()
   // only works because we are
   // working on only a single
   // processor
-  dealii::GridRefinement ::refine_and_coarsen_fixed_fraction(
-    tr, indicators, 2. / 3, 1. / 6);
+  dealii::GridRefinement ::refine_and_coarsen_fixed_fraction(tr, indicators, 2. / 3, 1. / 6);
   {
-    float coarsen_indicator = min_indicator - 1,
-          refine_indicator  = max_indicator + 1;
+    float        coarsen_indicator = min_indicator - 1, refine_indicator = max_indicator + 1;
     unsigned int cell_index = 0;
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
          ++cell, ++cell_index)
       if (cell->refine_flag_set())
         refine_indicator = std::min(refine_indicator, indicators(cell_index));
@@ -115,13 +106,10 @@ test()
         coarsen_indicator = std::max(coarsen_indicator, indicators(cell_index));
     if (myid == 0)
       {
-        deallog << "thresholds = " << refine_indicator << ' '
-                << coarsen_indicator << std::endl;
+        deallog << "thresholds = " << refine_indicator << ' ' << coarsen_indicator << std::endl;
       }
 
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
-         ++cell)
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end(); ++cell)
       {
         cell->clear_coarsen_flag();
         cell->clear_refine_flag();

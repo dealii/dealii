@@ -62,15 +62,12 @@ test()
       p3[d] = b;
     }
 
-  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-            Point<dim>>
-    res_1 = GridTools::find_active_cell_around_point(mapping, dof_handler, p1);
-  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-            Point<dim>>
-    res_2 = GridTools::find_active_cell_around_point(mapping, dof_handler, p2);
-  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-            Point<dim>>
-    res_3 = GridTools::find_active_cell_around_point(mapping, dof_handler, p3);
+  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator, Point<dim>> res_1 =
+    GridTools::find_active_cell_around_point(mapping, dof_handler, p1);
+  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator, Point<dim>> res_2 =
+    GridTools::find_active_cell_around_point(mapping, dof_handler, p2);
+  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator, Point<dim>> res_3 =
+    GridTools::find_active_cell_around_point(mapping, dof_handler, p3);
 
   deallog << "Standard find active cell around point: OK " << std::endl;
 

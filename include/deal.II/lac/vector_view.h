@@ -251,8 +251,7 @@ inline VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
 
 
 template <typename Number>
-inline VectorView<Number>::VectorView(const size_type new_size,
-                                      const Number *  ptr)
+inline VectorView<Number>::VectorView(const size_type new_size, const Number *ptr)
 {
   this->vec_size     = new_size;
   this->max_vec_size = new_size;

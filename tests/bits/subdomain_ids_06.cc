@@ -52,8 +52,7 @@ test()
   // ids based on their position, in
   // particular we take the quadrant
   // (octant)
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     {
       unsigned int subdomain = 0;
@@ -72,17 +71,15 @@ test()
       // check that the number of cells
       // associated is also what the respective
       // function returns
-      AssertThrow(
-        static_cast<unsigned int>(std::count(subdomain_association.begin(),
-                                             subdomain_association.end(),
-                                             subdomain)) ==
-          GridTools::count_cells_with_subdomain_association(tria, subdomain),
-        ExcInternalError());
+      AssertThrow(static_cast<unsigned int>(std::count(
+                    subdomain_association.begin(), subdomain_association.end(), subdomain)) ==
+                    GridTools::count_cells_with_subdomain_association(tria, subdomain),
+                  ExcInternalError());
 
       // ...and that this is also the correct
       // number
-      AssertThrow(GridTools::count_cells_with_subdomain_association(
-                    tria, subdomain) == (tria.n_active_cells() / (1 << dim)),
+      AssertThrow(GridTools::count_cells_with_subdomain_association(tria, subdomain) ==
+                    (tria.n_active_cells() / (1 << dim)),
                   ExcInternalError());
     }
 

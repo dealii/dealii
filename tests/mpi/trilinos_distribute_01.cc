@@ -39,9 +39,8 @@
 void
 test()
 {
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  const unsigned int n_processes =
-    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  const unsigned int myid        = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int n_processes = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   // create a vector that consists of elements indexed from 0 to n
   TrilinosWrappers::MPI::Vector vec;
@@ -53,8 +52,7 @@ test()
   AssertThrow(vec.local_size() == 100, ExcInternalError());
   AssertThrow(vec.local_range().first == 100 * myid, ExcInternalError());
   AssertThrow(vec.local_range().second == 100 * myid + 100, ExcInternalError());
-  for (unsigned int i = vec.local_range().first; i < vec.local_range().second;
-       ++i)
+  for (unsigned int i = vec.local_range().first; i < vec.local_range().second; ++i)
     vec(i) = i;
   vec.compress(VectorOperation::insert);
 
@@ -72,8 +70,7 @@ test()
   IndexSet locally_relevant_range(vec.size());
   locally_relevant_range.add_range(
     std::max<int>(100 * myid - 50, 0),
-    std::min(static_cast<types::global_dof_index>(100 * myid + 150),
-             vec.size()));
+    std::min(static_cast<types::global_dof_index>(100 * myid + 150), vec.size()));
   ConstraintMatrix cm(locally_relevant_range);
 
   // add constraints that constrain an element in the middle of the
@@ -91,8 +88,7 @@ test()
           cm.add_entry(p * 100 + 10, p * 100 - 25, 1);
         }
 
-      if ((p != n_processes - 1) &&
-          locally_relevant_range.is_element(p * 100 + 90))
+      if ((p != n_processes - 1) && locally_relevant_range.is_element(p * 100 + 90))
         {
           cm.add_line(p * 100 + 90);
           cm.add_entry(p * 100 + 90, p * 100 + 105, 1);
@@ -105,20 +101,16 @@ test()
 
   // verify correctness
   if (myid != 0)
-    AssertThrow(vec(vec.local_range().first + 10) ==
-                  vec.local_range().first - 25,
+    AssertThrow(vec(vec.local_range().first + 10) == vec.local_range().first - 25,
                 ExcInternalError());
 
   if (myid != n_processes - 1)
-    AssertThrow(vec(vec.local_range().first + 90) ==
-                  vec.local_range().first + 105,
+    AssertThrow(vec(vec.local_range().first + 90) == vec.local_range().first + 105,
                 ExcInternalError());
 
-  for (unsigned int i = vec.local_range().first; i < vec.local_range().second;
-       ++i)
+  for (unsigned int i = vec.local_range().first; i < vec.local_range().second; ++i)
     {
-      if ((i != vec.local_range().first + 10) &&
-          (i != vec.local_range().first + 90))
+      if ((i != vec.local_range().first + 10) && (i != vec.local_range().first + 90))
         {
           double val = vec(i);
           AssertThrow(std::fabs(val - i) <= 1e-6, ExcInternalError());

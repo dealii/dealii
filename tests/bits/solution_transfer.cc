@@ -88,8 +88,7 @@ transfer(std::ostream &out)
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
 
   VectorTools::interpolate(mapping, q_dof_handler, function, q_solution);
-  VectorTools::project(
-    mapping, dgq_dof_handler, cm, QGauss<dim>(3), function, dgq_solution);
+  VectorTools::project(mapping, dgq_dof_handler, cm, QGauss<dim>(3), function, dgq_solution);
 
   q_data_out.attach_dof_handler(q_dof_handler);
   q_data_out.add_data_vector(q_solution, "solution");
@@ -107,8 +106,7 @@ transfer(std::ostream &out)
   SolutionTransfer<dim> dgq_soltrans(dgq_dof_handler);
 
   // test a): pure refinement
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   ++cell;
   ++cell;
   for (; cell != endc; ++cell)
@@ -135,16 +133,14 @@ transfer(std::ostream &out)
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector(q_solution, "solution");
   q_data_out.build_patches();
-  deallog << "Interpolated/tranferred solution after pure refinement, FE_Q"
-          << std::endl
+  deallog << "Interpolated/tranferred solution after pure refinement, FE_Q" << std::endl
           << std::endl;
   q_data_out.write_gnuplot(out);
 
   dgq_data_out.clear_data_vectors();
   dgq_data_out.add_data_vector(dgq_solution, "solution");
   dgq_data_out.build_patches();
-  deallog << "Interpolated/tranferred solution after pure refinement, FE_DGQ"
-          << std::endl
+  deallog << "Interpolated/tranferred solution after pure refinement, FE_DGQ" << std::endl
           << std::endl;
   dgq_data_out.write_gnuplot(out);
 
@@ -173,19 +169,15 @@ transfer(std::ostream &out)
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector(q_solution, "solution");
   q_data_out.build_patches();
-  deallog
-    << "Interpolated/tranferred solution after coarsening and refinement, FE_Q"
-    << std::endl
-    << std::endl;
+  deallog << "Interpolated/tranferred solution after coarsening and refinement, FE_Q" << std::endl
+          << std::endl;
   q_data_out.write_gnuplot(out);
 
   dgq_data_out.clear_data_vectors();
   dgq_data_out.add_data_vector(dgq_solution, "solution");
   dgq_data_out.build_patches();
-  deallog
-    << "Interpolated/tranferred solution after coarsening and refinement, FE_DGQ"
-    << std::endl
-    << std::endl;
+  deallog << "Interpolated/tranferred solution after coarsening and refinement, FE_DGQ" << std::endl
+          << std::endl;
   dgq_data_out.write_gnuplot(out);
 }
 

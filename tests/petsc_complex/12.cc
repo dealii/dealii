@@ -46,11 +46,10 @@ test(PETScWrappers::MPI::Vector &v)
   for (unsigned int k = 0; k < v.size(); ++k)
     {
       const PetscScalar el = v(k);
-      AssertThrow(((pattern[k] == true) && (PetscRealPart(el) == 0.) &&
-                   (PetscImaginaryPart(el) == k)) ||
-                    ((pattern[k] == false) && (PetscRealPart(el) == 0.) &&
-                     (PetscImaginaryPart(el) == 0.)),
-                  ExcInternalError());
+      AssertThrow(
+        ((pattern[k] == true) && (PetscRealPart(el) == 0.) && (PetscImaginaryPart(el) == k)) ||
+          ((pattern[k] == false) && (PetscRealPart(el) == 0.) && (PetscImaginaryPart(el) == 0.)),
+        ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -75,13 +74,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -89,12 +86,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

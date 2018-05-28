@@ -35,8 +35,7 @@ public:
   void
   log_info()
   {
-    deallog << "My type: " << boost::core::demangle(typeid(*this).name())
-            << std::endl
+    deallog << "My type: " << boost::core::demangle(typeid(*this).name()) << std::endl
             << "p: " << p << std::endl;
   }
 

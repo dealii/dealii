@@ -49,9 +49,8 @@ test(TrilinosWrappers::SparseMatrix &m)
   m2.compress(VectorOperation::insert);
   m3.compress(VectorOperation::insert);
 
-  deallog << "Matrix nonzeros: " << m.n_nonzero_elements() << " "
-          << m2.n_nonzero_elements() << " " << m3.n_nonzero_elements()
-          << std::endl;
+  deallog << "Matrix nonzeros: " << m.n_nonzero_elements() << " " << m2.n_nonzero_elements() << " "
+          << m3.n_nonzero_elements() << std::endl;
 
   m.copy_from(m2);
   m.add(0.12, m3);
@@ -87,8 +86,7 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   try
     {
@@ -102,13 +100,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -116,12 +112,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

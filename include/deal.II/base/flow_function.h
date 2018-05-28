@@ -80,9 +80,8 @@ namespace Functions
      * point.
      */
     virtual void
-    vector_gradients(
-      const std::vector<Point<dim>> &           points,
-      std::vector<std::vector<Tensor<1, dim>>> &gradients) const override = 0;
+    vector_gradients(const std::vector<Point<dim>> &           points,
+                     std::vector<std::vector<Tensor<1, dim>>> &gradients) const override = 0;
     /**
      * Force terms in a structure more suitable for vector valued functions.
      * The outer vector is indexed by solution component, the inner by
@@ -96,18 +95,15 @@ namespace Functions
                       std::vector<std::vector<double>> &values) const = 0;
 
     virtual void
-    vector_value(const Point<dim> &points,
-                 Vector<double> &  value) const override;
+    vector_value(const Point<dim> &points, Vector<double> &value) const override;
     virtual double
-    value(const Point<dim> & points,
-          const unsigned int component) const override;
+    value(const Point<dim> &points, const unsigned int component) const override;
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
                       std::vector<Vector<double>> &  values) const override;
     virtual void
-    vector_gradient_list(
-      const std::vector<Point<dim>> &           points,
-      std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
+    vector_gradient_list(const std::vector<Point<dim>> &           points,
+                         std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
     /**
      * The force term in the momentum equation.
      */
@@ -165,9 +161,8 @@ namespace Functions
     vector_values(const std::vector<Point<dim>> &   points,
                   std::vector<std::vector<double>> &values) const override;
     virtual void
-    vector_gradients(
-      const std::vector<Point<dim>> &           points,
-      std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
+    vector_gradients(const std::vector<Point<dim>> &           points,
+                     std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
     virtual void
     vector_laplacians(const std::vector<Point<dim>> &   points,
                       std::vector<std::vector<double>> &values) const override;
@@ -212,9 +207,8 @@ namespace Functions
     vector_values(const std::vector<Point<dim>> &   points,
                   std::vector<std::vector<double>> &values) const override;
     virtual void
-    vector_gradients(
-      const std::vector<Point<dim>> &           points,
-      std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
+    vector_gradients(const std::vector<Point<dim>> &           points,
+                     std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
     virtual void
     vector_laplacians(const std::vector<Point<dim>> &   points,
                       std::vector<std::vector<double>> &values) const override;
@@ -254,9 +248,8 @@ namespace Functions
     vector_values(const std::vector<Point<2>> &     points,
                   std::vector<std::vector<double>> &values) const override;
     virtual void
-    vector_gradients(
-      const std::vector<Point<2>> &           points,
-      std::vector<std::vector<Tensor<1, 2>>> &gradients) const override;
+    vector_gradients(const std::vector<Point<2>> &           points,
+                     std::vector<std::vector<Tensor<1, 2>>> &gradients) const override;
     virtual void
     vector_laplacians(const std::vector<Point<2>> &     points,
                       std::vector<std::vector<double>> &values) const override;
@@ -316,9 +309,8 @@ namespace Functions
     vector_values(const std::vector<Point<2>> &     points,
                   std::vector<std::vector<double>> &values) const override;
     virtual void
-    vector_gradients(
-      const std::vector<Point<2>> &           points,
-      std::vector<std::vector<Tensor<1, 2>>> &gradients) const override;
+    vector_gradients(const std::vector<Point<2>> &           points,
+                     std::vector<std::vector<Tensor<1, 2>>> &gradients) const override;
     virtual void
     vector_laplacians(const std::vector<Point<2>> &     points,
                       std::vector<std::vector<double>> &values) const override;

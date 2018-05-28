@@ -38,24 +38,20 @@ test()
   const unsigned int dim      = spacedim - 1;
 
   Triangulation<dim, spacedim> boundary_mesh;
-  map<Triangulation<dim, spacedim>::cell_iterator,
-      Triangulation<spacedim, spacedim>::face_iterator>
+  map<Triangulation<dim, spacedim>::cell_iterator, Triangulation<spacedim, spacedim>::face_iterator>
                           surface_to_volume_mapping;
   Triangulation<spacedim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
   volume_mesh.refine_global(1);
-  surface_to_volume_mapping =
-    GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
+  surface_to_volume_mapping = GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
   boundary_mesh.refine_global(1);
 
-  for (Triangulation<dim, spacedim>::active_cell_iterator cell =
-         boundary_mesh.begin_active();
+  for (Triangulation<dim, spacedim>::active_cell_iterator cell = boundary_mesh.begin_active();
        cell != boundary_mesh.end();
        ++cell)
     {
       deallog << "Cell=" << cell << std::endl;
-      deallog << "   neighbors: " << cell->neighbor(0) << ' '
-              << cell->neighbor(1) << std::endl;
+      deallog << "   neighbors: " << cell->neighbor(0) << ' ' << cell->neighbor(1) << std::endl;
     }
 }
 

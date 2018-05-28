@@ -21,9 +21,8 @@ namespace Particles
 {
   template <int dim, int spacedim>
   ParticleIterator<dim, spacedim>::ParticleIterator(
-    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-    const typename std::multimap<internal::LevelInd,
-                                 Particle<dim, spacedim>>::iterator &particle) :
+    const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &                   map,
+    const typename std::multimap<internal::LevelInd, Particle<dim, spacedim>>::iterator &particle) :
     accessor(map, particle)
   {}
 
@@ -46,8 +45,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ParticleAccessor<dim, spacedim> &ParticleIterator<dim, spacedim>::
-                                         operator*() const
+  const ParticleAccessor<dim, spacedim> &ParticleIterator<dim, spacedim>::operator*() const
   {
     return accessor;
   }
@@ -55,8 +53,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ParticleAccessor<dim, spacedim> *ParticleIterator<dim, spacedim>::
-                                         operator->() const
+  const ParticleAccessor<dim, spacedim> *ParticleIterator<dim, spacedim>::operator->() const
   {
     return &(this->operator*());
   }
@@ -74,8 +71,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   bool
-  ParticleIterator<dim, spacedim>::
-  operator!=(const ParticleIterator<dim, spacedim> &other) const
+  ParticleIterator<dim, spacedim>::operator!=(const ParticleIterator<dim, spacedim> &other) const
   {
     return accessor != other.accessor;
   }
@@ -84,8 +80,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   bool
-  ParticleIterator<dim, spacedim>::
-  operator==(const ParticleIterator<dim, spacedim> &other) const
+  ParticleIterator<dim, spacedim>::operator==(const ParticleIterator<dim, spacedim> &other) const
   {
     return accessor == other.accessor;
   }

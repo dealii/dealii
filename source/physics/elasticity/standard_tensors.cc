@@ -28,8 +28,7 @@ const SymmetricTensor<2, dim>
 
 
 template <int dim>
-const SymmetricTensor<4, dim>
-  Physics::Elasticity::StandardTensors<dim>::S = identity_tensor<dim>();
+const SymmetricTensor<4, dim> Physics::Elasticity::StandardTensors<dim>::S = identity_tensor<dim>();
 
 
 

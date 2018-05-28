@@ -79,14 +79,11 @@ test(const unsigned int degree)
   // Make the grid bigger by a factor two.
   euler *= 2.0;
 
-  deallog << "Min diameter        : " << GridTools::minimal_cell_diameter(tria)
-          << std::endl
-          << "Max diameter        : " << GridTools::maximal_cell_diameter(tria)
-          << std::endl
-          << "Min mapped diameter : "
-          << GridTools::minimal_cell_diameter(tria, map_fe) << std::endl
-          << "Max mapped diameter : "
-          << GridTools::maximal_cell_diameter(tria, map_fe) << std::endl;
+  deallog << "Min diameter        : " << GridTools::minimal_cell_diameter(tria) << std::endl
+          << "Max diameter        : " << GridTools::maximal_cell_diameter(tria) << std::endl
+          << "Min mapped diameter : " << GridTools::minimal_cell_diameter(tria, map_fe) << std::endl
+          << "Max mapped diameter : " << GridTools::maximal_cell_diameter(tria, map_fe)
+          << std::endl;
 }
 
 int

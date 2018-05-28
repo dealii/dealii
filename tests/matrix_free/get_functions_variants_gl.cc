@@ -66,14 +66,10 @@ public:
                    src);
 
     deallog << "Error val, function values alone: " << errors[0] << std::endl;
-    deallog << "Error grad, function gradients alone: " << errors[1]
-            << std::endl;
-    deallog << "Error val, function values and gradients alone: " << errors[2]
-            << std::endl;
-    deallog << "Error grad, function values and gradients alone: " << errors[3]
-            << std::endl;
-    deallog << "Error Lapl, function Laplacians alone: " << errors[4]
-            << std::endl;
+    deallog << "Error grad, function gradients alone: " << errors[1] << std::endl;
+    deallog << "Error val, function values and gradients alone: " << errors[2] << std::endl;
+    deallog << "Error grad, function values and gradients alone: " << errors[3] << std::endl;
+    deallog << "Error Lapl, function Laplacians alone: " << errors[4] << std::endl;
   };
 
 private:
@@ -128,22 +124,18 @@ operator()(const MatrixFree<dim, Number> &data,
       // FEEvaluations. Those are tested in other
       // functions and seen as reference here
       for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
-        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements;
-             ++j)
+        for (unsigned int j = 0; j < VectorizedArray<Number>::n_array_elements; ++j)
           {
-            errors[0] +=
-              std::fabs(fe_eval.get_value(q)[j] - fe_eval2.get_value(q)[j]);
-            errors[2] +=
-              std::fabs(fe_eval.get_value(q)[j] - fe_eval4.get_value(q)[j]);
+            errors[0] += std::fabs(fe_eval.get_value(q)[j] - fe_eval2.get_value(q)[j]);
+            errors[2] += std::fabs(fe_eval.get_value(q)[j] - fe_eval4.get_value(q)[j]);
             for (unsigned int d = 0; d < dim; ++d)
               {
-                errors[1] += std::fabs(fe_eval.get_gradient(q)[d][j] -
-                                       fe_eval3.get_gradient(q)[d][j]);
-                errors[3] += std::fabs(fe_eval.get_gradient(q)[d][j] -
-                                       fe_eval4.get_gradient(q)[d][j]);
+                errors[1] +=
+                  std::fabs(fe_eval.get_gradient(q)[d][j] - fe_eval3.get_gradient(q)[d][j]);
+                errors[3] +=
+                  std::fabs(fe_eval.get_gradient(q)[d][j] - fe_eval4.get_gradient(q)[d][j]);
               }
-            errors[4] += std::fabs(fe_eval.get_laplacian(q)[j] -
-                                   fe_eval5.get_laplacian(q)[j]);
+            errors[4] += std::fabs(fe_eval.get_laplacian(q)[j] - fe_eval5.get_laplacian(q)[j]);
           }
     }
 }

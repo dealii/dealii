@@ -50,8 +50,7 @@ test()
   dof1.distribute_dofs(fe1);
   dof2.distribute_dofs(fe2);
 
-  Vector<double> v1(dof1.n_dofs()), v2(dof2.n_dofs()), v3(dof1.n_dofs()),
-    v4(dof2.n_dofs());
+  Vector<double> v1(dof1.n_dofs()), v2(dof2.n_dofs()), v3(dof1.n_dofs()), v4(dof2.n_dofs());
   for (unsigned int i = 0; i < v1.size(); ++i)
     v1(i) = i;
   for (unsigned int i = 0; i < v2.size(); ++i)
@@ -61,20 +60,15 @@ test()
   for (unsigned int i = 0; i < v2.size(); ++i)
     v4(i) = -v2(i);
 
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    component_interpretation(
-      dim, DataComponentInterpretation::component_is_part_of_vector);
+  std::vector<DataComponentInterpretation::DataComponentInterpretation> component_interpretation(
+    dim, DataComponentInterpretation::component_is_part_of_vector);
   DataOut<dim> data_out;
   data_out.add_data_vector(dof1, v1, "scalar1");
-  data_out.add_data_vector(dof2,
-                           v2,
-                           std::vector<std::string>(dim, "vector1"),
-                           component_interpretation);
+  data_out.add_data_vector(
+    dof2, v2, std::vector<std::string>(dim, "vector1"), component_interpretation);
   data_out.add_data_vector(dof1, v3, "scalar2");
-  data_out.add_data_vector(dof2,
-                           v4,
-                           std::vector<std::string>(dim, "vector2"),
-                           component_interpretation);
+  data_out.add_data_vector(
+    dof2, v4, std::vector<std::string>(dim, "vector2"), component_interpretation);
   data_out.build_patches();
 
   data_out.write_vtk(deallog.get_file_stream());
@@ -101,25 +95,21 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

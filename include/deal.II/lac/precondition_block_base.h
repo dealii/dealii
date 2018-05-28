@@ -87,8 +87,7 @@ public:
   /**
    * Constructor initializing default values.
    */
-  PreconditionBlockBase(bool      store_diagonals = false,
-                        Inversion method          = gauss_jordan);
+  PreconditionBlockBase(bool store_diagonals = false, Inversion method = gauss_jordan);
 
   /**
    * The virtual destructor
@@ -107,10 +106,7 @@ public:
    * <tt>compress</tt> is true, then only one block will be stored.
    */
   void
-  reinit(unsigned int nblocks,
-         size_type    blocksize,
-         bool         compress,
-         Inversion    method = gauss_jordan);
+  reinit(unsigned int nblocks, size_type blocksize, bool compress, Inversion method = gauss_jordan);
 
   /**
    * Tell the class that inverses are computed.
@@ -147,18 +143,14 @@ public:
    */
   template <typename number2>
   void
-  inverse_vmult(size_type              i,
-                Vector<number2> &      dst,
-                const Vector<number2> &src) const;
+  inverse_vmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Multiply with the transposed inverse block at position <tt>i</tt>.
    */
   template <typename number2>
   void
-  inverse_Tvmult(size_type              i,
-                 Vector<number2> &      dst,
-                 const Vector<number2> &src) const;
+  inverse_Tvmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #gauss_jordan.
@@ -300,8 +292,7 @@ private:
 //----------------------------------------------------------------------//
 
 template <typename number>
-inline PreconditionBlockBase<number>::PreconditionBlockBase(bool      store,
-                                                            Inversion method) :
+inline PreconditionBlockBase<number>::PreconditionBlockBase(bool store, Inversion method) :
   inversion(method),
   n_diagonal_blocks(0),
   var_store_diagonals(store),
@@ -317,8 +308,7 @@ PreconditionBlockBase<number>::clear()
   if (var_inverse_full.size() != 0)
     var_inverse_full.erase(var_inverse_full.begin(), var_inverse_full.end());
   if (var_inverse_householder.size() != 0)
-    var_inverse_householder.erase(var_inverse_householder.begin(),
-                                  var_inverse_householder.end());
+    var_inverse_householder.erase(var_inverse_householder.begin(), var_inverse_householder.end());
   if (var_inverse_svd.size() != 0)
     var_inverse_svd.erase(var_inverse_svd.begin(), var_inverse_svd.end());
   if (var_diagonal.size() != 0)
@@ -330,10 +320,7 @@ PreconditionBlockBase<number>::clear()
 
 template <typename number>
 inline void
-PreconditionBlockBase<number>::reinit(unsigned int n,
-                                      size_type    b,
-                                      bool         compress,
-                                      Inversion    method)
+PreconditionBlockBase<number>::reinit(unsigned int n, size_type b, bool compress, Inversion method)
 {
   inversion          = method;
   var_same_diagonal  = compress;
@@ -394,8 +381,7 @@ PreconditionBlockBase<number>::reinit(unsigned int n,
             break;
           case svd:
             {
-              std::vector<LAPACKFullMatrix<number>> tmp(
-                n, LAPACKFullMatrix<number>(b));
+              std::vector<LAPACKFullMatrix<number>> tmp(n, LAPACKFullMatrix<number>(b));
               var_inverse_svd.swap(tmp);
               break;
             }
@@ -478,8 +464,7 @@ PreconditionBlockBase<number>::inverse(size_type i) const
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  Assert(i < var_inverse_full.size(), ExcIndexRange(i, 0, var_inverse_full.size()));
   return var_inverse_full[i];
 }
 
@@ -531,8 +516,7 @@ PreconditionBlockBase<number>::inverse(size_type i)
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  Assert(i < var_inverse_full.size(), ExcIndexRange(i, 0, var_inverse_full.size()));
   return var_inverse_full[i];
 }
 
@@ -627,8 +611,7 @@ PreconditionBlockBase<number>::log_statistics() const
         {
           const LAPACKFullMatrix<number> &matrix = inverse_svd(b);
           size_type                       k      = 1;
-          while (k <= matrix.n_cols() &&
-                 matrix.singular_value(matrix.n_cols() - k) == 0)
+          while (k <= matrix.n_cols() && matrix.singular_value(matrix.n_cols() - k) == 0)
             ++k;
           const double s0 = matrix.singular_value(0);
           const double sm = matrix.singular_value(matrix.n_cols() - k);
@@ -647,9 +630,8 @@ PreconditionBlockBase<number>::log_statistics() const
           if (co > kappamax)
             kappamax = co;
         }
-      deallog << "dim ker [" << kermin << ':' << kermax << "] sigma [" << sigmin
-              << ':' << sigmax << "] kappa [" << kappamin << ':' << kappamax
-              << ']' << std::endl;
+      deallog << "dim ker [" << kermin << ':' << kermax << "] sigma [" << sigmin << ':' << sigmax
+              << "] kappa [" << kappamin << ':' << kappamax << ']' << std::endl;
     }
   else if (inversion == householder)
     {}

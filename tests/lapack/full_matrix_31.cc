@@ -33,15 +33,12 @@ DeclException5(ExcEl,
                double,
                double,
                double,
-               << "Error in element (" << arg1 << "," << arg2 << "): " << arg3
-               << " != " << arg4 << " delta=" << arg5);
+               << "Error in element (" << arg1 << "," << arg2 << "): " << arg3 << " != " << arg4
+               << " delta=" << arg5);
 
 template <typename NumberType>
 void
-test(const unsigned int m,
-     const unsigned int n,
-     const unsigned int k,
-     const NumberType   eps)
+test(const unsigned int m, const unsigned int n, const unsigned int k, const NumberType eps)
 {
   deallog << m << " " << n << " " << k << " " << std::endl;
   FullMatrix<NumberType>       A(k, m), B(k, n), C(m, n), D(k, k);
@@ -97,9 +94,8 @@ test(const unsigned int m,
 
       for (unsigned int i = 0; i < m; ++i)
         for (unsigned int j = 0; j < n; ++j)
-          AssertThrow(
-            std::abs(2. * C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
-            ExcEl(i, j, 2. * C(i, j), CL(i, j), 2. * C(i, j) - CL(i, j)));
+          AssertThrow(std::abs(2. * C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
+                      ExcEl(i, j, 2. * C(i, j), CL(i, j), 2. * C(i, j) - CL(i, j)));
 
       deallog << "OK symmetric adding" << std::endl;
     }

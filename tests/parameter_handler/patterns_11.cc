@@ -27,9 +27,8 @@ main()
   initlog();
 
   // create a pattern and match a string
-  const auto &pattern =
-    Patterns::Tuple(Patterns::Double(), Patterns::Anything());
-  const std::string desc = pattern.description();
+  const auto &      pattern = Patterns::Tuple(Patterns::Double(), Patterns::Anything());
+  const std::string desc    = pattern.description();
 
   deallog << desc << std::endl;
 

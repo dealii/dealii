@@ -54,66 +54,47 @@ make_constraint_matrix(const DoFHandler<2> &dof_handler, int version)
   constraints.clear();
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
-  std::vector<
-    GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
+  std::vector<GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
     periodicity_vectorDof;
   switch (version)
     {
       case 0:
-        GridTools::collect_periodic_faces(
-          dof_handler, 0, 1, 0, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 2, 3, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 0, 1, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 2, 3, 1, periodicity_vectorDof);
       case 1:
-        GridTools::collect_periodic_faces(
-          dof_handler, 0, 1, 0, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 3, 2, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 0, 1, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 3, 2, 1, periodicity_vectorDof);
       case 2:
-        GridTools::collect_periodic_faces(
-          dof_handler, 1, 0, 0, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 2, 3, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 1, 0, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 2, 3, 1, periodicity_vectorDof);
       case 3:
-        GridTools::collect_periodic_faces(
-          dof_handler, 1, 0, 0, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 3, 2, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 1, 0, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 3, 2, 1, periodicity_vectorDof);
       case 4:
-        GridTools::collect_periodic_faces(
-          dof_handler, 2, 3, 1, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 0, 1, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 2, 3, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 0, 1, 0, periodicity_vectorDof);
       case 5:
-        GridTools::collect_periodic_faces(
-          dof_handler, 3, 2, 1, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 0, 1, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 3, 2, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 0, 1, 0, periodicity_vectorDof);
       case 6:
-        GridTools::collect_periodic_faces(
-          dof_handler, 2, 3, 1, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 1, 0, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 2, 3, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 1, 0, 0, periodicity_vectorDof);
       case 7:
-        GridTools::collect_periodic_faces(
-          dof_handler, 3, 2, 1, periodicity_vectorDof);
-        GridTools::collect_periodic_faces(
-          dof_handler, 1, 0, 0, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 3, 2, 1, periodicity_vectorDof);
+        GridTools::collect_periodic_faces(dof_handler, 1, 0, 0, periodicity_vectorDof);
     }
 
-  DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vectorDof,
-                                                          constraints);
+  DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vectorDof, constraints);
 
   constraints.close();
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(
-    MappingQ<dim, dim>(1), dof_handler, support_points);
+  DoFTools::map_dofs_to_support_points(MappingQ<dim, dim>(1), dof_handler, support_points);
   for (const auto &line : constraints.get_lines())
     for (const auto &entry : line.entries)
       deallog << "DoF " << line.index << " at " << support_points[line.index]
               << " is constrained to "
-              << " DoF " << entry.first << " at " << support_points[entry.first]
-              << " with value " << entry.second << std::endl;
+              << " DoF " << entry.first << " at " << support_points[entry.first] << " with value "
+              << entry.second << std::endl;
   return constraints;
 }
 
@@ -229,8 +210,7 @@ main(int argc, char *argv[])
   GridGenerator::hyper_cube(triangulation, -L, L, true);
 
   triangulation.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cellBegin =
-    triangulation.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cellBegin = triangulation.begin_active();
   cellBegin->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
@@ -242,18 +222,14 @@ main(int argc, char *argv[])
 
   PeriodicReference<dim> periodic_function;
 
-  std::vector<Vector<double>> projection(8,
-                                         Vector<double>(dof_handler.n_dofs()));
+  std::vector<Vector<double>> projection(8, Vector<double>(dof_handler.n_dofs()));
 
   for (unsigned int i = 0; i < 8; ++i)
     {
       deallog << "Testing version " << i << std::endl;
       constraints[i] = make_constraint_matrix(dof_handler, i);
-      VectorTools::project(dof_handler,
-                           constraints[i],
-                           QGauss<dim>(3),
-                           periodic_function,
-                           projection[i]);
+      VectorTools::project(
+        dof_handler, constraints[i], QGauss<dim>(3), periodic_function, projection[i]);
       check_periodicity(dof_handler, projection[i], i);
     }
 }

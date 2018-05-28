@@ -37,9 +37,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  SolverBase::AdditionalData::AdditionalData(
-    const bool         output_solver_details,
-    const unsigned int gmres_restart_parameter) :
+  SolverBase::AdditionalData::AdditionalData(const bool         output_solver_details,
+                                             const unsigned int gmres_restart_parameter) :
     output_solver_details(output_solver_details),
     gmres_restart_parameter(gmres_restart_parameter)
   {}
@@ -141,9 +140,7 @@ namespace TrilinosWrappers
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
     linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
-      const_cast<Epetra_Operator *>(&A),
-      &x,
-      const_cast<Epetra_MultiVector *>(&b));
+      const_cast<Epetra_Operator *>(&A), &x, const_cast<Epetra_MultiVector *>(&b));
 
     do_solve(preconditioner);
   }
@@ -161,9 +158,7 @@ namespace TrilinosWrappers
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
     linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(
-      const_cast<Epetra_Operator *>(&A),
-      &x,
-      const_cast<Epetra_MultiVector *>(&b));
+      const_cast<Epetra_Operator *>(&A), &x, const_cast<Epetra_MultiVector *>(&b));
 
     do_solve(preconditioner);
   }
@@ -186,8 +181,7 @@ namespace TrilinosWrappers
            ExcMessage("Matrix is not compressed. Call compress() method."));
 
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View, A.range_partitioner(), const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -206,13 +200,11 @@ namespace TrilinosWrappers
                     const PreconditionBase &      preconditioner)
   {
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.OperatorRangeMap(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View, A.OperatorRangeMap(), const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem =
-      std_cxx14::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
+    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
 
     do_solve(preconditioner);
   }
@@ -223,20 +215,17 @@ namespace TrilinosWrappers
   SolverBase::solve(const SparseMatrix &                                      A,
                     dealii::LinearAlgebra::distributed::Vector<double> &      x,
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
-                    const PreconditionBase &preconditioner)
+                    const PreconditionBase &                                  preconditioner)
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
-      A.domain_partitioner().NumMyElements());
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
-      A.range_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
+                    A.domain_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
+                    A.range_partitioner().NumMyElements());
 
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View, A.range_partitioner(), const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -252,23 +241,19 @@ namespace TrilinosWrappers
   SolverBase::solve(Epetra_Operator &                                         A,
                     dealii::LinearAlgebra::distributed::Vector<double> &      x,
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
-                    const PreconditionBase &preconditioner)
+                    const PreconditionBase &                                  preconditioner)
   {
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
-      A.OperatorDomainMap().NumMyElements());
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
-      A.OperatorRangeMap().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
+                    A.OperatorDomainMap().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
+                    A.OperatorRangeMap().NumMyElements());
 
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.OperatorRangeMap(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View, A.OperatorRangeMap(), const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
-    linear_problem =
-      std_cxx14::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
+    linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>(&A, &ep_x, &ep_b);
 
     do_solve(preconditioner);
   }
@@ -314,8 +299,7 @@ namespace TrilinosWrappers
           // Note: CurrentResNormEst is set to -1.0 if no estimate of the
           // residual value is available
           current_residual =
-            (CurrentResNormEst < 0.0 ? compute_residual(CurrentResVector) :
-                                       CurrentResNormEst);
+            (CurrentResNormEst < 0.0 ? compute_residual(CurrentResVector) : CurrentResNormEst);
           if (CurrentIter == 0)
             initial_residual = current_residual;
 
@@ -368,13 +352,11 @@ namespace TrilinosWrappers
         // Consider linear problem converged if any of the collection
         // of criterion are met
         status_test_collection =
-          std_cxx14::make_unique<AztecOO_StatusTestCombo>(
-            AztecOO_StatusTestCombo::OR);
+          std_cxx14::make_unique<AztecOO_StatusTestCombo>(AztecOO_StatusTestCombo::OR);
 
         // Maximum number of iterations
         Assert(max_steps >= 0, ExcInternalError());
-        status_test_max_steps =
-          std_cxx14::make_unique<AztecOO_StatusTestMaxIters>(max_steps);
+        status_test_max_steps = std_cxx14::make_unique<AztecOO_StatusTestMaxIters>(max_steps);
         status_test_collection->AddStatusTest(*status_test_max_steps);
 
         Assert(linear_problem.GetRHS()->NumVectors() == 1,
@@ -388,8 +370,8 @@ namespace TrilinosWrappers
           tolerance);
         status_test_abs_tol->DefineResForm(AztecOO_StatusTestResNorm::Explicit,
                                            AztecOO_StatusTestResNorm::TwoNorm);
-        status_test_abs_tol->DefineScaleForm(
-          AztecOO_StatusTestResNorm::None, AztecOO_StatusTestResNorm::TwoNorm);
+        status_test_abs_tol->DefineScaleForm(AztecOO_StatusTestResNorm::None,
+                                             AztecOO_StatusTestResNorm::TwoNorm);
         status_test_collection->AddStatusTest(*status_test_abs_tol);
 
         // Residual norm, scaled by some initial value, is below some threshold
@@ -400,9 +382,8 @@ namespace TrilinosWrappers
           reduction);
         status_test_rel_tol->DefineResForm(AztecOO_StatusTestResNorm::Explicit,
                                            AztecOO_StatusTestResNorm::TwoNorm);
-        status_test_rel_tol->DefineScaleForm(
-          AztecOO_StatusTestResNorm::NormOfInitRes,
-          AztecOO_StatusTestResNorm::TwoNorm);
+        status_test_rel_tol->DefineScaleForm(AztecOO_StatusTestResNorm::NormOfInitRes,
+                                             AztecOO_StatusTestResNorm::TwoNorm);
         status_test_collection->AddStatusTest(*status_test_rel_tol);
       }
 
@@ -430,8 +411,7 @@ namespace TrilinosWrappers
           break;
         case gmres:
           solver.SetAztecOption(AZ_solver, AZ_gmres);
-          solver.SetAztecOption(AZ_kspace,
-                                additional_data.gmres_restart_parameter);
+          solver.SetAztecOption(AZ_kspace, additional_data.gmres_restart_parameter);
           break;
         case bicgstab:
           solver.SetAztecOption(AZ_solver, AZ_bicgstab);
@@ -447,8 +427,7 @@ namespace TrilinosWrappers
     set_preconditioner(solver, preconditioner);
 
     // ... set some options, ...
-    solver.SetAztecOption(
-      AZ_output, additional_data.output_solver_details ? AZ_all : AZ_none);
+    solver.SetAztecOption(AZ_output, additional_data.output_solver_details ? AZ_all : AZ_none);
     solver.SetAztecOption(AZ_conv, AZ_noscaled);
 
     // By default, the Trilinos solver chooses convergence criterion based on
@@ -469,19 +448,17 @@ namespace TrilinosWrappers
         if (const ReductionControl *const reduction_control =
               dynamic_cast<const ReductionControl *const>(&solver_control))
           {
-            status_test =
-              std_cxx14::make_unique<internal::TrilinosReductionControl>(
-                reduction_control->max_steps(),
-                reduction_control->tolerance(),
-                reduction_control->reduction(),
-                *linear_problem);
+            status_test = std_cxx14::make_unique<internal::TrilinosReductionControl>(
+              reduction_control->max_steps(),
+              reduction_control->tolerance(),
+              reduction_control->reduction(),
+              *linear_problem);
             solver.SetStatusTest(status_test.get());
           }
       }
 
     // ... and then solve!
-    ierr =
-      solver.Iterate(solver_control.max_steps(), solver_control.tolerance());
+    ierr = solver.Iterate(solver_control.max_steps(), solver_control.tolerance());
 
     // report errors in more detail than just by checking whether the return
     // status is zero or greater. the error strings are taken from the
@@ -519,13 +496,10 @@ namespace TrilinosWrappers
     // certain choices of solver or if a custom status test is set, then the
     // result returned by TrueResidual() is equal to -1. In this case we must
     // compute it ourself.
-    if (const internal::TrilinosReductionControl
-          *const reduction_control_status =
-            dynamic_cast<const internal::TrilinosReductionControl *const>(
-              status_test.get()))
+    if (const internal::TrilinosReductionControl *const reduction_control_status =
+          dynamic_cast<const internal::TrilinosReductionControl *const>(status_test.get()))
       {
-        Assert(dynamic_cast<const ReductionControl *const>(&solver_control),
-               ExcInternalError());
+        Assert(dynamic_cast<const ReductionControl *const>(&solver_control), ExcInternalError());
 
         // Check to see if solver converged in one step
         // This can happen if the matrix is diagonal and a non-trivial
@@ -535,16 +509,12 @@ namespace TrilinosWrappers
             // For ReductionControl, we must first register the initial residual
             // value. This is the basis from which it will determine whether the
             // current residual corresponds to a converged state.
-            solver_control.check(
-              0, reduction_control_status->get_initial_residual());
-            solver_control.check(
-              solver.NumIters(),
-              reduction_control_status->get_current_residual());
+            solver_control.check(0, reduction_control_status->get_initial_residual());
+            solver_control.check(solver.NumIters(),
+                                 reduction_control_status->get_current_residual());
           }
         else
-          solver_control.check(
-            solver.NumIters(),
-            reduction_control_status->get_current_residual());
+          solver_control.check(solver.NumIters(), reduction_control_status->get_current_residual());
       }
     else
       {
@@ -553,17 +523,16 @@ namespace TrilinosWrappers
       }
 
     if (solver_control.last_check() != SolverControl::success)
-      AssertThrow(false,
-                  SolverControl::NoConvergence(solver_control.last_step(),
-                                               solver_control.last_value()));
+      AssertThrow(
+        false,
+        SolverControl::NoConvergence(solver_control.last_step(), solver_control.last_value()));
   }
 
 
 
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &               solver,
-                                 const PreconditionBase &preconditioner)
+  SolverBase::set_preconditioner(AztecOO &solver, const PreconditionBase &preconditioner)
   {
     // Introduce the preconditioner, if the identity preconditioner is used,
     // the precondioner is set to none, ...
@@ -580,11 +549,9 @@ namespace TrilinosWrappers
 
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &              solver,
-                                 const Epetra_Operator &preconditioner)
+  SolverBase::set_preconditioner(AztecOO &solver, const Epetra_Operator &preconditioner)
   {
-    const int ierr =
-      solver.SetPrecOperator(const_cast<Epetra_Operator *>(&preconditioner));
+    const int ierr = solver.SetPrecOperator(const_cast<Epetra_Operator *>(&preconditioner));
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -607,9 +574,8 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverGMRES ------------------------ */
 
-  SolverGMRES::AdditionalData::AdditionalData(
-    const bool         output_solver_details,
-    const unsigned int restart_parameter) :
+  SolverGMRES::AdditionalData::AdditionalData(const bool         output_solver_details,
+                                              const unsigned int restart_parameter) :
     SolverBase::AdditionalData(output_solver_details, restart_parameter)
   {}
 
@@ -625,15 +591,13 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverBicgstab ------------------------ */
 
-  SolverBicgstab::AdditionalData::AdditionalData(
-    const bool output_solver_details) :
+  SolverBicgstab::AdditionalData::AdditionalData(const bool output_solver_details) :
     SolverBase::AdditionalData(output_solver_details)
   {}
 
 
 
-  SolverBicgstab::SolverBicgstab(SolverControl &       cn,
-                                 const AdditionalData &data) :
+  SolverBicgstab::SolverBicgstab(SolverControl &cn, const AdditionalData &data) :
     SolverBase(cn, data),
     additional_data(data)
   {
@@ -659,8 +623,7 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverTFQMR ------------------------ */
 
-  SolverTFQMR::AdditionalData::AdditionalData(
-    const bool output_solver_details) :
+  SolverTFQMR::AdditionalData::AdditionalData(const bool output_solver_details) :
     SolverBase::AdditionalData(output_solver_details)
   {}
 
@@ -677,7 +640,7 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverDirect ------------------------ */
 
-  SolverDirect::AdditionalData::AdditionalData(const bool output_solver_details,
+  SolverDirect::AdditionalData::AdditionalData(const bool         output_solver_details,
                                                const std::string &solver_type) :
     output_solver_details(output_solver_details),
     solver_type(solver_type)
@@ -708,32 +671,28 @@ namespace TrilinosWrappers
     linear_problem = std_cxx14::make_unique<Epetra_LinearProblem>();
 
     // Assign the matrix operator to the Epetra_LinearProblem object
-    linear_problem->SetOperator(
-      const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()));
+    linear_problem->SetOperator(const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()));
 
     // Fetch return value of Amesos Solver functions
     int ierr;
 
     // First set whether we want to print the solver information to screen or
     // not.
-    ConditionalOStream verbose_cout(std::cout,
-                                    additional_data.output_solver_details);
+    ConditionalOStream verbose_cout(std::cout, additional_data.output_solver_details);
 
     // Next allocate the Amesos solver, this is done in two steps, first we
     // create a solver Factory and and generate with that the concrete Amesos
     // solver, if possible.
     Amesos Factory;
 
-    AssertThrow(
-      Factory.Query(additional_data.solver_type.c_str()),
-      ExcMessage(std::string("You tried to select the solver type <") +
-                 additional_data.solver_type +
-                 "> but this solver is not supported by Trilinos either "
-                 "because it does not exist, or because Trilinos was not "
-                 "configured for its use."));
+    AssertThrow(Factory.Query(additional_data.solver_type.c_str()),
+                ExcMessage(std::string("You tried to select the solver type <") +
+                           additional_data.solver_type +
+                           "> but this solver is not supported by Trilinos either "
+                           "because it does not exist, or because Trilinos was not "
+                           "configured for its use."));
 
-    solver.reset(
-      Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
+    solver.reset(Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization();
@@ -752,13 +711,11 @@ namespace TrilinosWrappers
     linear_problem->SetLHS(&x.trilinos_vector());
 
     // Assign the RHS vector to the Epetra_LinearProblem object
-    linear_problem->SetRHS(
-      const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
+    linear_problem->SetRHS(const_cast<Epetra_MultiVector *>(&b.trilinos_vector()));
 
     // First set whether we want to print the solver information to screen or
     // not.
-    ConditionalOStream verbose_cout(std::cout,
-                                    additional_data.output_solver_details);
+    ConditionalOStream verbose_cout(std::cout, additional_data.output_solver_details);
 
 
     verbose_cout << "Starting solve" << std::endl;
@@ -774,15 +731,12 @@ namespace TrilinosWrappers
 
 
   void
-  SolverDirect::solve(
-    dealii::LinearAlgebra::distributed::Vector<double> &      x,
-    const dealii::LinearAlgebra::distributed::Vector<double> &b)
+  SolverDirect::solve(dealii::LinearAlgebra::distributed::Vector<double> &      x,
+                      const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    Epetra_Vector ep_x(
-      View, linear_problem->GetOperator()->OperatorDomainMap(), x.begin());
-    Epetra_Vector ep_b(View,
-                       linear_problem->GetOperator()->OperatorRangeMap(),
-                       const_cast<double *>(b.begin()));
+    Epetra_Vector ep_x(View, linear_problem->GetOperator()->OperatorDomainMap(), x.begin());
+    Epetra_Vector ep_b(
+      View, linear_problem->GetOperator()->OperatorRangeMap(), const_cast<double *>(b.begin()));
 
     // Assign the empty LHS vector to the Epetra_LinearProblem object
     linear_problem->SetLHS(&ep_x);
@@ -792,8 +746,7 @@ namespace TrilinosWrappers
 
     // First set whether we want to print the solver information to screen or
     // not.
-    ConditionalOStream verbose_cout(std::cout,
-                                    additional_data.output_solver_details);
+    ConditionalOStream verbose_cout(std::cout, additional_data.output_solver_details);
 
     verbose_cout << "Starting solve" << std::endl;
 
@@ -815,24 +768,21 @@ namespace TrilinosWrappers
 
     // First set whether we want to print the solver information to screen or
     // not.
-    ConditionalOStream verbose_cout(std::cout,
-                                    additional_data.output_solver_details);
+    ConditionalOStream verbose_cout(std::cout, additional_data.output_solver_details);
 
     // Next allocate the Amesos solver, this is done in two steps, first we
     // create a solver Factory and and generate with that the concrete Amesos
     // solver, if possible.
     Amesos Factory;
 
-    AssertThrow(
-      Factory.Query(additional_data.solver_type.c_str()),
-      ExcMessage(std::string("You tried to select the solver type <") +
-                 additional_data.solver_type +
-                 "> but this solver is not supported by Trilinos either "
-                 "because it does not exist, or because Trilinos was not "
-                 "configured for its use."));
+    AssertThrow(Factory.Query(additional_data.solver_type.c_str()),
+                ExcMessage(std::string("You tried to select the solver type <") +
+                           additional_data.solver_type +
+                           "> but this solver is not supported by Trilinos either "
+                           "because it does not exist, or because Trilinos was not "
+                           "configured for its use."));
 
-    solver.reset(
-      Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
+    solver.reset(Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization();
@@ -852,16 +802,14 @@ namespace TrilinosWrappers
     solver_control.check(0, 0);
 
     if (solver_control.last_check() != SolverControl::success)
-      AssertThrow(false,
-                  SolverControl::NoConvergence(solver_control.last_step(),
-                                               solver_control.last_value()));
+      AssertThrow(
+        false,
+        SolverControl::NoConvergence(solver_control.last_step(), solver_control.last_value()));
   }
 
 
   void
-  SolverDirect::solve(const SparseMatrix &A,
-                      MPI::Vector &       x,
-                      const MPI::Vector & b)
+  SolverDirect::solve(const SparseMatrix &A, MPI::Vector &x, const MPI::Vector &b)
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
@@ -887,8 +835,7 @@ namespace TrilinosWrappers
     Assert(A.local_range().second == A.m(),
            ExcMessage("Can only work in serial when using deal.II vectors."));
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View, A.range_partitioner(), const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
@@ -901,20 +848,16 @@ namespace TrilinosWrappers
 
 
   void
-  SolverDirect::solve(
-    const SparseMatrix &                                      A,
-    dealii::LinearAlgebra::distributed::Vector<double> &      x,
-    const dealii::LinearAlgebra::distributed::Vector<double> &b)
+  SolverDirect::solve(const SparseMatrix &                                      A,
+                      dealii::LinearAlgebra::distributed::Vector<double> &      x,
+                      const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
-      A.domain_partitioner().NumMyElements());
-    AssertDimension(
-      static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
-      A.range_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(x.local_size()),
+                    A.domain_partitioner().NumMyElements());
+    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(b.local_size()),
+                    A.range_partitioner().NumMyElements());
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b(
-      View, A.range_partitioner(), const_cast<double *>(b.begin()));
+    Epetra_Vector ep_b(View, A.range_partitioner(), const_cast<double *>(b.begin()));
 
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.

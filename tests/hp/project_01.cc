@@ -79,11 +79,9 @@ test()
 
   ConstraintMatrix cm;
   cm.close();
-  VectorTools::project(
-    dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);
+  VectorTools::project(dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dh.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
        cell != dh.end();
        ++cell)
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -92,13 +90,11 @@ test()
         // somewhat small. it won't
         // be zero since we project
         // and do not interpolate
-        Assert(
-          std::fabs(v(cell->vertex_dof_index(i, 0, cell->active_fe_index())) -
-                    F<dim>().value(cell->vertex(i))) < 1e-4,
-          ExcInternalError());
+        Assert(std::fabs(v(cell->vertex_dof_index(i, 0, cell->active_fe_index())) -
+                         F<dim>().value(cell->vertex(i))) < 1e-4,
+               ExcInternalError());
         deallog << cell->vertex(i) << ' '
-                << v(cell->vertex_dof_index(i, 0, cell->active_fe_index()))
-                << std::endl;
+                << v(cell->vertex_dof_index(i, 0, cell->active_fe_index())) << std::endl;
       }
 }
 

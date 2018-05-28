@@ -41,8 +41,7 @@ public:
   {}
 
   virtual double
-  value(const Point<spacedim> &p,
-        const unsigned int     component = 0) const override
+  value(const Point<spacedim> &p, const unsigned int component = 0) const override
   {
     return 2.0 * p[component];
   }
@@ -90,10 +89,8 @@ gnuplot_output(const GridOutFlags::Gnuplot &flags)
   displacement_dof_handler.initialize(triangulation, displacement_fe);
 
   Vector<double> displacements(displacement_dof_handler.n_dofs());
-  VectorTools::interpolate(
-    displacement_dof_handler, Shift<spacedim>(), displacements);
-  MappingQ1Eulerian<dim, Vector<double>, spacedim> mapping(
-    displacement_dof_handler, displacements);
+  VectorTools::interpolate(displacement_dof_handler, Shift<spacedim>(), displacements);
+  MappingQ1Eulerian<dim, Vector<double>, spacedim> mapping(displacement_dof_handler, displacements);
 
   GridOut grid_out;
   grid_out.set_flags(flags);

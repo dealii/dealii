@@ -61,8 +61,7 @@ test()
 
   auto boundary_worker =
     [](const Iterator &cell, const unsigned int &f, ScratchData &, CopyData &) {
-      deallog << "Boundary worker on : " << cell << ", Face : " << f
-              << std::endl;
+      deallog << "Boundary worker on : " << cell << ", Face : " << f << std::endl;
     };
 
   auto face_worker = [](const Iterator &    cell,
@@ -73,18 +72,15 @@ test()
                         const unsigned int &nsf,
                         ScratchData &       s,
                         CopyData &          c) {
-    deallog << "Face worker on : " << cell << ", Neighbor cell : " << ncell
-            << ", Face : " << f << ", Neighbor Face : " << nf
-            << ", Subface: " << sf << ", Neighbor Subface: " << nsf
+    deallog << "Face worker on : " << cell << ", Neighbor cell : " << ncell << ", Face : " << f
+            << ", Neighbor Face : " << nf << ", Subface: " << sf << ", Neighbor Subface: " << nsf
             << std::endl;
   };
 
   auto copier = [](const CopyData &) { deallog << "copier" << std::endl; };
 
-  std::function<void(const decltype(cell) &, ScratchData &, CopyData &)>
-    empty_cell_worker;
-  std::function<void(
-    const decltype(cell) &, const unsigned int &, ScratchData &, CopyData &)>
+  std::function<void(const decltype(cell) &, ScratchData &, CopyData &)> empty_cell_worker;
+  std::function<void(const decltype(cell) &, const unsigned int &, ScratchData &, CopyData &)>
     empty_boundary_worker;
 
   deallog << "CELLS ONLY" << std::endl << std::endl;
@@ -94,14 +90,8 @@ test()
 
   deallog << "BOUNDARY ONLY" << std::endl << std::endl;
 
-  mesh_loop(cell,
-            endc,
-            empty_cell_worker,
-            copier,
-            scratch,
-            copy,
-            assemble_boundary_faces,
-            boundary_worker);
+  mesh_loop(
+    cell, endc, empty_cell_worker, copier, scratch, copy, assemble_boundary_faces, boundary_worker);
 
   deallog << "CELLS LAST AND BOUNDARY" << std::endl << std::endl;
 

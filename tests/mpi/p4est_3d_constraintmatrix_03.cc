@@ -66,10 +66,8 @@ public:
   virtual typename DataOut<dim>::cell_iterator
   first_cell()
   {
-    typename DataOut<dim>::active_cell_iterator cell =
-      this->triangulation->begin_active();
-    while ((cell != this->triangulation->end()) &&
-           (cell->subdomain_id() != subdomain_id))
+    typename DataOut<dim>::active_cell_iterator cell = this->triangulation->begin_active();
+    while ((cell != this->triangulation->end()) && (cell->subdomain_id() != subdomain_id))
       ++cell;
 
     return cell;
@@ -82,8 +80,8 @@ public:
       {
         const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
 
-        return ++(FilteredIterator<typename DataOut<dim>::active_cell_iterator>(
-          predicate, old_cell));
+        return ++(
+          FilteredIterator<typename DataOut<dim>::active_cell_iterator>(predicate, old_cell));
       }
     else
       return old_cell;
@@ -111,8 +109,7 @@ public:
 
 template <int dim>
 double
-TemperatureInitialValues<dim>::value(const Point<dim> &p,
-                                     const unsigned int) const
+TemperatureInitialValues<dim>::value(const Point<dim> &p, const unsigned int) const
 {
   return p(0) * T1 + p(1) * (T0 - T1); // simple
 }
@@ -120,8 +117,7 @@ TemperatureInitialValues<dim>::value(const Point<dim> &p,
 
 template <int dim>
 void
-TemperatureInitialValues<dim>::vector_value(const Point<dim> &p,
-                                            Vector<double> &  values) const
+TemperatureInitialValues<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (unsigned int c = 0; c < this->n_components; ++c)
     values(c) = TemperatureInitialValues<dim>::value(p, c);
@@ -149,9 +145,7 @@ test()
   if (1)
     for (unsigned int step = 0; step < 5; ++step)
       {
-        typename Triangulation<dim>::active_cell_iterator cell =
-                                                            tr.begin_active(),
-                                                          endc = tr.end();
+        typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(), endc = tr.end();
 
         for (; cell != endc; ++cell)
           if (Testing::rand() % 42 == 1)
@@ -185,9 +179,7 @@ test()
   for (unsigned int steps = 0; steps < 7; ++steps)
     {
       {
-        typename Triangulation<dim>::active_cell_iterator cell =
-                                                            tr.begin_active(),
-                                                          endc = tr.end();
+        typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(), endc = tr.end();
 
         for (; cell != endc; ++cell)
           if (!cell->is_artificial() && !cell->is_ghost())
@@ -198,9 +190,7 @@ test()
                 cell->set_coarsen_flag();
             }
       }
-      for (typename Triangulation<dim>::cell_iterator cell = tr.begin();
-           cell != tr.end();
-           ++cell)
+      for (typename Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end(); ++cell)
         {
           if (!cell->has_children())
             continue;
@@ -215,8 +205,7 @@ test()
           if (coarsen_me)
             for (unsigned int i = 0; i < cell->n_children(); ++i)
               {
-                if (cell->child(i)->active() &&
-                    cell->child(i)->is_locally_owned())
+                if (cell->child(i)->active() && cell->child(i)->is_locally_owned())
                   {
                     cell->child(i)->clear_refine_flag();
                     cell->child(i)->set_coarsen_flag();
@@ -224,9 +213,7 @@ test()
               }
         }
 
-      parallel::distributed::SolutionTransfer<dim,
-                                              TrilinosWrappers::MPI::Vector>
-        trans(dofh);
+      parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> trans(dofh);
       tr.prepare_coarsening_and_refinement();
 
 
@@ -292,8 +279,7 @@ test()
 
   data_out.build_patches(1);
   const std::string filename =
-    ("solution." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
-     ".vtu");
+    ("solution." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) + ".vtu");
   std::ofstream output(filename.c_str());
   data_out.write_vtu(output);
 

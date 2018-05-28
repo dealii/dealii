@@ -47,9 +47,7 @@
 
 template <int dim, int spacedim>
 void
-test(const unsigned int refs,
-     const unsigned int degree,
-     const unsigned int subdivisions)
+test(const unsigned int refs, const unsigned int degree, const unsigned int subdivisions)
 {
   const unsigned int id = degree + 10 * refs + 100 * subdivisions;
 
@@ -88,41 +86,32 @@ test(const unsigned int refs,
   data_out_scal.attach_dof_handler(dof_handler);
 
   data_out_scal.add_data_vector(
-    scal_sol,
-    "scalar_data",
-    DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
+    scal_sol, "scalar_data", DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
 
   data_out_scal.build_patches(
-    mapping,
-    subdivisions,
-    DataOut<dim, DoFHandler<dim, spacedim>>::curved_inner_cells);
+    mapping, subdivisions, DataOut<dim, DoFHandler<dim, spacedim>>::curved_inner_cells);
 
-  std::string filename_scal =
-    ("scal_check_" + Utilities::int_to_string(id) + ".vtu");
+  std::string   filename_scal = ("scal_check_" + Utilities::int_to_string(id) + ".vtu");
   std::ofstream file_scal(filename_scal.c_str());
   data_out_scal.write_vtu(file_scal);
   data_out_scal.write_vtk(deallog.get_file_stream());
 
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(
-      spacedim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation(spacedim,
+                                  DataComponentInterpretation::component_is_part_of_vector);
 
   DataOut<dim, DoFHandler<dim, spacedim>> data_out_euler;
   data_out_euler.attach_dof_handler(map_dh);
 
-  data_out_euler.add_data_vector(
-    euler_vec,
-    "euler_vec",
-    DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data,
-    data_component_interpretation);
+  data_out_euler.add_data_vector(euler_vec,
+                                 "euler_vec",
+                                 DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data,
+                                 data_component_interpretation);
   data_out_euler.build_patches(
-    mapping,
-    degree,
-    DataOut<dim, DoFHandler<dim, spacedim>>::curved_inner_cells);
+    mapping, degree, DataOut<dim, DoFHandler<dim, spacedim>>::curved_inner_cells);
 
-  std::string filename_euler =
-    ("euler_check_" + Utilities::int_to_string(id) + ".vtu");
+  std::string   filename_euler = ("euler_check_" + Utilities::int_to_string(id) + ".vtu");
   std::ofstream file_euler(filename_euler.c_str());
 
   data_out_euler.write_vtu(file_euler);

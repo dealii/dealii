@@ -95,8 +95,7 @@ check(const int          degree,
       const unsigned int size  = 1000)
 {
   deallog << "Degree " << degree << std::endl;
-  LinearAlgebra::distributed::Vector<double> ev(size), x(size), y(size),
-    exact(size), diff(size);
+  LinearAlgebra::distributed::Vector<double> ev(size), x(size), y(size), exact(size), diff(size);
   GrowingVectorMemory<LinearAlgebra::distributed::Vector<double>> vector_memory;
 
   for (unsigned int i = 0; i < size; ++i)
@@ -143,8 +142,7 @@ check(const int          degree,
   diff -= exact;
 
   deallog << " Filter [" << a << "," << b << "]" << std::endl;
-  deallog << " Error: " << diff.linfty_norm() / exact.linfty_norm()
-          << std::endl;
+  deallog << " Error: " << diff.linfty_norm() / exact.linfty_norm() << std::endl;
 
 #ifdef EXTRA_OUTPUT
   // extra output for debugging:

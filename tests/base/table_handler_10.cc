@@ -49,12 +49,10 @@ main()
 
   // produce output. hope that row 4 is
   // completely padded
-  table.write_text(deallog.get_file_stream(),
-                   TableHandler::table_with_separate_column_description);
+  table.write_text(deallog.get_file_stream(), TableHandler::table_with_separate_column_description);
 
   table.set_scientific(keys[0], true);
   table.set_precision(keys[1], 1);
 
-  table.write_text(deallog.get_file_stream(),
-                   TableHandler::table_with_separate_column_description);
+  table.write_text(deallog.get_file_stream(), TableHandler::table_with_separate_column_description);
 }

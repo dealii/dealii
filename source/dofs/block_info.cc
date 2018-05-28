@@ -27,9 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 void
-BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
-                      bool                             levels_only,
-                      bool                             active_only)
+BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof, bool levels_only, bool active_only)
 {
   if (!levels_only && dof.has_active_dofs())
     {
@@ -41,8 +39,7 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof,
 
   if (!active_only && dof.has_level_dofs())
     {
-      std::vector<std::vector<types::global_dof_index>> sizes(
-        dof.get_triangulation().n_levels());
+      std::vector<std::vector<types::global_dof_index>> sizes(dof.get_triangulation().n_levels());
 
       for (unsigned int i = 0; i < sizes.size(); ++i)
         sizes[i].resize(dof.get_fe().n_blocks());

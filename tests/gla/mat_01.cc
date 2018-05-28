@@ -73,11 +73,9 @@ test()
   // check local values
   if (myid == 0)
     {
-      deallog << myid * 2 << ": "
-              << get_real_assert_zero_imag(mat(myid * 2, myid * 2))
+      deallog << myid * 2 << ": " << get_real_assert_zero_imag(mat(myid * 2, myid * 2))
               << std::endl;
-      deallog << myid * 2 + 1 << ": "
-              << get_real_assert_zero_imag(mat(myid * 2 + 1, myid * 2 + 1))
+      deallog << myid * 2 + 1 << ": " << get_real_assert_zero_imag(mat(myid * 2 + 1, myid * 2 + 1))
               << std::endl;
       deallog << "0,1 : " << get_real_assert_zero_imag(mat(0, 1)) << std::endl;
     }

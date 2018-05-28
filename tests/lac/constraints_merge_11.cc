@@ -27,8 +27,7 @@
 void
 merge_check()
 {
-  deallog << "Checking ConstraintMatrix::merge with localized lines"
-          << std::endl;
+  deallog << "Checking ConstraintMatrix::merge with localized lines" << std::endl;
 
   // set local lines to a very large range that
   // surely triggers an error if the

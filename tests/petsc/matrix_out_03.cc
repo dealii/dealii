@@ -25,8 +25,7 @@
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   std::ofstream logfile("output");
   deallog << std::fixed;
@@ -52,8 +51,7 @@ main(int argc, char **argv)
       sparse_matrix.compress(VectorOperation::insert);
 
       MatrixOut matrix_out;
-      matrix_out.build_patches(
-        sparse_matrix, "sparse_matrix", MatrixOut::Options(true, 1, true));
+      matrix_out.build_patches(sparse_matrix, "sparse_matrix", MatrixOut::Options(true, 1, true));
       matrix_out.write_gnuplot(logfile);
     }
 }

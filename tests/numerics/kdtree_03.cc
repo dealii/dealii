@@ -58,8 +58,7 @@ main()
           auto matches = kdtree.get_points_within_ball(p, r, true);
 
           deallog << std::endl
-                  << "At distance less than " << r << " from " << p
-                  << " we have:" << std::endl;
+                  << "At distance less than " << r << " from " << p << " we have:" << std::endl;
           for (auto &m : matches)
             {
               deallog << "points[" << m.first << "] = " << points[m.first]

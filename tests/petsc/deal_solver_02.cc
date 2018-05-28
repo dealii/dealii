@@ -68,8 +68,7 @@ main(int argc, char **argv)
     SolverBicgstab<PETScWrappers::MPI::Vector>      solver(control, mem);
     PreconditionIdentity                            preconditioner;
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 48, 51);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner), control.last_step(), 48, 51);
   }
   GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
 }

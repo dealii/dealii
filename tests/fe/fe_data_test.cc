@@ -115,8 +115,7 @@ test_fe_datas()
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim>(2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(
-    new FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), 4)));
+  fe_datas.push_back(new FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), 4)));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim>(4));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
@@ -195,16 +194,15 @@ test_fe_datas()
   // basis of others
   fe_datas.push_back(new FESystem<dim>(FESystem<dim>(FE_Q<dim>(1), 2), 2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FESystem<dim>(
-    FESystem<dim>(FE_Q<dim>(1), 2), 1, FESystem<dim>(FE_DGQ<dim>(1), 2), 1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(
-    new FESystem<dim>(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(2), 1),
-                      1,
-                      FESystem<dim>(FE_Q<dim>(2), 2),
-                      1,
-                      FESystem<dim>(FE_DGQ<dim>(2), 2),
-                      1));
+    new FESystem<dim>(FESystem<dim>(FE_Q<dim>(1), 2), 1, FESystem<dim>(FE_DGQ<dim>(1), 2), 1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FESystem<dim>(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(2), 1),
+                                       1,
+                                       FESystem<dim>(FE_Q<dim>(2), 2),
+                                       1,
+                                       FESystem<dim>(FE_DGQ<dim>(2), 2),
+                                       1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FESystem<dim>(*fe_datas[fe_datas.size() - 3],
                                        2,
@@ -226,14 +224,11 @@ test_fe_datas()
       deallog << "first_line_index=" << fe_data->first_line_index << std::endl;
       deallog << "first_quad_index=" << fe_data->first_quad_index << std::endl;
       deallog << "first_hex_index=" << fe_data->first_hex_index << std::endl;
-      deallog << "first_face_line_index=" << fe_data->first_face_line_index
-              << std::endl;
-      deallog << "first_face_quad_index=" << fe_data->first_face_quad_index
-              << std::endl;
+      deallog << "first_face_line_index=" << fe_data->first_face_line_index << std::endl;
+      deallog << "first_face_quad_index=" << fe_data->first_face_quad_index << std::endl;
       deallog << "dofs_per_face=" << fe_data->dofs_per_face << std::endl;
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
-      deallog << "primitive=" << (fe_data->is_primitive() ? "yes" : "no")
-              << std::endl
+      deallog << "primitive=" << (fe_data->is_primitive() ? "yes" : "no") << std::endl
               << "components=" << fe_data->components << std::endl
               << "blocks=" << fe_data->block_indices() << std::endl
               << "degree=" << fe_data->tensor_degree() << std::endl
@@ -249,15 +244,13 @@ test_fe_datas()
       if (fe_data->conforms(FiniteElementData<dim>::H2))
         deallog << " H2";
       deallog << std::endl;
-      deallog << "unit_support_points="
-              << fe_data->get_unit_support_points().size() << std::endl;
-      deallog << "unit_face_support_points="
-              << fe_data->get_unit_face_support_points().size() << std::endl;
-      deallog << "generalized_support_points="
-              << fe_data->get_generalized_support_points().size() << std::endl;
-      deallog << "generalized_face_support_points="
-              << fe_data->get_generalized_face_support_points().size()
+      deallog << "unit_support_points=" << fe_data->get_unit_support_points().size() << std::endl;
+      deallog << "unit_face_support_points=" << fe_data->get_unit_face_support_points().size()
               << std::endl;
+      deallog << "generalized_support_points=" << fe_data->get_generalized_support_points().size()
+              << std::endl;
+      deallog << "generalized_face_support_points="
+              << fe_data->get_generalized_face_support_points().size() << std::endl;
 
       deallog << "face_to_equivalent_cell_index:";
       for (unsigned int i = 0; i < fe_data->dofs_per_face; ++i)

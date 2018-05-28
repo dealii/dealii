@@ -43,8 +43,7 @@ namespace internal
     struct all_true
     {
       static constexpr bool value =
-        std::is_same<BoolStorage<Values..., true>,
-                     BoolStorage<true, Values...>>::value;
+        std::is_same<BoolStorage<Values..., true>, BoolStorage<true, Values...>>::value;
     };
   } // namespace TemplateConstraints
 } // namespace internal
@@ -58,8 +57,8 @@ namespace internal
 template <class Base, class... Derived>
 struct is_base_of_all
 {
-  static constexpr bool value = internal::TemplateConstraints::all_true<
-    std::is_base_of<Base, Derived>::value...>::value;
+  static constexpr bool value =
+    internal::TemplateConstraints::all_true<std::is_base_of<Base, Derived>::value...>::value;
 };
 
 
@@ -73,8 +72,8 @@ struct is_base_of_all
 template <class Type, class... Types>
 struct all_same_as
 {
-  static constexpr bool value = internal::TemplateConstraints::all_true<
-    std::is_same<Type, Types>::value...>::value;
+  static constexpr bool value =
+    internal::TemplateConstraints::all_true<std::is_same<Type, Types>::value...>::value;
 };
 
 
@@ -85,8 +84,7 @@ struct all_same_as
  * true.
  */
 template <bool... Values>
-struct enable_if_all
-  : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
+struct enable_if_all : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
 {};
 
 
@@ -448,9 +446,8 @@ namespace internal
 template <typename T, typename U>
 struct ProductType
 {
-  typedef
-    typename internal::ProductTypeImpl<typename std::decay<T>::type,
-                                       typename std::decay<U>::type>::type type;
+  typedef typename internal::ProductTypeImpl<typename std::decay<T>::type,
+                                             typename std::decay<U>::type>::type type;
 };
 
 namespace internal

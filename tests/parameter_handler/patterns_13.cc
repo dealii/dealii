@@ -42,14 +42,10 @@ main()
 
   prm.set("A tuple", "Mondo : 2.0, 3.0, 4.0 : 34");
 
-  deallog << "After ParameterHandler::set =========================="
-          << std::endl
-          << std::endl;
+  deallog << "After ParameterHandler::set ==========================" << std::endl << std::endl;
   prm.log_parameters(deallog);
 
-  deallog << "Actual variables            =========================="
-          << std::endl
-          << std::endl;
+  deallog << "Actual variables            ==========================" << std::endl << std::endl;
 
   deallog << Convert<T>::to_string(a) << std::endl;
 }

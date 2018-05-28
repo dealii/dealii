@@ -76,10 +76,7 @@ extern "C"
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbint.htm
    */
   void
-  Cblacs_gridinit(int *       context,
-                  const char *order,
-                  int         grid_height,
-                  int         grid_width);
+  Cblacs_gridinit(int *context, const char *order, int grid_height, int grid_width);
 
   /**
    * Return the process row and column index.
@@ -87,11 +84,7 @@ extern "C"
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbinfo.htm
    */
   void
-  Cblacs_gridinfo(int  context,
-                  int *grid_height,
-                  int *grid_width,
-                  int *grid_row,
-                  int *grid_col);
+  Cblacs_gridinfo(int context, int *grid_height, int *grid_width, int *grid_row, int *grid_col);
 
   /**
    * Given the system process number, return the row and column coordinates in
@@ -153,11 +146,7 @@ extern "C"
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dnumy.htm
    */
   int
-  numroc_(const int *n,
-          const int *nb,
-          const int *iproc,
-          const int *isproc,
-          const int *nprocs);
+  numroc_(const int *n, const int *nb, const int *iproc, const int *isproc, const int *nprocs);
 
   /**
    * Compute the Cholesky factorization of an N-by-N real
@@ -495,11 +484,7 @@ extern "C"
    * distributed matrix specified by a global index
    */
   int
-  indxg2p_(const int *glob,
-           const int *nb,
-           const int *iproc,
-           const int *isproc,
-           const int *nprocs);
+  indxg2p_(const int *glob, const int *nb, const int *iproc, const int *isproc, const int *nprocs);
 
   /**
    * Compute all eigenvalues and, optionally, eigenvectors of a real symmetric
@@ -1152,8 +1137,7 @@ ppocon(const char *  uplo,
        const int *   LIWORK,
        int *         INFO)
 {
-  pdpocon_(
-    uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
+  pdpocon_(uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
 }
 
 inline void
@@ -1171,8 +1155,7 @@ ppocon(const char * uplo,
        const int *  LIWORK,
        int *        INFO)
 {
-  pspocon_(
-    uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
+  pspocon_(uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
 }
 
 
@@ -1316,25 +1299,8 @@ pgemm(const char *  transa,
       const int *   JC,
       const int *   DESCC)
 {
-  pdgemm_(transa,
-          transb,
-          m,
-          n,
-          k,
-          alpha,
-          A,
-          IA,
-          JA,
-          DESCA,
-          B,
-          IB,
-          JB,
-          DESCB,
-          beta,
-          C,
-          IC,
-          JC,
-          DESCC);
+  pdgemm_(
+    transa, transb, m, n, k, alpha, A, IA, JA, DESCA, B, IB, JB, DESCB, beta, C, IC, JC, DESCC);
 }
 
 inline void
@@ -1358,25 +1324,8 @@ pgemm(const char * transa,
       const int *  JC,
       const int *  DESCC)
 {
-  psgemm_(transa,
-          transb,
-          m,
-          n,
-          k,
-          alpha,
-          A,
-          IA,
-          JA,
-          DESCA,
-          B,
-          IB,
-          JB,
-          DESCB,
-          beta,
-          C,
-          IC,
-          JC,
-          DESCC);
+  psgemm_(
+    transa, transb, m, n, k, alpha, A, IA, JA, DESCA, B, IB, JB, DESCB, beta, C, IC, JC, DESCC);
 }
 
 
@@ -1459,8 +1408,7 @@ psyev(const char *jobz,
       const int * lwork,
       int *       info)
 {
-  pdsyev_(
-    jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
+  pdsyev_(jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
 }
 
 inline void
@@ -1480,8 +1428,7 @@ psyev(const char *jobz,
       const int * lwork,
       int *       info)
 {
-  pssyev_(
-    jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
+  pssyev_(jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
 }
 
 
@@ -1918,8 +1865,7 @@ pgels(const char *trans,
       int *       lwork,
       int *       info)
 {
-  pdgels_(
-    trans, m, n, nrhs, A, ia, ja, desca, B, ib, jb, descb, work, lwork, info);
+  pdgels_(trans, m, n, nrhs, A, ia, ja, desca, B, ib, jb, descb, work, lwork, info);
 }
 
 inline void
@@ -1939,8 +1885,7 @@ pgels(const char *trans,
       int *       lwork,
       int *       info)
 {
-  psgels_(
-    trans, m, n, nrhs, A, ia, ja, desca, B, ib, jb, descb, work, lwork, info);
+  psgels_(trans, m, n, nrhs, A, ia, ja, desca, B, ib, jb, descb, work, lwork, info);
 }
 
 

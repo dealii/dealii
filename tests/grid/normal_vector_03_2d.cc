@@ -77,8 +77,7 @@ main()
       create_triangulation(case_no, tria);
       const Triangulation<2>::active_cell_iterator cell = tria.begin_active();
       Triangulation<2>::face_iterator              face;
-      for (unsigned int face_no = 0; face_no < GeometryInfo<2>::faces_per_cell;
-           ++face_no)
+      for (unsigned int face_no = 0; face_no < GeometryInfo<2>::faces_per_cell; ++face_no)
         {
           face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
@@ -88,21 +87,16 @@ main()
               Point<2>     p;
               Tensor<1, 2> normal;
 
-              for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_face;
-                   ++v)
+              for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_face; ++v)
                 {
-                  p += face->vertex(v) *
-                       linear_interpolator.shape_value(v, Point<1>(xi));
-                  normal += normals[v] *
-                            linear_interpolator.shape_value(v, Point<1>(xi));
+                  p += face->vertex(v) * linear_interpolator.shape_value(v, Point<1>(xi));
+                  normal += normals[v] * linear_interpolator.shape_value(v, Point<1>(xi));
                 }
               normal /= normal.norm();
 
-              deallog << "p=" << p << ", n=" << boundary.normal_vector(face, p)
-                      << std::endl;
+              deallog << "p=" << p << ", n=" << boundary.normal_vector(face, p) << std::endl;
 
-              Assert((boundary.normal_vector(face, p) - normal).norm() < 1e-10,
-                     ExcInternalError());
+              Assert((boundary.normal_vector(face, p) - normal).norm() < 1e-10, ExcInternalError());
             }
         }
 

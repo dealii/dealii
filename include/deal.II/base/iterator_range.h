@@ -257,8 +257,7 @@ inline typename IteratorRange<Iterator>::IteratorOverIterators::BaseIterator
 
 
 template <typename Iterator>
-inline const typename IteratorRange<
-  Iterator>::IteratorOverIterators::BaseIterator *
+inline const typename IteratorRange<Iterator>::IteratorOverIterators::BaseIterator *
   IteratorRange<Iterator>::IteratorOverIterators::operator->() const
 {
   return &element_of_iterator_collection;
@@ -289,8 +288,7 @@ IteratorRange<Iterator>::IteratorOverIterators::operator++(int)
 
 template <typename Iterator>
 inline bool
-IteratorRange<Iterator>::IteratorOverIterators::
-operator!=(const IteratorOverIterators &i_o_i)
+IteratorRange<Iterator>::IteratorOverIterators::operator!=(const IteratorOverIterators &i_o_i)
 {
   return element_of_iterator_collection != i_o_i.element_of_iterator_collection;
 }
@@ -303,8 +301,7 @@ inline IteratorRange<Iterator>::IteratorRange() : it_begin(), it_end()
 
 
 template <typename Iterator>
-inline IteratorRange<Iterator>::IteratorRange(const iterator b,
-                                              const iterator e) :
+inline IteratorRange<Iterator>::IteratorRange(const iterator b, const iterator e) :
   it_begin(b),
   it_end(e)
 {}

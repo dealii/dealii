@@ -49,8 +49,7 @@ test()
   local_relevant.add_range(1, 2);
 
   PETScWrappers::MPI::Vector vb_one(local_active, MPI_COMM_WORLD);
-  PETScWrappers::MPI::Vector v_one(
-    local_active, local_relevant, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector v_one(local_active, local_relevant, MPI_COMM_WORLD);
 
   LinearAlgebra::distributed::Vector<double> copied_one(
     local_active, local_relevant, MPI_COMM_WORLD);
@@ -89,8 +88,7 @@ test()
   for (unsigned int bl = 0; bl < 2; ++bl)
     {
       Assert(copied.block(bl)(myid * 2) == myid * 4.0, ExcInternalError());
-      Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0,
-             ExcInternalError());
+      Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
     }
 
   copied = v;
@@ -111,8 +109,7 @@ test()
   for (unsigned int bl = 0; bl < 2; ++bl)
     {
       Assert(copied.block(bl)(myid * 2) == myid * 4.0, ExcInternalError());
-      Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0,
-             ExcInternalError());
+      Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
     }
 
   // done
@@ -126,7 +123,7 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int                     myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 

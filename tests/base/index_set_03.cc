@@ -36,8 +36,7 @@ test()
   AssertThrow(index_set.is_contiguous() == false, ExcInternalError());
 
   for (unsigned int i = 0; i < index_set.size(); ++i)
-    deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
-            << std::endl;
+    deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false") << std::endl;
 }
 
 

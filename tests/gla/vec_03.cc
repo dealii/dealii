@@ -67,16 +67,12 @@ test()
 
   // check local values
   {
-    deallog << myid * 2 << ": " << get_real_assert_zero_imag(v(myid * 2))
-            << std::endl;
-    deallog << myid * 2 + 1 << ": "
-            << get_real_assert_zero_imag(v(myid * 2 + 1)) << std::endl;
+    deallog << myid * 2 << ": " << get_real_assert_zero_imag(v(myid * 2)) << std::endl;
+    deallog << myid * 2 + 1 << ": " << get_real_assert_zero_imag(v(myid * 2 + 1)) << std::endl;
   }
 
-  Assert(get_real_assert_zero_imag(v(myid * 2)) == myid * 4.0,
-         ExcInternalError());
-  Assert(get_real_assert_zero_imag(v(myid * 2 + 1)) == myid * 4.0 + 2.0,
-         ExcInternalError());
+  Assert(get_real_assert_zero_imag(v(myid * 2)) == myid * 4.0, ExcInternalError());
+  Assert(get_real_assert_zero_imag(v(myid * 2 + 1)) == myid * 4.0 + 2.0, ExcInternalError());
 
   ConstraintMatrix cm;
   cm.add_line(1);

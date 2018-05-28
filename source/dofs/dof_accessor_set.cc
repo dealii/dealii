@@ -50,28 +50,24 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
 {
   if (!this->has_children() && !this->is_artificial())
     {
-      if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension> *>(
+      if ((dynamic_cast<DoFHandler<DoFHandlerType::dimension, DoFHandlerType::space_dimension> *>(
              this->dof_handler) != nullptr) ||
           // for hp-DoFHandlers, we need to require that on
           // active cells, you either don't specify an fe_index,
           // or that you specify the correct one
-          (fe_index == this->active_fe_index()) ||
-          (fe_index == DoFHandlerType::default_fe_index))
+          (fe_index == this->active_fe_index()) || (fe_index == DoFHandlerType::default_fe_index))
         // simply set the values on this cell
         this->set_dof_values(local_values, values);
       else
         {
-          Assert(local_values.size() ==
-                   this->dof_handler->get_fe(fe_index).dofs_per_cell,
+          Assert(local_values.size() == this->dof_handler->get_fe(fe_index).dofs_per_cell,
                  ExcMessage("Incorrect size of local_values vector."));
 
-          FullMatrix<double> interpolation(
-            this->get_fe().dofs_per_cell,
-            this->dof_handler->get_fe(fe_index).dofs_per_cell);
+          FullMatrix<double> interpolation(this->get_fe().dofs_per_cell,
+                                           this->dof_handler->get_fe(fe_index).dofs_per_cell);
 
-          this->get_fe().get_interpolation_matrix(
-            this->dof_handler->get_fe(fe_index), interpolation);
+          this->get_fe().get_interpolation_matrix(this->dof_handler->get_fe(fe_index),
+                                                  interpolation);
 
           // do the interpolation to the target space. for historical
           // reasons, matrices are set to size 0x0 internally even
@@ -88,8 +84,7 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
     // otherwise distribute them to the children
     {
       Assert(
-        (dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                 DoFHandlerType::space_dimension> *>(
+        (dynamic_cast<DoFHandler<DoFHandlerType::dimension, DoFHandlerType::space_dimension> *>(
            this->dof_handler) != nullptr) ||
           (fe_index != DoFHandlerType::default_fe_index),
         ExcMessage("You cannot call this function on non-active cells "
@@ -99,14 +94,11 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
                    "of freedom are only distributed on active cells for which "
                    "the active_fe_index has been set."));
 
-      const FiniteElement<dim, spacedim> &fe =
-        this->get_dof_handler().get_fe(fe_index);
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const FiniteElement<dim, spacedim> &fe            = this->get_dof_handler().get_fe(fe_index);
+      const unsigned int                  dofs_per_cell = fe.dofs_per_cell;
 
-      Assert(this->dof_handler != nullptr,
-             typename BaseClass::ExcInvalidObject());
-      Assert(local_values.size() == dofs_per_cell,
-             typename BaseClass::ExcVectorDoesNotMatch());
+      Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
+      Assert(local_values.size() == dofs_per_cell, typename BaseClass::ExcVectorDoesNotMatch());
       Assert(values.size() == this->dof_handler->n_dofs(),
              typename BaseClass::ExcVectorDoesNotMatch());
 
@@ -115,10 +107,8 @@ DoFCellAccessor<DoFHandlerType, lda>::set_dof_values_by_interpolation(
       for (unsigned int child = 0; child < this->n_children(); ++child)
         {
           if (tmp.size() > 0)
-            fe.get_prolongation_matrix(child, this->refinement_case())
-              .vmult(tmp, local_values);
-          this->child(child)->set_dof_values_by_interpolation(
-            tmp, values, fe_index);
+            fe.get_prolongation_matrix(child, this->refinement_case()).vmult(tmp, local_values);
+          this->child(child)->set_dof_values_by_interpolation(tmp, values, fe_index);
         }
     }
 }

@@ -67,8 +67,7 @@ main()
     auto op_b1 = block_operator(a);
     auto op_b2 = block_diagonal_operator(d);
 
-    auto inverse_op_a =
-      block_forward_substitution<BlockVector<double>>(op_b1, op_b2);
+    auto inverse_op_a = block_forward_substitution<BlockVector<double>>(op_b1, op_b2);
 
     auto identity = inverse_op_a * op_a;
 
@@ -160,8 +159,7 @@ main()
     auto op_b1 = block_operator(a);
     auto op_b2 = block_diagonal_operator(d);
 
-    auto inverse_op_a =
-      block_back_substitution<BlockVector<double>>(op_b1, op_b2);
+    auto inverse_op_a = block_back_substitution<BlockVector<double>>(op_b1, op_b2);
 
     auto identity = inverse_op_a * op_a;
 

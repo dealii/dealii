@@ -41,8 +41,7 @@
 
 void check_this(Triangulation<3> &tria)
 {
-  for (Triangulation<3>::cell_iterator cell = tria.begin(); cell != tria.end();
-       ++cell)
+  for (Triangulation<3>::cell_iterator cell = tria.begin(); cell != tria.end(); ++cell)
     {
       std::set<unsigned int> vertices;
       for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)

@@ -91,8 +91,7 @@ namespace Step22
     DoFRenumbering::component_wise(dof_handler, block_component);
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(
-      dof_handler, dofs_per_block, block_component);
+    DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
     const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
@@ -103,26 +102,21 @@ namespace Step22
 
       relevant_partitioning.clear();
       IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                              locally_relevant_dofs);
+      DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
-      relevant_partitioning.push_back(
-        locally_relevant_dofs.get_view(n_u, n_u + n_p));
+      relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u + n_p));
     }
 
     ConstraintMatrix new_constraints;
     new_constraints.close();
     {
-      TrilinosWrappers::BlockSparsityPattern bsp(owned_partitioning,
-                                                 owned_partitioning,
-                                                 relevant_partitioning,
-                                                 mpi_communicator);
-      DoFTools::make_sparsity_pattern(
-        dof_handler,
-        bsp,
-        new_constraints,
-        false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+      TrilinosWrappers::BlockSparsityPattern bsp(
+        owned_partitioning, owned_partitioning, relevant_partitioning, mpi_communicator);
+      DoFTools::make_sparsity_pattern(dof_handler,
+                                      bsp,
+                                      new_constraints,
+                                      false,
+                                      Utilities::MPI::this_mpi_process(mpi_communicator));
 
       bsp.compress();
     }
@@ -138,8 +132,7 @@ namespace Step22
     const double inner_radius = .5;
     const double outer_radius = 1.;
 
-    GridGenerator::quarter_hyper_shell(
-      triangulation, center, inner_radius, outer_radius, 0, true);
+    GridGenerator::quarter_hyper_shell(triangulation, center, inner_radius, outer_radius, 0, true);
 
     triangulation.set_manifold(0, boundary);
     triangulation.set_manifold(1, boundary);
@@ -181,13 +174,11 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -195,12 +186,10 @@ main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

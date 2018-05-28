@@ -69,14 +69,12 @@ test(const bool left = true)
   // Setup system
   Triangulation<dim> triangulation;
 
-  GridGenerator::hyper_rectangle(
-    triangulation, Point<dim>(0, 0), Point<dim>(1, 1));
+  GridGenerator::hyper_rectangle(triangulation, Point<dim>(0, 0), Point<dim>(1, 1));
 
   triangulation.refine_global(1);
 
   // Extra refinement to generate hanging nodes
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     if (pred_r<dim>(cell))
@@ -96,14 +94,12 @@ test(const bool left = true)
   IndexSet support =
     left ? DoFTools::extract_dofs_with_support_contained_within(
              dh,
-             std::function<bool(
-               const typename DoFHandler<dim>::active_cell_iterator &)>(
+             std::function<bool(const typename DoFHandler<dim>::active_cell_iterator &)>(
                &pred_left<dim>),
              cm) :
            DoFTools::extract_dofs_with_support_contained_within(
              dh,
-             std::function<bool(
-               const typename DoFHandler<dim>::active_cell_iterator &)>(
+             std::function<bool(const typename DoFHandler<dim>::active_cell_iterator &)>(
                &pred_right<dim>),
              cm);
   support.print(deallog);
@@ -111,22 +107,18 @@ test(const bool left = true)
   // print grid and DoFs for visual inspection
   if (false)
     {
-      std::cout << "-------------------- " << Utilities::int_to_string(dim)
-                << std::endl;
+      std::cout << "-------------------- " << Utilities::int_to_string(dim) << std::endl;
       cm.print(std::cout);
 
       std::map<types::global_dof_index, Point<dim>> support_points;
       MappingQ1<dim>                                mapping;
       DoFTools::map_dofs_to_support_points(mapping, dh, support_points);
 
-      const std::string filename =
-        "grid" + Utilities::int_to_string(dim) + ".gp";
-      std::ofstream f(filename.c_str());
+      const std::string filename = "grid" + Utilities::int_to_string(dim) + ".gp";
+      std::ofstream     f(filename.c_str());
 
-      f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
-        << std::endl
-        << "set output \"grid" << Utilities::int_to_string(dim) << ".png\""
-        << std::endl
+      f << "set terminal png size 400,410 enhanced font \"Helvetica,8\"" << std::endl
+        << "set output \"grid" << Utilities::int_to_string(dim) << ".png\"" << std::endl
         << "set size square" << std::endl
         << "set view equal xy" << std::endl
         << "unset xtics" << std::endl

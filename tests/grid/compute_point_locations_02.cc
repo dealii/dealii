@@ -69,10 +69,9 @@ test_compute_pt_loc(unsigned int n_points)
   // Initializing the cache
   GridTools::Cache<dim, dim> cache(tria);
   // Finding the first cell and giving it as hint
-  auto my_pair = GridTools::find_active_cell_around_point(cache, points[0]);
-  auto cell_qpoint_map =
-    GridTools::compute_point_locations(cache, points, my_pair.first);
-  size_t n_cells = std::get<0>(cell_qpoint_map).size();
+  auto   my_pair         = GridTools::find_active_cell_around_point(cache, points[0]);
+  auto   cell_qpoint_map = GridTools::compute_point_locations(cache, points, my_pair.first);
+  size_t n_cells         = std::get<0>(cell_qpoint_map).size();
 
   deallog << "Points found in " << n_cells << " cells" << std::endl;
 
@@ -97,8 +96,7 @@ test_compute_pt_loc(unsigned int n_points)
           if (real_quad[q].distance(points[local_map[q]]) > 1e-10)
             deallog << "Error on cell : " << cell << " at local point " << i
                     << ", corresponding to real point " << points[local_map[q]]
-                    << ", that got transformed to " << real_quad[q]
-                    << " instead." << std::endl;
+                    << ", that got transformed to " << real_quad[q] << " instead." << std::endl;
         }
     }
   deallog << "Test finished" << std::endl;

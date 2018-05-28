@@ -336,8 +336,8 @@ void Step6<dim>::assemble_system()
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -347,8 +347,7 @@ void Step6<dim>::assemble_system()
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -359,17 +358,14 @@ void Step6<dim>::assemble_system()
 
       for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
-          const double current_coefficient =
-            coefficient<dim>(fe_values.quadrature_point(q_index));
+          const double current_coefficient = coefficient<dim>(fe_values.quadrature_point(q_index));
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) +=
-                  (current_coefficient * fe_values.shape_grad(i, q_index) *
-                   fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+                cell_matrix(i, j) += (current_coefficient * fe_values.shape_grad(i, q_index) *
+                                      fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
-                              fe_values.JxW(q_index));
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 * fe_values.JxW(q_index));
             }
         }
 
@@ -607,13 +603,12 @@ void Step6<dim>::run()
         refine_grid();
 
 
-      std::cout << "   Number of active cells:       "
-                << triangulation.n_active_cells() << std::endl;
+      std::cout << "   Number of active cells:       " << triangulation.n_active_cells()
+                << std::endl;
 
       setup_system();
 
-      std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-                << std::endl;
+      std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
       assemble_system();
       solve();
@@ -674,13 +669,11 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -691,12 +684,10 @@ int main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

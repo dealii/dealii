@@ -153,8 +153,8 @@ public:
    * be omitted and the result of size() is taken.
    */
   unsigned int
-  n_selected_blocks(const unsigned int overall_number_of_blocks =
-                      numbers::invalid_unsigned_int) const;
+  n_selected_blocks(
+    const unsigned int overall_number_of_blocks = numbers::invalid_unsigned_int) const;
 
   /**
    * Return the index of the first selected block. The argument is there for
@@ -163,8 +163,8 @@ public:
    * The function throws an exception if no block is selected at all.
    */
   unsigned int
-  first_selected_block(const unsigned int overall_number_of_blocks =
-                         numbers::invalid_unsigned_int) const;
+  first_selected_block(
+    const unsigned int overall_number_of_blocks = numbers::invalid_unsigned_int) const;
 
   /**
    * Return true if this mask represents a default constructed mask that
@@ -235,13 +235,11 @@ operator<<(std::ostream &out, const BlockMask &mask);
 
 // -------------------- inline functions ---------------------
 
-inline BlockMask::BlockMask(const std::vector<bool> &block_mask) :
-  block_mask(block_mask)
+inline BlockMask::BlockMask(const std::vector<bool> &block_mask) : block_mask(block_mask)
 {}
 
 
-inline BlockMask::BlockMask(const unsigned int n_blocks,
-                            const bool         initializer) :
+inline BlockMask::BlockMask(const unsigned int n_blocks, const bool initializer) :
   block_mask(n_blocks, initializer)
 {}
 
@@ -263,8 +261,7 @@ inline bool BlockMask::operator[](const unsigned int block_index) const
     {
       // otherwise check the validity of the index and
       // return whatever is appropriate
-      Assert(block_index < block_mask.size(),
-             ExcIndexRange(block_index, 0, block_mask.size()));
+      Assert(block_index < block_mask.size(), ExcIndexRange(block_index, 0, block_mask.size()));
       return block_mask[block_index];
     }
 }

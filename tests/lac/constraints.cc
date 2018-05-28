@@ -51,7 +51,7 @@ void make_tria(Triangulation<3> &tria, int step)
           // two cells packed behind each
           // other. if step==0, refine back one,
           // otherwise the one in front
-          const Point<3> vertices[12]        = {Point<3>(0, 0, 0),
+          const Point<3> vertices[12]   = {Point<3>(0, 0, 0),
                                          Point<3>(1, 0, 0),
                                          Point<3>(1, 0, 1),
                                          Point<3>(0, 0, 1),
@@ -65,8 +65,7 @@ void make_tria(Triangulation<3> &tria, int step)
                                          Point<3>(1, 2, 0),
                                          Point<3>(1, 2, 1),
                                          Point<3>(0, 2, 1)};
-          const int      cell_vertices[2][8] = {{0, 1, 2, 3, 4, 5, 6, 7},
-                                           {4, 5, 6, 7, 8, 9, 10, 11}};
+          const int cell_vertices[2][8] = {{0, 1, 2, 3, 4, 5, 6, 7}, {4, 5, 6, 7, 8, 9, 10, 11}};
           std::vector<CellData<3>> cells(2, CellData<3>());
           for (unsigned int cell = 0; cell < 2; ++cell)
             for (unsigned int j = 0; j < 8; ++j)
@@ -94,7 +93,7 @@ void make_tria(Triangulation<3> &tria, int step)
           // two cells packed next to each
           // other. if step==2, refine right one,
           // otherwise the left one
-          const Point<3> vertices[12]        = {Point<3>(0, 0, 0),
+          const Point<3> vertices[12]   = {Point<3>(0, 0, 0),
                                          Point<3>(1, 0, 0),
                                          Point<3>(1, 0, 1),
                                          Point<3>(0, 0, 1),
@@ -108,8 +107,7 @@ void make_tria(Triangulation<3> &tria, int step)
                                          Point<3>(2, 0, 1),
                                          Point<3>(2, 1, 0),
                                          Point<3>(2, 1, 1)};
-          const int      cell_vertices[2][8] = {{0, 1, 2, 3, 4, 5, 6, 7},
-                                           {1, 8, 9, 2, 5, 10, 11, 6}};
+          const int cell_vertices[2][8] = {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 8, 9, 2, 5, 10, 11, 6}};
           std::vector<CellData<3>> cells(2, CellData<3>());
           for (unsigned int cell = 0; cell < 2; ++cell)
             for (unsigned int j = 0; j < 8; ++j)
@@ -137,7 +135,7 @@ void make_tria(Triangulation<3> &tria, int step)
           // two cells packed on top of each
           // other. if step==4, refine top one,
           // otherwise the bottom one
-          const Point<3> vertices[12]        = {Point<3>(0, 0, 0),
+          const Point<3> vertices[12]   = {Point<3>(0, 0, 0),
                                          Point<3>(1, 0, 0),
                                          Point<3>(1, 0, 1),
                                          Point<3>(0, 0, 1),
@@ -151,8 +149,7 @@ void make_tria(Triangulation<3> &tria, int step)
                                          Point<3>(0, 0, 2),
                                          Point<3>(1, 1, 2),
                                          Point<3>(0, 1, 2)};
-          const int      cell_vertices[2][8] = {{0, 1, 2, 3, 4, 5, 6, 7},
-                                           {3, 2, 8, 9, 7, 6, 10, 11}};
+          const int cell_vertices[2][8] = {{0, 1, 2, 3, 4, 5, 6, 7}, {3, 2, 8, 9, 7, 6, 10, 11}};
           std::vector<CellData<3>> cells(2, CellData<3>());
           for (unsigned int cell = 0; cell < 2; ++cell)
             for (unsigned int j = 0; j < 8; ++j)
@@ -204,7 +201,7 @@ void make_tria(Triangulation<3> &tria, int step)
                                          Point<3>(2, 2, 0),
                                          Point<3>(2, 2, 1)};
 
-          const int cell_vertices[4][8] = {{0, 1, 2, 3, 4, 5, 6, 7},
+          const int                cell_vertices[4][8] = {{0, 1, 2, 3, 4, 5, 6, 7},
                                            {1, 8, 9, 2, 5, 10, 11, 6},
                                            {4, 5, 6, 7, 12, 13, 14, 15},
                                            {5, 10, 11, 6, 13, 16, 17, 14}};

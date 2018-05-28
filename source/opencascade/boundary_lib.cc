@@ -37,8 +37,7 @@ namespace OpenCASCADE
   DirectionalProjectionBoundary<dim, spacedim>::clone() const
   {
     return std::unique_ptr<Manifold<dim, spacedim>>(
-      new DirectionalProjectionBoundary(
-        this->sh, this->direction, this->tolerance));
+      new DirectionalProjectionBoundary(this->sh, this->direction, this->tolerance));
   }
 
 

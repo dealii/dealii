@@ -62,10 +62,8 @@ test()
   AssertThrow(stored_rows == rows, ExcInternalError());
   AssertThrow(stored_cols == columns, ExcInternalError());
 
-  const unsigned int stored_n_procs =
-    Utilities::MPI::n_mpi_processes(sp.get_mpi_communicator());
-  const unsigned int stored_myid =
-    Utilities::MPI::this_mpi_process(sp.get_mpi_communicator());
+  const unsigned int stored_n_procs = Utilities::MPI::n_mpi_processes(sp.get_mpi_communicator());
+  const unsigned int stored_myid    = Utilities::MPI::this_mpi_process(sp.get_mpi_communicator());
 
   AssertThrow(stored_n_procs == n_procs, ExcInternalError());
   AssertThrow(stored_myid == myid, ExcInternalError());
@@ -81,8 +79,7 @@ main(int argc, char **argv)
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {

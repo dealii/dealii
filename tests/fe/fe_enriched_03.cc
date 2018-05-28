@@ -63,8 +63,7 @@ public:
   gradient(const Point<dim> &point, const unsigned int component = 0) const
   {
     Tensor<1, dim> res = point;
-    Assert(point.norm() > 0,
-           dealii::ExcMessage("gradient is not defined at zero"));
+    Assert(point.norm() > 0, dealii::ExcMessage("gradient is not defined at zero"));
     res *= -value(point) / point.norm();
     return res;
   }
@@ -76,8 +75,7 @@ void
 test2()
 {
   deallog << "FEFaceValues" << std::endl;
-  deallog << "for same underlying FEs: f(qp) * N_{fe}(qp) == N_{pou}(qp)"
-          << std::endl;
+  deallog << "for same underlying FEs: f(qp) * N_{fe}(qp) == N_{pou}(qp)" << std::endl;
 
   Triangulation<dim> triangulation;
   DoFHandler<dim>    dof_handler(triangulation);
@@ -92,25 +90,21 @@ test2()
   FEFaceValues<dim> fe_face_values(
     fe, quadrature, update_values | update_gradients | update_JxW_values);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         ++face)
+    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
       {
         fe_face_values.reinit(cell, face);
-        const unsigned int                     n_q_points = quadrature.size();
+        const unsigned int                     n_q_points    = quadrature.size();
         const unsigned int                     dofs_per_cell = fe.dofs_per_cell;
-        const std::vector<dealii::Point<dim>> &q_points =
-          fe_face_values.get_quadrature_points();
+        const std::vector<dealii::Point<dim>> &q_points = fe_face_values.get_quadrature_points();
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             deallog << "dof=" << i << " qp=" << q_points[q_point]
                     << " f(qp)=" << function.value(q_points[q_point])
-                    << " N(qp)=" << fe_face_values.shape_value(i, q_point)
-                    << std::endl;
+                    << " N(qp)=" << fe_face_values.shape_value(i, q_point) << std::endl;
       }
 
   dof_handler.clear();
@@ -134,13 +128,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -148,12 +140,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -81,13 +81,11 @@ SystemTest<dim>::make_grid_and_dofs()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(0);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   dof_handler.distribute_dofs(fe);
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 }
 
 template <int dim>
@@ -101,8 +99,7 @@ SystemTest<dim>::shape_to_components()
 
   for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
     deallog << "  shapefunction " << i
-            << " is Nedelec:  " << (fe.is_primitive(i) ? "false" : "true")
-            << std::endl;
+            << " is Nedelec:  " << (fe.is_primitive(i) ? "false" : "true") << std::endl;
 }
 
 
@@ -111,8 +108,7 @@ template <int dim>
 void
 SystemTest<dim>::check_numbering()
 {
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
@@ -120,8 +116,7 @@ SystemTest<dim>::check_numbering()
     {
       cell->get_dof_indices(local_dof_indices);
       for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
-        deallog << "  DoF " << local_dof_indices[i]
-                << " belongs to base element "
+        deallog << "  DoF " << local_dof_indices[i] << " belongs to base element "
                 << fe.system_to_base_index(i).first.first << ", instance "
                 << fe.system_to_base_index(i).first.second << std::endl;
       deallog << std::endl;

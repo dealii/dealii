@@ -48,10 +48,8 @@ test()
   deallog << std::boolalpha;
   deallog << (FE_Nothing<dim>(1) == FE_Nothing<dim>(1, false)) << std::endl;
   deallog << (FE_Nothing<dim>(1) == FE_Nothing<dim>(2)) << std::endl;
-  deallog << (FE_Nothing<dim>(2, true) == FE_Nothing<dim>(2, false))
-          << std::endl;
-  deallog << (FE_Nothing<dim>(1, true) == FE_Nothing<dim>(2, true))
-          << std::endl;
+  deallog << (FE_Nothing<dim>(2, true) == FE_Nothing<dim>(2, false)) << std::endl;
+  deallog << (FE_Nothing<dim>(1, true) == FE_Nothing<dim>(2, true)) << std::endl;
 }
 
 

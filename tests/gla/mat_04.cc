@@ -57,13 +57,11 @@ test()
 
   parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD,
-    typename Triangulation<dim>::MeshSmoothing(
-      Triangulation<dim>::smoothing_on_refinement |
-      Triangulation<dim>::smoothing_on_coarsening));
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening));
   const double R0 = 6371000. - 2890000;
   const double R1 = 6371000. - 35000.;
-  GridGenerator::hyper_shell(
-    triangulation, Point<dim>(), R0, R1, (dim == 3) ? 96 : 12, true);
+  GridGenerator::hyper_shell(triangulation, Point<dim>(), R0, R1, (dim == 3) ? 96 : 12, true);
 
   FE_Q<dim> temperature_fe(1);
 
@@ -77,16 +75,9 @@ test()
   DynamicSparsityPattern         sp(relevant);
   typename LA::MPI::SparseMatrix matrix;
   DoFTools::make_sparsity_pattern(
-    dof_handler,
-    sp,
-    cm,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    dof_handler, sp, cm, false, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
   SparsityTools::distribute_sparsity_pattern(
-    sp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    relevant);
+    sp, dof_handler.n_locally_owned_dofs_per_processor(), MPI_COMM_WORLD, relevant);
   sp.compress();
   matrix.reinit(owned, owned, sp, MPI_COMM_WORLD);
 
@@ -118,13 +109,11 @@ test_trilinos_alternative()
 
   parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD,
-    typename Triangulation<dim>::MeshSmoothing(
-      Triangulation<dim>::smoothing_on_refinement |
-      Triangulation<dim>::smoothing_on_coarsening));
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening));
   const double R0 = 6371000. - 2890000;
   const double R1 = 6371000. - 35000.;
-  GridGenerator::hyper_shell(
-    triangulation, Point<dim>(), R0, R1, (dim == 3) ? 96 : 12, true);
+  GridGenerator::hyper_shell(triangulation, Point<dim>(), R0, R1, (dim == 3) ? 96 : 12, true);
 
   FE_Q<dim> temperature_fe(1);
 
@@ -138,11 +127,7 @@ test_trilinos_alternative()
   TrilinosWrappers::SparsityPattern sp(owned, MPI_COMM_WORLD);
   typename LA::MPI::SparseMatrix    matrix;
   DoFTools::make_sparsity_pattern(
-    dof_handler,
-    sp,
-    cm,
-    false,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    dof_handler, sp, cm, false, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
   sp.compress();
   matrix.reinit(sp);
 

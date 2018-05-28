@@ -70,8 +70,7 @@ void
 check_poly(const unsigned int n)
 {
   deallog << "Degree: " << n + 1 << std::endl;
-  std::vector<Polynomial<double>> p =
-    IntegratedLegendreSZ::generate_complete_basis(n);
+  std::vector<Polynomial<double>> p = IntegratedLegendreSZ::generate_complete_basis(n);
   check_at_one(p);
   check_at_half(p);
 }

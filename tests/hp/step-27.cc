@@ -127,8 +127,7 @@ namespace Step27
 
   template <int dim>
   double
-  RightHandSide<dim>::value(const Point<dim> &p,
-                            const unsigned int /*component*/) const
+  RightHandSide<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
   {
     double product = 1;
     for (unsigned int d = 0; d < dim; ++d)
@@ -145,9 +144,7 @@ namespace Step27
 
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem() :
-    dof_handler(triangulation),
-    max_degree(dim <= 2 ? 7 : 5)
+  LaplaceProblem<dim>::LaplaceProblem() : dof_handler(triangulation), max_degree(dim <= 2 ? 7 : 5)
   {
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
       {
@@ -163,8 +160,7 @@ namespace Step27
     for (unsigned int i = 0; i < fe_collection.size(); i++)
       fourier_q_collection.push_back(quadrature);
 
-    fourier = std::make_shared<FESeries::Fourier<dim>>(
-      N, fe_collection, fourier_q_collection);
+    fourier = std::make_shared<FESeries::Fourier<dim>>(N, fe_collection, fourier_q_collection);
     resize(fourier_coefficients, N);
   }
 
@@ -207,8 +203,7 @@ namespace Step27
   {
     hp::FEValues<dim> hp_fe_values(fe_collection,
                                    quadrature_collection,
-                                   update_values | update_gradients |
-                                     update_quadrature_points |
+                                   update_values | update_gradients | update_quadrature_points |
                                      update_JxW_values);
 
     const RightHandSide<dim> rhs_function;
@@ -218,8 +213,7 @@ namespace Step27
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                        endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -238,17 +232,15 @@ namespace Step27
         std::vector<double> rhs_values(fe_values.n_quadrature_points);
         rhs_function.value_list(fe_values.get_quadrature_points(), rhs_values);
 
-        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-             ++q_point)
+        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) +=
-                  (fe_values.shape_grad(i, q_point) *
-                   fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+                cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                      fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] * fe_values.JxW(q_point));
+              cell_rhs(i) +=
+                (fe_values.shape_value(i, q_point) * rhs_values[q_point] * fe_values.JxW(q_point));
             }
 
         local_dof_indices.resize(dofs_per_cell);
@@ -265,8 +257,7 @@ namespace Step27
   void
   LaplaceProblem<dim>::solve()
   {
-    SolverControl solver_control(system_rhs.size(),
-                                 1e-8 * system_rhs.l2_norm());
+    SolverControl solver_control(system_rhs.size(), 1e-8 * system_rhs.l2_norm());
     SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
@@ -299,12 +290,10 @@ namespace Step27
       {
         Vector<float> fe_degrees(triangulation.n_active_cells());
         {
-          typename hp::DoFHandler<dim>::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
+          typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                             endc = dof_handler.end();
           for (; cell != endc; ++cell)
-            fe_degrees(cell->active_cell_index()) =
-              fe_collection[cell->active_fe_index()].degree;
+            fe_degrees(cell->active_cell_index()) = fe_collection[cell->active_fe_index()].degree;
         }
 
         DataOut<dim, hp::DoFHandler<dim>> data_out;
@@ -316,9 +305,8 @@ namespace Step27
         data_out.add_data_vector(fe_degrees, "fe_degree");
         data_out.build_patches();
 
-        const std::string filename =
-          "solution-" + Utilities::int_to_string(cycle, 2) + ".vtk";
-        std::ofstream output(filename.c_str());
+        const std::string filename = "solution-" + Utilities::int_to_string(cycle, 2) + ".vtk";
+        std::ofstream     output(filename.c_str());
         data_out.write_vtk(output);
       }
 
@@ -326,35 +314,30 @@ namespace Step27
       GridRefinement::refine_and_coarsen_fixed_number(
         triangulation, estimated_error_per_cell, 0.3, 0.03);
 
-      float max_smoothness = *std::min_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end()),
-            min_smoothness = *std::max_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end());
+      float max_smoothness =
+              *std::min_element(smoothness_indicators.begin(), smoothness_indicators.end()),
+            min_smoothness =
+              *std::max_element(smoothness_indicators.begin(), smoothness_indicators.end());
       {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
+        typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                           endc = dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->refine_flag_set())
             {
               max_smoothness =
-                std::max(max_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
+                std::max(max_smoothness, smoothness_indicators(cell->active_cell_index()));
               min_smoothness =
-                std::min(min_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
+                std::min(min_smoothness, smoothness_indicators(cell->active_cell_index()));
             }
       }
       const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
 
       {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
+        typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                           endc = dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->refine_flag_set() &&
-              (smoothness_indicators(cell->active_cell_index()) >
-               threshold_smoothness) &&
+              (smoothness_indicators(cell->active_cell_index()) > threshold_smoothness) &&
               (cell->active_fe_index() + 1 < fe_collection.size()))
             {
               cell->clear_refine_flag();
@@ -374,43 +357,39 @@ namespace Step27
   {
     const unsigned int dim = 2;
 
-    static const Point<2> vertices_1[] = {
-      Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
-      Point<2>(0., -1.),       Point<2>(+1. / 2, -1.),
-      Point<2>(+1, -1.),
+    static const Point<2>         vertices_1[] = {Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
+                                          Point<2>(0., -1.),       Point<2>(+1. / 2, -1.),
+                                          Point<2>(+1, -1.),
 
-      Point<2>(-1., -1. / 2.), Point<2>(-1. / 2, -1. / 2.),
-      Point<2>(0., -1. / 2.),  Point<2>(+1. / 2, -1. / 2.),
-      Point<2>(+1, -1. / 2.),
+                                          Point<2>(-1., -1. / 2.), Point<2>(-1. / 2, -1. / 2.),
+                                          Point<2>(0., -1. / 2.),  Point<2>(+1. / 2, -1. / 2.),
+                                          Point<2>(+1, -1. / 2.),
 
-      Point<2>(-1., 0.),       Point<2>(-1. / 2, 0.),
-      Point<2>(+1. / 2, 0.),   Point<2>(+1, 0.),
+                                          Point<2>(-1., 0.),       Point<2>(-1. / 2, 0.),
+                                          Point<2>(+1. / 2, 0.),   Point<2>(+1, 0.),
 
-      Point<2>(-1., 1. / 2.),  Point<2>(-1. / 2, 1. / 2.),
-      Point<2>(0., 1. / 2.),   Point<2>(+1. / 2, 1. / 2.),
-      Point<2>(+1, 1. / 2.),
+                                          Point<2>(-1., 1. / 2.),  Point<2>(-1. / 2, 1. / 2.),
+                                          Point<2>(0., 1. / 2.),   Point<2>(+1. / 2, 1. / 2.),
+                                          Point<2>(+1, 1. / 2.),
 
-      Point<2>(-1., 1.),       Point<2>(-1. / 2, 1.),
-      Point<2>(0., 1.),        Point<2>(+1. / 2, 1.),
-      Point<2>(+1, 1.)};
-    const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
-    const std::vector<Point<dim>> vertices(&vertices_1[0],
-                                           &vertices_1[n_vertices]);
-    static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
-      {0, 1, 5, 6},
-      {1, 2, 6, 7},
-      {2, 3, 7, 8},
-      {3, 4, 8, 9},
-      {5, 6, 10, 11},
-      {8, 9, 12, 13},
-      {10, 11, 14, 15},
-      {12, 13, 17, 18},
-      {14, 15, 19, 20},
-      {15, 16, 20, 21},
-      {16, 17, 21, 22},
-      {17, 18, 22, 23}};
-    const unsigned int n_cells =
-      sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+                                          Point<2>(-1., 1.),       Point<2>(-1. / 2, 1.),
+                                          Point<2>(0., 1.),        Point<2>(+1. / 2, 1.),
+                                          Point<2>(+1, 1.)};
+    const unsigned int            n_vertices   = sizeof(vertices_1) / sizeof(vertices_1[0]);
+    const std::vector<Point<dim>> vertices(&vertices_1[0], &vertices_1[n_vertices]);
+    static const int   cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {{0, 1, 5, 6},
+                                                                              {1, 2, 6, 7},
+                                                                              {2, 3, 7, 8},
+                                                                              {3, 4, 8, 9},
+                                                                              {5, 6, 10, 11},
+                                                                              {8, 9, 12, 13},
+                                                                              {10, 11, 14, 15},
+                                                                              {12, 13, 17, 18},
+                                                                              {14, 15, 19, 20},
+                                                                              {15, 16, 20, 21},
+                                                                              {16, 17, 21, 22},
+                                                                              {17, 18, 22, 23}};
+    const unsigned int n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
 
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
@@ -439,12 +418,11 @@ namespace Step27
 
         setup_system();
 
-        std::cout << "   Number of active cells:       "
-                  << triangulation.n_active_cells() << std::endl
-                  << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+        std::cout << "   Number of active cells:       " << triangulation.n_active_cells()
                   << std::endl
-                  << "   Number of constraints       : "
-                  << constraints.n_constraints() << std::endl;
+                  << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl
+                  << "   Number of constraints       : " << constraints.n_constraints()
+                  << std::endl;
 
         assemble_system();
         solve();
@@ -484,8 +462,7 @@ namespace Step27
               for (unsigned int j = 0; j < N; ++j)
                 if (!((i == 0) && (j == 0)) && (i * i + j * j < N * N))
                   {
-                    k_vectors.push_back(
-                      Point<dim>(2. * numbers::PI * i, 2. * numbers::PI * j));
+                    k_vectors.push_back(Point<dim>(2. * numbers::PI * i, 2. * numbers::PI * j));
                     k_vectors_magnitude.push_back(i * i + j * j);
                   }
 
@@ -497,12 +474,10 @@ namespace Step27
             for (unsigned int i = 0; i < N; ++i)
               for (unsigned int j = 0; j < N; ++j)
                 for (unsigned int k = 0; k < N; ++k)
-                  if (!((i == 0) && (j == 0) && (k == 0)) &&
-                      (i * i + j * j + k * k < N * N))
+                  if (!((i == 0) && (j == 0) && (k == 0)) && (i * i + j * j + k * k < N * N))
                     {
-                      k_vectors.push_back(Point<dim>(2. * numbers::PI * i,
-                                                     2. * numbers::PI * j,
-                                                     2. * numbers::PI * k));
+                      k_vectors.push_back(Point<dim>(
+                        2. * numbers::PI * i, 2. * numbers::PI * j, 2. * numbers::PI * k));
                       k_vectors_magnitude.push_back(i * i + j * j + k * k);
                     }
 
@@ -519,8 +494,7 @@ namespace Step27
       ln_k[i] = std::log(k_vectors[i].norm());
 
 
-    std::vector<Table<2, std::complex<double>>> fourier_transform_matrices(
-      fe_collection.size());
+    std::vector<Table<2, std::complex<double>>> fourier_transform_matrices(fe_collection.size());
 
     QGauss<1>      base_quadrature(2);
     QIterated<dim> quadrature(base_quadrature, N);
@@ -528,8 +502,7 @@ namespace Step27
 
     for (unsigned int fe = 0; fe < fe_collection.size(); ++fe)
       {
-        fourier_transform_matrices[fe].reinit(n_fourier_modes,
-                                              fe_collection[fe].dofs_per_cell);
+        fourier_transform_matrices[fe].reinit(n_fourier_modes, fe_collection[fe].dofs_per_cell);
 
         for (unsigned int k = 0; k < n_fourier_modes; ++k)
           for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
@@ -538,10 +511,8 @@ namespace Step27
               for (unsigned int q = 0; q < quadrature.size(); ++q)
                 {
                   const Point<dim> x_q = quadrature.point(q);
-                  sum += std::exp(std::complex<double>(0, 1) *
-                                  (k_vectors[k] * x_q)) *
-                         fe_collection[fe].shape_value(j, x_q) *
-                         quadrature.weight(q);
+                  sum += std::exp(std::complex<double>(0, 1) * (k_vectors[k] * x_q)) *
+                         fe_collection[fe].shape_value(j, x_q) * quadrature.weight(q);
                 }
               fourier_transform_matrices[fe](k, j) = sum;
             }
@@ -550,8 +521,7 @@ namespace Step27
     std::vector<std::complex<double>> fourier_coefficients(n_fourier_modes);
     Vector<double>                    local_dof_values;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                        endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -564,52 +534,42 @@ namespace Step27
 
             for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
               fourier_coefficients[f] +=
-                fourier_transform_matrices[cell->active_fe_index()](f, i) *
-                local_dof_values(i);
+                fourier_transform_matrices[cell->active_fe_index()](f, i) * local_dof_values(i);
           }
 
         std::map<unsigned int, double> k_to_max_U_map;
         for (unsigned int f = 0; f < n_fourier_modes; ++f)
-          if ((k_to_max_U_map.find(k_vectors_magnitude[f]) ==
-               k_to_max_U_map.end()) ||
-              (k_to_max_U_map[k_vectors_magnitude[f]] <
-               std::abs(fourier_coefficients[f])))
-            k_to_max_U_map[k_vectors_magnitude[f]] =
-              std::abs(fourier_coefficients[f]);
+          if ((k_to_max_U_map.find(k_vectors_magnitude[f]) == k_to_max_U_map.end()) ||
+              (k_to_max_U_map[k_vectors_magnitude[f]] < std::abs(fourier_coefficients[f])))
+            k_to_max_U_map[k_vectors_magnitude[f]] = std::abs(fourier_coefficients[f]);
 
-        double sum_1 = 0, sum_ln_k = 0, sum_ln_k_square = 0, sum_ln_U = 0,
-               sum_ln_U_ln_k = 0;
+        double sum_1 = 0, sum_ln_k = 0, sum_ln_k_square = 0, sum_ln_U = 0, sum_ln_U_ln_k = 0;
         for (unsigned int f = 0; f < n_fourier_modes; ++f)
-          if (k_to_max_U_map[k_vectors_magnitude[f]] ==
-              std::abs(fourier_coefficients[f]))
+          if (k_to_max_U_map[k_vectors_magnitude[f]] == std::abs(fourier_coefficients[f]))
             {
               sum_1 += 1;
               sum_ln_k += ln_k[f];
               sum_ln_k_square += ln_k[f] * ln_k[f];
               sum_ln_U += std::log(std::abs(fourier_coefficients[f]));
-              sum_ln_U_ln_k +=
-                std::log(std::abs(fourier_coefficients[f])) * ln_k[f];
+              sum_ln_U_ln_k += std::log(std::abs(fourier_coefficients[f])) * ln_k[f];
             }
 
-        const double mu =
-          (1. / (sum_1 * sum_ln_k_square - sum_ln_k * sum_ln_k) *
-           (sum_ln_k * sum_ln_U - sum_1 * sum_ln_U_ln_k));
+        const double mu = (1. / (sum_1 * sum_ln_k_square - sum_ln_k * sum_ln_k) *
+                           (sum_ln_k * sum_ln_U - sum_1 * sum_ln_U_ln_k));
 
         smoothness_indicators(cell->active_cell_index()) = mu - 1. * dim / 2;
       }
 #else
     Vector<double> local_dof_values;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                        endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         local_dof_values.reinit(cell->get_fe().dofs_per_cell);
         cell->get_dof_values(solution, local_dof_values);
 
-        fourier->calculate(
-          local_dof_values, cell->active_fe_index(), fourier_coefficients);
+        fourier->calculate(local_dof_values, cell->active_fe_index(), fourier_coefficients);
 
         std::pair<std::vector<unsigned int>, std::vector<double>> res =
           FESeries::process_coefficients<dim>(
@@ -621,17 +581,14 @@ namespace Step27
           {
             ln_k.resize(res.first.size(), 0);
             for (unsigned int f = 0; f < ln_k.size(); f++)
-              ln_k[f] =
-                std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
+              ln_k[f] = std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
           }
 
         for (unsigned int f = 0; f < res.second.size(); f++)
           res.second[f] = std::log(res.second[f]);
 
-        std::pair<double, double> fit =
-          FESeries::linear_regression(ln_k, res.second);
-        smoothness_indicators(cell->active_cell_index()) =
-          -fit.first - 1. * dim / 2;
+        std::pair<double, double> fit = FESeries::linear_regression(ln_k, res.second);
+        smoothness_indicators(cell->active_cell_index()) = -fit.first - 1. * dim / 2;
       }
 #endif
   }
@@ -654,13 +611,11 @@ main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -668,12 +623,10 @@ main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

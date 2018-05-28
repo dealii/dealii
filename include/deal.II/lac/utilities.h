@@ -228,13 +228,11 @@ namespace Utilities
     {
       Assert(f != 0, ExcDivideByZero());
       const NumberType tau = g / f;
-      AssertThrow(
-        std::abs(tau) < 1.,
-        ExcMessage("real-valued Hyperbolic rotation does not exist for (" +
-                   std::to_string(f) + "," + std::to_string(g) + ")"));
-      const NumberType u =
-        std::copysign(sqrt((1. - tau) * (1. + tau)),
-                      f); // <-- more stable than std::sqrt(1.-tau*tau)
+      AssertThrow(std::abs(tau) < 1.,
+                  ExcMessage("real-valued Hyperbolic rotation does not exist for (" +
+                             std::to_string(f) + "," + std::to_string(g) + ")"));
+      const NumberType          u = std::copysign(sqrt((1. - tau) * (1. + tau)),
+                                         f); // <-- more stable than std::sqrt(1.-tau*tau)
       std::array<NumberType, 3> csr;
       csr[0] = 1. / u;       // c
       csr[1] = csr[0] * tau; // s
@@ -246,8 +244,7 @@ namespace Utilities
 
     template <typename NumberType>
     std::array<std::complex<NumberType>, 3>
-    givens_rotation(const std::complex<NumberType> & /*f*/,
-                    const std::complex<NumberType> & /*g*/)
+    givens_rotation(const std::complex<NumberType> & /*f*/, const std::complex<NumberType> & /*g*/)
     {
       AssertThrow(false, ExcNotImplemented());
       std::array<NumberType, 3> res;
@@ -375,14 +372,7 @@ namespace Utilities
       std::vector<double>   work;    // ^^
       types::blas_int       info;
       // call lapack_templates.h wrapper:
-      stev("N",
-           &n,
-           diagonal.data(),
-           subdiagonal.data(),
-           Z.data(),
-           &ldz,
-           work.data(),
-           &info);
+      stev("N", &n, diagonal.data(), subdiagonal.data(), Z.data(), &ldz, work.data(), &info);
 
       Assert(info == 0, LAPACKSupport::ExcErrorCode("dstev", info));
 
@@ -416,12 +406,10 @@ namespace Utilities
       const bool scale = (a_L < std::numeric_limits<double>::infinity());
       Assert(
         a < b,
-        ExcMessage(
-          "Lower bound of the unwanted spectrum should be smaller than the upper bound."));
+        ExcMessage("Lower bound of the unwanted spectrum should be smaller than the upper bound."));
 
       Assert(a_L <= a || a_L >= b || !scale,
-             ExcMessage(
-               "Scaling point should be outside of the unwanted spectrum."));
+             ExcMessage("Scaling point should be outside of the unwanted spectrum."));
 
       // Setup auxiliary vectors:
       typename VectorMemory<VectorType>::Pointer p_y(vector_memory);
@@ -452,10 +440,9 @@ namespace Utilities
       const double alpha = 1. / e;
       const double beta  = -c / e;
 
-      const double sigma1 =
-        e / (a_L - c); // BUGFIX which is relevant for odd degrees
-      double       sigma = scale ? sigma1 : 1.;
-      const double tau   = 2. / sigma;
+      const double sigma1 = e / (a_L - c); // BUGFIX which is relevant for odd degrees
+      double       sigma  = scale ? sigma1 : 1.;
+      const double tau    = 2. / sigma;
       op.vmult(y, x);
       y.sadd(alpha * sigma, beta * sigma, x);
 

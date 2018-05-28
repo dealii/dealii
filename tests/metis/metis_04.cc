@@ -55,8 +55,7 @@ test()
       deallog << " procs = " << procs << std::endl;
       GridTools::partition_triangulation(procs, triangulation);
       {
-        typename Triangulation<dim>::active_cell_iterator cell =
-          triangulation.begin_active();
+        typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
         for (; cell != triangulation.end(); ++cell)
           {
             deallog << cell->subdomain_id() << " ";

@@ -367,8 +367,7 @@ public:
      * Constructor; see the different fields for a description of the meaning
      * of the parameters.
      */
-    TimeSteppingData(const unsigned int look_ahead,
-                     const unsigned int look_back);
+    TimeSteppingData(const unsigned int look_ahead, const unsigned int look_back);
 
     /**
      * This denotes the number of timesteps the timestepping algorithm needs
@@ -599,8 +598,7 @@ public:
   /**
    * Exception.
    */
-  DeclExceptionMsg(ExcInvalidPosition,
-                   "You cannot insert a time step at the specified position.");
+  DeclExceptionMsg(ExcInvalidPosition, "You cannot insert a time step at the specified position.");
 
 protected:
   /**
@@ -1134,8 +1132,7 @@ namespace TimeStepBase_Tria_Flags
      * process. See the general description of this class for more
      * information.
      */
-    typedef std::vector<std::vector<std::pair<unsigned int, double>>>
-      CorrectionRelaxations;
+    typedef std::vector<std::vector<std::pair<unsigned int, double>>> CorrectionRelaxations;
 
     /**
      * Default values for the relaxations: no relaxations.
@@ -1146,16 +1143,15 @@ namespace TimeStepBase_Tria_Flags
      * Constructor. The default values are chosen such that almost no
      * restriction on the mesh refinement is imposed.
      */
-    RefinementFlags(const unsigned int max_refinement_level        = 0,
-                    const unsigned int first_sweep_with_correction = 0,
-                    const unsigned int min_cells_for_correction    = 0,
-                    const double       cell_number_corridor_top    = (1 << dim),
-                    const double       cell_number_corridor_bottom = 1,
-                    const CorrectionRelaxations &correction_relaxations =
-                      CorrectionRelaxations(),
-                    const unsigned int cell_number_correction_steps  = 0,
-                    const bool         mirror_flags_to_previous_grid = false,
-                    const bool         adapt_grids                   = false);
+    RefinementFlags(const unsigned int           max_refinement_level        = 0,
+                    const unsigned int           first_sweep_with_correction = 0,
+                    const unsigned int           min_cells_for_correction    = 0,
+                    const double                 cell_number_corridor_top    = (1 << dim),
+                    const double                 cell_number_corridor_bottom = 1,
+                    const CorrectionRelaxations &correction_relaxations = CorrectionRelaxations(),
+                    const unsigned int           cell_number_correction_steps  = 0,
+                    const bool                   mirror_flags_to_previous_grid = false,
+                    const bool                   adapt_grids                   = false);
 
     /**
      * Maximum level of a cell in the triangulation of a time level. If it is
@@ -1196,8 +1192,7 @@ namespace TimeStepBase_Tria_Flags
     /**
      * List of relaxations to the correction step.
      */
-    const std::vector<std::vector<std::pair<unsigned int, double>>>
-      correction_relaxations;
+    const std::vector<std::vector<std::pair<unsigned int, double>>> correction_relaxations;
 
     /**
      * Number of iterations to be performed to adjust the number of cells on a
@@ -1253,8 +1248,7 @@ namespace TimeStepBase_Tria_Flags
     /**
      * Constructor
      */
-    RefinementData(const double refinement_threshold,
-                   const double coarsening_threshold = 0);
+    RefinementData(const double refinement_threshold, const double coarsening_threshold = 0);
 
     /**
      * Threshold for refinement: cells having a larger value will be refined
@@ -1310,10 +1304,9 @@ public:
    * Typedef the data types of the TimeStepBase_Tria_Flags() namespace into
    * local scope.
    */
-  typedef typename TimeStepBase_Tria_Flags::Flags<dim> Flags;
-  typedef typename TimeStepBase_Tria_Flags::RefinementFlags<dim>
-                                                                RefinementFlags;
-  typedef typename TimeStepBase_Tria_Flags::RefinementData<dim> RefinementData;
+  typedef typename TimeStepBase_Tria_Flags::Flags<dim>           Flags;
+  typedef typename TimeStepBase_Tria_Flags::RefinementFlags<dim> RefinementFlags;
+  typedef typename TimeStepBase_Tria_Flags::RefinementData<dim>  RefinementData;
 
 
   /**
@@ -1351,11 +1344,10 @@ public:
    * needed anyway; the refinement flags can be omitted if you do not intend
    * to call the refinement function of this class.
    */
-  TimeStepBase_Tria(
-    const double                   time,
-    const Triangulation<dim, dim> &coarse_grid,
-    const Flags &                  flags,
-    const RefinementFlags &        refinement_flags = RefinementFlags());
+  TimeStepBase_Tria(const double                   time,
+                    const Triangulation<dim, dim> &coarse_grid,
+                    const Flags &                  flags,
+                    const RefinementFlags &        refinement_flags = RefinementFlags());
 
   /**
    * Destructor. At present, this does not more than releasing the lock on the
@@ -1477,8 +1469,7 @@ protected:
    * level.  This pointer is set through the constructor; ownership remains
    * with the owner of this management object.
    */
-  SmartPointer<const Triangulation<dim, dim>, TimeStepBase_Tria<dim>>
-    coarse_grid;
+  SmartPointer<const Triangulation<dim, dim>, TimeStepBase_Tria<dim>> coarse_grid;
 
   /**
    * Some flags about how this time level shall behave. See the documentation
@@ -1553,8 +1544,7 @@ TimeDependent::do_loop(InitFunctionObject      init_function,
 
   // wake up the first few time levels
   for (int step = -timestepping_data.look_ahead; step < 0; ++step)
-    for (int look_ahead = 0;
-         look_ahead <= static_cast<int>(timestepping_data.look_ahead);
+    for (int look_ahead = 0; look_ahead <= static_cast<int>(timestepping_data.look_ahead);
          ++look_ahead)
       switch (direction)
         {
@@ -1573,9 +1563,7 @@ TimeDependent::do_loop(InitFunctionObject      init_function,
     {
       // first thing: wake up the
       // timesteps ahead as necessary
-      for (unsigned int look_ahead = 0;
-           look_ahead <= timestepping_data.look_ahead;
-           ++look_ahead)
+      for (unsigned int look_ahead = 0; look_ahead <= timestepping_data.look_ahead; ++look_ahead)
         switch (direction)
           {
             case forward:
@@ -1584,8 +1572,7 @@ TimeDependent::do_loop(InitFunctionObject      init_function,
               break;
             case backward:
               if (n_timesteps > (step + look_ahead))
-                timesteps[n_timesteps - (step + look_ahead) - 1]->wake_up(
-                  look_ahead);
+                timesteps[n_timesteps - (step + look_ahead) - 1]->wake_up(look_ahead);
               break;
           };
 
@@ -1602,8 +1589,7 @@ TimeDependent::do_loop(InitFunctionObject      init_function,
         };
 
       // let the timesteps behind sleep
-      for (unsigned int look_back = 0; look_back <= timestepping_data.look_back;
-           ++look_back)
+      for (unsigned int look_back = 0; look_back <= timestepping_data.look_back; ++look_back)
         switch (direction)
           {
             case forward:
@@ -1612,29 +1598,23 @@ TimeDependent::do_loop(InitFunctionObject      init_function,
               break;
             case backward:
               if (n_timesteps - (step - look_back) <= n_timesteps)
-                timesteps[n_timesteps - (step - look_back) - 1]->sleep(
-                  look_back);
+                timesteps[n_timesteps - (step - look_back) - 1]->sleep(look_back);
               break;
           }
     }
 
   // make the last few timesteps sleep
-  for (int step = n_timesteps;
-       step < static_cast<int>(n_timesteps + timestepping_data.look_back);
+  for (int step = n_timesteps; step < static_cast<int>(n_timesteps + timestepping_data.look_back);
        ++step)
-    for (int look_back = 0;
-         look_back <= static_cast<int>(timestepping_data.look_back);
-         ++look_back)
+    for (int look_back = 0; look_back <= static_cast<int>(timestepping_data.look_back); ++look_back)
       switch (direction)
         {
           case forward:
-            if ((step - look_back >= 0) &&
-                (step - look_back < static_cast<int>(n_timesteps)))
+            if ((step - look_back >= 0) && (step - look_back < static_cast<int>(n_timesteps)))
               timesteps[step - look_back]->sleep(look_back);
             break;
           case backward:
-            if ((step - look_back >= 0) &&
-                (step - look_back < static_cast<int>(n_timesteps)))
+            if ((step - look_back >= 0) && (step - look_back < static_cast<int>(n_timesteps)))
               timesteps[n_timesteps - (step - look_back) - 1]->sleep(look_back);
             break;
         };

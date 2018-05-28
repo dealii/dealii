@@ -58,8 +58,7 @@ TimestepControl::declare_parameters(ParameterHandler &param)
   param.declare_entry("Max step", "1.", Patterns::Double());
   param.declare_entry("Tolerance", "1.e-2", Patterns::Double());
   param.declare_entry("Print step", "-1.", Patterns::Double());
-  param.declare_entry(
-    "Strategy", "uniform", Patterns::Selection("uniform|doubling"));
+  param.declare_entry("Strategy", "uniform", Patterns::Selection("uniform|doubling"));
 }
 
 

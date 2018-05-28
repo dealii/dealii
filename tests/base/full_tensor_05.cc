@@ -45,8 +45,8 @@ test()
         for (unsigned int k = 0; k < dim; ++k)
           for (unsigned int l = 0; l < dim; ++l)
             {
-              deallog << i << ' ' << j << ' ' << k << ' ' << l << ": "
-                      << t[i][j][k][l] << ' ' << a[k][l] << std::endl;
+              deallog << i << ' ' << j << ' ' << k << ' ' << l << ": " << t[i][j][k][l] << ' '
+                      << a[k][l] << std::endl;
               tmp_ij += t[i][j][k][l] * a[k][l];
             }
         b[i][j] = tmp_ij;

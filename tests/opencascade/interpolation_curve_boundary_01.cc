@@ -32,8 +32,7 @@
 using namespace OpenCASCADE;
 
 void
-remove_iges_header(const std::string &in_filename,
-                   const std::string &out_filename)
+remove_iges_header(const std::string &in_filename, const std::string &out_filename)
 {
   std::ifstream in(in_filename);
   std::ofstream out(out_filename);

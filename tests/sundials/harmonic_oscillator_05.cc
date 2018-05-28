@@ -51,8 +51,7 @@ main(int argc, char **argv)
 {
   std::ofstream out("output");
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   typedef Vector<double> VectorType;
 
@@ -82,8 +81,7 @@ main(int argc, char **argv)
   // Explicit jacobian.
   FullMatrix<double> J(3, 3);
 
-  ode.implicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = 0;
     ydot[1] = 0;
     ydot[2] = (b - y[2]) / eps;
@@ -91,8 +89,7 @@ main(int argc, char **argv)
   };
 
 
-  ode.explicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
     ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
     ydot[2] = -y[2] * y[0];
@@ -114,9 +111,8 @@ main(int argc, char **argv)
     return 0;
   };
 
-  ode.output_step = [&](const double       t,
-                        const VectorType & sol,
-                        const unsigned int step_number) -> int {
+  ode.output_step =
+    [&](const double t, const VectorType &sol, const unsigned int step_number) -> int {
     out << t << " " << sol[0] << " " << sol[1] << " " << sol[2] << std::endl;
     return 0;
   };

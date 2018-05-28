@@ -46,8 +46,7 @@ test()
   dh.distribute_dofs(fe);
 
   deallog << "dim, spacedim: " << dim << ", " << spacedim << std::endl
-          << "cells: " << tria.n_active_cells() << ", dofs: " << dh.n_dofs()
-          << std::endl;
+          << "cells: " << tria.n_active_cells() << ", dofs: " << dh.n_dofs() << std::endl;
 
   // Create a Mapping
   Vector<double> map_vector(dh.n_dofs());
@@ -59,8 +58,7 @@ test()
   dh.distribute_dofs(fe);
 
   deallog << "After refine:" << std::endl
-          << "cells: " << tria.n_active_cells() << ", dofs: " << dh.n_dofs()
-          << std::endl;
+          << "cells: " << tria.n_active_cells() << ", dofs: " << dh.n_dofs() << std::endl;
 }
 
 using namespace dealii;

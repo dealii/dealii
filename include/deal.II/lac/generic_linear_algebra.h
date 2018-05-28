@@ -184,8 +184,7 @@ namespace LinearAlgebraTrilinos
      */
     typedef TrilinosWrappers::BlockSparseMatrix BlockSparseMatrix;
 
-    typedef TrilinosWrappers::BlockSparsityPattern
-      BlockCompressedSparsityPattern;
+    typedef TrilinosWrappers::BlockSparsityPattern BlockCompressedSparsityPattern;
 
     /**
      * Typedef for the AMG preconditioner type.

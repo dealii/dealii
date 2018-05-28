@@ -40,10 +40,10 @@ test()
       // different numbers of base elements
       // and multiplicities
       fe_collection.push_back(FESystem<dim>(FE_DGPNonparametric<dim>(i), 3));
-      fe_collection.push_back(FESystem<dim>(
-        FE_DGPNonparametric<dim>(i), 2, FE_DGPNonparametric<dim>(i), 1));
-      fe_collection.push_back(FESystem<dim>(
-        FE_DGPNonparametric<dim>(i), 1, FE_DGPNonparametric<dim>(i), 2));
+      fe_collection.push_back(
+        FESystem<dim>(FE_DGPNonparametric<dim>(i), 2, FE_DGPNonparametric<dim>(i), 1));
+      fe_collection.push_back(
+        FESystem<dim>(FE_DGPNonparametric<dim>(i), 1, FE_DGPNonparametric<dim>(i), 2));
     }
 
   for (unsigned int i = 0; i < fe_collection.size(); ++i)
@@ -53,18 +53,14 @@ test()
           fe_collection[i].hp_line_dof_identities(fe_collection[j]);
 
         deallog << "Identities for " << fe_collection[i].get_name() << " and "
-                << fe_collection[j].get_name() << ": " << identities.size()
-                << std::endl;
+                << fe_collection[j].get_name() << ": " << identities.size() << std::endl;
 
         for (unsigned int k = 0; k < identities.size(); ++k)
           {
-            Assert(identities[k].first < fe_collection[i].dofs_per_line,
-                   ExcInternalError());
-            Assert(identities[k].second < fe_collection[j].dofs_per_line,
-                   ExcInternalError());
+            Assert(identities[k].first < fe_collection[i].dofs_per_line, ExcInternalError());
+            Assert(identities[k].second < fe_collection[j].dofs_per_line, ExcInternalError());
 
-            deallog << identities[k].first << ' ' << identities[k].second
-                    << std::endl;
+            deallog << identities[k].first << ' ' << identities[k].second << std::endl;
           }
 
         // make sure the identities are the
@@ -75,8 +71,7 @@ test()
         // three identical elements in the
         // collection)
         AssertThrow(identities ==
-                      fe_collection[i / 3 * 3].hp_line_dof_identities(
-                        fe_collection[j / 3 * 3]),
+                      fe_collection[i / 3 * 3].hp_line_dof_identities(fe_collection[j / 3 * 3]),
                     ExcInternalError());
       }
 }

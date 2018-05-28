@@ -60,8 +60,7 @@ void check_face(Quadrature<1> &q1)
     {
       deallog << "Face " << f << std::endl;
 
-      Quadrature<dim> quadrature =
-        QProjector<dim>::project_to_face(subquadrature, f);
+      Quadrature<dim> quadrature = QProjector<dim>::project_to_face(subquadrature, f);
       for (unsigned int k = 0; k < quadrature.size(); ++k)
         deallog << quadrature.point(k) << std::endl;
     }
@@ -71,8 +70,7 @@ void check_face(Quadrature<1> &q1)
       {
         deallog << "Face " << f << " subface " << s << std::endl;
 
-        Quadrature<dim> quadrature =
-          QProjector<dim>::project_to_face(subquadrature, f);
+        Quadrature<dim> quadrature = QProjector<dim>::project_to_face(subquadrature, f);
         for (unsigned int k = 0; k < quadrature.size(); ++k)
           deallog << quadrature.point(k) << std::endl;
       }
@@ -95,16 +93,14 @@ void check_faces(Quadrature<1> &q1)
     {
       deallog << "Face " << f << " orientation false" << std::endl;
 
-      unsigned int offset =
-        QProjector<dim>::DataSetDescriptor::face(f, false, false, false, nqs);
+      unsigned int offset = QProjector<dim>::DataSetDescriptor::face(f, false, false, false, nqs);
 
       for (unsigned int k = 0; k < nqs; ++k)
         deallog << faces.point(offset + k) << std::endl;
 
       deallog << "Face " << f << " orientation true" << std::endl;
 
-      offset =
-        QProjector<dim>::DataSetDescriptor::face(f, true, false, false, nqs);
+      offset = QProjector<dim>::DataSetDescriptor::face(f, true, false, false, nqs);
 
       for (unsigned int k = 0; k < nqs; ++k)
         deallog << faces.point(offset + k) << std::endl;

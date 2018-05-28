@@ -36,8 +36,8 @@ eval(const std::string &exp, const Point<2> &p, double expected)
   fp.initialize(variables, exp, constants);
 
   double result = fp.value(p);
-  deallog << "'" << exp << "' @ " << p << " is " << result << " ( expected "
-          << expected << " )" << std::endl;
+  deallog << "'" << exp << "' @ " << p << " is " << result << " ( expected " << expected << " )"
+          << std::endl;
   if (fabs(result - expected) > 1e-10)
     deallog << "ERROR!" << std::endl;
 }

@@ -77,17 +77,13 @@ namespace internal
          */
         template <class DoFHandlerType>
         void
-        update_all_active_cell_dof_indices_caches(
-          const DoFHandlerType &dof_handler)
+        update_all_active_cell_dof_indices_caches(const DoFHandlerType &dof_handler)
         {
-          typename DoFHandlerType::active_cell_iterator
-            beginc = dof_handler.begin_active(),
-            endc   = dof_handler.end();
+          typename DoFHandlerType::active_cell_iterator beginc = dof_handler.begin_active(),
+                                                        endc   = dof_handler.end();
 
           auto worker =
-            [](const typename DoFHandlerType::active_cell_iterator &cell,
-               void *,
-               void *) {
+            [](const typename DoFHandlerType::active_cell_iterator &cell, void *, void *) {
               if (!cell->is_artificial())
                 cell->update_cell_dof_indices_cache();
             };
@@ -115,17 +111,13 @@ namespace internal
          */
         template <class DoFHandlerType>
         void
-        update_all_level_cell_dof_indices_caches(
-          const DoFHandlerType &dof_handler)
+        update_all_level_cell_dof_indices_caches(const DoFHandlerType &dof_handler)
         {
-          typename DoFHandlerType::level_cell_iterator beginc =
-                                                         dof_handler.begin(),
-                                                       endc = dof_handler.end();
+          typename DoFHandlerType::level_cell_iterator beginc = dof_handler.begin(),
+                                                       endc   = dof_handler.end();
 
           auto worker =
-            [](const typename DoFHandlerType::level_cell_iterator &cell,
-               void *,
-               void *) {
+            [](const typename DoFHandlerType::level_cell_iterator &cell, void *, void *) {
               if (cell->has_children() || !cell->is_artificial())
                 cell->update_cell_dof_indices_cache();
             };
@@ -147,8 +139,7 @@ namespace internal
         }
 
 
-        typedef std::vector<std::pair<unsigned int, unsigned int>>
-          DoFIdentities;
+        typedef std::vector<std::pair<unsigned int, unsigned int>> DoFIdentities;
 
 
         /**
@@ -163,10 +154,9 @@ namespace internal
          */
         template <int structdim, int dim, int spacedim>
         void
-        ensure_existence_of_dof_identities(
-          const FiniteElement<dim, spacedim> &fe1,
-          const FiniteElement<dim, spacedim> &fe2,
-          std::unique_ptr<DoFIdentities> &    identities)
+        ensure_existence_of_dof_identities(const FiniteElement<dim, spacedim> &fe1,
+                                           const FiniteElement<dim, spacedim> &fe2,
+                                           std::unique_ptr<DoFIdentities> &    identities)
         {
           // see if we need to fill this entry, or whether it already
           // exists
@@ -176,22 +166,22 @@ namespace internal
                 {
                   case 0:
                     {
-                      identities = std_cxx14::make_unique<DoFIdentities>(
-                        fe1.hp_vertex_dof_identities(fe2));
+                      identities =
+                        std_cxx14::make_unique<DoFIdentities>(fe1.hp_vertex_dof_identities(fe2));
                       break;
                     }
 
                   case 1:
                     {
-                      identities = std_cxx14::make_unique<DoFIdentities>(
-                        fe1.hp_line_dof_identities(fe2));
+                      identities =
+                        std_cxx14::make_unique<DoFIdentities>(fe1.hp_line_dof_identities(fe2));
                       break;
                     }
 
                   case 2:
                     {
-                      identities = std_cxx14::make_unique<DoFIdentities>(
-                        fe1.hp_quad_dof_identities(fe2));
+                      identities =
+                        std_cxx14::make_unique<DoFIdentities>(fe1.hp_quad_dof_identities(fe2));
                       break;
                     }
 
@@ -203,11 +193,9 @@ namespace internal
               // any sense at all
               for (unsigned int i = 0; i < identities->size(); ++i)
                 {
-                  Assert((*identities)[i].first <
-                           fe1.template n_dofs_per_object<structdim>(),
+                  Assert((*identities)[i].first < fe1.template n_dofs_per_object<structdim>(),
                          ExcInternalError());
-                  Assert((*identities)[i].second <
-                           fe2.template n_dofs_per_object<structdim>(),
+                  Assert((*identities)[i].second < fe2.template n_dofs_per_object<structdim>(),
                          ExcInternalError());
                 }
             }
@@ -227,33 +215,27 @@ namespace internal
         get_most_dominating_fe_index(const iterator &object)
         {
           unsigned int dominating_fe_index = 0;
-          for (; dominating_fe_index < object->n_active_fe_indices();
-               ++dominating_fe_index)
+          for (; dominating_fe_index < object->n_active_fe_indices(); ++dominating_fe_index)
             {
-              const FiniteElement<dim, spacedim> &this_fe = object->get_fe(
-                object->nth_active_fe_index(dominating_fe_index));
+              const FiniteElement<dim, spacedim> &this_fe =
+                object->get_fe(object->nth_active_fe_index(dominating_fe_index));
 
               FiniteElementDomination::Domination domination =
                 FiniteElementDomination::either_element_can_dominate;
-              for (unsigned int other_fe_index = 0;
-                   other_fe_index < object->n_active_fe_indices();
+              for (unsigned int other_fe_index = 0; other_fe_index < object->n_active_fe_indices();
                    ++other_fe_index)
                 if (other_fe_index != dominating_fe_index)
                   {
                     const FiniteElement<dim, spacedim> &that_fe =
-                      object->get_fe(
-                        object->nth_active_fe_index(other_fe_index));
+                      object->get_fe(object->nth_active_fe_index(other_fe_index));
 
-                    domination =
-                      domination & this_fe.compare_for_face_domination(that_fe);
+                    domination = domination & this_fe.compare_for_face_domination(that_fe);
                   }
 
               // see if this element is able to dominate all the other
               // ones, and if so take it
-              if ((domination ==
-                   FiniteElementDomination::this_element_dominates) ||
-                  (domination ==
-                   FiniteElementDomination::either_element_can_dominate) ||
+              if ((domination == FiniteElementDomination::this_element_dominates) ||
+                  (domination == FiniteElementDomination::either_element_can_dominate) ||
                   (domination == FiniteElementDomination::no_requirements))
                 break;
             }
@@ -288,32 +270,24 @@ namespace internal
          */
         template <int spacedim>
         static types::global_dof_index
-        distribute_dofs_on_cell(
-          const DoFHandler<1, spacedim> &dof_handler,
-          const typename DoFHandler<1, spacedim>::active_cell_iterator &cell,
-          types::global_dof_index next_free_dof)
+        distribute_dofs_on_cell(const DoFHandler<1, spacedim> &dof_handler,
+                                const typename DoFHandler<1, spacedim>::active_cell_iterator &cell,
+                                types::global_dof_index next_free_dof)
         {
           // distribute dofs of vertices
           if (dof_handler.get_fe().dofs_per_vertex > 0)
-            for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell;
-                 ++v)
+            for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell; ++v)
               {
                 if (cell->vertex_dof_index(v, 0) == numbers::invalid_dof_index)
-                  for (unsigned int d = 0;
-                       d < dof_handler.get_fe().dofs_per_vertex;
-                       ++d)
+                  for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_vertex; ++d)
                     {
-                      Assert((cell->vertex_dof_index(v, d) ==
-                              numbers::invalid_dof_index),
+                      Assert((cell->vertex_dof_index(v, d) == numbers::invalid_dof_index),
                              ExcInternalError());
                       cell->set_vertex_dof_index(v, d, next_free_dof++);
                     }
                 else
-                  for (unsigned int d = 0;
-                       d < dof_handler.get_fe().dofs_per_vertex;
-                       ++d)
-                    Assert((cell->vertex_dof_index(v, d) !=
-                            numbers::invalid_dof_index),
+                  for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_vertex; ++d)
+                    Assert((cell->vertex_dof_index(v, d) != numbers::invalid_dof_index),
                            ExcInternalError());
               }
 
@@ -328,49 +302,38 @@ namespace internal
 
         template <int spacedim>
         static types::global_dof_index
-        distribute_dofs_on_cell(
-          const DoFHandler<2, spacedim> &dof_handler,
-          const typename DoFHandler<2, spacedim>::active_cell_iterator &cell,
-          types::global_dof_index next_free_dof)
+        distribute_dofs_on_cell(const DoFHandler<2, spacedim> &dof_handler,
+                                const typename DoFHandler<2, spacedim>::active_cell_iterator &cell,
+                                types::global_dof_index next_free_dof)
         {
           if (dof_handler.get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
+            for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
-              if (cell->vertex_dof_index(vertex, 0) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0;
-                     d < dof_handler.get_fe().dofs_per_vertex;
-                     ++d)
+              if (cell->vertex_dof_index(vertex, 0) == numbers::invalid_dof_index)
+                for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_vertex; ++d)
                   cell->set_vertex_dof_index(vertex, d, next_free_dof++);
 
           // for the four sides
           if (dof_handler.get_fe().dofs_per_line > 0)
-            for (unsigned int side = 0; side < GeometryInfo<2>::faces_per_cell;
-                 ++side)
+            for (unsigned int side = 0; side < GeometryInfo<2>::faces_per_cell; ++side)
               {
-                const typename DoFHandler<2, spacedim>::line_iterator line =
-                  cell->line(side);
+                const typename DoFHandler<2, spacedim>::line_iterator line = cell->line(side);
 
                 // distribute dofs if necessary: check whether line dof is
                 // already numbered (checking the first dof should be good
                 // enough)
                 if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d = 0;
-                       d < dof_handler.get_fe().dofs_per_line;
-                       ++d)
+                  for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_line; ++d)
                     line->set_dof_index(d, next_free_dof++);
               }
 
 
           // dofs of quad
           if (dof_handler.get_fe().dofs_per_quad > 0)
-            for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_quad;
-                 ++d)
+            for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_quad; ++d)
               cell->set_dof_index(d, next_free_dof++);
 
           return next_free_dof;
@@ -380,40 +343,31 @@ namespace internal
 
         template <int spacedim>
         static types::global_dof_index
-        distribute_dofs_on_cell(
-          const DoFHandler<3, spacedim> &dof_handler,
-          const typename DoFHandler<3, spacedim>::active_cell_iterator &cell,
-          types::global_dof_index next_free_dof)
+        distribute_dofs_on_cell(const DoFHandler<3, spacedim> &dof_handler,
+                                const typename DoFHandler<3, spacedim>::active_cell_iterator &cell,
+                                types::global_dof_index next_free_dof)
         {
           if (dof_handler.get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
+            for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
-              if (cell->vertex_dof_index(vertex, 0) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0;
-                     d < dof_handler.get_fe().dofs_per_vertex;
-                     ++d)
+              if (cell->vertex_dof_index(vertex, 0) == numbers::invalid_dof_index)
+                for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_vertex; ++d)
                   cell->set_vertex_dof_index(vertex, d, next_free_dof++);
 
           // for the lines
           if (dof_handler.get_fe().dofs_per_line > 0)
             for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
               {
-                const typename DoFHandler<3, spacedim>::line_iterator line =
-                  cell->line(l);
+                const typename DoFHandler<3, spacedim>::line_iterator line = cell->line(l);
 
                 // distribute dofs if necessary: check whether line dof is
                 // already numbered (checking the first dof should be good
                 // enough)
                 if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d = 0;
-                       d < dof_handler.get_fe().dofs_per_line;
-                       ++d)
+                  for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_line; ++d)
                     line->set_dof_index(d, next_free_dof++);
               }
 
@@ -421,17 +375,14 @@ namespace internal
           if (dof_handler.get_fe().dofs_per_quad > 0)
             for (unsigned int q = 0; q < GeometryInfo<3>::quads_per_cell; ++q)
               {
-                const typename DoFHandler<3, spacedim>::quad_iterator quad =
-                  cell->quad(q);
+                const typename DoFHandler<3, spacedim>::quad_iterator quad = cell->quad(q);
 
                 // distribute dofs if necessary: check whether line dof is
                 // already numbered (checking the first dof should be good
                 // enough)
                 if (quad->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d = 0;
-                       d < dof_handler.get_fe().dofs_per_quad;
-                       ++d)
+                  for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_quad; ++d)
                     quad->set_dof_index(d, next_free_dof++);
               }
 
@@ -451,39 +402,31 @@ namespace internal
         static types::global_dof_index
         distribute_dofs_on_cell(
           const hp::DoFHandler<1, spacedim> &,
-          const typename hp::DoFHandler<1, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
+          const typename hp::DoFHandler<1, spacedim>::active_cell_iterator &cell,
+          types::global_dof_index                                           next_free_dof)
         {
           const unsigned int dim = 1;
 
-          const FiniteElement<dim, spacedim> &fe = cell->get_fe();
-          const unsigned int fe_index            = cell->active_fe_index();
+          const FiniteElement<dim, spacedim> &fe       = cell->get_fe();
+          const unsigned int                  fe_index = cell->active_fe_index();
 
           // number dofs on vertices. to do so, check whether dofs for
           // this vertex have been distributed and for the present fe
           // (only check the first dof), and if this isn't the case
           // distribute new ones there
           if (fe.dofs_per_vertex > 0)
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<1>::vertices_per_cell;
-                 ++vertex)
-              if (cell->vertex_dof_index(vertex, 0, fe_index) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0; d < fe.dofs_per_vertex;
-                     ++d, ++next_free_dof)
-                  cell->set_vertex_dof_index(
-                    vertex, d, next_free_dof, fe_index);
+            for (unsigned int vertex = 0; vertex < GeometryInfo<1>::vertices_per_cell; ++vertex)
+              if (cell->vertex_dof_index(vertex, 0, fe_index) == numbers::invalid_dof_index)
+                for (unsigned int d = 0; d < fe.dofs_per_vertex; ++d, ++next_free_dof)
+                  cell->set_vertex_dof_index(vertex, d, next_free_dof, fe_index);
 
           // finally for the line. this one shouldn't be numbered yet
           if (fe.dofs_per_line > 0)
             {
-              Assert(
-                (cell->dof_index(0, fe_index) == numbers::invalid_dof_index),
-                ExcInternalError());
+              Assert((cell->dof_index(0, fe_index) == numbers::invalid_dof_index),
+                     ExcInternalError());
 
-              for (unsigned int d = 0; d < fe.dofs_per_line;
-                   ++d, ++next_free_dof)
+              for (unsigned int d = 0; d < fe.dofs_per_line; ++d, ++next_free_dof)
                 cell->set_dof_index(d, next_free_dof, fe_index);
             }
 
@@ -499,29 +442,23 @@ namespace internal
         static types::global_dof_index
         distribute_dofs_on_cell(
           const hp::DoFHandler<2, spacedim> &,
-          const typename hp::DoFHandler<2, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
+          const typename hp::DoFHandler<2, spacedim>::active_cell_iterator &cell,
+          types::global_dof_index                                           next_free_dof)
         {
           const unsigned int dim = 2;
 
-          const FiniteElement<dim, spacedim> &fe = cell->get_fe();
-          const unsigned int fe_index            = cell->active_fe_index();
+          const FiniteElement<dim, spacedim> &fe       = cell->get_fe();
+          const unsigned int                  fe_index = cell->active_fe_index();
 
           // number dofs on vertices. to do so, check whether dofs for
           // this vertex have been distributed and for the present fe
           // (only check the first dof), and if this isn't the case
           // distribute new ones there
           if (fe.dofs_per_vertex > 0)
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
-              if (cell->vertex_dof_index(vertex, 0, fe_index) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0; d < fe.dofs_per_vertex;
-                     ++d, ++next_free_dof)
-                  cell->set_vertex_dof_index(
-                    vertex, d, next_free_dof, fe_index);
+            for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
+              if (cell->vertex_dof_index(vertex, 0, fe_index) == numbers::invalid_dof_index)
+                for (unsigned int d = 0; d < fe.dofs_per_vertex; ++d, ++next_free_dof)
+                  cell->set_vertex_dof_index(vertex, d, next_free_dof, fe_index);
 
           // next the sides. do the same as above: check whether the
           // line is already numbered for the present fe_index, and if
@@ -529,12 +466,10 @@ namespace internal
           if (fe.dofs_per_line > 0)
             for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell; ++l)
               {
-                typename hp::DoFHandler<dim, spacedim>::line_iterator line =
-                  cell->line(l);
+                typename hp::DoFHandler<dim, spacedim>::line_iterator line = cell->line(l);
 
                 if (line->dof_index(0, fe_index) == numbers::invalid_dof_index)
-                  for (unsigned int d = 0; d < fe.dofs_per_line;
-                       ++d, ++next_free_dof)
+                  for (unsigned int d = 0; d < fe.dofs_per_line; ++d, ++next_free_dof)
                     line->set_dof_index(d, next_free_dof, fe_index);
               }
 
@@ -542,12 +477,10 @@ namespace internal
           // finally for the quad. this one shouldn't be numbered yet
           if (fe.dofs_per_quad > 0)
             {
-              Assert(
-                (cell->dof_index(0, fe_index) == numbers::invalid_dof_index),
-                ExcInternalError());
+              Assert((cell->dof_index(0, fe_index) == numbers::invalid_dof_index),
+                     ExcInternalError());
 
-              for (unsigned int d = 0; d < fe.dofs_per_quad;
-                   ++d, ++next_free_dof)
+              for (unsigned int d = 0; d < fe.dofs_per_quad; ++d, ++next_free_dof)
                 cell->set_dof_index(d, next_free_dof, fe_index);
             }
 
@@ -563,29 +496,23 @@ namespace internal
         static types::global_dof_index
         distribute_dofs_on_cell(
           const hp::DoFHandler<3, spacedim> &,
-          const typename hp::DoFHandler<3, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
+          const typename hp::DoFHandler<3, spacedim>::active_cell_iterator &cell,
+          types::global_dof_index                                           next_free_dof)
         {
           const unsigned int dim = 3;
 
-          const FiniteElement<dim, spacedim> &fe = cell->get_fe();
-          const unsigned int fe_index            = cell->active_fe_index();
+          const FiniteElement<dim, spacedim> &fe       = cell->get_fe();
+          const unsigned int                  fe_index = cell->active_fe_index();
 
           // number dofs on vertices. to do so, check whether dofs for
           // this vertex have been distributed and for the present fe
           // (only check the first dof), and if this isn't the case
           // distribute new ones there
           if (fe.dofs_per_vertex > 0)
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
-              if (cell->vertex_dof_index(vertex, 0, fe_index) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0; d < fe.dofs_per_vertex;
-                     ++d, ++next_free_dof)
-                  cell->set_vertex_dof_index(
-                    vertex, d, next_free_dof, fe_index);
+            for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
+              if (cell->vertex_dof_index(vertex, 0, fe_index) == numbers::invalid_dof_index)
+                for (unsigned int d = 0; d < fe.dofs_per_vertex; ++d, ++next_free_dof)
+                  cell->set_vertex_dof_index(vertex, d, next_free_dof, fe_index);
 
           // next the four lines. do the same as above: check whether
           // the line is already numbered for the present fe_index,
@@ -593,12 +520,10 @@ namespace internal
           if (fe.dofs_per_line > 0)
             for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
               {
-                typename hp::DoFHandler<dim, spacedim>::line_iterator line =
-                  cell->line(l);
+                typename hp::DoFHandler<dim, spacedim>::line_iterator line = cell->line(l);
 
                 if (line->dof_index(0, fe_index) == numbers::invalid_dof_index)
-                  for (unsigned int d = 0; d < fe.dofs_per_line;
-                       ++d, ++next_free_dof)
+                  for (unsigned int d = 0; d < fe.dofs_per_line; ++d, ++next_free_dof)
                     line->set_dof_index(d, next_free_dof, fe_index);
               }
 
@@ -606,12 +531,10 @@ namespace internal
           if (fe.dofs_per_quad > 0)
             for (unsigned int q = 0; q < GeometryInfo<3>::quads_per_cell; ++q)
               {
-                typename hp::DoFHandler<dim, spacedim>::quad_iterator quad =
-                  cell->quad(q);
+                typename hp::DoFHandler<dim, spacedim>::quad_iterator quad = cell->quad(q);
 
                 if (quad->dof_index(0, fe_index) == numbers::invalid_dof_index)
-                  for (unsigned int d = 0; d < fe.dofs_per_quad;
-                       ++d, ++next_free_dof)
+                  for (unsigned int d = 0; d < fe.dofs_per_quad; ++d, ++next_free_dof)
                     quad->set_dof_index(d, next_free_dof, fe_index);
               }
 
@@ -619,12 +542,10 @@ namespace internal
           // finally for the hex. this one shouldn't be numbered yet
           if (fe.dofs_per_hex > 0)
             {
-              Assert(
-                (cell->dof_index(0, fe_index) == numbers::invalid_dof_index),
-                ExcInternalError());
+              Assert((cell->dof_index(0, fe_index) == numbers::invalid_dof_index),
+                     ExcInternalError());
 
-              for (unsigned int d = 0; d < fe.dofs_per_hex;
-                   ++d, ++next_free_dof)
+              for (unsigned int d = 0; d < fe.dofs_per_hex; ++d, ++next_free_dof)
                 cell->set_dof_index(d, next_free_dof, fe_index);
             }
 
@@ -642,11 +563,9 @@ namespace internal
          */
         template <int dim, int spacedim>
         static std::map<types::global_dof_index, types::global_dof_index>
-        compute_vertex_dof_identities(
-          hp::DoFHandler<dim, spacedim> &dof_handler)
+        compute_vertex_dof_identities(hp::DoFHandler<dim, spacedim> &dof_handler)
         {
-          std::map<types::global_dof_index, types::global_dof_index>
-            dof_identities;
+          std::map<types::global_dof_index, types::global_dof_index> dof_identities;
 
           // Note: we may wish to have something here similar to what
           // we do for lines and quads, namely that we only identify
@@ -654,9 +573,8 @@ namespace internal
           // it is not clear whether this is actually necessary for
           // vertices at all, I can't think of a finite element that
           // would make that necessary...
-          dealii::Table<2, std::unique_ptr<DoFIdentities>>
-            vertex_dof_identities(dof_handler.get_fe_collection().size(),
-                                  dof_handler.get_fe_collection().size());
+          dealii::Table<2, std::unique_ptr<DoFIdentities>> vertex_dof_identities(
+            dof_handler.get_fe_collection().size(), dof_handler.get_fe_collection().size());
 
           // first identify vertices we want to exclude from working on.
           // specifically, these are the vertices of artificial and ghost
@@ -673,16 +591,12 @@ namespace internal
           // node constraints; we just end up with more DoFs than we would
           // if we unified DoF indices also between locally owned and ghost
           // cells, but we end up with a simpler algorithm in return.
-          std::vector<bool> include_vertex =
-            dof_handler.get_triangulation().get_used_vertices();
-          if (dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> *>(
+          std::vector<bool> include_vertex = dof_handler.get_triangulation().get_used_vertices();
+          if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
                 &dof_handler.get_triangulation()) != nullptr)
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_locally_owned())
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
+                for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
                   include_vertex[cell->vertex_index(v)] = false;
 
           // loop over all vertices and see which one we need to work
@@ -690,8 +604,7 @@ namespace internal
           for (unsigned int vertex_index = 0;
                vertex_index < dof_handler.get_triangulation().n_vertices();
                ++vertex_index)
-            if ((dof_handler.get_triangulation()
-                   .get_used_vertices()[vertex_index] == true) &&
+            if ((dof_handler.get_triangulation().get_used_vertices()[vertex_index] == true) &&
                 (include_vertex[vertex_index] == true))
               {
                 const unsigned int n_active_fe_indices =
@@ -700,26 +613,23 @@ namespace internal
                 if (n_active_fe_indices > 1)
                   {
                     const unsigned int first_fe_index =
-                      dealii::internal::DoFAccessorImplementation::
-                        Implementation::nth_active_vertex_fe_index(
-                          dof_handler, vertex_index, 0);
+                      dealii::internal::DoFAccessorImplementation::Implementation::
+                        nth_active_vertex_fe_index(dof_handler, vertex_index, 0);
 
                     // loop over all the other FEs with which we want
                     // to identify the DoF indices of the first FE of
                     for (unsigned int f = 1; f < n_active_fe_indices; ++f)
                       {
                         const unsigned int other_fe_index =
-                          dealii::internal::DoFAccessorImplementation::
-                            Implementation::nth_active_vertex_fe_index(
-                              dof_handler, vertex_index, f);
+                          dealii::internal::DoFAccessorImplementation::Implementation::
+                            nth_active_vertex_fe_index(dof_handler, vertex_index, f);
 
                         // make sure the entry in the equivalence
                         // table exists
                         ensure_existence_of_dof_identities<0>(
                           dof_handler.get_fe(first_fe_index),
                           dof_handler.get_fe(other_fe_index),
-                          vertex_dof_identities[first_fe_index]
-                                               [other_fe_index]);
+                          vertex_dof_identities[first_fe_index][other_fe_index]);
 
                         // then loop through the identities we
                         // have. first get the global numbers of the
@@ -730,30 +640,20 @@ namespace internal
                         // higher fe index to the one with the lower,
                         // to avoid circular reasoning.
                         DoFIdentities &identities =
-                          *vertex_dof_identities[first_fe_index]
-                                                [other_fe_index];
+                          *vertex_dof_identities[first_fe_index][other_fe_index];
                         for (unsigned int i = 0; i < identities.size(); ++i)
                           {
-                            const types::global_dof_index lower_dof_index =
-                              dealii::internal::DoFAccessorImplementation::
-                                Implementation::get_vertex_dof_index(
-                                  dof_handler,
-                                  vertex_index,
-                                  first_fe_index,
-                                  identities[i].first);
-                            const types::global_dof_index higher_dof_index =
-                              dealii::internal::DoFAccessorImplementation::
-                                Implementation::get_vertex_dof_index(
-                                  dof_handler,
-                                  vertex_index,
-                                  other_fe_index,
-                                  identities[i].second);
+                            const types::global_dof_index lower_dof_index = dealii::internal::
+                              DoFAccessorImplementation::Implementation::get_vertex_dof_index(
+                                dof_handler, vertex_index, first_fe_index, identities[i].first);
+                            const types::global_dof_index higher_dof_index = dealii::internal::
+                              DoFAccessorImplementation::Implementation::get_vertex_dof_index(
+                                dof_handler, vertex_index, other_fe_index, identities[i].second);
 
-                            Assert((dof_identities.find(higher_dof_index) ==
-                                    dof_identities.end()) ||
-                                     (dof_identities[higher_dof_index] ==
-                                      lower_dof_index),
-                                   ExcInternalError());
+                            Assert(
+                              (dof_identities.find(higher_dof_index) == dof_identities.end()) ||
+                                (dof_identities[higher_dof_index] == lower_dof_index),
+                              ExcInternalError());
 
                             dof_identities[higher_dof_index] = lower_dof_index;
                           }
@@ -781,15 +681,13 @@ namespace internal
         static std::map<types::global_dof_index, types::global_dof_index>
         compute_line_dof_identities(hp::DoFHandler<dim, spacedim> &dof_handler)
         {
-          std::map<types::global_dof_index, types::global_dof_index>
-            dof_identities;
+          std::map<types::global_dof_index, types::global_dof_index> dof_identities;
 
           // we will mark lines that we have already treated, so first save and
           // clear the user flags on lines and later restore them
           std::vector<bool> user_flags;
           dof_handler.get_triangulation().save_user_flags_line(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
+          const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
             .clear_user_flags_line();
 
           // exclude lines that bound cells we don't locally own, because
@@ -805,16 +703,14 @@ namespace internal
           // node constraints; we just end up with more DoFs than we would
           // if we unified DoF indices also between locally owned and ghost
           // cells, but we end up with a simpler algorithm in return.
-          if (dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> *>(
+          if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
                 &dof_handler.get_triangulation()) != nullptr)
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
+            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                   dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
               if (cell->is_locally_owned() == false)
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
                   cell->line(l)->set_user_flag();
 
           // An implementation of the algorithm described in the hp paper,
@@ -839,31 +735,26 @@ namespace internal
           dealii::Table<2, std::unique_ptr<DoFIdentities>> line_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
+          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                 dof_handler.begin_active();
                cell != dof_handler.end();
                ++cell)
             for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
               if (cell->line(l)->user_flag_set() == false)
                 {
-                  const typename hp::DoFHandler<dim, spacedim>::line_iterator
-                    line = cell->line(l);
+                  const typename hp::DoFHandler<dim, spacedim>::line_iterator line = cell->line(l);
                   line->set_user_flag();
 
-                  unsigned int unique_sets_of_dofs =
-                    line->n_active_fe_indices();
+                  unsigned int unique_sets_of_dofs = line->n_active_fe_indices();
 
                   // do a first loop over all sets of dofs and do identity
                   // uniquification
-                  const unsigned int n_active_fe_indices =
-                    line->n_active_fe_indices();
+                  const unsigned int n_active_fe_indices = line->n_active_fe_indices();
                   for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                     for (unsigned int g = f + 1; g < n_active_fe_indices; ++g)
                       {
-                        const unsigned int fe_index_1 =
-                                             line->nth_active_fe_index(f),
-                                           fe_index_2 =
-                                             line->nth_active_fe_index(g);
+                        const unsigned int fe_index_1 = line->nth_active_fe_index(f),
+                                           fe_index_2 = line->nth_active_fe_index(g);
 
                         if ((dof_handler.get_fe(fe_index_1).dofs_per_line ==
                              dof_handler.get_fe(fe_index_2).dofs_per_line) &&
@@ -876,25 +767,19 @@ namespace internal
                             // see if these sets of dofs are identical. the
                             // first condition for this is that indeed there are
                             // n identities
-                            if (line_dof_identities[fe_index_1][fe_index_2]
-                                  ->size() ==
+                            if (line_dof_identities[fe_index_1][fe_index_2]->size() ==
                                 dof_handler.get_fe(fe_index_1).dofs_per_line)
                               {
                                 unsigned int i = 0;
-                                for (; i < dof_handler.get_fe(fe_index_1)
-                                             .dofs_per_line;
-                                     ++i)
-                                  if (((*(line_dof_identities[fe_index_1]
-                                                             [fe_index_2]))[i]
-                                         .first != i) &&
-                                      ((*(line_dof_identities[fe_index_1]
-                                                             [fe_index_2]))[i]
-                                         .second != i))
+                                for (; i < dof_handler.get_fe(fe_index_1).dofs_per_line; ++i)
+                                  if (((*(line_dof_identities[fe_index_1][fe_index_2]))[i].first !=
+                                       i) &&
+                                      ((*(line_dof_identities[fe_index_1][fe_index_2]))[i].second !=
+                                       i))
                                     // not an identity
                                     break;
 
-                                if (i == dof_handler.get_fe(fe_index_1)
-                                           .dofs_per_line)
+                                if (i == dof_handler.get_fe(fe_index_1).dofs_per_line)
                                   {
                                     // The line dofs (i.e., the ones interior to
                                     // a line) of these two finite elements are
@@ -906,27 +791,22 @@ namespace internal
                                     --unique_sets_of_dofs;
 
                                     for (unsigned int j = 0;
-                                         j < dof_handler.get_fe(fe_index_1)
-                                               .dofs_per_line;
+                                         j < dof_handler.get_fe(fe_index_1).dofs_per_line;
                                          ++j)
                                       {
-                                        const types::global_dof_index
-                                          master_dof_index =
-                                            line->dof_index(j, fe_index_1);
-                                        const types::global_dof_index
-                                          slave_dof_index =
-                                            line->dof_index(j, fe_index_2);
+                                        const types::global_dof_index master_dof_index =
+                                          line->dof_index(j, fe_index_1);
+                                        const types::global_dof_index slave_dof_index =
+                                          line->dof_index(j, fe_index_2);
 
                                         // if master dof was already
                                         // constrained, constrain to that one,
                                         // otherwise constrain slave to master
-                                        if (dof_identities.find(
-                                              master_dof_index) !=
+                                        if (dof_identities.find(master_dof_index) !=
                                             dof_identities.end())
                                           {
                                             Assert(dof_identities.find(
-                                                     dof_identities
-                                                       [master_dof_index]) ==
+                                                     dof_identities[master_dof_index]) ==
                                                      dof_identities.end(),
                                                    ExcInternalError());
 
@@ -935,16 +815,13 @@ namespace internal
                                           }
                                         else
                                           {
-                                            Assert((dof_identities.find(
-                                                      master_dof_index) ==
+                                            Assert((dof_identities.find(master_dof_index) ==
                                                     dof_identities.end()) ||
-                                                     (dof_identities
-                                                        [slave_dof_index] ==
+                                                     (dof_identities[slave_dof_index] ==
                                                       master_dof_index),
                                                    ExcInternalError());
 
-                                            dof_identities[slave_dof_index] =
-                                              master_dof_index;
+                                            dof_identities[slave_dof_index] = master_dof_index;
                                           }
                                       }
                                   }
@@ -974,51 +851,39 @@ namespace internal
                       // identification. otherwise, the code that computes
                       // hanging node constraints will have to deal with it by
                       // computing appropriate constraints along this face/edge
-                      if (most_dominating_fe_index !=
-                          numbers::invalid_unsigned_int)
+                      if (most_dominating_fe_index != numbers::invalid_unsigned_int)
                         {
-                          const unsigned int n_active_fe_indices =
-                            line->n_active_fe_indices();
+                          const unsigned int n_active_fe_indices = line->n_active_fe_indices();
 
                           // loop over the indices of all the finite elements
                           // that are not dominating, and identify their dofs to
                           // the most dominating one
                           for (unsigned int f = 0; f < n_active_fe_indices; ++f)
-                            if (line->nth_active_fe_index(f) !=
-                                most_dominating_fe_index)
+                            if (line->nth_active_fe_index(f) != most_dominating_fe_index)
                               {
-                                const unsigned int other_fe_index =
-                                  line->nth_active_fe_index(f);
+                                const unsigned int other_fe_index = line->nth_active_fe_index(f);
 
                                 ensure_existence_of_dof_identities<1>(
                                   dof_handler.get_fe(most_dominating_fe_index),
                                   dof_handler.get_fe(other_fe_index),
-                                  line_dof_identities[most_dominating_fe_index]
-                                                     [other_fe_index]);
+                                  line_dof_identities[most_dominating_fe_index][other_fe_index]);
 
                                 DoFIdentities &identities =
-                                  *line_dof_identities[most_dominating_fe_index]
-                                                      [other_fe_index];
-                                for (unsigned int i = 0; i < identities.size();
-                                     ++i)
+                                  *line_dof_identities[most_dominating_fe_index][other_fe_index];
+                                for (unsigned int i = 0; i < identities.size(); ++i)
                                   {
-                                    const types::global_dof_index
-                                      master_dof_index = line->dof_index(
-                                        identities[i].first,
-                                        most_dominating_fe_index);
-                                    const types::global_dof_index
-                                      slave_dof_index = line->dof_index(
-                                        identities[i].second, other_fe_index);
+                                    const types::global_dof_index master_dof_index =
+                                      line->dof_index(identities[i].first,
+                                                      most_dominating_fe_index);
+                                    const types::global_dof_index slave_dof_index =
+                                      line->dof_index(identities[i].second, other_fe_index);
 
-                                    Assert(
-                                      (dof_identities.find(master_dof_index) ==
-                                       dof_identities.end()) ||
-                                        (dof_identities[slave_dof_index] ==
-                                         master_dof_index),
-                                      ExcInternalError());
+                                    Assert((dof_identities.find(master_dof_index) ==
+                                            dof_identities.end()) ||
+                                             (dof_identities[slave_dof_index] == master_dof_index),
+                                           ExcInternalError());
 
-                                    dof_identities[slave_dof_index] =
-                                      master_dof_index;
+                                    dof_identities[slave_dof_index] = master_dof_index;
                                   }
                               }
                         }
@@ -1026,8 +891,7 @@ namespace internal
                 }
 
           // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
+          const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
             .load_user_flags_line(user_flags);
 
           return dof_identities;
@@ -1058,8 +922,7 @@ namespace internal
         {
           const int dim = 3;
 
-          std::map<types::global_dof_index, types::global_dof_index>
-            dof_identities;
+          std::map<types::global_dof_index, types::global_dof_index> dof_identities;
 
 
           // we will mark quads that we have already treated, so first
@@ -1067,8 +930,7 @@ namespace internal
           // them
           std::vector<bool> user_flags;
           dof_handler.get_triangulation().save_user_flags_quad(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
+          const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
             .clear_user_flags_quad();
 
           // exclude quads that bound cells we don't locally own, because
@@ -1084,16 +946,14 @@ namespace internal
           // node constraints; we just end up with more DoFs than we would
           // if we unified DoF indices also between locally owned and ghost
           // cells, but we end up with a simpler algorithm in return.
-          if (dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> *>(
+          if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
                 &dof_handler.get_triangulation()) != nullptr)
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
+            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                   dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
               if (cell->is_locally_owned() == false)
-                for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell;
-                     ++q)
+                for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
                   cell->quad(q)->set_user_flag();
 
 
@@ -1111,16 +971,15 @@ namespace internal
           dealii::Table<2, std::unique_ptr<DoFIdentities>> quad_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
+          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                 dof_handler.begin_active();
                cell != dof_handler.end();
                ++cell)
             for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
               if ((cell->quad(q)->user_flag_set() == false) &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
-                  const typename hp::DoFHandler<dim, spacedim>::quad_iterator
-                    quad = cell->quad(q);
+                  const typename hp::DoFHandler<dim, spacedim>::quad_iterator quad = cell->quad(q);
                   quad->set_user_flag();
 
                   // find out which is the most dominating finite
@@ -1136,54 +995,44 @@ namespace internal
                   // along this face/edge
                   if (most_dominating_fe_index != numbers::invalid_unsigned_int)
                     {
-                      const unsigned int n_active_fe_indices =
-                        quad->n_active_fe_indices();
+                      const unsigned int n_active_fe_indices = quad->n_active_fe_indices();
 
                       // loop over the indices of all the finite
                       // elements that are not dominating, and
                       // identify their dofs to the most dominating
                       // one
                       for (unsigned int f = 0; f < n_active_fe_indices; ++f)
-                        if (quad->nth_active_fe_index(f) !=
-                            most_dominating_fe_index)
+                        if (quad->nth_active_fe_index(f) != most_dominating_fe_index)
                           {
-                            const unsigned int other_fe_index =
-                              quad->nth_active_fe_index(f);
+                            const unsigned int other_fe_index = quad->nth_active_fe_index(f);
 
                             ensure_existence_of_dof_identities<2>(
                               dof_handler.get_fe(most_dominating_fe_index),
                               dof_handler.get_fe(other_fe_index),
-                              quad_dof_identities[most_dominating_fe_index]
-                                                 [other_fe_index]);
+                              quad_dof_identities[most_dominating_fe_index][other_fe_index]);
 
                             DoFIdentities &identities =
-                              *quad_dof_identities[most_dominating_fe_index]
-                                                  [other_fe_index];
+                              *quad_dof_identities[most_dominating_fe_index][other_fe_index];
                             for (unsigned int i = 0; i < identities.size(); ++i)
                               {
                                 const types::global_dof_index master_dof_index =
-                                  quad->dof_index(identities[i].first,
-                                                  most_dominating_fe_index);
+                                  quad->dof_index(identities[i].first, most_dominating_fe_index);
                                 const types::global_dof_index slave_dof_index =
-                                  quad->dof_index(identities[i].second,
-                                                  other_fe_index);
+                                  quad->dof_index(identities[i].second, other_fe_index);
 
-                                Assert((dof_identities.find(master_dof_index) ==
-                                        dof_identities.end()) ||
-                                         (dof_identities[slave_dof_index] ==
-                                          master_dof_index),
-                                       ExcInternalError());
+                                Assert(
+                                  (dof_identities.find(master_dof_index) == dof_identities.end()) ||
+                                    (dof_identities[slave_dof_index] == master_dof_index),
+                                  ExcInternalError());
 
-                                dof_identities[slave_dof_index] =
-                                  master_dof_index;
+                                dof_identities[slave_dof_index] = master_dof_index;
                               }
                           }
                     }
                 }
 
           // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
+          const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
             .load_user_flags_quad(user_flags);
 
           return dof_identities;
@@ -1214,30 +1063,27 @@ namespace internal
         template <int dim, int spacedim>
         static unsigned int
         unify_dof_indices(hp::DoFHandler<dim, spacedim> &dof_handler,
-                          const unsigned int n_dofs_before_identification,
-                          const bool         check_validity)
+                          const unsigned int             n_dofs_before_identification,
+                          const bool                     check_validity)
         {
           // compute the constraints that correspond to unifying
           // dof indices on vertices, lines, and quads. do so
           // in parallel
-          std::map<types::global_dof_index, types::global_dof_index>
-            all_constrained_indices[dim];
+          std::map<types::global_dof_index, types::global_dof_index> all_constrained_indices[dim];
 
           {
             Threads::TaskGroup<> tasks;
 
             unsigned int i = 0;
             tasks += Threads::new_task([&, i]() {
-              all_constrained_indices[i] =
-                compute_vertex_dof_identities(dof_handler);
+              all_constrained_indices[i] = compute_vertex_dof_identities(dof_handler);
             });
 
             if (dim > 1)
               {
                 ++i;
                 tasks += Threads::new_task([&, i]() {
-                  all_constrained_indices[i] =
-                    compute_line_dof_identities(dof_handler);
+                  all_constrained_indices[i] = compute_line_dof_identities(dof_handler);
                 });
               }
 
@@ -1245,8 +1091,7 @@ namespace internal
               {
                 ++i;
                 tasks += Threads::new_task([&, i]() {
-                  all_constrained_indices[i] =
-                    compute_quad_dof_identities(dof_handler);
+                  all_constrained_indices[i] = compute_quad_dof_identities(dof_handler);
                 });
               }
 
@@ -1256,20 +1101,18 @@ namespace internal
           // create a vector that contains the new DoF indices; first preset the
           // ones that are identities as determined above, then enumerate the
           // rest
-          std::vector<types::global_dof_index> new_dof_indices(
-            n_dofs_before_identification, numbers::invalid_dof_index);
+          std::vector<types::global_dof_index> new_dof_indices(n_dofs_before_identification,
+                                                               numbers::invalid_dof_index);
 
           for (const auto &constrained_dof_indices : all_constrained_indices)
             for (const auto &p : constrained_dof_indices)
               {
-                Assert(new_dof_indices[p.first] == numbers::invalid_dof_index,
-                       ExcInternalError());
+                Assert(new_dof_indices[p.first] == numbers::invalid_dof_index, ExcInternalError());
                 new_dof_indices[p.first] = p.second;
               }
 
           types::global_dof_index next_free_dof = 0;
-          for (types::global_dof_index i = 0; i < n_dofs_before_identification;
-               ++i)
+          for (types::global_dof_index i = 0; i < n_dofs_before_identification; ++i)
             if (new_dof_indices[i] == numbers::invalid_dof_index)
               {
                 new_dof_indices[i] = next_free_dof;
@@ -1281,25 +1124,21 @@ namespace internal
           for (const auto &constrained_dof_indices : all_constrained_indices)
             for (const auto &p : constrained_dof_indices)
               {
-                Assert(new_dof_indices[p.first] != numbers::invalid_dof_index,
-                       ExcInternalError());
+                Assert(new_dof_indices[p.first] != numbers::invalid_dof_index, ExcInternalError());
 
                 new_dof_indices[p.first] = new_dof_indices[p.second];
               }
 
-          for (types::global_dof_index i = 0; i < n_dofs_before_identification;
-               ++i)
+          for (types::global_dof_index i = 0; i < n_dofs_before_identification; ++i)
             {
-              Assert(new_dof_indices[i] != numbers::invalid_dof_index,
-                     ExcInternalError());
+              Assert(new_dof_indices[i] != numbers::invalid_dof_index, ExcInternalError());
               Assert(new_dof_indices[i] < next_free_dof, ExcInternalError());
             }
 
           // finally, do the renumbering. verify that previous dof indices
           // were indeed all valid on all cells that we touch if we were
           // told to do so
-          renumber_dofs(
-            new_dof_indices, IndexSet(0), dof_handler, check_validity);
+          renumber_dofs(new_dof_indices, IndexSet(0), dof_handler, check_validity);
 
 
           return next_free_dof;
@@ -1315,25 +1154,22 @@ namespace internal
          */
         template <class DoFHandlerType>
         static types::global_dof_index
-        distribute_dofs(const types::subdomain_id subdomain_id,
-                        DoFHandlerType &          dof_handler)
+        distribute_dofs(const types::subdomain_id subdomain_id, DoFHandlerType &dof_handler)
         {
-          Assert(dof_handler.get_triangulation().n_levels() > 0,
-                 ExcMessage("Empty triangulation"));
+          Assert(dof_handler.get_triangulation().n_levels() > 0, ExcMessage("Empty triangulation"));
 
           // Step 1: distribute dofs on all cells, but definitely
           // exclude artificial cells
-          types::global_dof_index next_free_dof = 0;
-          typename DoFHandlerType::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
+          types::global_dof_index                       next_free_dof = 0;
+          typename DoFHandlerType::active_cell_iterator cell          = dof_handler.begin_active(),
+                                                        endc          = dof_handler.end();
 
           for (; cell != endc; ++cell)
             if (!cell->is_artificial())
               if ((subdomain_id == numbers::invalid_subdomain_id) ||
                   (cell->subdomain_id() == subdomain_id))
-                next_free_dof = Implementation::distribute_dofs_on_cell(
-                  dof_handler, cell, next_free_dof);
+                next_free_dof =
+                  Implementation::distribute_dofs_on_cell(dof_handler, cell, next_free_dof);
 
           // Step 2: unify dof indices in case this is an hp DoFHandler
           //
@@ -1341,11 +1177,10 @@ namespace internal
           // we can check that all previous DoF indices were valid, but
           // this only makes sense if we really distributed DoFs on
           // all (non-artificial) cells above
-          next_free_dof =
-            unify_dof_indices(dof_handler,
-                              next_free_dof,
-                              /* check_validity = */
-                              (subdomain_id == numbers::invalid_subdomain_id));
+          next_free_dof = unify_dof_indices(dof_handler,
+                                            next_free_dof,
+                                            /* check_validity = */
+                                            (subdomain_id == numbers::invalid_subdomain_id));
 
           update_all_active_cell_dof_indices_caches(dof_handler);
 
@@ -1368,45 +1203,37 @@ namespace internal
         static types::global_dof_index
         distribute_mg_dofs_on_cell(
           const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell,
-          types::global_dof_index next_free_dof,
+          types::global_dof_index                                        next_free_dof,
           const std::integral_constant<int, 1> &)
         {
           // distribute dofs of vertices
           if (cell->get_fe().dofs_per_vertex > 0)
-            for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell;
-                 ++v)
+            for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell; ++v)
               {
-                typename DoFHandler<dim, spacedim>::level_cell_iterator
-                  neighbor = cell->neighbor(v);
+                typename DoFHandler<dim, spacedim>::level_cell_iterator neighbor =
+                  cell->neighbor(v);
 
                 if (neighbor.state() == IteratorState::valid)
                   {
                     // has neighbor already been processed?
-                    if (neighbor->user_flag_set() &&
-                        (neighbor->level() == cell->level()))
+                    if (neighbor->user_flag_set() && (neighbor->level() == cell->level()))
                       // copy dofs if the neighbor is on the same level (only
                       // then are mg dofs the same)
                       {
                         if (v == 0)
-                          for (unsigned int d = 0;
-                               d < cell->get_fe().dofs_per_vertex;
-                               ++d)
+                          for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex; ++d)
                             cell->set_mg_vertex_dof_index(
                               cell->level(),
                               0,
                               d,
-                              neighbor->mg_vertex_dof_index(
-                                cell->level(), 1, d));
+                              neighbor->mg_vertex_dof_index(cell->level(), 1, d));
                         else
-                          for (unsigned int d = 0;
-                               d < cell->get_fe().dofs_per_vertex;
-                               ++d)
+                          for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex; ++d)
                             cell->set_mg_vertex_dof_index(
                               cell->level(),
                               1,
                               d,
-                              neighbor->mg_vertex_dof_index(
-                                cell->level(), 0, d));
+                              neighbor->mg_vertex_dof_index(cell->level(), 0, d));
 
                         // next neighbor
                         continue;
@@ -1414,10 +1241,8 @@ namespace internal
                   }
 
                 // otherwise: create dofs newly
-                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex;
-                     ++d)
-                  cell->set_mg_vertex_dof_index(
-                    cell->level(), v, d, next_free_dof++);
+                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex; ++d)
+                  cell->set_mg_vertex_dof_index(cell->level(), v, d, next_free_dof++);
               }
 
           // dofs of line
@@ -1437,39 +1262,30 @@ namespace internal
         static types::global_dof_index
         distribute_mg_dofs_on_cell(
           const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell,
-          types::global_dof_index next_free_dof,
+          types::global_dof_index                                        next_free_dof,
           const std::integral_constant<int, 2> &)
         {
           if (cell->get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<2>::vertices_per_cell;
-                 ++vertex)
+            for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
               // check whether dofs for this
               // vertex have been distributed
               // (only check the first dof)
-              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex;
-                     ++d)
-                  cell->set_mg_vertex_dof_index(
-                    cell->level(), vertex, d, next_free_dof++);
+              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == numbers::invalid_dof_index)
+                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex; ++d)
+                  cell->set_mg_vertex_dof_index(cell->level(), vertex, d, next_free_dof++);
 
           // for the four sides
           if (cell->get_fe().dofs_per_line > 0)
-            for (unsigned int side = 0; side < GeometryInfo<2>::faces_per_cell;
-                 ++side)
+            for (unsigned int side = 0; side < GeometryInfo<2>::faces_per_cell; ++side)
               {
-                typename DoFHandler<dim, spacedim>::line_iterator line =
-                  cell->line(side);
+                typename DoFHandler<dim, spacedim>::line_iterator line = cell->line(side);
 
                 // distribute dofs if necessary: check whether line dof is
                 // already numbered (check only first dof)
-                if (line->mg_dof_index(cell->level(), 0) ==
-                    numbers::invalid_dof_index)
+                if (line->mg_dof_index(cell->level(), 0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_line;
-                       ++d)
+                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_line; ++d)
                     line->set_mg_dof_index(cell->level(), d, next_free_dof++);
               }
 
@@ -1492,38 +1308,30 @@ namespace internal
         static types::global_dof_index
         distribute_mg_dofs_on_cell(
           const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell,
-          types::global_dof_index next_free_dof,
+          types::global_dof_index                                        next_free_dof,
           const std::integral_constant<int, 3> &)
         {
           if (cell->get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
-            for (unsigned int vertex = 0;
-                 vertex < GeometryInfo<3>::vertices_per_cell;
-                 ++vertex)
+            for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
               // check whether dofs for this vertex have been distributed
               // (only check the first dof)
-              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) ==
-                  numbers::invalid_dof_index)
-                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex;
-                     ++d)
-                  cell->set_mg_vertex_dof_index(
-                    cell->level(), vertex, d, next_free_dof++);
+              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == numbers::invalid_dof_index)
+                for (unsigned int d = 0; d < cell->get_fe().dofs_per_vertex; ++d)
+                  cell->set_mg_vertex_dof_index(cell->level(), vertex, d, next_free_dof++);
 
           // for the lines
           if (cell->get_fe().dofs_per_line > 0)
             for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
               {
-                typename DoFHandler<dim, spacedim>::line_iterator line =
-                  cell->line(l);
+                typename DoFHandler<dim, spacedim>::line_iterator line = cell->line(l);
 
                 // distribute dofs if necessary:
                 // check whether line dof is already
                 // numbered (check only first dof)
-                if (line->mg_dof_index(cell->level(), 0) ==
-                    numbers::invalid_dof_index)
+                if (line->mg_dof_index(cell->level(), 0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_line;
-                       ++d)
+                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_line; ++d)
                     line->set_mg_dof_index(cell->level(), d, next_free_dof++);
               }
 
@@ -1531,17 +1339,14 @@ namespace internal
           if (cell->get_fe().dofs_per_quad > 0)
             for (unsigned int q = 0; q < GeometryInfo<3>::quads_per_cell; ++q)
               {
-                typename DoFHandler<dim, spacedim>::quad_iterator quad =
-                  cell->quad(q);
+                typename DoFHandler<dim, spacedim>::quad_iterator quad = cell->quad(q);
 
                 // distribute dofs if necessary:
                 // check whether line dof is already
                 // numbered (check only first dof)
-                if (quad->mg_dof_index(cell->level(), 0) ==
-                    numbers::invalid_dof_index)
+                if (quad->mg_dof_index(cell->level(), 0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_quad;
-                       ++d)
+                  for (unsigned int d = 0; d < cell->get_fe().dofs_per_quad; ++d)
                     quad->set_mg_dof_index(cell->level(), d, next_free_dof++);
               }
 
@@ -1564,10 +1369,9 @@ namespace internal
         template <int spacedim>
         static types::global_dof_index
         distribute_mg_dofs_on_cell(
-          const hp::DoFHandler<1, spacedim> &dof_handler,
-          const typename hp::DoFHandler<1, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
+          const hp::DoFHandler<1, spacedim> &                               dof_handler,
+          const typename hp::DoFHandler<1, spacedim>::active_cell_iterator &cell,
+          types::global_dof_index                                           next_free_dof)
         {
           (void)dof_handler;
           (void)cell;
@@ -1580,10 +1384,9 @@ namespace internal
         template <int spacedim>
         static types::global_dof_index
         distribute_mg_dofs_on_cell(
-          const hp::DoFHandler<2, spacedim> &dof_handler,
-          const typename hp::DoFHandler<2, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
+          const hp::DoFHandler<2, spacedim> &                               dof_handler,
+          const typename hp::DoFHandler<2, spacedim>::active_cell_iterator &cell,
+          types::global_dof_index                                           next_free_dof)
         {
           (void)dof_handler;
           (void)cell;
@@ -1596,10 +1399,9 @@ namespace internal
         template <int spacedim>
         static types::global_dof_index
         distribute_mg_dofs_on_cell(
-          const hp::DoFHandler<3, spacedim> &dof_handler,
-          const typename hp::DoFHandler<3, spacedim>::active_cell_iterator
-            &                     cell,
-          types::global_dof_index next_free_dof)
+          const hp::DoFHandler<3, spacedim> &                               dof_handler,
+          const typename hp::DoFHandler<3, spacedim>::active_cell_iterator &cell,
+          types::global_dof_index                                           next_free_dof)
         {
           (void)dof_handler;
           (void)cell;
@@ -1618,8 +1420,7 @@ namespace internal
           const unsigned int dim      = DoFHandlerType::dimension;
           const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-          const dealii::Triangulation<dim, spacedim> &tria =
-            dof_handler.get_triangulation();
+          const dealii::Triangulation<dim, spacedim> &tria = dof_handler.get_triangulation();
           Assert(tria.n_levels() > 0, ExcMessage("Empty triangulation"));
           if (level >= tria.n_levels())
             return 0; // this is allowed for multigrid
@@ -1630,24 +1431,20 @@ namespace internal
           // same state as it was at the beginning of this function.
           std::vector<bool> user_flags;
           tria.save_user_flags(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .clear_user_flags();
+          const_cast<dealii::Triangulation<dim, spacedim> &>(tria).clear_user_flags();
 
-          types::global_dof_index next_free_dof = 0;
-          typename DoFHandler<dim, spacedim>::level_cell_iterator
-            cell = dof_handler.begin(level),
-            endc = dof_handler.end(level);
+          types::global_dof_index                                 next_free_dof = 0;
+          typename DoFHandler<dim, spacedim>::level_cell_iterator cell = dof_handler.begin(level),
+                                                                  endc = dof_handler.end(level);
 
           for (; cell != endc; ++cell)
             if ((level_subdomain_id == numbers::invalid_subdomain_id) ||
                 (cell->level_subdomain_id() == level_subdomain_id))
-              next_free_dof =
-                Implementation::distribute_mg_dofs_on_cell<dim, spacedim>(
-                  cell, next_free_dof, std::integral_constant<int, dim>());
+              next_free_dof = Implementation::distribute_mg_dofs_on_cell<dim, spacedim>(
+                cell, next_free_dof, std::integral_constant<int, dim>());
 
           // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .load_user_flags(user_flags);
+          const_cast<dealii::Triangulation<dim, spacedim> &>(tria).load_user_flags(user_flags);
 
           return next_free_dof;
         }
@@ -1666,11 +1463,10 @@ namespace internal
          */
         template <int dim, int spacedim>
         static void
-        renumber_vertex_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          DoFHandler<dim, spacedim> &                 dof_handler,
-          const bool                                  check_validity)
+        renumber_vertex_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                             const IndexSet &                            indices,
+                             DoFHandler<dim, spacedim> &                 dof_handler,
+                             const bool                                  check_validity)
         {
           // we can not use cell iterators in this function since then
           // we would renumber the dofs on the interface of two cells
@@ -1678,14 +1474,12 @@ namespace internal
           // correct but also faster; note, however, that dof numbers
           // may be invalid_dof_index, namely when the appropriate
           // vertex/line/etc is unused
-          for (std::vector<types::global_dof_index>::iterator i =
-                 dof_handler.vertex_dofs.begin();
+          for (std::vector<types::global_dof_index>::iterator i = dof_handler.vertex_dofs.begin();
                i != dof_handler.vertex_dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = (indices.size() == 0) ?
-                     (new_numbers[*i]) :
-                     (new_numbers[indices.index_within_set(*i)]);
+              *i = (indices.size() == 0) ? (new_numbers[*i]) :
+                                           (new_numbers[indices.index_within_set(*i)]);
             else if (check_validity)
               // if index is invalid_dof_index: check if this one
               // really is unused
@@ -1706,21 +1500,18 @@ namespace internal
          */
         template <int dim, int spacedim>
         static void
-        renumber_cell_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          DoFHandler<dim, spacedim> &                 dof_handler)
+        renumber_cell_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                           const IndexSet &                            indices,
+                           DoFHandler<dim, spacedim> &                 dof_handler)
         {
-          for (unsigned int level = 0; level < dof_handler.levels.size();
-               ++level)
+          for (unsigned int level = 0; level < dof_handler.levels.size(); ++level)
             for (std::vector<types::global_dof_index>::iterator i =
                    dof_handler.levels[level]->dof_object.dofs.begin();
                  i != dof_handler.levels[level]->dof_object.dofs.end();
                  ++i)
               if (*i != numbers::invalid_dof_index)
-                *i = ((indices.size() == 0) ?
-                        new_numbers[*i] :
-                        new_numbers[indices.index_within_set(*i)]);
+                *i = ((indices.size() == 0) ? new_numbers[*i] :
+                                              new_numbers[indices.index_within_set(*i)]);
         }
 
 
@@ -1734,10 +1525,9 @@ namespace internal
          */
         template <int spacedim>
         static void
-        renumber_face_dofs(
-          const std::vector<types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
-          DoFHandler<1, spacedim> & /*dof_handler*/)
+        renumber_face_dofs(const std::vector<types::global_dof_index> & /*new_numbers*/,
+                           const IndexSet & /*indices*/,
+                           DoFHandler<1, spacedim> & /*dof_handler*/)
         {
           // nothing to do in 1d since there are no separate faces
         }
@@ -1746,10 +1536,9 @@ namespace internal
 
         template <int spacedim>
         static void
-        renumber_face_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          DoFHandler<2, spacedim> &                   dof_handler)
+        renumber_face_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                           const IndexSet &                            indices,
+                           DoFHandler<2, spacedim> &                   dof_handler)
         {
           // treat dofs on lines
           for (std::vector<types::global_dof_index>::iterator i =
@@ -1757,19 +1546,17 @@ namespace internal
                i != dof_handler.faces->lines.dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
-                      new_numbers[*i] :
-                      new_numbers[indices.index_within_set(*i)]);
+              *i = ((indices.size() == 0) ? new_numbers[*i] :
+                                            new_numbers[indices.index_within_set(*i)]);
         }
 
 
 
         template <int spacedim>
         static void
-        renumber_face_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          DoFHandler<3, spacedim> &                   dof_handler)
+        renumber_face_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                           const IndexSet &                            indices,
+                           DoFHandler<3, spacedim> &                   dof_handler)
         {
           // treat dofs on lines
           for (std::vector<types::global_dof_index>::iterator i =
@@ -1777,9 +1564,8 @@ namespace internal
                i != dof_handler.faces->lines.dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
-                      new_numbers[*i] :
-                      new_numbers[indices.index_within_set(*i)]);
+              *i = ((indices.size() == 0) ? new_numbers[*i] :
+                                            new_numbers[indices.index_within_set(*i)]);
 
           // treat dofs on quads
           for (std::vector<types::global_dof_index>::iterator i =
@@ -1787,35 +1573,31 @@ namespace internal
                i != dof_handler.faces->quads.dofs.end();
                ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
-                      new_numbers[*i] :
-                      new_numbers[indices.index_within_set(*i)]);
+              *i = ((indices.size() == 0) ? new_numbers[*i] :
+                                            new_numbers[indices.index_within_set(*i)]);
         }
 
 
 
         template <int dim, int spacedim>
         static void
-        renumber_vertex_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          hp::DoFHandler<dim, spacedim> &             dof_handler,
-          const bool                                  check_validity)
+        renumber_vertex_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                             const IndexSet &                            indices,
+                             hp::DoFHandler<dim, spacedim> &             dof_handler,
+                             const bool                                  check_validity)
         {
           for (unsigned int vertex_index = 0;
                vertex_index < dof_handler.get_triangulation().n_vertices();
                ++vertex_index)
             {
-              const unsigned int n_active_fe_indices =
-                dealii::internal::DoFAccessorImplementation::Implementation::
-                  n_active_vertex_fe_indices(dof_handler, vertex_index);
+              const unsigned int n_active_fe_indices = dealii::internal::DoFAccessorImplementation::
+                Implementation::n_active_vertex_fe_indices(dof_handler, vertex_index);
 
               // if this vertex is unused, then we really ought not to have
               // allocated any space for it, i.e., n_active_fe_indices should be
               // zero, and there is no space to actually store dof indices for
               // this vertex
-              if (dof_handler.get_triangulation().vertex_used(vertex_index) ==
-                  false)
+              if (dof_handler.get_triangulation().vertex_used(vertex_index) == false)
                 Assert(n_active_fe_indices == 0, ExcInternalError());
 
               // otherwise the vertex is used; it may still not hold any dof
@@ -1824,19 +1606,14 @@ namespace internal
               // us to do
               for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                 {
-                  const unsigned int fe_index =
-                    dealii::internal::DoFAccessorImplementation::
-                      Implementation::nth_active_vertex_fe_index(
-                        dof_handler, vertex_index, f);
+                  const unsigned int fe_index = dealii::internal::DoFAccessorImplementation::
+                    Implementation::nth_active_vertex_fe_index(dof_handler, vertex_index, f);
 
-                  for (unsigned int d = 0;
-                       d < dof_handler.get_fe(fe_index).dofs_per_vertex;
-                       ++d)
+                  for (unsigned int d = 0; d < dof_handler.get_fe(fe_index).dofs_per_vertex; ++d)
                     {
                       const types::global_dof_index old_dof_index =
-                        dealii::internal::DoFAccessorImplementation::
-                          Implementation::get_vertex_dof_index(
-                            dof_handler, vertex_index, fe_index, d);
+                        dealii::internal::DoFAccessorImplementation::Implementation::
+                          get_vertex_dof_index(dof_handler, vertex_index, fe_index, d);
 
                       // if check_validity was set, then we are to verify that
                       // the previous indices were all valid. this really should
@@ -1847,20 +1624,18 @@ namespace internal
                       // must make sure that they have been set to something
                       // useful
                       if (check_validity)
-                        Assert(old_dof_index != numbers::invalid_dof_index,
-                               ExcInternalError());
+                        Assert(old_dof_index != numbers::invalid_dof_index, ExcInternalError());
 
                       if (old_dof_index != numbers::invalid_dof_index)
-                        dealii::internal::DoFAccessorImplementation::
-                          Implementation::set_vertex_dof_index(
+                        dealii::internal::DoFAccessorImplementation::Implementation::
+                          set_vertex_dof_index(
                             dof_handler,
                             vertex_index,
                             fe_index,
                             d,
                             (indices.size() == 0) ?
                               (new_numbers[old_dof_index]) :
-                              (new_numbers[indices.index_within_set(
-                                old_dof_index)]));
+                              (new_numbers[indices.index_within_set(old_dof_index)]));
                     }
                 }
             }
@@ -1870,13 +1645,12 @@ namespace internal
 
         template <int dim, int spacedim>
         static void
-        renumber_cell_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          hp::DoFHandler<dim, spacedim> &             dof_handler)
+        renumber_cell_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                           const IndexSet &                            indices,
+                           hp::DoFHandler<dim, spacedim> &             dof_handler)
         {
-          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                 cell = dof_handler.begin_active();
+          for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                 dof_handler.begin_active();
                cell != dof_handler.end();
                ++cell)
             if (!cell->is_artificial())
@@ -1884,20 +1658,16 @@ namespace internal
                 const unsigned int fe_index = cell->active_fe_index();
 
                 for (unsigned int d = 0;
-                     d < dof_handler.get_fe(fe_index)
-                           .template n_dofs_per_object<dim>();
+                     d < dof_handler.get_fe(fe_index).template n_dofs_per_object<dim>();
                      ++d)
                   {
-                    const types::global_dof_index old_dof_index =
-                      cell->dof_index(d, fe_index);
+                    const types::global_dof_index old_dof_index = cell->dof_index(d, fe_index);
                     if (old_dof_index != numbers::invalid_dof_index)
-                      cell->set_dof_index(
-                        d,
-                        (indices.size() == 0) ?
-                          (new_numbers[old_dof_index]) :
-                          (new_numbers[indices.index_within_set(
-                            old_dof_index)]),
-                        fe_index);
+                      cell->set_dof_index(d,
+                                          (indices.size() == 0) ?
+                                            (new_numbers[old_dof_index]) :
+                                            (new_numbers[indices.index_within_set(old_dof_index)]),
+                                          fe_index);
                   }
               }
         }
@@ -1906,10 +1676,9 @@ namespace internal
 
         template <int spacedim>
         static void
-        renumber_face_dofs(
-          const std::vector<types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
-          hp::DoFHandler<1, spacedim> & /*dof_handler*/)
+        renumber_face_dofs(const std::vector<types::global_dof_index> & /*new_numbers*/,
+                           const IndexSet & /*indices*/,
+                           hp::DoFHandler<1, spacedim> & /*dof_handler*/)
         {
           // nothing to do in 1d since there are no separate faces -- we've
           // already taken care of this when dealing with the vertices
@@ -1919,10 +1688,9 @@ namespace internal
 
         template <int spacedim>
         static void
-        renumber_face_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          hp::DoFHandler<2, spacedim> &               dof_handler)
+        renumber_face_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                           const IndexSet &                            indices,
+                           hp::DoFHandler<2, spacedim> &               dof_handler)
         {
           const unsigned int dim = 2;
 
@@ -1931,37 +1699,30 @@ namespace internal
             // save user flags on lines so we can use them to mark lines
             // we've already treated
             std::vector<bool> saved_line_user_flags;
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .save_user_flags_line(saved_line_user_flags);
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .clear_user_flags_line();
 
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
+            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                   dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
               if (!cell->is_artificial())
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
                   if (cell->line(l)->user_flag_set() == false)
                     {
-                      const typename hp::DoFHandler<dim,
-                                                    spacedim>::line_iterator
-                        line = cell->line(l);
+                      const typename hp::DoFHandler<dim, spacedim>::line_iterator line =
+                        cell->line(l);
                       line->set_user_flag();
 
-                      const unsigned int n_active_fe_indices =
-                        line->n_active_fe_indices();
+                      const unsigned int n_active_fe_indices = line->n_active_fe_indices();
 
                       for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                         {
-                          const unsigned int fe_index =
-                            line->nth_active_fe_index(f);
+                          const unsigned int fe_index = line->nth_active_fe_index(f);
 
-                          for (unsigned int d = 0;
-                               d < dof_handler.get_fe(fe_index).dofs_per_line;
+                          for (unsigned int d = 0; d < dof_handler.get_fe(fe_index).dofs_per_line;
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
@@ -1971,8 +1732,7 @@ namespace internal
                                   d,
                                   (indices.size() == 0) ?
                                     (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
+                                    (new_numbers[indices.index_within_set(old_dof_index)]),
                                   fe_index);
                             }
                         }
@@ -1980,8 +1740,7 @@ namespace internal
 
             // at the end, restore the user
             // flags for the lines
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .load_user_flags_line(saved_line_user_flags);
           }
         }
@@ -1990,10 +1749,9 @@ namespace internal
 
         template <int spacedim>
         static void
-        renumber_face_dofs(
-          const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices,
-          hp::DoFHandler<3, spacedim> &               dof_handler)
+        renumber_face_dofs(const std::vector<types::global_dof_index> &new_numbers,
+                           const IndexSet &                            indices,
+                           hp::DoFHandler<3, spacedim> &               dof_handler)
         {
           const unsigned int dim = 3;
 
@@ -2002,37 +1760,30 @@ namespace internal
             // save user flags on lines so we can use them to mark lines
             // we've already treated
             std::vector<bool> saved_line_user_flags;
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .save_user_flags_line(saved_line_user_flags);
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .clear_user_flags_line();
 
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
+            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                   dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
               if (!cell->is_artificial())
-                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
                   if (cell->line(l)->user_flag_set() == false)
                     {
-                      const typename hp::DoFHandler<dim,
-                                                    spacedim>::line_iterator
-                        line = cell->line(l);
+                      const typename hp::DoFHandler<dim, spacedim>::line_iterator line =
+                        cell->line(l);
                       line->set_user_flag();
 
-                      const unsigned int n_active_fe_indices =
-                        line->n_active_fe_indices();
+                      const unsigned int n_active_fe_indices = line->n_active_fe_indices();
 
                       for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                         {
-                          const unsigned int fe_index =
-                            line->nth_active_fe_index(f);
+                          const unsigned int fe_index = line->nth_active_fe_index(f);
 
-                          for (unsigned int d = 0;
-                               d < dof_handler.get_fe(fe_index).dofs_per_line;
+                          for (unsigned int d = 0; d < dof_handler.get_fe(fe_index).dofs_per_line;
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
@@ -2042,8 +1793,7 @@ namespace internal
                                   d,
                                   (indices.size() == 0) ?
                                     (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
+                                    (new_numbers[indices.index_within_set(old_dof_index)]),
                                   fe_index);
                             }
                         }
@@ -2051,45 +1801,37 @@ namespace internal
 
             // at the end, restore the user
             // flags for the lines
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .load_user_flags_line(saved_line_user_flags);
           }
 
           // then deal with dofs on quads
           {
             std::vector<bool> saved_quad_user_flags;
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .save_user_flags_quad(saved_quad_user_flags);
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .clear_user_flags_quad();
 
-            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator
-                   cell = dof_handler.begin_active();
+            for (typename hp::DoFHandler<dim, spacedim>::active_cell_iterator cell =
+                   dof_handler.begin_active();
                  cell != dof_handler.end();
                  ++cell)
               if (!cell->is_artificial())
-                for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell;
-                     ++q)
+                for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
                   if (cell->quad(q)->user_flag_set() == false)
                     {
-                      const typename hp::DoFHandler<dim,
-                                                    spacedim>::quad_iterator
-                        quad = cell->quad(q);
+                      const typename hp::DoFHandler<dim, spacedim>::quad_iterator quad =
+                        cell->quad(q);
                       quad->set_user_flag();
 
-                      const unsigned int n_active_fe_indices =
-                        quad->n_active_fe_indices();
+                      const unsigned int n_active_fe_indices = quad->n_active_fe_indices();
 
                       for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                         {
-                          const unsigned int fe_index =
-                            quad->nth_active_fe_index(f);
+                          const unsigned int fe_index = quad->nth_active_fe_index(f);
 
-                          for (unsigned int d = 0;
-                               d < dof_handler.get_fe(fe_index).dofs_per_quad;
+                          for (unsigned int d = 0; d < dof_handler.get_fe(fe_index).dofs_per_quad;
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
@@ -2099,16 +1841,14 @@ namespace internal
                                   d,
                                   (indices.size() == 0) ?
                                     (new_numbers[old_dof_index]) :
-                                    (new_numbers[indices.index_within_set(
-                                      old_dof_index)]),
+                                    (new_numbers[indices.index_within_set(old_dof_index)]),
                                   fe_index);
                             }
                         }
                     }
 
             // at the end, restore the user flags for the quads
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
+            const_cast<dealii::Triangulation<dim, spacedim> &>(dof_handler.get_triangulation())
               .load_user_flags_quad(saved_quad_user_flags);
           }
         }
@@ -2131,7 +1871,7 @@ namespace internal
         renumber_dofs(const std::vector<types::global_dof_index> &new_numbers,
                       const IndexSet &                            indices,
                       DoFHandlerType &                            dof_handler,
-                      const bool check_validity)
+                      const bool                                  check_validity)
         {
           if (DoFHandlerType::dimension == 1)
             Assert(indices == IndexSet(0), ExcNotImplemented());
@@ -2140,14 +1880,12 @@ namespace internal
           // can be done in parallel because the respective functions
           // work on separate data structures
           Threads::TaskGroup<> tasks;
-          tasks += Threads::new_task([&]() {
-            renumber_vertex_dofs(
-              new_numbers, indices, dof_handler, check_validity);
-          });
           tasks += Threads::new_task(
-            [&]() { renumber_face_dofs(new_numbers, indices, dof_handler); });
-          tasks += Threads::new_task(
-            [&]() { renumber_cell_dofs(new_numbers, indices, dof_handler); });
+            [&]() { renumber_vertex_dofs(new_numbers, indices, dof_handler, check_validity); });
+          tasks +=
+            Threads::new_task([&]() { renumber_face_dofs(new_numbers, indices, dof_handler); });
+          tasks +=
+            Threads::new_task([&]() { renumber_cell_dofs(new_numbers, indices, dof_handler); });
           tasks.join_all();
 
           // update the cache used for cell dof indices
@@ -2168,42 +1906,35 @@ namespace internal
          */
         template <int dim, int spacedim>
         static void
-        renumber_vertex_mg_dofs(
-          const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<dim, spacedim> &                         dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+        renumber_vertex_mg_dofs(const std::vector<dealii::types::global_dof_index> &new_numbers,
+                                const IndexSet &                                    indices,
+                                DoFHandler<dim, spacedim> &                         dof_handler,
+                                const unsigned int                                  level,
+                                const bool                                          check_validity)
         {
-          Assert(level < dof_handler.get_triangulation().n_levels(),
-                 ExcInternalError());
+          Assert(level < dof_handler.get_triangulation().n_levels(), ExcInternalError());
 
-          for (typename std::vector<
-                 typename DoFHandler<dim, spacedim>::MGVertexDoFs>::iterator i =
+          for (typename std::vector<typename DoFHandler<dim, spacedim>::MGVertexDoFs>::iterator i =
                  dof_handler.mg_vertex_dofs.begin();
                i != dof_handler.mg_vertex_dofs.end();
                ++i)
             // if the present vertex lives on the current level
-            if ((i->get_coarsest_level() <= level) &&
-                (i->get_finest_level() >= level))
-              for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_vertex;
-                   ++d)
+            if ((i->get_coarsest_level() <= level) && (i->get_finest_level() >= level))
+              for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_vertex; ++d)
                 {
-                  const dealii::types::global_dof_index idx = i->get_index(
-                    level, d, dof_handler.get_fe().dofs_per_vertex);
+                  const dealii::types::global_dof_index idx =
+                    i->get_index(level, d, dof_handler.get_fe().dofs_per_vertex);
 
                   if (check_validity)
-                    Assert(idx != numbers::invalid_dof_index,
-                           ExcInternalError());
+                    Assert(idx != numbers::invalid_dof_index, ExcInternalError());
 
                   if (idx != numbers::invalid_dof_index)
-                    i->set_index(
-                      level,
-                      d,
-                      dof_handler.get_fe().dofs_per_vertex,
-                      (indices.size() == 0) ?
-                        (new_numbers[idx]) :
-                        (new_numbers[indices.index_within_set(idx)]));
+                    i->set_index(level,
+                                 d,
+                                 dof_handler.get_fe().dofs_per_vertex,
+                                 (indices.size() == 0) ?
+                                   (new_numbers[idx]) :
+                                   (new_numbers[indices.index_within_set(idx)]));
                 }
         }
 
@@ -2218,11 +1949,10 @@ namespace internal
          */
         template <int dim, int spacedim>
         static void
-        renumber_cell_mg_dofs(
-          const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<dim, spacedim> &                         dof_handler,
-          const unsigned int                                  level)
+        renumber_cell_mg_dofs(const std::vector<dealii::types::global_dof_index> &new_numbers,
+                              const IndexSet &                                    indices,
+                              DoFHandler<dim, spacedim> &                         dof_handler,
+                              const unsigned int                                  level)
         {
           for (std::vector<types::global_dof_index>::iterator i =
                  dof_handler.mg_levels[level]->dof_object.dofs.begin();
@@ -2231,12 +1961,10 @@ namespace internal
             {
               if (*i != numbers::invalid_dof_index)
                 {
-                  Assert((indices.size() > 0 ? indices.is_element(*i) :
-                                               (*i < new_numbers.size())),
+                  Assert((indices.size() > 0 ? indices.is_element(*i) : (*i < new_numbers.size())),
                          ExcInternalError());
-                  *i = (indices.size() == 0) ?
-                         (new_numbers[*i]) :
-                         (new_numbers[indices.index_within_set(*i)]);
+                  *i = (indices.size() == 0) ? (new_numbers[*i]) :
+                                               (new_numbers[indices.index_within_set(*i)]);
                 }
             }
         }
@@ -2252,12 +1980,11 @@ namespace internal
          */
         template <int spacedim>
         static void
-        renumber_face_mg_dofs(
-          const std::vector<types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
-          DoFHandler<1, spacedim> & /*dof_handler*/,
-          const unsigned int /*level*/,
-          const bool /*check_validity*/)
+        renumber_face_mg_dofs(const std::vector<types::global_dof_index> & /*new_numbers*/,
+                              const IndexSet & /*indices*/,
+                              DoFHandler<1, spacedim> & /*dof_handler*/,
+                              const unsigned int /*level*/,
+                              const bool /*check_validity*/)
         {
           // nothing to do in 1d because there are no separate faces
         }
@@ -2266,20 +1993,18 @@ namespace internal
 
         template <int spacedim>
         static void
-        renumber_face_mg_dofs(
-          const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<2, spacedim> &                           dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+        renumber_face_mg_dofs(const std::vector<dealii::types::global_dof_index> &new_numbers,
+                              const IndexSet &                                    indices,
+                              DoFHandler<2, spacedim> &                           dof_handler,
+                              const unsigned int                                  level,
+                              const bool                                          check_validity)
         {
           if (dof_handler.get_fe().dofs_per_line > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
               dof_handler.get_triangulation().save_user_flags(user_flags);
-              const_cast<dealii::Triangulation<2, spacedim> &>(
-                dof_handler.get_triangulation())
+              const_cast<dealii::Triangulation<2, spacedim> &>(dof_handler.get_triangulation())
                 .clear_user_flags();
 
               // flag all lines adjacent to cells of the current
@@ -2289,42 +2014,33 @@ namespace internal
               typename DoFHandler<2, spacedim>::level_cell_iterator cell,
                 endc = dof_handler.end(level);
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                for (unsigned int line = 0;
-                     line < GeometryInfo<2>::faces_per_cell;
-                     ++line)
+                for (unsigned int line = 0; line < GeometryInfo<2>::faces_per_cell; ++line)
                   cell->face(line)->set_user_flag();
 
-              for (typename DoFHandler<2, spacedim>::cell_iterator cell =
-                     dof_handler.begin();
+              for (typename DoFHandler<2, spacedim>::cell_iterator cell = dof_handler.begin();
                    cell != dof_handler.end();
                    ++cell)
-                for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell; ++l)
                   if (cell->line(l)->user_flag_set())
                     {
-                      for (unsigned int d = 0;
-                           d < dof_handler.get_fe().dofs_per_line;
-                           ++d)
+                      for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_line; ++d)
                         {
                           const dealii::types::global_dof_index idx =
                             cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != numbers::invalid_dof_index,
-                                   ExcInternalError());
+                            Assert(idx != numbers::invalid_dof_index, ExcInternalError());
 
                           if (idx != numbers::invalid_dof_index)
                             cell->line(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices.size() == 0) ?
-                                 new_numbers[idx] :
-                                 new_numbers[indices.index_within_set(idx)]));
+                              ((indices.size() == 0) ? new_numbers[idx] :
+                                                       new_numbers[indices.index_within_set(idx)]));
                         }
                       cell->line(l)->clear_user_flag();
                     }
               // finally, restore user flags
-              const_cast<dealii::Triangulation<2, spacedim> &>(
-                dof_handler.get_triangulation())
+              const_cast<dealii::Triangulation<2, spacedim> &>(dof_handler.get_triangulation())
                 .load_user_flags(user_flags);
             }
         }
@@ -2333,21 +2049,18 @@ namespace internal
 
         template <int spacedim>
         static void
-        renumber_face_mg_dofs(
-          const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<3, spacedim> &                           dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+        renumber_face_mg_dofs(const std::vector<dealii::types::global_dof_index> &new_numbers,
+                              const IndexSet &                                    indices,
+                              DoFHandler<3, spacedim> &                           dof_handler,
+                              const unsigned int                                  level,
+                              const bool                                          check_validity)
         {
-          if (dof_handler.get_fe().dofs_per_line > 0 ||
-              dof_handler.get_fe().dofs_per_quad > 0)
+          if (dof_handler.get_fe().dofs_per_line > 0 || dof_handler.get_fe().dofs_per_quad > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
               dof_handler.get_triangulation().save_user_flags(user_flags);
-              const_cast<dealii::Triangulation<3, spacedim> &>(
-                dof_handler.get_triangulation())
+              const_cast<dealii::Triangulation<3, spacedim> &>(dof_handler.get_triangulation())
                 .clear_user_flags();
 
               // flag all lines adjacent to cells of the current
@@ -2356,36 +2069,28 @@ namespace internal
               typename DoFHandler<3, spacedim>::level_cell_iterator cell,
                 endc = dof_handler.end(level);
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                for (unsigned int line = 0;
-                     line < GeometryInfo<3>::lines_per_cell;
-                     ++line)
+                for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell; ++line)
                   cell->line(line)->set_user_flag();
 
-              for (typename DoFHandler<3, spacedim>::cell_iterator cell =
-                     dof_handler.begin();
+              for (typename DoFHandler<3, spacedim>::cell_iterator cell = dof_handler.begin();
                    cell != dof_handler.end();
                    ++cell)
-                for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
                   if (cell->line(l)->user_flag_set())
                     {
-                      for (unsigned int d = 0;
-                           d < dof_handler.get_fe().dofs_per_line;
-                           ++d)
+                      for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_line; ++d)
                         {
                           const dealii::types::global_dof_index idx =
                             cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != numbers::invalid_dof_index,
-                                   ExcInternalError());
+                            Assert(idx != numbers::invalid_dof_index, ExcInternalError());
 
                           if (idx != numbers::invalid_dof_index)
                             cell->line(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices.size() == 0) ?
-                                 new_numbers[idx] :
-                                 new_numbers[indices.index_within_set(idx)]));
+                              ((indices.size() == 0) ? new_numbers[idx] :
+                                                       new_numbers[indices.index_within_set(idx)]));
                         }
                       cell->line(l)->clear_user_flag();
                     }
@@ -2394,43 +2099,34 @@ namespace internal
               // those quads logically belong to the same level as the cell,
               // at least for isotropic refinement
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                for (unsigned int quad = 0;
-                     quad < GeometryInfo<3>::quads_per_cell;
-                     ++quad)
+                for (unsigned int quad = 0; quad < GeometryInfo<3>::quads_per_cell; ++quad)
                   cell->quad(quad)->set_user_flag();
 
-              for (typename DoFHandler<3, spacedim>::cell_iterator cell =
-                     dof_handler.begin();
+              for (typename DoFHandler<3, spacedim>::cell_iterator cell = dof_handler.begin();
                    cell != dof_handler.end();
                    ++cell)
-                for (unsigned int l = 0; l < GeometryInfo<3>::quads_per_cell;
-                     ++l)
+                for (unsigned int l = 0; l < GeometryInfo<3>::quads_per_cell; ++l)
                   if (cell->quad(l)->user_flag_set())
                     {
-                      for (unsigned int d = 0;
-                           d < dof_handler.get_fe().dofs_per_quad;
-                           ++d)
+                      for (unsigned int d = 0; d < dof_handler.get_fe().dofs_per_quad; ++d)
                         {
                           const dealii::types::global_dof_index idx =
                             cell->quad(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != numbers::invalid_dof_index,
-                                   ExcInternalError());
+                            Assert(idx != numbers::invalid_dof_index, ExcInternalError());
 
                           if (idx != numbers::invalid_dof_index)
                             cell->quad(l)->set_mg_dof_index(
                               level,
                               d,
-                              ((indices.size() == 0) ?
-                                 new_numbers[idx] :
-                                 new_numbers[indices.index_within_set(idx)]));
+                              ((indices.size() == 0) ? new_numbers[idx] :
+                                                       new_numbers[indices.index_within_set(idx)]));
                         }
                       cell->quad(l)->clear_user_flag();
                     }
 
               // finally, restore user flags
-              const_cast<dealii::Triangulation<3, spacedim> &>(
-                dof_handler.get_triangulation())
+              const_cast<dealii::Triangulation<3, spacedim> &>(dof_handler.get_triangulation())
                 .load_user_flags(user_flags);
             }
         }
@@ -2439,31 +2135,26 @@ namespace internal
 
         template <int dim, int spacedim>
         static void
-        renumber_mg_dofs(
-          const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &                                    indices,
-          DoFHandler<dim, spacedim> &                         dof_handler,
-          const unsigned int                                  level,
-          const bool                                          check_validity)
+        renumber_mg_dofs(const std::vector<dealii::types::global_dof_index> &new_numbers,
+                         const IndexSet &                                    indices,
+                         DoFHandler<dim, spacedim> &                         dof_handler,
+                         const unsigned int                                  level,
+                         const bool                                          check_validity)
         {
-          Assert(level < dof_handler.get_triangulation().n_global_levels(),
-                 ExcInternalError());
+          Assert(level < dof_handler.get_triangulation().n_global_levels(), ExcInternalError());
 
           // renumber DoF indices on vertices, cells, and faces. this
           // can be done in parallel because the respective functions
           // work on separate data structures
           Threads::TaskGroup<> tasks;
           tasks += Threads::new_task([&]() {
-            renumber_vertex_mg_dofs(
-              new_numbers, indices, dof_handler, level, check_validity);
+            renumber_vertex_mg_dofs(new_numbers, indices, dof_handler, level, check_validity);
           });
           tasks += Threads::new_task([&]() {
-            renumber_face_mg_dofs(
-              new_numbers, indices, dof_handler, level, check_validity);
+            renumber_face_mg_dofs(new_numbers, indices, dof_handler, level, check_validity);
           });
-          tasks += Threads::new_task([&]() {
-            renumber_cell_mg_dofs(new_numbers, indices, dof_handler, level);
-          });
+          tasks += Threads::new_task(
+            [&]() { renumber_cell_mg_dofs(new_numbers, indices, dof_handler, level); });
           tasks.join_all();
         }
 
@@ -2471,12 +2162,11 @@ namespace internal
 
         template <int dim, int spacedim>
         static void
-        renumber_mg_dofs(
-          const std::vector<dealii::types::global_dof_index> & /*new_numbers*/,
-          const IndexSet & /*indices*/,
-          hp::DoFHandler<dim, spacedim> & /*dof_handler*/,
-          const unsigned int /*level*/,
-          const bool /*check_validity*/)
+        renumber_mg_dofs(const std::vector<dealii::types::global_dof_index> & /*new_numbers*/,
+                         const IndexSet & /*indices*/,
+                         hp::DoFHandler<dim, spacedim> & /*dof_handler*/,
+                         const unsigned int /*level*/,
+                         const bool /*check_validity*/)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -2499,8 +2189,8 @@ namespace internal
       NumberCache
       Sequential<DoFHandlerType>::distribute_dofs() const
       {
-        const types::global_dof_index n_dofs = Implementation::distribute_dofs(
-          numbers::invalid_subdomain_id, *dof_handler);
+        const types::global_dof_index n_dofs =
+          Implementation::distribute_dofs(numbers::invalid_subdomain_id, *dof_handler);
 
         // return a sequential, complete index set
         return NumberCache(n_dofs);
@@ -2515,28 +2205,25 @@ namespace internal
         std::vector<bool> user_flags;
         dof_handler->get_triangulation().save_user_flags(user_flags);
 
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension> &>(
+        const_cast<
+          dealii::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &>(
           dof_handler->get_triangulation())
           .clear_user_flags();
 
         std::vector<NumberCache> number_caches;
         number_caches.reserve(dof_handler->get_triangulation().n_levels());
-        for (unsigned int level = 0;
-             level < dof_handler->get_triangulation().n_levels();
-             ++level)
+        for (unsigned int level = 0; level < dof_handler->get_triangulation().n_levels(); ++level)
           {
             // first distribute dofs on this level
-            const types::global_dof_index n_level_dofs =
-              Implementation::distribute_dofs_on_level(
-                numbers::invalid_subdomain_id, *dof_handler, level);
+            const types::global_dof_index n_level_dofs = Implementation::distribute_dofs_on_level(
+              numbers::invalid_subdomain_id, *dof_handler, level);
 
             // then add a complete, sequential index set
             number_caches.emplace_back(NumberCache(n_level_dofs));
           }
 
-        const_cast<dealii::Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension> &>(
+        const_cast<
+          dealii::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &>(
           dof_handler->get_triangulation())
           .load_user_flags(user_flags);
 
@@ -2550,8 +2237,7 @@ namespace internal
       Sequential<DoFHandlerType>::renumber_dofs(
         const std::vector<types::global_dof_index> &new_numbers) const
       {
-        Implementation::renumber_dofs(
-          new_numbers, IndexSet(0), *dof_handler, true);
+        Implementation::renumber_dofs(new_numbers, IndexSet(0), *dof_handler, true);
 
         // return a sequential, complete index set. take into account that the
         // number of DoF indices may in fact be smaller than there were before
@@ -2561,8 +2247,7 @@ namespace internal
         // some located at vertices or faces; this leaves us with fewer
         // DoFs than there were before, so use the largest index as
         // the one to determine the size of the index space
-        return NumberCache(
-          *std::max_element(new_numbers.begin(), new_numbers.end()) + 1);
+        return NumberCache(*std::max_element(new_numbers.begin(), new_numbers.end()) + 1);
       }
 
 
@@ -2573,8 +2258,7 @@ namespace internal
         const unsigned int                          level,
         const std::vector<types::global_dof_index> &new_numbers) const
       {
-        Implementation::renumber_mg_dofs(
-          new_numbers, IndexSet(0), *dof_handler, level, true);
+        Implementation::renumber_mg_dofs(new_numbers, IndexSet(0), *dof_handler, level, true);
 
         // return a sequential, complete index set
         return NumberCache(new_numbers.size());
@@ -2585,8 +2269,7 @@ namespace internal
 
 
       template <class DoFHandlerType>
-      ParallelShared<DoFHandlerType>::ParallelShared(
-        DoFHandlerType &dof_handler) :
+      ParallelShared<DoFHandlerType>::ParallelShared(DoFHandlerType &dof_handler) :
         dof_handler(&dof_handler)
       {}
 
@@ -2609,23 +2292,22 @@ namespace internal
                                       const unsigned int            n_procs)
         {
           (void)n_procs;
-          std::vector<types::subdomain_id> subdomain_association(
-            n_dofs, numbers::invalid_subdomain_id);
+          std::vector<types::subdomain_id>     subdomain_association(n_dofs,
+                                                                 numbers::invalid_subdomain_id);
           std::vector<types::global_dof_index> local_dof_indices;
           local_dof_indices.reserve(DoFTools::max_dofs_per_cell(dof_handler));
 
           // loop over all cells and record which subdomain a DoF belongs to.
           // give to the smaller subdomain_id in case it is on an interface
-          typename DoFHandlerType::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
+          typename DoFHandlerType::active_cell_iterator cell = dof_handler.begin_active(),
+                                                        endc = dof_handler.end();
           for (; cell != endc; ++cell)
             {
               // get the owner of the cell; note that we have made sure above
               // that all cells are either locally owned or ghosts (not
               // artificial), so this call will always yield the true owner
-              const types::subdomain_id subdomain_id = cell->subdomain_id();
-              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              const types::subdomain_id subdomain_id  = cell->subdomain_id();
+              const unsigned int        dofs_per_cell = cell->get_fe().dofs_per_cell;
               local_dof_indices.resize(dofs_per_cell);
               cell->get_dof_indices(local_dof_indices);
 
@@ -2633,11 +2315,9 @@ namespace internal
               // they must be on partition interfaces. In that case assign them
               // to the processor with the smaller subdomain id.
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                if (subdomain_association[local_dof_indices[i]] ==
-                    numbers::invalid_subdomain_id)
+                if (subdomain_association[local_dof_indices[i]] == numbers::invalid_subdomain_id)
                   subdomain_association[local_dof_indices[i]] = subdomain_id;
-                else if (subdomain_association[local_dof_indices[i]] >
-                         subdomain_id)
+                else if (subdomain_association[local_dof_indices[i]] > subdomain_id)
                   {
                     subdomain_association[local_dof_indices[i]] = subdomain_id;
                   }
@@ -2645,12 +2325,11 @@ namespace internal
 
           Assert(std::find(subdomain_association.begin(),
                            subdomain_association.end(),
-                           numbers::invalid_subdomain_id) ==
-                   subdomain_association.end(),
+                           numbers::invalid_subdomain_id) == subdomain_association.end(),
                  ExcInternalError());
 
-          Assert(*std::max_element(subdomain_association.begin(),
-                                   subdomain_association.end()) < n_procs,
+          Assert(*std::max_element(subdomain_association.begin(), subdomain_association.end()) <
+                   n_procs,
                  ExcInternalError());
 
           return subdomain_association;
@@ -2665,11 +2344,10 @@ namespace internal
          */
         template <class DoFHandlerType>
         std::vector<types::subdomain_id>
-        get_dof_level_subdomain_association(
-          const DoFHandlerType &        dof_handler,
-          const types::global_dof_index n_dofs_on_level,
-          const unsigned int            n_procs,
-          const unsigned int            level)
+        get_dof_level_subdomain_association(const DoFHandlerType &        dof_handler,
+                                            const types::global_dof_index n_dofs_on_level,
+                                            const unsigned int            n_procs,
+                                            const unsigned int            level)
         {
           (void)n_procs;
           std::vector<types::subdomain_id> level_subdomain_association(
@@ -2679,17 +2357,15 @@ namespace internal
 
           // loop over all cells and record which subdomain a DoF belongs to.
           // interface goes to proccessor with smaller subdomain id
-          typename DoFHandlerType::cell_iterator cell =
-                                                   dof_handler.begin(level),
+          typename DoFHandlerType::cell_iterator cell = dof_handler.begin(level),
                                                  endc = dof_handler.end(level);
           for (; cell != endc; ++cell)
             {
               // get the owner of the cell; note that we have made sure above
               // that all cells are either locally owned or ghosts (not
               // artificial), so this call will always yield the true owner
-              const types::subdomain_id level_subdomain_id =
-                cell->level_subdomain_id();
-              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              const types::subdomain_id level_subdomain_id = cell->level_subdomain_id();
+              const unsigned int        dofs_per_cell      = cell->get_fe().dofs_per_cell;
               local_dof_indices.resize(dofs_per_cell);
               cell->get_mg_dof_indices(local_dof_indices);
 
@@ -2699,20 +2375,16 @@ namespace internal
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 if (level_subdomain_association[local_dof_indices[i]] ==
                     numbers::invalid_subdomain_id)
-                  level_subdomain_association[local_dof_indices[i]] =
-                    level_subdomain_id;
-                else if (level_subdomain_association[local_dof_indices[i]] >
-                         level_subdomain_id)
+                  level_subdomain_association[local_dof_indices[i]] = level_subdomain_id;
+                else if (level_subdomain_association[local_dof_indices[i]] > level_subdomain_id)
                   {
-                    level_subdomain_association[local_dof_indices[i]] =
-                      level_subdomain_id;
+                    level_subdomain_association[local_dof_indices[i]] = level_subdomain_id;
                   }
             }
 
           Assert(std::find(level_subdomain_association.begin(),
                            level_subdomain_association.end(),
-                           numbers::invalid_subdomain_id) ==
-                   level_subdomain_association.end(),
+                           numbers::invalid_subdomain_id) == level_subdomain_association.end(),
                  ExcInternalError());
 
           Assert(*std::max_element(level_subdomain_association.begin(),
@@ -2737,8 +2409,7 @@ namespace internal
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
-        const unsigned int n_procs =
-          Utilities::MPI::n_mpi_processes(tr->get_communicator());
+        const unsigned int n_procs = Utilities::MPI::n_mpi_processes(tr->get_communicator());
 
         // If the underlying shared::Tria allows artificial cells,
         // then save the current set of subdomain ids, and set
@@ -2749,10 +2420,9 @@ namespace internal
           {
             saved_subdomain_ids.resize(tr->n_active_cells());
 
-            typename parallel::shared::Triangulation<dim, spacedim>::
-              active_cell_iterator
-                cell = this->dof_handler->get_triangulation().begin_active(),
-                endc = this->dof_handler->get_triangulation().end();
+            typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator
+              cell = this->dof_handler->get_triangulation().begin_active(),
+              endc = this->dof_handler->get_triangulation().end();
 
             const std::vector<types::subdomain_id> &true_subdomain_ids =
               tr->get_true_subdomain_ids_of_cells();
@@ -2766,8 +2436,8 @@ namespace internal
 
         // first let the sequential algorithm do its magic. it is going to
         // enumerate DoFs on all cells, regardless of owner
-        const types::global_dof_index n_dofs = Implementation::distribute_dofs(
-          numbers::invalid_subdomain_id, *this->dof_handler);
+        const types::global_dof_index n_dofs =
+          Implementation::distribute_dofs(numbers::invalid_subdomain_id, *this->dof_handler);
 
         // then re-enumerate them based on their subdomain association.
         // for this, we first have to identify for each current DoF
@@ -2778,8 +2448,7 @@ namespace internal
         // function has to deal with other kinds of triangulations as
         // well, whereas we here know what kind of triangulation
         // we have and can simplify the code accordingly
-        std::vector<types::global_dof_index> new_dof_indices(
-          n_dofs, numbers::invalid_dof_index);
+        std::vector<types::global_dof_index> new_dof_indices(n_dofs, numbers::invalid_dof_index);
         {
           // first get the association of each dof with a subdomain and
           // determine the total number of subdomain ids used
@@ -2792,13 +2461,11 @@ namespace internal
           // the same subdomain, then they will be in this order also after
           // reordering
           types::global_dof_index next_free_index = 0;
-          for (types::subdomain_id subdomain = 0; subdomain < n_procs;
-               ++subdomain)
+          for (types::subdomain_id subdomain = 0; subdomain < n_procs; ++subdomain)
             for (types::global_dof_index i = 0; i < n_dofs; ++i)
               if (subdomain_association[i] == subdomain)
                 {
-                  Assert(new_dof_indices[i] == numbers::invalid_dof_index,
-                         ExcInternalError());
+                  Assert(new_dof_indices[i] == numbers::invalid_dof_index, ExcInternalError());
                   new_dof_indices[i] = next_free_index;
                   ++next_free_index;
                 }
@@ -2814,8 +2481,7 @@ namespace internal
         // version of the function because we do things on all
         // cells and all cells have their subdomain ids and DoFs
         // correctly set
-        Implementation::renumber_dofs(
-          new_dof_indices, IndexSet(0), *this->dof_handler, true);
+        Implementation::renumber_dofs(new_dof_indices, IndexSet(0), *this->dof_handler, true);
 
         // update the number cache. for this, we first have to find the
         // subdomain association for each DoF again following renumbering, from
@@ -2830,11 +2496,9 @@ namespace internal
           get_dof_subdomain_association(*this->dof_handler, n_dofs, n_procs);
 
         for (unsigned int i = 1; i < n_dofs; ++i)
-          Assert(subdomain_association[i] >= subdomain_association[i - 1],
-                 ExcInternalError());
+          Assert(subdomain_association[i] >= subdomain_association[i - 1], ExcInternalError());
 
-        std::vector<IndexSet> locally_owned_dofs_per_processor(
-          n_procs, IndexSet(n_dofs));
+        std::vector<IndexSet> locally_owned_dofs_per_processor(n_procs, IndexSet(n_dofs));
         {
           // we know that the set of subdomain indices is contiguous from
           // the assertion above; find the start and end index for each
@@ -2849,18 +2513,16 @@ namespace internal
           while (start_index < n_dofs)
             {
               while ((end_index) < n_dofs &&
-                     (subdomain_association[end_index] ==
-                      subdomain_association[start_index]))
+                     (subdomain_association[end_index] == subdomain_association[start_index]))
                 ++end_index;
 
               // we've now identified a range of same indices. set that
               // range in the corresponding IndexSet
               if (end_index > start_index)
                 {
-                  const unsigned int subdomain_owner =
-                    subdomain_association[start_index];
-                  locally_owned_dofs_per_processor[subdomain_owner].add_range(
-                    start_index, end_index);
+                  const unsigned int subdomain_owner = subdomain_association[start_index];
+                  locally_owned_dofs_per_processor[subdomain_owner].add_range(start_index,
+                                                                              end_index);
                 }
 
               // then move on to thinking about the next range
@@ -2871,10 +2533,9 @@ namespace internal
         // finally, restore current subdomain ids
         if (tr->with_artificial_cells())
           {
-            typename parallel::shared::Triangulation<dim, spacedim>::
-              active_cell_iterator
-                cell = this->dof_handler->get_triangulation().begin_active(),
-                endc = this->dof_handler->get_triangulation().end();
+            typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator
+              cell = this->dof_handler->get_triangulation().begin_active(),
+              endc = this->dof_handler->get_triangulation().end();
 
             for (unsigned int index = 0; cell != endc; ++cell, ++index)
               cell->set_subdomain_id(saved_subdomain_ids[index]);
@@ -2882,9 +2543,8 @@ namespace internal
 
         // return a NumberCache object made up from the sets of locally
         // owned DoFs
-        return NumberCache(
-          locally_owned_dofs_per_processor,
-          this->dof_handler->get_triangulation().locally_owned_subdomain());
+        return NumberCache(locally_owned_dofs_per_processor,
+                           this->dof_handler->get_triangulation().locally_owned_subdomain());
       }
 
 
@@ -2901,8 +2561,7 @@ namespace internal
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
-        const unsigned int n_procs =
-          Utilities::MPI::n_mpi_processes(tr->get_communicator());
+        const unsigned int n_procs  = Utilities::MPI::n_mpi_processes(tr->get_communicator());
         const unsigned int n_levels = tr->n_global_levels();
 
         std::vector<NumberCache> number_caches;
@@ -2920,8 +2579,7 @@ namespace internal
             std::vector<types::subdomain_id> saved_level_subdomain_ids;
             saved_level_subdomain_ids.resize(tr->n_cells(lvl));
             {
-              typename parallel::shared::Triangulation<dim,
-                                                       spacedim>::cell_iterator
+              typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator
                 cell = this->dof_handler->get_triangulation().begin(lvl),
                 endc = this->dof_handler->get_triangulation().end(lvl);
 
@@ -2950,15 +2608,14 @@ namespace internal
             // can't quite do that. also, that function has to deal with other
             // kinds of triangulations as well, whereas we here know what kind
             // of triangulation we have and can simplify the code accordingly
-            std::vector<types::global_dof_index> new_dof_indices(
-              n_dofs_on_level, numbers::invalid_dof_index);
+            std::vector<types::global_dof_index> new_dof_indices(n_dofs_on_level,
+                                                                 numbers::invalid_dof_index);
             {
               // first get the association of each dof with a subdomain and
               // determine the total number of subdomain ids used
-              const std::vector<types::subdomain_id>
-                level_subdomain_association =
-                  get_dof_level_subdomain_association(
-                    *this->dof_handler, n_dofs_on_level, n_procs, lvl);
+              const std::vector<types::subdomain_id> level_subdomain_association =
+                get_dof_level_subdomain_association(
+                  *this->dof_handler, n_dofs_on_level, n_procs, lvl);
 
               // then renumber the subdomains by first looking at those
               // belonging to subdomain 0, then those of subdomain 1, etc. note
@@ -2966,14 +2623,12 @@ namespace internal
               // belong to the same subdomain, then they will be in this order
               // also after reordering
               types::global_dof_index next_free_index = 0;
-              for (types::subdomain_id level_subdomain = 0;
-                   level_subdomain < n_procs;
+              for (types::subdomain_id level_subdomain = 0; level_subdomain < n_procs;
                    ++level_subdomain)
                 for (types::global_dof_index i = 0; i < n_dofs_on_level; ++i)
                   if (level_subdomain_association[i] == level_subdomain)
                     {
-                      Assert(new_dof_indices[i] == numbers::invalid_dof_index,
-                             ExcInternalError());
+                      Assert(new_dof_indices[i] == numbers::invalid_dof_index, ExcInternalError());
                       new_dof_indices[i] = next_free_index;
                       ++next_free_index;
                     }
@@ -2982,8 +2637,7 @@ namespace internal
               Assert(next_free_index == n_dofs_on_level, ExcInternalError());
               Assert(std::find(new_dof_indices.begin(),
                                new_dof_indices.end(),
-                               numbers::invalid_dof_index) ==
-                       new_dof_indices.end(),
+                               numbers::invalid_dof_index) == new_dof_indices.end(),
                      ExcInternalError());
             }
 
@@ -3009,12 +2663,11 @@ namespace internal
                 *this->dof_handler, n_dofs_on_level, n_procs, lvl);
 
             for (unsigned int i = 1; i < n_dofs_on_level; ++i)
-              Assert(level_subdomain_association[i] >=
-                       level_subdomain_association[i - 1],
+              Assert(level_subdomain_association[i] >= level_subdomain_association[i - 1],
                      ExcInternalError());
 
-            std::vector<IndexSet> locally_owned_dofs_per_processor(
-              n_procs, IndexSet(n_dofs_on_level));
+            std::vector<IndexSet> locally_owned_dofs_per_processor(n_procs,
+                                                                   IndexSet(n_dofs_on_level));
             {
               // we know that the set of subdomain indices is contiguous from
               // the assertion above; find the start and end index for each
@@ -3039,8 +2692,8 @@ namespace internal
                     {
                       const unsigned int level_subdomain_owner =
                         level_subdomain_association[start_index];
-                      locally_owned_dofs_per_processor[level_subdomain_owner]
-                        .add_range(start_index, end_index);
+                      locally_owned_dofs_per_processor[level_subdomain_owner].add_range(start_index,
+                                                                                        end_index);
                     }
 
                   // then move on to thinking about the next range
@@ -3050,8 +2703,7 @@ namespace internal
 
             // finally, restore current level subdomain ids
             {
-              typename parallel::shared::Triangulation<dim,
-                                                       spacedim>::cell_iterator
+              typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator
                 cell = this->dof_handler->get_triangulation().begin(lvl),
                 endc = this->dof_handler->get_triangulation().end(lvl);
 
@@ -3061,8 +2713,7 @@ namespace internal
               // add NumberCache for current level
               number_caches.emplace_back(
                 NumberCache(locally_owned_dofs_per_processor,
-                            this->dof_handler->get_triangulation()
-                              .locally_owned_subdomain()));
+                            this->dof_handler->get_triangulation().locally_owned_subdomain()));
             }
           }
 
@@ -3091,12 +2742,10 @@ namespace internal
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
-        typename parallel::shared::Triangulation<dim,
-                                                 spacedim>::active_cell_iterator
+        typename parallel::shared::Triangulation<dim, spacedim>::active_cell_iterator
           cell = this->dof_handler->get_triangulation().begin_active(),
           endc = this->dof_handler->get_triangulation().end();
-        std::vector<types::subdomain_id> current_subdomain_ids(
-          tr->n_active_cells());
+        std::vector<types::subdomain_id>        current_subdomain_ids(tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids =
           tr->get_true_subdomain_ids_of_cells();
         if (tr->with_artificial_cells())
@@ -3106,8 +2755,8 @@ namespace internal
               cell->set_subdomain_id(true_subdomain_ids[index]);
             }
 
-        std::vector<types::global_dof_index> global_gathered_numbers(
-          this->dof_handler->n_dofs(), 0);
+        std::vector<types::global_dof_index> global_gathered_numbers(this->dof_handler->n_dofs(),
+                                                                     0);
         // as we call DoFRenumbering::subdomain_wise (*dof_handler) from
         // distribute_dofs(), we need to support sequential-like input.
         // Distributed-like input from, for example, component_wise renumbering
@@ -3118,22 +2767,18 @@ namespace internal
           }
         else
           {
-            Assert(new_numbers.size() ==
-                     this->dof_handler->locally_owned_dofs().n_elements(),
+            Assert(new_numbers.size() == this->dof_handler->locally_owned_dofs().n_elements(),
                    ExcInternalError());
-            const unsigned int n_cpu =
-              Utilities::MPI::n_mpi_processes(tr->get_communicator());
-            std::vector<types::global_dof_index> gathered_new_numbers(
-              this->dof_handler->n_dofs(), 0);
+            const unsigned int n_cpu = Utilities::MPI::n_mpi_processes(tr->get_communicator());
+            std::vector<types::global_dof_index> gathered_new_numbers(this->dof_handler->n_dofs(),
+                                                                      0);
             Assert(Utilities::MPI::this_mpi_process(tr->get_communicator()) ==
-                     this->dof_handler->get_triangulation()
-                       .locally_owned_subdomain(),
+                     this->dof_handler->get_triangulation().locally_owned_subdomain(),
                    ExcInternalError())
 
             // gather new numbers among processors into one vector
             {
-              std::vector<types::global_dof_index> new_numbers_copy(
-                new_numbers);
+              std::vector<types::global_dof_index> new_numbers_copy(new_numbers);
 
               // store the number of elements that are to be received from each
               // process
@@ -3142,13 +2787,8 @@ namespace internal
               types::global_dof_index shift = 0;
               // set rcounts based on new_numbers:
               int cur_count = new_numbers_copy.size();
-              int ierr      = MPI_Allgather(&cur_count,
-                                       1,
-                                       MPI_INT,
-                                       rcounts.data(),
-                                       1,
-                                       MPI_INT,
-                                       tr->get_communicator());
+              int ierr      = MPI_Allgather(
+                &cur_count, 1, MPI_INT, rcounts.data(), 1, MPI_INT, tr->get_communicator());
               AssertThrowMPI(ierr);
 
               // compute the displacements (relative to recvbuf)
@@ -3160,8 +2800,7 @@ namespace internal
                   shift += rcounts[i];
                 }
               Assert(((int)new_numbers_copy.size()) ==
-                       rcounts[Utilities::MPI::this_mpi_process(
-                         tr->get_communicator())],
+                       rcounts[Utilities::MPI::this_mpi_process(tr->get_communicator())],
                      ExcInternalError());
               ierr = MPI_Allgatherv(new_numbers_copy.data(),
                                     new_numbers_copy.size(),
@@ -3184,19 +2823,13 @@ namespace internal
             std::vector<unsigned int> flag_2(this->dof_handler->n_dofs(), 0);
             for (unsigned int i = 0; i < n_cpu; i++)
               {
-                const IndexSet iset =
-                  this->dof_handler->locally_owned_dofs_per_processor()[i];
-                for (types::global_dof_index ind = 0; ind < iset.n_elements();
-                     ind++)
+                const IndexSet iset = this->dof_handler->locally_owned_dofs_per_processor()[i];
+                for (types::global_dof_index ind = 0; ind < iset.n_elements(); ind++)
                   {
-                    const types::global_dof_index target =
-                      iset.nth_index_in_set(ind);
-                    const types::global_dof_index value =
-                      gathered_new_numbers[shift + ind];
-                    Assert(target < this->dof_handler->n_dofs(),
-                           ExcInternalError());
-                    Assert(value < this->dof_handler->n_dofs(),
-                           ExcInternalError());
+                    const types::global_dof_index target = iset.nth_index_in_set(ind);
+                    const types::global_dof_index value  = gathered_new_numbers[shift + ind];
+                    Assert(target < this->dof_handler->n_dofs(), ExcInternalError());
+                    Assert(value < this->dof_handler->n_dofs(), ExcInternalError());
                     global_gathered_numbers[target] = value;
                     flag_1[target]++;
                     flag_2[value]++;
@@ -3204,14 +2837,10 @@ namespace internal
                 shift += iset.n_elements();
               }
 
-            Assert(*std::max_element(flag_1.begin(), flag_1.end()) == 1,
-                   ExcInternalError());
-            Assert(*std::min_element(flag_1.begin(), flag_1.end()) == 1,
-                   ExcInternalError());
-            Assert((*std::max_element(flag_2.begin(), flag_2.end())) == 1,
-                   ExcInternalError());
-            Assert((*std::min_element(flag_2.begin(), flag_2.end())) == 1,
-                   ExcInternalError());
+            Assert(*std::max_element(flag_1.begin(), flag_1.end()) == 1, ExcInternalError());
+            Assert(*std::min_element(flag_1.begin(), flag_1.end()) == 1, ExcInternalError());
+            Assert((*std::max_element(flag_2.begin(), flag_2.end())) == 1, ExcInternalError());
+            Assert((*std::min_element(flag_2.begin(), flag_2.end())) == 1, ExcInternalError());
           }
 
         // let the sequential algorithm do its magic; ignore the
@@ -3274,9 +2903,8 @@ namespace internal
         template <int dim>
         struct CellDataTransferBuffer
         {
-          std::vector<unsigned int> tree_indices;
-          std::vector<typename dealii::internal::p4est::types<dim>::quadrant>
-                                                       quadrants;
+          std::vector<unsigned int>                                           tree_indices;
+          std::vector<typename dealii::internal::p4est::types<dim>::quadrant> quadrants;
           std::vector<dealii::types::global_dof_index> dof_numbers_and_indices;
 
 
@@ -3292,14 +2920,11 @@ namespace internal
             // but the element type is internal to p4est and does not
             // know how to serialize itself. consequently, first copy it over
             // to an array of bytes, and then serialize that
-            std::vector<char> quadrants_as_chars(sizeof(quadrants[0]) *
-                                                 quadrants.size());
+            std::vector<char> quadrants_as_chars(sizeof(quadrants[0]) * quadrants.size());
             if (quadrants_as_chars.size() > 0)
               {
                 Assert(quadrants.data() != nullptr, ExcInternalError());
-                std::memcpy(quadrants_as_chars.data(),
-                            quadrants.data(),
-                            quadrants_as_chars.size());
+                std::memcpy(quadrants_as_chars.data(), quadrants.data(), quadrants_as_chars.size());
               }
 
             // now serialize everything
@@ -3320,11 +2945,8 @@ namespace internal
 
             if (quadrants_as_chars.size() > 0)
               {
-                quadrants.resize(quadrants_as_chars.size() /
-                                 sizeof(quadrants[0]));
-                std::memcpy(quadrants.data(),
-                            quadrants_as_chars.data(),
-                            quadrants_as_chars.size());
+                quadrants.resize(quadrants_as_chars.size() / sizeof(quadrants[0]));
+                std::memcpy(quadrants.data(), quadrants_as_chars.data(), quadrants_as_chars.size());
               }
             else
               quadrants.clear();
@@ -3346,9 +2968,8 @@ namespace internal
             {
 #  ifdef DEAL_II_WITH_ZLIB
               boost::iostreams::filtering_ostream out;
-              out.push(
-                boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                  boost::iostreams::gzip::best_compression)));
+              out.push(boost::iostreams::gzip_compressor(
+                boost::iostreams::gzip_params(boost::iostreams::gzip::best_compression)));
               out.push(boost::iostreams::back_inserter(buffer));
 
               boost::archive::binary_oarchive archive(out);
@@ -3384,8 +3005,7 @@ namespace internal
 #  ifdef DEAL_II_WITH_ZLIB
               boost::iostreams::filtering_ostream decompressing_stream;
               decompressing_stream.push(boost::iostreams::gzip_decompressor());
-              decompressing_stream.push(
-                boost::iostreams::back_inserter(decompressed_buffer));
+              decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
               decompressing_stream.write(buffer.data(), buffer.size());
 #  else
               decompressed_buffer.assign(buffer.begin(), buffer.end());
@@ -3405,20 +3025,16 @@ namespace internal
         template <int dim, int spacedim>
         void
         get_mg_dofindices_recursively(
-          const parallel::distributed::Triangulation<dim, spacedim> &tria,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell,
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &dealii_cell,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &                          quadrant,
-          CellDataTransferBuffer<dim> &cell_data_transfer_buffer)
+          const parallel::distributed::Triangulation<dim, spacedim> &    tria,
+          const typename dealii::internal::p4est::types<dim>::quadrant & p4est_cell,
+          const typename DoFHandler<dim, spacedim>::level_cell_iterator &dealii_cell,
+          const typename dealii::internal::p4est::types<dim>::quadrant & quadrant,
+          CellDataTransferBuffer<dim> &                                  cell_data_transfer_buffer)
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
               // why would somebody request a cell that is not ours?
-              Assert(dealii_cell->level_subdomain_id() ==
-                       tria.locally_owned_subdomain(),
+              Assert(dealii_cell->level_subdomain_id() == tria.locally_owned_subdomain(),
                      ExcInternalError());
 
 
@@ -3445,58 +3061,40 @@ namespace internal
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
           internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
 
-          for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-               ++c)
+          for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
             get_mg_dofindices_recursively<dim, spacedim>(
-              tria,
-              p4est_child[c],
-              dealii_cell->child(c),
-              quadrant,
-              cell_data_transfer_buffer);
+              tria, p4est_child[c], dealii_cell->child(c), quadrant, cell_data_transfer_buffer);
         }
 
 
         template <int dim, int spacedim>
         void
         find_marked_mg_ghost_cells_recursively(
-          const typename parallel::distributed::Triangulation<dim, spacedim>
-            &                tria,
-          const unsigned int tree_index,
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &dealii_cell,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell,
-          std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>
-            &neighbor_cell_list)
+          const typename parallel::distributed::Triangulation<dim, spacedim> &tria,
+          const unsigned int                                                  tree_index,
+          const typename DoFHandler<dim, spacedim>::level_cell_iterator &     dealii_cell,
+          const typename dealii::internal::p4est::types<dim>::quadrant &      p4est_cell,
+          std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>> &neighbor_cell_list)
         {
           // recurse...
           if (dealii_cell->has_children())
             {
               typename dealii::internal::p4est::types<dim>::quadrant
                 p4est_child[GeometryInfo<dim>::max_children_per_cell];
-              internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                           p4est_child);
+              internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
 
 
-              for (unsigned int c = 0;
-                   c < GeometryInfo<dim>::max_children_per_cell;
-                   ++c)
+              for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
                 find_marked_mg_ghost_cells_recursively<dim, spacedim>(
-                  tria,
-                  tree_index,
-                  dealii_cell->child(c),
-                  p4est_child[c],
-                  neighbor_cell_list);
+                  tria, tree_index, dealii_cell->child(c), p4est_child[c], neighbor_cell_list);
             }
 
           if (dealii_cell->user_flag_set() &&
-              dealii_cell->level_subdomain_id() !=
-                tria.locally_owned_subdomain())
+              dealii_cell->level_subdomain_id() != tria.locally_owned_subdomain())
             {
-              neighbor_cell_list[dealii_cell->level_subdomain_id()]
-                .tree_indices.push_back(tree_index);
-              neighbor_cell_list[dealii_cell->level_subdomain_id()]
-                .quadrants.push_back(p4est_cell);
+              neighbor_cell_list[dealii_cell->level_subdomain_id()].tree_indices.push_back(
+                tree_index);
+              neighbor_cell_list[dealii_cell->level_subdomain_id()].quadrants.push_back(p4est_cell);
             }
         }
 
@@ -3504,19 +3102,15 @@ namespace internal
         template <int dim, int spacedim>
         void
         set_mg_dofindices_recursively(
-          const parallel::distributed::Triangulation<dim, spacedim> &tria,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell,
-          const typename DoFHandler<dim, spacedim>::level_cell_iterator
-            &dealii_cell,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &                              quadrant,
-          dealii::types::global_dof_index *dofs)
+          const parallel::distributed::Triangulation<dim, spacedim> &    tria,
+          const typename dealii::internal::p4est::types<dim>::quadrant & p4est_cell,
+          const typename DoFHandler<dim, spacedim>::level_cell_iterator &dealii_cell,
+          const typename dealii::internal::p4est::types<dim>::quadrant & quadrant,
+          dealii::types::global_dof_index *                              dofs)
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
-              Assert(dealii_cell->level_subdomain_id() !=
-                       dealii::numbers::artificial_subdomain_id,
+              Assert(dealii_cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id,
                      ExcInternalError());
 
               // update dof indices of cell
@@ -3537,19 +3131,13 @@ namespace internal
                   complete = false;
 
               if (!complete)
-                const_cast<
-                  typename DoFHandler<dim, spacedim>::level_cell_iterator &>(
-                  dealii_cell)
+                const_cast<typename DoFHandler<dim, spacedim>::level_cell_iterator &>(dealii_cell)
                   ->set_user_flag();
               else
-                const_cast<
-                  typename DoFHandler<dim, spacedim>::level_cell_iterator &>(
-                  dealii_cell)
+                const_cast<typename DoFHandler<dim, spacedim>::level_cell_iterator &>(dealii_cell)
                   ->clear_user_flag();
 
-              const_cast<
-                typename DoFHandler<dim, spacedim>::level_cell_iterator &>(
-                dealii_cell)
+              const_cast<typename DoFHandler<dim, spacedim>::level_cell_iterator &>(dealii_cell)
                 ->set_mg_dof_indices(dof_indices);
               return;
             }
@@ -3564,8 +3152,7 @@ namespace internal
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
           internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
 
-          for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-               ++c)
+          for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
             set_mg_dofindices_recursively<dim, spacedim>(
               tria, p4est_child[c], dealii_cell->child(c), quadrant, dofs);
         }
@@ -3575,35 +3162,25 @@ namespace internal
         template <int dim, int spacedim, class DoFHandlerType>
         void
         communicate_mg_ghost_cells(
-          const typename parallel::distributed::Triangulation<dim, spacedim>
-            &             tria,
-          DoFHandlerType &dof_handler,
-          const std::vector<dealii::types::global_dof_index>
-            &coarse_cell_to_p4est_tree_permutation,
-          const std::vector<dealii::types::global_dof_index>
-            &p4est_tree_to_coarse_cell_permutation)
+          const typename parallel::distributed::Triangulation<dim, spacedim> &tria,
+          DoFHandlerType &                                                    dof_handler,
+          const std::vector<dealii::types::global_dof_index> &coarse_cell_to_p4est_tree_permutation,
+          const std::vector<dealii::types::global_dof_index> &p4est_tree_to_coarse_cell_permutation)
         {
           // build list of cells to request for each neighbor
-          std::set<dealii::types::subdomain_id> level_ghost_owners =
-            tria.level_ghost_owners();
-          typedef std::map<dealii::types::subdomain_id,
-                           CellDataTransferBuffer<dim>>
-                    cellmap_t;
+          std::set<dealii::types::subdomain_id> level_ghost_owners = tria.level_ghost_owners();
+          typedef std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>> cellmap_t;
           cellmap_t neighbor_cell_list;
-          for (std::set<dealii::types::subdomain_id>::iterator it =
-                 level_ghost_owners.begin();
+          for (std::set<dealii::types::subdomain_id>::iterator it = level_ghost_owners.begin();
                it != level_ghost_owners.end();
                ++it)
-            neighbor_cell_list.insert(
-              std::make_pair(*it, CellDataTransferBuffer<dim>()));
+            neighbor_cell_list.insert(std::make_pair(*it, CellDataTransferBuffer<dim>()));
 
-          for (typename DoFHandlerType::level_cell_iterator cell =
-                 dof_handler.begin(0);
+          for (typename DoFHandlerType::level_cell_iterator cell = dof_handler.begin(0);
                cell != dof_handler.end(0);
                ++cell)
             {
-              typename dealii::internal::p4est::types<dim>::quadrant
-                p4est_coarse_cell;
+              typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
               internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
               find_marked_mg_ghost_cells_recursively<dim, spacedim>(
@@ -3613,8 +3190,7 @@ namespace internal
                 p4est_coarse_cell,
                 neighbor_cell_list);
             }
-          Assert(level_ghost_owners.size() == neighbor_cell_list.size(),
-                 ExcInternalError());
+          Assert(level_ghost_owners.size() == neighbor_cell_list.size(), ExcInternalError());
 
           //* send our requests:
           std::vector<std::vector<char>> sendbuffers(level_ghost_owners.size());
@@ -3640,9 +3216,8 @@ namespace internal
             }
 
           //* receive requests and reply
-          std::vector<std::vector<char>> reply_buffers(
-            level_ghost_owners.size());
-          std::vector<MPI_Request> reply_requests(level_ghost_owners.size());
+          std::vector<std::vector<char>> reply_buffers(level_ghost_owners.size());
+          std::vector<MPI_Request>       reply_requests(level_ghost_owners.size());
 
           for (unsigned int idx = 0; idx < level_ghost_owners.size(); ++idx)
             {
@@ -3651,8 +3226,7 @@ namespace internal
 
               MPI_Status status;
               int        len;
-              int        ierr = MPI_Probe(
-                MPI_ANY_SOURCE, 10101, tria.get_communicator(), &status);
+              int        ierr = MPI_Probe(MPI_ANY_SOURCE, 10101, tria.get_communicator(), &status);
               AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
@@ -3671,19 +3245,16 @@ namespace internal
               cell_data_transfer_buffer.unpack_data(receive);
 
               // store the dof indices for each cell
-              for (unsigned int c = 0;
-                   c < cell_data_transfer_buffer.tree_indices.size();
-                   ++c)
+              for (unsigned int c = 0; c < cell_data_transfer_buffer.tree_indices.size(); ++c)
                 {
                   typename DoFHandlerType::level_cell_iterator cell(
                     &dof_handler.get_triangulation(),
                     0,
-                    p4est_tree_to_coarse_cell_permutation
-                      [cell_data_transfer_buffer.tree_indices[c]],
+                    p4est_tree_to_coarse_cell_permutation[cell_data_transfer_buffer
+                                                            .tree_indices[c]],
                     &dof_handler);
 
-                  typename dealii::internal::p4est::types<dim>::quadrant
-                    p4est_coarse_cell;
+                  typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
                   internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
                   get_mg_dofindices_recursively<dim, spacedim>(
@@ -3714,8 +3285,7 @@ namespace internal
 
               MPI_Status status;
               int        len;
-              int        ierr = MPI_Probe(
-                MPI_ANY_SOURCE, 10102, tria.get_communicator(), &status);
+              int        ierr = MPI_Probe(MPI_ANY_SOURCE, 10102, tria.get_communicator(), &status);
               AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
@@ -3738,23 +3308,20 @@ namespace internal
               // set the dof indices for each cell
               dealii::types::global_dof_index *dofs =
                 cell_data_transfer_buffer.dof_numbers_and_indices.data();
-              for (unsigned int c = 0;
-                   c < cell_data_transfer_buffer.tree_indices.size();
+              for (unsigned int c = 0; c < cell_data_transfer_buffer.tree_indices.size();
                    ++c, dofs += 1 + dofs[0])
                 {
                   typename DoFHandlerType::level_cell_iterator cell(
                     &tria,
                     0,
-                    p4est_tree_to_coarse_cell_permutation
-                      [cell_data_transfer_buffer.tree_indices[c]],
+                    p4est_tree_to_coarse_cell_permutation[cell_data_transfer_buffer
+                                                            .tree_indices[c]],
                     &dof_handler);
 
-                  typename dealii::internal::p4est::types<dim>::quadrant
-                    p4est_coarse_cell;
+                  typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
                   internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
-                  Assert(cell->get_fe().dofs_per_cell == dofs[0],
-                         ExcInternalError());
+                  Assert(cell->get_fe().dofs_per_cell == dofs[0], ExcInternalError());
 
                   set_mg_dofindices_recursively<dim, spacedim>(
                     tria,
@@ -3769,15 +3336,13 @@ namespace internal
           // buffers.
           if (requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(
-                requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+              const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
           if (reply_requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(reply_requests.size(),
-                                           reply_requests.data(),
-                                           MPI_STATUSES_IGNORE);
+              const int ierr =
+                MPI_Waitall(reply_requests.size(), reply_requests.data(), MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
         }
@@ -3872,8 +3437,7 @@ namespace internal
           // define functions that pack data on cells that are ghost cells
           // somewhere else, and unpack data on cells where we get information
           // from elsewhere
-          auto pack =
-            [](const typename DoFHandlerType::active_cell_iterator &cell)
+          auto pack = [](const typename DoFHandlerType::active_cell_iterator &cell)
             -> boost::optional<std::vector<types::global_dof_index>> {
             Assert(cell->is_locally_owned(), ExcInternalError());
 
@@ -3897,8 +3461,7 @@ namespace internal
                 // this by removing the user flag
                 if (std::find(local_dof_indices.begin(),
                               local_dof_indices.end(),
-                              numbers::invalid_dof_index) !=
-                    local_dof_indices.end())
+                              numbers::invalid_dof_index) != local_dof_indices.end())
                   {
                     Assert(cell->user_flag_set(), ExcInternalError());
                   }
@@ -3921,8 +3484,7 @@ namespace internal
                 const bool is_complete =
                   (std::find(local_dof_indices.begin(),
                              local_dof_indices.end(),
-                             numbers::invalid_dof_index) ==
-                   local_dof_indices.end());
+                             numbers::invalid_dof_index) == local_dof_indices.end());
                 Assert(is_complete, ExcInternalError());
 #    endif
                 return boost::optional<std::vector<types::global_dof_index>>();
@@ -3931,8 +3493,7 @@ namespace internal
 
           auto unpack =
             [](const typename DoFHandlerType::active_cell_iterator &cell,
-               const std::vector<types::global_dof_index> &received_dof_indices)
-            -> void {
+               const std::vector<types::global_dof_index> &received_dof_indices) -> void {
             // this function should only be called on ghost cells, and
             // on top of that, only on cells that have not been
             // completed -- which we indicate via the user flag.
@@ -3947,10 +3508,10 @@ namespace internal
             // if we did get a complete array, then we may be in the first
             // or second ghost exchange, but in any case we need not exchange
             // another time. so delete the user flag
-            const bool is_complete = (std::find(received_dof_indices.begin(),
-                                                received_dof_indices.end(),
-                                                numbers::invalid_dof_index) ==
-                                      received_dof_indices.end());
+            const bool is_complete =
+              (std::find(received_dof_indices.begin(),
+                         received_dof_indices.end(),
+                         numbers::invalid_dof_index) == received_dof_indices.end());
             if (is_complete)
               cell->clear_user_flag();
 
@@ -3966,8 +3527,7 @@ namespace internal
             // cell dof indices cache because we may have set dof indices
             // on a neighboring ghost cell before this one, which may have
             // affected the dof indices we know about the current cell
-            std::vector<types::global_dof_index> local_dof_indices(
-              cell->get_fe().dofs_per_cell);
+            std::vector<types::global_dof_index> local_dof_indices(cell->get_fe().dofs_per_cell);
             cell->update_cell_dof_indices_cache();
             cell->get_dof_indices(local_dof_indices);
 
@@ -3977,18 +3537,16 @@ namespace internal
               else
                 // we already know the dof index. check that there
                 // is no conflict
-                Assert(
-                  (received_dof_indices[i] == numbers::invalid_dof_index) ||
-                    (received_dof_indices[i] == local_dof_indices[i]),
-                  ExcInternalError());
+                Assert((received_dof_indices[i] == numbers::invalid_dof_index) ||
+                         (received_dof_indices[i] == local_dof_indices[i]),
+                       ExcInternalError());
 
-            const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
-              ->set_dof_indices(local_dof_indices);
+            const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)->set_dof_indices(
+              local_dof_indices);
           };
 
-          GridTools::exchange_cell_data_to_ghosts<
-            std::vector<types::global_dof_index>,
-            DoFHandlerType>(dof_handler, pack, unpack);
+          GridTools::exchange_cell_data_to_ghosts<std::vector<types::global_dof_index>,
+                                                  DoFHandlerType>(dof_handler, pack, unpack);
 
           // finally update the cell DoF indices caches to make sure
           // our internal data structures are consistent
@@ -4008,9 +3566,9 @@ namespace internal
           // different tags for phase 1 and 2, but the cost of a
           // barrier is negligible compared to everything else we do
           // here
-          if (const auto *triangulation = dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> *>(
-                &dof_handler.get_triangulation()))
+          if (const auto *triangulation =
+                dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+                  &dof_handler.get_triangulation()))
             {
               const int ierr = MPI_Barrier(triangulation->get_communicator());
               AssertThrowMPI(ierr);
@@ -4018,9 +3576,8 @@ namespace internal
           else
             {
               Assert(false,
-                     ExcMessage(
-                       "The function communicate_dof_indices_on_marked_cells() "
-                       "only works with parallel distributed triangulations."));
+                     ExcMessage("The function communicate_dof_indices_on_marked_cells() "
+                                "only works with parallel distributed triangulations."));
             }
 #  endif
         }
@@ -4034,8 +3591,7 @@ namespace internal
 
 
       template <class DoFHandlerType>
-      ParallelDistributed<DoFHandlerType>::ParallelDistributed(
-        DoFHandlerType &dof_handler) :
+      ParallelDistributed<DoFHandlerType>::ParallelDistributed(DoFHandlerType &dof_handler) :
         dof_handler(&dof_handler)
       {}
 
@@ -4054,8 +3610,7 @@ namespace internal
 
         parallel::distributed::Triangulation<dim, spacedim> *triangulation =
           (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-            const_cast<dealii::Triangulation<dim, spacedim> *>(
-              &dof_handler->get_triangulation())));
+            const_cast<dealii::Triangulation<dim, spacedim> *>(&dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
         const unsigned int n_cpus =
@@ -4082,15 +3637,13 @@ namespace internal
 
         // --------- Phase 1: enumerate dofs on locally owned cells
         const dealii::types::global_dof_index n_initial_local_dofs =
-          Implementation::distribute_dofs(
-            triangulation->locally_owned_subdomain(), *dof_handler);
+          Implementation::distribute_dofs(triangulation->locally_owned_subdomain(), *dof_handler);
 
         // --------- Phase 2: un-numerate dofs on interfaces to ghost cells
         //                    that we don't own; re-enumerate the remaining ones
 
         // start with the identity permutation of indices
-        std::vector<dealii::types::global_dof_index> renumbering(
-          n_initial_local_dofs);
+        std::vector<dealii::types::global_dof_index> renumbering(n_initial_local_dofs);
         for (dealii::types::global_dof_index i = 0; i < renumbering.size(); ++i)
           renumbering[i] = i;
 
@@ -4098,8 +3651,8 @@ namespace internal
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
           for (auto cell : dof_handler->active_cell_iterators())
-            if (cell->is_ghost() && (cell->subdomain_id() <
-                                     triangulation->locally_owned_subdomain()))
+            if (cell->is_ghost() &&
+                (cell->subdomain_id() < triangulation->locally_owned_subdomain()))
               {
                 // we found a neighboring ghost cell whose subdomain
                 // is "stronger" than our own subdomain
@@ -4124,24 +3677,21 @@ namespace internal
 
         // --------- Phase 3: shift indices so that each processor has a unique
         //                    range of indices
-        std::vector<dealii::types::global_dof_index>
-          n_locally_owned_dofs_per_processor(n_cpus);
+        std::vector<dealii::types::global_dof_index> n_locally_owned_dofs_per_processor(n_cpus);
 
-        const int ierr =
-          MPI_Allgather(&n_locally_owned_dofs,
-                        1,
-                        DEAL_II_DOF_INDEX_MPI_TYPE,
-                        n_locally_owned_dofs_per_processor.data(),
-                        1,
-                        DEAL_II_DOF_INDEX_MPI_TYPE,
-                        triangulation->get_communicator());
+        const int ierr = MPI_Allgather(&n_locally_owned_dofs,
+                                       1,
+                                       DEAL_II_DOF_INDEX_MPI_TYPE,
+                                       n_locally_owned_dofs_per_processor.data(),
+                                       1,
+                                       DEAL_II_DOF_INDEX_MPI_TYPE,
+                                       triangulation->get_communicator());
         AssertThrowMPI(ierr);
 
-        const dealii::types::global_dof_index my_shift =
-          std::accumulate(n_locally_owned_dofs_per_processor.begin(),
-                          n_locally_owned_dofs_per_processor.begin() +
-                            triangulation->locally_owned_subdomain(),
-                          static_cast<dealii::types::global_dof_index>(0));
+        const dealii::types::global_dof_index my_shift = std::accumulate(
+          n_locally_owned_dofs_per_processor.begin(),
+          n_locally_owned_dofs_per_processor.begin() + triangulation->locally_owned_subdomain(),
+          static_cast<dealii::types::global_dof_index>(0));
         for (auto &new_index : renumbering)
           if (new_index != numbers::invalid_dof_index)
             new_index += my_shift;
@@ -4149,8 +3699,7 @@ namespace internal
         // now re-enumerate all dofs to this shifted and condensed
         // numbering form.  we renumber some dofs as invalid, so
         // choose the nocheck-version.
-        Implementation::renumber_dofs(
-          renumbering, IndexSet(0), *dof_handler, false);
+        Implementation::renumber_dofs(renumbering, IndexSet(0), *dof_handler, false);
 
         // now a little bit of housekeeping
         const dealii::types::global_dof_index n_global_dofs =
@@ -4158,34 +3707,26 @@ namespace internal
                           n_locally_owned_dofs_per_processor.end(),
                           dealii::types::global_dof_index(0));
 
-        std::vector<IndexSet> locally_owned_dofs_per_processor(
-          n_cpus, IndexSet(n_global_dofs));
+        std::vector<IndexSet> locally_owned_dofs_per_processor(n_cpus, IndexSet(n_global_dofs));
         {
           dealii::types::global_dof_index current_shift = 0;
           for (unsigned int i = 0; i < n_cpus; ++i)
             {
               locally_owned_dofs_per_processor[i].add_range(
-                current_shift,
-                current_shift + n_locally_owned_dofs_per_processor[i]);
+                current_shift, current_shift + n_locally_owned_dofs_per_processor[i]);
               current_shift += n_locally_owned_dofs_per_processor[i];
             }
         }
         NumberCache number_cache(locally_owned_dofs_per_processor,
                                  triangulation->locally_owned_subdomain());
         Assert(
-          number_cache
-              .locally_owned_dofs_per_processor[triangulation
-                                                  ->locally_owned_subdomain()]
+          number_cache.locally_owned_dofs_per_processor[triangulation->locally_owned_subdomain()]
               .n_elements() == number_cache.n_locally_owned_dofs,
           ExcInternalError());
         Assert(
-          !number_cache
-              .locally_owned_dofs_per_processor[triangulation
-                                                  ->locally_owned_subdomain()]
+          !number_cache.locally_owned_dofs_per_processor[triangulation->locally_owned_subdomain()]
               .n_elements() ||
-            number_cache
-                .locally_owned_dofs_per_processor[triangulation
-                                                    ->locally_owned_subdomain()]
+            number_cache.locally_owned_dofs_per_processor[triangulation->locally_owned_subdomain()]
                 .nth_index_in_set(0) == my_shift,
           ExcInternalError());
 
@@ -4204,8 +3745,7 @@ namespace internal
           // figure out which cells are ghost cells on which we have
           // to exchange DoF indices
           const std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-            vertices_with_ghost_neighbors =
-              triangulation->compute_vertices_with_ghost_neighbors();
+            vertices_with_ghost_neighbors = triangulation->compute_vertices_with_ghost_neighbors();
 
           // mark all cells that either have to send data (locally
           // owned cells that are adjacent to ghost neighbors in some
@@ -4213,11 +3753,9 @@ namespace internal
           for (auto cell : dof_handler->active_cell_iterators())
             if (cell->is_locally_owned())
               {
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim>::vertices_per_cell;
-                     ++v)
-                  if (vertices_with_ghost_neighbors.find(cell->vertex_index(
-                        v)) != vertices_with_ghost_neighbors.end())
+                for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+                  if (vertices_with_ghost_neighbors.find(cell->vertex_index(v)) !=
+                      vertices_with_ghost_neighbors.end())
                     {
                       cell->set_user_flag();
                       break;
@@ -4266,27 +3804,23 @@ namespace internal
               {
                 local_dof_indices.resize(cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices(local_dof_indices);
-                if (local_dof_indices.end() !=
-                    std::find(local_dof_indices.begin(),
-                              local_dof_indices.end(),
-                              numbers::invalid_dof_index))
+                if (local_dof_indices.end() != std::find(local_dof_indices.begin(),
+                                                         local_dof_indices.end(),
+                                                         numbers::invalid_dof_index))
                   {
                     if (cell->is_ghost())
                       {
-                        Assert(
-                          false,
-                          ExcMessage("A ghost cell ended up with incomplete "
-                                     "DoF index information. This should not "
-                                     "have happened!"));
+                        Assert(false,
+                               ExcMessage("A ghost cell ended up with incomplete "
+                                          "DoF index information. This should not "
+                                          "have happened!"));
                       }
                     else
                       {
-                        Assert(
-                          false,
-                          ExcMessage(
-                            "A locally owned cell ended up with incomplete "
-                            "DoF index information. This should not "
-                            "have happened!"));
+                        Assert(false,
+                               ExcMessage("A locally owned cell ended up with incomplete "
+                                          "DoF index information. This should not "
+                                          "have happened!"));
                       }
                   }
               }
@@ -4311,14 +3845,12 @@ namespace internal
 
         parallel::distributed::Triangulation<dim, spacedim> *triangulation =
           (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-            const_cast<dealii::Triangulation<dim, spacedim> *>(
-              &dof_handler->get_triangulation())));
+            const_cast<dealii::Triangulation<dim, spacedim> *>(&dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
         AssertThrow(
           (triangulation->settings &
-           parallel::distributed::Triangulation<dim, spacedim>::
-             construct_multigrid_hierarchy),
+           parallel::distributed::Triangulation<dim, spacedim>::construct_multigrid_hierarchy),
           ExcMessage("Multigrid DoFs can only be distributed on a parallel "
                      "Triangulation if the flag construct_multigrid_hierarchy "
                      "is set in the constructor."));
@@ -4340,31 +3872,25 @@ namespace internal
             NumberCache level_number_cache;
 
             //* 1. distribute on own subdomain
-            const unsigned int n_initial_local_dofs =
-              Implementation::distribute_dofs_on_level(
-                triangulation->locally_owned_subdomain(), *dof_handler, level);
+            const unsigned int n_initial_local_dofs = Implementation::distribute_dofs_on_level(
+              triangulation->locally_owned_subdomain(), *dof_handler, level);
 
             //* 2. iterate over ghostcells and kill dofs that are not
             // owned by us
-            std::vector<dealii::types::global_dof_index> renumbering(
-              n_initial_local_dofs);
-            for (dealii::types::global_dof_index i = 0; i < renumbering.size();
-                 ++i)
+            std::vector<dealii::types::global_dof_index> renumbering(n_initial_local_dofs);
+            for (dealii::types::global_dof_index i = 0; i < renumbering.size(); ++i)
               renumbering[i] = i;
 
             if (level < triangulation->n_levels())
               {
                 std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-                typename DoFHandlerType::level_cell_iterator
-                  cell = dof_handler->begin(level),
-                  endc = dof_handler->end(level);
+                typename DoFHandlerType::level_cell_iterator cell = dof_handler->begin(level),
+                                                             endc = dof_handler->end(level);
 
                 for (; cell != endc; ++cell)
-                  if (cell->level_subdomain_id() !=
-                        numbers::artificial_subdomain_id &&
-                      (cell->level_subdomain_id() <
-                       triangulation->locally_owned_subdomain()))
+                  if (cell->level_subdomain_id() != numbers::artificial_subdomain_id &&
+                      (cell->level_subdomain_id() < triangulation->locally_owned_subdomain()))
                     {
                       // we found a neighboring ghost cell whose
                       // subdomain is "stronger" than our own
@@ -4375,19 +3901,16 @@ namespace internal
                       // (i.e. the ones on the interface)
                       local_dof_indices.resize(cell->get_fe().dofs_per_cell);
                       cell->get_mg_dof_indices(local_dof_indices);
-                      for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell;
-                           ++i)
+                      for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
                         if (local_dof_indices[i] != numbers::invalid_dof_index)
-                          renumbering[local_dof_indices[i]] =
-                            numbers::invalid_dof_index;
+                          renumbering[local_dof_indices[i]] = numbers::invalid_dof_index;
                     }
               }
 
             // TODO: make this code simpler with the new constructors of
             // NumberCache make indices consecutive
             level_number_cache.n_locally_owned_dofs = 0;
-            for (std::vector<dealii::types::global_dof_index>::iterator it =
-                   renumbering.begin();
+            for (std::vector<dealii::types::global_dof_index>::iterator it = renumbering.begin();
                  it != renumbering.end();
                  ++it)
               if (*it != numbers::invalid_dof_index)
@@ -4395,26 +3918,23 @@ namespace internal
 
             //* 3. communicate local dofcount and shift ids to make
             // them unique
-            level_number_cache.n_locally_owned_dofs_per_processor.resize(
-              n_cpus);
+            level_number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
-            int ierr = MPI_Allgather(
-              &level_number_cache.n_locally_owned_dofs,
-              1,
-              DEAL_II_DOF_INDEX_MPI_TYPE,
-              &level_number_cache.n_locally_owned_dofs_per_processor[0],
-              1,
-              DEAL_II_DOF_INDEX_MPI_TYPE,
-              triangulation->get_communicator());
+            int ierr = MPI_Allgather(&level_number_cache.n_locally_owned_dofs,
+                                     1,
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     &level_number_cache.n_locally_owned_dofs_per_processor[0],
+                                     1,
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     triangulation->get_communicator());
             AssertThrowMPI(ierr);
 
-            const dealii::types::global_dof_index shift = std::accumulate(
-              level_number_cache.n_locally_owned_dofs_per_processor.begin(),
-              level_number_cache.n_locally_owned_dofs_per_processor.begin() +
-                triangulation->locally_owned_subdomain(),
-              static_cast<dealii::types::global_dof_index>(0));
-            for (std::vector<dealii::types::global_dof_index>::iterator it =
-                   renumbering.begin();
+            const dealii::types::global_dof_index shift =
+              std::accumulate(level_number_cache.n_locally_owned_dofs_per_processor.begin(),
+                              level_number_cache.n_locally_owned_dofs_per_processor.begin() +
+                                triangulation->locally_owned_subdomain(),
+                              static_cast<dealii::types::global_dof_index>(0));
+            for (std::vector<dealii::types::global_dof_index>::iterator it = renumbering.begin();
                  it != renumbering.end();
                  ++it)
               if (*it != numbers::invalid_dof_index)
@@ -4433,13 +3953,12 @@ namespace internal
                 renumbering, IndexSet(0), *dof_handler, level, false);
 
             // now a little bit of housekeeping
-            level_number_cache.n_global_dofs = std::accumulate(
-              level_number_cache.n_locally_owned_dofs_per_processor.begin(),
-              level_number_cache.n_locally_owned_dofs_per_processor.end(),
-              static_cast<dealii::types::global_dof_index>(0));
+            level_number_cache.n_global_dofs =
+              std::accumulate(level_number_cache.n_locally_owned_dofs_per_processor.begin(),
+                              level_number_cache.n_locally_owned_dofs_per_processor.end(),
+                              static_cast<dealii::types::global_dof_index>(0));
 
-            level_number_cache.locally_owned_dofs =
-              IndexSet(level_number_cache.n_global_dofs);
+            level_number_cache.locally_owned_dofs = IndexSet(level_number_cache.n_global_dofs);
             level_number_cache.locally_owned_dofs.add_range(
               shift, shift + level_number_cache.n_locally_owned_dofs);
             level_number_cache.locally_owned_dofs.compress();
@@ -4452,27 +3971,21 @@ namespace internal
                 {
                   level_number_cache.locally_owned_dofs_per_processor[i] =
                     IndexSet(level_number_cache.n_global_dofs);
-                  level_number_cache.locally_owned_dofs_per_processor[i]
-                    .add_range(current_shift,
-                               current_shift +
-                                 level_number_cache
-                                   .n_locally_owned_dofs_per_processor[i]);
-                  current_shift +=
-                    level_number_cache.n_locally_owned_dofs_per_processor[i];
+                  level_number_cache.locally_owned_dofs_per_processor[i].add_range(
+                    current_shift,
+                    current_shift + level_number_cache.n_locally_owned_dofs_per_processor[i]);
+                  current_shift += level_number_cache.n_locally_owned_dofs_per_processor[i];
                 }
             }
             Assert(level_number_cache
-                       .locally_owned_dofs_per_processor
-                         [triangulation->locally_owned_subdomain()]
+                       .locally_owned_dofs_per_processor[triangulation->locally_owned_subdomain()]
                        .n_elements() == level_number_cache.n_locally_owned_dofs,
                    ExcInternalError());
             Assert(!level_number_cache
-                       .locally_owned_dofs_per_processor
-                         [triangulation->locally_owned_subdomain()]
+                       .locally_owned_dofs_per_processor[triangulation->locally_owned_subdomain()]
                        .n_elements() ||
                      level_number_cache
-                         .locally_owned_dofs_per_processor
-                           [triangulation->locally_owned_subdomain()]
+                         .locally_owned_dofs_per_processor[triangulation->locally_owned_subdomain()]
                          .nth_index_in_set(0) == shift,
                    ExcInternalError());
 
@@ -4491,11 +4004,9 @@ namespace internal
 
           // mark all ghost cells for transfer
           {
-            typename DoFHandlerType::level_cell_iterator cell,
-              endc = dof_handler->end();
+            typename DoFHandlerType::level_cell_iterator cell, endc = dof_handler->end();
             for (cell = dof_handler->begin(); cell != endc; ++cell)
-              if (cell->level_subdomain_id() !=
-                    dealii::numbers::artificial_subdomain_id &&
+              if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id &&
                   !cell->is_locally_owned_on_level())
                 cell->set_user_flag();
           }
@@ -4503,11 +4014,10 @@ namespace internal
           // Phase 1. Request all marked cells from corresponding owners. If we
           // managed to get every DoF, remove the user_flag, otherwise we
           // will request them again in the step below.
-          communicate_mg_ghost_cells(
-            *triangulation,
-            *dof_handler,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
+          communicate_mg_ghost_cells(*triangulation,
+                                     *dof_handler,
+                                     triangulation->coarse_cell_to_p4est_tree_permutation,
+                                     triangulation->p4est_tree_to_coarse_cell_permutation);
 
           // have a barrier so that sends from above and below this
           // place are not mixed up.
@@ -4527,20 +4037,17 @@ namespace internal
 
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
-          communicate_mg_ghost_cells(
-            *triangulation,
-            *dof_handler,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
+          communicate_mg_ghost_cells(*triangulation,
+                                     *dof_handler,
+                                     triangulation->coarse_cell_to_p4est_tree_permutation,
+                                     triangulation->p4est_tree_to_coarse_cell_permutation);
 
 #  ifdef DEBUG
           // make sure we have removed all flags:
           {
-            typename DoFHandlerType::level_cell_iterator cell,
-              endc = dof_handler->end();
+            typename DoFHandlerType::level_cell_iterator cell, endc = dof_handler->end();
             for (cell = dof_handler->begin(); cell != endc; ++cell)
-              if (cell->level_subdomain_id() !=
-                    dealii::numbers::artificial_subdomain_id &&
+              if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id &&
                   !cell->is_locally_owned_on_level())
                 Assert(cell->user_flag_set() == false, ExcInternalError());
           }
@@ -4555,19 +4062,16 @@ namespace internal
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
-          typename DoFHandlerType::level_cell_iterator cell,
-            endc = dof_handler->end();
+          typename DoFHandlerType::level_cell_iterator cell, endc = dof_handler->end();
 
           for (cell = dof_handler->begin(); cell != endc; ++cell)
-            if (cell->level_subdomain_id() !=
-                dealii::numbers::artificial_subdomain_id)
+            if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id)
               {
                 local_dof_indices.resize(cell->get_fe().dofs_per_cell);
                 cell->get_mg_dof_indices(local_dof_indices);
-                if (local_dof_indices.end() !=
-                    std::find(local_dof_indices.begin(),
-                              local_dof_indices.end(),
-                              numbers::invalid_dof_index))
+                if (local_dof_indices.end() != std::find(local_dof_indices.begin(),
+                                                         local_dof_indices.end(),
+                                                         numbers::invalid_dof_index))
                   {
                     Assert(false, ExcMessage("not all DoFs got distributed!"));
                   }
@@ -4588,8 +4092,7 @@ namespace internal
       {
         (void)new_numbers;
 
-        Assert(new_numbers.size() == dof_handler->n_locally_owned_dofs(),
-               ExcInternalError());
+        Assert(new_numbers.size() == dof_handler->n_locally_owned_dofs(), ExcInternalError());
 
 #ifndef DEAL_II_WITH_P4EST
         Assert(false, ExcNotImplemented());
@@ -4600,8 +4103,7 @@ namespace internal
 
         parallel::distributed::Triangulation<dim, spacedim> *triangulation =
           (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-            const_cast<dealii::Triangulation<dim, spacedim> *>(
-              &dof_handler->get_triangulation())));
+            const_cast<dealii::Triangulation<dim, spacedim> *>(&dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
 
@@ -4616,16 +4118,14 @@ namespace internal
         IndexSet my_locally_owned_new_dof_indices(dof_handler->n_dofs());
         if (dof_handler->n_locally_owned_dofs() > 0)
           {
-            std::vector<dealii::types::global_dof_index> new_numbers_sorted =
-              new_numbers;
+            std::vector<dealii::types::global_dof_index> new_numbers_sorted = new_numbers;
             std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
 
-            my_locally_owned_new_dof_indices.add_indices(
-              new_numbers_sorted.begin(), new_numbers_sorted.end());
+            my_locally_owned_new_dof_indices.add_indices(new_numbers_sorted.begin(),
+                                                         new_numbers_sorted.end());
             my_locally_owned_new_dof_indices.compress();
 
-            Assert(my_locally_owned_new_dof_indices.n_elements() ==
-                     new_numbers.size(),
+            Assert(my_locally_owned_new_dof_indices.n_elements() == new_numbers.size(),
                    ExcInternalError());
           }
 
@@ -4654,8 +4154,7 @@ namespace internal
                   // (e.g., by visiting a neighboring cell, if it is on the
                   // boundary), and if we don't own it
                   if ((local_dof_indices[i] != numbers::invalid_dof_index) &&
-                      (!dof_handler->locally_owned_dofs().is_element(
-                        local_dof_indices[i])))
+                      (!dof_handler->locally_owned_dofs().is_element(local_dof_indices[i])))
                     local_dof_indices[i] = numbers::invalid_dof_index;
 
                 cell->set_dof_indices(local_dof_indices);
@@ -4665,10 +4164,8 @@ namespace internal
 
         // renumber. Skip when there is nothing to do because we own no DoF.
         if (dof_handler->locally_owned_dofs().n_elements() > 0)
-          Implementation::renumber_dofs(new_numbers,
-                                        dof_handler->locally_owned_dofs(),
-                                        *dof_handler,
-                                        false);
+          Implementation::renumber_dofs(
+            new_numbers, dof_handler->locally_owned_dofs(), *dof_handler, false);
 
         // communicate newly assigned DoF indices to other processors
         // and get the same information for our own ghost cells.
@@ -4687,8 +4184,7 @@ namespace internal
           // figure out which cells are ghost cells on which we have
           // to exchange DoF indices
           const std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-            vertices_with_ghost_neighbors =
-              triangulation->compute_vertices_with_ghost_neighbors();
+            vertices_with_ghost_neighbors = triangulation->compute_vertices_with_ghost_neighbors();
 
 
           // Send and receive cells. After this, only the local cells
@@ -4724,8 +4220,8 @@ namespace internal
         // objects and shop them across the network.
         const unsigned int n_cpus =
           Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
-        std::vector<IndexSet> locally_owned_dofs_per_processor(
-          n_cpus, IndexSet(dof_handler->n_dofs()));
+        std::vector<IndexSet> locally_owned_dofs_per_processor(n_cpus,
+                                                               IndexSet(dof_handler->n_dofs()));
         {
           // serialize our own IndexSet
           std::vector<char> my_data;
@@ -4733,9 +4229,8 @@ namespace internal
 #  ifdef DEAL_II_WITH_ZLIB
 
             boost::iostreams::filtering_ostream out;
-            out.push(
-              boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                boost::iostreams::gzip::best_compression)));
+            out.push(boost::iostreams::gzip_compressor(
+              boost::iostreams::gzip_params(boost::iostreams::gzip::best_compression)));
             out.push(boost::iostreams::back_inserter(my_data));
 
             boost::archive::binary_oarchive archive(out);
@@ -4753,8 +4248,8 @@ namespace internal
           }
 
           // determine maximum size of IndexSet
-          const unsigned int max_size = Utilities::MPI::max(
-            my_data.size(), triangulation->get_communicator());
+          const unsigned int max_size =
+            Utilities::MPI::max(my_data.size(), triangulation->get_communicator());
 
           // as the MPI_Allgather call will be reading max_size elements, and
           // as this may be past the end of my_data, we need to increase the
@@ -4772,10 +4267,8 @@ namespace internal
           AssertThrowMPI(ierr);
 
           for (unsigned int i = 0; i < n_cpus; ++i)
-            if (i == Utilities::MPI::this_mpi_process(
-                       triangulation->get_communicator()))
-              locally_owned_dofs_per_processor[i] =
-                my_locally_owned_new_dof_indices;
+            if (i == Utilities::MPI::this_mpi_process(triangulation->get_communicator()))
+              locally_owned_dofs_per_processor[i] = my_locally_owned_new_dof_indices;
             else
               {
                 // copy the data previously received into a stringstream
@@ -4787,10 +4280,8 @@ namespace internal
 #  ifdef DEAL_II_WITH_ZLIB
 
                   boost::iostreams::filtering_ostream decompressing_stream;
-                  decompressing_stream.push(
-                    boost::iostreams::gzip_decompressor());
-                  decompressing_stream.push(
-                    boost::iostreams::back_inserter(decompressed_buffer));
+                  decompressing_stream.push(boost::iostreams::gzip_decompressor());
+                  decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
 
                   decompressing_stream.write(&buffer[i * max_size], max_size);
 #  else
@@ -4806,9 +4297,8 @@ namespace internal
               }
         }
 
-        return NumberCache(
-          locally_owned_dofs_per_processor,
-          Utilities::MPI::this_mpi_process(triangulation->get_communicator()));
+        return NumberCache(locally_owned_dofs_per_processor,
+                           Utilities::MPI::this_mpi_process(triangulation->get_communicator()));
 #endif
       }
 
@@ -4826,25 +4316,23 @@ namespace internal
         const std::vector<IndexSet> &index_sets =
           dof_handler->locally_owned_mg_dofs_per_processor(level);
 
-        constexpr int dim      = DoFHandlerType::dimension;
-        constexpr int spacedim = DoFHandlerType::space_dimension;
+        constexpr int                                 dim      = DoFHandlerType::dimension;
+        constexpr int                                 spacedim = DoFHandlerType::space_dimension;
         const parallel::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
 #ifdef DEAL_II_WITH_MPI
-        const unsigned int my_rank =
-          Utilities::MPI::this_mpi_process(tr->get_communicator());
+        const unsigned int my_rank = Utilities::MPI::this_mpi_process(tr->get_communicator());
 
 #  ifdef DEBUG
         for (types::global_dof_index i : new_numbers)
           {
             Assert(index_sets[my_rank].is_element(i),
-                   ExcNotImplemented(
-                     "Renumberings that change the locally owned mg dofs "
-                     "partitioning are currently not implemented for "
-                     "the multigrid levels"));
+                   ExcNotImplemented("Renumberings that change the locally owned mg dofs "
+                                     "partitioning are currently not implemented for "
+                                     "the multigrid levels"));
           }
 #  endif
 
@@ -4852,28 +4340,23 @@ namespace internal
         // use Utilities::MPI::Partitioner for handling the data exchange
         // of the new numbers, which is simply the extraction of ghost data
         IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(
-          *dof_handler, level, relevant_dofs);
-        std::vector<types::global_dof_index> ghosted_new_numbers(
-          relevant_dofs.n_elements());
+        DoFTools::extract_locally_relevant_level_dofs(*dof_handler, level, relevant_dofs);
+        std::vector<types::global_dof_index> ghosted_new_numbers(relevant_dofs.n_elements());
         {
           Utilities::MPI::Partitioner partitioner(
             index_sets[my_rank], relevant_dofs, tr->get_communicator());
-          std::vector<types::global_dof_index> temp_array(
-            partitioner.n_import_indices());
-          const unsigned int       communication_channel = 17;
-          std::vector<MPI_Request> requests;
+          std::vector<types::global_dof_index> temp_array(partitioner.n_import_indices());
+          const unsigned int                   communication_channel = 17;
+          std::vector<MPI_Request>             requests;
           partitioner.export_to_ghosted_array_start(
             communication_channel,
             make_array_view(new_numbers),
             make_array_view(temp_array),
-            ArrayView<types::global_dof_index>(ghosted_new_numbers.data() +
-                                                 new_numbers.size(),
+            ArrayView<types::global_dof_index>(ghosted_new_numbers.data() + new_numbers.size(),
                                                partitioner.n_ghost_indices()),
             requests);
           partitioner.export_to_ghosted_array_finish(
-            ArrayView<types::global_dof_index>(ghosted_new_numbers.data() +
-                                                 new_numbers.size(),
+            ArrayView<types::global_dof_index>(ghosted_new_numbers.data() + new_numbers.size(),
                                                partitioner.n_ghost_indices()),
             requests);
 
@@ -4882,8 +4365,7 @@ namespace internal
           // middle of the array, so we first copy the ghosted part from
           // smaller ranks to the front, then insert the data in the middle.
           unsigned int n_ghosts_on_smaller_ranks = 0;
-          for (std::pair<unsigned int, unsigned int> t :
-               partitioner.ghost_targets())
+          for (std::pair<unsigned int, unsigned int> t : partitioner.ghost_targets())
             {
               if (t.first > my_rank)
                 break;
@@ -4894,14 +4376,12 @@ namespace internal
               Assert(ghosted_new_numbers.data() != nullptr, ExcInternalError());
               std::memmove(ghosted_new_numbers.data(),
                            ghosted_new_numbers.data() + new_numbers.size(),
-                           sizeof(types::global_dof_index) *
-                             n_ghosts_on_smaller_ranks);
+                           sizeof(types::global_dof_index) * n_ghosts_on_smaller_ranks);
             }
           if (new_numbers.size() > 0)
             {
               Assert(new_numbers.data() != nullptr, ExcInternalError());
-              std::memcpy(ghosted_new_numbers.data() +
-                            n_ghosts_on_smaller_ranks,
+              std::memcpy(ghosted_new_numbers.data() + n_ghosts_on_smaller_ranks,
                           new_numbers.data(),
                           sizeof(types::global_dof_index) * new_numbers.size());
             }
@@ -4917,8 +4397,7 @@ namespace internal
         Assert(false, ExcNotImplemented());
 #endif
 
-        return NumberCache(
-          index_sets, Utilities::MPI::this_mpi_process(tr->get_communicator()));
+        return NumberCache(index_sets, Utilities::MPI::this_mpi_process(tr->get_communicator()));
       }
     } // namespace Policy
   }   // namespace DoFHandlerImplementation

@@ -46,8 +46,8 @@ main(int argc, char *argv[])
         std::abs(2.0 * pt.first + pt.second[0][1]) > 1e-12)
       {
         test_passed = false;
-        deallog << "Error with point " << pt.second[0] << " received from rank "
-                << pt.first << std::endl;
+        deallog << "Error with point " << pt.second[0] << " received from rank " << pt.first
+                << std::endl;
       }
   if (test_passed)
     deallog << "Test: ok" << std::endl;

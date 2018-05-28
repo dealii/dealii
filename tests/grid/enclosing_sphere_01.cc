@@ -183,10 +183,9 @@ test()
   for (unsigned int case_no = 0; case_no < 4; ++case_no)
     {
       create_triangulation(case_no, tria);
-      const std::pair<Point<dim>, double> smallest_sphere =
-        tria.begin_active()->enclosing_ball();
-      const double &    radius = smallest_sphere.second;
-      const Point<dim> &center = smallest_sphere.first;
+      const std::pair<Point<dim>, double> smallest_sphere = tria.begin_active()->enclosing_ball();
+      const double &                      radius          = smallest_sphere.second;
+      const Point<dim> &                  center          = smallest_sphere.first;
 
       deallog << "dim" << dim << ":case" << case_no << ":diameter=" << radius
               << ":center=" << center << std::endl;

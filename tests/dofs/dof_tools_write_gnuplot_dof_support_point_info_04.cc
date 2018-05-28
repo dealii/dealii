@@ -31,8 +31,7 @@ test(const double epsilon)
   support_points[0] = p1;
   support_points[1] = p2;
 
-  DoFTools::write_gnuplot_dof_support_point_info(deallog.get_file_stream(),
-                                                 support_points);
+  DoFTools::write_gnuplot_dof_support_point_info(deallog.get_file_stream(), support_points);
   deallog << std::endl;
 }
 

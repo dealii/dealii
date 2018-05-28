@@ -26,12 +26,9 @@ std::string
 cleanup_type(const std::string &in)
 {
   std::string ret = in;
-  ret =
-    Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");
-  ret =
-    Utilities::replace_in_string(ret, "NSt3__17complexIdEE", "St7complexIdE");
-  ret =
-    Utilities::replace_in_string(ret, "NSt3__17complexIeEE", "St7complexIeE");
+  ret             = Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");
+  ret             = Utilities::replace_in_string(ret, "NSt3__17complexIdEE", "St7complexIdE");
+  ret             = Utilities::replace_in_string(ret, "NSt3__17complexIeEE", "St7complexIeE");
   return ret;
 }
 
@@ -40,12 +37,10 @@ template <typename number>
 void
 check(const number &x)
 {
-  deallog << "typeid(x).name() = " << cleanup_type(typeid(x).name())
-          << std::endl;
+  deallog << "typeid(x).name() = " << cleanup_type(typeid(x).name()) << std::endl;
 
   deallog << "typeid(NumberTraits<number>::real_type).name() = "
-          << typeid(typename numbers::NumberTraits<number>::real_type).name()
-          << std::endl;
+          << typeid(typename numbers::NumberTraits<number>::real_type).name() << std::endl;
 
   deallog << numbers::NumberTraits<number>::conjugate(x) << std::endl;
 

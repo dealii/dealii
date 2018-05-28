@@ -43,14 +43,13 @@ main()
 
   // set a=x+y-z, which happens to be
   // zero
-  parallel::transform(
-    x.begin(),
-    x.end(),
-    y.begin(),
-    z.begin(),
-    a.begin(),
-    (boost::lambda::_1 + boost::lambda::_2 - boost::lambda::_3),
-    10);
+  parallel::transform(x.begin(),
+                      x.end(),
+                      y.begin(),
+                      z.begin(),
+                      a.begin(),
+                      (boost::lambda::_1 + boost::lambda::_2 - boost::lambda::_3),
+                      10);
 
   AssertThrow(a.l2_norm() == 0, ExcInternalError());
 

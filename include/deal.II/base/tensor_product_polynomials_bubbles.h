@@ -191,9 +191,8 @@ TensorProductPolynomialsBubbles<0>::n() const
 template <int dim>
 template <int order>
 Tensor<order, dim>
-TensorProductPolynomialsBubbles<dim>::compute_derivative(
-  const unsigned int i,
-  const Point<dim> & p) const
+TensorProductPolynomialsBubbles<dim>::compute_derivative(const unsigned int i,
+                                                         const Point<dim> & p) const
 {
   const unsigned int q_degree      = this->polynomials.size() - 1;
   const unsigned int max_q_indices = this->n_tensor_pols;
@@ -203,8 +202,7 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
 
   // treat the regular basis functions
   if (i < max_q_indices)
-    return this
-      ->TensorProductPolynomials<dim>::template compute_derivative<order>(i, p);
+    return this->TensorProductPolynomials<dim>::template compute_derivative<order>(i, p);
 
   const unsigned int comp = i - this->n_tensor_pols;
 
@@ -213,16 +211,14 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
     {
       case 1:
         {
-          Tensor<1, dim> &derivative_1 =
-            *reinterpret_cast<Tensor<1, dim> *>(&derivative);
+          Tensor<1, dim> &derivative_1 = *reinterpret_cast<Tensor<1, dim> *>(&derivative);
 
           for (unsigned int d = 0; d < dim; ++d)
             {
               derivative_1[d] = 1.;
               // compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
               for (unsigned j = 0; j < dim; ++j)
-                derivative_1[d] *=
-                  (d == j ? 4 * (1 - 2 * p(j)) : 4 * p(j) * (1 - p(j)));
+                derivative_1[d] *= (d == j ? 4 * (1 - 2 * p(j)) : 4 * p(j) * (1 - p(j)));
               // and multiply with (2*x_i-1)^{r-1}
               for (unsigned int i = 0; i < q_degree - 1; ++i)
                 derivative_1[d] *= 2 * p(comp) - 1;
@@ -245,8 +241,7 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
         }
       case 2:
         {
-          Tensor<2, dim> &derivative_2 =
-            *reinterpret_cast<Tensor<2, dim> *>(&derivative);
+          Tensor<2, dim> &derivative_2 = *reinterpret_cast<Tensor<2, dim> *>(&derivative);
 
           double v[dim + 1][3];
           {

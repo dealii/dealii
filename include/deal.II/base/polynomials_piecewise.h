@@ -113,9 +113,7 @@ namespace Polynomials
      * make sense.
      */
     void
-    value(const number       x,
-          const unsigned int n_derivatives,
-          number *           values) const;
+    value(const number x, const unsigned int n_derivatives, number *values) const;
 
     /**
      * Degree of the polynomial. This is the degree of the underlying base
@@ -166,9 +164,8 @@ namespace Polynomials
    * intervals.
    */
   std::vector<PiecewisePolynomial<double>>
-  generate_complete_Lagrange_basis_on_subdivisions(
-    const unsigned int n_subdivisions,
-    const unsigned int base_degree);
+  generate_complete_Lagrange_basis_on_subdivisions(const unsigned int n_subdivisions,
+                                                   const unsigned int base_degree);
 
 } // namespace Polynomials
 

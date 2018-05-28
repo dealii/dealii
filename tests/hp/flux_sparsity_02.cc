@@ -65,8 +65,7 @@ check()
         Assert(false, ExcNotImplemented());
     }
 
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, subdivisions, p1, p2);
+  GridGenerator::subdivided_hyper_rectangle(triangulation, subdivisions, p1, p2);
 
   // Create FE Collection and insert two FE objects
   // DGQ0 and DGQ1
@@ -89,8 +88,7 @@ check()
     cell_coupling(0, 0) = DoFTools::always;
     face_coupling(0, 0) = DoFTools::always;
 
-    DoFTools::make_flux_sparsity_pattern(
-      dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect that all dofs couple with each other.
@@ -106,8 +104,7 @@ check()
     cell_coupling(0, 0) = DoFTools::always;
     face_coupling(0, 0) = DoFTools::none;
 
-    DoFTools::make_flux_sparsity_pattern(
-      dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect no couplings across the face.
@@ -123,8 +120,7 @@ check()
     cell_coupling(0, 0) = DoFTools::none;
     face_coupling(0, 0) = DoFTools::always;
 
-    DoFTools::make_flux_sparsity_pattern(
-      dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect that all dofs couple with each other.
@@ -140,8 +136,7 @@ check()
     cell_coupling(0, 0) = DoFTools::none;
     face_coupling(0, 0) = DoFTools::none;
 
-    DoFTools::make_flux_sparsity_pattern(
-      dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect no couplings.

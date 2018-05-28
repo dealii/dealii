@@ -112,13 +112,11 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   triangulation.refine_global(n_glob_ref);
   for (unsigned int ref = 0; ref < n_ref; ++ref)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         if (cell->is_locally_owned() &&
-            (cell->center().norm() < 0.5 &&
-               (cell->level() < 5 || cell->center().norm() > 0.45) ||
+            (cell->center().norm() < 0.5 && (cell->level() < 5 || cell->center().norm() > 0.45) ||
              (dim == 2 && cell->center().norm() > 1.2)))
           cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
@@ -143,13 +141,9 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
 
   // interpolate:
   LinearAlgebra::distributed::Vector<LevelNumberType> fine_projection;
-  fine_projection.reinit(
-    locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
-  VectorTools::project(dof_handler,
-                       constraints,
-                       QGauss<dim>(n_q_points + 2),
-                       function,
-                       fine_projection);
+  fine_projection.reinit(locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+  VectorTools::project(
+    dof_handler, constraints, QGauss<dim>(n_q_points + 2), function, fine_projection);
   fine_projection.update_ghost_values();
 
   // output for debug purposes:
@@ -164,15 +158,13 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
         subdomain(i) = triangulation.locally_owned_subdomain();
       data_out.add_data_vector(subdomain, "subdomain");
       data_out.build_patches();
-      const std::string filename =
-        "output_" + Utilities::int_to_string(myid) + ".vtu";
-      std::ofstream output(filename.c_str());
+      const std::string filename = "output_" + Utilities::int_to_string(myid) + ".vtu";
+      std::ofstream     output(filename.c_str());
       data_out.write_vtu(output);
 
       const std::string mg_mesh = "mg_mesh";
       GridOut           grid_out;
-      grid_out.write_mesh_per_processor_as_vtu(
-        triangulation, mg_mesh, true, true);
+      grid_out.write_mesh_per_processor_as_vtu(triangulation, mg_mesh, true, true);
     }
 
   // MG hanging node constraints
@@ -185,11 +177,10 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   mg_transfer.build(dof_handler);
 
   // now the core of the test:
-  const unsigned int max_level =
-    dof_handler.get_triangulation().n_global_levels() - 1;
+  const unsigned int max_level = dof_handler.get_triangulation().n_global_levels() - 1;
   const unsigned int min_level = 0;
-  MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>>
-    level_projection(min_level, max_level);
+  MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>> level_projection(min_level,
+                                                                                      max_level);
   mg_transfer.interpolate_to_mg(dof_handler, level_projection, fine_projection);
 
   // now go through all GMG levels and make sure FE field can represent
@@ -197,8 +188,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   QGauss<dim>                  quadrature(n_q_points);
   std::vector<LevelNumberType> q_values(quadrature.size());
 
-  FEValues<dim> fe_values(
-    fe, quadrature, update_values | update_quadrature_points);
+  FEValues<dim> fe_values(fe, quadrature, update_values | update_quadrature_points);
   for (unsigned int level = max_level + 1; level != min_level;)
     {
       --level;
@@ -211,11 +201,9 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
           {
             fe_values.reinit(cell);
             cell->get_mg_dof_indices(dof_indices);
-            fe_values.get_function_values(
-              level_projection[level], dof_indices, q_values);
+            fe_values.get_function_values(level_projection[level], dof_indices, q_values);
 
-            const std::vector<Point<dim>> &q_points =
-              fe_values.get_quadrature_points();
+            const std::vector<Point<dim>> &q_points = fe_values.get_quadrature_points();
 
             for (unsigned int q = 0; q < q_points.size(); ++q)
               {
@@ -226,22 +214,17 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
                     for (const auto i : dof_indices)
                       std::cout << i << " ";
                     std::cout << std::endl << "values: ";
-                    std::vector<LevelNumberType> local_values(
-                      dof_indices.size());
-                    level_projection[level].extract_subvector_to(dof_indices,
-                                                                 local_values);
+                    std::vector<LevelNumberType> local_values(dof_indices.size());
+                    level_projection[level].extract_subvector_to(dof_indices, local_values);
                     for (const auto v : local_values)
                       std::cout << v << " ";
-                    std::cout << std::endl
-                              << "val(q)=" << q_values[q] << std::endl;
+                    std::cout << std::endl << "val(q)=" << q_values[q] << std::endl;
                     std::cout << "MGTransfer indices:" << std::endl;
                     mg_transfer.print_indices(std::cout);
                     AssertThrow(false,
-                                ExcMessage("Level " + std::to_string(level) +
-                                           " Diff " + std::to_string(diff) +
-                                           " center_x " +
-                                           std::to_string(cell->center()[0]) +
-                                           " center_y " +
+                                ExcMessage("Level " + std::to_string(level) + " Diff " +
+                                           std::to_string(diff) + " center_x " +
+                                           std::to_string(cell->center()[0]) + " center_y " +
                                            std::to_string(cell->center()[1])));
                   }
               }

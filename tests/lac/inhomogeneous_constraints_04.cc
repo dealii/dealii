@@ -104,10 +104,8 @@ test(bool use_constraint_matrix)
       cm.close();
       cm.print(logfile);
 
-      cm.distribute_local_to_global(
-        local_mat, local_vec, local_dofs1, mat, rhs, true);
-      cm.distribute_local_to_global(
-        local_mat, local_vec, local_dofs2, mat, rhs, true);
+      cm.distribute_local_to_global(local_mat, local_vec, local_dofs1, mat, rhs, true);
+      cm.distribute_local_to_global(local_mat, local_vec, local_dofs2, mat, rhs, true);
     }
   else
     {
@@ -124,12 +122,9 @@ test(bool use_constraint_matrix)
         }
 
       std::map<types::global_dof_index, double> boundary_values;
-      boundary_values.insert(
-        std::pair<types::global_dof_index, double>(1, -5.0));
-      boundary_values.insert(
-        std::pair<types::global_dof_index, double>(3, 2.0));
-      boundary_values.insert(
-        std::pair<types::global_dof_index, double>(4, 0.0));
+      boundary_values.insert(std::pair<types::global_dof_index, double>(1, -5.0));
+      boundary_values.insert(std::pair<types::global_dof_index, double>(3, 2.0));
+      boundary_values.insert(std::pair<types::global_dof_index, double>(4, 0.0));
       MatrixTools::apply_boundary_values(boundary_values, mat, solution, rhs);
     }
 

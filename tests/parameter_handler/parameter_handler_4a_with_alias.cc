@@ -38,21 +38,14 @@ main()
         prm.enter_subsection("Testing 2");
         {
           prm.declare_entry(
-            "string list 2",
-            "a",
-            Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-            "docs 1");
+            "string list 2", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")), "docs 1");
           prm.declare_entry("int 2", "1", Patterns::Integer());
-          prm.declare_entry(
-            "double 2", "3.1415926", Patterns::Double(), "docs 3");
+          prm.declare_entry("double 2", "3.1415926", Patterns::Double(), "docs 3");
         }
         prm.leave_subsection();
 
         prm.declare_entry(
-          "string list",
-          "a",
-          Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-          "docs 1");
+          "string list", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")), "docs 1");
         prm.declare_entry("int", "1", Patterns::Integer());
         prm.declare_alias("int", "int_alias");
         prm.declare_entry("double", "3.1415926", Patterns::Double(), "docs 3");
@@ -71,13 +64,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -85,12 +76,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 

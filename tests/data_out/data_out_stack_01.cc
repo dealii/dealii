@@ -25,9 +25,7 @@
 
 template <int dim>
 void
-check_this(const DoFHandler<dim> &,
-           const Vector<double> &,
-           const Vector<double> &)
+check_this(const DoFHandler<dim> &, const Vector<double> &, const Vector<double> &)
 {
   // 3d would generate 4d data, which
   // we don't presently support
@@ -47,10 +45,8 @@ check_this<1>(const DoFHandler<1> & dof_handler,
   const unsigned int dim = 1;
 
   DataOutStack<dim> data_out_stack;
-  data_out_stack.declare_data_vector("node_data",
-                                     DataOutStack<dim>::dof_vector);
-  data_out_stack.declare_data_vector("cell_data",
-                                     DataOutStack<dim>::cell_vector);
+  data_out_stack.declare_data_vector("node_data", DataOutStack<dim>::dof_vector);
+  data_out_stack.declare_data_vector("cell_data", DataOutStack<dim>::cell_vector);
 
 
   data_out_stack.new_parameter_value(1., 1.);

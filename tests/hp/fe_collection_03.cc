@@ -49,8 +49,7 @@ test()
   if (dim > 1)
     {
       hp::FECollection<dim> fe_collection;
-      fe_collection.push_back(
-        FESystem<dim>(FESystem<dim>(FE_Q<dim>(2), dim), 1));
+      fe_collection.push_back(FESystem<dim>(FESystem<dim>(FE_Q<dim>(2), dim), 1));
       fe_collection.push_back(FE_RaviartThomas<dim>(1));
       AssertThrow(fe_collection.n_blocks() == 1, ExcInternalError());
     }

@@ -63,8 +63,7 @@ public:
    *
    * The element is currently only implemented for order 0 in 2D.
    */
-  FE_RannacherTurek(const unsigned int order                 = 0,
-                    const unsigned int n_face_support_points = 2);
+  FE_RannacherTurek(const unsigned int order = 0, const unsigned int n_face_support_points = 2);
 
   virtual std::string
   get_name() const override;

@@ -41,9 +41,7 @@ check()
   FESystem<2> fe(fe_velocity, 1, fe_pressure, 1, fe_dg, 2, fe_nonprim, 1);
 
   // same using component masks to copy over:
-  auto run = [&](const unsigned int first,
-                 const unsigned int n,
-                 const std::string &desc) {
+  auto run = [&](const unsigned int first, const unsigned int n, const std::string &desc) {
     const unsigned int n_components = fe.n_components();
 
     ComponentMask mask(n_components, false);
@@ -52,8 +50,7 @@ check()
 
     deallog << "<tr>\n"
             << "<td><code>" << mask << "</code></td>\n"
-            << "<td><code>" << fe.get_sub_fe(mask).get_name()
-            << "</code></td>\n"
+            << "<td><code>" << fe.get_sub_fe(mask).get_name() << "</code></td>\n"
             << "<td>" << desc << "</td>\n"
             << "</tr>\n";
 
@@ -61,9 +58,8 @@ check()
     Assert(fe.get_sub_fe(mask) == fe.get_sub_fe(first, n), ExcInternalError());
   };
 
-  deallog
-    << "\n<table>\n"
-    << "<tr>\n<th>ComponentMask</th>\n<th>Result</th>\n<th>Description</th>\n</tr>\n";
+  deallog << "\n<table>\n"
+          << "<tr>\n<th>ComponentMask</th>\n<th>Result</th>\n<th>Description</th>\n</tr>\n";
   run(0, 7, "@p fe itself, the whole @p FESystem");
   run(0, 2, "just the @p fe_velocity");
   run(0, 1, "The first component in @p fe_velocity");

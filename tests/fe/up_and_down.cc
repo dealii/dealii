@@ -91,8 +91,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
         // this, _all_ children have
         // to be active, not only
         // some of them
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
+        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
           AssertThrow(cell->child(c)->active(), ExcInternalError());
 
         // then restrict and prolongate
@@ -120,8 +119,8 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   const double relative_residual = (x2.l2_norm() / x.l2_norm());
 
   const double threshold = 1e-6;
-  deallog << ", dofs_per_cell=" << fe.dofs_per_cell << "; relative residual: "
-          << (relative_residual < threshold ? "ok" : "botched up!")
+  deallog << ", dofs_per_cell=" << fe.dofs_per_cell
+          << "; relative residual: " << (relative_residual < threshold ? "ok" : "botched up!")
           << std::endl;
 
   // TODO:[WB] Why this exception with a value different from above. Output of
@@ -199,40 +198,33 @@ test()
     new FESystem<dim>(FE_Q<dim>(2), 2),
     new FESystem<dim>(FE_Q<dim>(1), 2, FE_DGQ<dim>(2), 2),
     new FESystem<dim>(FE_Q<dim>(1), 2, FE_DGQ<dim>(2), 2, FE_DGQ<dim>(0), 1),
-    new FESystem<dim>(
-      FE_Q<dim>(1),
-      2,
-      FESystem<dim>(FE_Q<dim>(1), 2, FE_DGQ<dim>(2), 2, FE_DGQ<dim>(2), 1),
-      2,
-      FE_DGQ<dim>(0),
-      1),
     new FESystem<dim>(FE_Q<dim>(1),
                       2,
-                      FESystem<dim>(FE_Q<dim>(1),
-                                    2,
-                                    FE_DGQ<dim>(2),
-                                    2,
-                                    FESystem<dim>(FE_DGQ<dim>(0), 3),
-                                    1),
+                      FESystem<dim>(FE_Q<dim>(1), 2, FE_DGQ<dim>(2), 2, FE_DGQ<dim>(2), 1),
                       2,
                       FE_DGQ<dim>(0),
                       1),
+    new FESystem<dim>(
+      FE_Q<dim>(1),
+      2,
+      FESystem<dim>(FE_Q<dim>(1), 2, FE_DGQ<dim>(2), 2, FESystem<dim>(FE_DGQ<dim>(0), 3), 1),
+      2,
+      FE_DGQ<dim>(0),
+      1),
 
     // finally mixed elements,
     // with scalar and Nedelec
     // elements, to make things
     // really difficult
     (dim != 1 ? new FESystem<dim>(FE_Nedelec<dim>(0), 2) : nullptr),
-    (dim != 1 ? new FESystem<dim>(FE_Nedelec<dim>(0), 2, FE_Q<dim>(2), 2) :
+    (dim != 1 ? new FESystem<dim>(FE_Nedelec<dim>(0), 2, FE_Q<dim>(2), 2) : nullptr),
+    (dim != 1 ? new FESystem<dim>(FE_Nedelec<dim>(0),
+                                  2,
+                                  FE_DGQ<dim>(2),
+                                  2,
+                                  FESystem<dim>(FE_Nedelec<dim>(0), 2, FE_Q<dim>(2), 2),
+                                  2) :
                 nullptr),
-    (dim != 1 ?
-       new FESystem<dim>(FE_Nedelec<dim>(0),
-                         2,
-                         FE_DGQ<dim>(2),
-                         2,
-                         FESystem<dim>(FE_Nedelec<dim>(0), 2, FE_Q<dim>(2), 2),
-                         2) :
-       nullptr),
   };
 
   for (unsigned int i = 0; i < sizeof(fe_list) / sizeof(fe_list[0]); ++i)

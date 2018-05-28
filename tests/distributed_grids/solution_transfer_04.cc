@@ -52,9 +52,7 @@ test(std::ostream & /*out*/)
   parallel::distributed::SolutionTransfer<dim, Vector<double>> soltrans(dofh);
   parallel::distributed::SolutionTransfer<dim, Vector<double>> soltrans2(dofh);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tr.begin_active();
-       cell != tr.end();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
        ++cell)
     {
       cell->set_refine_flag();
@@ -94,9 +92,8 @@ test(std::ostream & /*out*/)
 
   deallog << "#dofs:" << dofh.n_dofs() << std::endl;
 
-  deallog << "norm: " << interpolated_solution1.l2_norm() << " "
-          << interpolated_solution2.l2_norm() << " "
-          << interpolated_solution.l2_norm() << std::endl;
+  deallog << "norm: " << interpolated_solution1.l2_norm() << " " << interpolated_solution2.l2_norm()
+          << " " << interpolated_solution.l2_norm() << std::endl;
 }
 
 

@@ -23,12 +23,7 @@
 
 
 inline double
-value(unsigned int i,
-      unsigned int j,
-      unsigned int k,
-      unsigned int l,
-      double       lambda,
-      double       mu)
+value(unsigned int i, unsigned int j, unsigned int k, unsigned int l, double lambda, double mu)
 {
   return ((i == k) && (j == l) ? mu : 0) + ((i == l) && (j == k) ? mu : 0) +
          ((i == j) && (k == l) ? lambda : 0);

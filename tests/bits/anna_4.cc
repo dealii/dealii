@@ -65,8 +65,7 @@ VectorBoundaryValues<dim>::VectorBoundaryValues() : Function<dim>(2)
 
 template <int dim>
 inline void
-VectorBoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
+VectorBoundaryValues<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
 
@@ -101,9 +100,7 @@ private:
 // first component: Q1-Element,
 // second component: lowest order DG_Element
 template <int dim>
-FindBug<dim>::FindBug() :
-  fe(FE_Q<dim>(1), 1, FE_DGP<dim>(0), 1),
-  dof_handler(triangulation)
+FindBug<dim>::FindBug() : fe(FE_Q<dim>(1), 1, FE_DGP<dim>(0), 1), dof_handler(triangulation)
 {}
 
 
@@ -114,8 +111,7 @@ FindBug<dim>::make_grid_and_dofs()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(1);
 
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
 
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
@@ -123,8 +119,7 @@ FindBug<dim>::make_grid_and_dofs()
   dof_handler.distribute_dofs(fe);
 
 
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   solution.reinit(dof_handler.n_dofs());
 }
@@ -181,11 +176,8 @@ FindBug<dim>::dirichlet_conditions()
 
 
   // Here comes the crucial call....
-  VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
-                                           Functions::ZeroFunction<dim>(2),
-                                           dirichlet_dofs,
-                                           component_mask);
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, Functions::ZeroFunction<dim>(2), dirichlet_dofs, component_mask);
 
 
   std::vector<bool>            fixed_dofs(dof_handler.n_dofs());
@@ -194,8 +186,7 @@ FindBug<dim>::dirichlet_conditions()
 
   // get a list of those boundary DoFs which
   // we want to be fixed:
-  DoFTools::extract_boundary_dofs(
-    dof_handler, component_mask, fixed_dofs, boundary_ids);
+  DoFTools::extract_boundary_dofs(dof_handler, component_mask, fixed_dofs, boundary_ids);
 
   // (Primitive) Check if the DoFs
   // where adjusted correctly (note
@@ -219,11 +210,8 @@ FindBug<dim>::dirichlet_conditions()
   // so also check a more complicated
   // boundary value function
   dirichlet_dofs.clear();
-  VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
-                                           VectorBoundaryValues<dim>(),
-                                           dirichlet_dofs,
-                                           component_mask);
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, VectorBoundaryValues<dim>(), dirichlet_dofs, component_mask);
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     if (fixed_dofs[i] == true)
       deallog << i << " " << dirichlet_dofs[i] << std::endl;

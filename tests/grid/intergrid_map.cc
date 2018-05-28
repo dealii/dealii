@@ -70,8 +70,7 @@ check()
       intergrid_map_2.make_mapping(dof_2, dof_1);
 
       // write out the mapping
-      typename DoFHandler<dim>::cell_iterator cell = dof_1.begin(),
-                                              endc = dof_1.end();
+      typename DoFHandler<dim>::cell_iterator cell = dof_1.begin(), endc = dof_1.end();
       for (; cell != endc; ++cell)
         {
           deallog << cell << "->" << intergrid_map_1[cell] << "->"

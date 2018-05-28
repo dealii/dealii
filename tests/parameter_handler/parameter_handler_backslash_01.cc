@@ -38,9 +38,7 @@ main()
     {
       ParameterHandler prm;
       prm.enter_subsection("Testing");
-      prm.declare_entry("Function",
-                        "a",
-                        Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
+      prm.declare_entry("Function", "a", Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
       prm.leave_subsection();
 
       // test both relevant parse_input functions
@@ -50,8 +48,7 @@ main()
         }
       else
         {
-          std::ifstream input_stream(SOURCE_DIR
-                                     "/prm/parameter_handler_backslash_01.prm");
+          std::ifstream input_stream(SOURCE_DIR "/prm/parameter_handler_backslash_01.prm");
           prm.parse_input(input_stream);
         }
 

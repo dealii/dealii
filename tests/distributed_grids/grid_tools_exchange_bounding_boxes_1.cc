@@ -32,8 +32,8 @@ test_exchange_bbox()
   std::vector<unsigned int> n_bboxes = {2, 4, 3, 5, 1, 3, 8};
 
   const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
-  unsigned int    n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
-  unsigned int    proc    = Utilities::MPI::this_mpi_process(mpi_communicator);
+  unsigned int    n_procs          = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  unsigned int    proc             = Utilities::MPI::this_mpi_process(mpi_communicator);
 
   deallog << "Test for: dimension " << spacedim << std::endl;
   deallog << n_procs << "  mpi processes" << std::endl;
@@ -64,12 +64,9 @@ test_exchange_bbox()
     {
       if (global_boxes[i].size() != n_bboxes[i % 7])
         {
-          deallog << "Test FAILED: dimension check failed for process " << i
-                  << std::endl;
-          deallog << "Expected number of bboxes: " << n_bboxes[i % 7]
-                  << std::endl;
-          deallog << "Received number of bboxes: " << global_boxes[i].size()
-                  << std::endl;
+          deallog << "Test FAILED: dimension check failed for process " << i << std::endl;
+          deallog << "Expected number of bboxes: " << n_bboxes[i % 7] << std::endl;
+          deallog << "Received number of bboxes: " << global_boxes[i].size() << std::endl;
           passed = false;
         }
     }
@@ -86,21 +83,16 @@ test_exchange_bbox()
               boundary_pt[1] = global_boxes[p][b].get_boundary_points().second;
               for (unsigned int d = 0; d < spacedim; ++d)
                 for (unsigned int pt = 0; pt < 2; ++pt)
-                  if (std::abs(boundary_pt[pt][d] -
-                               (p + (2 * b + pt) * spacedim + d) * (p + 1)) >
+                  if (std::abs(boundary_pt[pt][d] - (p + (2 * b + pt) * spacedim + d) * (p + 1)) >
                       1e-10)
                     {
                       passed = false;
-                      deallog << "Test FAILED, value not corresponding for:"
-                              << std::endl;
+                      deallog << "Test FAILED, value not corresponding for:" << std::endl;
                       deallog << "Current proc: " << proc << std::endl;
                       deallog << "Value for proc: " << p << std::endl;
-                      deallog << "BBox " << b << " Point " << pt
-                              << " Dimension " << d << std::endl;
-                      deallog << "Value found: " << (int)boundary_pt[pt][d]
-                              << std::endl;
-                      deallog << "Value expected: "
-                              << (p + (2 * b + pt) * spacedim + d) * (p + 1)
+                      deallog << "BBox " << b << " Point " << pt << " Dimension " << d << std::endl;
+                      deallog << "Value found: " << (int)boundary_pt[pt][d] << std::endl;
+                      deallog << "Value expected: " << (p + (2 * b + pt) * spacedim + d) * (p + 1)
                               << std::endl;
                     }
             }

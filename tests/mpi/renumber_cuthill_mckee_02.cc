@@ -49,9 +49,7 @@ test()
   GridGenerator::hyper_cube(tr, -1.0, 1.0);
   tr.refine_global(8 - 2 * dim);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tr.begin_active();
-       cell != tr.end();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
        ++cell)
     if (!cell->is_ghost() && !cell->is_artificial())
       if (cell->center().norm() < 0.3)
@@ -65,37 +63,32 @@ test()
 
   static const FE_Q<dim> fe(1);
   dofh.distribute_dofs(fe);
-  std::vector<types::global_dof_index> renumbering(
-    dofh.locally_owned_dofs().n_elements());
+  std::vector<types::global_dof_index> renumbering(dofh.locally_owned_dofs().n_elements());
   std::vector<types::global_dof_index> starting_indices;
   starting_indices.push_back(dofh.locally_owned_dofs().nth_index_in_set(0));
-  DoFRenumbering::compute_Cuthill_McKee(
-    renumbering, dofh, false, false, starting_indices);
+  DoFRenumbering::compute_Cuthill_McKee(renumbering, dofh, false, false, starting_indices);
 
   // send everything to processor 0 for output
   std::vector<types::global_dof_index> complete_renumbering(dofh.n_dofs());
-  std::copy(
-    renumbering.begin(), renumbering.end(), complete_renumbering.begin());
+  std::copy(renumbering.begin(), renumbering.end(), complete_renumbering.begin());
   unsigned int offset = renumbering.size();
   for (unsigned int i = 1; i < nprocs; ++i)
     {
       if (myid == i)
-        MPI_Send(
-          &renumbering[0],
-          renumbering.size(),
-          Utilities::MPI::internal::mpi_type_id(&complete_renumbering[0]),
-          0,
-          i,
-          MPI_COMM_WORLD);
+        MPI_Send(&renumbering[0],
+                 renumbering.size(),
+                 Utilities::MPI::internal::mpi_type_id(&complete_renumbering[0]),
+                 0,
+                 i,
+                 MPI_COMM_WORLD);
       else if (myid == 0)
-        MPI_Recv(
-          &complete_renumbering[offset],
-          dofh.locally_owned_dofs_per_processor()[i].n_elements(),
-          Utilities::MPI::internal::mpi_type_id(&complete_renumbering[0]),
-          i,
-          i,
-          MPI_COMM_WORLD,
-          MPI_STATUSES_IGNORE);
+        MPI_Recv(&complete_renumbering[offset],
+                 dofh.locally_owned_dofs_per_processor()[i].n_elements(),
+                 Utilities::MPI::internal::mpi_type_id(&complete_renumbering[0]),
+                 i,
+                 i,
+                 MPI_COMM_WORLD,
+                 MPI_STATUSES_IGNORE);
       offset += dofh.locally_owned_dofs_per_processor()[i].n_elements();
     }
 

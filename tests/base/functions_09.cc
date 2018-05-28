@@ -78,8 +78,7 @@ template <int rank, int dim>
 void
 check()
 {
-  deallog << "ConstantTensorFunction<" << rank << ", " << dim
-          << ">:" << std::endl;
+  deallog << "ConstantTensorFunction<" << rank << ", " << dim << ">:" << std::endl;
 
   Tensor<rank, dim> value;
   FillTensor<rank, dim>::fill_tensor(value, 0);

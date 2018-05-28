@@ -97,8 +97,7 @@ namespace LinearAlgebra
        * copied.
        */
       virtual void
-      reinit(const VectorSpaceVector<Number> &V,
-             const bool omit_zeroing_entries = false) override;
+      reinit(const VectorSpaceVector<Number> &V, const bool omit_zeroing_entries = false) override;
 
       /**
        * Import all the element from the input vector @p V.
@@ -109,11 +108,10 @@ namespace LinearAlgebra
        * copy a vector to the GPU.
        */
       virtual void
-      import(
-        const ReadWriteVector<Number> &                 V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const ReadWriteVector<Number> &                 V,
+             VectorOperation::values                         operation,
+             std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+               std::shared_ptr<const CommunicationPatternBase>()) override;
 
       /**
        * Sets all elements of the vector to the scalar @p s. This operation is
@@ -149,8 +147,7 @@ namespace LinearAlgebra
       /**
        * Return the scalar product of two vectors.
        */
-      virtual Number
-      operator*(const VectorSpaceVector<Number> &V) const override;
+      virtual Number operator*(const VectorSpaceVector<Number> &V) const override;
 
       /**
        * Add @p to all components. Note that @p a is a scalar not a vector.
@@ -178,9 +175,7 @@ namespace LinearAlgebra
        * = s*(*this)+a*V</tt>
        */
       virtual void
-      sadd(const Number                     s,
-           const Number                     a,
-           const VectorSpaceVector<Number> &V) override;
+      sadd(const Number s, const Number a, const VectorSpaceVector<Number> &V) override;
 
       /**
        * Scale each element of this vector by the corresponding element in the

@@ -36,8 +36,7 @@ void check(Triangulation<3> &tria)
 {
   Point<3> p(0.75, 0.75, 0.75);
 
-  Triangulation<3>::active_cell_iterator cell =
-    GridTools::find_active_cell_around_point(tria, p);
+  Triangulation<3>::active_cell_iterator cell = GridTools::find_active_cell_around_point(tria, p);
 
   deallog << cell << std::endl;
   for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell; ++v)

@@ -82,10 +82,9 @@ public:
 
         for (unsigned int q = 0; q < velocity.n_q_points; ++q)
           {
-            SymmetricTensor<2, dim, vector_t> sym_grad_u =
-              velocity.get_symmetric_gradient(q);
-            vector_t pres = pressure.get_value(q);
-            vector_t div  = -trace(sym_grad_u);
+            SymmetricTensor<2, dim, vector_t> sym_grad_u = velocity.get_symmetric_gradient(q);
+            vector_t                          pres       = pressure.get_value(q);
+            vector_t                          div        = -trace(sym_grad_u);
             pressure.submit_value(div, q);
 
             // subtract p * I
@@ -107,8 +106,7 @@ public:
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &MatrixFreeTest<dim, VectorType>::local_apply, this, dst, src);
+    data.cell_loop(&MatrixFreeTest<dim, VectorType>::local_apply, this, dst, src);
   };
 
 private:
@@ -176,8 +174,7 @@ test(const unsigned int fe_degree)
   constraints_p.close();
 
   std::vector<types::global_dof_index> dofs_per_block(2);
-  DoFTools::count_dofs_per_block(
-    dof_handler, dofs_per_block, stokes_sub_blocks);
+  DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, stokes_sub_blocks);
 
   // std::cout << "Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -206,11 +203,8 @@ test(const unsigned int fe_degree)
   {
     QGauss<dim> quadrature_formula(fe_degree + 2);
 
-    FEValues<dim> fe_values(mapping,
-                            fe,
-                            quadrature_formula,
-                            update_values | update_JxW_values |
-                              update_gradients);
+    FEValues<dim> fe_values(
+      mapping, fe, quadrature_formula, update_values | update_JxW_values | update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -226,8 +220,7 @@ test(const unsigned int fe_degree)
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -247,10 +240,9 @@ test(const unsigned int fe_degree)
               {
                 for (unsigned int j = 0; j <= i; ++j)
                   {
-                    local_matrix(i, j) +=
-                      (phi_grads_u[i] * phi_grads_u[j] -
-                       div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
-                      fe_values.JxW(q);
+                    local_matrix(i, j) += (phi_grads_u[i] * phi_grads_u[j] -
+                                           div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
+                                          fe_values.JxW(q);
                   }
               }
           }
@@ -259,8 +251,7 @@ test(const unsigned int fe_degree)
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix, local_dof_indices, system_matrix);
       }
   }
 
@@ -301,8 +292,7 @@ test(const unsigned int fe_degree)
                    dofs,
                    constraints,
                    quad,
-                   typename MatrixFree<dim>::AdditionalData(
-                     MatrixFree<dim>::AdditionalData::none));
+                   typename MatrixFree<dim>::AdditionalData(MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult(solution, system_rhs);
@@ -314,8 +304,7 @@ test(const unsigned int fe_degree)
   mf_solution -= solution;
   const double error    = mf_solution.linfty_norm();
   const double relative = solution.linfty_norm();
-  deallog << "Verification fe degree " << fe_degree << ": " << error / relative
-          << std::endl
+  deallog << "Verification fe degree " << fe_degree << ": " << error / relative << std::endl
           << std::endl;
 }
 

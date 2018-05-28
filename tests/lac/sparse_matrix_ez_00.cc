@@ -66,24 +66,19 @@ main(int argc, char *argv[])
   m_ez.print(logfile);
 
   m_ez.set(2, 4, 0.0, /*elide_zero_values=*/false);
-  logfile << "Insert new zero to (2,4), out of range of default row length:"
-          << std::endl;
+  logfile << "Insert new zero to (2,4), out of range of default row length:" << std::endl;
   m_ez.print(logfile);
 
   m_ez.set(2, 1, 0.0, /*elide_zero_values=*/false);
-  logfile << "Set existing entry (2,1) to zero with elide_zero_values=false:"
-          << std::endl;
+  logfile << "Set existing entry (2,1) to zero with elide_zero_values=false:" << std::endl;
   m_ez.print(logfile);
 
   m_ez.set(3, 0, 1.414, /*elide_zero_values=*/false);
-  logfile << "Insert a non-zero entry at (3,0) with elide_zero_values=false:"
-          << std::endl;
+  logfile << "Insert a non-zero entry at (3,0) with elide_zero_values=false:" << std::endl;
   m_ez.print(logfile);
 
   m_ez.set(4, 4, 0.0, /*elide_zero_values=*/false);
-  logfile
-    << "Insert new zero entry to an empty row with elide_zero_values=false:"
-    << std::endl;
+  logfile << "Insert new zero entry to an empty row with elide_zero_values=false:" << std::endl;
   m_ez.print(logfile);
 
   {

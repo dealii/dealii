@@ -67,8 +67,7 @@ test()
   typedef decltype(cell) Iterator;
 
   auto cell_worker = [](const Iterator &cell, ScratchData &s, CopyData &c) {
-    deallog << "Cell worker on : " << cell << " ghost? " << cell->is_ghost()
-            << std::endl;
+    deallog << "Cell worker on : " << cell << " ghost? " << cell->is_ghost() << std::endl;
     ++c.n_cells;
     if (cell->is_ghost())
       ++c.n_ghost_cells;
@@ -78,8 +77,7 @@ test()
 
   auto boundary_worker =
     [](const Iterator &cell, const unsigned int &f, ScratchData &, CopyData &) {
-      deallog << "Boundary worker on : " << cell << ", Face : " << f
-              << std::endl;
+      deallog << "Boundary worker on : " << cell << ", Face : " << f << std::endl;
     };
 
   auto face_worker = [](const Iterator &    cell,
@@ -90,9 +88,8 @@ test()
                         const unsigned int &nsf,
                         ScratchData &       s,
                         CopyData &          c) {
-    deallog << "Face worker on : " << cell << ", Neighbor cell : " << ncell
-            << ", Face : " << f << ", Neighbor Face : " << nf
-            << ", Subface: " << sf << ", Neighbor Subface: " << nsf
+    deallog << "Face worker on : " << cell << ", Neighbor cell : " << ncell << ", Face : " << f
+            << ", Neighbor Face : " << nf << ", Subface: " << sf << ", Neighbor Subface: " << nsf
             << ", cell->is_ghost(): " << cell->is_ghost()
             << ", neighbor->is_ghost(): " << ncell->is_ghost() << std::endl;
   };
@@ -104,15 +101,12 @@ test()
     data.n_ghost_cells += c.n_ghost_cells;
   };
 
-  std::function<void(const decltype(cell) &, ScratchData &, CopyData &)>
-    empty_cell_worker;
-  std::function<void(
-    const decltype(cell) &, const unsigned int &, ScratchData &, CopyData &)>
+  std::function<void(const decltype(cell) &, ScratchData &, CopyData &)> empty_cell_worker;
+  std::function<void(const decltype(cell) &, const unsigned int &, ScratchData &, CopyData &)>
     empty_boundary_worker;
 
   auto print_summary = [&]() {
-    deallog << "n_cells: " << data.n_cells
-            << " n_own_cells: " << data.n_own_cells
+    deallog << "n_cells: " << data.n_cells << " n_own_cells: " << data.n_own_cells
             << " n_ghost_cells: " << data.n_ghost_cells << std::endl;
   };
 
@@ -122,8 +116,7 @@ test()
     deallog << "OWN CELLS:" << std::endl << std::endl;
 
     data.reset();
-    mesh_loop(
-      cell, endc, cell_worker, copier, scratch, copy, assemble_own_cells);
+    mesh_loop(cell, endc, cell_worker, copier, scratch, copy, assemble_own_cells);
     print_summary();
   }
 
@@ -132,13 +125,8 @@ test()
     deallog << "GHOST and OWN CELLS" << std::endl << std::endl;
 
     data.reset();
-    mesh_loop(cell,
-              endc,
-              cell_worker,
-              copier,
-              scratch,
-              copy,
-              assemble_own_cells | assemble_ghost_cells);
+    mesh_loop(
+      cell, endc, cell_worker, copier, scratch, copy, assemble_own_cells | assemble_ghost_cells);
     print_summary();
   }
 
@@ -147,8 +135,7 @@ test()
     deallog << "GHOST CELLS:" << std::endl << std::endl;
 
     data.reset();
-    mesh_loop(
-      cell, endc, cell_worker, copier, scratch, copy, assemble_ghost_cells);
+    mesh_loop(cell, endc, cell_worker, copier, scratch, copy, assemble_ghost_cells);
     print_summary();
   }
 
@@ -163,8 +150,7 @@ test()
               copier,
               scratch,
               copy,
-              assemble_own_cells | assemble_own_interior_faces_once |
-                assemble_ghost_faces_once,
+              assemble_own_cells | assemble_own_interior_faces_once | assemble_ghost_faces_once,
               empty_boundary_worker,
               face_worker);
     print_summary();

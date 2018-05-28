@@ -103,10 +103,8 @@ namespace parallel
     {
     public:
       typedef
-        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-          active_cell_iterator;
-      typedef typename dealii::Triangulation<dim, spacedim>::cell_iterator
-        cell_iterator;
+        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator active_cell_iterator;
+      typedef typename dealii::Triangulation<dim, spacedim>::cell_iterator  cell_iterator;
 
       /**
        * Configuration flags for distributed Triangulations to be set in the
@@ -238,12 +236,11 @@ namespace parallel
        *
        * Otherwise all non-locally owned cells are considered ghost.
        */
-      Triangulation(
-        MPI_Comm mpi_communicator,
-        const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing =
-          (dealii::Triangulation<dim, spacedim>::none),
-        const bool     allow_artificial_cells = false,
-        const Settings settings               = partition_auto);
+      Triangulation(MPI_Comm mpi_communicator,
+                    const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing =
+                      (dealii::Triangulation<dim, spacedim>::none),
+                    const bool     allow_artificial_cells = false,
+                    const Settings settings               = partition_auto);
 
       /**
        * Destructor.
@@ -270,7 +267,7 @@ namespace parallel
       virtual void
       create_triangulation(const std::vector<Point<spacedim>> &vertices,
                            const std::vector<CellData<dim>> &  cells,
-                           const SubCellData &subcelldata) override;
+                           const SubCellData &                 subcelldata) override;
 
       /**
        * Copy @p other_tria to this triangulation.
@@ -284,8 +281,7 @@ namespace parallel
        * and a number of artificial cells.
        */
       virtual void
-      copy_triangulation(
-        const dealii::Triangulation<dim, spacedim> &other_tria) override;
+      copy_triangulation(const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
       /**
        * Read the data of this object from a stream for the purpose of
@@ -376,8 +372,7 @@ namespace parallel
        * DoF distribution and partitioning functions with semi-artificial
        * cells.
        */
-      std::vector<std::vector<types::subdomain_id>>
-        true_level_subdomain_ids_of_cells;
+      std::vector<std::vector<types::subdomain_id>> true_level_subdomain_ids_of_cells;
     };
 
     template <int dim, int spacedim>

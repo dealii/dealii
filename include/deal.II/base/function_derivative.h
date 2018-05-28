@@ -50,9 +50,7 @@ public:
    * direction vector of the differentiation and the step size <tt>h</tt> of
    * the difference formula.
    */
-  FunctionDerivative(const Function<dim> &f,
-                     const Point<dim> &   direction,
-                     const double         h = 1.e-6);
+  FunctionDerivative(const Function<dim> &f, const Point<dim> &direction, const double h = 1.e-6);
 
   /**
    * Constructor. Provided are the functions to compute derivatives of and the

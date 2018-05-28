@@ -103,8 +103,7 @@ check()
   QGauss<dim> quadrature(3);
 
   Vector<double> rhs(dof.n_dofs());
-  VectorTools::create_right_hand_side(
-    dof, quadrature, MySquareFunction<dim>(), rhs);
+  VectorTools::create_right_hand_side(dof, quadrature, MySquareFunction<dim>(), rhs);
   for (unsigned int i = 0; i < rhs.size(); ++i)
     deallog << rhs(i) << std::endl;
 }

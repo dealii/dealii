@@ -68,15 +68,13 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     {
       Tensor<1, dim> div_alt;
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-        div_alt += fe_values[extractor].divergence(i, q) *
-                   fe_function(local_dof_indices[i]);
+        div_alt += fe_values[extractor].divergence(i, q) * fe_function(local_dof_indices[i]);
 
       deallog << "q_point=" << q << std::endl
               << "   method 1: " << divergences[q] << std::endl
               << "   method 2: " << div_alt << std::endl
               << std::endl;
-      Assert((divergences[q] - div_alt).norm() <= divergences[q].norm(),
-             ExcInternalError());
+      Assert((divergences[q] - div_alt).norm() <= divergences[q].norm(), ExcInternalError());
     }
 }
 

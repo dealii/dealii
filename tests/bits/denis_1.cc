@@ -78,15 +78,13 @@ main()
 
   dof_handler.distribute_dofs(fe);
 
-  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
-                                      endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
 
   phi_solution.reinit(dof_handler.n_dofs());
   VectorTools::interpolate(dof_handler, F(), phi_solution);
 
   gradient_phi.reinit(triangulation.n_active_cells());
-  DerivativeApproximation::approximate_gradient(
-    dof_handler, phi_solution, gradient_phi);
+  DerivativeApproximation::approximate_gradient(dof_handler, phi_solution, gradient_phi);
 
   gradient_phi_min = 1e30;
   gradient_phi_max = -1;

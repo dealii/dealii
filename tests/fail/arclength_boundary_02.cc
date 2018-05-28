@@ -44,7 +44,7 @@ main()
   pts.push_back(Point<2>(1, 1));
   pts.push_back(Point<2>(1, 0));
 
-  TopoDS_Edge edge = interpolation_curve(pts, Tensor<1, 2>(), true);
+  TopoDS_Edge                           edge = interpolation_curve(pts, Tensor<1, 2>(), true);
   ArclengthProjectionLineManifold<2, 2> manifold(edge);
 
   Triangulation<2> tria;

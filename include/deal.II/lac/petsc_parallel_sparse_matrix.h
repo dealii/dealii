@@ -214,9 +214,8 @@ namespace PETScWrappers
                    const size_type               local_rows,
                    const size_type               local_columns,
                    const std::vector<size_type> &row_lengths,
-                   const bool                    is_symmetric = false,
-                   const std::vector<size_type> &offdiag_row_lengths =
-                     std::vector<size_type>());
+                   const bool                    is_symmetric        = false,
+                   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Initialize using the given sparsity pattern with communication
@@ -246,7 +245,7 @@ namespace PETScWrappers
                    const std::vector<size_type> &local_rows_per_process,
                    const std::vector<size_type> &local_columns_per_process,
                    const unsigned int            this_process,
-                   const bool preset_nonzero_locations = true);
+                   const bool                    preset_nonzero_locations = true);
 
       /**
        * This operator assigns a scalar to a matrix. Since this does usually
@@ -303,9 +302,8 @@ namespace PETScWrappers
              const size_type               local_rows,
              const size_type               local_columns,
              const std::vector<size_type> &row_lengths,
-             const bool                    is_symmetric = false,
-             const std::vector<size_type> &offdiag_row_lengths =
-               std::vector<size_type>());
+             const bool                    is_symmetric        = false,
+             const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Initialize using the given sparsity pattern with communication
@@ -374,8 +372,7 @@ namespace PETScWrappers
                      int,
                      int,
                      << "The number of local rows " << arg1
-                     << " must be larger than the total number of rows "
-                     << arg2);
+                     << " must be larger than the total number of rows " << arg2);
       //@}
 
       /**
@@ -429,9 +426,7 @@ namespace PETScWrappers
        * This function calls MatrixBase::mmult() to do the actual work.
        */
       void
-      mmult(SparseMatrix &      C,
-            const SparseMatrix &B,
-            const MPI::Vector & V = MPI::Vector()) const;
+      mmult(SparseMatrix &C, const SparseMatrix &B, const MPI::Vector &V = MPI::Vector()) const;
 
       /**
        * Perform the matrix-matrix multiplication with the transpose of
@@ -441,9 +436,7 @@ namespace PETScWrappers
        * This function calls MatrixBase::Tmmult() to do the actual work.
        */
       void
-      Tmmult(SparseMatrix &      C,
-             const SparseMatrix &B,
-             const MPI::Vector & V = MPI::Vector()) const;
+      Tmmult(SparseMatrix &C, const SparseMatrix &B, const MPI::Vector &V = MPI::Vector()) const;
 
     private:
       /**
@@ -482,9 +475,8 @@ namespace PETScWrappers
                 const size_type               local_rows,
                 const size_type               local_columns,
                 const std::vector<size_type> &row_lengths,
-                const bool                    is_symmetric = false,
-                const std::vector<size_type> &offdiag_row_lengths =
-                  std::vector<size_type>());
+                const bool                    is_symmetric        = false,
+                const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Same as previous functions.

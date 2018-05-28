@@ -43,13 +43,10 @@ test(const unsigned int chunk_size)
   ChunkSparseMatrix<double>::iterator i = m.begin();
   for (; i != m.end(); ++i)
     {
-      deallog << i->row() << ' ' << i->column() << ' ' << i->value()
-              << std::endl;
-      if (((i->row() + 2 * i->column() + 1) % 3 == 0) ||
-          (i->row() == i->column()))
+      deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
+      if (((i->row() + 2 * i->column() + 1) % 3 == 0) || (i->row() == i->column()))
         {
-          AssertThrow(std::fabs(i->value() - i->row() * i->column()) < 1e-14,
-                      ExcInternalError());
+          AssertThrow(std::fabs(i->value() - i->row() * i->column()) < 1e-14, ExcInternalError());
         }
       else
         AssertThrow(i->value() == 0, ExcInternalError());
@@ -68,21 +65,18 @@ main()
   try
     {
       const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
-      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
-           ++i)
+      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]); ++i)
         test(chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -90,12 +84,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

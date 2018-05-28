@@ -49,14 +49,12 @@ test(const unsigned int &size)
       const auto &u_points = unpacked[i++].get_boundary_points();
       if (b_points.first.distance(u_points.first) > 1e-12)
         {
-          deallog << "NOT OK: " << b_points.first << " != " << u_points.first
-                  << std::endl;
+          deallog << "NOT OK: " << b_points.first << " != " << u_points.first << std::endl;
           ok = false;
         }
       else if (b_points.second.distance(u_points.second) > 1e-12)
         {
-          deallog << "NOT OK: " << b_points.second << " != " << u_points.second
-                  << std::endl;
+          deallog << "NOT OK: " << b_points.second << " != " << u_points.second << std::endl;
           ok = false;
         }
     }

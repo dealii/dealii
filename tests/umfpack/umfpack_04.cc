@@ -51,9 +51,8 @@ assemble_laplace(MatrixType &        B,
                  FiniteElement<dim> &fe)
 {
   QGauss<dim>   quadrature_formula(2);
-  FEValues<dim> fe_values(fe,
-                          quadrature_formula,
-                          update_values | update_gradients | update_JxW_values);
+  FEValues<dim> fe_values(
+    fe, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -63,8 +62,7 @@ assemble_laplace(MatrixType &        B,
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -83,14 +81,12 @@ assemble_laplace(MatrixType &        B,
               comp_j = fe.system_to_component_index(j).first;
               if (comp_i == comp_j)
                 for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-                  cell_matrix(i, j) +=
-                    (fe_values.shape_grad(i, q_point) *
-                     fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+                  cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                        fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
             }
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1 *
-                              fe_values.JxW(q_point));
+              cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1 * fe_values.JxW(q_point));
         }
 
       cell->get_dof_indices(local_dof_indices);
@@ -142,9 +138,8 @@ test()
         size[k], size[l], dof_handler.max_couplings_between_dofs());
   b_sparsity_pattern.collect_sizes();
 
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
 
   DoFTools::make_sparsity_pattern(dof_handler, b_sparsity_pattern);
   DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
@@ -159,8 +154,8 @@ test()
   B.reinit(sparsity_pattern);
 
   BlockVector<double> bb(size), bx(size);
-  Vector<double>      b(dof_handler.n_dofs()), x(dof_handler.n_dofs()),
-    ub(dof_handler.n_dofs()), ubb(dof_handler.n_dofs());
+  Vector<double>      b(dof_handler.n_dofs()), x(dof_handler.n_dofs()), ub(dof_handler.n_dofs()),
+    ubb(dof_handler.n_dofs());
 
   assemble_laplace(Bb, bb, dof_handler, fe);
   assemble_laplace(B, b, dof_handler, fe);
@@ -175,55 +170,41 @@ test()
   ubb = bb;
 
   SolverControl                 control(1000, 1e-13);
-  SolverCG<BlockVector<double>> bcg(
-    control, SolverCG<BlockVector<double>>::AdditionalData());
+  SolverCG<BlockVector<double>> bcg(control, SolverCG<BlockVector<double>>::AdditionalData());
 
   switch (dim)
     {
       case 1:
-        check_solver_within_range(bcg.solve(Bb, bx, bb, PreconditionIdentity()),
-                                  control.last_step(),
-                                  112,
-                                  114);
+        check_solver_within_range(
+          bcg.solve(Bb, bx, bb, PreconditionIdentity()), control.last_step(), 112, 114);
         break;
       case 2:
-        check_solver_within_range(bcg.solve(Bb, bx, bb, PreconditionIdentity()),
-                                  control.last_step(),
-                                  60,
-                                  62);
+        check_solver_within_range(
+          bcg.solve(Bb, bx, bb, PreconditionIdentity()), control.last_step(), 60, 62);
         break;
       case 3:
-        check_solver_within_range(bcg.solve(Bb, bx, bb, PreconditionIdentity()),
-                                  control.last_step(),
-                                  24,
-                                  26);
+        check_solver_within_range(
+          bcg.solve(Bb, bx, bb, PreconditionIdentity()), control.last_step(), 24, 26);
         break;
       default:
         Assert(false, ExcNotImplemented());
     }
 
-  SolverCG<Vector<double>> cg(control,
-                              SolverCG<Vector<double>>::AdditionalData());
+  SolverCG<Vector<double>> cg(control, SolverCG<Vector<double>>::AdditionalData());
 
   switch (dim)
     {
       case 1:
-        check_solver_within_range(cg.solve(B, x, b, PreconditionIdentity()),
-                                  control.last_step(),
-                                  112,
-                                  114);
+        check_solver_within_range(
+          cg.solve(B, x, b, PreconditionIdentity()), control.last_step(), 112, 114);
         break;
       case 2:
-        check_solver_within_range(cg.solve(B, x, b, PreconditionIdentity()),
-                                  control.last_step(),
-                                  60,
-                                  62);
+        check_solver_within_range(
+          cg.solve(B, x, b, PreconditionIdentity()), control.last_step(), 60, 62);
         break;
       case 3:
-        check_solver_within_range(cg.solve(B, x, b, PreconditionIdentity()),
-                                  control.last_step(),
-                                  24,
-                                  26);
+        check_solver_within_range(
+          cg.solve(B, x, b, PreconditionIdentity()), control.last_step(), 24, 26);
         break;
       default:
         Assert(false, ExcNotImplemented());
@@ -233,25 +214,21 @@ test()
   SparseDirectUMFPACK umfpack, umfpackb;
   umfpack.factorize(B);
   umfpack.solve(ub);
-  deallog << "absolute norms = " << x.l2_norm() << ' ' << ub.l2_norm()
-          << std::endl;
+  deallog << "absolute norms = " << x.l2_norm() << ' ' << ub.l2_norm() << std::endl;
   x -= ub;
 
-  deallog << "relative norm distance = " << x.l2_norm() / ub.l2_norm()
-          << std::endl;
+  deallog << "relative norm distance = " << x.l2_norm() / ub.l2_norm() << std::endl;
   Assert(x.l2_norm() / ub.l2_norm() < 1e-12, ExcInternalError());
 
   deallog << "Block Sparse Factorization" << std::endl;
   umfpackb.factorize(Bb);
   // umfpackb.factorize(B);
   umfpackb.solve(ubb);
-  deallog << "absolute norms = " << bx.l2_norm() << ' ' << ubb.l2_norm()
-          << std::endl;
+  deallog << "absolute norms = " << bx.l2_norm() << ' ' << ubb.l2_norm() << std::endl;
   b = bx;
   b -= ubb;
 
-  deallog << "relative norm distance = " << b.l2_norm() / ubb.l2_norm()
-          << std::endl;
+  deallog << "relative norm distance = " << b.l2_norm() / ubb.l2_norm() << std::endl;
   Assert(b.l2_norm() / ubb.l2_norm() < 1e-12, ExcInternalError());
 }
 

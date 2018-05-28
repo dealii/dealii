@@ -46,36 +46,32 @@ test()
 
   std::set<std::string> output;
 
-  typedef
-    typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-                 cell_iterator;
-  typedef double DT;
-  int            counter = 0;
-  GridTools::
-    exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
-      tria,
-      [&](const cell_iterator &cell) -> boost::optional<DT> {
-        ++counter;
-        if (counter % 2 == 0)
-          {
-            DT value = counter;
+  typedef typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell_iterator;
+  typedef double                                                                   DT;
+  int                                                                              counter = 0;
+  GridTools::exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
+    tria,
+    [&](const cell_iterator &cell) -> boost::optional<DT> {
+      ++counter;
+      if (counter % 2 == 0)
+        {
+          DT value = counter;
 
-            deallog << "pack " << cell->id() << " " << value << std::endl;
-            return value;
-          }
-        else
-          {
-            deallog << "skipping " << cell->id() << ' ' << counter << std::endl;
-            return boost::optional<DT>();
-          }
-      },
-      [&](const cell_iterator &cell, const DT &data) {
-        std::ostringstream oss;
-        oss << "unpack " << cell->id() << " " << data << " from "
-            << cell->subdomain_id();
+          deallog << "pack " << cell->id() << " " << value << std::endl;
+          return value;
+        }
+      else
+        {
+          deallog << "skipping " << cell->id() << ' ' << counter << std::endl;
+          return boost::optional<DT>();
+        }
+    },
+    [&](const cell_iterator &cell, const DT &data) {
+      std::ostringstream oss;
+      oss << "unpack " << cell->id() << " " << data << " from " << cell->subdomain_id();
 
-        output.insert(oss.str());
-      });
+      output.insert(oss.str());
+    });
 
   // sort the output because it will come in in random order
   for (auto &it : output)

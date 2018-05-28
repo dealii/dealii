@@ -27,8 +27,7 @@ namespace dealii
 {
   template <int dim, int spacedim>
   bool
-  operator==(const Triangulation<dim, spacedim> &t1,
-             const Triangulation<dim, spacedim> &t2)
+  operator==(const Triangulation<dim, spacedim> &t1, const Triangulation<dim, spacedim> &t2)
   {
     // test a few attributes, though we can't
     // test everything unfortunately...
@@ -41,8 +40,7 @@ namespace dealii
     if (t1.n_faces() != t2.n_faces())
       return false;
 
-    typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin(),
-                                                         c2 = t2.begin();
+    typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin(), c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -75,8 +73,7 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active() &&
-            (c1->subdomain_id() != c2->subdomain_id()))
+        if (c1->active() && c2->active() && (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
         if (c1->level_subdomain_id() != c2->level_subdomain_id())
@@ -105,8 +102,7 @@ namespace dealii
 
     // also check the order of raw iterators as they contain
     // something about the history of the triangulation
-    typename Triangulation<dim, spacedim>::cell_iterator r1 = t1.begin(),
-                                                         r2 = t2.begin();
+    typename Triangulation<dim, spacedim>::cell_iterator r1 = t1.begin(), r2 = t2.begin();
     for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
       {
         if (r1->level() != r2->level())

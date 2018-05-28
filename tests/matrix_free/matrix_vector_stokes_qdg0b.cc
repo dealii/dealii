@@ -87,10 +87,9 @@ public:
 
         for (unsigned int q = 0; q < velocity.n_q_points; ++q)
           {
-            SymmetricTensor<2, dim, vector_t> sym_grad_u =
-              velocity.get_symmetric_gradient(q);
-            vector_t pres = pressure.get_value(q);
-            vector_t div  = -velocity.get_divergence(q);
+            SymmetricTensor<2, dim, vector_t> sym_grad_u = velocity.get_symmetric_gradient(q);
+            vector_t                          pres       = pressure.get_value(q);
+            vector_t                          div        = -velocity.get_divergence(q);
             pressure.submit_value(div, q);
 
             // subtract p * I
@@ -208,10 +207,8 @@ test(const unsigned int fe_degree)
   {
     QGauss<dim> quadrature_formula(fe_degree + 2);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_JxW_values |
-                              update_gradients);
+    FEValues<dim> fe_values(
+      fe, quadrature_formula, update_values | update_JxW_values | update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -227,8 +224,7 @@ test(const unsigned int fe_degree)
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -248,10 +244,9 @@ test(const unsigned int fe_degree)
               {
                 for (unsigned int j = 0; j <= i; ++j)
                   {
-                    local_matrix(i, j) +=
-                      (phi_grads_u[i] * phi_grads_u[j] -
-                       div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
-                      fe_values.JxW(q);
+                    local_matrix(i, j) += (phi_grads_u[i] * phi_grads_u[j] -
+                                           div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
+                                          fe_values.JxW(q);
                   }
               }
           }
@@ -260,8 +255,7 @@ test(const unsigned int fe_degree)
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          local_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(local_matrix, local_dof_indices, system_matrix);
       }
   }
 
@@ -288,8 +282,7 @@ test(const unsigned int fe_degree)
     mf_data.reinit(dofs,
                    constraints,
                    quad,
-                   typename MatrixFree<dim>::AdditionalData(
-                     MatrixFree<dim>::AdditionalData::none));
+                   typename MatrixFree<dim>::AdditionalData(MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult(solution, system_rhs);
@@ -304,8 +297,7 @@ test(const unsigned int fe_degree)
     for (unsigned int j = 0; j < system_rhs.block(i).size(); ++j)
       error += std::fabs(solution.block(i)(j) - vec2[i](j));
   double relative = solution.block(0).l1_norm();
-  deallog << "  Verification fe degree " << fe_degree << ": "
-          << error / relative << std::endl
+  deallog << "  Verification fe degree " << fe_degree << ": " << error / relative << std::endl
           << std::endl;
 }
 

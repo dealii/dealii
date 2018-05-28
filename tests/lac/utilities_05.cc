@@ -34,8 +34,7 @@ test(const NumberType a, const NumberType b)
   x[1] = b;
   y[1] = NumberType();
 
-  const std::array<NumberType, 3> csr =
-    Utilities::LinearAlgebra::hyperbolic_rotation(a, b);
+  const std::array<NumberType, 3> csr = Utilities::LinearAlgebra::hyperbolic_rotation(a, b);
 
   rotation(0, 0) = csr[0];  //  c
   rotation(1, 1) = csr[0];  //  c

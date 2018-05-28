@@ -32,8 +32,7 @@
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   initlog();
 
@@ -46,8 +45,7 @@ main(int argc, char **argv)
   SparseMatrix<double> matrix(sparsity);
   {
     double value = 1;
-    for (SparseMatrix<double>::iterator p = matrix.begin(); p != matrix.end();
-         ++p, ++value)
+    for (SparseMatrix<double>::iterator p = matrix.begin(); p != matrix.end(); ++p, ++value)
       p->value() = value;
   }
   deallog << "Original:" << std::endl;
@@ -63,14 +61,8 @@ main(int argc, char **argv)
 
 
   // now copy everything into a Trilinos matrix
-  Epetra_Map rowmap(TrilinosWrappers::types::int_type(4),
-                    4,
-                    0,
-                    Utilities::Trilinos::comm_world());
-  Epetra_Map colmap(TrilinosWrappers::types::int_type(5),
-                    5,
-                    0,
-                    Utilities::Trilinos::comm_world());
+  Epetra_Map rowmap(TrilinosWrappers::types::int_type(4), 4, 0, Utilities::Trilinos::comm_world());
+  Epetra_Map colmap(TrilinosWrappers::types::int_type(5), 5, 0, Utilities::Trilinos::comm_world());
 
   TrilinosWrappers::SparseMatrix tmatrix;
   tmatrix.reinit(rowmap, colmap, matrix, 0, true, &xsparsity);

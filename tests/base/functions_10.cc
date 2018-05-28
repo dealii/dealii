@@ -45,13 +45,11 @@ fill(const std::array<std::vector<double>, 2> &coordinates)
 Table<3, double>
 fill(const std::array<std::vector<double>, 3> &coordinates)
 {
-  Table<3, double> data(
-    coordinates[0].size(), coordinates[1].size(), coordinates[2].size());
+  Table<3, double> data(coordinates[0].size(), coordinates[1].size(), coordinates[2].size());
   for (unsigned int i = 0; i < coordinates[0].size(); ++i)
     for (unsigned int j = 0; j < coordinates[1].size(); ++j)
       for (unsigned int k = 0; k < coordinates[2].size(); ++k)
-        data[i][j][k] =
-          coordinates[0][i] * coordinates[1][j] * coordinates[2][k];
+        data[i][j][k] = coordinates[0][i] * coordinates[1][j] * coordinates[2][k];
   return data;
 }
 
@@ -77,16 +75,14 @@ check()
     {
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
-        p[d] =
-          coordinates[d][0] + (random_value<double>()) *
-                                (coordinates[d].back() - coordinates[d][0]);
+        p[d] = coordinates[d][0] +
+               (random_value<double>()) * (coordinates[d].back() - coordinates[d][0]);
 
       double exact_value = 1;
       for (unsigned int d = 0; d < dim; ++d)
         exact_value *= p[d];
 
-      AssertThrow(std::fabs(exact_value - f.value(p)) < 1e-12,
-                  ExcInternalError());
+      AssertThrow(std::fabs(exact_value - f.value(p)) < 1e-12, ExcInternalError());
 
       Tensor<1, dim> exact_gradient;
       for (unsigned int d = 0; d < dim; ++d)
@@ -96,8 +92,7 @@ check()
             exact_gradient[d] *= (k == d) ? 1.0 : p[k];
         }
 
-      AssertThrow((exact_gradient - f.gradient(p)).norm() < 1e-12,
-                  ExcInternalError());
+      AssertThrow((exact_gradient - f.gradient(p)).norm() < 1e-12, ExcInternalError());
     }
 
   // now also verify that it computes values outside the box correctly, as
@@ -106,8 +101,7 @@ check()
   for (unsigned int d = 0; d < dim; ++d)
     value_at_bottom_left *= coordinates[d][0];
 
-  AssertThrow(std::fabs(f.value(Point<dim>()) - value_at_bottom_left) < 1e-12,
-              ExcInternalError());
+  AssertThrow(std::fabs(f.value(Point<dim>()) - value_at_bottom_left) < 1e-12, ExcInternalError());
 
   Point<dim> top_right;
   double     value_at_top_right = 1;
@@ -116,8 +110,7 @@ check()
       top_right[d] = 1000;
       value_at_top_right *= coordinates[d].back();
     }
-  AssertThrow(std::fabs(f.value(top_right) - value_at_top_right) < 1e-12,
-              ExcInternalError());
+  AssertThrow(std::fabs(f.value(top_right) - value_at_top_right) < 1e-12, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

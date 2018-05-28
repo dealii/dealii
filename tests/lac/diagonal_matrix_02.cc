@@ -73,8 +73,7 @@ test(const bool hanging_nodes = true)
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -89,11 +88,7 @@ test(const bool hanging_nodes = true)
   {
     TrilinosWrappers::SparsityPattern csp(owned_set, MPI_COMM_WORLD);
     DoFTools::make_sparsity_pattern(
-      dof,
-      csp,
-      constraints,
-      true,
-      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+      dof, csp, constraints, true, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
     csp.compress();
     sparse_matrix.reinit(csp);
   }
@@ -108,17 +103,15 @@ test(const bool hanging_nodes = true)
   {
     QGauss<dim> quadrature_formula(fe_degree + 1);
 
-    FEValues<dim> fe_values(
-      dof.get_fe(), quadrature_formula, update_gradients | update_JxW_values);
+    FEValues<dim> fe_values(dof.get_fe(), quadrature_formula, update_gradients | update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -129,16 +122,14 @@ test(const bool hanging_nodes = true)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
-                                        fe_values.shape_grad(j, q_point)) *
-                                       fe_values.JxW(q_point);
+                  cell_matrix(i, j) +=
+                    (fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point)) *
+                    fe_values.JxW(q_point);
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, sparse_matrix);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, diagonal_matrix);
+          constraints.distribute_local_to_global(cell_matrix, local_dof_indices, sparse_matrix);
+          constraints.distribute_local_to_global(cell_matrix, local_dof_indices, diagonal_matrix);
         }
   }
   sparse_matrix.compress(VectorOperation::add);
@@ -166,8 +157,7 @@ test(const bool hanging_nodes = true)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   mpi_initlog();
 

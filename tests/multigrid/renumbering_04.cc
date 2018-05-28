@@ -43,8 +43,7 @@ check(FiniteElement<dim> &fe)
 {
   deallog << std::endl << "**** " << fe.get_name() << std::endl;
 
-  Triangulation<dim> tria(
-    Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> tria(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
   tria.begin_active()->set_refine_flag();
@@ -61,8 +60,7 @@ check(FiniteElement<dim> &fe)
     for (unsigned int level = 0; level < tria.n_levels(); ++level)
       {
         deallog << "* level " << level << std::endl;
-        for (typename DoFHandler<dim>::cell_iterator cell = dh.begin(level);
-             cell != dh.end(level);
+        for (typename DoFHandler<dim>::cell_iterator cell = dh.begin(level); cell != dh.end(level);
              ++cell)
           {
             deallog << "cell " << cell->id() << ":" << std::endl;
@@ -84,8 +82,7 @@ check(FiniteElement<dim> &fe)
     for (unsigned int level = 0; level < tria.n_levels(); ++level)
       {
         deallog << "* level " << level << std::endl;
-        for (typename DoFHandler<dim>::cell_iterator cell = dh.begin(level);
-             cell != dh.end(level);
+        for (typename DoFHandler<dim>::cell_iterator cell = dh.begin(level); cell != dh.end(level);
              ++cell)
           {
             deallog << "cell " << cell->id() << ":" << std::endl;

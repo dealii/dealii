@@ -71,19 +71,14 @@ void
 MakeFlux<dim>::make_grid()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1, true);
-  typedef typename dealii::Triangulation<dim>::cell_iterator CellIteratorTria;
-  std::vector<dealii::GridTools::PeriodicFacePair<CellIteratorTria>>
-                     periodic_faces;
-  const unsigned int b_id1     = 2;
-  const unsigned int b_id2     = 3;
-  const unsigned int direction = 1;
+  typedef typename dealii::Triangulation<dim>::cell_iterator         CellIteratorTria;
+  std::vector<dealii::GridTools::PeriodicFacePair<CellIteratorTria>> periodic_faces;
+  const unsigned int                                                 b_id1     = 2;
+  const unsigned int                                                 b_id2     = 3;
+  const unsigned int                                                 direction = 1;
 
-  dealii::GridTools::collect_periodic_faces(triangulation,
-                                            b_id1,
-                                            b_id2,
-                                            direction,
-                                            periodic_faces,
-                                            dealii::Tensor<1, dim>());
+  dealii::GridTools::collect_periodic_faces(
+    triangulation, b_id1, b_id2, direction, periodic_faces, dealii::Tensor<1, dim>());
   triangulation.add_periodicity(periodic_faces);
   triangulation.refine_global(1);
 }
@@ -105,13 +100,11 @@ MakeFlux<dim>::run()
            */
 
           Point<dim> refn_point;
-          refn_point = Point<dim>(0.005, 0.995);
-          typename Triangulation<dim>::active_cell_iterator cell_it =
-            triangulation.begin_active();
+          refn_point                                                = Point<dim>(0.005, 0.995);
+          typename Triangulation<dim>::active_cell_iterator cell_it = triangulation.begin_active();
           for (; cell_it != triangulation.end(); ++cell_it)
             {
-              if (cell_it->is_locally_owned() &&
-                  cell_it->point_inside(refn_point))
+              if (cell_it->is_locally_owned() && cell_it->point_inside(refn_point))
                 {
                   cell_it->set_refine_flag();
                   break;
@@ -125,7 +118,7 @@ MakeFlux<dim>::run()
       DynamicSparsityPattern dsp(dof_handler.n_dofs());
 
       // set up full mask not doing anything
-      const unsigned int n_components = dof_handler.get_fe().n_components();
+      const unsigned int           n_components = dof_handler.get_fe().n_components();
       Table<2, DoFTools::Coupling> mask(n_components, n_components);
       for (unsigned int i = 0; i < n_components; ++i)
         for (unsigned int j = 0; j < n_components; ++j)
@@ -152,13 +145,11 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -166,12 +157,10 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

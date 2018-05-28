@@ -40,8 +40,7 @@ test(VectorType &v)
 
   // then check the norm
   VectorTools::subtract_mean_value(v);
-  AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(),
-              ExcInternalError());
+  AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -67,13 +66,11 @@ main(int argc, char *argv[])
         v_tmp.import(v1, VectorOperation::insert);
         v2.import(v_tmp, VectorOperation::insert);
         VectorTools::subtract_mean_value(v2);
-        AssertThrow(std::fabs(v2.mean_value()) < 1e-10 * v2.l2_norm(),
-                    ExcInternalError());
+        AssertThrow(std::fabs(v2.mean_value()) < 1e-10 * v2.l2_norm(), ExcInternalError());
         deallog << "OK" << std::endl;
       }
       {
-        TrilinosWrappers::MPI::BlockVector v(
-          std::vector<IndexSet>(1, local_range), MPI_COMM_WORLD);
+        TrilinosWrappers::MPI::BlockVector v(std::vector<IndexSet>(1, local_range), MPI_COMM_WORLD);
         test(v);
       }
     }
@@ -81,13 +78,11 @@ main(int argc, char *argv[])
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -95,12 +90,10 @@ main(int argc, char *argv[])
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

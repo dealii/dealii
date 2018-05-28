@@ -165,8 +165,7 @@ void Step3::make_grid()
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(5);
 
-  std::cout << "Number of active cells: " << triangulation.n_active_cells()
-            << std::endl;
+  std::cout << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
 }
 
 // @note We call the Triangulation::n_active_cells() function, rather than
@@ -194,8 +193,7 @@ void Step3::make_grid()
 void Step3::setup_system()
 {
   dof_handler.distribute_dofs(fe);
-  std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+  std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
   // There should be one DoF for each vertex. Since we have a 32 times 32
   // grid, the number of DoFs should be 33 times 33, or 1089.
 
@@ -294,9 +292,8 @@ void Step3::assemble_system()
   // weights are always used together, so only the products (Jacobians times
   // weights, or short <code>JxW</code>) are computed; since we need them, we
   // have to list #update_JxW_values as well:
-  FEValues<2> fe_values(fe,
-                        quadrature_formula,
-                        update_values | update_gradients | update_JxW_values);
+  FEValues<2> fe_values(
+    fe, quadrature_formula, update_values | update_gradients | update_JxW_values);
   // The advantage of this approach is that we can specify what kind of
   // information we actually need on each cell. It is easily understandable
   // that this approach can significantly speed up finite element computations,
@@ -433,9 +430,8 @@ void Step3::assemble_system()
           // this is repeated for all shape functions $i$ and $j$:
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_grad(i, q_index) *
-                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+              cell_matrix(i, j) += (fe_values.shape_grad(i, q_index) *
+                                    fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
           // We then do the same thing for the right hand side. Here,
           // the integral is over the shape function i times the right
@@ -443,8 +439,7 @@ void Step3::assemble_system()
           // with constant value one (more interesting examples will
           // be considered in the following programs).
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            cell_rhs(i) +=
-              (fe_values.shape_value(i, q_index) * 1 * fe_values.JxW(q_index));
+            cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1 * fe_values.JxW(q_index));
         }
       // Now that we have the contribution of this cell, we have to transfer
       // it to the global matrix and right hand side. To this end, we first
@@ -457,8 +452,7 @@ void Step3::assemble_system()
       // obtained using local_dof_indices[i]:
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+          system_matrix.add(local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
       // And again, we do the same thing for the right hand side vector.
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -515,8 +509,7 @@ void Step3::assemble_system()
   // Now that we got the list of boundary DoFs and their respective boundary
   // values, let's use them to modify the system of equations
   // accordingly. This is done by the following function call:
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 }
 
 

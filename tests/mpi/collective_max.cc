@@ -24,7 +24,7 @@
 void
 test()
 {
-  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int       myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   int          int_sum;
@@ -38,8 +38,7 @@ test()
   double_sum = Utilities::MPI::max<double>(myid + 1, MPI_COMM_WORLD);
 
   if (myid == 0)
-    deallog << int_sum << ' ' << uint_sum << ' ' << double_sum << ' '
-            << float_sum << std::endl;
+    deallog << int_sum << ' ' << uint_sum << ' ' << double_sum << ' ' << float_sum << std::endl;
 }
 
 
@@ -47,8 +46,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;

@@ -30,12 +30,10 @@ print_tria_info(const Triangulation<dim> &tria)
 {
   const bool manifold_0_is_flat =
     dynamic_cast<const FlatManifold<dim> *>(&tria.get_manifold(0)) != nullptr;
-  deallog << (tria.n_active_cells() != 0) << ", " << (tria.n_active_hexs() != 0)
-          << ", " << (tria.n_active_quads() != 0) << ", "
-          << (tria.n_active_lines() != 0) << ", " << (tria.n_levels() != 0)
-          << ", " << (tria.n_vertices() != 0) << ", "
-          << (tria.get_periodic_face_map().size() != 0) << ", "
-          << manifold_0_is_flat << std::endl;
+  deallog << (tria.n_active_cells() != 0) << ", " << (tria.n_active_hexs() != 0) << ", "
+          << (tria.n_active_quads() != 0) << ", " << (tria.n_active_lines() != 0) << ", "
+          << (tria.n_levels() != 0) << ", " << (tria.n_vertices() != 0) << ", "
+          << (tria.get_periodic_face_map().size() != 0) << ", " << manifold_0_is_flat << std::endl;
 }
 
 
@@ -97,8 +95,7 @@ test_periodic_cube()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1.0, 1.0, true);
 
-  typedef GridTools::PeriodicFacePair<
-    typename Triangulation<dim>::cell_iterator>
+  typedef GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>
                                   periodic_face_pair;
   std::vector<periodic_face_pair> periodicity_vector;
   GridTools::collect_periodic_faces(tria, 0, 1, 0, periodicity_vector);

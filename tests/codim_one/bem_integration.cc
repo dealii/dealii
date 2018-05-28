@@ -73,10 +73,9 @@ public:
   run();
 
   void
-  compute_SD_integral_on_cell(
-    vector<double> &                                         dst,
-    typename DoFHandler<dim, dim + 1>::active_cell_iterator &cell,
-    const Point<dim + 1> &                                   point);
+  compute_SD_integral_on_cell(vector<double> &                                         dst,
+                              typename DoFHandler<dim, dim + 1>::active_cell_iterator &cell,
+                              const Point<dim + 1> &                                   point);
 
 private:
   double
@@ -104,8 +103,8 @@ LaplaceKernelIntegration<2>::LaplaceKernelIntegration()
   qps[4] = Point<2>(.5, .5);
   vector<double>       ws(5, 1.);
   static Quadrature<2> quadrature(qps, ws);
-  fe_values = new FEValues<2, 3>(
-    fe, quadrature, update_values | update_jacobians | update_normal_vectors);
+  fe_values =
+    new FEValues<2, 3>(fe, quadrature, update_values | update_jacobians | update_normal_vectors);
 }
 
 template <int dim>
@@ -127,7 +126,7 @@ LaplaceKernelIntegration<2>::compute_SD_integral_on_cell(
   Assert(dst.size() == 2, ExcDimensionMismatch(dst.size(), 2));
   fe_values->reinit(cell);
   vector<DerivativeForm<1, 2, 3>> jacobians = fe_values->get_jacobians();
-  vector<Tensor<1, 3>>            normals = fe_values->get_all_normal_vectors();
+  vector<Tensor<1, 3>>            normals   = fe_values->get_all_normal_vectors();
 
   Tensor<1, 3> n, n_c;
   Tensor<1, 3> r_c = point - cell->center();
@@ -179,8 +178,7 @@ LaplaceKernelIntegration<dim>::term_D(const Tensor<1, 3> &r,
   Tensor<1, 3> ra2 = cross_product_3d(r, a2);
   Tensor<1, 3> a12 = cross_product_3d(a1, a2);
 
-  double integral =
-    1. / 2. / numbers::PI * atan2(ra1 * ra2, (r.norm() * (r * a12)));
+  double integral = 1. / 2. / numbers::PI * atan2(ra1 * ra2, (r.norm() * (r * a12)));
 
   return integral;
 }
@@ -213,18 +211,15 @@ main()
 
   Point<3> point(.5, .5, 0);
   double   true_result = -3.163145629 / numbers::PI;
-  deallog << "Error on  " << point << " : " << integration(point) - true_result
-          << endl;
+  deallog << "Error on  " << point << " : " << integration(point) - true_result << endl;
 
   point       = Point<3>(3, 3, 0);
   true_result = -.2306783616;
-  deallog << "Error on  " << point << " : " << integration(point) - true_result
-          << endl;
+  deallog << "Error on  " << point << " : " << integration(point) - true_result << endl;
 
   point       = Point<3>(1.5, .5, 0);
   true_result = -1.006860525;
-  deallog << "Error on  " << point << " : " << integration(point) - true_result
-          << endl;
+  deallog << "Error on  " << point << " : " << integration(point) - true_result << endl;
 
   return 0;
 }

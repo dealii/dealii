@@ -51,8 +51,7 @@ test()
   parallel::distributed::Triangulation<2> tr(MPI_COMM_WORLD);
 
   const unsigned int initial_refinement = 3;
-  GridGenerator::hyper_shell(
-    tr, Point<2>(), EquationData::R0, EquationData::R1, 12, true);
+  GridGenerator::hyper_shell(tr, Point<2>(), EquationData::R0, EquationData::R1, 12, true);
   static SphericalManifold<2> boundary;
   tr.set_manifold(0, boundary);
   tr.set_manifold(1, boundary);
@@ -64,17 +63,14 @@ test()
   // now read indicators
   Vector<float> indicators(tr.n_active_cells());
   {
-    std::ifstream in(SOURCE_DIR
-                     "/refine_and_coarsen_fixed_fraction_06/indicators");
+    std::ifstream in(SOURCE_DIR "/refine_and_coarsen_fixed_fraction_06/indicators");
     Assert(in, ExcMessage("File missing"));
     for (unsigned int i = 0; i < indicators.size(); ++i)
       in >> indicators(i);
   }
 
-  double min_indicator =
-           *std::min_element(indicators.begin(), indicators.end()),
-         max_indicator =
-           *std::max_element(indicators.begin(), indicators.end());
+  double min_indicator = *std::min_element(indicators.begin(), indicators.end()),
+         max_indicator = *std::max_element(indicators.begin(), indicators.end());
 
 
 
@@ -84,11 +80,9 @@ test()
   parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_fraction(
     tr, indicators, 0.6, 0.2);
   {
-    float coarsen_indicator = min_indicator - 1,
-          refine_indicator  = max_indicator + 1;
+    float        coarsen_indicator = min_indicator - 1, refine_indicator = max_indicator + 1;
     unsigned int cell_index = 0;
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
          ++cell, ++cell_index)
       if (cell->refine_flag_set())
         refine_indicator = std::min(refine_indicator, indicators(cell_index));
@@ -96,13 +90,10 @@ test()
         coarsen_indicator = std::max(coarsen_indicator, indicators(cell_index));
     if (myid == 0)
       {
-        deallog << "thresholds = " << refine_indicator << ' '
-                << coarsen_indicator << std::endl;
+        deallog << "thresholds = " << refine_indicator << ' ' << coarsen_indicator << std::endl;
       }
 
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
-         ++cell)
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end(); ++cell)
       {
         cell->clear_coarsen_flag();
         cell->clear_refine_flag();
@@ -115,14 +106,11 @@ test()
   // only works because we are
   // working on only a single
   // processor
-  dealii::GridRefinement ::refine_and_coarsen_fixed_fraction(
-    tr, indicators, 0.6, 0.2);
+  dealii::GridRefinement ::refine_and_coarsen_fixed_fraction(tr, indicators, 0.6, 0.2);
   {
-    float coarsen_indicator = min_indicator - 1,
-          refine_indicator  = max_indicator + 1;
+    float        coarsen_indicator = min_indicator - 1, refine_indicator = max_indicator + 1;
     unsigned int cell_index = 0;
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
          ++cell, ++cell_index)
       if (cell->refine_flag_set())
         refine_indicator = std::min(refine_indicator, indicators(cell_index));
@@ -130,13 +118,10 @@ test()
         coarsen_indicator = std::max(coarsen_indicator, indicators(cell_index));
     if (myid == 0)
       {
-        deallog << "thresholds = " << refine_indicator << ' '
-                << coarsen_indicator << std::endl;
+        deallog << "thresholds = " << refine_indicator << ' ' << coarsen_indicator << std::endl;
       }
 
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
-         ++cell)
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end(); ++cell)
       {
         cell->clear_coarsen_flag();
         cell->clear_refine_flag();

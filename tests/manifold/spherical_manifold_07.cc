@@ -55,8 +55,7 @@ main()
       weights[1] = .5 - eps;
       weights[2] = 2 * eps;
 
-      Point<3> Q = manifold.get_new_point(make_array_view(points1),
-                                          make_array_view(weights));
+      Point<3> Q = manifold.get_new_point(make_array_view(points1), make_array_view(weights));
 
       deallog << Q << std::endl;
     }

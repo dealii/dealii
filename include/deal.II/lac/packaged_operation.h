@@ -109,15 +109,11 @@ public:
   PackagedOperation()
   {
     apply = [](Range &) {
-      Assert(
-        false,
-        ExcMessage("Uninitialized PackagedOperation<Range>::apply called"));
+      Assert(false, ExcMessage("Uninitialized PackagedOperation<Range>::apply called"));
     };
 
     apply_add = [](Range &) {
-      Assert(
-        false,
-        ExcMessage("Uninitialized PackagedOperation<Range>::apply_add called"));
+      Assert(false, ExcMessage("Uninitialized PackagedOperation<Range>::apply_add called"));
     };
 
     reinit_vector = [](Range &, bool) {
@@ -288,8 +284,7 @@ public:
  */
 template <typename Range>
 PackagedOperation<Range>
-operator+(const PackagedOperation<Range> &first_comp,
-          const PackagedOperation<Range> &second_comp)
+operator+(const PackagedOperation<Range> &first_comp, const PackagedOperation<Range> &second_comp)
 {
   PackagedOperation<Range> return_comp;
 
@@ -321,8 +316,7 @@ operator+(const PackagedOperation<Range> &first_comp,
  */
 template <typename Range>
 PackagedOperation<Range>
-operator-(const PackagedOperation<Range> &first_comp,
-          const PackagedOperation<Range> &second_comp)
+operator-(const PackagedOperation<Range> &first_comp, const PackagedOperation<Range> &second_comp)
 {
   PackagedOperation<Range> return_comp;
 
@@ -487,9 +481,7 @@ namespace
 
     template <typename C>
     static std::true_type
-    test(decltype(&C::operator+=),
-         decltype(&C::operator-=),
-         decltype(&C::l2_norm));
+    test(decltype(&C::operator+=), decltype(&C::operator-=), decltype(&C::l2_norm));
 
   public:
     // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
@@ -515,8 +507,7 @@ namespace
  */
 
 template <typename Range,
-          typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
 PackagedOperation<Range>
 operator+(const Range &u, const Range &v)
 {
@@ -559,8 +550,7 @@ operator+(const Range &u, const Range &v)
  */
 
 template <typename Range,
-          typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
 PackagedOperation<Range>
 operator-(const Range &u, const Range &v)
 {
@@ -602,10 +592,8 @@ operator-(const Range &u, const Range &v)
  * @ingroup LAOperators
  */
 template <typename Range,
-          typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
-PackagedOperation<Range> operator*(const Range &              u,
-                                   typename Range::value_type number)
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator*(const Range &u, typename Range::value_type number)
 {
   return PackagedOperation<Range>(u) * number;
 }
@@ -626,10 +614,8 @@ PackagedOperation<Range> operator*(const Range &              u,
  * @ingroup LAOperators
  */
 template <typename Range,
-          typename = typename std::enable_if<
-            has_vector_interface<Range>::type::value>::type>
-PackagedOperation<Range> operator*(typename Range::value_type number,
-                                   const Range &              u)
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator*(typename Range::value_type number, const Range &u)
 {
   return number * PackagedOperation<Range>(u);
 }
@@ -652,8 +638,8 @@ PackagedOperation<Range> operator*(typename Range::value_type number,
  * @ingroup LAOperators
  */
 template <typename Range, typename Domain, typename Payload>
-PackagedOperation<Range>
-operator*(const LinearOperator<Range, Domain, Payload> &op, const Domain &u)
+PackagedOperation<Range> operator*(const LinearOperator<Range, Domain, Payload> &op,
+                                   const Domain &                                u)
 {
   PackagedOperation<Range> return_comp;
 
@@ -687,8 +673,8 @@ operator*(const LinearOperator<Range, Domain, Payload> &op, const Domain &u)
  * @ingroup LAOperators
  */
 template <typename Range, typename Domain, typename Payload>
-PackagedOperation<Domain>
-operator*(const Range &u, const LinearOperator<Range, Domain, Payload> &op)
+PackagedOperation<Domain> operator*(const Range &                                 u,
+                                    const LinearOperator<Range, Domain, Payload> &op)
 {
   PackagedOperation<Range> return_comp;
 
@@ -714,9 +700,8 @@ operator*(const Range &u, const LinearOperator<Range, Domain, Payload> &op)
  * @ingroup LAOperators
  */
 template <typename Range, typename Domain, typename Payload>
-PackagedOperation<Range>
-operator*(const LinearOperator<Range, Domain, Payload> &op,
-          const PackagedOperation<Domain> &             comp)
+PackagedOperation<Range> operator*(const LinearOperator<Range, Domain, Payload> &op,
+                                   const PackagedOperation<Domain> &             comp)
 {
   PackagedOperation<Range> return_comp;
 
@@ -758,9 +743,8 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
  * @ingroup LAOperators
  */
 template <typename Range, typename Domain, typename Payload>
-PackagedOperation<Domain>
-operator*(const PackagedOperation<Range> &              comp,
-          const LinearOperator<Range, Domain, Payload> &op)
+PackagedOperation<Domain> operator*(const PackagedOperation<Range> &              comp,
+                                    const LinearOperator<Range, Domain, Payload> &op)
 {
   PackagedOperation<Range> return_comp;
 

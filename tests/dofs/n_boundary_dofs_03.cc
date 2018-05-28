@@ -53,8 +53,7 @@ test()
   GridGenerator::hyper_cube(triangulation_2, 2, 3);
 
   Triangulation<1, spacedim> triangulation;
-  GridGenerator::merge_triangulations(
-    triangulation_1, triangulation_2, triangulation);
+  GridGenerator::merge_triangulations(triangulation_1, triangulation_2, triangulation);
 
   // assign boundary ids
   triangulation.begin()->face(0)->set_boundary_id(12);
@@ -71,8 +70,7 @@ test()
 
   for (types::boundary_id b : {12, 13, 14, 15})
     {
-      const unsigned int N =
-        dof_handler.n_boundary_dofs(std::set<types::boundary_id>{b});
+      const unsigned int N = dof_handler.n_boundary_dofs(std::set<types::boundary_id>{b});
       deallog << (int)b << ' ' << N << std::endl;
     }
 }

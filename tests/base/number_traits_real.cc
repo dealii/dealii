@@ -29,8 +29,7 @@ check(const number &x)
   deallog << "typeid(x).name() = " << typeid(x).name() << std::endl;
 
   deallog << "typeid(NumberTraits<number>::real_type).name() = "
-          << typeid(typename numbers::NumberTraits<number>::real_type).name()
-          << std::endl;
+          << typeid(typename numbers::NumberTraits<number>::real_type).name() << std::endl;
 
   deallog << numbers::NumberTraits<number>::conjugate(x) << std::endl;
 

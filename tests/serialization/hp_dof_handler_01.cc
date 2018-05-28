@@ -35,13 +35,11 @@ namespace dealii
 {
   template <int dim, int spacedim>
   bool
-  operator==(const hp::DoFHandler<dim, spacedim> &t1,
-             const hp::DoFHandler<dim, spacedim> &t2)
+  operator==(const hp::DoFHandler<dim, spacedim> &t1, const hp::DoFHandler<dim, spacedim> &t2)
   {
     // test a few attributes, though we can't
     // test everything unfortunately...
-    typename hp::DoFHandler<dim, spacedim>::cell_iterator c1 = t1.begin(),
-                                                          c2 = t2.begin();
+    typename hp::DoFHandler<dim, spacedim>::cell_iterator c1 = t1.begin(), c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -71,8 +69,7 @@ namespace dealii
               }
           }
 
-        if (c1->active() && c2->active() &&
-            (c1->subdomain_id() != c2->subdomain_id()))
+        if (c1->active() && c2->active() && (c1->subdomain_id() != c2->subdomain_id()))
           return false;
 
         if (c1->material_id() != c2->material_id())
@@ -84,21 +81,17 @@ namespace dealii
         if (c1->user_flag_set() != c2->user_flag_set())
           return false;
 
-        if (c1->active() && c2->active() &&
-            c1->get_fe().get_name() != c2->get_fe().get_name())
+        if (c1->active() && c2->active() && c1->get_fe().get_name() != c2->get_fe().get_name())
           return false;
 
-        if (c1->active() && c2->active() &&
-            c1->active_fe_index() != c2->active_fe_index())
+        if (c1->active() && c2->active() && c1->active_fe_index() != c2->active_fe_index())
           return false;
 
         // compare dofs on this cell and then on the faces
         if (c1->has_children() == false)
           {
-            std::vector<types::global_dof_index> local_dofs_1(
-              c1->get_fe().dofs_per_cell);
-            std::vector<types::global_dof_index> local_dofs_2(
-              c2->get_fe().dofs_per_cell);
+            std::vector<types::global_dof_index> local_dofs_1(c1->get_fe().dofs_per_cell);
+            std::vector<types::global_dof_index> local_dofs_2(c2->get_fe().dofs_per_cell);
 
             c1->get_dof_indices(local_dofs_1);
             c2->get_dof_indices(local_dofs_2);
@@ -107,15 +100,11 @@ namespace dealii
 
             for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
               {
-                std::vector<types::global_dof_index> local_dofs_1(
-                  c1->get_fe().dofs_per_face);
-                std::vector<types::global_dof_index> local_dofs_2(
-                  c2->get_fe().dofs_per_face);
+                std::vector<types::global_dof_index> local_dofs_1(c1->get_fe().dofs_per_face);
+                std::vector<types::global_dof_index> local_dofs_2(c2->get_fe().dofs_per_face);
 
-                c1->face(f)->get_dof_indices(local_dofs_1,
-                                             c1->active_fe_index());
-                c2->face(f)->get_dof_indices(local_dofs_2,
-                                             c2->active_fe_index());
+                c1->face(f)->get_dof_indices(local_dofs_1, c1->active_fe_index());
+                c2->face(f)->get_dof_indices(local_dofs_2, c2->active_fe_index());
                 if (local_dofs_1 != local_dofs_2)
                   return false;
               }
@@ -124,8 +113,7 @@ namespace dealii
 
     // also check the order of raw iterators as they contain
     // something about the history of the triangulation
-    typename hp::DoFHandler<dim, spacedim>::cell_iterator r1 = t1.begin(),
-                                                          r2 = t2.begin();
+    typename hp::DoFHandler<dim, spacedim>::cell_iterator r1 = t1.begin(), r2 = t2.begin();
     for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
       {
         if (r1->level() != r2->level())
@@ -172,8 +160,8 @@ test()
   do_boundary(tria);
 
   hp::FECollection<dim, spacedim> fe_collection;
-  fe_collection.push_back(FESystem<dim, spacedim>(
-    FE_Q<dim, spacedim>(2), dim, FE_Q<dim, spacedim>(1), 1));
+  fe_collection.push_back(
+    FESystem<dim, spacedim>(FE_Q<dim, spacedim>(2), dim, FE_Q<dim, spacedim>(1), 1));
 
   hp::DoFHandler<dim, spacedim> dof_1(tria);
   hp::DoFHandler<dim, spacedim> dof_2(tria);

@@ -38,8 +38,7 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "min diameter: " << GridTools::minimal_cell_diameter(tria)
-                  << std::endl;
+                  << "min diameter: " << GridTools::minimal_cell_diameter(tria) << std::endl;
         };
     };
 
@@ -54,8 +53,7 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "min diameter: " << GridTools::minimal_cell_diameter(tria)
-                  << std::endl;
+                  << "min diameter: " << GridTools::minimal_cell_diameter(tria) << std::endl;
         };
     };
 }
@@ -64,8 +62,7 @@ test1()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   MPILogInitAll mpi_init_log;
 

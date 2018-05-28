@@ -108,8 +108,7 @@ check()
 
   Vector<float> error(tr.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate(
-    mapping, dof, q_face, neumann_bc, v, error);
+  KellyErrorEstimator<dim>::estimate(mapping, dof, q_face, neumann_bc, v, error);
 
   deallog << "Estimated error:" << std::endl;
   for (unsigned int i = 0; i < error.size(); ++i)

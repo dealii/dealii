@@ -76,15 +76,13 @@ namespace MeshWorker
      * PureFunctionCalled if not overloaded by a derived class.
      */
     virtual void
-    cell(DoFInfo<dim, spacedim, number> &dinfo,
-         IntegrationInfo<dim, spacedim> &info) const;
+    cell(DoFInfo<dim, spacedim, number> &dinfo, IntegrationInfo<dim, spacedim> &info) const;
     /**
      * Virtual function for integrating on boundary faces. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.
      */
     virtual void
-    boundary(DoFInfo<dim, spacedim, number> &dinfo,
-             IntegrationInfo<dim, spacedim> &info) const;
+    boundary(DoFInfo<dim, spacedim, number> &dinfo, IntegrationInfo<dim, spacedim> &info) const;
     /**
      * Virtual function for integrating on interior faces. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.

@@ -82,8 +82,7 @@ test()
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
-  NonMatching::create_coupling_mass_matrix(
-    space_dh, dh, quad, coupling, ConstraintMatrix());
+  NonMatching::create_coupling_mass_matrix(space_dh, dh, quad, coupling, ConstraintMatrix());
 
   SparsityPattern mass_sparsity;
   {
@@ -103,8 +102,7 @@ test()
   Vector<double> squares(dh.n_dofs());
   Vector<double> projected_squares(dh.n_dofs());
 
-  VectorTools::interpolate(
-    space_dh, Functions::SquareFunction<spacedim>(), space_square);
+  VectorTools::interpolate(space_dh, Functions::SquareFunction<spacedim>(), space_square);
   VectorTools::interpolate(dh, Functions::SquareFunction<spacedim>(), squares);
 
   coupling.Tvmult(projected_squares, space_square);

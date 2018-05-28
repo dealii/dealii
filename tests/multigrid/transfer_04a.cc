@@ -56,8 +56,8 @@ setup_tria(parallel::distributed::Triangulation<dim> &tr)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
 
-  for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-         cell = tr.begin_active();
+  for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell =
+         tr.begin_active();
        cell != tr.end();
        ++cell)
     {
@@ -66,26 +66,23 @@ setup_tria(parallel::distributed::Triangulation<dim> &tr)
     }
   tr.execute_coarsening_and_refinement();
 
-  for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-         cell = tr.begin_active();
+  for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell =
+         tr.begin_active();
        cell != tr.end();
        ++cell)
     {
-      if (cell->id().to_string() == "0_2:00" ||
-          cell->id().to_string() == "0_2:01" ||
+      if (cell->id().to_string() == "0_2:00" || cell->id().to_string() == "0_2:01" ||
           cell->id().to_string() == "0_2:02")
         cell->set_refine_flag();
     }
   tr.execute_coarsening_and_refinement();
 
 
-  for (typename parallel::distributed::Triangulation<dim>::cell_iterator cell =
-         tr.begin();
+  for (typename parallel::distributed::Triangulation<dim>::cell_iterator cell = tr.begin();
        cell != tr.end();
        ++cell)
     {
-      deallog << "cell=" << cell->id()
-              << " level_subdomain_id=" << cell->level_subdomain_id()
+      deallog << "cell=" << cell->id() << " level_subdomain_id=" << cell->level_subdomain_id()
               << std::endl;
     }
 }
@@ -114,8 +111,7 @@ check_fe(FiniteElement<dim> &fe)
       data_out.add_data_vector(subdomain, "subdomain");
       data_out.build_patches(0);
       const std::string filename =
-        ("solution." +
-         Utilities::int_to_string(tr.locally_owned_subdomain(), 4) + ".vtu");
+        ("solution." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) + ".vtu");
       std::ofstream output(filename.c_str());
       data_out.write_vtu(output);
     }
@@ -138,13 +134,10 @@ check_fe(FiniteElement<dim> &fe)
   for (unsigned int level = u.min_level(); level <= u.max_level(); ++level)
     {
       u[level].reinit(dofh.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
-      for (unsigned int i = 0;
-           i < dofh.locally_owned_mg_dofs(level).n_elements();
-           ++i)
+      for (unsigned int i = 0; i < dofh.locally_owned_mg_dofs(level).n_elements(); ++i)
         {
-          unsigned int index =
-            dofh.locally_owned_mg_dofs(level).nth_index_in_set(i);
-          u[level][index] = 1; // 1000+level*100+index;
+          unsigned int index = dofh.locally_owned_mg_dofs(level).nth_index_in_set(i);
+          u[level][index]    = 1; // 1000+level*100+index;
         }
       u[level].compress(VectorOperation::insert);
     }

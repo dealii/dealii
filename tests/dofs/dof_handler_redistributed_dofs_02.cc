@@ -41,8 +41,7 @@ main()
   hp::DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe_collection);
 
-  SmartPointer<const hp::FECollection<dim, spacedim>> fe_p(
-    &dh.get_fe_collection());
+  SmartPointer<const hp::FECollection<dim, spacedim>> fe_p(&dh.get_fe_collection());
 
   dh.distribute_dofs(*fe_p);
 

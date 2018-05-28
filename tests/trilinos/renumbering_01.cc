@@ -125,14 +125,12 @@ private:
                                     sparsity_pattern,
                                     constraints,
                                     /*keep constrained dofs*/ false);
-    SparsityTools::distribute_sparsity_pattern(
-      sparsity_pattern,
-      dof_handler.n_locally_owned_dofs_per_processor(),
-      MPI_COMM_WORLD,
-      locally_relevant_dofs);
+    SparsityTools::distribute_sparsity_pattern(sparsity_pattern,
+                                               dof_handler.n_locally_owned_dofs_per_processor(),
+                                               MPI_COMM_WORLD,
+                                               locally_relevant_dofs);
 
-    system_matrix.reinit(
-      locally_owned_dofs, locally_owned_dofs, sparsity_pattern, MPI_COMM_WORLD);
+    system_matrix.reinit(locally_owned_dofs, locally_owned_dofs, sparsity_pattern, MPI_COMM_WORLD);
     deallog << "local_range: " << system_matrix.local_range().first << " - "
             << system_matrix.local_range().second << std::endl;
   }

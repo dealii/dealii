@@ -82,16 +82,14 @@ DoFToolsEx::transfer(const DoFHandler<dim> &source_dof,
         {
           // cell has not been coarsend, but possibly been refined
           cell->get_dof_values(source_vector, local_dofs);
-          source2target[cell]->set_dof_values_by_interpolation(local_dofs,
-                                                               target_vector);
+          source2target[cell]->set_dof_values_by_interpolation(local_dofs, target_vector);
         }
       else
         {
           // the source cell has been coarsened
-          Assert(cell->level() > source2target[cell]->level(),
-                 ExcInternalError());
-          target2source[source2target[cell]]->get_interpolated_dof_values(
-            source_vector, local_dofs);
+          Assert(cell->level() > source2target[cell]->level(), ExcInternalError());
+          target2source[source2target[cell]]->get_interpolated_dof_values(source_vector,
+                                                                          local_dofs);
           source2target[cell]->set_dof_values(local_dofs, target_vector);
         }
     }
@@ -149,8 +147,7 @@ main()
   FE_Q<2> fe(1);
 
   // dof handlers
-  DoFHandler<2> dof(tria), refined_dof(refined_tria), coarse_dof(coarse_tria),
-    both_dof(both_tria);
+  DoFHandler<2> dof(tria), refined_dof(refined_tria), coarse_dof(coarse_tria), both_dof(both_tria);
   dof.distribute_dofs(fe);
   refined_dof.distribute_dofs(fe);
   coarse_dof.distribute_dofs(fe);
@@ -162,8 +159,8 @@ main()
   VectorTools::interpolate(dof, test_function, sol);
 
   // setup solution vectors
-  Vector<double> refined_sol(refined_dof.n_dofs()),
-    coarse_sol(coarse_dof.n_dofs()), both_sol(both_dof.n_dofs());
+  Vector<double> refined_sol(refined_dof.n_dofs()), coarse_sol(coarse_dof.n_dofs()),
+    both_sol(both_dof.n_dofs());
 
   // transfer solutions
   DoFToolsEx::transfer(dof, sol, refined_dof, refined_sol);

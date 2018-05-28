@@ -145,8 +145,7 @@ public:
    * (which should really be in the unit cell) and the corresponding weights.
    * You will want to have the weights sum up to one, but this is not checked.
    */
-  Quadrature(const std::vector<Point<dim>> &points,
-             const std::vector<double> &    weights);
+  Quadrature(const std::vector<Point<dim>> &points, const std::vector<double> &weights);
 
   /**
    * Construct a dummy quadrature formula from a list of points, with weights
@@ -193,8 +192,7 @@ public:
    * arguments.
    */
   void
-  initialize(const std::vector<Point<dim>> &points,
-             const std::vector<double> &    weights);
+  initialize(const std::vector<Point<dim>> &points, const std::vector<double> &weights);
 
   /**
    * Number of quadrature points.
@@ -317,9 +315,7 @@ public:
   /**
    * Constructor for a three-dimensional formula.
    */
-  QAnisotropic(const Quadrature<1> &qx,
-               const Quadrature<1> &qy,
-               const Quadrature<1> &qz);
+  QAnisotropic(const Quadrature<1> &qx, const Quadrature<1> &qy, const Quadrature<1> &qz);
 };
 
 

@@ -69,20 +69,15 @@ check()
         Assert(false, ExcNotImplemented());
     }
 
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, subdivisions, p1, p2);
+  GridGenerator::subdivided_hyper_rectangle(triangulation, subdivisions, p1, p2);
 
   // Create FE Collection and insert two FE objects
   // (RT0 - DGQ0 - Q1 ^ dim) and (Nothing - Nothing - Q2 ^ dim)
   hp::FECollection<dim> fe_collection;
-  fe_collection.push_back(FESystem<dim>(
-    FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1, FE_Q<dim>(2), dim));
-  fe_collection.push_back(FESystem<dim>(FE_RaviartThomasNodal<dim>(0),
-                                        1,
-                                        FE_DGQ<dim>(0),
-                                        1,
-                                        FE_Nothing<dim>(),
-                                        dim));
+  fe_collection.push_back(
+    FESystem<dim>(FE_Nothing<dim>(dim), 1, FE_Nothing<dim>(), 1, FE_Q<dim>(2), dim));
+  fe_collection.push_back(
+    FESystem<dim>(FE_RaviartThomasNodal<dim>(0), 1, FE_DGQ<dim>(0), 1, FE_Nothing<dim>(), dim));
 
   hp::DoFHandler<dim> dof_handler(triangulation);
   dof_handler.begin_active()->set_active_fe_index(1);
@@ -115,8 +110,7 @@ check()
           face_coupling[c][d] = DoFTools::always;
       }
 
-  DoFTools::make_flux_sparsity_pattern(
-    dof_handler, dsp, cell_coupling, face_coupling);
+  DoFTools::make_flux_sparsity_pattern(dof_handler, dsp, cell_coupling, face_coupling);
   dsp.compress();
 
   // Print sparsity pattern

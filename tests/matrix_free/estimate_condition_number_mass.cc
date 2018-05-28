@@ -55,7 +55,7 @@ mass_operator(const MatrixFree<dim, Number> &              data,
               const std::pair<unsigned int, unsigned int> &cell_range)
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);
-  const unsigned int n_q_points = fe_eval.n_q_points;
+  const unsigned int                                     n_q_points = fe_eval.n_q_points;
 
   for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
     {
@@ -137,9 +137,7 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
   SolverControl control(n_iterations, 0);
   SolverCG<>    solver(control);
   solver.connect_condition_number_slot(
-    std::bind(output_double_number,
-              std::placeholders::_1,
-              "Condition number estimate: "));
+    std::bind(output_double_number, std::placeholders::_1, "Condition number estimate: "));
   try
     {
       solver.solve(mf, out, in, PreconditionIdentity());

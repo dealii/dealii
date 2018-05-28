@@ -48,9 +48,7 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const unsigned int n_components) :
-    Function<dim>(n_components),
-    q(q)
+  F(const unsigned int q, const unsigned int n_components) : Function<dim>(n_components), q(q)
   {}
 
   virtual double
@@ -95,9 +93,8 @@ test()
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  cell                                                   = tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+  cell = tria.begin_active();
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm() < 0.2)
@@ -134,8 +131,7 @@ test()
 
   ConstraintMatrix constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -144,15 +140,13 @@ test()
   // std::endl; std::cout << "Number of constraints: " <<
   // constraints.n_constraints() << std::endl;
 
-  std::shared_ptr<MatrixFree<dim, number>> mf_data(
-    new MatrixFree<dim, number>());
+  std::shared_ptr<MatrixFree<dim, number>> mf_data(new MatrixFree<dim, number>());
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.tasks_block_size      = 7;
-    data.mapping_update_flags =
-      update_quadrature_points | update_gradients | update_JxW_values;
+    data.mapping_update_flags  = update_quadrature_points | update_gradients | update_JxW_values;
     mf_data->reinit(dof, constraints, quad, data);
   }
 
@@ -173,13 +167,9 @@ test()
       }
   }
 
-  MatrixFreeOperators::LaplaceOperator<
-    dim,
-    fe_degree,
-    fe_degree + 1,
-    1,
-    LinearAlgebra::distributed::Vector<number>>
-    mf;
+  MatrixFreeOperators::
+    LaplaceOperator<dim, fe_degree, fe_degree + 1, 1, LinearAlgebra::distributed::Vector<number>>
+      mf;
   mf.initialize(mf_data);
   mf.set_coefficient(coefficient);
   mf.compute_diagonal();
@@ -205,11 +195,7 @@ test()
   {
     TrilinosWrappers::SparsityPattern csp(owned_set, MPI_COMM_WORLD);
     DoFTools::make_sparsity_pattern(
-      dof,
-      csp,
-      constraints,
-      true,
-      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+      dof, csp, constraints, true, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
     csp.compress();
     sparse_matrix.reinit(csp);
   }
@@ -218,17 +204,15 @@ test()
 
     FEValues<dim> fe_values(dof.get_fe(),
                             quadrature_formula,
-                            update_gradients | update_JxW_values |
-                              update_quadrature_points);
+                            update_gradients | update_JxW_values | update_quadrature_points);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -240,15 +224,12 @@ test()
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   cell_matrix(i, j) +=
-                    (fe_values.shape_grad(i, q_point) *
-                     fe_values.shape_grad(j, q_point)) *
-                    function.value(fe_values.quadrature_point(q_point)) *
-                    fe_values.JxW(q_point);
+                    (fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point)) *
+                    function.value(fe_values.quadrature_point(q_point)) * fe_values.JxW(q_point);
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, sparse_matrix);
+          constraints.distribute_local_to_global(cell_matrix, local_dof_indices, sparse_matrix);
         }
   }
   sparse_matrix.compress(VectorOperation::add);
@@ -264,8 +245,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

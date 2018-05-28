@@ -97,8 +97,7 @@ test()
     FESubfaceValues<dim> fe_subf_val_m(mapping, elem, f_quad, w_m);
 
     deallog << dim << " Checking no mapping FEValues behavior: " << std::endl;
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -119,8 +118,7 @@ test()
           Assert(values[0] == values_m[0], ExcInternalError())
 
             // Also check the Jacobian with FESubfaceValues
-            if (cell->at_boundary(f) == false &&
-                cell->neighbor(f)->level() < cell->level())
+            if (cell->at_boundary(f) == false && cell->neighbor(f)->level() < cell->level())
           {
             fe_subf_val.reinit(cell->neighbor(f),
                                cell->neighbor_face_no(f),

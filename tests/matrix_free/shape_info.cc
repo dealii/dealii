@@ -42,10 +42,8 @@ test(const FiniteElement<dim> &fe, const Quadrature<1> &quad)
     {
       internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
       shape_info.reinit(quad, fe, i);
-      deallog << "Detected shape info type for "
-              << fe.base_element(i).get_name() << ": "
-              << static_cast<unsigned int>(shape_info.element_type)
-              << std::endl;
+      deallog << "Detected shape info type for " << fe.base_element(i).get_name() << ": "
+              << static_cast<unsigned int>(shape_info.element_type) << std::endl;
     }
 }
 

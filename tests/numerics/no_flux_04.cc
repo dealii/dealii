@@ -109,11 +109,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   data_out.attach_dof_handler(dh);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(
-      dim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation(dim, DataComponentInterpretation::component_is_part_of_vector);
 
-  data_out.add_data_vector(
-    v, "x", DataOut<dim>::type_dof_data, data_component_interpretation);
+  data_out.add_data_vector(v, "x", DataOut<dim>::type_dof_data, data_component_interpretation);
   data_out.build_patches(fe.degree);
 
   data_out.write_vtk(deallog.get_file_stream());

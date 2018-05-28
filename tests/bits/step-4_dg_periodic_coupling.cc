@@ -53,11 +53,9 @@ class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   void
-  cell(MeshWorker::DoFInfo<dim> &                 dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
   face(MeshWorker::DoFInfo<dim> &                 dinfo1,
        MeshWorker::DoFInfo<dim> &                 dinfo2,
@@ -67,19 +65,16 @@ public:
 
 template <int dim>
 void
-MatrixIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+                            typename MeshWorker::IntegrationInfo<dim> &info) const
 {
-  LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
-                                         info.fe_values());
+  LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix, info.fe_values());
 }
 
 template <int dim>
 void
-MatrixIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+MatrixIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+                                typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().degree;
   LocalIntegrators::Laplace ::nitsche_matrix(
@@ -90,11 +85,10 @@ MatrixIntegrator<dim>::boundary(
 
 template <int dim>
 void
-MatrixIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim> &                 dinfo1,
-  MeshWorker::DoFInfo<dim> &                 dinfo2,
-  typename MeshWorker::IntegrationInfo<dim> &info1,
-  typename MeshWorker::IntegrationInfo<dim> &info2) const
+MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &                 dinfo1,
+                            MeshWorker::DoFInfo<dim> &                 dinfo2,
+                            typename MeshWorker::IntegrationInfo<dim> &info1,
+                            typename MeshWorker::IntegrationInfo<dim> &info2) const
 {
   const unsigned int deg = info1.fe_values(0).get_fe().degree;
   LocalIntegrators::Laplace ::ip_matrix(
@@ -152,19 +146,14 @@ void
 Step4<dim>::make_grid()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1, true);
-  typedef typename dealii::Triangulation<dim>::cell_iterator CellIteratorTria;
-  std::vector<dealii::GridTools::PeriodicFacePair<CellIteratorTria>>
-                     periodic_faces;
-  const unsigned int b_id1     = 2;
-  const unsigned int b_id2     = 3;
-  const unsigned int direction = 1;
+  typedef typename dealii::Triangulation<dim>::cell_iterator         CellIteratorTria;
+  std::vector<dealii::GridTools::PeriodicFacePair<CellIteratorTria>> periodic_faces;
+  const unsigned int                                                 b_id1     = 2;
+  const unsigned int                                                 b_id2     = 3;
+  const unsigned int                                                 direction = 1;
 
-  dealii::GridTools::collect_periodic_faces(triangulation,
-                                            b_id1,
-                                            b_id2,
-                                            direction,
-                                            periodic_faces,
-                                            dealii::Tensor<1, dim>());
+  dealii::GridTools::collect_periodic_faces(
+    triangulation, b_id1, b_id2, direction, periodic_faces, dealii::Tensor<1, dim>());
   triangulation.add_periodicity(periodic_faces);
   triangulation.refine_global(1);
 }
@@ -180,7 +169,7 @@ Step4<dim>::setup_system()
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
 
   // set up full mask not doing anything
-  const unsigned int n_components = dof_handler.get_fe().n_components();
+  const unsigned int           n_components = dof_handler.get_fe().n_components();
   Table<2, DoFTools::Coupling> mask(n_components, n_components);
   for (unsigned int i = 0; i < n_components; ++i)
     for (unsigned int j = 0; j < n_components; ++j)
@@ -194,20 +183,16 @@ Step4<dim>::setup_system()
 
   MappingQGeneric<dim>                mapping(1);
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  UpdateFlags update_flags = update_values | update_gradients;
+  UpdateFlags                         update_flags = update_values | update_gradients;
   info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
 
-  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+  MeshWorker::DoFInfo<dim>                                  dof_info(dof_handler);
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>> assembler;
   assembler.initialize(system_matrix);
   MatrixIntegrator<dim> integrator;
-  MeshWorker::integration_loop<dim, dim>(dof_handler.begin_active(),
-                                         dof_handler.end(),
-                                         dof_info,
-                                         info_box,
-                                         integrator,
-                                         assembler);
+  MeshWorker::integration_loop<dim, dim>(
+    dof_handler.begin_active(), dof_handler.end(), dof_info, info_box, integrator, assembler);
 
   for (unsigned int i = 0; i < system_rhs.size(); ++i)
     system_rhs(i) = 0.01 * i - 0.000001 * i * i;
@@ -235,8 +220,7 @@ template <int dim>
 void
 Step4<dim>::output_results(const unsigned int cycle) const
 {
-  std::string filename =
-    "solution-" + dealii::Utilities::int_to_string(cycle, 2);
+  std::string filename = "solution-" + dealii::Utilities::int_to_string(cycle, 2);
 
   dealii::DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
@@ -291,8 +275,8 @@ Step4<2>::check_periodicity(const unsigned int cycle) const
       else
         {
           deallog << point1 << "\t fail" << std::endl;
-          deallog << point1 << "\t" << value1[0] << "\t" << value2[0] << "\t"
-                  << rel_error << std::endl;
+          deallog << point1 << "\t" << value1[0] << "\t" << value2[0] << "\t" << rel_error
+                  << std::endl;
           all_passed = false;
         }
     }
@@ -336,13 +320,11 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -350,12 +332,10 @@ main(int argc, char **argv)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

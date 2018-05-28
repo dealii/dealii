@@ -28,9 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  OutputOperator<VectorType>::OutputOperator() :
-    step(numbers::invalid_unsigned_int),
-    os(nullptr)
+  OutputOperator<VectorType>::OutputOperator() : step(numbers::invalid_unsigned_int), os(nullptr)
   {}
 
   template <typename VectorType>
@@ -54,9 +52,7 @@ namespace Algorithms
               continue;
             deallog << vectors.name(i);
             for (unsigned int j = 0; j < v->size(); ++j)
-              deallog << ' '
-                      << ::dealii::internal::ElementAccess<VectorType>::get(*v,
-                                                                            j);
+              deallog << ' ' << ::dealii::internal::ElementAccess<VectorType>::get(*v, j);
             deallog << std::endl;
           }
         deallog << std::endl;
@@ -70,9 +66,7 @@ namespace Algorithms
             if (v == nullptr)
               continue;
             for (unsigned int j = 0; j < v->size(); ++j)
-              (*os) << ' '
-                    << ::dealii::internal::ElementAccess<VectorType>::get(*v,
-                                                                          j);
+              (*os) << ' ' << ::dealii::internal::ElementAccess<VectorType>::get(*v, j);
           }
         (*os) << std::endl;
       }

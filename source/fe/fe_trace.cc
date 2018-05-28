@@ -38,12 +38,8 @@ template <int dim, int spacedim>
 FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree) :
   FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>(
     TensorProductPolynomials<dim - 1>(
-      Polynomials::generate_complete_Lagrange_basis(
-        QGaussLobatto<1>(degree + 1).get_points())),
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
+      Polynomials::generate_complete_Lagrange_basis(QGaussLobatto<1>(degree + 1).get_points())),
+    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
     std::vector<bool>(1, true)),
   fe_q(degree)
 {
@@ -88,8 +84,7 @@ FE_TraceQ<dim, spacedim>::get_name() const
   // kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_TraceQ<" << Utilities::dim_string(dim, spacedim) << ">("
-          << this->degree << ")";
+  namebuf << "FE_TraceQ<" << Utilities::dim_string(dim, spacedim) << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -98,12 +93,10 @@ FE_TraceQ<dim, spacedim>::get_name() const
 
 template <int dim, int spacedim>
 bool
-FE_TraceQ<dim, spacedim>::has_support_on_face(
-  const unsigned int shape_index,
-  const unsigned int face_index) const
+FE_TraceQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
+                                              const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
+  Assert(shape_index < this->dofs_per_cell, ExcIndexRange(shape_index, 0, this->dofs_per_cell));
   Assert(face_index < GeometryInfo<dim>::faces_per_cell,
          ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
@@ -124,19 +117,17 @@ FE_TraceQ<dim, spacedim>::get_constant_modes() const
   Table<2, bool> constant_modes(1, this->dofs_per_cell);
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     constant_modes(0, i) = true;
-  return std::pair<Table<2, bool>, std::vector<unsigned int>>(
-    constant_modes, std::vector<unsigned int>(1, 0));
+  return std::pair<Table<2, bool>, std::vector<unsigned int>>(constant_modes,
+                                                              std::vector<unsigned int>(1, 0));
 }
 
 template <int dim, int spacedim>
 void
-FE_TraceQ<dim, spacedim>::
-  convert_generalized_support_point_values_to_dof_values(
-    const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const
+FE_TraceQ<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
+  const std::vector<Vector<double>> &support_point_values,
+  std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
+  AssertDimension(support_point_values.size(), this->get_unit_support_points().size());
   AssertDimension(support_point_values.size(), nodal_values.size());
   AssertDimension(this->dofs_per_cell, nodal_values.size());
 
@@ -190,8 +181,7 @@ FE_TraceQ<dim, spacedim>::compare_for_face_domination(
       else
         return FiniteElementDomination::other_element_dominates;
     }
-  else if (const FE_Nothing<dim> *fe_nothing =
-             dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
+  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
     {
       if (fe_nothing->is_dominating())
         {
@@ -218,8 +208,7 @@ FE_TraceQ<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
   FullMatrix<double> &                interpolation_matrix) const
 {
-  get_subface_interpolation_matrix(
-    source_fe, numbers::invalid_unsigned_int, interpolation_matrix);
+  get_subface_interpolation_matrix(source_fe, numbers::invalid_unsigned_int, interpolation_matrix);
 }
 
 
@@ -234,33 +223,27 @@ FE_TraceQ<dim, spacedim>::get_subface_interpolation_matrix(
   // this is the code from FE_FaceQ
   Assert(interpolation_matrix.n() == this->dofs_per_face,
          ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(
-    interpolation_matrix.m() == x_source_fe.dofs_per_face,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_face));
+  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+         ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_face));
 
   // see if source is a FaceQ element
   if (const FE_TraceQ<dim, spacedim> *source_fe =
         dynamic_cast<const FE_TraceQ<dim, spacedim> *>(&x_source_fe))
     {
-      fe_q.get_subface_interpolation_matrix(
-        source_fe->fe_q, subface, interpolation_matrix);
+      fe_q.get_subface_interpolation_matrix(source_fe->fe_q, subface, interpolation_matrix);
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
     {
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
   else
-    AssertThrow(
-      false,
-      (typename FiniteElement<dim,
-                              spacedim>::ExcInterpolationNotImplemented()));
+    AssertThrow(false, (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 }
 
 
 
 template <int spacedim>
-FE_TraceQ<1, spacedim>::FE_TraceQ(const unsigned int degree) :
-  FE_FaceQ<1, spacedim>(degree)
+FE_TraceQ<1, spacedim>::FE_TraceQ(const unsigned int degree) : FE_FaceQ<1, spacedim>(degree)
 {}
 
 
@@ -273,8 +256,7 @@ FE_TraceQ<1, spacedim>::get_name() const
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
-  namebuf << "FE_TraceQ<" << Utilities::dim_string(1, spacedim) << ">("
-          << this->degree << ")";
+  namebuf << "FE_TraceQ<" << Utilities::dim_string(1, spacedim) << ">(" << this->degree << ")";
 
   return namebuf.str();
 }

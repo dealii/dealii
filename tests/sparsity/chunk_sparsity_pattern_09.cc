@@ -28,8 +28,7 @@ main()
   deallog.attach(logfile);
 
   const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
-  for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
-       ++i)
+  for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]); ++i)
     {
       chunk_size = chunk_sizes[i];
       copy_from_4<ChunkSparsityPattern>();

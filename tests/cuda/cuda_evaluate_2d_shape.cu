@@ -36,13 +36,9 @@ template <int M, int N, int type, bool add, bool dof_to_quad>
 __global__ void
 evaluate_tensor_product(double *dst, double *src)
 {
-  CUDAWrappers::internal::EvaluatorTensorProduct<
-    CUDAWrappers::internal::evaluate_general,
-    2,
-    M - 1,
-    N,
-    double>
-    evaluator;
+  CUDAWrappers::internal::
+    EvaluatorTensorProduct<CUDAWrappers::internal::evaluate_general, 2, M - 1, N, double>
+      evaluator;
 
   if (type == 0)
     {
@@ -67,8 +63,7 @@ test()
   for (unsigned int i = 0; i < (M + 1) / 2; ++i)
     for (unsigned int j = 0; j < N; ++j)
       {
-        shape_host[i * N + j] =
-          -1. + 2. * static_cast<double>(Testing::rand()) / RAND_MAX;
+        shape_host[i * N + j] = -1. + 2. * static_cast<double>(Testing::rand()) / RAND_MAX;
         if (type == 1)
           shape_host[(M - 1 - i) * N + N - 1 - j] = -shape_host[i * N + j];
         else
@@ -85,8 +80,7 @@ test()
 
   constexpr int                          M_2d = M * M;
   constexpr int                          N_2d = N * N;
-  LinearAlgebra::ReadWriteVector<double> x_host(N_2d), x_ref(N_2d),
-    y_host(M_2d), y_ref(M_2d);
+  LinearAlgebra::ReadWriteVector<double> x_host(N_2d), x_ref(N_2d), y_host(M_2d), y_ref(M_2d);
   for (unsigned int i = 0; i < N_2d; ++i)
     x_host[i] = static_cast<double>(Testing::rand()) / RAND_MAX;
 
@@ -98,8 +92,7 @@ test()
           const double shape_val = shape_host[i * N + j];
           for (unsigned int m = 0; m < M; ++m)
             for (unsigned int n = 0; n < N; ++n)
-              shape_2d(i * M + m, j * N + n) =
-                shape_val * shape_host[m * N + n];
+              shape_2d(i * M + m, j * N + n) = shape_val * shape_host[m * N + n];
         }
     }
 
@@ -119,20 +112,18 @@ test()
 
   unsigned int size_shape_values = M * N * sizeof(double);
 
-  cudaError_t cuda_error =
-    cudaMemcpyToSymbol(CUDAWrappers::internal::global_shape_values,
-                       shape_host.begin(),
-                       size_shape_values,
-                       0,
-                       cudaMemcpyHostToDevice);
+  cudaError_t cuda_error = cudaMemcpyToSymbol(CUDAWrappers::internal::global_shape_values,
+                                              shape_host.begin(),
+                                              size_shape_values,
+                                              0,
+                                              cudaMemcpyHostToDevice);
   AssertCuda(cuda_error);
 
-  cuda_error =
-    cudaMemcpyToSymbol(CUDAWrappers::internal::global_shape_gradients,
-                       shape_host.begin(),
-                       size_shape_values,
-                       0,
-                       cudaMemcpyHostToDevice);
+  cuda_error = cudaMemcpyToSymbol(CUDAWrappers::internal::global_shape_gradients,
+                                  shape_host.begin(),
+                                  size_shape_values,
+                                  0,
+                                  cudaMemcpyHostToDevice);
   AssertCuda(cuda_error);
 
   // Launch the kernel

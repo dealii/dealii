@@ -57,8 +57,7 @@ test(std::ostream & /*out*/)
 
       Assert(tr.n_active_cells() == 8, ExcInternalError());
 
-      typename Triangulation<dim>::active_cell_iterator cell =
-        tr.begin_active();
+      typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
       std::advance(cell, i);
       cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();

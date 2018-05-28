@@ -42,10 +42,9 @@ check(const double (&array)[N], const Point<dim>(&point))
 
   // UNPACK BUFFER
   double unpacked_array[N];
-  Utilities::unpack(
-    buffer.cbegin(), buffer.cbegin() + buffer_separator, unpacked_array);
-  Point<dim> unpacked_point = Utilities::unpack<Point<dim>>(
-    buffer.cbegin() + buffer_separator, buffer.cend());
+  Utilities::unpack(buffer.cbegin(), buffer.cbegin() + buffer_separator, unpacked_array);
+  Point<dim> unpacked_point =
+    Utilities::unpack<Point<dim>>(buffer.cbegin() + buffer_separator, buffer.cend());
 
   // TEST RESULTS
   bool equal_array = true;
@@ -57,8 +56,7 @@ check(const double (&array)[N], const Point<dim>(&point))
       }
   deallog << "compare array: " << (equal_array ? "OK" : "Failed") << std::endl;
 
-  deallog << "compare point: "
-          << (point.distance(unpacked_point) < 1e-12 ? "OK" : "Failed")
+  deallog << "compare point: " << (point.distance(unpacked_point) < 1e-12 ? "OK" : "Failed")
           << std::endl;
 }
 

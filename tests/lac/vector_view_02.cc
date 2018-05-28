@@ -26,17 +26,13 @@ checkReinit1(const size_type N, const bool fast = false)
 {
   deallog << "Reinit with const size and fast" << std::endl;
 
-  deallog
-    << "Creating Vector<number> of size N+10 and filling with values 1 to N+10"
-    << std::endl;
+  deallog << "Creating Vector<number> of size N+10 and filling with values 1 to N+10" << std::endl;
 
   Vector<number> V(N + 10);
   for (unsigned int i = 0; i < V.size(); i++)
     V(i) = i + 1;
 
-  deallog
-    << "Creating VectorView<number> of size N+10 pointing to Vector<number>"
-    << std::endl;
+  deallog << "Creating VectorView<number> of size N+10 pointing to Vector<number>" << std::endl;
   VectorView<number> VV(V.size(), V.begin());
 
   deallog << "Printing Vector<number>" << std::endl;
@@ -44,14 +40,12 @@ checkReinit1(const size_type N, const bool fast = false)
     deallog << V(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Printing VectorView<number> pointing to Vector<number>"
-          << std::endl;
+  deallog << "Printing VectorView<number> pointing to Vector<number>" << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     deallog << VV(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Reinit VectorView<number> to size N from N+10 with fast=" << fast
-          << std::endl;
+  deallog << "Reinit VectorView<number> to size N from N+10 with fast=" << fast << std::endl;
   VV.reinit(N, fast);
 
   deallog << "Printing Vector<number>" << std::endl;
@@ -59,8 +53,7 @@ checkReinit1(const size_type N, const bool fast = false)
     deallog << V(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Printing VectorView<number> pointing to Vector<number>"
-          << std::endl;
+  deallog << "Printing VectorView<number> pointing to Vector<number>" << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     deallog << VV(i) << '\t';
   deallog << std::endl;

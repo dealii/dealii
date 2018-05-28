@@ -65,8 +65,7 @@ namespace mg
 
   template <typename number>
   void
-  SparseMatrixCollection<number>::resize(const unsigned int minlevel,
-                                         const unsigned int maxlevel)
+  SparseMatrixCollection<number>::resize(const unsigned int minlevel, const unsigned int maxlevel)
   {
     matrix.resize(minlevel, maxlevel);
     matrix.clear_elements();
@@ -88,12 +87,9 @@ namespace mg
   void
   SparseMatrixCollection<number>::reinit(const DoFHandlerType &dof_handler)
   {
-    AssertIndexRange(sparsity.max_level(),
-                     dof_handler.get_triangulation().n_levels());
+    AssertIndexRange(sparsity.max_level(), dof_handler.get_triangulation().n_levels());
 
-    for (unsigned int level = sparsity.min_level();
-         level <= sparsity.max_level();
-         ++level)
+    for (unsigned int level = sparsity.min_level(); level <= sparsity.max_level(); ++level)
       {
         DynamicSparsityPattern dsp(dof_handler.n_dofs(level));
         MGTools::make_flux_sparsity_pattern(dof_handler, dsp, level);
@@ -104,10 +100,8 @@ namespace mg
         if (level > 0)
           {
             DynamicSparsityPattern ci_sparsity;
-            ci_sparsity.reinit(dof_handler.n_dofs(level - 1),
-                               dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(
-              dof_handler, ci_sparsity, level);
+            ci_sparsity.reinit(dof_handler.n_dofs(level - 1), dof_handler.n_dofs(level));
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
             sparsity_edge[level].copy_from(ci_sparsity);
             matrix_up[level].reinit(sparsity_edge[level]);
             matrix_down[level].reinit(sparsity_edge[level]);

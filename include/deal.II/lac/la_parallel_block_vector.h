@@ -79,8 +79,7 @@ namespace LinearAlgebra
      * @author Katharina Kormann, Martin Kronbichler, 2011
      */
     template <typename Number>
-    class BlockVector : public BlockVectorBase<Vector<Number>>,
-                        public VectorSpaceVector<Number>
+    class BlockVector : public BlockVectorBase<Vector<Number>>, public VectorSpaceVector<Number>
     {
     public:
       /**
@@ -135,8 +134,7 @@ namespace LinearAlgebra
        * Confer the other constructor further down if you intend to use blocks
        * of different sizes.
        */
-      explicit BlockVector(const size_type num_blocks = 0,
-                           const size_type block_size = 0);
+      explicit BlockVector(const size_type num_blocks = 0, const size_type block_size = 0);
 
       /**
        * Copy-Constructor. Dimension set to that of V, all components are
@@ -176,8 +174,7 @@ namespace LinearAlgebra
       /**
        * Same as above but the ghost indices are assumed to be empty.
        */
-      BlockVector(const std::vector<IndexSet> &local_ranges,
-                  const MPI_Comm               communicator);
+      BlockVector(const std::vector<IndexSet> &local_ranges, const MPI_Comm communicator);
 
       /**
        * Copy operator: fill all components of the vector with the given
@@ -270,8 +267,7 @@ namespace LinearAlgebra
        * be routed to the wrong block.
        */
       void
-      reinit(const std::vector<size_type> &N,
-             const bool                    omit_zeroing_entries = false);
+      reinit(const std::vector<size_type> &N, const bool omit_zeroing_entries = false);
 
       /**
        * Change the dimension to that of the vector <tt>V</tt>. The same
@@ -289,8 +285,7 @@ namespace LinearAlgebra
        */
       template <typename Number2>
       void
-      reinit(const BlockVector<Number2> &V,
-             const bool                  omit_zeroing_entries = false);
+      reinit(const BlockVector<Number2> &V, const bool omit_zeroing_entries = false);
 
       /**
        * This function copies the data that has accumulated in the data buffer
@@ -353,8 +348,7 @@ namespace LinearAlgebra
        */
       template <typename OtherNumber>
       void
-      add(const std::vector<size_type> &       indices,
-          const ::dealii::Vector<OtherNumber> &values);
+      add(const std::vector<size_type> &indices, const ::dealii::Vector<OtherNumber> &values);
 
       /**
        * Scaling and simple vector addition, i.e.  <tt>*this =
@@ -440,8 +434,7 @@ namespace LinearAlgebra
        * copied.
        */
       virtual void
-      reinit(const VectorSpaceVector<Number> &V,
-             const bool omit_zeroing_entries = false) override;
+      reinit(const VectorSpaceVector<Number> &V, const bool omit_zeroing_entries = false) override;
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -476,17 +469,15 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
-      import(
-        const LinearAlgebra::ReadWriteVector<Number> &  V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const LinearAlgebra::ReadWriteVector<Number> &  V,
+             VectorOperation::values                         operation,
+             std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+               std::shared_ptr<const CommunicationPatternBase>()) override;
 
       /**
        * Return the scalar product of two vectors.
        */
-      virtual Number
-      operator*(const VectorSpaceVector<Number> &V) const override;
+      virtual Number operator*(const VectorSpaceVector<Number> &V) const override;
 
       /**
        * Calculate the scalar product between each block of this vector and @p V
@@ -508,7 +499,7 @@ namespace LinearAlgebra
       void
       multivector_inner_product(FullMatrixType &           matrix,
                                 const BlockVector<Number> &V,
-                                const bool symmetric = false) const;
+                                const bool                 symmetric = false) const;
 
       /**
        * Calculate the scalar product between each block of this vector and @p V
@@ -530,7 +521,7 @@ namespace LinearAlgebra
       Number
       multivector_inner_product_with_metric(const FullMatrixType &     matrix,
                                             const BlockVector<Number> &V,
-                                            const bool symmetric = false) const;
+                                            const bool                 symmetric = false) const;
 
       /**
        * Set each block of this vector as follows:
@@ -574,17 +565,14 @@ namespace LinearAlgebra
        * stored in @p values to the vector components specified by @p indices.
        */
       virtual void
-      add(const std::vector<size_type> &indices,
-          const std::vector<Number> &   values);
+      add(const std::vector<size_type> &indices, const std::vector<Number> &values);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
        * s*(*this)+a*V</tt>.
        */
       virtual void
-      sadd(const Number                     s,
-           const Number                     a,
-           const VectorSpaceVector<Number> &V) override;
+      sadd(const Number s, const Number a, const VectorSpaceVector<Number> &V) override;
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -738,8 +726,7 @@ swap(LinearAlgebra::distributed::BlockVector<Number> &u,
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector<LinearAlgebra::distributed::BlockVector<Number>>
-  : std::false_type
+struct is_serial_vector<LinearAlgebra::distributed::BlockVector<Number>> : std::false_type
 {};
 
 

@@ -40,8 +40,7 @@ main()
 
   deallog << endl
           << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]" << endl
-          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being"
-          << endl
+          << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being" << endl
           << "the distance from (x,y) to four vertices of the square." << endl
           << endl;
 
@@ -50,11 +49,8 @@ main()
 
   for (unsigned int m = 1; m < 7; ++m)
     {
-      deallog << " =========Quadrature Order: " << m
-              << " =============================== " << endl;
-      deallog
-        << " ============================================================ "
-        << endl;
+      deallog << " =========Quadrature Order: " << m << " =============================== " << endl;
+      deallog << " ============================================================ " << endl;
       unsigned int index = 0;
       {
         deallog << " ===============Vertex: " << vertices[index]
@@ -67,8 +63,8 @@ main()
           {
             for (unsigned int j = 0; j < 6; ++j)
               {
-                double exact_integral  = exact_integral_one_over_r(index, i, j);
-                double approx_integral = 0;
+                double exact_integral    = exact_integral_one_over_r(index, i, j);
+                double approx_integral   = 0;
                 double approx_integral_2 = 0;
 
                 for (unsigned int q = 0; q < quad.size(); ++q)
@@ -76,8 +72,7 @@ main()
                     double x = quad.point(q)[0];
                     double y = quad.point(q)[1];
                     double R = sqrt(x * x + y * y);
-                    approx_integral += (pow(x, (double)i) * pow(y, (double)j) /
-                                        R * quad.weight(q));
+                    approx_integral += (pow(x, (double)i) * pow(y, (double)j) / R * quad.weight(q));
                   }
 
                 for (unsigned int q = 0; q < quad2.size(); ++q)
@@ -85,14 +80,12 @@ main()
                     double x = quad2.point(q)[0];
                     double y = quad2.point(q)[1];
                     double R = sqrt(x * x + y * y);
-                    approx_integral_2 +=
-                      (pow(x, (double)i) * pow(y, (double)j) * quad2.weight(q));
+                    approx_integral_2 += (pow(x, (double)i) * pow(y, (double)j) * quad2.weight(q));
                   }
 
                 deallog << "f(x,y) = x^" << i << " y^" << j
-                        << ", Errors = " << approx_integral - exact_integral
-                        << ", " << approx_integral_2 - exact_integral
-                        << std::endl;
+                        << ", Errors = " << approx_integral - exact_integral << ", "
+                        << approx_integral_2 - exact_integral << std::endl;
               }
           }
       }

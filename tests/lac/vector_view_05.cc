@@ -32,15 +32,13 @@ checkReadWriteConstructor(Vector<number> &V)
     deallog << V(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Printing VectorView<number> pointing to Vector<number>"
-          << std::endl;
+  deallog << "Printing VectorView<number> pointing to Vector<number>" << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     deallog << VV(i) << '\t';
   deallog << std::endl;
 
-  deallog
-    << "Incrementing Vector<number> elements using Read-write handle of VectorView<number>"
-    << std::endl;
+  deallog << "Incrementing Vector<number> elements using Read-write handle of VectorView<number>"
+          << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     VV(i) = VV(i) + 1;
 

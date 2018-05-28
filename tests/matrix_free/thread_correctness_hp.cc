@@ -52,8 +52,7 @@ public:
 #define CALL_METHOD(degree)                                        \
   subrange_deg = data.create_cell_subrange_hp(cell_range, degree); \
   if (subrange_deg.second > subrange_deg.first)                    \
-  helmholtz_operator<dim, degree, Vector<Number>, degree + 1>(     \
-    data, dst, src, subrange_deg)
+  helmholtz_operator<dim, degree, Vector<Number>, degree + 1>(data, dst, src, subrange_deg)
 
     CALL_METHOD(1);
     CALL_METHOD(2);
@@ -93,8 +92,7 @@ do_test(const unsigned int parallel_option)
   // refine a few cells
   for (unsigned int i = 0; i < 11 - 3 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tria.begin_active(),
+      typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                         endc = tria.end();
       for (; cell != endc; ++cell)
         if (Testing::rand() % (7 - i) == 0)
@@ -116,9 +114,7 @@ do_test(const unsigned int parallel_option)
   hp::DoFHandler<dim> dof(tria);
   // set the active FE index in a random order
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                         dof.begin_active(),
-                                                       endc = dof.end();
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int fe_index = Testing::rand() % max_degree;
@@ -130,8 +126,7 @@ do_test(const unsigned int parallel_option)
   dof.distribute_dofs(fe_collection);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   // std::cout << "Number of cells: " <<
@@ -154,20 +149,17 @@ do_test(const unsigned int parallel_option)
       MatrixFree<dim, number> mf_data_par;
       if (parallel_option == 0)
         {
-          data.tasks_parallel_scheme =
-            MatrixFree<dim, number>::AdditionalData::partition_partition;
+          data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_partition;
           deallog << "Parallel option partition/partition" << std::endl;
         }
       else if (parallel_option == 1)
         {
-          data.tasks_parallel_scheme =
-            MatrixFree<dim, number>::AdditionalData::partition_color;
+          data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::partition_color;
           deallog << "Parallel option partition/color" << std::endl;
         }
       else
         {
-          data.tasks_parallel_scheme =
-            MatrixFree<dim, number>::AdditionalData::color;
+          data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::color;
           deallog << "Parallel option partition/color" << std::endl;
         }
       data.tasks_block_size = 1;

@@ -123,8 +123,7 @@ PolynomialSpace<dim>::set_numbering(const std::vector<unsigned int> &renumber)
 
 template <int dim>
 double
-PolynomialSpace<dim>::compute_value(const unsigned int i,
-                                    const Point<dim> & p) const
+PolynomialSpace<dim>::compute_value(const unsigned int i, const Point<dim> &p) const
 {
   const auto ix = compute_index(i);
   // take the product of the
@@ -140,8 +139,7 @@ PolynomialSpace<dim>::compute_value(const unsigned int i,
 
 template <int dim>
 Tensor<1, dim>
-PolynomialSpace<dim>::compute_grad(const unsigned int i,
-                                   const Point<dim> & p) const
+PolynomialSpace<dim>::compute_grad(const unsigned int i, const Point<dim> &p) const
 {
   const auto ix = compute_index(i);
 
@@ -165,8 +163,7 @@ PolynomialSpace<dim>::compute_grad(const unsigned int i,
 
 template <int dim>
 Tensor<2, dim>
-PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
-                                        const Point<dim> & p) const
+PolynomialSpace<dim>::compute_grad_grad(const unsigned int i, const Point<dim> &p) const
 {
   const auto ix = compute_index(i);
 
@@ -200,13 +197,12 @@ PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
 
 template <int dim>
 void
-PolynomialSpace<dim>::compute(
-  const Point<dim> &           p,
-  std::vector<double> &        values,
-  std::vector<Tensor<1, dim>> &grads,
-  std::vector<Tensor<2, dim>> &grad_grads,
-  std::vector<Tensor<3, dim>> &third_derivatives,
-  std::vector<Tensor<4, dim>> &fourth_derivatives) const
+PolynomialSpace<dim>::compute(const Point<dim> &           p,
+                              std::vector<double> &        values,
+                              std::vector<Tensor<1, dim>> &grads,
+                              std::vector<Tensor<2, dim>> &grad_grads,
+                              std::vector<Tensor<3, dim>> &third_derivatives,
+                              std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
   const unsigned int n_1d = polynomials.size();
 
@@ -221,9 +217,9 @@ PolynomialSpace<dim>::compute(
   Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
          ExcDimensionMismatch2(fourth_derivatives.size(), n_pols, 0));
 
-  unsigned int v_size = 0;
-  bool update_values = false, update_grads = false, update_grad_grads = false;
-  bool update_3rd_derivatives = false, update_4th_derivatives = false;
+  unsigned int v_size        = 0;
+  bool         update_values = false, update_grads = false, update_grad_grads = false;
+  bool         update_3rd_derivatives = false, update_4th_derivatives = false;
   if (values.size() == n_pols)
     {
       update_values = true;
@@ -271,9 +267,8 @@ PolynomialSpace<dim>::compute(
       for (unsigned int iz = 0; iz < ((dim > 2) ? n_1d : 1); ++iz)
         for (unsigned int iy = 0; iy < ((dim > 1) ? n_1d - iz : 1); ++iy)
           for (unsigned int ix = 0; ix < n_1d - iy - iz; ++ix)
-            values[index_map_inverse[k++]] = v[0][ix][0] *
-                                             ((dim > 1) ? v[1][iy][0] : 1.) *
-                                             ((dim > 2) ? v[2][iz][0] : 1.);
+            values[index_map_inverse[k++]] =
+              v[0][ix][0] * ((dim > 1) ? v[1][iy][0] : 1.) * ((dim > 2) ? v[2][iz][0] : 1.);
     }
 
   if (update_grads)
@@ -307,15 +302,11 @@ PolynomialSpace<dim>::compute(
                     // Derivative
                     // order for each
                     // direction
-                    const unsigned int j0 =
-                      ((d1 == 0) ? 1 : 0) + ((d2 == 0) ? 1 : 0);
-                    const unsigned int j1 =
-                      ((d1 == 1) ? 1 : 0) + ((d2 == 1) ? 1 : 0);
-                    const unsigned int j2 =
-                      ((d1 == 2) ? 1 : 0) + ((d2 == 2) ? 1 : 0);
+                    const unsigned int j0 = ((d1 == 0) ? 1 : 0) + ((d2 == 0) ? 1 : 0);
+                    const unsigned int j1 = ((d1 == 1) ? 1 : 0) + ((d2 == 1) ? 1 : 0);
+                    const unsigned int j2 = ((d1 == 2) ? 1 : 0) + ((d2 == 2) ? 1 : 0);
 
-                    grad_grads[k2][d1][d2] = v[0][ix][j0] *
-                                             ((dim > 1) ? v[1][iy][j1] : 1.) *
+                    grad_grads[k2][d1][d2] = v[0][ix][j0] * ((dim > 1) ? v[1][iy][j1] : 1.) *
                                              ((dim > 2) ? v[2][iz][j2] : 1.);
                   }
             }
@@ -349,8 +340,7 @@ PolynomialSpace<dim>::compute(
                         }
 
                       third_derivatives[k2][d1][d2][d3] =
-                        v[0][ix][deriv_order[0]] *
-                        ((dim > 1) ? v[1][iy][deriv_order[1]] : 1.) *
+                        v[0][ix][deriv_order[0]] * ((dim > 1) ? v[1][iy][deriv_order[1]] : 1.) *
                         ((dim > 2) ? v[2][iz][deriv_order[2]] : 1.);
                     }
             }
@@ -387,8 +377,7 @@ PolynomialSpace<dim>::compute(
                           }
 
                         fourth_derivatives[k2][d1][d2][d3][d4] =
-                          v[0][ix][deriv_order[0]] *
-                          ((dim > 1) ? v[1][iy][deriv_order[1]] : 1.) *
+                          v[0][ix][deriv_order[0]] * ((dim > 1) ? v[1][iy][deriv_order[1]] : 1.) *
                           ((dim > 2) ? v[2][iz][deriv_order[2]] : 1.);
                       }
             }

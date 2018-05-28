@@ -59,8 +59,7 @@ namespace SUNDIALS
     int
     t_kinsol_function(N_Vector yy, N_Vector FF, void *user_data)
     {
-      KINSOL<VectorType> &solver =
-        *static_cast<KINSOL<VectorType> *>(user_data);
+      KINSOL<VectorType> &            solver = *static_cast<KINSOL<VectorType> *>(user_data);
       GrowingVectorMemory<VectorType> mem;
 
       typename VectorMemory<VectorType>::Pointer src_yy(mem);
@@ -90,8 +89,7 @@ namespace SUNDIALS
     int
     t_kinsol_setup_jacobian(KINMem kinsol_mem)
     {
-      KINSOL<VectorType> &solver =
-        *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
+      KINSOL<VectorType> &solver = *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
       GrowingVectorMemory<VectorType> mem;
 
       typename VectorMemory<VectorType>::Pointer src_ycur(mem);
@@ -117,8 +115,7 @@ namespace SUNDIALS
                             realtype *sJpnorm,
                             realtype *sFdotJp)
     {
-      KINSOL<VectorType> &solver =
-        *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
+      KINSOL<VectorType> &solver = *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
       GrowingVectorMemory<VectorType> mem;
 
       typename VectorMemory<VectorType>::Pointer src_ycur(mem);
@@ -151,8 +148,7 @@ namespace SUNDIALS
   } // namespace
 
   template <typename VectorType>
-  KINSOL<VectorType>::KINSOL(const AdditionalData &data,
-                             const MPI_Comm        mpi_comm) :
+  KINSOL<VectorType>::KINSOL(const AdditionalData &data, const MPI_Comm mpi_comm) :
     data(data),
     kinsol_mem(nullptr),
     solution(nullptr),
@@ -196,11 +192,10 @@ namespace SUNDIALS
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
-        const IndexSet is = initial_guess_and_solution.locally_owned_elements();
+        const IndexSet     is                = initial_guess_and_solution.locally_owned_elements();
         const unsigned int local_system_size = is.n_elements();
 
-        solution =
-          N_VNew_Parallel(communicator, local_system_size, system_size);
+        solution = N_VNew_Parallel(communicator, local_system_size, system_size);
 
         u_scale = N_VNew_Parallel(communicator, local_system_size, system_size);
         N_VConst_Parallel(1.e0, u_scale);
@@ -212,8 +207,7 @@ namespace SUNDIALS
 #  endif
       {
         Assert(is_serial_vector<VectorType>::value,
-               ExcInternalError(
-                 "Trying to use a serial code with a parallel vector."));
+               ExcInternalError("Trying to use a serial code with a parallel vector."));
         solution = N_VNew_Serial(system_size);
         u_scale  = N_VNew_Serial(system_size);
         N_VConst_Serial(1.e0, u_scale);
@@ -297,12 +291,10 @@ namespace SUNDIALS
         AssertKINSOL(status);
       }
 
-    if (data.strategy == AdditionalData::newton ||
-        data.strategy == AdditionalData::linesearch)
+    if (data.strategy == AdditionalData::newton || data.strategy == AdditionalData::linesearch)
       Assert(residual, ExcFunctionNotProvided("residual"));
 
-    if (data.strategy == AdditionalData::fixed_point ||
-        data.strategy == AdditionalData::picard)
+    if (data.strategy == AdditionalData::fixed_point || data.strategy == AdditionalData::picard)
       Assert(iteration_function, ExcFunctionNotProvided("iteration_function"));
 
     // call to KINSol

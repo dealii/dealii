@@ -605,32 +605,24 @@ namespace VectorTools
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType, template <int, int> class DoFHandlerType>
   void
-  interpolate(
-    const Mapping<dim, spacedim> &                             mapping,
-    const DoFHandlerType<dim, spacedim> &                      dof,
-    const Function<spacedim, typename VectorType::value_type> &function,
-    VectorType &                                               vec,
-    const ComponentMask &component_mask = ComponentMask());
+  interpolate(const Mapping<dim, spacedim> &                             mapping,
+              const DoFHandlerType<dim, spacedim> &                      dof,
+              const Function<spacedim, typename VectorType::value_type> &function,
+              VectorType &                                               vec,
+              const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Call the @p interpolate() function above with
    * <tt>mapping=MappingQGeneric1@<dim>@()</tt>.
    */
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType, template <int, int> class DoFHandlerType>
   void
-  interpolate(
-    const DoFHandlerType<dim, spacedim> &                      dof,
-    const Function<spacedim, typename VectorType::value_type> &function,
-    VectorType &                                               vec,
-    const ComponentMask &component_mask = ComponentMask());
+  interpolate(const DoFHandlerType<dim, spacedim> &                      dof,
+              const Function<spacedim, typename VectorType::value_type> &function,
+              VectorType &                                               vec,
+              const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Interpolate different finite element spaces. The interpolation of vector
@@ -702,16 +694,12 @@ namespace VectorTools
    *
    * @author Valentin Zingan, 2013
    */
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType, template <int, int> class DoFHandlerType>
   void
   interpolate_based_on_material_id(
     const Mapping<dim, spacedim> &       mapping,
     const DoFHandlerType<dim, spacedim> &dof_handler,
-    const std::map<types::material_id,
-                   const Function<spacedim, typename VectorType::value_type> *>
+    const std::map<types::material_id, const Function<spacedim, typename VectorType::value_type> *>
       &                  function_map,
     VectorType &         dst,
     const ComponentMask &component_mask = ComponentMask());
@@ -740,10 +728,7 @@ namespace VectorTools
    * parallel::distributed::Triangulation<dim>::no_automatic_repartitioning
    * flag).
    */
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType, template <int, int> class DoFHandlerType>
   void
   interpolate_to_different_mesh(const DoFHandlerType<dim, spacedim> &dof1,
                                 const VectorType &                   u1,
@@ -763,16 +748,13 @@ namespace VectorTools
    * Without it - due to cellwise interpolation - the resulting output vector
    * does not necessarily respect continuity requirements at hanging nodes.
    */
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType, template <int, int> class DoFHandlerType>
   void
   interpolate_to_different_mesh(const DoFHandlerType<dim, spacedim> &dof1,
                                 const VectorType &                   u1,
                                 const DoFHandlerType<dim, spacedim> &dof2,
-                                const ConstraintMatrix &constraints,
-                                VectorType &            u2);
+                                const ConstraintMatrix &             constraints,
+                                VectorType &                         u2);
 
   /**
    * The same function as above, but takes an InterGridMap object directly as
@@ -781,16 +763,12 @@ namespace VectorTools
    * @p intergridmap has to be initialized via InterGridMap::make_mapping
    * pointing from a source DoFHandler to a destination DoFHandler.
    */
-  template <int dim,
-            int spacedim,
-            typename VectorType,
-            template <int, int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType, template <int, int> class DoFHandlerType>
   void
-  interpolate_to_different_mesh(
-    const InterGridMap<DoFHandlerType<dim, spacedim>> &intergridmap,
-    const VectorType &                                 u1,
-    const ConstraintMatrix &                           constraints,
-    VectorType &                                       u2);
+  interpolate_to_different_mesh(const InterGridMap<DoFHandlerType<dim, spacedim>> &intergridmap,
+                                const VectorType &                                 u1,
+                                const ConstraintMatrix &                           constraints,
+                                VectorType &                                       u2);
 
   /**
    * Compute the projection of @p function to the finite element space.
@@ -845,16 +823,15 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const Mapping<dim, spacedim> &   mapping,
-          const DoFHandler<dim, spacedim> &dof,
-          const ConstraintMatrix &         constraints,
-          const Quadrature<dim> &          quadrature,
+  project(const Mapping<dim, spacedim> &                             mapping,
+          const DoFHandler<dim, spacedim> &                          dof,
+          const ConstraintMatrix &                                   constraints,
+          const Quadrature<dim> &                                    quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec,
-          const bool                 enforce_zero_boundary     = false,
-          const Quadrature<dim - 1> &q_boundary                = (dim > 1 ?
-                                                     QGauss<dim - 1>(2) :
-                                                     Quadrature<dim - 1>(0)),
+          const bool                                                 enforce_zero_boundary = false,
+          const Quadrature<dim - 1> &q_boundary                = (dim > 1 ? QGauss<dim - 1>(2) :
+                                                             Quadrature<dim - 1>(0)),
           const bool                 project_to_boundary_first = false);
 
   /**
@@ -863,15 +840,14 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const DoFHandler<dim, spacedim> &dof,
-          const ConstraintMatrix &         constraints,
-          const Quadrature<dim> &          quadrature,
+  project(const DoFHandler<dim, spacedim> &                          dof,
+          const ConstraintMatrix &                                   constraints,
+          const Quadrature<dim> &                                    quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec,
-          const bool                 enforce_zero_boundary     = false,
-          const Quadrature<dim - 1> &q_boundary                = (dim > 1 ?
-                                                     QGauss<dim - 1>(2) :
-                                                     Quadrature<dim - 1>(0)),
+          const bool                                                 enforce_zero_boundary = false,
+          const Quadrature<dim - 1> &q_boundary                = (dim > 1 ? QGauss<dim - 1>(2) :
+                                                             Quadrature<dim - 1>(0)),
           const bool                 project_to_boundary_first = false);
 
   /**
@@ -880,15 +856,15 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const hp::MappingCollection<dim, spacedim> &mapping,
-          const hp::DoFHandler<dim, spacedim> &       dof,
-          const ConstraintMatrix &                    constraints,
-          const hp::QCollection<dim> &                quadrature,
+  project(const hp::MappingCollection<dim, spacedim> &               mapping,
+          const hp::DoFHandler<dim, spacedim> &                      dof,
+          const ConstraintMatrix &                                   constraints,
+          const hp::QCollection<dim> &                               quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec,
-          const bool                      enforce_zero_boundary = false,
-          const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
-            dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
+          const bool                                                 enforce_zero_boundary = false,
+          const hp::QCollection<dim - 1> &                           q_boundary =
+            hp::QCollection<dim - 1>(dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
           const bool project_to_boundary_first = false);
 
   /**
@@ -897,14 +873,14 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const hp::DoFHandler<dim, spacedim> &dof,
-          const ConstraintMatrix &             constraints,
-          const hp::QCollection<dim> &         quadrature,
+  project(const hp::DoFHandler<dim, spacedim> &                      dof,
+          const ConstraintMatrix &                                   constraints,
+          const hp::QCollection<dim> &                               quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec,
-          const bool                      enforce_zero_boundary = false,
-          const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
-            dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
+          const bool                                                 enforce_zero_boundary = false,
+          const hp::QCollection<dim - 1> &                           q_boundary =
+            hp::QCollection<dim - 1>(dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
           const bool project_to_boundary_first = false);
 
   /**
@@ -965,15 +941,14 @@ namespace VectorTools
    */
   template <int dim, typename VectorType>
   void
-  project(std::shared_ptr<
-            const MatrixFree<dim, typename VectorType::value_type>> data,
-          const ConstraintMatrix &                                  constraints,
-          const unsigned int      n_q_points_1d,
-          const std::function<VectorizedArray<typename VectorType::value_type>(
-            const unsigned int,
-            const unsigned int)> &func,
-          VectorType &            vec_result,
-          const unsigned int      fe_component = 0);
+  project(
+    std::shared_ptr<const MatrixFree<dim, typename VectorType::value_type>> data,
+    const ConstraintMatrix &                                                constraints,
+    const unsigned int                                                      n_q_points_1d,
+    const std::function<VectorizedArray<typename VectorType::value_type>(const unsigned int,
+                                                                         const unsigned int)> &func,
+    VectorType &       vec_result,
+    const unsigned int fe_component = 0);
 
   /**
    * Same as above but for <code>n_q_points_1d =
@@ -981,14 +956,13 @@ namespace VectorTools
    */
   template <int dim, typename VectorType>
   void
-  project(std::shared_ptr<
-            const MatrixFree<dim, typename VectorType::value_type>> data,
-          const ConstraintMatrix &                                  constraints,
-          const std::function<VectorizedArray<typename VectorType::value_type>(
-            const unsigned int,
-            const unsigned int)> &                                  func,
-          VectorType &                                              vec_result,
-          const unsigned int fe_component = 0);
+  project(
+    std::shared_ptr<const MatrixFree<dim, typename VectorType::value_type>> data,
+    const ConstraintMatrix &                                                constraints,
+    const std::function<VectorizedArray<typename VectorType::value_type>(const unsigned int,
+                                                                         const unsigned int)> &func,
+    VectorType &       vec_result,
+    const unsigned int fe_component = 0);
 
   /**
    * Compute Dirichlet boundary conditions.  This function makes up a map of
@@ -1041,17 +1015,13 @@ namespace VectorTools
    *
    * See the general documentation of this namespace for more information.
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
   interpolate_boundary_values(
-    const Mapping<dim, spacedim> &       mapping,
-    const DoFHandlerType<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        function_map,
-    std::map<types::global_dof_index, number> &boundary_values,
+    const Mapping<dim, spacedim> &                                          mapping,
+    const DoFHandlerType<dim, spacedim> &                                   dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &function_map,
+    std::map<types::global_dof_index, number> &                             boundary_values,
     const ComponentMask &component_mask = ComponentMask());
 
   /**
@@ -1061,11 +1031,10 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   interpolate_boundary_values(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        function_map,
-    std::map<types::global_dof_index, number> &boundary_values,
+    const hp::MappingCollection<dim, spacedim> &                            mapping,
+    const hp::DoFHandler<dim, spacedim> &                                   dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &function_map,
+    std::map<types::global_dof_index, number> &                             boundary_values,
     const ComponentMask &component_mask = ComponentMask());
 
   /**
@@ -1077,18 +1046,14 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
-  interpolate_boundary_values(
-    const Mapping<dim, spacedim> &             mapping,
-    const DoFHandlerType<dim, spacedim> &      dof,
-    const types::boundary_id                   boundary_component,
-    const Function<spacedim, number> &         boundary_function,
-    std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+  interpolate_boundary_values(const Mapping<dim, spacedim> &             mapping,
+                              const DoFHandlerType<dim, spacedim> &      dof,
+                              const types::boundary_id                   boundary_component,
+                              const Function<spacedim, number> &         boundary_function,
+                              std::map<types::global_dof_index, number> &boundary_values,
+                              const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Call the other interpolate_boundary_values() function, see above, with
@@ -1099,17 +1064,13 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
-  interpolate_boundary_values(
-    const DoFHandlerType<dim, spacedim> &      dof,
-    const types::boundary_id                   boundary_component,
-    const Function<spacedim, number> &         boundary_function,
-    std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+  interpolate_boundary_values(const DoFHandlerType<dim, spacedim> &      dof,
+                              const types::boundary_id                   boundary_component,
+                              const Function<spacedim, number> &         boundary_function,
+                              std::map<types::global_dof_index, number> &boundary_values,
+                              const ComponentMask &component_mask = ComponentMask());
 
 
   /**
@@ -1118,16 +1079,12 @@ namespace VectorTools
    * apply as for the previous function, in particular about the use of the
    * component mask and the requires size of the function object.
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
   interpolate_boundary_values(
-    const DoFHandlerType<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        function_map,
-    std::map<types::global_dof_index, number> &boundary_values,
+    const DoFHandlerType<dim, spacedim> &                                   dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &function_map,
+    std::map<types::global_dof_index, number> &                             boundary_values,
     const ComponentMask &component_mask = ComponentMask());
 
 
@@ -1192,17 +1149,13 @@ namespace VectorTools
    *
    * @ingroup constraints
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
   interpolate_boundary_values(
-    const Mapping<dim, spacedim> &       mapping,
-    const DoFHandlerType<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                  function_map,
-    ConstraintMatrix &   constraints,
+    const Mapping<dim, spacedim> &                                          mapping,
+    const DoFHandlerType<dim, spacedim> &                                   dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &function_map,
+    ConstraintMatrix &                                                      constraints,
     const ComponentMask &component_mask = ComponentMask());
 
   /**
@@ -1216,18 +1169,14 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
-  interpolate_boundary_values(
-    const Mapping<dim, spacedim> &       mapping,
-    const DoFHandlerType<dim, spacedim> &dof,
-    const types::boundary_id             boundary_component,
-    const Function<spacedim, number> &   boundary_function,
-    ConstraintMatrix &                   constraints,
-    const ComponentMask &                component_mask = ComponentMask());
+  interpolate_boundary_values(const Mapping<dim, spacedim> &       mapping,
+                              const DoFHandlerType<dim, spacedim> &dof,
+                              const types::boundary_id             boundary_component,
+                              const Function<spacedim, number> &   boundary_function,
+                              ConstraintMatrix &                   constraints,
+                              const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Call the other interpolate_boundary_values() function, see above, with
@@ -1240,17 +1189,13 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
-  interpolate_boundary_values(
-    const DoFHandlerType<dim, spacedim> &dof,
-    const types::boundary_id             boundary_component,
-    const Function<spacedim, number> &   boundary_function,
-    ConstraintMatrix &                   constraints,
-    const ComponentMask &                component_mask = ComponentMask());
+  interpolate_boundary_values(const DoFHandlerType<dim, spacedim> &dof,
+                              const types::boundary_id             boundary_component,
+                              const Function<spacedim, number> &   boundary_function,
+                              ConstraintMatrix &                   constraints,
+                              const ComponentMask &component_mask = ComponentMask());
 
 
   /**
@@ -1261,16 +1206,12 @@ namespace VectorTools
    *
    * @ingroup constraints
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename number>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename number>
   void
   interpolate_boundary_values(
-    const DoFHandlerType<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                  function_map,
-    ConstraintMatrix &   constraints,
+    const DoFHandlerType<dim, spacedim> &                                   dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &function_map,
+    ConstraintMatrix &                                                      constraints,
     const ComponentMask &component_mask = ComponentMask());
 
 
@@ -1341,12 +1282,11 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const Mapping<dim, spacedim> &   mapping,
-    const DoFHandler<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        boundary_functions,
-    const Quadrature<dim - 1> &                q,
-    std::map<types::global_dof_index, number> &boundary_values,
+    const Mapping<dim, spacedim> &                                          mapping,
+    const DoFHandler<dim, spacedim> &                                       dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_functions,
+    const Quadrature<dim - 1> &                                             q,
+    std::map<types::global_dof_index, number> &                             boundary_values,
     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -1356,11 +1296,10 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const DoFHandler<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        boundary_function,
-    const Quadrature<dim - 1> &                q,
-    std::map<types::global_dof_index, number> &boundary_values,
+    const DoFHandler<dim, spacedim> &                                       dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_function,
+    const Quadrature<dim - 1> &                                             q,
+    std::map<types::global_dof_index, number> &                             boundary_values,
     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -1369,12 +1308,11 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        boundary_functions,
-    const hp::QCollection<dim - 1> &           q,
-    std::map<types::global_dof_index, number> &boundary_values,
+    const hp::MappingCollection<dim, spacedim> &                            mapping,
+    const hp::DoFHandler<dim, spacedim> &                                   dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_functions,
+    const hp::QCollection<dim - 1> &                                        q,
+    std::map<types::global_dof_index, number> &                             boundary_values,
     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -1384,11 +1322,10 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const hp::DoFHandler<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        boundary_function,
-    const hp::QCollection<dim - 1> &           q,
-    std::map<types::global_dof_index, number> &boundary_values,
+    const hp::DoFHandler<dim, spacedim> &                                   dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_function,
+    const hp::QCollection<dim - 1> &                                        q,
+    std::map<types::global_dof_index, number> &                             boundary_values,
     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -1432,13 +1369,12 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const Mapping<dim, spacedim> &   mapping,
-    const DoFHandler<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                        boundary_functions,
-    const Quadrature<dim - 1> &q,
-    ConstraintMatrix &         constraints,
-    std::vector<unsigned int>  component_mapping = std::vector<unsigned int>());
+    const Mapping<dim, spacedim> &                                          mapping,
+    const DoFHandler<dim, spacedim> &                                       dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_functions,
+    const Quadrature<dim - 1> &                                             q,
+    ConstraintMatrix &                                                      constraints,
+    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Call the project_boundary_values() function, see above, with
@@ -1449,12 +1385,11 @@ namespace VectorTools
   template <int dim, int spacedim, typename number>
   void
   project_boundary_values(
-    const DoFHandler<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                        boundary_function,
-    const Quadrature<dim - 1> &q,
-    ConstraintMatrix &         constraints,
-    std::vector<unsigned int>  component_mapping = std::vector<unsigned int>());
+    const DoFHandler<dim, spacedim> &                                       dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *> &boundary_function,
+    const Quadrature<dim - 1> &                                             q,
+    ConstraintMatrix &                                                      constraints,
+    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 
   /**
@@ -1730,14 +1665,13 @@ namespace VectorTools
    */
   template <int dim>
   void
-  project_boundary_values_div_conforming(
-    const hp::DoFHandler<dim> &            dof_handler,
-    const unsigned int                     first_vector_component,
-    const Function<dim, double> &          boundary_function,
-    const types::boundary_id               boundary_component,
-    ConstraintMatrix &                     constraints,
-    const hp::MappingCollection<dim, dim> &mapping_collection =
-      hp::StaticMappingQ1<dim>::mapping_collection);
+  project_boundary_values_div_conforming(const hp::DoFHandler<dim> &  dof_handler,
+                                         const unsigned int           first_vector_component,
+                                         const Function<dim, double> &boundary_function,
+                                         const types::boundary_id     boundary_component,
+                                         ConstraintMatrix &           constraints,
+                                         const hp::MappingCollection<dim, dim> &mapping_collection =
+                                           hp::StaticMappingQ1<dim>::mapping_collection);
 
 
   /**
@@ -1974,7 +1908,7 @@ namespace VectorTools
     const std::set<types::boundary_id> &  boundary_ids,
     typename FunctionMap<spacedim>::type &function_map,
     ConstraintMatrix &                    constraints,
-    const Mapping<dim, spacedim> &mapping = StaticMappingQ1<dim>::mapping);
+    const Mapping<dim, spacedim> &        mapping = StaticMappingQ1<dim>::mapping);
 
   /**
    * This function does the same as the
@@ -1995,7 +1929,7 @@ namespace VectorTools
     const unsigned int                   first_vector_component,
     const std::set<types::boundary_id> & boundary_ids,
     ConstraintMatrix &                   constraints,
-    const Mapping<dim, spacedim> &mapping = StaticMappingQ1<dim>::mapping);
+    const Mapping<dim, spacedim> &       mapping = StaticMappingQ1<dim>::mapping);
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
@@ -2021,7 +1955,7 @@ namespace VectorTools
     const std::set<types::boundary_id> &  boundary_ids,
     typename FunctionMap<spacedim>::type &function_map,
     ConstraintMatrix &                    constraints,
-    const Mapping<dim, spacedim> &mapping = StaticMappingQ1<dim>::mapping);
+    const Mapping<dim, spacedim> &        mapping = StaticMappingQ1<dim>::mapping);
 
   /**
    * Same as above for homogeneous tangential-flux constraints.
@@ -2038,7 +1972,7 @@ namespace VectorTools
     const unsigned int                   first_vector_component,
     const std::set<types::boundary_id> & boundary_ids,
     ConstraintMatrix &                   constraints,
-    const Mapping<dim, spacedim> &mapping = StaticMappingQ1<dim>::mapping);
+    const Mapping<dim, spacedim> &       mapping = StaticMappingQ1<dim>::mapping);
 
 
   //@}
@@ -2055,13 +1989,12 @@ namespace VectorTools
    */
   template <int dim, int spacedim, typename VectorType>
   void
-  create_right_hand_side(
-    const Mapping<dim, spacedim> &                             mapping,
-    const DoFHandler<dim, spacedim> &                          dof,
-    const Quadrature<dim> &                                    q,
-    const Function<spacedim, typename VectorType::value_type> &rhs,
-    VectorType &                                               rhs_vector,
-    const ConstraintMatrix &constraints = ConstraintMatrix());
+  create_right_hand_side(const Mapping<dim, spacedim> &                             mapping,
+                         const DoFHandler<dim, spacedim> &                          dof,
+                         const Quadrature<dim> &                                    q,
+                         const Function<spacedim, typename VectorType::value_type> &rhs,
+                         VectorType &                                               rhs_vector,
+                         const ConstraintMatrix &constraints = ConstraintMatrix());
 
   /**
    * Call the create_right_hand_side() function, see above, with
@@ -2069,37 +2002,34 @@ namespace VectorTools
    */
   template <int dim, int spacedim, typename VectorType>
   void
-  create_right_hand_side(
-    const DoFHandler<dim, spacedim> &                          dof,
-    const Quadrature<dim> &                                    q,
-    const Function<spacedim, typename VectorType::value_type> &rhs,
-    VectorType &                                               rhs_vector,
-    const ConstraintMatrix &constraints = ConstraintMatrix());
+  create_right_hand_side(const DoFHandler<dim, spacedim> &                          dof,
+                         const Quadrature<dim> &                                    q,
+                         const Function<spacedim, typename VectorType::value_type> &rhs,
+                         VectorType &                                               rhs_vector,
+                         const ConstraintMatrix &constraints = ConstraintMatrix());
 
   /**
    * Like the previous set of functions, but for hp objects.
    */
   template <int dim, int spacedim, typename VectorType>
   void
-  create_right_hand_side(
-    const hp::MappingCollection<dim, spacedim> &               mapping,
-    const hp::DoFHandler<dim, spacedim> &                      dof,
-    const hp::QCollection<dim> &                               q,
-    const Function<spacedim, typename VectorType::value_type> &rhs,
-    VectorType &                                               rhs_vector,
-    const ConstraintMatrix &constraints = ConstraintMatrix());
+  create_right_hand_side(const hp::MappingCollection<dim, spacedim> &               mapping,
+                         const hp::DoFHandler<dim, spacedim> &                      dof,
+                         const hp::QCollection<dim> &                               q,
+                         const Function<spacedim, typename VectorType::value_type> &rhs,
+                         VectorType &                                               rhs_vector,
+                         const ConstraintMatrix &constraints = ConstraintMatrix());
 
   /**
    * Like the previous set of functions, but for hp objects.
    */
   template <int dim, int spacedim, typename VectorType>
   void
-  create_right_hand_side(
-    const hp::DoFHandler<dim, spacedim> &                      dof,
-    const hp::QCollection<dim> &                               q,
-    const Function<spacedim, typename VectorType::value_type> &rhs,
-    VectorType &                                               rhs_vector,
-    const ConstraintMatrix &constraints = ConstraintMatrix());
+  create_right_hand_side(const hp::DoFHandler<dim, spacedim> &                      dof,
+                         const hp::QCollection<dim> &                               q,
+                         const Function<spacedim, typename VectorType::value_type> &rhs,
+                         VectorType &                                               rhs_vector,
+                         const ConstraintMatrix &constraints = ConstraintMatrix());
 
   /**
    * Create a right hand side vector for a point source at point @p p. In
@@ -2174,11 +2104,10 @@ namespace VectorTools
    */
   template <int dim, int spacedim>
   void
-  create_point_source_vector(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof_handler,
-    const Point<spacedim> &                     p,
-    Vector<double> &                            rhs_vector);
+  create_point_source_vector(const hp::MappingCollection<dim, spacedim> &mapping,
+                             const hp::DoFHandler<dim, spacedim> &       dof_handler,
+                             const Point<spacedim> &                     p,
+                             Vector<double> &                            rhs_vector);
 
   /**
    * Like the previous set of functions, but for hp objects. The function uses
@@ -2234,12 +2163,11 @@ namespace VectorTools
    */
   template <int dim, int spacedim>
   void
-  create_point_source_vector(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof_handler,
-    const Point<spacedim> &                     p,
-    const Point<dim> &                          direction,
-    Vector<double> &                            rhs_vector);
+  create_point_source_vector(const hp::MappingCollection<dim, spacedim> &mapping,
+                             const hp::DoFHandler<dim, spacedim> &       dof_handler,
+                             const Point<spacedim> &                     p,
+                             const Point<dim> &                          direction,
+                             Vector<double> &                            rhs_vector);
 
   /**
    * Like the previous set of functions, but for hp objects. The function uses
@@ -2271,8 +2199,7 @@ namespace VectorTools
     const Quadrature<dim - 1> &                                q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,
-    const std::set<types::boundary_id> &                       boundary_ids =
-      std::set<types::boundary_id>());
+    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * Call the create_boundary_right_hand_side() function, see above, with
@@ -2288,8 +2215,7 @@ namespace VectorTools
     const Quadrature<dim - 1> &                                q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,
-    const std::set<types::boundary_id> &                       boundary_ids =
-      std::set<types::boundary_id>());
+    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * Same as the set of functions above, but for hp objects.
@@ -2305,8 +2231,7 @@ namespace VectorTools
     const hp::QCollection<dim - 1> &                           q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,
-    const std::set<types::boundary_id> &                       boundary_ids =
-      std::set<types::boundary_id>());
+    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * Call the create_boundary_right_hand_side() function, see above, with a
@@ -2323,8 +2248,7 @@ namespace VectorTools
     const hp::QCollection<dim - 1> &                           q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
     VectorType &                                               rhs_vector,
-    const std::set<types::boundary_id> &                       boundary_ids =
-      std::set<types::boundary_id>());
+    const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   //@}
   /**
@@ -2454,12 +2378,12 @@ namespace VectorTools
   integrate_difference(const hp::MappingCollection<dim, spacedim> &mapping,
                        const hp::DoFHandler<dim, spacedim> &       dof,
                        const InVector &                            fe_function,
-                       const Function<spacedim, double> &exact_solution,
-                       OutVector &                       difference,
-                       const hp::QCollection<dim> &      q,
-                       const NormType &                  norm,
-                       const Function<spacedim, double> *weight   = nullptr,
-                       const double                      exponent = 2.);
+                       const Function<spacedim, double> &          exact_solution,
+                       OutVector &                                 difference,
+                       const hp::QCollection<dim> &                q,
+                       const NormType &                            norm,
+                       const Function<spacedim, double> *          weight   = nullptr,
+                       const double                                exponent = 2.);
 
   /**
    * Call the integrate_difference() function, see above, with
@@ -2522,12 +2446,11 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  point_difference(
-    const DoFHandler<dim, spacedim> &                          dof,
-    const VectorType &                                         fe_function,
-    const Function<spacedim, typename VectorType::value_type> &exact_solution,
-    Vector<typename VectorType::value_type> &                  difference,
-    const Point<spacedim> &                                    point);
+  point_difference(const DoFHandler<dim, spacedim> &                          dof,
+                   const VectorType &                                         fe_function,
+                   const Function<spacedim, typename VectorType::value_type> &exact_solution,
+                   Vector<typename VectorType::value_type> &                  difference,
+                   const Point<spacedim> &                                    point);
 
   /**
    * Point error evaluation. Find the first cell containing the given point
@@ -2543,13 +2466,12 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  point_difference(
-    const Mapping<dim, spacedim> &                             mapping,
-    const DoFHandler<dim, spacedim> &                          dof,
-    const VectorType &                                         fe_function,
-    const Function<spacedim, typename VectorType::value_type> &exact_solution,
-    Vector<typename VectorType::value_type> &                  difference,
-    const Point<spacedim> &                                    point);
+  point_difference(const Mapping<dim, spacedim> &                             mapping,
+                   const DoFHandler<dim, spacedim> &                          dof,
+                   const VectorType &                                         fe_function,
+                   const Function<spacedim, typename VectorType::value_type> &exact_solution,
+                   Vector<typename VectorType::value_type> &                  difference,
+                   const Point<spacedim> &                                    point);
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -2790,11 +2712,10 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  point_gradient(
-    const DoFHandler<dim, spacedim> &dof,
-    const VectorType &               fe_function,
-    const Point<spacedim> &          point,
-    std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
+  point_gradient(const DoFHandler<dim, spacedim> &                                  dof,
+                 const VectorType &                                                 fe_function,
+                 const Point<spacedim> &                                            point,
+                 std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
 
   /**
    * Same as above for hp.
@@ -2814,11 +2735,10 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  point_gradient(
-    const hp::DoFHandler<dim, spacedim> &dof,
-    const VectorType &                   fe_function,
-    const Point<spacedim> &              point,
-    std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
+  point_gradient(const hp::DoFHandler<dim, spacedim> &                              dof,
+                 const VectorType &                                                 fe_function,
+                 const Point<spacedim> &                                            point,
+                 std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -2892,12 +2812,11 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  point_gradient(
-    const Mapping<dim, spacedim> &   mapping,
-    const DoFHandler<dim, spacedim> &dof,
-    const VectorType &               fe_function,
-    const Point<spacedim> &          point,
-    std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
+  point_gradient(const Mapping<dim, spacedim> &                                     mapping,
+                 const DoFHandler<dim, spacedim> &                                  dof,
+                 const VectorType &                                                 fe_function,
+                 const Point<spacedim> &                                            point,
+                 std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
 
   /**
    * Same as above for hp.
@@ -2917,12 +2836,11 @@ namespace VectorTools
    */
   template <int dim, typename VectorType, int spacedim>
   void
-  point_gradient(
-    const hp::MappingCollection<dim, spacedim> &mapping,
-    const hp::DoFHandler<dim, spacedim> &       dof,
-    const VectorType &                          fe_function,
-    const Point<spacedim> &                     point,
-    std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
+  point_gradient(const hp::MappingCollection<dim, spacedim> &                       mapping,
+                 const hp::DoFHandler<dim, spacedim> &                              dof,
+                 const VectorType &                                                 fe_function,
+                 const Point<spacedim> &                                            point,
+                 std::vector<Tensor<1, spacedim, typename VectorType::value_type>> &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -3032,8 +2950,7 @@ namespace VectorTools
    */
   template <typename VectorType>
   void
-  subtract_mean_value(VectorType &             v,
-                      const std::vector<bool> &p_select = std::vector<bool>());
+  subtract_mean_value(VectorType &v, const std::vector<bool> &p_select = std::vector<bool>());
 
 
   /**
@@ -3108,14 +3025,11 @@ namespace VectorTools
    *
    * @author Luca Heltai, 2015
    */
-  template <int dim,
-            int spacedim,
-            template <int, int> class DoFHandlerType,
-            typename VectorType>
+  template <int dim, int spacedim, template <int, int> class DoFHandlerType, typename VectorType>
   void
   get_position_vector(const DoFHandlerType<dim, spacedim> &dh,
                       VectorType &                         vector,
-                      const ComponentMask &mask = ComponentMask());
+                      const ComponentMask &                mask = ComponentMask());
 
   //@}
 

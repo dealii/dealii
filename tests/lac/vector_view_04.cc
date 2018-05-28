@@ -24,20 +24,16 @@ template <typename number>
 void
 checkReinit2(Vector<number> &V)
 {
-  deallog
-    << "Reinit a ReadWrite VectorView<number> with Vector<number> and const size"
-    << std::endl;
+  deallog << "Reinit a ReadWrite VectorView<number> with Vector<number> and const size"
+          << std::endl;
 
-  deallog
-    << "Creating dummy Vector<number> of size V.size() and filling with zeros"
-    << std::endl;
+  deallog << "Creating dummy Vector<number> of size V.size() and filling with zeros" << std::endl;
 
   Vector<number> _V(V.size());
   for (unsigned int i = 0; i < _V.size(); i++)
     _V(i) = 0;
 
-  deallog << "Creating VectorView<number> pointing to dummy Vector<number>"
-          << std::endl;
+  deallog << "Creating VectorView<number> pointing to dummy Vector<number>" << std::endl;
   VectorView<number> VV(_V.size(), _V.begin());
 
   deallog << "Printing dummy Vector<number>" << std::endl;
@@ -45,8 +41,7 @@ checkReinit2(Vector<number> &V)
     deallog << _V(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Printing VectorView<number> pointing to dummy Vector<number>"
-          << std::endl;
+  deallog << "Printing VectorView<number> pointing to dummy Vector<number>" << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     deallog << VV(i) << '\t';
   deallog << std::endl;
@@ -59,15 +54,13 @@ checkReinit2(Vector<number> &V)
     deallog << V(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Printing VectorView<number> pointing to half of Vector<number>"
-          << std::endl;
+  deallog << "Printing VectorView<number> pointing to half of Vector<number>" << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     deallog << VV(i) << '\t';
   deallog << std::endl;
 
-  deallog
-    << "Incrementing Vector<number> elements using Read-write handle of VectorView<number>"
-    << std::endl;
+  deallog << "Incrementing Vector<number> elements using Read-write handle of VectorView<number>"
+          << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     VV(i) = VV(i) + 1;
 

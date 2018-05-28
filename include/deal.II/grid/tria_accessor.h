@@ -199,8 +199,7 @@ namespace TriaAccessorExceptions
                  int,
                  << "You can only set the child index if the cell does not "
                  << "currently have children registered; or you can clear it. "
-                 << "The given index was " << arg1
-                 << " (-1 means: clear children).");
+                 << "The given index was " << arg1 << " (-1 means: clear children).");
   /**
    * @ingroup Exceptions
    */
@@ -212,9 +211,7 @@ namespace TriaAccessorExceptions
                  << "index=" << arg1.index() << ", state="
                  << (arg1.state() == IteratorState::valid ?
                        "valid" :
-                       (arg1.state() == IteratorState::past_the_end ?
-                          "past_the_end" :
-                          "invalid")));
+                       (arg1.state() == IteratorState::past_the_end ? "past_the_end" : "invalid")));
   /**
    * @ingroup Exceptions
    */
@@ -251,11 +248,10 @@ namespace TriaAccessorExceptions
   /**
    * @ingroup Exceptions
    */
-  DeclException1(
-    ExcSetOnlyEvenChildren,
-    int,
-    << "You can only set the child index of an even numbered child."
-    << "The number of the child given was " << arg1 << ".");
+  DeclException1(ExcSetOnlyEvenChildren,
+                 int,
+                 << "You can only set the child index of an even numbered child."
+                 << "The number of the child given was " << arg1 << ".");
 } // namespace TriaAccessorExceptions
 
 
@@ -502,8 +498,8 @@ protected:
    * The level if this is a cell (<tt>structdim==dim</tt>). Else, contains
    * zero.
    */
-  typename dealii::internal::TriaAccessorImplementation::
-    PresentLevelType<structdim, dim>::type present_level;
+  typename dealii::internal::TriaAccessorImplementation::PresentLevelType<structdim, dim>::type
+    present_level;
 
   /**
    * Used to store the index of the element presently pointed to on the level
@@ -555,8 +551,7 @@ public:
   /**
    * Propagate typedef from base class to this class.
    */
-  typedef typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData
-    AccessorData;
+  typedef typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData AccessorData;
 
   /**
    * Constructor.  This class is used for iterators that do not make
@@ -638,17 +633,15 @@ public:
    * Dummy function to extract lines. Returns a default-constructed line
    * iterator.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::line_iterator
-    line(const unsigned int i) const;
+  typename dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>::line_iterator
+  line(const unsigned int i) const;
 
   /**
    * Dummy function to extract quads. Returns a default-constructed quad
    * iterator.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::quad_iterator
-    quad(const unsigned int i) const;
+  typename dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>::quad_iterator
+  quad(const unsigned int i) const;
 };
 
 
@@ -678,8 +671,7 @@ public:
   /**
    * Propagate typedef from base class to this class.
    */
-  typedef typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData
-    AccessorData;
+  typedef typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData AccessorData;
 
   /**
    * Constructor.
@@ -807,9 +799,8 @@ public:
   /**
    * Pointer to the @p ith line bounding this object.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::line_iterator
-    line(const unsigned int i) const;
+  typename dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>::line_iterator
+  line(const unsigned int i) const;
 
   /**
    * Line index of the @p ith line bounding this object.
@@ -823,9 +814,8 @@ public:
   /**
    * Pointer to the @p ith quad bounding this object.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::quad_iterator
-    quad(const unsigned int i) const;
+  typename dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>::quad_iterator
+  quad(const unsigned int i) const;
 
   /**
    * Quad index of the @p ith quad bounding this object.
@@ -1572,8 +1562,7 @@ public:
    * current function, whether two objects are translations of each other.
    */
   bool
-  is_translation_of(
-    const TriaIterator<TriaAccessor<structdim, dim, spacedim>> &o) const;
+  is_translation_of(const TriaIterator<TriaAccessor<structdim, dim, spacedim>> &o) const;
 
   /**
    * @}
@@ -1593,8 +1582,7 @@ private:
    * triangulation.
    */
   void
-  set(const dealii::internal::TriangulationImplementation::TriaObject<structdim>
-        &o) const;
+  set(const dealii::internal::TriangulationImplementation::TriaObject<structdim> &o) const;
 
   /**
    * Set the flag indicating, what <code>line_orientation()</code> will
@@ -1749,8 +1737,7 @@ public:
    * Constructor. The second argument is the global index of the vertex we
    * point to.
    */
-  TriaAccessor(const Triangulation<dim, spacedim> *tria,
-               const unsigned int                  vertex_index);
+  TriaAccessor(const Triangulation<dim, spacedim> *tria, const unsigned int vertex_index);
 
   /**
    * Constructor. This constructor exists in order to maintain interface
@@ -1865,8 +1852,8 @@ public:
    * Pointer to the @p ith line bounding this object. Will point to an invalid
    * object.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::line_iterator static line(const unsigned int);
+  typename dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>::
+    line_iterator static line(const unsigned int);
 
   /**
    * Line index of the @p ith line bounding this object. Throws an exception.
@@ -1877,8 +1864,8 @@ public:
   /**
    * Pointer to the @p ith quad bounding this object.
    */
-  static typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::quad_iterator
+  static
+    typename dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>::quad_iterator
     quad(const unsigned int i);
 
   /**
@@ -2291,8 +2278,8 @@ public:
    * Pointer to the @p ith line bounding this object. Will point to an invalid
    * object.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<1, spacedim>::line_iterator static line(const unsigned int);
+  typename dealii::internal::TriangulationImplementation::Iterators<1, spacedim>::
+    line_iterator static line(const unsigned int);
 
   /**
    * Line index of the @p ith line bounding this object.
@@ -2306,8 +2293,8 @@ public:
   /**
    * Pointer to the @p ith quad bounding this object.
    */
-  static typename dealii::internal::TriangulationImplementation::
-    Iterators<1, spacedim>::quad_iterator
+  static
+    typename dealii::internal::TriangulationImplementation::Iterators<1, spacedim>::quad_iterator
     quad(const unsigned int i);
 
   /**
@@ -2730,8 +2717,7 @@ public:
    * ordering of the given face.
    */
   TriaIterator<CellAccessor<dim, spacedim>>
-  neighbor_child_on_subface(const unsigned int face_no,
-                            const unsigned int subface_no) const;
+  neighbor_child_on_subface(const unsigned int face_no, const unsigned int subface_no) const;
 
   /**
    * Return a pointer to the @p ith neighbor.  If the neighbor does not exist,
@@ -3041,8 +3027,8 @@ public:
    * space it lives in.
    */
   void
-  set_refine_flag(const RefinementCase<dim> ref_case =
-                    RefinementCase<dim>::isotropic_refinement) const;
+  set_refine_flag(
+    const RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * Clear the refinement flag.
@@ -3058,10 +3044,9 @@ public:
    * active cells.
    */
   bool
-  flag_for_face_refinement(
-    const unsigned int             face_no,
-    const RefinementCase<dim - 1> &face_refinement_case =
-      RefinementCase<dim - 1>::isotropic_refinement) const;
+  flag_for_face_refinement(const unsigned int             face_no,
+                           const RefinementCase<dim - 1> &face_refinement_case =
+                             RefinementCase<dim - 1>::isotropic_refinement) const;
 
   /**
    * Modify the refinement flag of the cell to ensure that line
@@ -3207,8 +3192,7 @@ public:
    * multigrid.
    */
   void
-  set_level_subdomain_id(
-    const types::subdomain_id new_level_subdomain_id) const;
+  set_level_subdomain_id(const types::subdomain_id new_level_subdomain_id) const;
 
 
   /**
@@ -3227,8 +3211,7 @@ public:
    * is implicitly defined by which processor you're on.
    */
   void
-  recursively_set_subdomain_id(
-    const types::subdomain_id new_subdomain_id) const;
+  recursively_set_subdomain_id(const types::subdomain_id new_subdomain_id) const;
   /**
    * @}
    */
@@ -3529,8 +3512,7 @@ private:
 
 template <int structdim, int dim, int spacedim>
 template <typename OtherAccessor>
-InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
-  const OtherAccessor &)
+InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(const OtherAccessor &)
 {
   Assert(false,
          ExcMessage("You are attempting an illegal conversion between "
@@ -3559,8 +3541,7 @@ TriaAccessor<structdim, dim, spacedim>::TriaAccessor(
 
 template <int dim, int spacedim>
 template <int structdim2, int dim2, int spacedim2>
-CellAccessor<dim, spacedim>::CellAccessor(
-  const InvalidAccessor<structdim2, dim2, spacedim2> &)
+CellAccessor<dim, spacedim>::CellAccessor(const InvalidAccessor<structdim2, dim2, spacedim2> &)
 {
   Assert(false,
          ExcMessage("You are attempting an illegal conversion between "
@@ -3589,8 +3570,7 @@ TriaAccessor<structdim, dim, spacedim>::TriaAccessor(
 
 template <int dim, int spacedim>
 template <int structdim2, int dim2, int spacedim2>
-CellAccessor<dim, spacedim>::CellAccessor(
-  const TriaAccessor<structdim2, dim2, spacedim2> &)
+CellAccessor<dim, spacedim>::CellAccessor(const TriaAccessor<structdim2, dim2, spacedim2> &)
 {
   Assert(false,
          ExcMessage("You are attempting an illegal conversion between "

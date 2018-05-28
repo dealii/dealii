@@ -997,11 +997,7 @@ axpy(const types::blas_int *,
 
 
 /// Template wrapper for LAPACK functions dgemv and sgemv
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4,
-          typename number5>
+template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
 gemv(const char *,
      const types::blas_int *,
@@ -1164,11 +1160,7 @@ trmv(const char * /*uplo*/,
 
 
 /// Template wrapper for LAPACK functions dgemm and sgemm
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4,
-          typename number5>
+template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
 gemm(const char *,
      const char *,
@@ -1269,11 +1261,7 @@ gemm(const char *,
 /// Template wrapper for potrf
 template <typename number1>
 inline void
-potrf(const char *,
-      const types::blas_int *,
-      number1 *,
-      const types::blas_int *,
-      types::blas_int *)
+potrf(const char *, const types::blas_int *, number1 *, const types::blas_int *, types::blas_int *)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1474,11 +1462,7 @@ pocon(const char *           uplo,
 /// Template wrapper for potri
 template <typename number1>
 inline void
-potri(const char *,
-      const types::blas_int *,
-      number1 *,
-      const types::blas_int *,
-      types::blas_int *)
+potri(const char *, const types::blas_int *, number1 *, const types::blas_int *, types::blas_int *)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -1999,10 +1983,7 @@ geqrf(const types::blas_int *,
 
 
 /// Template wrapper for LAPACK functions dormqr and sormqr
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4>
+template <typename number1, typename number2, typename number3, typename number4>
 inline void
 ormqr(const char *,
       const char *,
@@ -2303,20 +2284,7 @@ geev(const char *           jobvl,
      const types::blas_int *lwork,
      types::blas_int *      info)
 {
-  dgeev_(jobvl,
-         jobvr,
-         n,
-         A,
-         lda,
-         lambda_re,
-         lambda_im,
-         vl,
-         ldvl,
-         vr,
-         ldva,
-         work,
-         lwork,
-         info);
+  dgeev_(jobvl, jobvr, n, A, lda, lambda_re, lambda_im, vl, ldvl, vr, ldva, work, lwork, info);
 }
 #else
 inline void
@@ -2357,20 +2325,7 @@ geev(const char *           jobvl,
      const types::blas_int *lwork,
      types::blas_int *      info)
 {
-  sgeev_(jobvl,
-         jobvr,
-         n,
-         A,
-         lda,
-         lambda_re,
-         lambda_im,
-         vl,
-         ldvl,
-         vr,
-         ldva,
-         work,
-         lwork,
-         info);
+  sgeev_(jobvl, jobvr, n, A, lda, lambda_re, lambda_im, vl, ldvl, vr, ldva, work, lwork, info);
 }
 #else
 inline void
@@ -3005,10 +2960,7 @@ syevr(const char *           jobz,
 
 
 /// Template wrapper for LAPACK functions dsygv and ssygv
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4>
+template <typename number1, typename number2, typename number3, typename number4>
 inline void
 sygv(const types::blas_int *,
      const char *,
@@ -3300,11 +3252,7 @@ sygvx(const types::blas_int *,
 
 
 /// Template wrapper for LAPACK functions dgesdd and sgesdd
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4,
-          typename number5>
+template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
 gesdd(const char *,
       const types::blas_int *,
@@ -3407,11 +3355,7 @@ gesdd(const char *,
 
 
 /// Template wrapper for LAPACK functions dgesvd and sgesvd
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4,
-          typename number5>
+template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
 gesvd(types::blas_int *,
       types::blas_int *,
@@ -3514,11 +3458,7 @@ gesvd(types::blas_int *,
 
 
 /// Template wrapper for LAPACK functions dgelsd and sgelsd
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4,
-          typename number5>
+template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
 gelsd(const types::blas_int *,
       const types::blas_int *,
@@ -3621,10 +3561,7 @@ gelsd(const types::blas_int *,
 
 
 /// Template wrapper for LAPACK functions dstev and sstev
-template <typename number1,
-          typename number2,
-          typename number3,
-          typename number4>
+template <typename number1, typename number2, typename number3, typename number4>
 inline void
 stev(const char *,
      const types::blas_int *,

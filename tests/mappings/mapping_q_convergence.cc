@@ -58,12 +58,10 @@ regression_slope(const std::vector<double> &x, const std::vector<double> &y)
   FullMatrix<double> K(2, 2), invK(2, 2);
   Vector<double>     X(2), B(2);
 
-  Assert(x.size() == y.size(),
-         ExcMessage("x and y are expected to have the same size"));
+  Assert(x.size() == y.size(), ExcMessage("x and y are expected to have the same size"));
 
   Assert(x.size() >= 2,
-         dealii::ExcMessage(
-           "at least two points are required for linear regression fit"));
+         dealii::ExcMessage("at least two points are required for linear regression fit"));
 
   double sum_1 = 0.0, sum_x = 0.0, sum_x2 = 0.0, sum_y = 0.0, sum_xy = 0.0;
 
@@ -178,14 +176,12 @@ void
 create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
 {
   GridGenerator::hyper_cube(triangulation, -1.0, 1.0);
-  GridTools::transform(std::bind(&Geometry<dim>::push_forward,
-                                 std::cref(geometry),
-                                 std::placeholders::_1),
-                       triangulation);
+  GridTools::transform(
+    std::bind(&Geometry<dim>::push_forward, std::cref(geometry), std::placeholders::_1),
+    triangulation);
 
   triangulation.set_manifold(0, geometry);
-  for (Triangulation<3>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     cell->set_all_manifold_ids(0);
@@ -229,35 +225,30 @@ test(const FiniteElement<dim> &fe)
                                v);
 
           Vector<double> diff(triangulation.n_active_cells());
-          VectorTools::integrate_difference(
-            mapping,
-            dof_handler,
-            v,
-            fe_function,
-            diff,
-            // superconvergence with QGauss(k + 1)
-            // QGauss<dim>(fe.degree + 2),
-            // normal convergence with QIterated
-            QIterated<dim>(QGauss<1>(fe.degree + 1), 2),
-            VectorTools::L2_norm);
-          log_refinements.push_back(
-            std::log10(std::pow(2.0, -double(refinement_n))));
+          VectorTools::integrate_difference(mapping,
+                                            dof_handler,
+                                            v,
+                                            fe_function,
+                                            diff,
+                                            // superconvergence with QGauss(k + 1)
+                                            // QGauss<dim>(fe.degree + 2),
+                                            // normal convergence with QIterated
+                                            QIterated<dim>(QGauss<1>(fe.degree + 1), 2),
+                                            VectorTools::L2_norm);
+          log_refinements.push_back(std::log10(std::pow(2.0, -double(refinement_n))));
           log_l2_errors.push_back(std::log10(diff.l2_norm()));
           if (log_refinements.size() > 1)
             {
               deallog << "current slope: "
-                      << (*(log_l2_errors.end() - 1) -
-                          *(log_l2_errors.end() - 2)) /
-                           (*(log_refinements.end() - 1) -
-                            *(log_refinements.end() - 2))
+                      << (*(log_l2_errors.end() - 1) - *(log_l2_errors.end() - 2)) /
+                           (*(log_refinements.end() - 1) - *(log_refinements.end() - 2))
                       << std::endl;
             }
         }
       deallog << "Last number of DoFs: " << dof_handler.n_dofs() << std::endl;
-      deallog << "Last L2 error: " << std::pow(10.0, log_l2_errors.back())
+      deallog << "Last L2 error: " << std::pow(10.0, log_l2_errors.back()) << std::endl;
+      deallog << "regression slope: " << regression_slope(log_refinements, log_l2_errors)
               << std::endl;
-      deallog << "regression slope: "
-              << regression_slope(log_refinements, log_l2_errors) << std::endl;
     }
 }
 

@@ -50,8 +50,7 @@ void concentric_disks(Triangulation<2> &         tria,
   double r = x[0], d = 0.5 * x[0],
          q = 1.0 / sqrt(2.0); // q: corner points factor
 
-  const unsigned int nlay = x.size() - 1, vlayer = 8, lcells = 8,
-                     n_vert = (2 + nlay) * vlayer + 1,
+  const unsigned int nlay = x.size() - 1, vlayer = 8, lcells = 8, n_vert = (2 + nlay) * vlayer + 1,
                      n_cell = 3 + (1 + nlay) * lcells + 1; // 19
 
   int fc = 4; // fv = 1,  f: fixed, displacement of index on the vertices and
@@ -227,29 +226,24 @@ void concentric_disks(Triangulation<2> &         tria,
       cell_idx++;
     }
 
-  tria.create_triangulation(
-    vertices, cells, SubCellData()); // no boundary information
+  tria.create_triangulation(vertices, cells, SubCellData()); // no boundary information
 
   double       eps   = 1e-5 * x[0];
   unsigned int label = 100;
 
-  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active();
-       cell != tria.end();
+  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active(); cell != tria.end();
        ++cell)
     {
-      cell->set_all_manifold_ids(
-        1); // not faces ... for Transfinite interpolation
+      cell->set_all_manifold_ids(1); // not faces ... for Transfinite interpolation
       for (unsigned int k = 0; k < gp.n_balls; ++k)
         {
           for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
             {
-              const Point<2> p0 = cell->face(f)->vertex(0),
-                             p1 = cell->face(f)->vertex(1);
-              const double d0   = p0.distance(gp.ball_centers[k]),
+              const Point<2> p0 = cell->face(f)->vertex(0), p1 = cell->face(f)->vertex(1);
+              const double   d0 = p0.distance(gp.ball_centers[k]),
                            d1   = p1.distance(gp.ball_centers[k]);
 
-              if ((std::abs(d0 - gp.radius[k]) < eps) &&
-                  (std::abs(d1 - gp.radius[k]) < eps))
+              if ((std::abs(d0 - gp.radius[k]) < eps) && (std::abs(d1 - gp.radius[k]) < eps))
                 {
                   cell->face(f)->set_all_manifold_ids(label + k);
                 }
@@ -261,9 +255,7 @@ void concentric_disks(Triangulation<2> &         tria,
   // --------------------------------------------------------------------------------
 }
 
-void concentric_disks(Triangulation<2> &  tria,
-                      std::vector<double> x,
-                      Geom_parameters &   gp)
+void concentric_disks(Triangulation<2> &tria, std::vector<double> x, Geom_parameters &gp)
 {
   concentric_disks(tria, 0.0, x, gp);
 }

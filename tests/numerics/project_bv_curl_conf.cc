@@ -45,8 +45,7 @@ BoundaryFunction<dim>::BoundaryFunction() : Function<dim>(dim)
 
 template <int dim>
 void
-BoundaryFunction<dim>::vector_value(const Point<dim> &,
-                                    Vector<double> &values) const
+BoundaryFunction<dim>::vector_value(const Point<dim> &, Vector<double> &values) const
 {
   for (unsigned int d = 0; d < dim; ++d)
     values(d) = d + 1.0;

@@ -51,8 +51,7 @@ main()
 
   MappingQ<3>     mapping(4);
   QGauss<2>       q_face(3);
-  FEFaceValues<3> fe_face_values(
-    mapping, fe, q_face, update_normal_vectors | update_JxW_values);
+  FEFaceValues<3> fe_face_values(mapping, fe, q_face, update_normal_vectors | update_JxW_values);
   fe_face_values.reinit(dof_handler.begin_active(), 0);
 
   // if we got here, we got past the previous

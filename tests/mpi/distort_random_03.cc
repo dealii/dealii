@@ -34,7 +34,7 @@ template <int dim>
 void
 test1(const bool keep_boundary)
 {
-  const unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int                   my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
@@ -61,8 +61,7 @@ test1(const bool keep_boundary)
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   MPILogInitAll log_all;
 

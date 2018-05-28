@@ -35,10 +35,8 @@ main(int argc, char **argv)
   try
     {
       std::cerr << "TimerOutput\n";
-      TimerOutput timer_out(MPI_COMM_WORLD,
-                            std::cerr,
-                            TimerOutput::summary,
-                            TimerOutput::cpu_times);
+      TimerOutput timer_out(
+        MPI_COMM_WORLD, std::cerr, TimerOutput::summary, TimerOutput::cpu_times);
       timer_out.enter_section("Section1");
 
       throw Timer07Exception();
@@ -50,10 +48,8 @@ main(int argc, char **argv)
   try
     {
       std::cerr << "TimerOutput::Scope\n";
-      TimerOutput        timer_out(MPI_COMM_WORLD,
-                            std::cerr,
-                            TimerOutput::summary,
-                            TimerOutput::cpu_times);
+      TimerOutput timer_out(
+        MPI_COMM_WORLD, std::cerr, TimerOutput::summary, TimerOutput::cpu_times);
       TimerOutput::Scope timer_scope(timer_out, "Section1");
 
       throw Timer07Exception();
@@ -66,8 +62,7 @@ main(int argc, char **argv)
   try
     {
       std::cerr << "TimerOutput::Scope with MPI_COMM_SELF\n";
-      TimerOutput timer_out(
-        MPI_COMM_SELF, std::cerr, TimerOutput::summary, TimerOutput::cpu_times);
+      TimerOutput timer_out(MPI_COMM_SELF, std::cerr, TimerOutput::summary, TimerOutput::cpu_times);
       TimerOutput::Scope timer_scope(timer_out, "Section1");
 
       throw Timer07Exception();
@@ -76,21 +71,17 @@ main(int argc, char **argv)
     {}
 
   // convert numbers to xs to avoid printing time data
-  auto        is_digit = [](const char c) -> bool { return std::isdigit(c); };
-  std::string output   = captured_cerr.str();
-  std::string::iterator next_number =
-    std::find_if(output.begin(), output.end(), is_digit);
+  auto                  is_digit    = [](const char c) -> bool { return std::isdigit(c); };
+  std::string           output      = captured_cerr.str();
+  std::string::iterator next_number = std::find_if(output.begin(), output.end(), is_digit);
   while (next_number != output.end())
     {
       // convert everything between the |s to xs so that we have consistent
       // output.
       const std::string::iterator start_pipe =
-        std::find(
-          std::string::reverse_iterator(next_number), output.rend(), '|')
-          .base();
+        std::find(std::string::reverse_iterator(next_number), output.rend(), '|').base();
       Assert(start_pipe != output.end(), ExcInternalError());
-      const std::string::iterator end_pipe =
-        std::find(next_number, output.end(), '|');
+      const std::string::iterator end_pipe = std::find(next_number, output.end(), '|');
       Assert(end_pipe != output.end(), ExcInternalError());
       Assert(end_pipe - start_pipe > 1, ExcInternalError());
 

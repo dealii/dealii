@@ -41,8 +41,7 @@ test()
 
   GridGenerator::hyper_cube(tria, 0, 1);
 
-  const typename Triangulation<dim>::active_cell_iterator cell =
-    tria.begin_active();
+  const typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
 
   // distort the cell a bit. all
   // faces but face 0 stay planar;
@@ -59,8 +58,7 @@ test()
       // original unit cell as well
       // as the center point
       const Point<dim> trial_point =
-        (point < 8 ? GeometryInfo<dim>::unit_cell_vertex(point) :
-                     Point<dim>(.5, .5, .5));
+        (point < 8 ? GeometryInfo<dim>::unit_cell_vertex(point) : Point<dim>(.5, .5, .5));
 
       deallog << "Trial point = " << trial_point << std::endl;
 
@@ -69,8 +67,7 @@ test()
           const typename Triangulation<dim>::quad_iterator quad =
             (dim > 2 ?
                cell->quad(e) :
-               *reinterpret_cast<
-                 const typename Triangulation<dim>::quad_iterator *>(&cell));
+               *reinterpret_cast<const typename Triangulation<dim>::quad_iterator *>(&cell));
 
           deallog << "    Quad " << e << ", projected point=";
 
@@ -91,8 +88,7 @@ test()
           // trial_point than any of
           // the vertices of the quad
           for (unsigned int v = 0; v < 4; ++v)
-            AssertThrow(p.distance(trial_point) <=
-                          quad->vertex(v).distance(trial_point),
+            AssertThrow(p.distance(trial_point) <= quad->vertex(v).distance(trial_point),
                         ExcInternalError());
         }
       deallog << std::endl;

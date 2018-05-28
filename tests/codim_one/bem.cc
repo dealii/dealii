@@ -94,8 +94,8 @@ private:
 
   FullMatrix<double> system_matrix;
 
-  Vector<double> solution, smooth_solution, system_rhs, tangential_derivative,
-    tangential_velocity, error;
+  Vector<double> solution, smooth_solution, system_rhs, tangential_derivative, tangential_velocity,
+    error;
 
   Point<spacedim> velocity;
 };
@@ -128,9 +128,8 @@ BEM<spacedim>::run()
           tria.set_manifold(1, boundary);
           tria.refine_global(1);
 
-          double side_length =
-                   tria.begin_active()->vertex(0).norm() // CIRCLE RADIUS
-                   * 2 * sin(numbers::PI / tria.n_active_cells()),
+          double side_length = tria.begin_active()->vertex(0).norm() // CIRCLE RADIUS
+                               * 2 * sin(numbers::PI / tria.n_active_cells()),
                  global_error = 0.;
 
           table.add_value("cycle", cycle);
@@ -153,8 +152,7 @@ BEM<spacedim>::run()
     Assert(false, ExcNotImplemented());
 
   table.set_scientific("L^2 norm error", true);
-  table.evaluate_convergence_rates("L^2 norm error",
-                                   ConvergenceTable::reduction_rate_log2);
+  table.evaluate_convergence_rates("L^2 norm error", ConvergenceTable::reduction_rate_log2);
   //     table.write_text(std::cout);
 }
 
@@ -177,21 +175,16 @@ BEM<spacedim>::assemble_system()
   const QGauss<spacedim - 1>       quadrature_formula(2);
   const QGaussLog<1>               qlog(1);
   FEValues<spacedim - 1, spacedim> fe_values_i(
-    fe,
-    quadrature_formula,
-    update_JxW_values | update_normal_vectors | update_quadrature_points),
-    fe_values_j(fe,
-                quadrature_formula,
-                update_JxW_values | update_normal_vectors |
-                  update_quadrature_points);
+    fe, quadrature_formula, update_JxW_values | update_normal_vectors | update_quadrature_points),
+    fe_values_j(
+      fe, quadrature_formula, update_JxW_values | update_normal_vectors | update_quadrature_points);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
 
   // The following two matrices will be subtracted to obtain the system
   // matrix.
-  FullMatrix<double> DLP_matrix(
-    dof_handler.n_dofs()); // DLP stands for double layer potential
+  FullMatrix<double> DLP_matrix(dof_handler.n_dofs()); // DLP stands for double layer potential
   FullMatrix<double> mass_matrix(dof_handler.n_dofs());
 
   FullMatrix<double> cell_mass_matrix(dofs_per_cell, dofs_per_cell);
@@ -203,9 +196,11 @@ BEM<spacedim>::assemble_system()
   std::vector<types::global_dof_index> local_dof_indices_i(dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices_j(dofs_per_cell);
 
-  typename DoFHandler<spacedim - 1, spacedim>::active_cell_iterator
-    cell_i = dof_handler.begin_active(),
-    cell_j = dof_handler.begin_active(), endc = dof_handler.end();
+  typename DoFHandler<spacedim - 1, spacedim>::active_cell_iterator cell_i =
+                                                                      dof_handler.begin_active(),
+                                                                    cell_j =
+                                                                      dof_handler.begin_active(),
+                                                                    endc = dof_handler.end();
 
   // cycle on i index
   for (; cell_i != endc; ++cell_i)
@@ -219,10 +214,8 @@ BEM<spacedim>::assemble_system()
 
       // assembling of the right hand side
       Point<spacedim - 1> a_unit(0.), b_unit(1.);
-      Point<spacedim> A = fe_values_i.get_mapping().transform_unit_to_real_cell(
-                        cell_i, a_unit),
-                      B = fe_values_i.get_mapping().transform_unit_to_real_cell(
-                        cell_i, b_unit);
+      Point<spacedim>     A = fe_values_i.get_mapping().transform_unit_to_real_cell(cell_i, a_unit),
+                      B     = fe_values_i.get_mapping().transform_unit_to_real_cell(cell_i, b_unit);
 
       cell_rhs = 0.;
 
@@ -232,16 +225,15 @@ BEM<spacedim>::assemble_system()
       // constant on the cell, so they are taken in the first quadrature
       // point.
       double constant_factor =
-        -pow(fe_values_i.JxW(0) / fe_values_i.get_quadrature().weight(0), 2) /
-        numbers::PI * velocity * cell_normals_i[0];
+        -pow(fe_values_i.JxW(0) / fe_values_i.get_quadrature().weight(0), 2) / numbers::PI *
+        velocity * cell_normals_i[0];
 
       // These are constant on the cell so there is no need to loop on
       // quadrature points. Besides, the cell_rhs vector element index is
       // chosen = 0 because it is actually a 1x1 matrix. There should be a
       // loop over cell dofs, but this is necessary just for higher degree
       // elements.
-      cell_rhs(0) +=
-        constant_factor * (log(A.distance(B)) + 8. * qlog.weight(0));
+      cell_rhs(0) += constant_factor * (log(A.distance(B)) + 8. * qlog.weight(0));
       // A Gauss integration is performed to compute the integrals on K_i X
       // K_j in the case when i!=j. cycle on j index
       for (cell_j = dof_handler.begin_active(); cell_j != endc; ++cell_j)
@@ -258,10 +250,8 @@ BEM<spacedim>::assemble_system()
               // with constant elements there is only 1 dof per cell, so
               // there is no real cycle over cell dofs
               for (unsigned int a = 0; a < dofs_per_cell; ++a)
-                for (unsigned int q_point_i = 0; q_point_i < n_q_points;
-                     q_point_i++)
-                  for (unsigned int q_point_j = 0; q_point_j < n_q_points;
-                       q_point_j++)
+                for (unsigned int q_point_i = 0; q_point_i < n_q_points; q_point_i++)
+                  for (unsigned int q_point_j = 0; q_point_j < n_q_points; q_point_j++)
                     {
                       // If the integration is performed on two different
                       // elements there are no singularities in the domain
@@ -272,27 +262,24 @@ BEM<spacedim>::assemble_system()
                         {
                           // assembling of double layer potential
 
-                          cell_DLP_matrix(a, b) +=
-                            1. / numbers::PI * cell_normals_i[q_point_i] *
-                            (fe_values_j.quadrature_point(q_point_j) -
-                             fe_values_i.quadrature_point(q_point_i)) /
-                            pow((fe_values_j.quadrature_point(q_point_j) -
-                                 fe_values_i.quadrature_point(q_point_i))
-                                  .norm(),
-                                2) *
-                            fe_values_i.JxW(q_point_i) *
-                            fe_values_j.JxW(q_point_j);
+                          cell_DLP_matrix(a, b) += 1. / numbers::PI * cell_normals_i[q_point_i] *
+                                                   (fe_values_j.quadrature_point(q_point_j) -
+                                                    fe_values_i.quadrature_point(q_point_i)) /
+                                                   pow((fe_values_j.quadrature_point(q_point_j) -
+                                                        fe_values_i.quadrature_point(q_point_i))
+                                                         .norm(),
+                                                       2) *
+                                                   fe_values_i.JxW(q_point_i) *
+                                                   fe_values_j.JxW(q_point_j);
                         }
 
 
 
                       // assembling of right hand side
-                      cell_rhs(a) +=
-                        -1. / numbers::PI * velocity *
-                        cell_normals_j[q_point_j] *
-                        log(fe_values_i.quadrature_point(q_point_i).distance(
-                          fe_values_j.quadrature_point(q_point_j))) *
-                        fe_values_i.JxW(q_point_i) * fe_values_j.JxW(q_point_j);
+                      cell_rhs(a) += -1. / numbers::PI * velocity * cell_normals_j[q_point_j] *
+                                     log(fe_values_i.quadrature_point(q_point_i).distance(
+                                       fe_values_j.quadrature_point(q_point_j))) *
+                                     fe_values_i.JxW(q_point_i) * fe_values_j.JxW(q_point_j);
                     }
               for (unsigned int a = 0; a < dofs_per_cell; ++a)
                 for (unsigned int b = 0; b < dofs_per_cell; ++b)
@@ -304,8 +291,7 @@ BEM<spacedim>::assemble_system()
               // The mass matrix is simply a diagonal matrix with the area
               // of each element as entries.
               for (unsigned q_point_i = 0; q_point_i < n_q_points; ++q_point_i)
-                mass_matrix(cell_i->index(), cell_i->index()) +=
-                  fe_values_i.JxW(q_point_i);
+                mass_matrix(cell_i->index(), cell_i->index()) += fe_values_i.JxW(q_point_i);
 
               // The double layer potential matrix has no diagonal terms
               // since the scalar product between the cell normal and the
@@ -360,9 +346,9 @@ BEM<spacedim>::solve()
   std::vector<Point<spacedim>>         cell_tangentials(q_iterated.size());
   std::vector<types::global_dof_index> local_dof_indices(fe_q.dofs_per_cell);
 
-  typename DoFHandler<spacedim - 1, spacedim>::active_cell_iterator
-    cell = dof_handler_q.begin_active(),
-    endc = dof_handler_q.end();
+  typename DoFHandler<spacedim - 1, spacedim>::active_cell_iterator cell =
+                                                                      dof_handler_q.begin_active(),
+                                                                    endc = dof_handler_q.end();
   for (; cell != endc; ++cell)
     {
       fe_values_q.reinit(cell);
@@ -381,20 +367,18 @@ BEM<spacedim>::solve()
       std::vector<Tensor<1, spacedim>> gradient(q_iterated.size());
       for (unsigned int pnt = 0; pnt < q_iterated.size(); ++pnt)
         for (unsigned int fun = 0; fun < fe_q.dofs_per_cell; ++fun)
-          gradient[pnt] += smooth_solution(local_dof_indices[fun]) *
-                           fe_values_q.shape_grad(fun, pnt);
+          gradient[pnt] +=
+            smooth_solution(local_dof_indices[fun]) * fe_values_q.shape_grad(fun, pnt);
 
       for (unsigned int pnt = 0; pnt < q_iterated.size(); ++pnt)
         {
           tangential_derivative(cell->index()) =
-            gradient[pnt] * cell_tangentials[pnt] +
-            velocity * cell_tangentials[0];
+            gradient[pnt] * cell_tangentials[pnt] + velocity * cell_tangentials[0];
 
-          error(cell->index()) =
-            tangential_derivative(cell->index()) -
-            2. * velocity[0] *
-              sin(numbers::PI / 2. - (1. / 2. + cell->index()) * 2. *
-                                       numbers::PI / tria.n_active_cells());
+          error(cell->index()) = tangential_derivative(cell->index()) -
+                                 2. * velocity[0] *
+                                   sin(numbers::PI / 2. - (1. / 2. + cell->index()) * 2. *
+                                                            numbers::PI / tria.n_active_cells());
 
           tangential_velocity(cell->index()) = velocity * cell_tangentials[0];
         }
@@ -413,9 +397,7 @@ BEM<spacedim>::output_results()
     "tangential_velocity",
     DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
   dataout.add_data_vector(
-    error,
-    "error",
-    DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
+    error, "error", DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
   dataout.build_patches();
   dataout.write_vtk(logfile);
 }

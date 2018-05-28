@@ -77,8 +77,7 @@ test()
   deallog << "OK" << std::endl << "Square root: ";
   d = std::sqrt(c);
   for (unsigned int i = 0; i < n_vectors; ++i)
-    AssertThrow(std::fabs(d[i] - std::sqrt(Number(i))) <
-                  std::numeric_limits<Number>::epsilon(),
+    AssertThrow(std::fabs(d[i] - std::sqrt(Number(i))) < std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
 
   deallog << "OK" << std::endl << "Absolute value: ";
@@ -93,26 +92,22 @@ test()
   deallog << "OK" << std::endl << "Minimum value: ";
   d = std::min(Number(0.5) * a + b, c);
   for (unsigned int i = 0; i < n_vectors; ++i)
-    AssertThrow(d[i] == std::min(Number(0.5 * a[i] + b[i]), c[i]),
-                ExcInternalError());
+    AssertThrow(d[i] == std::min(Number(0.5 * a[i] + b[i]), c[i]), ExcInternalError());
 
   deallog << "OK" << std::endl << "Sine: ";
   e = std::sin(d);
   for (unsigned int i = 0; i < n_vectors; ++i)
-    AssertThrow(std::fabs(e[i] - std::sin(d[i])) <
-                  10. * std::numeric_limits<Number>::epsilon(),
+    AssertThrow(std::fabs(e[i] - std::sin(d[i])) < 10. * std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
   deallog << "OK" << std::endl << "Cosine: ";
   e = std::cos(c);
   for (unsigned int i = 0; i < n_vectors; ++i)
-    AssertThrow(std::fabs(e[i] - std::cos(c[i])) <
-                  10. * std::numeric_limits<Number>::epsilon(),
+    AssertThrow(std::fabs(e[i] - std::cos(c[i])) < 10. * std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
   deallog << "OK" << std::endl << "Tangent: ";
   d = std::tan(e);
   for (unsigned int i = 0; i < n_vectors; ++i)
-    AssertThrow(std::fabs(d[i] - std::tan(e[i])) <
-                  10. * std::numeric_limits<Number>::epsilon(),
+    AssertThrow(std::fabs(d[i] - std::tan(e[i])) < 10. * std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
   deallog << "OK" << std::endl << "Exponential: ";
   d = std::exp(c - a);
@@ -123,8 +118,7 @@ test()
   deallog << "OK" << std::endl << "Logarithm: ";
   e = std::log(d);
   for (unsigned int i = 0; i < n_vectors; ++i)
-    AssertThrow(std::fabs(e[i] - (c[i] - a[i])) <
-                  10. * std::numeric_limits<Number>::epsilon(),
+    AssertThrow(std::fabs(e[i] - (c[i] - a[i])) < 10. * std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
   deallog << "OK" << std::endl;
 }

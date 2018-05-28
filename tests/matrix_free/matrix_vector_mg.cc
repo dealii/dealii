@@ -38,11 +38,9 @@ void
 test()
 {
   const SphericalManifold<dim> manifold;
-  Triangulation<dim>           tria(
-    Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim>           tria(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
@@ -57,8 +55,7 @@ test()
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs(fe);
   ConstraintMatrix constraints;
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   // std::cout << "Number of cells: " <<
@@ -99,15 +96,13 @@ test()
   MGTools::make_boundary_list(dof, dirichlet_boundary, boundary_indices);
   for (unsigned int level = 0; level < nlevels; ++level)
     {
-      std::set<types::global_dof_index>::iterator bc_it =
-        boundary_indices[level].begin();
+      std::set<types::global_dof_index>::iterator bc_it = boundary_indices[level].begin();
       for (; bc_it != boundary_indices[level].end(); ++bc_it)
         mg_constraints[level].add_line(*bc_it);
       mg_constraints[level].close();
       typename MatrixFree<dim>::AdditionalData data;
       data.level_mg_handler = level;
-      mg_matrices[level].reinit(
-        mapping, dof, mg_constraints[level], quad, data);
+      mg_matrices[level].reinit(mapping, dof, mg_constraints[level], quad, data);
 
       DynamicSparsityPattern csp;
       csp.reinit(dof.n_dofs(level), dof.n_dofs(level));
@@ -123,13 +118,12 @@ test()
     QGauss<dim>   quad(fe_degree + 1);
     FEValues<dim> fe_values(
       mapping, fe, quad, update_values | update_gradients | update_JxW_values);
-    const unsigned int n_quadrature_points = quad.size();
-    const unsigned int dofs_per_cell       = fe.dofs_per_cell;
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    const unsigned int                   n_quadrature_points = quad.size();
+    const unsigned int                   dofs_per_cell       = fe.dofs_per_cell;
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
     for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
@@ -139,20 +133,17 @@ test()
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       10. * fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                    10. * fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                   fe_values.JxW(q_point));
             }
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, local_dof_indices, system_matrix);
+        constraints.distribute_local_to_global(cell_matrix, local_dof_indices, system_matrix);
       }
 
     // now to the MG assembly
-    typename DoFHandler<dim>::cell_iterator cellm = dof.begin(),
-                                            endcm = dof.end();
+    typename DoFHandler<dim>::cell_iterator cellm = dof.begin(), endcm = dof.end();
     for (; cellm != endcm; ++cellm)
       {
         cell_matrix = 0;
@@ -162,11 +153,10 @@ test()
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       10. * fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  ((fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) +
+                    10. * fe_values.shape_value(i, q_point) * fe_values.shape_value(j, q_point)) *
+                   fe_values.JxW(q_point));
             }
         cellm->get_mg_dof_indices(local_dof_indices);
         mg_constraints[cellm->level()].distribute_local_to_global(
@@ -214,8 +204,7 @@ test()
 
       result_mf -= result_spmv;
       const double diff_norm = result_mf.linfty_norm();
-      deallog << "Norm of difference MG level " << level << ": " << diff_norm
-              << std::endl;
+      deallog << "Norm of difference MG level " << level << ": " << diff_norm << std::endl;
     }
   deallog << std::endl;
 }

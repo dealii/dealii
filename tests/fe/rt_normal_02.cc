@@ -66,33 +66,31 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
   QGauss<1>     quad(6);
   Quadrature<2> qproject = QProjector<2>::project_to_all_faces(quad);
 
-  FEFaceValues<2> fe_v_face(
+  FEFaceValues<2> fe_v_face(dof_handler->get_fe(),
+                            quad,
+                            UpdateFlags(update_values | update_quadrature_points |
+                                        update_gradients | update_normal_vectors |
+                                        update_JxW_values));
+
+  FEValues<2> fe_v(
     dof_handler->get_fe(),
-    quad,
-    UpdateFlags(update_values | update_quadrature_points | update_gradients |
-                update_normal_vectors | update_JxW_values));
+    qproject,
+    UpdateFlags(update_values | update_quadrature_points | update_gradients | update_JxW_values));
 
-  FEValues<2> fe_v(dof_handler->get_fe(),
-                   qproject,
-                   UpdateFlags(update_values | update_quadrature_points |
-                               update_gradients | update_JxW_values));
-
-  FEValues<2> fe_v_n(dof_handler->get_fe(),
-                     qproject,
-                     UpdateFlags(update_values | update_quadrature_points |
-                                 update_gradients | update_JxW_values));
+  FEValues<2> fe_v_n(
+    dof_handler->get_fe(),
+    qproject,
+    UpdateFlags(update_values | update_quadrature_points | update_gradients | update_JxW_values));
 
   const unsigned int n_q_face      = quad.size();
   const unsigned int n_q_proj      = qproject.size();
   const unsigned int n_components  = dof_handler->get_fe().n_components();
   const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
 
-  deallog << "Quad Points Face " << n_q_face << ", Quad Points Proj. "
-          << n_q_proj << std::endl;
+  deallog << "Quad Points Face " << n_q_face << ", Quad Points Proj. " << n_q_proj << std::endl;
 
   // Cell iterators
-  DoFHandler<2>::active_cell_iterator cell = dof_handler->begin_active(),
-                                      endc = dof_handler->end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler->begin_active(), endc = dof_handler->end();
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -106,34 +104,30 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
           if (!cell->face(f)->at_boundary())
             {
               const QProjector<2>::DataSetDescriptor offset =
-                (QProjector<2>::DataSetDescriptor::face(
-                  f,
-                  cell->face_orientation(f),
-                  cell->face_flip(f),
-                  cell->face_rotation(f),
-                  quad.size()));
+                (QProjector<2>::DataSetDescriptor::face(f,
+                                                        cell->face_orientation(f),
+                                                        cell->face_flip(f),
+                                                        cell->face_rotation(f),
+                                                        quad.size()));
               fe_v_face.reinit(cell, f);
 
-              DoFHandler<2>::active_cell_iterator cell_n = cell->neighbor(f);
-              const unsigned int neighbor = cell->neighbor_of_neighbor(f);
+              DoFHandler<2>::active_cell_iterator cell_n   = cell->neighbor(f);
+              const unsigned int                  neighbor = cell->neighbor_of_neighbor(f);
               fe_v_n.reinit(cell_n);
 
               const QProjector<2>::DataSetDescriptor offset_n =
-                (QProjector<2>::DataSetDescriptor::face(
-                  neighbor,
-                  cell_n->face_orientation(neighbor),
-                  cell_n->face_flip(neighbor),
-                  cell_n->face_rotation(neighbor),
-                  quad.size()));
+                (QProjector<2>::DataSetDescriptor::face(neighbor,
+                                                        cell_n->face_orientation(neighbor),
+                                                        cell_n->face_flip(neighbor),
+                                                        cell_n->face_rotation(neighbor),
+                                                        quad.size()));
 
               // Get values from solution vector (For Trap.Rule)
-              std::vector<Vector<double>> this_value(
-                n_q_proj, Vector<double>(n_components));
+              std::vector<Vector<double>> this_value(n_q_proj, Vector<double>(n_components));
               fe_v.get_function_values(solution, this_value);
 
               // Same for neighbor cell
-              std::vector<Vector<double>> this_value_n(
-                n_q_proj, Vector<double>(n_components));
+              std::vector<Vector<double>> this_value_n(n_q_proj, Vector<double>(n_components));
               fe_v_n.get_function_values(solution, this_value_n);
 
               for (unsigned int q_point = 0; q_point < n_q_face; ++q_point)
@@ -149,13 +143,10 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
                   double v_n = this_value_n[q_point + offset_n](1);
                   double un1 = u * nx + v * ny, un2 = u_n * nx + v_n * ny;
 
-                  deallog << "QP " << q_point
-                          << ", Error: " << (u - u_n) * nx + (v - v_n) * ny
-                          << ", u " << un1 << ", un " << un2 << ", Rat "
-                          << un2 / un1 << std::endl;
+                  deallog << "QP " << q_point << ", Error: " << (u - u_n) * nx + (v - v_n) * ny
+                          << ", u " << un1 << ", un " << un2 << ", Rat " << un2 / un1 << std::endl;
 
-                  Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) < 1e-12,
-                         ExcInternalError());
+                  Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) < 1e-12, ExcInternalError());
                 }
             }
         }
@@ -173,25 +164,24 @@ void EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
   // This quadrature rule determines the points, where the
   // continuity will be tested.
   QGauss<1>       quad(6);
-  FEFaceValues<2> fe_v_face(
-    dof_handler->get_fe(),
-    quad,
-    UpdateFlags(update_values | update_quadrature_points | update_gradients |
-                update_normal_vectors | update_JxW_values));
+  FEFaceValues<2> fe_v_face(dof_handler->get_fe(),
+                            quad,
+                            UpdateFlags(update_values | update_quadrature_points |
+                                        update_gradients | update_normal_vectors |
+                                        update_JxW_values));
 
-  FEFaceValues<2> fe_v_face_n(
-    dof_handler->get_fe(),
-    quad,
-    UpdateFlags(update_values | update_quadrature_points | update_gradients |
-                update_normal_vectors | update_JxW_values));
+  FEFaceValues<2> fe_v_face_n(dof_handler->get_fe(),
+                              quad,
+                              UpdateFlags(update_values | update_quadrature_points |
+                                          update_gradients | update_normal_vectors |
+                                          update_JxW_values));
 
   const unsigned int n_q_face      = quad.size();
   const unsigned int n_components  = dof_handler->get_fe().n_components();
   const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
 
   // Cell iterators
-  DoFHandler<2>::active_cell_iterator cell = dof_handler->begin_active(),
-                                      endc = dof_handler->end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler->begin_active(), endc = dof_handler->end();
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -209,13 +199,11 @@ void EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
               fe_v_face_n.reinit(cell->neighbor(f), neighbor);
 
               // Get values from solution vector (For Trap.Rule)
-              std::vector<Vector<double>> this_value(
-                n_q_face, Vector<double>(n_components));
+              std::vector<Vector<double>> this_value(n_q_face, Vector<double>(n_components));
               fe_v_face.get_function_values(solution, this_value);
 
               // Same for neighbor cell
-              std::vector<Vector<double>> this_value_n(
-                n_q_face, Vector<double>(n_components));
+              std::vector<Vector<double>> this_value_n(n_q_face, Vector<double>(n_components));
               fe_v_face_n.get_function_values(solution, this_value_n);
 
               for (unsigned int q_point = 0; q_point < n_q_face; ++q_point)
@@ -231,13 +219,10 @@ void EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
                   double v_n = this_value_n[q_point](1);
                   double un1 = u * nx + v * ny, un2 = u_n * nx + v_n * ny;
 
-                  deallog << "QP " << q_point
-                          << ", Error: " << (u - u_n) * nx + (v - v_n) * ny
-                          << ", u " << un1 << ", un " << un2 << ", Rat "
-                          << un2 / un1 << std::endl;
+                  deallog << "QP " << q_point << ", Error: " << (u - u_n) * nx + (v - v_n) * ny
+                          << ", u " << un1 << ", un " << un2 << ", Rat " << un2 / un1 << std::endl;
 
-                  Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) < 1e-12,
-                         ExcInternalError());
+                  Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) < 1e-12, ExcInternalError());
                 }
             }
         }

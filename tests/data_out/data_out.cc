@@ -91,15 +91,12 @@ LaplaceProblem<dim>::make_grid_and_dofs()
     };
 
 
-  deallog << "   Number of active cells: " << triangulation.n_active_cells()
-          << std::endl
-          << "   Total number of cells: " << triangulation.n_cells()
-          << std::endl;
+  deallog << "   Number of active cells: " << triangulation.n_active_cells() << std::endl
+          << "   Total number of cells: " << triangulation.n_cells() << std::endl;
 
   dof_handler.distribute_dofs(fe);
 
-  deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
   solution.reinit(dof_handler.n_dofs());
 }

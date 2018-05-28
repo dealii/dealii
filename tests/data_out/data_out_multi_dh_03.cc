@@ -58,13 +58,10 @@ test()
 
   DataOut<dim> data_out;
   data_out.add_data_vector(dof1, v1, "scalar");
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    component_interpretation(
-      dim, DataComponentInterpretation::component_is_part_of_vector);
-  data_out.add_data_vector(dof2,
-                           v2,
-                           std::vector<std::string>(dim, "vector"),
-                           component_interpretation);
+  std::vector<DataComponentInterpretation::DataComponentInterpretation> component_interpretation(
+    dim, DataComponentInterpretation::component_is_part_of_vector);
+  data_out.add_data_vector(
+    dof2, v2, std::vector<std::string>(dim, "vector"), component_interpretation);
   data_out.build_patches();
 
   data_out.write_vtk(deallog.get_file_stream());
@@ -91,25 +88,21 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

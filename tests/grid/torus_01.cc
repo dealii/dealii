@@ -45,8 +45,7 @@ test<3, 3>()
 
   const TorusManifold<3> desc_torus(1.0, 0.4);
   unsigned int           c = 0;
-  for (Triangulation<dim, spacedim>::active_vertex_iterator v =
-         triangulation.begin_active_vertex();
+  for (Triangulation<dim, spacedim>::active_vertex_iterator v = triangulation.begin_active_vertex();
        v != triangulation.end_vertex();
        ++v, ++c)
     {
@@ -57,12 +56,10 @@ test<3, 3>()
       x              = desc_torus.push_forward(x);
       Tensor<1, 3> t = desc_torus.get_tangent_vector(p, x);
 
-      deallog.get_file_stream()
-        << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2] << " rto "
-        << t[0] << ", " << t[1] << ", " << t[2] << std::endl;
+      deallog.get_file_stream() << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2]
+                                << " rto " << t[0] << ", " << t[1] << ", " << t[2] << std::endl;
     }
-  deallog.get_file_stream() << "set view equal xyz" << std::endl
-                            << "splot '-' w l" << std::endl;
+  deallog.get_file_stream() << "set view equal xyz" << std::endl << "splot '-' w l" << std::endl;
   GridOut().write_gnuplot(triangulation, deallog.get_file_stream());
   deallog.get_file_stream() << "e" << std::endl << "pause -1" << std::endl;
 }

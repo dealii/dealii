@@ -110,16 +110,15 @@ TestPointValueHistory<dim>::run()
   // and this is not corrected for.
   {
     QGauss<dim>   quadrature_formula(2);
-    FEValues<dim> fe_values(
-      finite_element,
-      quadrature_formula,
-      update_values | update_quadrature_points); // just need local_dof_indices
-                                                 // and quadrature_points
+    FEValues<dim> fe_values(finite_element,
+                            quadrature_formula,
+                            update_values |
+                              update_quadrature_points); // just need local_dof_indices
+                                                         // and quadrature_points
 
-    std::vector<types::global_dof_index> local_dof_indices(
-      finite_element.dofs_per_cell);
-    std::vector<Point<dim>> dof_locations(finite_element.dofs_per_cell);
-    Vector<double>          cell_pole(finite_element.dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(finite_element.dofs_per_cell);
+    std::vector<Point<dim>>              dof_locations(finite_element.dofs_per_cell);
+    Vector<double>                       cell_pole(finite_element.dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator cell, endc;
     cell = dof_handler.begin_active();
@@ -132,11 +131,9 @@ TestPointValueHistory<dim>::run()
         cell_pole     = 0;
         for (unsigned int dof = 0; dof != finite_element.dofs_per_cell; dof++)
           {
-            unsigned int dof_component =
-              finite_element.system_to_component_index(dof).first;
+            unsigned int dof_component = finite_element.system_to_component_index(dof).first;
 
-            for (unsigned int q_point = 0; q_point < quadrature_formula.size();
-                 ++q_point)
+            for (unsigned int q_point = 0; q_point < quadrature_formula.size(); ++q_point)
               {
                 cell_pole(dof) += (fe_values.shape_value(dof, q_point) *
                                    dof_locations[q_point](dof_component % dim));
@@ -178,14 +175,12 @@ TestPointValueHistory<dim>::run()
 
   {
     node_monitor.add_field_name("Solution");
-    node_monitor.add_field_name(
-      "Post Processed Vector"); // not sensitive to spaces
+    node_monitor.add_field_name("Post Processed Vector"); // not sensitive to spaces
 
     // two alternatives here, adding a point at a time or a vector of points
     // 2d points
     std::vector<Point<2>> point_vector(5, Point<2>());
-    point_vector[0] =
-      Point<2>(0, 0); // some of these points will hit a node, others won't
+    point_vector[0] = Point<2>(0, 0); // some of these points will hit a node, others won't
     point_vector[1] = Point<2>(0.25, 0);
     point_vector[2] = Point<2>(0.25, 0.45);
     point_vector[3] = Point<2>(0.45, 0.45);

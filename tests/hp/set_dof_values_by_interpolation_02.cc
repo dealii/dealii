@@ -77,8 +77,7 @@ test()
   Vector<double> solution2(dof_handler.n_dofs());
 
   // do the test
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
@@ -93,8 +92,7 @@ test()
       cell->set_dof_values_by_interpolation(local, solution1);
 
       // then do the same with the "correct", local fe_index
-      cell->set_dof_values_by_interpolation(
-        local, solution2, cell->active_fe_index());
+      cell->set_dof_values_by_interpolation(local, solution2, cell->active_fe_index());
 
       // now verify correctness
       AssertThrow(solution1 == solution2, ExcInternalError());

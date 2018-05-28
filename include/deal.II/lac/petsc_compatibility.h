@@ -46,11 +46,9 @@ namespace PETScWrappers
   set_option_value(const std::string &name, const std::string &value)
   {
 #  if DEAL_II_PETSC_VERSION_LT(3, 7, 0)
-    const PetscErrorCode ierr =
-      PetscOptionsSetValue(name.c_str(), value.c_str());
+    const PetscErrorCode ierr = PetscOptionsSetValue(name.c_str(), value.c_str());
 #  else
-    const PetscErrorCode ierr =
-      PetscOptionsSetValue(nullptr, name.c_str(), value.c_str());
+    const PetscErrorCode ierr = PetscOptionsSetValue(nullptr, name.c_str(), value.c_str());
 #  endif
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }

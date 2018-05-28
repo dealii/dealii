@@ -178,7 +178,7 @@ public:
   SparseVanka(const SparseMatrix<number> &M,
               const std::vector<bool> &   selected,
               const bool                  conserve_memory = false,
-              const unsigned int n_threads = MultithreadInfo::n_threads());
+              const unsigned int          n_threads       = MultithreadInfo::n_threads());
 
   /**
    * Destructor. Delete all allocated matrices.
@@ -196,7 +196,7 @@ public:
      */
     AdditionalData(const std::vector<bool> &selected,
                    const bool               conserve_memory = false,
-                   const unsigned int n_threads = MultithreadInfo::n_threads());
+                   const unsigned int       n_threads       = MultithreadInfo::n_threads());
 
     /**
      * Indices of those degrees of freedom that we shall work on.
@@ -227,8 +227,7 @@ public:
    * (using the <code>vmult</code> function of derived classes).
    */
   void
-  initialize(const SparseMatrix<number> &M,
-             const AdditionalData &      additional_data);
+  initialize(const SparseMatrix<number> &M, const AdditionalData &additional_data);
 
   /**
    * Do the preconditioning. This function takes the residual in @p src and
@@ -327,8 +326,7 @@ private:
    * Array of inverse matrices, one for each degree of freedom. Only those
    * elements will be used that are tagged in @p selected.
    */
-  mutable std::vector<SmartPointer<FullMatrix<float>, SparseVanka<number>>>
-    inverses;
+  mutable std::vector<SmartPointer<FullMatrix<float>, SparseVanka<number>>> inverses;
 
   /**
    * The dimension of the range space.
@@ -549,7 +547,7 @@ public:
                    const unsigned int          n_blocks,
                    const BlockingStrategy      blocking_strategy,
                    const bool                  conserve_memory = false,
-                   const unsigned int n_threads = MultithreadInfo::n_threads());
+                   const unsigned int          n_threads       = MultithreadInfo::n_threads());
 
   /**
    * Apply the preconditioner.
@@ -614,8 +612,7 @@ SparseVanka<number>::n() const
 template <typename number>
 template <typename number2>
 inline void
-SparseVanka<number>::Tvmult(Vector<number2> & /*dst*/,
-                            const Vector<number2> & /*src*/) const
+SparseVanka<number>::Tvmult(Vector<number2> & /*dst*/, const Vector<number2> & /*src*/) const
 {
   AssertThrow(false, ExcNotImplemented());
 }

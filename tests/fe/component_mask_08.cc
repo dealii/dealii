@@ -30,17 +30,14 @@ void
 test()
 {
   // test for an initialized mask
-  AssertThrow(ComponentMask(12, false).represents_the_all_selected_mask() ==
-                false,
+  AssertThrow(ComponentMask(12, false).represents_the_all_selected_mask() == false,
               ExcInternalError());
   // note the semantics of the following as
   // described in the documentation
-  AssertThrow(ComponentMask(12, true).represents_the_all_selected_mask() ==
-                false,
+  AssertThrow(ComponentMask(12, true).represents_the_all_selected_mask() == false,
               ExcInternalError());
   // test for an empty mask
-  AssertThrow(ComponentMask().represents_the_all_selected_mask() == true,
-              ExcInternalError());
+  AssertThrow(ComponentMask().represents_the_all_selected_mask() == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

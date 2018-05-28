@@ -77,8 +77,7 @@ namespace internal
        * that it makes the object use a $Q_1$ mapping (i.e., an object of type
        * MappingQGeneric(1)) implicitly.
        */
-      MappingDataOnTheFly(const Quadrature<1> &quadrature,
-                          const UpdateFlags    update_flags);
+      MappingDataOnTheFly(const Quadrature<1> &quadrature, const UpdateFlags update_flags);
 
       /**
        * Initialize with the given cell iterator.
@@ -157,10 +156,9 @@ namespace internal
     /*-------------------------- Inline functions ---------------------------*/
 
     template <int dim, typename Number>
-    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
-      const Mapping<dim> & mapping,
-      const Quadrature<1> &quadrature,
-      const UpdateFlags    update_flags) :
+    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(const Mapping<dim> & mapping,
+                                                                 const Quadrature<1> &quadrature,
+                                                                 const UpdateFlags update_flags) :
       fe_values(mapping,
                 fe_dummy,
                 Quadrature<dim>(quadrature),
@@ -175,29 +173,22 @@ namespace internal
       if (update_flags & update_quadrature_points)
         {
           mapping_info_storage.quadrature_point_offsets.resize(1, 0);
-          mapping_info_storage.quadrature_points.resize(
-            fe_values.n_quadrature_points);
+          mapping_info_storage.quadrature_points.resize(fe_values.n_quadrature_points);
         }
       if (fe_values.get_update_flags() & update_normal_vectors)
         {
-          mapping_info_storage.normal_vectors.resize(
-            fe_values.n_quadrature_points);
-          mapping_info_storage.normals_times_jacobians[0].resize(
-            fe_values.n_quadrature_points);
+          mapping_info_storage.normal_vectors.resize(fe_values.n_quadrature_points);
+          mapping_info_storage.normals_times_jacobians[0].resize(fe_values.n_quadrature_points);
         }
-      Assert(!(fe_values.get_update_flags() & update_jacobian_grads),
-             ExcNotImplemented());
+      Assert(!(fe_values.get_update_flags() & update_jacobian_grads), ExcNotImplemented());
     }
 
 
 
     template <int dim, typename Number>
-    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
-      const Quadrature<1> &quadrature,
-      const UpdateFlags    update_flags) :
-      MappingDataOnTheFly(::dealii::StaticMappingQ1<dim, dim>::mapping,
-                          quadrature,
-                          update_flags)
+    inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(const Quadrature<1> &quadrature,
+                                                                 const UpdateFlags update_flags) :
+      MappingDataOnTheFly(::dealii::StaticMappingQ1<dim, dim>::mapping, quadrature, update_flags)
     {}
 
 
@@ -225,16 +216,13 @@ namespace internal
             }
           if (fe_values.get_update_flags() & update_quadrature_points)
             for (unsigned int d = 0; d < dim; ++d)
-              mapping_info_storage.quadrature_points[q][d] =
-                fe_values.quadrature_point(q)[d];
+              mapping_info_storage.quadrature_points[q][d] = fe_values.quadrature_point(q)[d];
           if (fe_values.get_update_flags() & update_normal_vectors)
             {
               for (unsigned int d = 0; d < dim; ++d)
-                mapping_info_storage.normal_vectors[q][d] =
-                  fe_values.normal_vector(q)[d];
+                mapping_info_storage.normal_vectors[q][d] = fe_values.normal_vector(q)[d];
               mapping_info_storage.normals_times_jacobians[0][q] =
-                mapping_info_storage.normal_vectors[q] *
-                mapping_info_storage.jacobians[0][q];
+                mapping_info_storage.normal_vectors[q] * mapping_info_storage.jacobians[0][q];
             }
         }
     }
@@ -245,8 +233,7 @@ namespace internal
     inline bool
     MappingDataOnTheFly<dim, Number>::is_initialized() const
     {
-      return present_cell !=
-             typename dealii::Triangulation<dim>::cell_iterator();
+      return present_cell != typename dealii::Triangulation<dim>::cell_iterator();
     }
 
 

@@ -541,13 +541,11 @@ vectorized_transpose_and_store(const bool                     add_into,
 {
   if (add_into)
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements; ++v)
         out[offsets[v] + i] += in[i][v];
   else
     for (unsigned int i = 0; i < n_entries; ++i)
-      for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
-           ++v)
+      for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements; ++v)
         out[offsets[v] + i] = in[i][v];
 }
 
@@ -697,8 +695,7 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
-           ExcMessage("Memory not aligned"));
+    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0, ExcMessage("Memory not aligned"));
     _mm512_stream_pd(ptr, data);
   }
 
@@ -868,14 +865,10 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
           __m256d t1 = _mm256_permute2f128_pd(u1, u3, 0x20);
           __m256d t2 = _mm256_permute2f128_pd(u0, u2, 0x31);
           __m256d t3 = _mm256_permute2f128_pd(u1, u3, 0x31);
-          *(__m256d *)((double *)(&out[4 * i + 0].data) + outer) =
-            _mm256_unpacklo_pd(t0, t1);
-          *(__m256d *)((double *)(&out[4 * i + 1].data) + outer) =
-            _mm256_unpackhi_pd(t0, t1);
-          *(__m256d *)((double *)(&out[4 * i + 2].data) + outer) =
-            _mm256_unpacklo_pd(t2, t3);
-          *(__m256d *)((double *)(&out[4 * i + 3].data) + outer) =
-            _mm256_unpackhi_pd(t2, t3);
+          *(__m256d *)((double *)(&out[4 * i + 0].data) + outer) = _mm256_unpacklo_pd(t0, t1);
+          *(__m256d *)((double *)(&out[4 * i + 1].data) + outer) = _mm256_unpackhi_pd(t0, t1);
+          *(__m256d *)((double *)(&out[4 * i + 2].data) + outer) = _mm256_unpacklo_pd(t2, t3);
+          *(__m256d *)((double *)(&out[4 * i + 3].data) + outer) = _mm256_unpackhi_pd(t2, t3);
         }
       for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
         for (unsigned int v = 0; v < 4; ++v)
@@ -908,14 +901,10 @@ vectorized_transpose_and_store(const bool                     add_into,
       double *out3 = out + offsets[3 + outer];
       for (unsigned int i = 0; i < n_chunks; ++i)
         {
-          __m256d u0 =
-            *(const __m256d *)((const double *)(&in[4 * i + 0].data) + outer);
-          __m256d u1 =
-            *(const __m256d *)((const double *)(&in[4 * i + 1].data) + outer);
-          __m256d u2 =
-            *(const __m256d *)((const double *)(&in[4 * i + 2].data) + outer);
-          __m256d u3 =
-            *(const __m256d *)((const double *)(&in[4 * i + 3].data) + outer);
+          __m256d u0   = *(const __m256d *)((const double *)(&in[4 * i + 0].data) + outer);
+          __m256d u1   = *(const __m256d *)((const double *)(&in[4 * i + 1].data) + outer);
+          __m256d u2   = *(const __m256d *)((const double *)(&in[4 * i + 2].data) + outer);
+          __m256d u3   = *(const __m256d *)((const double *)(&in[4 * i + 3].data) + outer);
           __m256d t0   = _mm256_permute2f128_pd(u0, u2, 0x20);
           __m256d t1   = _mm256_permute2f128_pd(u1, u3, 0x20);
           __m256d t2   = _mm256_permute2f128_pd(u0, u2, 0x31);
@@ -1099,8 +1088,7 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
-           ExcMessage("Memory not aligned"));
+    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0, ExcMessage("Memory not aligned"));
     _mm512_stream_ps(ptr, data);
   }
 
@@ -1268,26 +1256,22 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
           // To avoid warnings about uninitialized variables, need to initialize
           // one variable with zero before using it.
           __m256 t0, t1, t2, t3 = _mm256_set1_ps(0.F);
-          t0        = _mm256_insertf128_ps(t3, u0, 0);
-          t0        = _mm256_insertf128_ps(t0, u4, 1);
-          t1        = _mm256_insertf128_ps(t3, u1, 0);
-          t1        = _mm256_insertf128_ps(t1, u5, 1);
-          t2        = _mm256_insertf128_ps(t3, u2, 0);
-          t2        = _mm256_insertf128_ps(t2, u6, 1);
-          t3        = _mm256_insertf128_ps(t3, u3, 0);
-          t3        = _mm256_insertf128_ps(t3, u7, 1);
-          __m256 v0 = _mm256_shuffle_ps(t0, t1, 0x44);
-          __m256 v1 = _mm256_shuffle_ps(t0, t1, 0xee);
-          __m256 v2 = _mm256_shuffle_ps(t2, t3, 0x44);
-          __m256 v3 = _mm256_shuffle_ps(t2, t3, 0xee);
-          *(__m256 *)((float *)(&out[4 * i + 0].data) + outer) =
-            _mm256_shuffle_ps(v0, v2, 0x88);
-          *(__m256 *)((float *)(&out[4 * i + 1].data) + outer) =
-            _mm256_shuffle_ps(v0, v2, 0xdd);
-          *(__m256 *)((float *)(&out[4 * i + 2].data) + outer) =
-            _mm256_shuffle_ps(v1, v3, 0x88);
-          *(__m256 *)((float *)(&out[4 * i + 3].data) + outer) =
-            _mm256_shuffle_ps(v1, v3, 0xdd);
+          t0                                                   = _mm256_insertf128_ps(t3, u0, 0);
+          t0                                                   = _mm256_insertf128_ps(t0, u4, 1);
+          t1                                                   = _mm256_insertf128_ps(t3, u1, 0);
+          t1                                                   = _mm256_insertf128_ps(t1, u5, 1);
+          t2                                                   = _mm256_insertf128_ps(t3, u2, 0);
+          t2                                                   = _mm256_insertf128_ps(t2, u6, 1);
+          t3                                                   = _mm256_insertf128_ps(t3, u3, 0);
+          t3                                                   = _mm256_insertf128_ps(t3, u7, 1);
+          __m256 v0                                            = _mm256_shuffle_ps(t0, t1, 0x44);
+          __m256 v1                                            = _mm256_shuffle_ps(t0, t1, 0xee);
+          __m256 v2                                            = _mm256_shuffle_ps(t2, t3, 0x44);
+          __m256 v3                                            = _mm256_shuffle_ps(t2, t3, 0xee);
+          *(__m256 *)((float *)(&out[4 * i + 0].data) + outer) = _mm256_shuffle_ps(v0, v2, 0x88);
+          *(__m256 *)((float *)(&out[4 * i + 1].data) + outer) = _mm256_shuffle_ps(v0, v2, 0xdd);
+          *(__m256 *)((float *)(&out[4 * i + 2].data) + outer) = _mm256_shuffle_ps(v1, v3, 0x88);
+          *(__m256 *)((float *)(&out[4 * i + 3].data) + outer) = _mm256_shuffle_ps(v1, v3, 0xdd);
         }
       for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
         for (unsigned int v = 0; v < 8; ++v)
@@ -1313,14 +1297,10 @@ vectorized_transpose_and_store(const bool                    add_into,
     {
       for (unsigned int i = 0; i < n_chunks; ++i)
         {
-          __m256 u0 =
-            *(const __m256 *)((const float *)(&in[4 * i + 0].data) + outer);
-          __m256 u1 =
-            *(const __m256 *)((const float *)(&in[4 * i + 1].data) + outer);
-          __m256 u2 =
-            *(const __m256 *)((const float *)(&in[4 * i + 2].data) + outer);
-          __m256 u3 =
-            *(const __m256 *)((const float *)(&in[4 * i + 3].data) + outer);
+          __m256 u0   = *(const __m256 *)((const float *)(&in[4 * i + 0].data) + outer);
+          __m256 u1   = *(const __m256 *)((const float *)(&in[4 * i + 1].data) + outer);
+          __m256 u2   = *(const __m256 *)((const float *)(&in[4 * i + 2].data) + outer);
+          __m256 u3   = *(const __m256 *)((const float *)(&in[4 * i + 3].data) + outer);
           __m256 t0   = _mm256_shuffle_ps(u0, u1, 0x44);
           __m256 t1   = _mm256_shuffle_ps(u0, u1, 0xee);
           __m256 t2   = _mm256_shuffle_ps(u2, u3, 0x44);
@@ -1343,29 +1323,21 @@ vectorized_transpose_and_store(const bool                    add_into,
           // pointers
           if (add_into)
             {
-              res0 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[0 + outer]),
-                                res0);
+              res0 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[0 + outer]), res0);
               _mm_storeu_ps(out + 4 * i + offsets[0 + outer], res0);
-              res1 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[1 + outer]),
-                                res1);
+              res1 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[1 + outer]), res1);
               _mm_storeu_ps(out + 4 * i + offsets[1 + outer], res1);
-              res2 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[2 + outer]),
-                                res2);
+              res2 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[2 + outer]), res2);
               _mm_storeu_ps(out + 4 * i + offsets[2 + outer], res2);
-              res3 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[3 + outer]),
-                                res3);
+              res3 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[3 + outer]), res3);
               _mm_storeu_ps(out + 4 * i + offsets[3 + outer], res3);
-              res4 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[4 + outer]),
-                                res4);
+              res4 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[4 + outer]), res4);
               _mm_storeu_ps(out + 4 * i + offsets[4 + outer], res4);
-              res5 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[5 + outer]),
-                                res5);
+              res5 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[5 + outer]), res5);
               _mm_storeu_ps(out + 4 * i + offsets[5 + outer], res5);
-              res6 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[6 + outer]),
-                                res6);
+              res6 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[6 + outer]), res6);
               _mm_storeu_ps(out + 4 * i + offsets[6 + outer], res6);
-              res7 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[7 + outer]),
-                                res7);
+              res7 = _mm_add_ps(_mm_loadu_ps(out + 4 * i + offsets[7 + outer]), res7);
               _mm_storeu_ps(out + 4 * i + offsets[7 + outer], res7);
             }
           else
@@ -1534,8 +1506,7 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
-           ExcMessage("Memory not aligned"));
+    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0, ExcMessage("Memory not aligned"));
     _mm256_stream_pd(ptr, data);
   }
 
@@ -1913,8 +1884,7 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
-           ExcMessage("Memory not aligned"));
+    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0, ExcMessage("Memory not aligned"));
     _mm256_stream_ps(ptr, data);
   }
 
@@ -2319,8 +2289,7 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
-           ExcMessage("Memory not aligned"));
+    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0, ExcMessage("Memory not aligned"));
     _mm_stream_pd(ptr, data);
   }
 
@@ -2492,12 +2461,10 @@ vectorized_transpose_and_store(const bool                     add_into,
           __m128d u1   = in[2 * i + 1].data;
           __m128d res0 = _mm_unpacklo_pd(u0, u1);
           __m128d res1 = _mm_unpackhi_pd(u0, u1);
-          _mm_storeu_pd(
-            out + 2 * i + offsets[0],
-            _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[0]), res0));
-          _mm_storeu_pd(
-            out + 2 * i + offsets[1],
-            _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[1]), res1));
+          _mm_storeu_pd(out + 2 * i + offsets[0],
+                        _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[0]), res0));
+          _mm_storeu_pd(out + 2 * i + offsets[1],
+                        _mm_add_pd(_mm_loadu_pd(out + 2 * i + offsets[1]), res1));
         }
       for (unsigned int i = 2 * n_chunks; i < n_entries; ++i)
         for (unsigned int v = 0; v < 2; ++v)
@@ -2658,8 +2625,7 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
-           ExcMessage("Memory not aligned"));
+    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0, ExcMessage("Memory not aligned"));
     _mm_stream_ps(ptr, data);
   }
 
@@ -2889,8 +2855,7 @@ vectorized_transpose_and_store(const bool                    add_into,
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE bool
-operator==(const VectorizedArray<Number> &lhs,
-           const VectorizedArray<Number> &rhs)
+operator==(const VectorizedArray<Number> &lhs, const VectorizedArray<Number> &rhs)
 {
   for (unsigned int i = 0; i < VectorizedArray<Number>::n_array_elements; ++i)
     if (lhs[i] != rhs[i])
@@ -2932,8 +2897,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  * @relatesalso VectorizedArray
  */
 template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator*(const VectorizedArray<Number> &u, const VectorizedArray<Number> &v)
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number> operator*(const VectorizedArray<Number> &u,
+                                                               const VectorizedArray<Number> &v)
 {
   VectorizedArray<Number> tmp = u;
   return tmp *= v;
@@ -3079,8 +3044,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  * @relatesalso VectorizedArray
  */
 template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator*(const Number &u, const VectorizedArray<Number> &v)
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number> operator*(const Number &                 u,
+                                                               const VectorizedArray<Number> &v)
 {
   VectorizedArray<Number> tmp;
   tmp = u;
@@ -3095,8 +3060,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator*(const double &u, const VectorizedArray<float> &v)
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float> operator*(const double &                u,
+                                                              const VectorizedArray<float> &v)
 {
   VectorizedArray<float> tmp;
   tmp = float(u);
@@ -3110,8 +3075,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
  * @relatesalso VectorizedArray
  */
 template <typename Number>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
-                             operator*(const VectorizedArray<Number> &v, const Number &u)
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number> operator*(const VectorizedArray<Number> &v,
+                                                               const Number &                 u)
 {
   return u * v;
 }
@@ -3124,8 +3089,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number>
  *
  * @relatesalso VectorizedArray
  */
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float>
-                             operator*(const VectorizedArray<float> &v, const double &u)
+inline DEAL_II_ALWAYS_INLINE VectorizedArray<float> operator*(const VectorizedArray<float> &v,
+                                                              const double &                u)
 {
   return u * v;
 }
@@ -3247,9 +3212,7 @@ namespace std
     // optimization bug in gcc-4.6 with SSE2 (see also deal.II developers list
     // from April 2014, topic "matrix_free/step-48 Test").
     Number values[::dealii::VectorizedArray<Number>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
-         ++i)
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number>::n_array_elements; ++i)
       values[i] = std::sin(x[i]);
     ::dealii::VectorizedArray<Number> out;
     out.load(&values[0]);
@@ -3270,9 +3233,7 @@ namespace std
   cos(const ::dealii::VectorizedArray<Number> &x)
   {
     Number values[::dealii::VectorizedArray<Number>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
-         ++i)
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number>::n_array_elements; ++i)
       values[i] = std::cos(x[i]);
     ::dealii::VectorizedArray<Number> out;
     out.load(&values[0]);
@@ -3293,9 +3254,7 @@ namespace std
   tan(const ::dealii::VectorizedArray<Number> &x)
   {
     Number values[::dealii::VectorizedArray<Number>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
-         ++i)
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number>::n_array_elements; ++i)
       values[i] = std::tan(x[i]);
     ::dealii::VectorizedArray<Number> out;
     out.load(&values[0]);
@@ -3316,9 +3275,7 @@ namespace std
   exp(const ::dealii::VectorizedArray<Number> &x)
   {
     Number values[::dealii::VectorizedArray<Number>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
-         ++i)
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number>::n_array_elements; ++i)
       values[i] = std::exp(x[i]);
     ::dealii::VectorizedArray<Number> out;
     out.load(&values[0]);
@@ -3339,9 +3296,7 @@ namespace std
   log(const ::dealii::VectorizedArray<Number> &x)
   {
     Number values[::dealii::VectorizedArray<Number>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
-         ++i)
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number>::n_array_elements; ++i)
       values[i] = std::log(x[i]);
     ::dealii::VectorizedArray<Number> out;
     out.load(&values[0]);
@@ -3378,9 +3333,7 @@ namespace std
   pow(const ::dealii::VectorizedArray<Number> &x, const Number p)
   {
     Number values[::dealii::VectorizedArray<Number>::n_array_elements];
-    for (unsigned int i = 0;
-         i < dealii::VectorizedArray<Number>::n_array_elements;
-         ++i)
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number>::n_array_elements; ++i)
       values[i] = std::pow(x[i], p);
     ::dealii::VectorizedArray<Number> out;
     out.load(&values[0]);
@@ -3414,8 +3367,7 @@ namespace std
    */
   template <typename Number>
   inline ::dealii::VectorizedArray<Number>
-  max(const ::dealii::VectorizedArray<Number> &x,
-      const ::dealii::VectorizedArray<Number> &y)
+  max(const ::dealii::VectorizedArray<Number> &x, const ::dealii::VectorizedArray<Number> &y)
   {
     return x.get_max(y);
   }
@@ -3431,8 +3383,7 @@ namespace std
    */
   template <typename Number>
   inline ::dealii::VectorizedArray<Number>
-  min(const ::dealii::VectorizedArray<Number> &x,
-      const ::dealii::VectorizedArray<Number> &y)
+  min(const ::dealii::VectorizedArray<Number> &x, const ::dealii::VectorizedArray<Number> &y)
   {
     return x.get_min(y);
   }

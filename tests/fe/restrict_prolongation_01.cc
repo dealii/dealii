@@ -54,9 +54,8 @@ check(const FiniteElement<dim, spacedim> &fe,
     nested_size = dpc;
 
   // loop over all possible refinement cases
-  unsigned int ref_case = (isotropic_only) ?
-                            RefinementCase<dim>::isotropic_refinement :
-                            RefinementCase<dim>::cut_x;
+  unsigned int ref_case =
+    (isotropic_only) ? RefinementCase<dim>::isotropic_refinement : RefinementCase<dim>::cut_x;
   for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
     {
       deallog << "RefinementCase " << ref_case << std::endl;
@@ -78,9 +77,8 @@ check(const FiniteElement<dim, spacedim> &fe,
 
       // now create the matrix coarse to fine (prolongation)
       // and fine to coarse (restriction) with respect to all dofs
-      unsigned int child_no = 0;
-      typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator cell =
-        dh.begin_active();
+      unsigned int                                                     child_no = 0;
+      typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator cell     = dh.begin_active();
       for (; cell != dh.end(); ++cell, ++child_no)
         {
           FullMatrix<double> restriction_local =

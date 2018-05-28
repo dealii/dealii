@@ -539,8 +539,7 @@ public:
     right
   };
   /// Generate a formula with <tt>n</tt> quadrature points
-  QGaussRadauChebyshev(const unsigned int n,
-                       EndPoint           ep = QGaussRadauChebyshev::left);
+  QGaussRadauChebyshev(const unsigned int n, EndPoint ep = QGaussRadauChebyshev::left);
 
   /**
    * Move constructor. We cannot rely on the move constructor for `Quadrature`,
@@ -643,8 +642,7 @@ public:
    * @return A quadrature object that can be used to integrate on the simplex
    */
   Quadrature<dim>
-  compute_affine_transformation(
-    const std::array<Point<dim>, dim + 1> &vertices) const;
+  compute_affine_transformation(const std::array<Point<dim>, dim + 1> &vertices) const;
 };
 
 /**
@@ -677,8 +675,7 @@ public:
    * @param radial_quadrature Radial quadrature
    * @param angular_quadrature Angular quadrature
    */
-  QTrianglePolar(const Quadrature<1> &radial_quadrature,
-                 const Quadrature<1> &angular_quadrature);
+  QTrianglePolar(const Quadrature<1> &radial_quadrature, const Quadrature<1> &angular_quadrature);
 
   /**
    * Call the other constructor, with QGauss<1>(n) for both radial and
@@ -833,12 +830,9 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
                           const double       alpha,
                           const bool         flag);
 template <>
-QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
-                                  const unsigned int index,
-                                  const bool         flag);
+QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n, const unsigned int index, const bool flag);
 template <>
-QTelles<1>::QTelles(const Quadrature<1> &base_quad,
-                    const Point<1> &     singularity);
+QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity);
 
 
 

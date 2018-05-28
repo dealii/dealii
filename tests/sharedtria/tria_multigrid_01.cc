@@ -39,31 +39,24 @@ compare_meshes(parallel::shared::Triangulation<dim> &     shared_tria,
   std::map<CellId, unsigned int> shared_map;
   std::map<CellId, unsigned int> p4est_map;
 
-  typename Triangulation<dim>::cell_iterator cell1 = shared_tria.begin(),
-                                             endc1 = shared_tria.end();
+  typename Triangulation<dim>::cell_iterator cell1 = shared_tria.begin(), endc1 = shared_tria.end();
   for (; cell1 != endc1; ++cell1)
     {
       if (cell1->is_locally_owned_on_level())
-        shared_map.insert(
-          std::make_pair(cell1->id(), cell1->level_subdomain_id()));
+        shared_map.insert(std::make_pair(cell1->id(), cell1->level_subdomain_id()));
     }
 
-  typename Triangulation<dim>::cell_iterator cell2 = p4est_tria.begin(),
-                                             endc2 = p4est_tria.end();
+  typename Triangulation<dim>::cell_iterator cell2 = p4est_tria.begin(), endc2 = p4est_tria.end();
   for (; cell2 != endc2; ++cell2)
     {
       if (cell2->is_locally_owned_on_level())
-        p4est_map.insert(
-          std::make_pair(cell2->id(), cell2->level_subdomain_id()));
+        p4est_map.insert(std::make_pair(cell2->id(), cell2->level_subdomain_id()));
     }
 
-  for (std::map<CellId, unsigned int>::iterator it = p4est_map.begin();
-       it != p4est_map.end();
-       ++it)
+  for (std::map<CellId, unsigned int>::iterator it = p4est_map.begin(); it != p4est_map.end(); ++it)
     {
-      AssertThrow(
-        shared_map[it->first] == it->second,
-        ExcMessage("Not all CellIds map to correct level subdomain_ids."))
+      AssertThrow(shared_map[it->first] == it->second,
+                  ExcMessage("Not all CellIds map to correct level subdomain_ids."))
     }
 
 
@@ -123,22 +116,19 @@ test()
   unsigned int refinements = 2;
   GridGenerator::subdivided_hyper_cube(shared_tria, 2, -1, 1);
   shared_tria.refine_global(refinements);
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         shared_tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = shared_tria.begin_active();
        cell != shared_tria.end();
        ++cell)
     if (cell->center().norm() < 0.55)
       cell->set_refine_flag();
   shared_tria.execute_coarsening_and_refinement();
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         shared_tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = shared_tria.begin_active();
        cell != shared_tria.end();
        ++cell)
     if (cell->center().norm() > 0.3 && cell->center().norm() < 0.42)
       cell->set_refine_flag();
   shared_tria.execute_coarsening_and_refinement();
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         shared_tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = shared_tria.begin_active();
        cell != shared_tria.end();
        ++cell)
     if (cell->at_boundary() && (cell->center()[0] < 0 || cell->center()[1] < 0))
@@ -147,23 +137,19 @@ test()
 
   GridGenerator::subdivided_hyper_cube(p4est_tria, 2, -1, 1);
   p4est_tria.refine_global(refinements);
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         p4est_tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = p4est_tria.begin_active();
        cell != p4est_tria.end();
        ++cell)
     if (cell->is_locally_owned() && cell->center().norm() < 0.55)
       cell->set_refine_flag();
   p4est_tria.execute_coarsening_and_refinement();
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         p4est_tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = p4est_tria.begin_active();
        cell != p4est_tria.end();
        ++cell)
-    if (cell->is_locally_owned() && cell->center().norm() > 0.3 &&
-        cell->center().norm() < 0.42)
+    if (cell->is_locally_owned() && cell->center().norm() > 0.3 && cell->center().norm() < 0.42)
       cell->set_refine_flag();
   p4est_tria.execute_coarsening_and_refinement();
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         p4est_tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = p4est_tria.begin_active();
        cell != p4est_tria.end();
        ++cell)
     if (cell->is_locally_owned() && cell->at_boundary() &&

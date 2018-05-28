@@ -44,8 +44,7 @@ void
 print_dofs(const hp::DoFHandler<dim> &dof)
 {
   std::vector<types::global_dof_index> v;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     {
@@ -93,8 +92,7 @@ check()
   hp::DoFHandler<dim> dof(tr);
   {
     bool coin = false;
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-           dof.begin_active();
+    for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
          cell != dof.end();
          ++cell)
       {

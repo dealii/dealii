@@ -79,19 +79,15 @@ main()
     {
       // you should buy more cores, seriously.
       deallog << "* default thread limit for tests: " << n << std::endl;
-      deallog << "max concurrent running: " << n << " should be: " << n
-              << std::endl;
+      deallog << "max concurrent running: " << n << " should be: " << n << std::endl;
     }
   else if (MultithreadInfo::n_threads() == n)
     {
-      deallog << "* default thread limit for tests: "
-              << MultithreadInfo::n_threads() << std::endl;
+      deallog << "* default thread limit for tests: " << MultithreadInfo::n_threads() << std::endl;
       test();
     }
   else
-    Assert(
-      false,
-      ExcInternalError("did somebody mess with LimitConcurrency in tests.h?"));
+    Assert(false, ExcInternalError("did somebody mess with LimitConcurrency in tests.h?"));
 
   deallog << "* now with thread limit 1:" << std::endl;
   MultithreadInfo::set_thread_limit(1);

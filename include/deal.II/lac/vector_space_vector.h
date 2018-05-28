@@ -63,8 +63,7 @@ namespace LinearAlgebra
      * copied.
      */
     virtual void
-    reinit(const VectorSpaceVector<Number> &V,
-           const bool                       omit_zeroing_entries = false) = 0;
+    reinit(const VectorSpaceVector<Number> &V, const bool omit_zeroing_entries = false) = 0;
 
     /**
      * Sets all elements of the vector to the scalar @p s. This operation is
@@ -106,11 +105,10 @@ namespace LinearAlgebra
      * performance.
      */
     virtual void
-    import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>()) = 0;
+    import(const ReadWriteVector<Number> &                 V,
+           VectorOperation::values                         operation,
+           std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+             std::shared_ptr<const CommunicationPatternBase>()) = 0;
 
     /**
      * Return the scalar product of two vectors.
@@ -143,9 +141,7 @@ namespace LinearAlgebra
      * s*(*this)+a*V</tt>.
      */
     virtual void
-    sadd(const Number                     s,
-         const Number                     a,
-         const VectorSpaceVector<Number> &V) = 0;
+    sadd(const Number s, const Number a, const VectorSpaceVector<Number> &V) = 0;
 
     /**
      * Scale each element of this vector by the corresponding element in the

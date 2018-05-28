@@ -236,8 +236,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  */
 template <int dim, int spacedim = dim>
-class FE_Q_DG0
-  : public FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>
+class FE_Q_DG0 : public FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>
 {
 public:
   /**
@@ -279,7 +278,7 @@ public:
    */
   virtual void
   get_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                           FullMatrix<double> &matrix) const override;
+                           FullMatrix<double> &                matrix) const override;
 
 
   /**
@@ -287,8 +286,7 @@ public:
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, there

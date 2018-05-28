@@ -53,8 +53,7 @@ test()
       // twice globally
       const double R0 = 6371000. - 2890000.;
       const double R1 = 6371000. - 35000.;
-      GridGenerator::hyper_shell(
-        triangulation, Point<dim>(), R0, R1, (dim == 3) ? 96 : 12, true);
+      GridGenerator::hyper_shell(triangulation, Point<dim>(), R0, R1, (dim == 3) ? 96 : 12, true);
       triangulation.reset_manifold(0);
       triangulation.refine_global(2);
 
@@ -62,8 +61,7 @@ test()
       // refinement that are close to
       // the north pole
       unsigned int x_flagged_cells = 0;
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
         if (!cell->is_ghost() && !cell->is_artificial())
@@ -82,8 +80,7 @@ test()
       triangulation.prepare_coarsening_and_refinement();
       {
         unsigned int n_flagged_cells = 0;
-        for (typename Triangulation<dim>::active_cell_iterator cell =
-               triangulation.begin_active();
+        for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
              cell != triangulation.end();
              ++cell)
           if (!cell->is_ghost() && !cell->is_artificial())
@@ -93,12 +90,7 @@ test()
         Assert(n_flagged_cells == x_flagged_cells, ExcInternalError());
 
         unsigned int global_f_c = 0;
-        MPI_Allreduce(&n_flagged_cells,
-                      &global_f_c,
-                      1,
-                      MPI_UNSIGNED,
-                      MPI_SUM,
-                      MPI_COMM_WORLD);
+        MPI_Allreduce(&n_flagged_cells, &global_f_c, 1, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
 
         if (myid == 0)
           deallog << "# flagged cells = " << global_f_c << std::endl;
@@ -107,8 +99,7 @@ test()
       triangulation.execute_coarsening_and_refinement();
 
       if (myid == 0)
-        deallog << "#cells = " << triangulation.n_global_active_cells()
-                << std::endl;
+        deallog << "#cells = " << triangulation.n_global_active_cells() << std::endl;
     }
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

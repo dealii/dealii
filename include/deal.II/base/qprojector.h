@@ -110,12 +110,12 @@ public:
    * same as those of the original rule.
    */
   static void
-  project_to_subface(const SubQuadrature &          quadrature,
-                     const unsigned int             face_no,
-                     const unsigned int             subface_no,
-                     std::vector<Point<dim>> &      q_points,
-                     const RefinementCase<dim - 1> &ref_case =
-                       RefinementCase<dim - 1>::isotropic_refinement);
+  project_to_subface(
+    const SubQuadrature &          quadrature,
+    const unsigned int             face_no,
+    const unsigned int             subface_no,
+    std::vector<Point<dim>> &      q_points,
+    const RefinementCase<dim - 1> &ref_case = RefinementCase<dim - 1>::isotropic_refinement);
 
   /**
    * Compute the cell quadrature formula corresponding to using
@@ -127,11 +127,11 @@ public:
    * same as those of the original rule.
    */
   static Quadrature<dim>
-  project_to_subface(const SubQuadrature &          quadrature,
-                     const unsigned int             face_no,
-                     const unsigned int             subface_no,
-                     const RefinementCase<dim - 1> &ref_case =
-                       RefinementCase<dim - 1>::isotropic_refinement);
+  project_to_subface(
+    const SubQuadrature &          quadrature,
+    const unsigned int             face_no,
+    const unsigned int             subface_no,
+    const RefinementCase<dim - 1> &ref_case = RefinementCase<dim - 1>::isotropic_refinement);
 
   /**
    * Take a face quadrature formula and generate a cell quadrature formula
@@ -179,8 +179,7 @@ public:
    * GeometryInfo<dim>::children_per_cell.
    */
   static Quadrature<dim>
-  project_to_child(const Quadrature<dim> &quadrature,
-                   const unsigned int     child_no);
+  project_to_child(const Quadrature<dim> &quadrature, const unsigned int child_no);
 
   /**
    * Project a quadrature rule to all children of a cell. Similarly to
@@ -199,9 +198,7 @@ public:
    * connecting the points <tt>p1</tt> and <tt>p2</tt>.
    */
   static Quadrature<dim>
-  project_to_line(const Quadrature<1> &quadrature,
-                  const Point<dim> &   p1,
-                  const Point<dim> &   p2);
+  project_to_line(const Quadrature<1> &quadrature, const Point<dim> &p1, const Point<dim> &p2);
 
   /**
    * Since the project_to_all_faces() and project_to_all_subfaces() functions
@@ -270,8 +267,7 @@ public:
             const bool                       face_flip,
             const bool                       face_rotation,
             const unsigned int               n_quadrature_points,
-            const internal::SubfaceCase<dim> ref_case =
-              internal::SubfaceCase<dim>::case_isotropic);
+            const internal::SubfaceCase<dim> ref_case = internal::SubfaceCase<dim>::case_isotropic);
 
     /**
      * Conversion operator to an integer denoting the offset of the first
@@ -326,8 +322,7 @@ private:
 
 
 template <int dim>
-inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor(
-  const unsigned int dataset_offset) :
+inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor(const unsigned int dataset_offset) :
   dataset_offset(dataset_offset)
 {}
 
@@ -362,9 +357,7 @@ inline QProjector<dim>::DataSetDescriptor::operator unsigned int() const
 
 template <>
 void
-QProjector<1>::project_to_face(const Quadrature<0> &,
-                               const unsigned int,
-                               std::vector<Point<1>> &);
+QProjector<1>::project_to_face(const Quadrature<0> &, const unsigned int, std::vector<Point<1>> &);
 template <>
 void
 QProjector<2>::project_to_face(const Quadrature<1> &  quadrature,
@@ -408,8 +401,7 @@ Quadrature<1>
 QProjector<1>::project_to_all_subfaces(const Quadrature<0> &quadrature);
 
 template <>
-QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
-                        const unsigned int   n_copies);
+QIterated<1>::QIterated(const Quadrature<1> &base_quadrature, const unsigned int n_copies);
 
 
 #endif // DOXYGEN

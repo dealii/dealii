@@ -91,9 +91,8 @@ test()
       deallog << "  Case " << case_no << std::endl;
       create_triangulation((case_no == 1), tria);
 
-      const typename Triangulation<dim>::active_cell_iterator cell =
-        tria.begin_active();
-      Point<dim> trial_point;
+      const typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+      Point<dim>                                              trial_point;
       for (unsigned int i = 0; i < dim; ++i)
         trial_point[i] = 1.5;
 

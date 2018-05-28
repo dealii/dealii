@@ -81,10 +81,8 @@ test()
   const unsigned int global_mesh_refinement_steps = 5;
 
   MPI_Comm           mpi_communicator = MPI_COMM_WORLD;
-  const unsigned int n_mpi_processes =
-    Utilities::MPI::n_mpi_processes(mpi_communicator);
-  const unsigned int this_mpi_process =
-    Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int n_mpi_processes  = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const unsigned int this_mpi_process = Utilities::MPI::this_mpi_process(mpi_communicator);
 
   parallel::distributed::Triangulation<dim> triangulation(mpi_communicator);
   GridGenerator::hyper_cube(triangulation, -1, 1);
@@ -105,31 +103,21 @@ test()
     dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
-  std::shared_ptr<MatrixFree<dim, double>> mf_data(
-    new MatrixFree<dim, double>());
+  std::shared_ptr<MatrixFree<dim, double>> mf_data(new MatrixFree<dim, double>());
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, double>::AdditionalData data;
-    data.tasks_parallel_scheme =
-      MatrixFree<dim, double>::AdditionalData::partition_color;
-    data.mapping_update_flags =
-      update_values | update_gradients | update_JxW_values;
+    data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::partition_color;
+    data.mapping_update_flags  = update_values | update_gradients | update_JxW_values;
     mf_data->reinit(dof_handler, constraints, quad, data);
   }
 
-  MatrixFreeOperators::MassOperator<dim,
-                                    fe_degree,
-                                    fe_degree + 1,
-                                    1,
-                                    LinearAlgebra::distributed::Vector<double>>
-    mass;
-  MatrixFreeOperators::LaplaceOperator<
-    dim,
-    fe_degree,
-    fe_degree + 1,
-    1,
-    LinearAlgebra::distributed::Vector<double>>
-    laplace;
+  MatrixFreeOperators::
+    MassOperator<dim, fe_degree, fe_degree + 1, 1, LinearAlgebra::distributed::Vector<double>>
+      mass;
+  MatrixFreeOperators::
+    LaplaceOperator<dim, fe_degree, fe_degree + 1, 1, LinearAlgebra::distributed::Vector<double>>
+      laplace;
   mass.initialize(mf_data);
   laplace.initialize(mf_data);
 
@@ -153,8 +141,7 @@ test()
     for (unsigned int k = 0; k < inv_mass_matrix.local_size(); ++k)
       if (inv_mass_matrix.local_element(k) > 1e-15)
         {
-          inv_mass_matrix.local_element(k) =
-            std::sqrt(1. / inv_mass_matrix.local_element(k));
+          inv_mass_matrix.local_element(k) = std::sqrt(1. / inv_mass_matrix.local_element(k));
         }
       else
         inv_mass_matrix.local_element(k) = 0;
@@ -162,11 +149,9 @@ test()
     diagonal_mass_inv.reinit(inv_mass_matrix);
   }
 
-  const auto invM = linear_operator<LinearAlgebra::distributed::Vector<double>>(
-    diagonal_mass_inv);
+  const auto invM = linear_operator<LinearAlgebra::distributed::Vector<double>>(diagonal_mass_inv);
   const auto OP =
-    invM *
-    linear_operator<LinearAlgebra::distributed::Vector<double>>(laplace) * invM;
+    invM * linear_operator<LinearAlgebra::distributed::Vector<double>>(laplace) * invM;
 
   // Do actuall work:
   LinearAlgebra::distributed::Vector<double> init_vector;
@@ -179,8 +164,8 @@ test()
   GrowingVectorMemory<LinearAlgebra::distributed::Vector<double>> vector_memory;
   for (unsigned int k = 4; k < 10; ++k)
     {
-      const double est = Utilities::LinearAlgebra::lanczos_largest_eigenvalue(
-        OP, init_vector, k, vector_memory);
+      const double est =
+        Utilities::LinearAlgebra::lanczos_largest_eigenvalue(OP, init_vector, k, vector_memory);
       deallog << k << " " << est << std::endl;
     }
 
@@ -199,11 +184,9 @@ test()
     std::vector<std::complex<double>> lambda(number_of_eigenvalues);
 
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 10;
-    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-    additional_data(
+    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData additional_data(
       num_arnoldi_vectors,
-      PArpackSolver<
-        LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
+      PArpackSolver<LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
       true,
       1);
 
@@ -247,13 +230,11 @@ test()
         {
           for (unsigned int j = 0; j < eigenfunctions.size(); j++)
             {
-              const double err =
-                std::abs(eigenfunctions[j] * eigenfunctions[i] - (i == j));
-              Assert(
-                err < precision,
-                ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
-                           " and " + Utilities::int_to_string(j) +
-                           " are not orthonormal: " + std::to_string(err)));
+              const double err = std::abs(eigenfunctions[j] * eigenfunctions[i] - (i == j));
+              Assert(err < precision,
+                     ExcMessage("Eigenvectors " + Utilities::int_to_string(i) + " and " +
+                                Utilities::int_to_string(j) +
+                                " are not orthonormal: " + std::to_string(err)));
             }
 
           OP.vmult(Ax, eigenfunctions[i]);
@@ -289,13 +270,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -303,12 +282,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

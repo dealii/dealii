@@ -57,9 +57,7 @@ reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
 
 template <typename Transfer>
 void
-make_matrix(const Transfer &    transfer,
-            const unsigned int  high_level,
-            FullMatrix<double> &matrix)
+make_matrix(const Transfer &transfer, const unsigned int high_level, FullMatrix<double> &matrix)
 {
   Vector<double> src(matrix.n());
   Vector<double> dst(matrix.m());
@@ -92,8 +90,7 @@ void
 refine_mesh(Triangulation<dim> &triangulation)
 {
   bool cell_refined = false;
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     {
@@ -106,8 +103,7 @@ refine_mesh(Triangulation<dim> &triangulation)
         }
     }
   if (!cell_refined) // if no cell was selected for refinement, refine global
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       cell->set_refine_flag();
@@ -127,12 +123,9 @@ check(const FiniteElement<dim> &fe)
   std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
 
-  const Point<dim> bottom_left =
-    (dim == 2 ? Point<dim>(-1, -1) : Point<dim>(-1, -1, -1));
-  const Point<dim> top_right =
-    (dim == 2 ? Point<dim>(1, 1) : Point<dim>(1, 1, 1));
-  GridGenerator::subdivided_hyper_rectangle(
-    tr, subdivisions, bottom_left, top_right, true);
+  const Point<dim> bottom_left = (dim == 2 ? Point<dim>(-1, -1) : Point<dim>(-1, -1, -1));
+  const Point<dim> top_right   = (dim == 2 ? Point<dim>(1, 1) : Point<dim>(1, 1, 1));
+  GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, bottom_left, top_right, true);
   refine_mesh(tr);
 
   DoFHandler<dim> mg_dof_handler(tr);
@@ -154,8 +147,7 @@ check(const FiniteElement<dim> &fe)
   MGTransferPrebuilt<Vector<double>> transfer;
   transfer.build_matrices(mg_dof_handler);
 
-  FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1),
-                                 mg_dof_handler.n_dofs(0));
+  FullMatrix<double> prolong_0_1(mg_dof_handler.n_dofs(1), mg_dof_handler.n_dofs(0));
 
   deallog << "Level 0->1" << std::endl;
   make_matrix(transfer, 1, prolong_0_1);

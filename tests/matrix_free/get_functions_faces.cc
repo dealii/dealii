@@ -63,14 +63,12 @@ private:
         const std::pair<unsigned int, unsigned int> &) const
   {}
   void
-  local_apply_boundary_face(
-    const MatrixFree<dim, number> &data,
-    Vector<number> &,
-    const Vector<number> &                       src,
-    const std::pair<unsigned int, unsigned int> &face_range) const
+  local_apply_boundary_face(const MatrixFree<dim, number> &data,
+                            Vector<number> &,
+                            const Vector<number> &                       src,
+                            const std::pair<unsigned int, unsigned int> &face_range) const
   {
-    FEFaceEvaluation<dim, fe_degree, fe_degree + 1, 1, number> fe_eval(data,
-                                                                       true);
+    FEFaceEvaluation<dim, fe_degree, fe_degree + 1, 1, number> fe_eval(data, true);
     for (unsigned int face = face_range.first; face < face_range.second; face++)
       {
         fe_eval.reinit(face);
@@ -83,8 +81,8 @@ private:
         deallog << "Face " << face << ": ";
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
-            deallog << fe_eval.get_value(q)[0] << " "
-                    << fe_eval.get_normal_derivative(q)[0] << "   ";
+            deallog << fe_eval.get_value(q)[0] << " " << fe_eval.get_normal_derivative(q)[0]
+                    << "   ";
           }
         deallog << std::endl;
       }
@@ -138,11 +136,9 @@ test()
   {
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, double>::AdditionalData data;
-    data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
-    data.mapping_update_flags_inner_faces =
-      (update_gradients | update_JxW_values);
-    data.mapping_update_flags_boundary_faces =
-      (update_gradients | update_JxW_values);
+    data.tasks_parallel_scheme               = MatrixFree<dim, double>::AdditionalData::none;
+    data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+    data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
 
     mf_data.reinit(dof, constraints, quad, data);
   }

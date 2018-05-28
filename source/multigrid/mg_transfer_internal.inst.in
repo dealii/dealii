@@ -25,15 +25,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
         template void
         fill_copy_indices<deal_II_dimension, deal_II_space_dimension>(
-          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
-            &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
           const MGConstrainedDoFs *,
-          std::vector<std::vector<
-            std::pair<types::global_dof_index, types::global_dof_index>>> &,
-          std::vector<std::vector<
-            std::pair<types::global_dof_index, types::global_dof_index>>> &,
-          std::vector<std::vector<
-            std::pair<types::global_dof_index, types::global_dof_index>>> &,
+          std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index>>> &,
+          std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index>>> &,
+          std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index>>> &,
           const bool);
 #endif
       \}

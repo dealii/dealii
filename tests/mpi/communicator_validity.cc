@@ -63,22 +63,19 @@ do_test(MPI_Comm communicator)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   mpi_initlog();
 
   do_test<LinearAlgebra::distributed::Vector<double>>(MPI_COMM_WORLD);
 
   {
-    MPI_Comm communicator =
-      Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
+    MPI_Comm communicator = Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     do_test<LinearAlgebra::distributed::Vector<double>>(communicator);
     MPI_Comm_free(&communicator);
   }
   {
-    MPI_Comm communicator =
-      Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
+    MPI_Comm communicator = Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     do_test<LinearAlgebra::distributed::Vector<double>>(communicator);
     MPI_Comm_free(&communicator);
   }

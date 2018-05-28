@@ -73,10 +73,8 @@ test(std::string filename)
   const FE_Q<dim, spacedim> fe(1);
   DoFHandler<dim, spacedim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
-  FEValues<dim, spacedim> fe_values(fe,
-                                    q_midpoint,
-                                    update_values | update_JxW_values |
-                                      update_normal_vectors | update_gradients);
+  FEValues<dim, spacedim> fe_values(
+    fe, q_midpoint, update_values | update_JxW_values | update_normal_vectors | update_gradients);
 
   // finite elements used for the
   // graphical representation with
@@ -84,8 +82,7 @@ test(std::string filename)
   const FE_DGQ<dim, spacedim> fe_help(0);
   DoFHandler<dim, spacedim>   dof_handler_help(triangulation);
   dof_handler_help.distribute_dofs(fe_help);
-  FEValues<dim, spacedim> fe_values_help(
-    fe_help, q_midpoint, update_normal_vectors);
+  FEValues<dim, spacedim> fe_values_help(fe_help, q_midpoint, update_normal_vectors);
 
   deallog << "no. of cells " << triangulation.n_cells() << std::endl;
   deallog << "no. of dofs " << dof_handler.n_dofs() << std::endl;
@@ -124,13 +121,12 @@ test(std::string filename)
   std::vector<Tensor<1, spacedim>> cell_normals(q_midpoint.size());
   std::vector<Point<spacedim>>     cell_tangentials(q_midpoint.size());
   std::vector<double>              shape_directional_derivative(dofs_per_cell);
-  Vector<double> projected_directional_derivative(triangulation.n_cells());
+  Vector<double>                   projected_directional_derivative(triangulation.n_cells());
 
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
-  typename DoFHandler<dim, spacedim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  typename DoFHandler<dim, spacedim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                           endc = dof_handler.end();
 
   for (; cell != endc; ++cell)
     {
@@ -145,35 +141,29 @@ test(std::string filename)
       // the plane tangential to the
       // element surface.
       cell_tangentials[0][0] =
-        cell_normals[0][1] /
-        sqrt(pow(cell_normals[0][0], 2) + pow(cell_normals[0][1], 2));
+        cell_normals[0][1] / sqrt(pow(cell_normals[0][0], 2) + pow(cell_normals[0][1], 2));
       cell_tangentials[0][1] =
-        -cell_normals[0][0] /
-        sqrt(pow(cell_normals[0][0], 2) + pow(cell_normals[0][1], 2));
+        -cell_normals[0][0] / sqrt(pow(cell_normals[0][0], 2) + pow(cell_normals[0][1], 2));
       if (spacedim == 3)
         cell_tangentials[0][2] = 0.;
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          shape_directional_derivative[i] =
-            fe_values.shape_grad(i, 0) * cell_tangentials[0];
+          shape_directional_derivative[i] = fe_values.shape_grad(i, 0) * cell_tangentials[0];
 
           // notice that the dof_index for
           // fe_dgq(0) is the same as that of
           // the cell
           projected_directional_derivative(cell->index()) +=
-            projected_one(local_dof_indices[i]) *
-            shape_directional_derivative[i];
+            projected_one(local_dof_indices[i]) * shape_directional_derivative[i];
         }
 
       deallog << "cell no. " << cell->index() << "; "
-              << "dir.deriv. "
-              << projected_directional_derivative(cell->index()) << "; "
+              << "dir.deriv. " << projected_directional_derivative(cell->index()) << "; "
               << std::endl;
       if (spacedim == 2)
         deallog << "exact solution "
-                << cos(2 * numbers::PI * (cell->index() + .5) /
-                       triangulation.n_cells())
+                << cos(2 * numbers::PI * (cell->index() + .5) / triangulation.n_cells())
                 << std::endl;
     }
 

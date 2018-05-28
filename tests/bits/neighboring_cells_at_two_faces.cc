@@ -88,8 +88,7 @@ check_neighbors(const Triangulation<2> &tria)
     if (cell->neighbor(f).state() == IteratorState::valid)
       {
         const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor(f);
-        deallog << "At face " << f
-                << ": neighbor_of_neighbor=" << neighbor_neighbor << std::endl;
+        deallog << "At face " << f << ": neighbor_of_neighbor=" << neighbor_neighbor << std::endl;
         Assert(cell->face(f) == cell->neighbor(f)->face(neighbor_neighbor),
                ExcMessage("Error in neighbor_of_neighbor() function!"));
       }

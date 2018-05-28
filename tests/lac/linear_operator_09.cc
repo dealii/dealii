@@ -47,8 +47,7 @@ main(int argc, char *argv[])
     unsigned int np = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
     if (4 % np == 0 && np <= 4)
       {
-        PETScWrappers::MPI::SparseMatrix a(
-          MPI_COMM_WORLD, 4, 4, 4 / np, 4 / np, 1);
+        PETScWrappers::MPI::SparseMatrix a(MPI_COMM_WORLD, 4, 4, 4 / np, 4 / np, 1);
         for (unsigned int i = 0; i < 4; ++i)
           for (unsigned int j = 0; j < 4; ++j)
             a.add(i, i, 1);

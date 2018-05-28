@@ -365,8 +365,8 @@ public:
   FiniteElementData(const std::vector<unsigned int> &dofs_per_object,
                     const unsigned int               n_components,
                     const unsigned int               degree,
-                    const Conformity                 conformity = unknown,
-                    const BlockIndices &block_indices = BlockIndices());
+                    const Conformity                 conformity    = unknown,
+                    const BlockIndices &             block_indices = BlockIndices());
 
   /**
    * Number of dofs per vertex.
@@ -485,15 +485,15 @@ namespace FiniteElementDomination
     switch (d1)
       {
         case this_element_dominates:
-          if ((d2 == this_element_dominates) ||
-              (d2 == either_element_can_dominate) || (d2 == no_requirements))
+          if ((d2 == this_element_dominates) || (d2 == either_element_can_dominate) ||
+              (d2 == no_requirements))
             return this_element_dominates;
           else
             return neither_element_dominates;
 
         case other_element_dominates:
-          if ((d2 == other_element_dominates) ||
-              (d2 == either_element_can_dominate) || (d2 == no_requirements))
+          if ((d2 == other_element_dominates) || (d2 == either_element_can_dominate) ||
+              (d2 == no_requirements))
             return other_element_dominates;
           else
             return neither_element_dominates;

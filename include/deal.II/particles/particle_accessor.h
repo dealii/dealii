@@ -146,8 +146,7 @@ namespace Particles
      * operation requires a reference to the triangulation.
      */
     typename Triangulation<dim, spacedim>::cell_iterator
-    get_surrounding_cell(
-      const Triangulation<dim, spacedim> &triangulation) const;
+    get_surrounding_cell(const Triangulation<dim, spacedim> &triangulation) const;
 
     /**
      * Serialize the contents of this class.
@@ -191,11 +190,9 @@ namespace Particles
      * map. This constructor is protected so that it can only be accessed by
      * friend classes.
      */
-    ParticleAccessor(
-      const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
-      const typename std::multimap<internal::LevelInd,
-                                   Particle<dim, spacedim>>::iterator
-        &particle);
+    ParticleAccessor(const std::multimap<internal::LevelInd, Particle<dim, spacedim>> &map,
+                     const typename std::multimap<internal::LevelInd,
+                                                  Particle<dim, spacedim>>::iterator & particle);
 
   private:
     /**
@@ -208,8 +205,7 @@ namespace Particles
      * An iterator into the container of particles. Obviously,
      * this accessor is invalidated if the container changes.
      */
-    typename std::multimap<internal::LevelInd,
-                           Particle<dim, spacedim>>::iterator particle;
+    typename std::multimap<internal::LevelInd, Particle<dim, spacedim>>::iterator particle;
 
     /**
      * Make ParticleIterator a friend to allow it constructing

@@ -38,9 +38,7 @@
 
 template <int dim>
 inline void
-plot_derivatives(Mapping<dim> &      mapping,
-                 FiniteElement<dim> &finel,
-                 const char *        name)
+plot_derivatives(Mapping<dim> &mapping, FiniteElement<dim> &finel, const char *name)
 {
   deallog.push(name);
 
@@ -54,8 +52,7 @@ plot_derivatives(Mapping<dim> &      mapping,
 
   QTrapez<dim> q;
   //  QIterated<dim> q(q_trapez, div);
-  FEValues<dim> fe(
-    mapping, finel, q, UpdateFlags(update_gradients | update_hessians));
+  FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_gradients | update_hessians));
   fe.reinit(c);
 
   unsigned int k = 0;
@@ -170,7 +167,7 @@ main()
 
   // FESystem test.
   MappingQGeneric<2> m(1);
-  FESystem<2> q2_q3(FE_Q<2>(2), 1, FE_Q<2>(QIterated<1>(QTrapez<1>(), 3)), 1);
+  FESystem<2>        q2_q3(FE_Q<2>(2), 1, FE_Q<2>(QIterated<1>(QTrapez<1>(), 3)), 1);
   //  plot_derivatives(m, q2_q3, "Q2_Q3");
 
   return 0;

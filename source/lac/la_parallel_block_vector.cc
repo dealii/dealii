@@ -36,9 +36,8 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-#  define TEMPL_COPY_CONSTRUCTOR(S1, S2)                 \
-    template BlockVector<S1> &BlockVector<S1>::operator= \
-      <S2>(const BlockVector<S2> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2) \
+    template BlockVector<S1> &BlockVector<S1>::operator=<S2>(const BlockVector<S2> &)
 
     TEMPL_COPY_CONSTRUCTOR(double, float);
     TEMPL_COPY_CONSTRUCTOR(float, double);

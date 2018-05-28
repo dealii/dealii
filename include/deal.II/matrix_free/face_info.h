@@ -142,8 +142,7 @@ namespace internal
       std::size_t
       memory_consumption() const
       {
-        return sizeof(faces) +
-               cell_and_face_to_plain_faces.memory_consumption() +
+        return sizeof(faces) + cell_and_face_to_plain_faces.memory_consumption() +
                cell_and_face_boundary_id.memory_consumption();
       }
 

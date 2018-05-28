@@ -67,8 +67,7 @@ public:
    *
    * @pre minlevel <= maxlevel
    */
-  MGLevelObject(const unsigned int minlevel = 0,
-                const unsigned int maxlevel = 0);
+  MGLevelObject(const unsigned int minlevel = 0, const unsigned int maxlevel = 0);
 
   /**
    * Access object on level @p level.
@@ -180,9 +179,7 @@ private:
 
 
 template <class Object>
-MGLevelObject<Object>::MGLevelObject(const unsigned int min,
-                                     const unsigned int max) :
-  minlevel(0)
+MGLevelObject<Object>::MGLevelObject(const unsigned int min, const unsigned int max) : minlevel(0)
 {
   resize(min, max);
 }
@@ -208,8 +205,7 @@ const Object &MGLevelObject<Object>::operator[](const unsigned int i) const
 
 template <class Object>
 void
-MGLevelObject<Object>::resize(const unsigned int new_minlevel,
-                              const unsigned int new_maxlevel)
+MGLevelObject<Object>::resize(const unsigned int new_minlevel, const unsigned int new_maxlevel)
 {
   Assert(new_minlevel <= new_maxlevel, ExcInternalError());
   // note that on clear(), the
@@ -285,9 +281,9 @@ template <class Object>
 std::size_t
 MGLevelObject<Object>::memory_consumption() const
 {
-  std::size_t result = sizeof(*this);
+  std::size_t                                                           result = sizeof(*this);
   typedef typename std::vector<std::shared_ptr<Object>>::const_iterator Iter;
-  const Iter end = objects.end();
+  const Iter                                                            end = objects.end();
   for (Iter o = objects.begin(); o != end; ++o)
     result += (*o)->memory_consumption();
 

@@ -39,8 +39,7 @@ test()
 
   for (unsigned int i = 0; i < is3.size(); ++i)
     {
-      deallog << i << ' ' << (is3.is_element(i) ? "true" : "false")
-              << std::endl;
+      deallog << i << ' ' << (is3.is_element(i) ? "true" : "false") << std::endl;
 
       AssertThrow((is1.is_element(i) && is2.is_element(i)) == is3.is_element(i),
                   ExcInternalError());

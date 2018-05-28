@@ -26,9 +26,7 @@
 
 template <int dim>
 void
-check1(const Function<dim> &f,
-       const unsigned int   degree,
-       const unsigned int   comp)
+check1(const Function<dim> &f, const unsigned int degree, const unsigned int comp)
 {
   FE_Q<dim>     feq(degree);
   FESystem<dim> fe(feq, comp);

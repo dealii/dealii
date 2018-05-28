@@ -45,22 +45,13 @@ main()
   {
     deallog << TensorAccessors::extract<8>(t_ref, indices)[2] << std::endl;
     deallog << TensorAccessors::extract<7>(t_ref, indices)[1][2] << std::endl;
-    deallog << TensorAccessors::extract<6>(t_ref, indices)[0][1][2]
-            << std::endl;
-    deallog << TensorAccessors::extract<5>(t_ref, indices)[2][0][1][2]
-            << std::endl;
-    deallog << TensorAccessors::extract<4>(t_ref, indices)[1][2][0][1][2]
-            << std::endl;
-    deallog << TensorAccessors::extract<3>(t_ref, indices)[0][1][2][0][1][2]
-            << std::endl;
-    deallog << TensorAccessors::extract<2>(t_ref, indices)[2][0][1][2][0][1][2]
-            << std::endl;
-    deallog << TensorAccessors::extract<1>(t_ref,
-                                           indices)[1][2][0][1][2][0][1][2]
-            << std::endl;
-    deallog << TensorAccessors::extract<0>(t_ref,
-                                           indices)[0][1][2][0][1][2][0][1][2]
-            << std::endl;
+    deallog << TensorAccessors::extract<6>(t_ref, indices)[0][1][2] << std::endl;
+    deallog << TensorAccessors::extract<5>(t_ref, indices)[2][0][1][2] << std::endl;
+    deallog << TensorAccessors::extract<4>(t_ref, indices)[1][2][0][1][2] << std::endl;
+    deallog << TensorAccessors::extract<3>(t_ref, indices)[0][1][2][0][1][2] << std::endl;
+    deallog << TensorAccessors::extract<2>(t_ref, indices)[2][0][1][2][0][1][2] << std::endl;
+    deallog << TensorAccessors::extract<1>(t_ref, indices)[1][2][0][1][2][0][1][2] << std::endl;
+    deallog << TensorAccessors::extract<0>(t_ref, indices)[0][1][2][0][1][2][0][1][2] << std::endl;
   }
 
   // Apply on c-style arrays:

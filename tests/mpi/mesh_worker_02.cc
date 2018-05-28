@@ -74,8 +74,7 @@ myIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &info1,
                         CellInfo &) const
 {
   deallog << "F cell1 = " << info1.cell->id() << " face = " << info1.face_number
-          << " cell2 = " << info2.cell->id() << " face2 = " << info2.face_number
-          << std::endl;
+          << " cell2 = " << info2.cell->id() << " face2 = " << info2.face_number << std::endl;
 }
 
 
@@ -123,16 +122,9 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
   //
 
 
-  MeshWorker::integration_loop<dim,
-                               dim,
-                               typename DoFHandler<dim>::active_cell_iterator,
-                               DoNothingAssembler>(dofs.begin_active(),
-                                                   dofs.end(),
-                                                   dof_info,
-                                                   info_box,
-                                                   local,
-                                                   assembler,
-                                                   lctrl);
+  MeshWorker::
+    integration_loop<dim, dim, typename DoFHandler<dim>::active_cell_iterator, DoNothingAssembler>(
+      dofs.begin_active(), dofs.end(), dof_info, info_box, local, assembler, lctrl);
 
   //  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>,
   //  MeshWorker::IntegrationInfoBox<dim> >
@@ -152,10 +144,9 @@ template <int dim>
 void
 test_loop(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 {
-  deallog << "* own_cells=" << lctrl.own_cells
-          << " ghost_cells=" << lctrl.ghost_cells
-          << " own_faces=" << lctrl.own_faces
-          << " faces_to_ghost=" << lctrl.faces_to_ghost << std::endl;
+  deallog << "* own_cells=" << lctrl.own_cells << " ghost_cells=" << lctrl.ghost_cells
+          << " own_faces=" << lctrl.own_faces << " faces_to_ghost=" << lctrl.faces_to_ghost
+          << std::endl;
   test_simple(dofs, lctrl);
 }
 
@@ -203,9 +194,8 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
+  MPILogInitAll                    log;
 
   test<2>();
 }

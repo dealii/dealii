@@ -50,8 +50,8 @@ Test()
   // Test vector declaration
   for (unsigned int i = 0; i < dim; ++i)
     {
-      std::string id = "Function " + Utilities::int_to_string(dim) + " - " +
-                       Utilities::int_to_string(i);
+      std::string id =
+        "Function " + Utilities::int_to_string(dim) + " - " + Utilities::int_to_string(i);
       prm.enter_subsection(id);
 
       Functions::ParsedFunction<dim>::declare_parameters(prm, i + 1);
@@ -76,19 +76,17 @@ Test()
         {
           function.set_time(t);
           Point<dim>                  p;
-          std::vector<Vector<double>> values(vertices.size(),
-                                             Vector<double>(i + 1));
+          std::vector<Vector<double>> values(vertices.size(), Vector<double>(i + 1));
           function.vector_value_list(vertices, values);
           for (unsigned int j = 0; j < vertices.size(); ++j)
             {
               double delta = 0.;
               for (unsigned int di = 0; di < i; ++di)
                 {
-                  delta = values[j](di) -
-                          std::cos(numbers::PI * (i + 1) * vertices[j][di]) * t;
+                  delta = values[j](di) - std::cos(numbers::PI * (i + 1) * vertices[j][di]) * t;
                   if (std::abs(delta) > 1e-10)
-                    deallog << "p(" << di << "): " << vertices[j]
-                            << ", delta: " << delta << std::endl;
+                    deallog << "p(" << di << "): " << vertices[j] << ", delta: " << delta
+                            << std::endl;
                 }
             }
         }

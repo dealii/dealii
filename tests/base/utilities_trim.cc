@@ -43,8 +43,7 @@ test()
   check("  \rmiddle\r\n   ", "middle");
   check("left\v\t\r\n   ", "left");
   check("  \n\v\f\r\nright", "right");
-  check(" \t\v\f\t\r\n\r multiple  words with spaces  \v\f\n",
-        "multiple  words with spaces");
+  check(" \t\v\f\t\r\n\r multiple  words with spaces  \v\f\n", "multiple  words with spaces");
 
   deallog << "OK" << std::endl;
 }

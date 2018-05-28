@@ -43,10 +43,8 @@ void check_this(Triangulation<3> &tria)
 {
   QTrapez<2>      quadrature;
   FE_Q<3>         fe(1);
-  FEFaceValues<3> fe_face_values1(
-    fe, quadrature, update_quadrature_points | update_JxW_values);
-  FEFaceValues<3> fe_face_values2(
-    fe, quadrature, update_quadrature_points | update_JxW_values);
+  FEFaceValues<3> fe_face_values1(fe, quadrature, update_quadrature_points | update_JxW_values);
+  FEFaceValues<3> fe_face_values2(fe, quadrature, update_quadrature_points | update_JxW_values);
 
   DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
@@ -55,9 +53,7 @@ void check_this(Triangulation<3> &tria)
 
   // look at all faces, not only
   // active ones
-  for (DoFHandler<3>::cell_iterator cell = dof_handler.begin();
-       cell != dof_handler.end();
-       ++cell)
+  for (DoFHandler<3>::cell_iterator cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
     for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
       if (!cell->at_boundary(f))
         {
@@ -84,13 +80,11 @@ void check_this(Triangulation<3> &tria)
                         << "  " << fe_face_values1.quadrature_point(q) << ", "
                         << fe_face_values1.JxW(q) << std::endl;
 
-              Assert((fe_face_values1.quadrature_point(q) -
-                      fe_face_values2.quadrature_point(q))
+              Assert((fe_face_values1.quadrature_point(q) - fe_face_values2.quadrature_point(q))
                          .norm_square() < 1e-20,
                      ExcInternalError());
 
-              Assert(std::fabs(fe_face_values1.JxW(q) -
-                               fe_face_values2.JxW(q)) < 1e-15,
+              Assert(std::fabs(fe_face_values1.JxW(q) - fe_face_values2.JxW(q)) < 1e-15,
                      ExcInternalError());
             }
         }

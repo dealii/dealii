@@ -61,12 +61,10 @@ check(const char *p)
   // make sure the prm object was reset to a state where we are in the
   // subsection we were in before attempting the `parse_input` call
   // (namely, in the top-level section of the prm tree)
-  deallog << "test_1="
-          << prm.get("test_1") // should =1, because we read that value
+  deallog << "test_1=" << prm.get("test_1") // should =1, because we read that value
           << std::endl;
   prm.enter_subsection("subsec");
-  deallog << "test_2="
-          << prm.get("test_2") // should =default, because the action failed
+  deallog << "test_2=" << prm.get("test_2") // should =default, because the action failed
           << std::endl;
   prm.leave_subsection();
 }

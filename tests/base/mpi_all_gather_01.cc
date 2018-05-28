@@ -37,25 +37,21 @@ main(int argc, char *argv[])
   for (unsigned int i = 0; i < my_proc + 1; ++i)
     local_points[i] = Point<3>(my_proc, -my_proc, i);
 
-  auto gathered_points =
-    Utilities::MPI::all_gather(MPI_COMM_WORLD, local_points);
-  bool test_passed = true;
+  auto gathered_points = Utilities::MPI::all_gather(MPI_COMM_WORLD, local_points);
+  bool test_passed     = true;
   for (unsigned int i = 0; i < n_procs; ++i)
     {
       if (gathered_points[i].size() != i + 1)
         {
           test_passed = false;
-          deallog << "Error: Points received from rank " << i
-                  << " have wrong size. " << std::endl;
+          deallog << "Error: Points received from rank " << i << " have wrong size. " << std::endl;
         }
       for (unsigned int p = 0; p < gathered_points[i].size(); ++p)
-        if (gathered_points[i][p][0] != (double)i ||
-            gathered_points[i][p][1] != (double)-i ||
+        if (gathered_points[i][p][0] != (double)i || gathered_points[i][p][1] != (double)-i ||
             gathered_points[i][p][2] != (double)p)
           {
             test_passed = false;
-            deallog << "Error with point " << p << " from rank " << i
-                    << std::endl;
+            deallog << "Error with point " << p << " from rank " << i << std::endl;
           }
     }
 

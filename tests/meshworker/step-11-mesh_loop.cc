@@ -142,12 +142,10 @@ namespace Step11
     system_rhs.reinit(dof_handler.n_dofs());
 
     std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs(
-      dof_handler, ComponentMask(), boundary_dofs);
+    DoFTools::extract_boundary_dofs(dof_handler, ComponentMask(), boundary_dofs);
 
     const unsigned int first_boundary_dof = std::distance(
-      boundary_dofs.begin(),
-      std::find(boundary_dofs.begin(), boundary_dofs.end(), true));
+      boundary_dofs.begin(), std::find(boundary_dofs.begin(), boundary_dofs.end(), true));
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
@@ -183,26 +181,24 @@ namespace Step11
       fe_values(mapping,
                 fe,
                 QGauss<dim>(quadrature_degree),
-                update_values | update_gradients | update_quadrature_points |
-                  update_JxW_values),
+                update_values | update_gradients | update_quadrature_points | update_JxW_values),
       fe_face_values(mapping,
                      fe,
                      QGauss<dim - 1>(quadrature_degree),
-                     update_values | update_quadrature_points |
-                       update_JxW_values | update_normal_vectors)
+                     update_values | update_quadrature_points | update_JxW_values |
+                       update_normal_vectors)
     {}
 
     ScratchData(const ScratchData<dim> &scratch_data) :
       fe_values(scratch_data.fe_values.get_mapping(),
                 scratch_data.fe_values.get_fe(),
                 scratch_data.fe_values.get_quadrature(),
-                update_values | update_gradients | update_quadrature_points |
-                  update_JxW_values),
+                update_values | update_gradients | update_quadrature_points | update_JxW_values),
       fe_face_values(scratch_data.fe_face_values.get_mapping(),
                      scratch_data.fe_face_values.get_fe(),
                      scratch_data.fe_face_values.get_quadrature(),
-                     update_values | update_quadrature_points |
-                       update_JxW_values | update_normal_vectors)
+                     update_values | update_quadrature_points | update_JxW_values |
+                       update_normal_vectors)
     {}
 
     FEValues<dim>     fe_values;
@@ -223,80 +219,66 @@ namespace Step11
   {
     typedef decltype(dof_handler.begin_active()) Iterator;
 
-    auto cell_worker = [](const Iterator &  cell,
-                          ScratchData<dim> &scratch_data,
-                          CopyData &        copy_data) {
-      const unsigned int dofs_per_cell =
-        scratch_data.fe_values.get_fe().dofs_per_cell;
-      const unsigned int n_q_points =
-        scratch_data.fe_values.get_quadrature().size();
+    auto cell_worker =
+      [](const Iterator &cell, ScratchData<dim> &scratch_data, CopyData &copy_data) {
+        const unsigned int dofs_per_cell = scratch_data.fe_values.get_fe().dofs_per_cell;
+        const unsigned int n_q_points    = scratch_data.fe_values.get_quadrature().size();
 
-      copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
-      copy_data.cell_rhs.reinit(dofs_per_cell);
+        copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
+        copy_data.cell_rhs.reinit(dofs_per_cell);
 
-      copy_data.local_dof_indices.resize(dofs_per_cell);
-      cell->get_dof_indices(copy_data.local_dof_indices);
+        copy_data.local_dof_indices.resize(dofs_per_cell);
+        cell->get_dof_indices(copy_data.local_dof_indices);
 
-      scratch_data.fe_values.reinit(cell);
+        scratch_data.fe_values.reinit(cell);
 
-      std::vector<double>   rhs_values(n_q_points);
-      ConstantFunction<dim> right_hand_side(-2.0);
-      right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),
-                                 rhs_values);
+        std::vector<double>   rhs_values(n_q_points);
+        ConstantFunction<dim> right_hand_side(-2.0);
+        right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(), rhs_values);
 
-      // ... and assemble the local contributions to the system matrix and
-      // right hand side as also discussed above:
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              copy_data.cell_matrix(i, j) +=
-                (scratch_data.fe_values.shape_grad(i, q_point) *
-                 scratch_data.fe_values.shape_grad(j, q_point) *
-                 scratch_data.fe_values.JxW(q_point));
+        // ... and assemble the local contributions to the system matrix and
+        // right hand side as also discussed above:
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            {
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                copy_data.cell_matrix(i, j) += (scratch_data.fe_values.shape_grad(i, q_point) *
+                                                scratch_data.fe_values.shape_grad(j, q_point) *
+                                                scratch_data.fe_values.JxW(q_point));
 
-            copy_data.cell_rhs(i) +=
-              (scratch_data.fe_values.shape_value(i, q_point) *
-               rhs_values[q_point] * scratch_data.fe_values.JxW(q_point));
-          }
-    };
+              copy_data.cell_rhs(i) += (scratch_data.fe_values.shape_value(i, q_point) *
+                                        rhs_values[q_point] * scratch_data.fe_values.JxW(q_point));
+            }
+      };
 
     auto boundary_worker = [](const Iterator &    cell,
                               const unsigned int &face_no,
                               ScratchData<dim> &  scratch_data,
                               CopyData &          copy_data) {
-      const unsigned int dofs_per_cell =
-        scratch_data.fe_values.get_fe().dofs_per_cell;
-      const unsigned int n_face_q_points =
-        scratch_data.fe_face_values.get_quadrature().size();
+      const unsigned int dofs_per_cell   = scratch_data.fe_values.get_fe().dofs_per_cell;
+      const unsigned int n_face_q_points = scratch_data.fe_face_values.get_quadrature().size();
 
       std::vector<double>   face_boundary_values(n_face_q_points);
       ConstantFunction<dim> boundary_values(1.0);
 
       scratch_data.fe_face_values.reinit(cell, face_no);
-      boundary_values.value_list(
-        scratch_data.fe_face_values.get_quadrature_points(),
-        face_boundary_values);
+      boundary_values.value_list(scratch_data.fe_face_values.get_quadrature_points(),
+                                 face_boundary_values);
 
       for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           copy_data.cell_rhs(i) -=
-            (face_boundary_values[q_point] *
-             scratch_data.fe_face_values.shape_value(i, q_point) *
+            (face_boundary_values[q_point] * scratch_data.fe_face_values.shape_value(i, q_point) *
              scratch_data.fe_face_values.JxW(q_point));
     };
 
     auto copier = [&](const CopyData &c) {
-      constraints.distribute_local_to_global(c.cell_matrix,
-                                             c.cell_rhs,
-                                             c.local_dof_indices,
-                                             system_matrix,
-                                             system_rhs);
+      constraints.distribute_local_to_global(
+        c.cell_matrix, c.cell_rhs, c.local_dof_indices, system_matrix, system_rhs);
     };
 
-    const unsigned int gauss_degree = std::max(
-      static_cast<unsigned int>(std::ceil(1. * (mapping.get_degree() + 1) / 2)),
-      2U);
+    const unsigned int gauss_degree =
+      std::max(static_cast<unsigned int>(std::ceil(1. * (mapping.get_degree() + 1) / 2)), 2U);
 
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
@@ -304,8 +286,7 @@ namespace Step11
                           copier,
                           ScratchData<dim>(mapping, fe, gauss_degree),
                           CopyData(),
-                          MeshWorker::assemble_own_cells |
-                            MeshWorker::assemble_boundary_faces,
+                          MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces,
                           boundary_worker);
 
 
@@ -340,14 +321,13 @@ namespace Step11
     // Then, the function just called returns its results as a vector of
     // values each of which denotes the norm on one cell. To get the global
     // norm, we do the following:
-    const double norm = VectorTools::compute_global_error(
-      triangulation, norm_per_cell, VectorTools::H1_seminorm);
+    const double norm =
+      VectorTools::compute_global_error(triangulation, norm_per_cell, VectorTools::H1_seminorm);
 
     // Last task -- generate output:
     output_table.add_value("cells", triangulation.n_active_cells());
     output_table.add_value("|u|_1", norm);
-    output_table.add_value("error",
-                           std::fabs(norm - std::sqrt(3.14159265358 / 2)));
+    output_table.add_value("error", std::fabs(norm - std::sqrt(3.14159265358 / 2)));
   }
 
 

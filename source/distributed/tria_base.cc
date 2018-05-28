@@ -41,12 +41,10 @@ namespace parallel
 {
   template <int dim, int spacedim>
   Triangulation<dim, spacedim>::Triangulation(
-    MPI_Comm mpi_communicator,
-    const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
-               smooth_grid,
-    const bool check_for_distorted_cells) :
-    dealii::Triangulation<dim, spacedim>(smooth_grid,
-                                         check_for_distorted_cells),
+    MPI_Comm                                                           mpi_communicator,
+    const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing smooth_grid,
+    const bool                                                         check_for_distorted_cells) :
+    dealii::Triangulation<dim, spacedim>(smooth_grid, check_for_distorted_cells),
     mpi_communicator(mpi_communicator),
     my_subdomain(Utilities::MPI::this_mpi_process(this->mpi_communicator)),
     n_subdomains(Utilities::MPI::n_mpi_processes(this->mpi_communicator))
@@ -75,15 +73,13 @@ namespace parallel
     dealii::Triangulation<dim, spacedim>::copy_triangulation(other_tria);
 
     if (const dealii::parallel::Triangulation<dim, spacedim> *other_tria_x =
-          dynamic_cast<const dealii::parallel::Triangulation<dim, spacedim> *>(
-            &other_tria))
+          dynamic_cast<const dealii::parallel::Triangulation<dim, spacedim> *>(&other_tria))
       {
         mpi_communicator = other_tria_x->get_communicator();
 
         // release unused vector memory because we will have very different
         // vectors now
-        ::dealii::internal::GrowingVectorMemoryImplementation::
-          release_all_unused_memory();
+        ::dealii::internal::GrowingVectorMemoryImplementation::release_all_unused_memory();
       }
 #endif
   }
@@ -98,10 +94,8 @@ namespace parallel
       this->dealii::Triangulation<dim, spacedim>::memory_consumption() +
       MemoryConsumption::memory_consumption(mpi_communicator) +
       MemoryConsumption::memory_consumption(my_subdomain) +
-      MemoryConsumption::memory_consumption(
-        number_cache.n_locally_owned_active_cells) +
-      MemoryConsumption::memory_consumption(
-        number_cache.n_global_active_cells) +
+      MemoryConsumption::memory_consumption(number_cache.n_locally_owned_active_cells) +
+      MemoryConsumption::memory_consumption(number_cache.n_global_active_cells) +
       MemoryConsumption::memory_consumption(number_cache.n_global_levels);
     return mem;
   }
@@ -111,8 +105,7 @@ namespace parallel
   {
     // release unused vector memory because the vector layout is going to look
     // very different now
-    ::dealii::internal::GrowingVectorMemoryImplementation::
-      release_all_unused_memory();
+    ::dealii::internal::GrowingVectorMemoryImplementation::release_all_unused_memory();
   }
 
   template <int dim, int spacedim>
@@ -144,8 +137,7 @@ namespace parallel
 
   template <int dim, int spacedim>
   const std::vector<unsigned int> &
-  Triangulation<dim, spacedim>::n_locally_owned_active_cells_per_processor()
-    const
+  Triangulation<dim, spacedim>::n_locally_owned_active_cells_per_processor() const
   {
     return number_cache.n_locally_owned_active_cells;
   }
@@ -188,36 +180,31 @@ namespace parallel
 
     {
       // find ghost owners
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
+      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active();
            cell != this->end();
            ++cell)
         if (cell->is_ghost())
           number_cache.ghost_owners.insert(cell->subdomain_id());
 
-      Assert(number_cache.ghost_owners.size() <
-               Utilities::MPI::n_mpi_processes(mpi_communicator),
+      Assert(number_cache.ghost_owners.size() < Utilities::MPI::n_mpi_processes(mpi_communicator),
              ExcInternalError());
     }
 
     if (this->n_levels() > 0)
-      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
+      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active();
            cell != this->end();
            ++cell)
         if (cell->subdomain_id() == my_subdomain)
           ++number_cache.n_locally_owned_active_cells[my_subdomain];
 
-    unsigned int send_value =
-      number_cache.n_locally_owned_active_cells[my_subdomain];
-    const int ierr =
-      MPI_Allgather(&send_value,
-                    1,
-                    MPI_UNSIGNED,
-                    number_cache.n_locally_owned_active_cells.data(),
-                    1,
-                    MPI_UNSIGNED,
-                    this->mpi_communicator);
+    unsigned int send_value = number_cache.n_locally_owned_active_cells[my_subdomain];
+    const int    ierr       = MPI_Allgather(&send_value,
+                                   1,
+                                   MPI_UNSIGNED,
+                                   number_cache.n_locally_owned_active_cells.data(),
+                                   1,
+                                   MPI_UNSIGNED,
+                                   this->mpi_communicator);
     AssertThrowMPI(ierr);
 
     number_cache.n_global_active_cells =
@@ -225,8 +212,7 @@ namespace parallel
                       number_cache.n_locally_owned_active_cells.end(),
                       /* ensure sum is computed with correct data type:*/
                       static_cast<types::global_dof_index>(0));
-    number_cache.n_global_levels =
-      Utilities::MPI::max(this->n_levels(), this->mpi_communicator);
+    number_cache.n_global_levels = Utilities::MPI::max(this->n_levels(), this->mpi_communicator);
   }
 
 
@@ -242,14 +228,12 @@ namespace parallel
       return;
 
     // find level ghost owners
-    for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-           this->begin();
+    for (typename Triangulation<dim, spacedim>::cell_iterator cell = this->begin();
          cell != this->end();
          ++cell)
       if (cell->level_subdomain_id() != numbers::artificial_subdomain_id &&
           cell->level_subdomain_id() != this->locally_owned_subdomain())
-        this->number_cache.level_ghost_owners.insert(
-          cell->level_subdomain_id());
+        this->number_cache.level_ghost_owners.insert(cell->level_subdomain_id());
 
 #  ifdef DEBUG
     // Check that level_ghost_owners is symmetric by sending a message to
@@ -259,23 +243,17 @@ namespace parallel
       AssertThrowMPI(ierr);
 
       // important: preallocate to avoid (re)allocation:
-      std::vector<MPI_Request> requests(
-        this->number_cache.level_ghost_owners.size());
-      unsigned int dummy       = 0;
-      unsigned int req_counter = 0;
+      std::vector<MPI_Request> requests(this->number_cache.level_ghost_owners.size());
+      unsigned int             dummy       = 0;
+      unsigned int             req_counter = 0;
 
       for (std::set<types::subdomain_id>::iterator it =
              this->number_cache.level_ghost_owners.begin();
            it != this->number_cache.level_ghost_owners.end();
            ++it, ++req_counter)
         {
-          ierr = MPI_Isend(&dummy,
-                           1,
-                           MPI_UNSIGNED,
-                           *it,
-                           9001,
-                           this->mpi_communicator,
-                           &requests[req_counter]);
+          ierr = MPI_Isend(
+            &dummy, 1, MPI_UNSIGNED, *it, 9001, this->mpi_communicator, &requests[req_counter]);
           AssertThrowMPI(ierr);
         }
 
@@ -285,20 +263,14 @@ namespace parallel
            ++it)
         {
           unsigned int dummy;
-          ierr = MPI_Recv(&dummy,
-                          1,
-                          MPI_UNSIGNED,
-                          *it,
-                          9001,
-                          this->mpi_communicator,
-                          MPI_STATUS_IGNORE);
+          ierr =
+            MPI_Recv(&dummy, 1, MPI_UNSIGNED, *it, 9001, this->mpi_communicator, MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
 
       if (requests.size() > 0)
         {
-          ierr =
-            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+          ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
 
@@ -380,8 +352,7 @@ namespace parallel
       if (cell->is_ghost())
         {
           const types::subdomain_id owner = cell->subdomain_id();
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-               ++v)
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
             {
               if (vertex_of_own_cell[cell->vertex_index(v)])
                 result[cell->vertex_index(v)].insert(owner);

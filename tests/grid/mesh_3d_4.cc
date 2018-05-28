@@ -36,8 +36,7 @@ count_wrong_faces(const Triangulation<3> &tria)
 
   // count faces with "wrong"
   // orientation
-  for (Triangulation<3>::active_cell_iterator cell = tria.begin_active();
-       cell != tria.end();
+  for (Triangulation<3>::active_cell_iterator cell = tria.begin_active(); cell != tria.end();
        ++cell)
     for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
       if (cell->face_orientation(f) == false)

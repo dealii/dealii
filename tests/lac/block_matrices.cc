@@ -108,25 +108,21 @@ test()
           ac += bsp.block(1, col).row_length(row - 2);
         else
           ac += bsp.block(2, col).row_length(row - 9);
-      deallog << "Row=" << row << ": expected length=" << c
-              << ", actual length=" << ac << std::endl;
+      deallog << "Row=" << row << ": expected length=" << c << ", actual length=" << ac
+              << std::endl;
       total_nonzero_elements += ac;
       AssertThrow(c == ac, ExcInternalError());
     };
-  deallog << total_nonzero_elements << "==" << bsp.n_nonzero_elements()
-          << std::endl;
-  AssertThrow(total_nonzero_elements == bsp.n_nonzero_elements(),
-              ExcInternalError());
+  deallog << total_nonzero_elements << "==" << bsp.n_nonzero_elements() << std::endl;
+  AssertThrow(total_nonzero_elements == bsp.n_nonzero_elements(), ExcInternalError());
 
 
 
   // now make a matrix with this
   // sparsity pattern
   BlockSparseMatrix<double> bsm(bsp);
-  deallog << total_nonzero_elements << "==" << bsm.n_nonzero_elements()
-          << std::endl;
-  AssertThrow(total_nonzero_elements == bsm.n_nonzero_elements(),
-              ExcInternalError());
+  deallog << total_nonzero_elements << "==" << bsm.n_nonzero_elements() << std::endl;
+  AssertThrow(total_nonzero_elements == bsm.n_nonzero_elements(), ExcInternalError());
 
   // try to write something into it,
   // set entry (i,j) to i*j
@@ -144,8 +140,7 @@ test()
   BlockSparseMatrix<double>::const_iterator       iter     = bsm.begin();
   const BlockSparseMatrix<double>::const_iterator end_iter = bsm.end();
   for (; iter != end_iter; ++iter)
-    deallog << iter->row() << '\t' << iter->column() << '\t' << iter->value()
-            << std::endl;
+    deallog << iter->row() << '\t' << iter->column() << '\t' << iter->value() << std::endl;
   deallog.pop();
 
   // now allocate two block vectors
@@ -187,8 +182,7 @@ test()
 
       // compare to vmult result
       Assert(row_sum == dst(row), ExcInternalError());
-      deallog << "vmult " << row << ' ' << row_sum << ' ' << dst(row)
-              << std::endl;
+      deallog << "vmult " << row << ' ' << row_sum << ' ' << dst(row) << std::endl;
     };
 
 
@@ -212,12 +206,10 @@ main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       // abort
       return 2;
     }
@@ -225,12 +217,10 @@ main()
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       // abort
       return 3;
     };

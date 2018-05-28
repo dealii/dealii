@@ -58,8 +58,7 @@ public:
 
 template <int dim>
 void
-MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
-                            MeshWorker::IntegrationInfo<dim> &info)
+MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info)
 {
   const FEValuesBase<dim> &fe           = info.fe_values();
   FullMatrix<double> &     local_matrix = dinfo.matrix(0).matrix;
@@ -67,31 +66,27 @@ MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
   for (unsigned int k = 0; k < fe.n_quadrature_points; ++k)
     for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
       for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-        local_matrix(i, j) +=
-          (fe.shape_grad(i, k) * fe.shape_grad(j, k)) * fe.JxW(k);
+        local_matrix(i, j) += (fe.shape_grad(i, k) * fe.shape_grad(j, k)) * fe.JxW(k);
 }
 
 
 template <int dim>
 void
-MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim> &        dinfo,
-                            MeshWorker::IntegrationInfo<dim> &info)
+MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info)
 {
   const FEValuesBase<dim> &fe           = info.fe_values();
   FullMatrix<double> &     local_matrix = dinfo.matrix(0).matrix;
 
-  const unsigned int deg = fe.get_fe().tensor_degree();
-  const double       penalty =
-    2. * deg * (deg + 1) * dinfo.face->measure() / dinfo.cell->measure();
+  const unsigned int deg     = fe.get_fe().tensor_degree();
+  const double       penalty = 2. * deg * (deg + 1) * dinfo.face->measure() / dinfo.cell->measure();
 
   for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
     for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
       for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-        local_matrix(i, j) +=
-          (fe.shape_value(i, k) * penalty * fe.shape_value(j, k) -
-           (fe.normal_vector(k) * fe.shape_grad(i, k)) * fe.shape_value(j, k) -
-           (fe.normal_vector(k) * fe.shape_grad(j, k)) * fe.shape_value(i, k)) *
-          fe.JxW(k);
+        local_matrix(i, j) += (fe.shape_value(i, k) * penalty * fe.shape_value(j, k) -
+                               (fe.normal_vector(k) * fe.shape_grad(i, k)) * fe.shape_value(j, k) -
+                               (fe.normal_vector(k) * fe.shape_grad(j, k)) * fe.shape_value(i, k)) *
+                              fe.JxW(k);
 }
 
 
@@ -109,12 +104,10 @@ MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &        dinfo1,
   FullMatrix<double> &     matrix_v2u1 = dinfo2.matrix(0, true).matrix;
   FullMatrix<double> &     matrix_v2u2 = dinfo2.matrix(0, false).matrix;
 
-  const unsigned int deg = fe1.get_fe().tensor_degree();
-  const double       penalty1 =
-    deg * (deg + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
-  const double penalty2 =
-    deg * (deg + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
-  const double penalty = penalty1 + penalty2;
+  const unsigned int deg      = fe1.get_fe().tensor_degree();
+  const double       penalty1 = deg * (deg + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
+  const double       penalty2 = deg * (deg + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
+  const double       penalty  = penalty1 + penalty2;
 
   for (unsigned k = 0; k < fe1.n_quadrature_points; ++k)
     for (unsigned int i = 0; i < fe1.dofs_per_cell; ++i)
@@ -122,31 +115,23 @@ MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &        dinfo1,
         {
           matrix_v1u1(i, j) +=
             (fe1.shape_value(i, k) * penalty * fe1.shape_value(j, k) -
-             (fe1.normal_vector(k) * fe1.shape_grad(i, k)) *
-               fe1.shape_value(j, k) -
-             (fe1.normal_vector(k) * fe1.shape_grad(j, k)) *
-               fe1.shape_value(i, k)) *
+             (fe1.normal_vector(k) * fe1.shape_grad(i, k)) * fe1.shape_value(j, k) -
+             (fe1.normal_vector(k) * fe1.shape_grad(j, k)) * fe1.shape_value(i, k)) *
             .5 * fe1.JxW(k);
           matrix_v1u2(i, j) +=
             (-fe1.shape_value(i, k) * penalty * fe2.shape_value(j, k) +
-             (fe1.normal_vector(k) * fe1.shape_grad(i, k)) *
-               fe2.shape_value(j, k) -
-             (fe1.normal_vector(k) * fe2.shape_grad(j, k)) *
-               fe1.shape_value(i, k)) *
+             (fe1.normal_vector(k) * fe1.shape_grad(i, k)) * fe2.shape_value(j, k) -
+             (fe1.normal_vector(k) * fe2.shape_grad(j, k)) * fe1.shape_value(i, k)) *
             .5 * fe1.JxW(k);
           matrix_v2u1(i, j) +=
             (-fe2.shape_value(i, k) * penalty * fe1.shape_value(j, k) -
-             (fe1.normal_vector(k) * fe2.shape_grad(i, k)) *
-               fe1.shape_value(j, k) +
-             (fe1.normal_vector(k) * fe1.shape_grad(j, k)) *
-               fe2.shape_value(i, k)) *
+             (fe1.normal_vector(k) * fe2.shape_grad(i, k)) * fe1.shape_value(j, k) +
+             (fe1.normal_vector(k) * fe1.shape_grad(j, k)) * fe2.shape_value(i, k)) *
             .5 * fe1.JxW(k);
           matrix_v2u2(i, j) +=
             (fe2.shape_value(i, k) * penalty * fe2.shape_value(j, k) +
-             (fe1.normal_vector(k) * fe2.shape_grad(i, k)) *
-               fe2.shape_value(j, k) +
-             (fe1.normal_vector(k) * fe2.shape_grad(j, k)) *
-               fe2.shape_value(i, k)) *
+             (fe1.normal_vector(k) * fe2.shape_grad(i, k)) * fe2.shape_value(j, k) +
+             (fe1.normal_vector(k) * fe2.shape_grad(j, k)) * fe2.shape_value(i, k)) *
             .5 * fe1.JxW(k);
         }
 }
@@ -160,9 +145,8 @@ assemble(const DoFHandler<dim> &dof_handler, SparseMatrix<double> &matrix)
   MappingQGeneric<dim>      mapping(1);
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  const unsigned int                  n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
+  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
   info_box.initialize_update_flags();
   UpdateFlags update_flags = update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);
@@ -173,10 +157,7 @@ assemble(const DoFHandler<dim> &dof_handler, SparseMatrix<double> &matrix)
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>> assembler;
   assembler.initialize(matrix);
 
-  MeshWorker::loop<dim,
-                   dim,
-                   MeshWorker::DoFInfo<dim>,
-                   MeshWorker::IntegrationInfoBox<dim>>(
+  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>>(
     dof_handler.begin_active(),
     dof_handler.end(),
     dof_info,
@@ -199,9 +180,8 @@ assemble(const DoFHandler<dim> &             dof_handler,
   MappingQGeneric<dim>      mapping(1);
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
-  info_box.initialize_gauss_quadrature(
-    n_gauss_points, n_gauss_points, n_gauss_points);
+  const unsigned int                  n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
+  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
   info_box.initialize_update_flags();
   UpdateFlags update_flags = update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);
@@ -212,8 +192,7 @@ assemble(const DoFHandler<dim> &             dof_handler,
   MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double>> assembler;
   assembler.initialize(matrix);
 
-  MeshWorker::loop<MeshWorker::DoFInfo<dim>,
-                   MeshWorker::IntegrationInfoBox<dim>>(
+  MeshWorker::loop<MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim>>(
     dof_handler.begin(),
     dof_handler.end(),
     dof_info,
@@ -235,12 +214,11 @@ test_simple(DoFHandler<dim> &mgdofs)
 
   const DoFHandler<dim> &   dofs = mgdofs;
   const FiniteElement<dim> &fe   = dofs.get_fe();
-  pattern.reinit(dofs.n_dofs(),
-                 dofs.n_dofs(),
-                 (GeometryInfo<dim>::faces_per_cell *
-                    GeometryInfo<dim>::max_children_per_face +
-                  1) *
-                   fe.dofs_per_cell);
+  pattern.reinit(
+    dofs.n_dofs(),
+    dofs.n_dofs(),
+    (GeometryInfo<dim>::faces_per_cell * GeometryInfo<dim>::max_children_per_face + 1) *
+      fe.dofs_per_cell);
   DoFTools::make_flux_sparsity_pattern(dofs, pattern);
   pattern.compress();
   matrix.reinit(pattern);
@@ -263,9 +241,7 @@ test_simple(DoFHandler<dim> &mgdofs)
   mg_matrix_dg_up.resize(0, n_levels - 1);
   mg_matrix_dg_down.resize(0, n_levels - 1);
 
-  for (unsigned int level = mg_sparsity.min_level();
-       level <= mg_sparsity.max_level();
-       ++level)
+  for (unsigned int level = mg_sparsity.min_level(); level <= mg_sparsity.max_level(); ++level)
     {
       DynamicSparsityPattern c_sparsity(mgdofs.n_dofs(level));
       DynamicSparsityPattern ci_sparsity;
@@ -305,9 +281,7 @@ test(const FiniteElement<dim> &fe)
   deallog << std::endl;
 
   unsigned int cn = 0;
-  for (typename Triangulation<dim>::cell_iterator cell = tr.begin();
-       cell != tr.end();
-       ++cell, ++cn)
+  for (typename Triangulation<dim>::cell_iterator cell = tr.begin(); cell != tr.end(); ++cell, ++cn)
     cell->set_user_index(cn);
 
   DoFHandler<dim> dofs(tr);

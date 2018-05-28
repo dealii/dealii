@@ -187,8 +187,7 @@ namespace mg
    * @date 2003, 2009, 2010
    */
   template <class RelaxationType, typename VectorType>
-  class SmootherRelaxation : public MGLevelObject<RelaxationType>,
-                             public MGSmoother<VectorType>
+  class SmootherRelaxation : public MGLevelObject<RelaxationType>, public MGSmoother<VectorType>
   {
   public:
     /**
@@ -235,9 +234,7 @@ namespace mg
      * The actual smoothing method.
      */
     virtual void
-    smooth(const unsigned int level,
-           VectorType &       u,
-           const VectorType & rhs) const override;
+    smooth(const unsigned int level, VectorType &u, const VectorType &rhs) const override;
 
     /**
      * The apply variant of smoothing, setting the vector u to zero before
@@ -256,9 +253,7 @@ namespace mg
      * in the vector @p u given the right hand side, which is done by smooth().
      */
     virtual void
-    apply(const unsigned int level,
-          VectorType &       u,
-          const VectorType & rhs) const override;
+    apply(const unsigned int level, VectorType &u, const VectorType &rhs) const override;
 
     /**
      * Memory used by this object.
@@ -474,9 +469,9 @@ public:
    */
   template <typename MatrixType2>
   void
-  initialize(const MGLevelObject<MatrixType2> &matrices,
-             const typename PreconditionerType::AdditionalData &
-               additional_data = typename PreconditionerType::AdditionalData());
+  initialize(const MGLevelObject<MatrixType2> &                 matrices,
+             const typename PreconditionerType::AdditionalData &additional_data =
+               typename PreconditionerType::AdditionalData());
 
   /**
    * Initialize for matrices. This function stores pointers to the level
@@ -536,9 +531,7 @@ public:
    * The actual smoothing method.
    */
   virtual void
-  smooth(const unsigned int level,
-         VectorType &       u,
-         const VectorType & rhs) const override;
+  smooth(const unsigned int level, VectorType &u, const VectorType &rhs) const override;
 
   /**
    * The apply variant of smoothing, setting the vector u to zero before
@@ -556,9 +549,7 @@ public:
    * in the vector @p u given the right hand side, which is done by smooth().
    */
   virtual void
-  apply(const unsigned int level,
-        VectorType &       u,
-        const VectorType & rhs) const override;
+  apply(const unsigned int level, VectorType &u, const VectorType &rhs) const override;
 
   /**
    * Object containing relaxation methods.
@@ -588,9 +579,7 @@ private:
 
 template <typename VectorType>
 inline void
-MGSmootherIdentity<VectorType>::smooth(const unsigned int,
-                                       VectorType &,
-                                       const VectorType &) const
+MGSmootherIdentity<VectorType>::smooth(const unsigned int, VectorType &, const VectorType &) const
 {}
 
 template <typename VectorType>
@@ -694,9 +683,8 @@ namespace mg
   template <class RelaxationType, typename VectorType>
   template <typename MatrixType2, class DATA>
   inline void
-  SmootherRelaxation<RelaxationType, VectorType>::initialize(
-    const MGLevelObject<MatrixType2> &m,
-    const MGLevelObject<DATA> &       data)
+  SmootherRelaxation<RelaxationType, VectorType>::initialize(const MGLevelObject<MatrixType2> &m,
+                                                             const MGLevelObject<DATA> &       data)
   {
     const unsigned int min = std::max(m.min_level(), data.min_level());
     const unsigned int max = std::min(m.max_level(), data.max_level());
@@ -710,10 +698,9 @@ namespace mg
 
   template <class RelaxationType, typename VectorType>
   inline void
-  SmootherRelaxation<RelaxationType, VectorType>::smooth(
-    const unsigned int level,
-    VectorType &       u,
-    const VectorType & rhs) const
+  SmootherRelaxation<RelaxationType, VectorType>::smooth(const unsigned int level,
+                                                         VectorType &       u,
+                                                         const VectorType & rhs) const
   {
     unsigned int maxlevel = this->max_level();
     unsigned int steps2   = this->steps;
@@ -741,10 +728,9 @@ namespace mg
 
   template <class RelaxationType, typename VectorType>
   inline void
-  SmootherRelaxation<RelaxationType, VectorType>::apply(
-    const unsigned int level,
-    VectorType &       u,
-    const VectorType & rhs) const
+  SmootherRelaxation<RelaxationType, VectorType>::apply(const unsigned int level,
+                                                        VectorType &       u,
+                                                        const VectorType & rhs) const
   {
     unsigned int maxlevel = this->max_level();
     unsigned int steps2   = this->steps;
@@ -790,11 +776,11 @@ namespace mg
 //----------------------------------------------------------------------//
 
 template <typename MatrixType, class RelaxationType, typename VectorType>
-inline MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::
-  MGSmootherRelaxation(const unsigned int steps,
-                       const bool         variable,
-                       const bool         symmetric,
-                       const bool         transpose) :
+inline MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::MGSmootherRelaxation(
+  const unsigned int steps,
+  const bool         variable,
+  const bool         symmetric,
+  const bool         transpose) :
   MGSmoother<VectorType>(steps, variable, symmetric, transpose)
 {}
 
@@ -830,8 +816,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
       // Workaround: Unfortunately, not every "m[i]" object has a rich
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
-      matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data);
     }
 }
@@ -857,8 +842,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
       // Workaround: Unfortunately, not every "m[i]" object has a rich
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
-      matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data[i]);
     }
 }
@@ -883,8 +867,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
       // Workaround: Unfortunately, not every "m[i]" object has a rich
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
-      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(),
-                                                m[i].block(row, col));
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(), m[i].block(row, col));
       smoothers[i].initialize(m[i].block(row, col), data);
     }
 }
@@ -912,8 +895,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
       // Workaround: Unfortunately, not every "m[i]" object has a rich
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
-      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(),
-                                                m[i].block(row, col));
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(), m[i].block(row, col));
       smoothers[i].initialize(m[i].block(row, col), data[i]);
     }
 }
@@ -921,10 +903,9 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
 
 template <typename MatrixType, class RelaxationType, typename VectorType>
 inline void
-MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::smooth(
-  const unsigned int level,
-  VectorType &       u,
-  const VectorType & rhs) const
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::smooth(const unsigned int level,
+                                                                     VectorType &       u,
+                                                                     const VectorType & rhs) const
 {
   unsigned int maxlevel = smoothers.max_level();
   unsigned int steps2   = this->steps;
@@ -952,10 +933,9 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::smooth(
 
 template <typename MatrixType, class RelaxationType, typename VectorType>
 inline void
-MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::apply(
-  const unsigned int level,
-  VectorType &       u,
-  const VectorType & rhs) const
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::apply(const unsigned int level,
+                                                                    VectorType &       u,
+                                                                    const VectorType & rhs) const
 {
   unsigned int maxlevel = smoothers.max_level();
   unsigned int steps2   = this->steps;
@@ -990,11 +970,9 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::apply(
 
 template <typename MatrixType, class RelaxationType, typename VectorType>
 inline std::size_t
-MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::
-  memory_consumption() const
+MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::memory_consumption() const
 {
-  return sizeof(*this) + matrices.memory_consumption() +
-         smoothers.memory_consumption() +
+  return sizeof(*this) + matrices.memory_consumption() + smoothers.memory_consumption() +
          this->vector_memory.memory_consumption();
 }
 
@@ -1002,11 +980,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::
 //----------------------------------------------------------------------//
 
 template <typename MatrixType, typename PreconditionerType, typename VectorType>
-inline MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::
-  MGSmootherPrecondition(const unsigned int steps,
-                         const bool         variable,
-                         const bool         symmetric,
-                         const bool         transpose) :
+inline MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::MGSmootherPrecondition(
+  const unsigned int steps,
+  const bool         variable,
+  const bool         symmetric,
+  const bool         transpose) :
   MGSmoother<VectorType>(steps, variable, symmetric, transpose)
 {}
 
@@ -1043,8 +1021,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
       // Workaround: Unfortunately, not every "m[i]" object has a rich
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
-      matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data);
     }
 }
@@ -1072,8 +1049,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
       // Workaround: Unfortunately, not every "m[i]" object has a rich
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
-      matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data[i]);
     }
 }
@@ -1272,11 +1248,9 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::apply(
 
 template <typename MatrixType, typename PreconditionerType, typename VectorType>
 inline std::size_t
-MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::
-  memory_consumption() const
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::memory_consumption() const
 {
-  return sizeof(*this) + matrices.memory_consumption() +
-         smoothers.memory_consumption() +
+  return sizeof(*this) + matrices.memory_consumption() + smoothers.memory_consumption() +
          this->vector_memory.memory_consumption();
 }
 

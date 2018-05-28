@@ -62,12 +62,10 @@ test(unsigned int degree)
   grid_out.write_ucd(tria, logfile);
 
   QTrapez<dim>                                    quad;
-  MappingQEulerian<dim, Vector<double>, spacedim> mapping(
-    degree, shift_dh, shift);
+  MappingQEulerian<dim, Vector<double>, spacedim> mapping(degree, shift_dh, shift);
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active(),
+                                                              endc = tria.end();
   Point<spacedim> real;
   Point<dim>      unit;
   double          eps = 1e-10;

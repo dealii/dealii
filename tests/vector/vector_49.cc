@@ -38,10 +38,9 @@ test(Vector<double> &v)
   Vector<double> w(v);
 
   // make sure they're equal
-  deallog << v * w << ' ' << v.l2_norm() * w.l2_norm() << ' '
-          << v * w - v.l2_norm() * w.l2_norm() << std::endl;
-  Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < 1e-14 * (v * w),
-         ExcInternalError());
+  deallog << v * w << ' ' << v.l2_norm() * w.l2_norm() << ' ' << v * w - v.l2_norm() * w.l2_norm()
+          << std::endl;
+  Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < 1e-14 * (v * w), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -62,13 +61,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -76,12 +73,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -38,8 +38,7 @@ test()
     rows.add_range(2 * n_procs, 4 * n_procs);
   rows.compress();
 
-  TrilinosWrappers::MPI::Vector src(rows, MPI_COMM_WORLD),
-    dst(rows, MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector src(rows, MPI_COMM_WORLD), dst(rows, MPI_COMM_WORLD);
 
   TrilinosWrappers::SparseMatrix mat(rows, rows, MPI_COMM_WORLD);
   for (const auto &row : rows)

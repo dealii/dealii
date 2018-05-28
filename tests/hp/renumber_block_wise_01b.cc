@@ -54,8 +54,7 @@ check()
   Triangulation<dim>        tr;
   std::vector<unsigned int> sub(3, 1U);
   sub[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle(
-    tr, sub, Point<dim>(), Point<dim>(2, 1, 1));
+  GridGenerator::subdivided_hyper_rectangle(tr, sub, Point<dim>(), Point<dim>(2, 1, 1));
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim>(2));
@@ -64,8 +63,7 @@ check()
   hp::DoFHandler<dim> dof(tr);
   {
     bool coin = false;
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-           dof.begin_active();
+    for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
          cell != dof.end();
          ++cell)
       {
@@ -77,8 +75,7 @@ check()
 
   std::vector<bool>                    touched(dof.n_dofs(), false);
   std::vector<types::global_dof_index> local_dof_indices;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     {

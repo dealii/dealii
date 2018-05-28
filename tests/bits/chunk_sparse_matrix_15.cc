@@ -55,16 +55,14 @@ test(const unsigned int chunk_size)
       for (unsigned int i = 0; i < m.m(); ++i)
         {
           double sum = 0;
-          for (ChunkSparseMatrix<double>::const_iterator it = m.begin(i);
-               it != m.end(i);
-               ++it)
+          for (ChunkSparseMatrix<double>::const_iterator it = m.begin(i); it != m.end(i); ++it)
             sum += it->value() * src(it->column());
           dst(i) = sum;
         }
       m.vmult(dst_ref, src);
       dst -= dst_ref;
-      deallog << "Error in matrix-vector product done via iterator: "
-              << dst.linfty_norm() << std::endl;
+      deallog << "Error in matrix-vector product done via iterator: " << dst.linfty_norm()
+              << std::endl;
     }
 }
 
@@ -78,21 +76,18 @@ main()
   try
     {
       const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
-      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
-           ++i)
+      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]); ++i)
         test(chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -100,12 +95,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

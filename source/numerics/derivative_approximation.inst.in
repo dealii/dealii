@@ -14,40 +14,35 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; VEC : REAL_VECTOR_TYPES;
-     DH : DOFHANDLER_TEMPLATES)
+for (deal_II_dimension : DIMENSIONS; VEC : REAL_VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES)
   {
     namespace DerivativeApproximation
     \{
       template void
-      approximate_gradient<deal_II_dimension>(
-        const Mapping<deal_II_dimension> &mapping,
-        const DH<deal_II_dimension> &     dof_handler,
-        const VEC &                       solution,
-        Vector<float> &                   derivative_norm,
-        const unsigned int                component);
+      approximate_gradient<deal_II_dimension>(const Mapping<deal_II_dimension> &mapping,
+                                              const DH<deal_II_dimension> &     dof_handler,
+                                              const VEC &                       solution,
+                                              Vector<float> &                   derivative_norm,
+                                              const unsigned int                component);
 
       template void
-      approximate_gradient<deal_II_dimension>(
-        const DH<deal_II_dimension> &dof_handler,
-        const VEC &                  solution,
-        Vector<float> &              derivative_norm,
-        const unsigned int           component);
+      approximate_gradient<deal_II_dimension>(const DH<deal_II_dimension> &dof_handler,
+                                              const VEC &                  solution,
+                                              Vector<float> &              derivative_norm,
+                                              const unsigned int           component);
 
       template void
-      approximate_second_derivative<deal_II_dimension>(
-        const Mapping<deal_II_dimension> &mapping,
-        const DH<deal_II_dimension> &     dof_handler,
-        const VEC &                       solution,
-        Vector<float> &                   derivative_norm,
-        const unsigned int                component);
+      approximate_second_derivative<deal_II_dimension>(const Mapping<deal_II_dimension> &mapping,
+                                                       const DH<deal_II_dimension> &dof_handler,
+                                                       const VEC &                  solution,
+                                                       Vector<float> &              derivative_norm,
+                                                       const unsigned int           component);
 
       template void
-      approximate_second_derivative<deal_II_dimension>(
-        const DH<deal_II_dimension> &dof_handler,
-        const VEC &                  solution,
-        Vector<float> &              derivative_norm,
-        const unsigned int           component);
+      approximate_second_derivative<deal_II_dimension>(const DH<deal_II_dimension> &dof_handler,
+                                                       const VEC &                  solution,
+                                                       Vector<float> &              derivative_norm,
+                                                       const unsigned int           component);
 
       template void
       approximate_derivative_tensor<DH<deal_II_dimension>, VEC, 1>(

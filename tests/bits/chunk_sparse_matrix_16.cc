@@ -57,8 +57,7 @@ test(const unsigned int chunk_size)
       for (unsigned int i = 0; i < m.m(); ++i)
         {
           types::global_dof_index n_entries = numbers::invalid_unsigned_int;
-          m.extract_row_copy(
-            i, values.size(), n_entries, &indices[0], &values[0]);
+          m.extract_row_copy(i, values.size(), n_entries, &indices[0], &values[0]);
           double sum = 0;
           for (unsigned int j = 0; j < n_entries; ++j)
             sum += values[j] * src(indices[j]);
@@ -66,8 +65,8 @@ test(const unsigned int chunk_size)
         }
       m.vmult(dst_ref, src);
       dst -= dst_ref;
-      deallog << "Error in matrix-vector product done via extract_row_copy: "
-              << dst.linfty_norm() << std::endl;
+      deallog << "Error in matrix-vector product done via extract_row_copy: " << dst.linfty_norm()
+              << std::endl;
     }
 }
 
@@ -81,21 +80,18 @@ main()
   try
     {
       const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
-      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
-           ++i)
+      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]); ++i)
         test(chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -103,12 +99,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

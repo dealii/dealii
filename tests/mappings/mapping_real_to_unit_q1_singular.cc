@@ -52,8 +52,7 @@ test_real_to_unit_cell()
   catch (typename Mapping<dim>::ExcTransformationFailed)
     {
       deallog << "Transformation for point " << point << " on cell with "
-              << "center " << cell->center() << " is not invertible"
-              << std::endl;
+              << "center " << cell->center() << " is not invertible" << std::endl;
     }
   deallog << "OK" << std::endl;
 }

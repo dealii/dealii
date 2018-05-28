@@ -41,8 +41,7 @@ test(std::ostream & /*out*/)
   GridGenerator::hyper_cube(tr);
   for (unsigned int i = 0; i < 19; ++i)
     {
-      deallog << "cells: " << tr.n_active_cells() << " level:" << tr.n_levels()
-              << std::endl;
+      deallog << "cells: " << tr.n_active_cells() << " level:" << tr.n_levels() << std::endl;
 
       typename parallel::distributed::Triangulation<dim>::cell_iterator it;
       it = tr.begin_active();

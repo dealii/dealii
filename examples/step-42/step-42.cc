@@ -108,21 +108,17 @@ namespace Step42
   class ConstitutiveLaw
   {
   public:
-    ConstitutiveLaw(const double E,
-                    const double nu,
-                    const double sigma_0,
-                    const double gamma);
+    ConstitutiveLaw(const double E, const double nu, const double sigma_0, const double gamma);
 
     void set_sigma_0(double sigma_zero);
 
-    bool get_stress_strain_tensor(
-      const SymmetricTensor<2, dim> &strain_tensor,
-      SymmetricTensor<4, dim> &      stress_strain_tensor) const;
+    bool get_stress_strain_tensor(const SymmetricTensor<2, dim> &strain_tensor,
+                                  SymmetricTensor<4, dim> &      stress_strain_tensor) const;
 
-    void get_linearized_stress_strain_tensors(
-      const SymmetricTensor<2, dim> &strain_tensor,
-      SymmetricTensor<4, dim> &      stress_strain_tensor_linearized,
-      SymmetricTensor<4, dim> &      stress_strain_tensor) const;
+    void
+    get_linearized_stress_strain_tensors(const SymmetricTensor<2, dim> &strain_tensor,
+                                         SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
+                                         SymmetricTensor<4, dim> &stress_strain_tensor) const;
 
   private:
     const double kappa;
@@ -148,22 +144,17 @@ namespace Step42
   // this constructor, we also compute the two principal components of the
   // stress-strain relation and its linearization.
   template <int dim>
-  ConstitutiveLaw<dim>::ConstitutiveLaw(double E,
-                                        double nu,
-                                        double sigma_0,
-                                        double gamma) :
+  ConstitutiveLaw<dim>::ConstitutiveLaw(double E, double nu, double sigma_0, double gamma) :
     kappa(E / (3 * (1 - 2 * nu))),
     mu(E / (2 * (1 + nu))),
     sigma_0(sigma_0),
     gamma(gamma),
-    stress_strain_tensor_kappa(kappa *
-                               outer_product(unit_symmetric_tensor<dim>(),
-                                             unit_symmetric_tensor<dim>())),
+    stress_strain_tensor_kappa(
+      kappa * outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>())),
     stress_strain_tensor_mu(
       2 * mu *
-      (identity_tensor<dim>() - outer_product(unit_symmetric_tensor<dim>(),
-                                              unit_symmetric_tensor<dim>()) /
-                                  3.0))
+      (identity_tensor<dim>() -
+       outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>()) / 3.0))
   {}
 
 
@@ -200,12 +191,10 @@ namespace Step42
     Assert(dim == 3, ExcNotImplemented());
 
     SymmetricTensor<2, dim> stress_tensor;
-    stress_tensor =
-      (stress_strain_tensor_kappa + stress_strain_tensor_mu) * strain_tensor;
+    stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu) * strain_tensor;
 
-    const SymmetricTensor<2, dim> deviator_stress_tensor =
-      deviator(stress_tensor);
-    const double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
+    const SymmetricTensor<2, dim> deviator_stress_tensor      = deviator(stress_tensor);
+    const double                  deviator_stress_tensor_norm = deviator_stress_tensor.norm();
 
     stress_strain_tensor = stress_strain_tensor_mu;
     if (deviator_stress_tensor_norm > sigma_0)
@@ -240,14 +229,13 @@ namespace Step42
     Assert(dim == 3, ExcNotImplemented());
 
     SymmetricTensor<2, dim> stress_tensor;
-    stress_tensor =
-      (stress_strain_tensor_kappa + stress_strain_tensor_mu) * strain_tensor;
+    stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu) * strain_tensor;
 
     stress_strain_tensor            = stress_strain_tensor_mu;
     stress_strain_tensor_linearized = stress_strain_tensor_mu;
 
-    SymmetricTensor<2, dim> deviator_stress_tensor = deviator(stress_tensor);
-    const double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
+    SymmetricTensor<2, dim> deviator_stress_tensor      = deviator(stress_tensor);
+    const double            deviator_stress_tensor_norm = deviator_stress_tensor.norm();
 
     if (deviator_stress_tensor_norm > sigma_0)
       {
@@ -278,11 +266,9 @@ namespace Step42
     public:
       BoundaryForce();
 
-      virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+      virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
-      virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  values) const override;
+      virtual void vector_value(const Point<dim> &p, Vector<double> &values) const override;
     };
 
     template <int dim>
@@ -291,15 +277,13 @@ namespace Step42
 
 
     template <int dim>
-    double BoundaryForce<dim>::value(const Point<dim> &,
-                                     const unsigned int) const
+    double BoundaryForce<dim>::value(const Point<dim> &, const unsigned int) const
     {
       return 0.;
     }
 
     template <int dim>
-    void BoundaryForce<dim>::vector_value(const Point<dim> &p,
-                                          Vector<double> &  values) const
+    void BoundaryForce<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = BoundaryForce<dim>::value(p, c);
@@ -313,11 +297,9 @@ namespace Step42
     public:
       BoundaryValues();
 
-      virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+      virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
-      virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  values) const override;
+      virtual void vector_value(const Point<dim> &p, Vector<double> &values) const override;
     };
 
 
@@ -327,15 +309,13 @@ namespace Step42
 
 
     template <int dim>
-    double BoundaryValues<dim>::value(const Point<dim> &,
-                                      const unsigned int) const
+    double BoundaryValues<dim>::value(const Point<dim> &, const unsigned int) const
     {
       return 0.;
     }
 
     template <int dim>
-    void BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                           Vector<double> &  values) const
+    void BoundaryValues<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = BoundaryValues<dim>::value(p, c);
@@ -359,11 +339,9 @@ namespace Step42
     public:
       SphereObstacle(const double z_surface);
 
-      virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+      virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
-      virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  values) const override;
+      virtual void vector_value(const Point<dim> &p, Vector<double> &values) const override;
 
     private:
       const double z_surface;
@@ -378,8 +356,7 @@ namespace Step42
 
 
     template <int dim>
-    double SphereObstacle<dim>::value(const Point<dim> & p,
-                                      const unsigned int component) const
+    double SphereObstacle<dim>::value(const Point<dim> &p, const unsigned int component) const
     {
       if (component == 0)
         return p(0);
@@ -388,8 +365,7 @@ namespace Step42
       else if (component == 2)
         {
           if ((p(0) - 0.5) * (p(0) - 0.5) + (p(1) - 0.5) * (p(1) - 0.5) < 0.36)
-            return (-std::sqrt(0.36 - (p(0) - 0.5) * (p(0) - 0.5) -
-                               (p(1) - 0.5) * (p(1) - 0.5)) +
+            return (-std::sqrt(0.36 - (p(0) - 0.5) * (p(0) - 0.5) - (p(1) - 0.5) * (p(1) - 0.5)) +
                     z_surface + 0.59);
           else
             return 1000;
@@ -402,8 +378,7 @@ namespace Step42
 
 
     template <int dim>
-    void SphereObstacle<dim>::vector_value(const Point<dim> &p,
-                                           Vector<double> &  values) const
+    void SphereObstacle<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = SphereObstacle<dim>::value(p, c);
@@ -460,8 +435,7 @@ namespace Step42
       ny(0)
     {
       std::ifstream f(name);
-      AssertThrow(
-        f, ExcMessage(std::string("Can't read from file <") + name + ">!"));
+      AssertThrow(f, ExcMessage(std::string("Can't read from file <") + name + ">!"));
 
       std::string temp;
       f >> temp >> nx >> ny;
@@ -480,8 +454,8 @@ namespace Step42
 
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         std::cout << "Read obstacle from file <" << name << ">" << std::endl
-                  << "Resolution of the scanned obstacle picture: " << nx
-                  << " x " << ny << std::endl;
+                  << "Resolution of the scanned obstacle picture: " << nx << " x " << ny
+                  << std::endl;
     }
 
     // The following two functions return the value of a given pixel with
@@ -534,11 +508,9 @@ namespace Step42
     public:
       ChineseObstacle(const std::string &filename, const double z_surface);
 
-      virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+      virtual double value(const Point<dim> &p, const unsigned int component = 0) const override;
 
-      virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  values) const override;
+      virtual void vector_value(const Point<dim> &p, Vector<double> &values) const override;
 
     private:
       const BitmapFile<dim> input_obstacle;
@@ -547,8 +519,7 @@ namespace Step42
 
 
     template <int dim>
-    ChineseObstacle<dim>::ChineseObstacle(const std::string &filename,
-                                          const double       z_surface) :
+    ChineseObstacle<dim>::ChineseObstacle(const std::string &filename, const double z_surface) :
       Function<dim>(dim),
       input_obstacle(filename),
       z_surface(z_surface)
@@ -556,8 +527,7 @@ namespace Step42
 
 
     template <int dim>
-    double ChineseObstacle<dim>::value(const Point<dim> & p,
-                                       const unsigned int component) const
+    double ChineseObstacle<dim>::value(const Point<dim> &p, const unsigned int component) const
     {
       if (component == 0)
         return p(0);
@@ -575,8 +545,7 @@ namespace Step42
     }
 
     template <int dim>
-    void ChineseObstacle<dim>::vector_value(const Point<dim> &p,
-                                            Vector<double> &  values) const
+    void ChineseObstacle<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = ChineseObstacle<dim>::value(p, c);
@@ -627,12 +596,9 @@ namespace Step42
     void setup_system();
     void compute_dirichlet_constraints();
     void update_solution_and_constraints();
-    void
-         assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
-    void assemble_newton_system(
-      const TrilinosWrappers::MPI::Vector &linearization_point);
-    void compute_nonlinear_residual(
-      const TrilinosWrappers::MPI::Vector &linearization_point);
+    void assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
+    void assemble_newton_system(const TrilinosWrappers::MPI::Vector &linearization_point);
+    void compute_nonlinear_residual(const TrilinosWrappers::MPI::Vector &linearization_point);
     void solve_newton_system();
     void solve_newton();
     void refine_grid();
@@ -758,11 +724,10 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::declare_parameters(ParameterHandler &prm)
   {
-    prm.declare_entry(
-      "polynomial degree",
-      "1",
-      Patterns::Integer(),
-      "Polynomial degree of the FE_Q finite element space, typically 1 or 2.");
+    prm.declare_entry("polynomial degree",
+                      "1",
+                      Patterns::Integer(),
+                      "Polynomial degree of the FE_Q finite element space, typically 1 or 2.");
     prm.declare_entry("number of initial refinements",
                       "2",
                       Patterns::Integer(),
@@ -779,27 +744,24 @@ namespace Step42
                       "5",
                       Patterns::Integer(),
                       "Number of adaptive mesh refinement cycles to run.");
-    prm.declare_entry(
-      "obstacle",
-      "sphere",
-      Patterns::Selection("sphere|read from file"),
-      "The name of the obstacle to use. This may either be 'sphere' if we should "
-      "use a spherical obstacle, or 'read from file' in which case the obstacle "
-      "will be read from a file named 'obstacle.pbm' that is supposed to be in "
-      "ASCII PBM format.");
-    prm.declare_entry(
-      "output directory",
-      "",
-      Patterns::Anything(),
-      "Directory for output files (graphical output and benchmark "
-      "statistics). If empty, use the current directory.");
-    prm.declare_entry(
-      "transfer solution",
-      "false",
-      Patterns::Bool(),
-      "Whether the solution should be used as a starting guess "
-      "for the next finer mesh. If false, then the iteration starts at "
-      "zero on every mesh.");
+    prm.declare_entry("obstacle",
+                      "sphere",
+                      Patterns::Selection("sphere|read from file"),
+                      "The name of the obstacle to use. This may either be 'sphere' if we should "
+                      "use a spherical obstacle, or 'read from file' in which case the obstacle "
+                      "will be read from a file named 'obstacle.pbm' that is supposed to be in "
+                      "ASCII PBM format.");
+    prm.declare_entry("output directory",
+                      "",
+                      Patterns::Anything(),
+                      "Directory for output files (graphical output and benchmark "
+                      "statistics). If empty, use the current directory.");
+    prm.declare_entry("transfer solution",
+                      "false",
+                      Patterns::Bool(),
+                      "Whether the solution should be used as a starting guess "
+                      "for the next finer mesh. If false, then the iteration starts at "
+                      "zero on every mesh.");
     prm.declare_entry("base mesh",
                       "box",
                       Patterns::Selection("box|half sphere"),
@@ -815,17 +777,12 @@ namespace Step42
   // we initialize the mesh refinement strategy and the output directory,
   // creating such a directory if necessary.
   template <int dim>
-  PlasticityContactProblem<dim>::PlasticityContactProblem(
-    const ParameterHandler &prm) :
+  PlasticityContactProblem<dim>::PlasticityContactProblem(const ParameterHandler &prm) :
     mpi_communicator(MPI_COMM_WORLD),
     pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-    computing_timer(MPI_COMM_WORLD,
-                    pcout,
-                    TimerOutput::never,
-                    TimerOutput::wall_times),
+    computing_timer(MPI_COMM_WORLD, pcout, TimerOutput::never, TimerOutput::wall_times),
 
-    n_initial_global_refinements(
-      prm.get_integer("number of initial refinements")),
+    n_initial_global_refinements(prm.get_integer("number of initial refinements")),
     triangulation(mpi_communicator),
     fe_degree(prm.get_integer("polynomial degree")),
     fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree + 1)), dim),
@@ -840,12 +797,10 @@ namespace Step42
     base_mesh(prm.get("base mesh")),
     obstacle(prm.get("obstacle") == "read from file" ?
                static_cast<const Function<dim> *>(
-                 new EquationData::ChineseObstacle<dim>(
-                   "obstacle.pbm",
-                   (base_mesh == "box" ? 1.0 : 0.5))) :
+                 new EquationData::ChineseObstacle<dim>("obstacle.pbm",
+                                                        (base_mesh == "box" ? 1.0 : 0.5))) :
                static_cast<const Function<dim> *>(
-                 new EquationData::SphereObstacle<dim>(
-                   base_mesh == "box" ? 1.0 : 0.5))),
+                 new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
 
     transfer_solution(prm.get_bool("transfer solution")),
     n_refinement_cycles(prm.get_integer("number of cycles")),
@@ -873,8 +828,7 @@ namespace Step42
 
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;
     pcout << "    FE degree " << fe_degree << std::endl;
-    pcout << "    transfer solution " << (transfer_solution ? "true" : "false")
-          << std::endl;
+    pcout << "    transfer solution " << (transfer_solution ? "true" : "false") << std::endl;
   }
 
 
@@ -946,23 +900,17 @@ namespace Step42
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
-        Triangulation<3>::active_cell_iterator cell =
-                                                 triangulation.begin_active(),
+        Triangulation<3>::active_cell_iterator cell = triangulation.begin_active(),
                                                endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int face_no = 0;
-               face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
             if (cell->face(face_no)->at_boundary())
               {
                 if (std::fabs(cell->face(face_no)->center()[2] - p2[2]) < 1e-12)
                   cell->face(face_no)->set_boundary_id(1);
-                if (std::fabs(cell->face(face_no)->center()[0] - p1[0]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[0] - p2[0]) <
-                      1e-12 ||
-                    std::fabs(cell->face(face_no)->center()[1] - p1[1]) <
-                      1e-12 ||
+                if (std::fabs(cell->face(face_no)->center()[0] - p1[0]) < 1e-12 ||
+                    std::fabs(cell->face(face_no)->center()[0] - p2[0]) < 1e-12 ||
+                    std::fabs(cell->face(face_no)->center()[1] - p1[1]) < 1e-12 ||
                     std::fabs(cell->face(face_no)->center()[1] - p2[1]) < 1e-12)
                   cell->face(face_no)->set_boundary_id(8);
                 if (std::fabs(cell->face(face_no)->center()[2] - p1[2]) < 1e-12)
@@ -996,22 +944,18 @@ namespace Step42
 
       locally_owned_dofs = dof_handler.locally_owned_dofs();
       locally_relevant_dofs.clear();
-      DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                              locally_relevant_dofs);
+      DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
     }
 
     /* setup hanging nodes and Dirichlet constraints */
     {
       TimerOutput::Scope t(computing_timer, "Setup: constraints");
       constraints_hanging_nodes.reinit(locally_relevant_dofs);
-      DoFTools::make_hanging_node_constraints(dof_handler,
-                                              constraints_hanging_nodes);
+      DoFTools::make_hanging_node_constraints(dof_handler, constraints_hanging_nodes);
       constraints_hanging_nodes.close();
 
-      pcout << "   Number of active cells: "
-            << triangulation.n_global_active_cells() << std::endl
-            << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+      pcout << "   Number of active cells: " << triangulation.n_global_active_cells() << std::endl
+            << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
       compute_dirichlet_constraints();
     }
@@ -1023,8 +967,7 @@ namespace Step42
       newton_rhs.reinit(locally_owned_dofs, mpi_communicator);
       newton_rhs_uncondensed.reinit(locally_owned_dofs, mpi_communicator);
       diag_mass_matrix_vector.reinit(locally_owned_dofs, mpi_communicator);
-      fraction_of_plastic_q_points_per_cell.reinit(
-        triangulation.n_active_cells());
+      fraction_of_plastic_q_points_per_cell.reinit(triangulation.n_active_cells());
 
       active_set.clear();
       active_set.set_size(dof_handler.n_dofs());
@@ -1037,15 +980,13 @@ namespace Step42
     // to zero.
     {
       TimerOutput::Scope                t(computing_timer, "Setup: matrix");
-      TrilinosWrappers::SparsityPattern sp(locally_owned_dofs,
-                                           mpi_communicator);
+      TrilinosWrappers::SparsityPattern sp(locally_owned_dofs, mpi_communicator);
 
-      DoFTools::make_sparsity_pattern(
-        dof_handler,
-        sp,
-        constraints_dirichlet_and_hanging_nodes,
-        false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+      DoFTools::make_sparsity_pattern(dof_handler,
+                                      sp,
+                                      constraints_dirichlet_and_hanging_nodes,
+                                      false,
+                                      Utilities::MPI::this_mpi_process(mpi_communicator));
       sp.compress();
       newton_matrix.reinit(sp);
 
@@ -1089,12 +1030,11 @@ namespace Step42
     if (base_mesh == "box")
       {
         // interpolate all components of the solution
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          6,
-          EquationData::BoundaryValues<dim>(),
-          constraints_dirichlet_and_hanging_nodes,
-          ComponentMask());
+        VectorTools::interpolate_boundary_values(dof_handler,
+                                                 6,
+                                                 EquationData::BoundaryValues<dim>(),
+                                                 constraints_dirichlet_and_hanging_nodes,
+                                                 ComponentMask());
 
         // interpolate x- and y-components of the
         // solution (this is a bit mask, so apply
@@ -1106,16 +1046,14 @@ namespace Step42
           8,
           EquationData::BoundaryValues<dim>(),
           constraints_dirichlet_and_hanging_nodes,
-          (fe.component_mask(x_displacement) |
-           fe.component_mask(y_displacement)));
+          (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
       }
     else
-      VectorTools::interpolate_boundary_values(
-        dof_handler,
-        0,
-        EquationData::BoundaryValues<dim>(),
-        constraints_dirichlet_and_hanging_nodes,
-        ComponentMask());
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               0,
+                                               EquationData::BoundaryValues<dim>(),
+                                               constraints_dirichlet_and_hanging_nodes,
+                                               ComponentMask());
 
     constraints_dirichlet_and_hanging_nodes.close();
   }
@@ -1153,39 +1091,32 @@ namespace Step42
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const FEValuesExtractors::Vector displacement(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->face(face)->at_boundary() && cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell_matrix = 0;
 
-              for (unsigned int q_point = 0; q_point < n_face_q_points;
-                   ++q_point)
+              for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   cell_matrix(i, i) +=
                     (fe_values_face[displacement].value(i, q_point) *
-                     fe_values_face[displacement].value(i, q_point) *
-                     fe_values_face.JxW(q_point));
+                     fe_values_face[displacement].value(i, q_point) * fe_values_face.JxW(q_point));
 
               cell->get_dof_indices(local_dof_indices);
 
               for (unsigned int i = 0; i < dofs_per_cell; i++)
-                mass_matrix.add(local_dof_indices[i],
-                                local_dof_indices[i],
-                                cell_matrix(i, i));
+                mass_matrix.add(local_dof_indices[i], local_dof_indices[i], cell_matrix(i, i));
             }
     mass_matrix.compress(VectorOperation::add);
   }
@@ -1213,16 +1144,14 @@ namespace Step42
   {
     std::vector<bool> dof_touched(dof_handler.n_dofs(), false);
 
-    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs,
-                                                       mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
     distributed_solution = solution;
 
-    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs,
-                                         mpi_communicator);
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     lambda = newton_rhs_uncondensed;
 
-    TrilinosWrappers::MPI::Vector diag_mass_matrix_vector_relevant(
-      locally_relevant_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector diag_mass_matrix_vector_relevant(locally_relevant_dofs,
+                                                                   mpi_communicator);
     diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
 
 
@@ -1244,30 +1173,25 @@ namespace Step42
     // looping over quadrature points is equivalent to looping over shape
     // functions defined on a face. With this, the code looks as follows:
     Quadrature<dim - 1> face_quadrature(fe.get_unit_face_support_points());
-    FEFaceValues<dim>   fe_values_face(
-      fe, face_quadrature, update_quadrature_points);
+    FEFaceValues<dim>   fe_values_face(fe, face_quadrature, update_quadrature_points);
 
     const unsigned int dofs_per_face   = fe.dofs_per_face;
     const unsigned int n_face_q_points = face_quadrature.size();
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_face);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
       if (!cell->is_artificial())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->face(face)->at_boundary() && cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell->face(face)->get_dof_indices(dof_indices);
 
-              for (unsigned int q_point = 0; q_point < n_face_q_points;
-                   ++q_point)
+              for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                 {
                   // At each quadrature point (i.e., at each support point of a
                   // degree of freedom located on the contact boundary), we then
@@ -1282,8 +1206,7 @@ namespace Step42
                   // to the correct value, and add the index to the IndexSet
                   // object that stores which degree of freedom is part of the
                   // contact:
-                  const unsigned int component =
-                    fe.face_system_to_component_index(q_point).first;
+                  const unsigned int component = fe.face_system_to_component_index(q_point).first;
 
                   const unsigned int index_z = dof_indices[q_point];
 
@@ -1294,22 +1217,18 @@ namespace Step42
                       const Point<dim> this_support_point =
                         fe_values_face.quadrature_point(q_point);
 
-                      const double obstacle_value =
-                        obstacle->value(this_support_point, 2);
-                      const double solution_here = solution(index_z);
-                      const double undeformed_gap =
-                        obstacle_value - this_support_point(2);
+                      const double obstacle_value = obstacle->value(this_support_point, 2);
+                      const double solution_here  = solution(index_z);
+                      const double undeformed_gap = obstacle_value - this_support_point(2);
 
                       const double c = 100.0 * e_modulus;
-                      if ((lambda(index_z) /
-                               diag_mass_matrix_vector_relevant(index_z) +
+                      if ((lambda(index_z) / diag_mass_matrix_vector_relevant(index_z) +
                              c * (solution_here - undeformed_gap) >
                            0) &&
                           !constraints_hanging_nodes.is_constrained(index_z))
                         {
                           all_constraints.add_line(index_z);
-                          all_constraints.set_inhomogeneity(index_z,
-                                                            undeformed_gap);
+                          all_constraints.set_inhomogeneity(index_z, undeformed_gap);
                           distributed_solution(index_z) = undeformed_gap;
 
                           active_set.add_index(index_z);
@@ -1336,8 +1255,7 @@ namespace Step42
     all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
 
     pcout << "         Size of active set: "
-          << Utilities::MPI::sum((active_set & locally_owned_dofs).n_elements(),
-                                 mpi_communicator)
+          << Utilities::MPI::sum((active_set & locally_owned_dofs).n_elements(), mpi_communicator)
           << std::endl;
   }
 
@@ -1361,31 +1279,25 @@ namespace Step42
     QGauss<dim>     quadrature_formula(fe.degree + 1);
     QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_JxW_values);
+    FEValues<dim> fe_values(
+      fe, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
-    FEFaceValues<dim> fe_values_face(fe,
-                                     face_quadrature_formula,
-                                     update_values | update_quadrature_points |
-                                       update_JxW_values);
+    FEFaceValues<dim> fe_values_face(
+      fe, face_quadrature_formula, update_values | update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     const EquationData::BoundaryForce<dim> boundary_force;
-    std::vector<Vector<double>> boundary_force_values(n_face_q_points,
-                                                      Vector<double>(dim));
+    std::vector<Vector<double>> boundary_force_values(n_face_q_points, Vector<double>(dim));
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     const FEValuesExtractors::Vector displacement(0);
@@ -1398,17 +1310,15 @@ namespace Step42
           cell_rhs    = 0;
 
           std::vector<SymmetricTensor<2, dim>> strain_tensor(n_q_points);
-          fe_values[displacement].get_function_symmetric_gradients(
-            linearization_point, strain_tensor);
+          fe_values[displacement].get_function_symmetric_gradients(linearization_point,
+                                                                   strain_tensor);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
               SymmetricTensor<4, dim> stress_strain_tensor_linearized;
               SymmetricTensor<4, dim> stress_strain_tensor;
               constitutive_law.get_linearized_stress_strain_tensors(
-                strain_tensor[q_point],
-                stress_strain_tensor_linearized,
-                stress_strain_tensor);
+                strain_tensor[q_point], stress_strain_tensor_linearized, stress_strain_tensor);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
@@ -1438,49 +1348,37 @@ namespace Step42
 
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     cell_matrix(i, j) +=
-                      (stress_phi_i *
-                       fe_values[displacement].symmetric_gradient(j, q_point) *
+                      (stress_phi_i * fe_values[displacement].symmetric_gradient(j, q_point) *
                        fe_values.JxW(q_point));
 
                   cell_rhs(i) +=
-                    ((stress_phi_i -
-                      stress_strain_tensor *
-                        fe_values[displacement].symmetric_gradient(i,
-                                                                   q_point)) *
+                    ((stress_phi_i - stress_strain_tensor *
+                                       fe_values[displacement].symmetric_gradient(i, q_point)) *
                      strain_tensor[q_point] * fe_values.JxW(q_point));
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            if (cell->face(face)->at_boundary() &&
-                cell->face(face)->boundary_id() == 1)
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face(face)->at_boundary() && cell->face(face)->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
-                boundary_force.vector_value_list(
-                  fe_values_face.get_quadrature_points(),
-                  boundary_force_values);
+                boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                 boundary_force_values);
 
-                for (unsigned int q_point = 0; q_point < n_face_q_points;
-                     ++q_point)
+                for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                   {
                     Tensor<1, dim> rhs_values;
                     rhs_values[2] = boundary_force_values[q_point][2];
                     for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                      cell_rhs(i) +=
-                        (fe_values_face[displacement].value(i, q_point) *
-                         rhs_values * fe_values_face.JxW(q_point));
+                      cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values *
+                                      fe_values_face.JxW(q_point));
                   }
               }
 
           cell->get_dof_indices(local_dof_indices);
-          all_constraints.distribute_local_to_global(cell_matrix,
-                                                     cell_rhs,
-                                                     local_dof_indices,
-                                                     newton_matrix,
-                                                     newton_rhs,
-                                                     true);
+          all_constraints.distribute_local_to_global(
+            cell_matrix, cell_rhs, local_dof_indices, newton_matrix, newton_rhs, true);
         }
 
     newton_matrix.compress(VectorOperation::add);
@@ -1520,23 +1418,18 @@ namespace Step42
     QGauss<dim>     quadrature_formula(fe.degree + 1);
     QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_JxW_values);
+    FEValues<dim> fe_values(
+      fe, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
-    FEFaceValues<dim> fe_values_face(fe,
-                                     face_quadrature_formula,
-                                     update_values | update_quadrature_points |
-                                       update_JxW_values);
+    FEFaceValues<dim> fe_values_face(
+      fe, face_quadrature_formula, update_values | update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     const EquationData::BoundaryForce<dim> boundary_force;
-    std::vector<Vector<double>> boundary_force_values(n_face_q_points,
-                                                      Vector<double>(dim));
+    std::vector<Vector<double>> boundary_force_values(n_face_q_points, Vector<double>(dim));
 
     Vector<double> cell_rhs(dofs_per_cell);
 
@@ -1549,8 +1442,7 @@ namespace Step42
 
     fraction_of_plastic_q_points_per_cell = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     unsigned int cell_number                            = 0;
     for (; cell != endc; ++cell, ++cell_number)
@@ -1560,52 +1452,45 @@ namespace Step42
           cell_rhs = 0;
 
           std::vector<SymmetricTensor<2, dim>> strain_tensors(n_q_points);
-          fe_values[displacement].get_function_symmetric_gradients(
-            linearization_point, strain_tensors);
+          fe_values[displacement].get_function_symmetric_gradients(linearization_point,
+                                                                   strain_tensors);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
               SymmetricTensor<4, dim> stress_strain_tensor;
-              const bool              q_point_is_plastic =
-                constitutive_law.get_stress_strain_tensor(
-                  strain_tensors[q_point], stress_strain_tensor);
+              const bool q_point_is_plastic = constitutive_law.get_stress_strain_tensor(
+                strain_tensors[q_point], stress_strain_tensor);
               if (q_point_is_plastic)
                 ++fraction_of_plastic_q_points_per_cell(cell_number);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  cell_rhs(i) -=
-                    (strain_tensors[q_point] * stress_strain_tensor *
-                     fe_values[displacement].symmetric_gradient(i, q_point) *
-                     fe_values.JxW(q_point));
+                  cell_rhs(i) -= (strain_tensors[q_point] * stress_strain_tensor *
+                                  fe_values[displacement].symmetric_gradient(i, q_point) *
+                                  fe_values.JxW(q_point));
 
                   Tensor<1, dim> rhs_values;
                   rhs_values = 0;
-                  cell_rhs(i) += (fe_values[displacement].value(i, q_point) *
-                                  rhs_values * fe_values.JxW(q_point));
+                  cell_rhs(i) += (fe_values[displacement].value(i, q_point) * rhs_values *
+                                  fe_values.JxW(q_point));
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            if (cell->face(face)->at_boundary() &&
-                cell->face(face)->boundary_id() == 1)
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face(face)->at_boundary() && cell->face(face)->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
-                boundary_force.vector_value_list(
-                  fe_values_face.get_quadrature_points(),
-                  boundary_force_values);
+                boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                 boundary_force_values);
 
-                for (unsigned int q_point = 0; q_point < n_face_q_points;
-                     ++q_point)
+                for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                   {
                     Tensor<1, dim> rhs_values;
                     rhs_values[2] = boundary_force_values[q_point][2];
                     for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                      cell_rhs(i) +=
-                        (fe_values_face[displacement].value(i, q_point) *
-                         rhs_values * fe_values_face.JxW(q_point));
+                      cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values *
+                                      fe_values_face.JxW(q_point));
                   }
               }
 
@@ -1654,8 +1539,7 @@ namespace Step42
   {
     TimerOutput::Scope t(computing_timer, "Solve");
 
-    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs,
-                                                       mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
     distributed_solution = solution;
 
     constraints_hanging_nodes.set_zero(distributed_solution);
@@ -1666,8 +1550,7 @@ namespace Step42
       TimerOutput::Scope t(computing_timer, "Solve: setup preconditioner");
 
       std::vector<std::vector<bool>> constant_modes;
-      DoFTools::extract_constant_modes(
-        dof_handler, ComponentMask(), constant_modes);
+      DoFTools::extract_constant_modes(dof_handler, ComponentMask(), constant_modes);
 
       TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
       additional_data.constant_modes        = constant_modes;
@@ -1688,18 +1571,15 @@ namespace Step42
 
       const double relative_accuracy = 1e-8;
       const double solver_tolerance =
-        relative_accuracy *
-        newton_matrix.residual(tmp, distributed_solution, newton_rhs);
+        relative_accuracy * newton_matrix.residual(tmp, distributed_solution, newton_rhs);
 
       SolverControl solver_control(newton_matrix.m(), solver_tolerance);
       SolverBicgstab<TrilinosWrappers::MPI::Vector> solver(solver_control);
-      solver.solve(
-        newton_matrix, distributed_solution, newton_rhs, preconditioner);
+      solver.solve(newton_matrix, distributed_solution, newton_rhs, preconditioner);
 
       pcout << "         Error: " << solver_control.initial_value() << " -> "
-            << solver_control.last_value() << " in "
-            << solver_control.last_step() << " Bicgstab iterations."
-            << std::endl;
+            << solver_control.last_value() << " in " << solver_control.last_step()
+            << " Bicgstab iterations." << std::endl;
     }
 
     all_constraints.distribute(distributed_solution);
@@ -1728,16 +1608,12 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::solve_newton()
   {
-    TrilinosWrappers::MPI::Vector old_solution(locally_owned_dofs,
-                                               mpi_communicator);
-    TrilinosWrappers::MPI::Vector residual(locally_owned_dofs,
-                                           mpi_communicator);
-    TrilinosWrappers::MPI::Vector tmp_vector(locally_owned_dofs,
-                                             mpi_communicator);
-    TrilinosWrappers::MPI::Vector locally_relevant_tmp_vector(
-      locally_relevant_dofs, mpi_communicator);
-    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs,
-                                                       mpi_communicator);
+    TrilinosWrappers::MPI::Vector old_solution(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector residual(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector tmp_vector(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector locally_relevant_tmp_vector(locally_relevant_dofs,
+                                                              mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
 
     double residual_norm;
     double previous_residual_norm = -std::numeric_limits<double>::max();
@@ -1749,11 +1625,9 @@ namespace Step42
     for (unsigned int newton_step = 1; newton_step <= 100; ++newton_step)
       {
         if (newton_step == 1 &&
-            ((transfer_solution && current_refinement_cycle == 0) ||
-             !transfer_solution))
+            ((transfer_solution && current_refinement_cycle == 0) || !transfer_solution))
           constitutive_law.set_sigma_0(1e+10);
-        else if (newton_step == 2 || current_refinement_cycle > 0 ||
-                 !transfer_solution)
+        else if (newton_step == 2 || current_refinement_cycle > 0 || !transfer_solution)
           constitutive_law.set_sigma_0(correct_sigma);
 
         pcout << " " << std::endl;
@@ -1801,8 +1675,7 @@ namespace Step42
         // In either of these two cases, we bypass the line search and just
         // update residual and other vectors as necessary.
         if ((newton_step == 1) ||
-            (transfer_solution && newton_step == 2 &&
-             current_refinement_cycle == 0) ||
+            (transfer_solution && newton_step == 2 && current_refinement_cycle == 0) ||
             (!transfer_solution && newton_step == 2))
           {
             compute_nonlinear_residual(solution);
@@ -1819,8 +1692,8 @@ namespace Step42
 
             residual_norm = residual.l2_norm();
 
-            pcout << "      Accepting Newton solution with residual: "
-                  << residual_norm << std::endl;
+            pcout << "      Accepting Newton solution with residual: " << residual_norm
+                  << std::endl;
           }
         else
           {
@@ -1848,11 +1721,9 @@ namespace Step42
 
                 residual_norm = residual.l2_norm();
 
-                pcout
-                  << "      Residual of the non-contact part of the system: "
-                  << residual_norm << std::endl
-                  << "         with a damping parameter alpha = " << alpha
-                  << std::endl;
+                pcout << "      Residual of the non-contact part of the system: " << residual_norm
+                      << std::endl
+                      << "         with a damping parameter alpha = " << alpha << std::endl;
 
                 if (residual_norm < previous_residual_norm)
                   break;
@@ -1869,8 +1740,7 @@ namespace Step42
         // has not changed across all processors and the residual is
         // less than a threshold of $10^{-10}$, then we terminate
         // the iteration on the current mesh:
-        if (Utilities::MPI::sum((active_set == old_active_set) ? 0 : 1,
-                                mpi_communicator) == 0)
+        if (Utilities::MPI::sum((active_set == old_active_set) ? 0 : 1, mpi_communicator) == 0)
           {
             pcout << "      Active set did not change!" << std::endl;
             if (residual_norm < 1e-10)
@@ -1895,8 +1765,7 @@ namespace Step42
   {
     if (refinement_strategy == RefinementStrategy::refine_global)
       {
-        for (typename Triangulation<dim>::active_cell_iterator cell =
-               triangulation.begin_active();
+        for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
              cell != triangulation.end();
              ++cell)
           if (cell->is_locally_owned())
@@ -1917,8 +1786,8 @@ namespace Step42
 
     triangulation.prepare_coarsening_and_refinement();
 
-    parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector>
-      solution_transfer(dof_handler);
+    parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> solution_transfer(
+      dof_handler);
     if (transfer_solution)
       solution_transfer.prepare_for_coarsening_and_refinement(solution);
 
@@ -1928,8 +1797,7 @@ namespace Step42
 
     if (transfer_solution)
       {
-        TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs,
-                                                           mpi_communicator);
+        TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
         solution_transfer.interpolate(distributed_solution);
 
         // enforce constraints to make the interpolated solution conforming on
@@ -1958,13 +1826,12 @@ namespace Step42
   // is keep track which vertices we have already touched, as we
   // encounter the same vertices multiple times as we loop over cells.
   template <int dim>
-  void PlasticityContactProblem<dim>::move_mesh(
-    const TrilinosWrappers::MPI::Vector &displacement) const
+  void
+  PlasticityContactProblem<dim>::move_mesh(const TrilinosWrappers::MPI::Vector &displacement) const
   {
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
 
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active();
+    for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
       if (cell->is_locally_owned())
@@ -1975,8 +1842,7 @@ namespace Step42
 
               Point<dim> vertex_displacement;
               for (unsigned int d = 0; d < dim; ++d)
-                vertex_displacement[d] =
-                  displacement(cell->vertex_dof_index(v, d));
+                vertex_displacement[d] = displacement(cell->vertex_dof_index(v, d));
 
               cell->vertex(v) += vertex_displacement;
             }
@@ -1999,8 +1865,7 @@ namespace Step42
   // want to generate output, we need vectors that do indeed have
   // ghost entries for all locally relevant degrees of freedom.
   template <int dim>
-  void PlasticityContactProblem<dim>::output_results(
-    const std::string &filename_base)
+  void PlasticityContactProblem<dim>::output_results(const std::string &filename_base)
   {
     TimerOutput::Scope t(computing_timer, "Graphical output");
 
@@ -2009,19 +1874,16 @@ namespace Step42
     move_mesh(solution);
 
     // Calculation of the contact forces
-    TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs,
-                                                     mpi_communicator);
-    const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
-                       end_res = (newton_rhs_uncondensed.local_range().second);
+    TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
+    const unsigned int            start_res = (newton_rhs_uncondensed.local_range().first),
+                       end_res              = (newton_rhs_uncondensed.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
-        distributed_lambda(n) =
-          newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);
+        distributed_lambda(n) = newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);
     distributed_lambda.compress(VectorOperation::insert);
     constraints_hanging_nodes.distribute(distributed_lambda);
 
-    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs,
-                                         mpi_communicator);
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     lambda = distributed_lambda;
 
 
@@ -2030,8 +1892,7 @@ namespace Step42
     data_out.attach_dof_handler(dof_handler);
 
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_component_interpretation(
-        dim, DataComponentInterpretation::component_is_part_of_vector);
+      data_component_interpretation(dim, DataComponentInterpretation::component_is_part_of_vector);
     data_out.add_data_vector(solution,
                              std::vector<std::string>(dim, "displacement"),
                              DataOut<dim>::type_dof_data,
@@ -2050,8 +1911,7 @@ namespace Step42
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.add_data_vector(fraction_of_plastic_q_points_per_cell,
-                             "fraction_of_plastic_q_points");
+    data_out.add_data_vector(fraction_of_plastic_q_points_per_cell, "fraction_of_plastic_q_points");
 
     data_out.build_patches();
 
@@ -2075,18 +1935,13 @@ namespace Step42
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i = 0;
-             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
-             ++i)
-          filenames.push_back(filename_base + "-" +
-                              Utilities::int_to_string(i, 4) + ".vtu");
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
+          filenames.push_back(filename_base + "-" + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream pvtu_master_output(
-          (output_dir + filename_base + ".pvtu"));
+        std::ofstream pvtu_master_output((output_dir + filename_base + ".pvtu"));
         data_out.write_pvtu_record(pvtu_master_output, filenames);
 
-        std::ofstream visit_master_output(
-          (output_dir + filename_base + ".visit"));
+        std::ofstream visit_master_output((output_dir + filename_base + ".visit"));
         DataOutBase::write_visit_record(visit_master_output, filenames);
       }
 
@@ -2113,21 +1968,18 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::output_contact_force() const
   {
-    TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs,
-                                                     mpi_communicator);
-    const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
-                       end_res = (newton_rhs_uncondensed.local_range().second);
+    TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
+    const unsigned int            start_res = (newton_rhs_uncondensed.local_range().first),
+                       end_res              = (newton_rhs_uncondensed.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
-        distributed_lambda(n) =
-          newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);
+        distributed_lambda(n) = newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);
       else
         distributed_lambda(n) = 0;
     distributed_lambda.compress(VectorOperation::insert);
     constraints_hanging_nodes.distribute(distributed_lambda);
 
-    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs,
-                                         mpi_communicator);
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     lambda = distributed_lambda;
 
     double contact_force = 0.0;
@@ -2140,26 +1992,20 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary() &&
-              cell->face(face)->boundary_id() == 1)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->face(face)->at_boundary() && cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
 
               std::vector<Tensor<1, dim>> lambda_values(n_face_q_points);
-              fe_values_face[displacement].get_function_values(lambda,
-                                                               lambda_values);
+              fe_values_face[displacement].get_function_values(lambda, lambda_values);
 
-              for (unsigned int q_point = 0; q_point < n_face_q_points;
-                   ++q_point)
-                contact_force +=
-                  lambda_values[q_point][2] * fe_values_face.JxW(q_point);
+              for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
+                contact_force += lambda_values[q_point][2] * fe_values_face.JxW(q_point);
             }
     contact_force = Utilities::MPI::sum(contact_force, MPI_COMM_WORLD);
 
@@ -2181,8 +2027,7 @@ namespace Step42
   void PlasticityContactProblem<dim>::run()
   {
     computing_timer.reset();
-    for (; current_refinement_cycle < n_refinement_cycles;
-         ++current_refinement_cycle)
+    for (; current_refinement_cycle < n_refinement_cycles; ++current_refinement_cycle)
       {
         {
           TimerOutput::Scope t(computing_timer, "Setup");
@@ -2212,8 +2057,8 @@ namespace Step42
 
         Utilities::System::MemoryStats stats;
         Utilities::System::get_memory_stats(stats);
-        pcout << "Peak virtual memory used, resident in kB: " << stats.VmSize
-              << " " << stats.VmRSS << std::endl;
+        pcout << "Peak virtual memory used, resident in kB: " << stats.VmSize << " " << stats.VmRSS
+              << std::endl;
 
         if (base_mesh == "box")
           output_contact_force();
@@ -2236,8 +2081,7 @@ int main(int argc, char *argv[])
       PlasticityContactProblem<3>::declare_parameters(prm);
       if (argc != 2)
         {
-          std::cerr << "*** Call this program as <./step-42 input.prm>"
-                    << std::endl;
+          std::cerr << "*** Call this program as <./step-42 input.prm>" << std::endl;
           return 1;
         }
 
@@ -2253,13 +2097,11 @@ int main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -2267,12 +2109,10 @@ int main(int argc, char *argv[])
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     }
 

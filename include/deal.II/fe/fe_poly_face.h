@@ -53,9 +53,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2009
  */
-template <class PolynomialType,
-          int dim      = PolynomialType::dimension + 1,
-          int spacedim = dim>
+template <class PolynomialType, int dim = PolynomialType::dimension + 1, int spacedim = dim>
 class FE_PolyFace : public FiniteElement<dim, spacedim>
 {
 public:
@@ -85,27 +83,22 @@ protected:
    */
 
 
-  virtual std::unique_ptr<
-    typename FiniteElement<dim, spacedim>::InternalDataBase>
-  get_data(
-    const UpdateFlags /*update_flags*/,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim> & /*quadrature*/,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      & /*output_data*/) const override
+  virtual std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+  get_data(const UpdateFlags /*update_flags*/,
+           const Mapping<dim, spacedim> & /*mapping*/,
+           const Quadrature<dim> & /*quadrature*/,
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+             & /*output_data*/) const override
   {
     return std_cxx14::make_unique<InternalData>();
   }
 
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-  get_face_data(
-    const UpdateFlags update_flags,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim - 1> &quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      & /*output_data*/) const override
+  get_face_data(const UpdateFlags update_flags,
+                const Mapping<dim, spacedim> & /*mapping*/,
+                const Quadrature<dim - 1> &quadrature,
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+                  & /*output_data*/) const override
   {
     // generate a new data object and
     // initialize some fields
@@ -127,8 +120,7 @@ protected:
     if (data->update_each & update_values)
       {
         values.resize(poly_space.n());
-        data->shape_values.resize(poly_space.n(),
-                                  std::vector<double>(n_q_points));
+        data->shape_values.resize(poly_space.n(), std::vector<double>(n_q_points));
         for (unsigned int i = 0; i < n_q_points; ++i)
           {
             poly_space.compute(quadrature.point(i),
@@ -144,8 +136,7 @@ protected:
       }
     // No derivatives of this element
     // are implemented.
-    if (data->update_each & update_gradients ||
-        data->update_each & update_hessians)
+    if (data->update_each & update_gradients || data->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }
@@ -154,19 +145,14 @@ protected:
   }
 
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-  get_subface_data(
-    const UpdateFlags             update_flags,
-    const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim - 1> &   quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override
+  get_subface_data(const UpdateFlags             update_flags,
+                   const Mapping<dim, spacedim> &mapping,
+                   const Quadrature<dim - 1> &   quadrature,
+                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+                     &output_data) const override
   {
     return get_face_data(
-      update_flags,
-      mapping,
-      QProjector<dim - 1>::project_to_all_children(quadrature),
-      output_data);
+      update_flags, mapping, QProjector<dim - 1>::project_to_all_children(quadrature), output_data);
   }
 
   virtual void
@@ -175,14 +161,11 @@ protected:
     const CellSimilarity::Similarity                            cell_similarity,
     const Quadrature<dim> &                                     quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_face_values(
@@ -190,14 +173,11 @@ protected:
     const unsigned int                                          face_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_subface_values(
@@ -206,14 +186,11 @@ protected:
     const unsigned int                                          sub_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   /**
    * Fields of cell-independent data.

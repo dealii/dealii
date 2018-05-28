@@ -97,8 +97,7 @@ test_real_to_unit_cell()
   VectorTools::get_position_vector(dhq, eulerq, mask);
   MappingFEField<dim, spacedim> map(dhq, eulerq, mask);
 
-  typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-    triangulation.begin_active();
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell = triangulation.begin_active();
 
   // Move a vertex a little bit
   const unsigned int n_dx = 5;
@@ -122,9 +121,8 @@ test_real_to_unit_cell()
           // pull back that we get
           // the same point again
 
-          const Point<spacedim> p =
-            map.transform_unit_to_real_cell(cell, unit_points[i]);
-          const Point<dim> p_unit = map.transform_real_to_unit_cell(cell, p);
+          const Point<spacedim> p      = map.transform_unit_to_real_cell(cell, unit_points[i]);
+          const Point<dim>      p_unit = map.transform_real_to_unit_cell(cell, p);
 
           Assert(unit_points[i].distance(p_unit) < 1e-10, ExcInternalError());
         }

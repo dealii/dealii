@@ -30,9 +30,7 @@ protected:
 
 
 template <typename number>
-QuickMatrix<number>::QuickMatrix(unsigned int nx, unsigned int ny) :
-  nx(nx),
-  ny(ny)
+QuickMatrix<number>::QuickMatrix(unsigned int nx, unsigned int ny) : nx(nx), ny(ny)
 {}
 
 template <typename number>
@@ -59,17 +57,14 @@ QuickMatrix<number>::vmult(Vector<number2> &d, const Vector<number2> &s) const
   for (unsigned int y = 1; y < top; y++)
     {
       start += step;
-      d(start) =
-        s(start) - .25 * (s(start - step) + s(start + 1) + s(start + step));
+      d(start) = s(start) - .25 * (s(start - step) + s(start + 1) + s(start + step));
 
       for (unsigned int x = 1; x < right; ++x)
         {
           const unsigned int xy = start + x;
-          d(xy) =
-            s(xy) - .25 * (s(xy - step) + s(xy - 1) + s(xy + 1) + s(xy + step));
+          d(xy) = s(xy) - .25 * (s(xy - step) + s(xy - 1) + s(xy + 1) + s(xy + step));
         }
-      d(start + right) = s(start + right) -
-                         .25 * (s(start + right - 1) + s(start + right + step));
+      d(start + right) = s(start + right) - .25 * (s(start + right - 1) + s(start + right + step));
     }
 
   // Top row
@@ -80,8 +75,7 @@ QuickMatrix<number>::vmult(Vector<number2> &d, const Vector<number2> &s) const
   for (unsigned int x = 1; x < right; ++x)
     {
       const unsigned int xy = start + x;
-      d(xy) = s(xy) - .25 * (s(xy - step) + s(xy - 1) + s(xy + 1));
+      d(xy)                 = s(xy) - .25 * (s(xy - step) + s(xy - 1) + s(xy + 1));
     }
-  d(start + right) =
-    s(start + right) - .25 * (s(start + right - step) + s(start + right - 1));
+  d(start + right) = s(start + right) - .25 * (s(start + right - step) + s(start + right - 1));
 }

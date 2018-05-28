@@ -62,13 +62,11 @@ namespace Step48
   class SineGordonOperation
   {
   public:
-    SineGordonOperation(const MatrixFree<dim, double> &data_in,
-                        const double                   time_step);
+    SineGordonOperation(const MatrixFree<dim, double> &data_in, const double time_step);
 
     void
     apply(LinearAlgebra::distributed::Vector<double> &                     dst,
-          const std::vector<LinearAlgebra::distributed::Vector<double> *> &src)
-      const;
+          const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const;
 
   private:
     const MatrixFree<dim, double> &            data;
@@ -76,19 +74,17 @@ namespace Step48
     LinearAlgebra::distributed::Vector<double> inv_mass_matrix;
 
     void
-    local_apply(
-      const MatrixFree<dim, double> &                                  data,
-      LinearAlgebra::distributed::Vector<double> &                     dst,
-      const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+    local_apply(const MatrixFree<dim, double> &                                  data,
+                LinearAlgebra::distributed::Vector<double> &                     dst,
+                const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
+                const std::pair<unsigned int, unsigned int> &                    cell_range) const;
   };
 
 
 
   template <int dim, int fe_degree>
-  SineGordonOperation<dim, fe_degree>::SineGordonOperation(
-    const MatrixFree<dim, double> &data_in,
-    const double                   time_step) :
+  SineGordonOperation<dim, fe_degree>::SineGordonOperation(const MatrixFree<dim, double> &data_in,
+                                                           const double time_step) :
     data(data_in),
     delta_t_sqr(make_vectorized_array(time_step * time_step))
   {
@@ -111,8 +107,7 @@ namespace Step48
     inv_mass_matrix.compress(VectorOperation::add);
     for (unsigned int k = 0; k < inv_mass_matrix.local_size(); ++k)
       if (inv_mass_matrix.local_element(k) > 1e-15)
-        inv_mass_matrix.local_element(k) =
-          1. / inv_mass_matrix.local_element(k);
+        inv_mass_matrix.local_element(k) = 1. / inv_mass_matrix.local_element(k);
       else
         inv_mass_matrix.local_element(k) = 0;
   }
@@ -125,7 +120,7 @@ namespace Step48
     const MatrixFree<dim> &                                          data,
     LinearAlgebra::distributed::Vector<double> &                     dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
-    const std::pair<unsigned int, unsigned int> &cell_range) const
+    const std::pair<unsigned int, unsigned int> &                    cell_range) const
   {
     AssertDimension(src.size(), 2);
     FEEvaluation<dim, fe_degree> current(data), old(data);
@@ -163,8 +158,7 @@ namespace Step48
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
     dst = 0;
-    data.cell_loop(
-      &SineGordonOperation<dim, fe_degree>::local_apply, this, dst, src);
+    data.cell_loop(&SineGordonOperation<dim, fe_degree>::local_apply, this, dst, src);
     dst.scale(inv_mass_matrix);
   }
 
@@ -174,8 +168,7 @@ namespace Step48
   class InitialSolution : public Function<dim>
   {
   public:
-    InitialSolution(const unsigned int n_components = 1,
-                    const double       time         = 0.) :
+    InitialSolution(const unsigned int n_components = 1, const double time = 0.) :
       Function<dim>(n_components, time)
     {}
     virtual double
@@ -184,8 +177,7 @@ namespace Step48
 
   template <int dim>
   double
-  InitialSolution<dim>::value(const Point<dim> &p,
-                              const unsigned int /* component */) const
+  InitialSolution<dim>::value(const Point<dim> &p, const unsigned int /* component */) const
   {
     return 4. * std::exp(-p.square() * 10);
   }
@@ -218,8 +210,7 @@ namespace Step48
 
     MatrixFree<dim, double> matrix_free_data;
 
-    LinearAlgebra::distributed::Vector<double> solution, old_solution,
-      old_old_solution;
+    LinearAlgebra::distributed::Vector<double> solution, old_solution, old_old_solution;
 
     const unsigned int n_global_refinements;
     double             time, time_step;
@@ -262,8 +253,7 @@ namespace Step48
 
     dof_handler.distribute_dofs(fe);
 
-    deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+    deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
 
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
@@ -274,11 +264,9 @@ namespace Step48
 
     QGaussLobatto<1>                         quadrature(fe_degree + 1);
     typename MatrixFree<dim>::AdditionalData additional_data;
-    additional_data.tasks_parallel_scheme =
-      MatrixFree<dim>::AdditionalData::partition_partition;
+    additional_data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::partition_partition;
 
-    matrix_free_data.reinit(
-      dof_handler, constraints, quadrature, additional_data);
+    matrix_free_data.reinit(dof_handler, constraints, quadrature, additional_data);
 
     matrix_free_data.initialize_dof_vector(solution);
     old_solution.reinit(solution);
@@ -305,8 +293,8 @@ namespace Step48
       std::sqrt(Utilities::MPI::sum(norm_per_cell.norm_sqr(), MPI_COMM_WORLD));
 
     deallog << "   Time:" << std::setw(8) << std::setprecision(3) << time
-            << ", solution norm: " << std::setprecision(5) << std::setw(7)
-            << solution_norm << std::endl;
+            << ", solution norm: " << std::setprecision(5) << std::setw(7) << solution_norm
+            << std::endl;
   }
 
 
@@ -317,35 +305,29 @@ namespace Step48
   {
     make_grid_and_dofs();
 
-    const double local_min_cell_diameter =
-      triangulation.last()->diameter() / std::sqrt(dim);
+    const double local_min_cell_diameter = triangulation.last()->diameter() / std::sqrt(dim);
     const double global_min_cell_diameter =
       -Utilities::MPI::max(-local_min_cell_diameter, MPI_COMM_WORLD);
     time_step = cfl_number * global_min_cell_diameter;
     time_step = (final_time - time) / (int((final_time - time) / time_step));
-    deallog << "   Time step size: " << time_step
-            << ", finest cell: " << global_min_cell_diameter << std::endl
+    deallog << "   Time step size: " << time_step << ", finest cell: " << global_min_cell_diameter
+            << std::endl
             << std::endl;
 
 
-    VectorTools::interpolate(
-      dof_handler, InitialSolution<dim>(1, time), solution);
-    VectorTools::interpolate(
-      dof_handler, InitialSolution<dim>(1, time - time_step), old_solution);
+    VectorTools::interpolate(dof_handler, InitialSolution<dim>(1, time), solution);
+    VectorTools::interpolate(dof_handler, InitialSolution<dim>(1, time - time_step), old_solution);
     output_results(0);
 
-    std::vector<LinearAlgebra::distributed::Vector<double> *>
-      previous_solutions;
+    std::vector<LinearAlgebra::distributed::Vector<double> *> previous_solutions;
     previous_solutions.push_back(&old_solution);
     previous_solutions.push_back(&old_old_solution);
 
-    SineGordonOperation<dim, fe_degree> sine_gordon_op(matrix_free_data,
-                                                       time_step);
+    SineGordonOperation<dim, fe_degree> sine_gordon_op(matrix_free_data, time_step);
 
     unsigned int timestep_number = 1;
 
-    for (time += time_step; time <= final_time;
-         time += time_step, ++timestep_number)
+    for (time += time_step; time <= final_time; time += time_step, ++timestep_number)
       {
         old_old_solution.swap(old_solution);
         old_solution.swap(solution);
@@ -367,8 +349,7 @@ namespace Step48
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

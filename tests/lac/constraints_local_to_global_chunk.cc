@@ -65,8 +65,7 @@ test(unsigned int chunk_size)
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 1, Functions::ZeroFunction<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof, 1, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
 
   SparsityPattern      sparsity;
@@ -80,16 +79,15 @@ test(unsigned int chunk_size)
   SparseMatrix<double>      sparse(sparsity);
   ChunkSparseMatrix<double> chunk_sparse(chunk_sparsity);
 
-  FullMatrix<double> local_mat(fe.dofs_per_cell, fe.dofs_per_cell);
+  FullMatrix<double>                   local_mat(fe.dofs_per_cell, fe.dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
   // loop over cells, fill local matrix with
   // random values, insert both into sparse and
   // full matrix. Make some random entries equal
   // to zero
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                 endc = dof.end();
-  unsigned int counter                                = 0;
+  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(), endc = dof.end();
+  unsigned int                                   counter = 0;
   for (; cell != endc; ++cell)
     {
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
@@ -99,10 +97,8 @@ test(unsigned int chunk_size)
           else
             local_mat(i, j) = random_value<double>();
       cell->get_dof_indices(local_dof_indices);
-      constraints.distribute_local_to_global(
-        local_mat, local_dof_indices, sparse);
-      constraints.distribute_local_to_global(
-        local_mat, local_dof_indices, chunk_sparse);
+      constraints.distribute_local_to_global(local_mat, local_dof_indices, sparse);
+      constraints.distribute_local_to_global(local_mat, local_dof_indices, chunk_sparse);
     }
 
   // now check that the entries are indeed the
@@ -110,10 +106,9 @@ test(unsigned int chunk_size)
   double frobenius = 0.;
   for (unsigned int i = 0; i < sparse.m(); ++i)
     for (unsigned int j = 0; j < sparse.n(); ++j)
-      frobenius += numbers::NumberTraits<double>::abs_square(
-        sparse.el(i, j) - chunk_sparse.el(i, j));
-  deallog << "Difference between chunk and sparse matrix: "
-          << std::sqrt(frobenius) << std::endl;
+      frobenius +=
+        numbers::NumberTraits<double>::abs_square(sparse.el(i, j) - chunk_sparse.el(i, j));
+  deallog << "Difference between chunk and sparse matrix: " << std::sqrt(frobenius) << std::endl;
 }
 
 

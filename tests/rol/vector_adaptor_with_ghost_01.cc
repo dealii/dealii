@@ -29,10 +29,8 @@ template <typename VectorType>
 void
 prepare_vector(VectorType &v)
 {
-  const unsigned int myid =
-                       dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                     numproc =
-                       dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  const unsigned int myid    = dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
+                     numproc = dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   const unsigned int set = 200;
   AssertIndexRange(numproc, set - 2);
@@ -53,16 +51,8 @@ prepare_vector(VectorType &v)
   IndexSet local_owned(global_size);
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet     local_relevant(global_size);
-  unsigned int ghost_indices[10] = {1,
-                                    2,
-                                    13,
-                                    set - 2,
-                                    set - 1,
-                                    set,
-                                    set + 1,
-                                    2 * set,
-                                    2 * set + 1,
-                                    2 * set + 3};
+  unsigned int ghost_indices[10] = {
+    1, 2, 13, set - 2, set - 1, set, set + 1, 2 * set, 2 * set + 1, 2 * set + 3};
   local_relevant.add_indices(&ghost_indices[0], &ghost_indices[0] + 10);
 
   // --- Prepare vector.
@@ -137,13 +127,11 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -151,12 +139,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

@@ -111,13 +111,12 @@ namespace internal
        * collected by the call to @p assign_ghosts.
        */
       void
-      read_dof_indices(
-        const std::vector<types::global_dof_index> &local_indices,
-        const std::vector<unsigned int> &           lexicographic_inv,
-        const ConstraintMatrix &                    constraints,
-        const unsigned int                          cell_number,
-        ConstraintValues<double> &                  constraint_values,
-        bool &                                      cell_at_boundary);
+      read_dof_indices(const std::vector<types::global_dof_index> &local_indices,
+                       const std::vector<unsigned int> &           lexicographic_inv,
+                       const ConstraintMatrix &                    constraints,
+                       const unsigned int                          cell_number,
+                       ConstraintValues<double> &                  constraint_values,
+                       bool &                                      cell_at_boundary);
 
       /**
        * This method assigns the correct indices to ghost indices from the
@@ -146,8 +145,7 @@ namespace internal
        * increased efficiency. Run at the end of reorder_cells.
        */
       void
-      compute_cell_index_compression(
-        const std::vector<unsigned char> &irregular_cells);
+      compute_cell_index_compression(const std::vector<unsigned char> &irregular_cells);
 
       /**
        * Finds possible compression for the face indices that we can apply for
@@ -155,8 +153,7 @@ namespace internal
        */
       template <int length>
       void
-      compute_face_index_compression(
-        const std::vector<FaceToCellTopology<length>> &faces);
+      compute_face_index_compression(const std::vector<FaceToCellTopology<length>> &faces);
 
       /**
        * This function computes the connectivity of the currently stored
@@ -166,7 +163,7 @@ namespace internal
       void
       make_connectivity_graph(const TaskInfo &                 task_info,
                               const std::vector<unsigned int> &renumbering,
-                              DynamicSparsityPattern &connectivity) const;
+                              DynamicSparsityPattern &         connectivity) const;
 
       /**
        * Compute a renumbering of the degrees of freedom to improve the data
@@ -179,8 +176,7 @@ namespace internal
        * value of this function.
        */
       void
-      compute_dof_renumbering(
-        std::vector<types::global_dof_index> &renumbering);
+      compute_dof_renumbering(std::vector<types::global_dof_index> &renumbering);
 
       /**
        * Fills the array that defines how to zero selected ranges in the result
@@ -193,9 +189,8 @@ namespace internal
        */
       template <int length>
       void
-      compute_vector_zero_access_pattern(
-        const TaskInfo &                               task_info,
-        const std::vector<FaceToCellTopology<length>> &faces);
+      compute_vector_zero_access_pattern(const TaskInfo &                               task_info,
+                                         const std::vector<FaceToCellTopology<length>> &faces);
 
       /**
        * Return the memory consumption in bytes of this class.
@@ -209,8 +204,7 @@ namespace internal
        */
       template <typename StreamType>
       void
-      print_memory_consumption(StreamType &    out,
-                               const TaskInfo &size_info) const;
+      print_memory_consumption(StreamType &out, const TaskInfo &size_info) const;
 
       /**
        * Prints a representation of the indices in the class to the given
@@ -347,8 +341,7 @@ namespace internal
        * from or writing to a vector. The second number stores the index of
        * the constraint weights, stored in the variable constraint_pool_data.
        */
-      std::vector<std::pair<unsigned short, unsigned short>>
-        constraint_indicator;
+      std::vector<std::pair<unsigned short, unsigned short>> constraint_indicator;
 
       /**
        * Reordered index storage for `IndexStorageVariants::interleaved`.

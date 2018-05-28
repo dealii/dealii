@@ -75,8 +75,7 @@ check()
 
   hp::DoFHandler<dim> dof_handler(tria);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                      endc = dof_handler.end();
   for (; cell != endc; ++cell)
     cell->set_active_fe_index(Testing::rand() % fe.size());

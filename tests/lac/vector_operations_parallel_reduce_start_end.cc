@@ -32,14 +32,11 @@ check()
     {
       const unsigned int size = 17 + test * 1101;
 
-      std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-        thread_loop_partitioner;
-      thread_loop_partitioner.reset(
-        new ::dealii::parallel::internal::TBBPartitioner());
+      std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
+      thread_loop_partitioner.reset(new ::dealii::parallel::internal::TBBPartitioner());
 
       Number *val;
-      Utilities::System::posix_memalign(
-        (void **)&val, 64, sizeof(Number) * size);
+      Utilities::System::posix_memalign((void **)&val, 64, sizeof(Number) * size);
 
       for (unsigned int i = 0; i < size; ++i)
         val[i] = random_value<double>();
@@ -67,8 +64,7 @@ check()
         }
 
       // check values:
-      AssertThrow(std::fabs(sum - sum_direct) < 1e-6 * sum_direct,
-                  ExcInternalError());
+      AssertThrow(std::fabs(sum - sum_direct) < 1e-6 * sum_direct, ExcInternalError());
 
       free(val);
     }

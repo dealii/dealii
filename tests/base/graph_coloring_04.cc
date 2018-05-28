@@ -43,8 +43,7 @@ template <int dim>
 std::vector<types::global_dof_index>
 get_conflict_indices(const typename DoFHandler<dim>::active_cell_iterator &it)
 {
-  std::vector<types::global_dof_index> local_dof_indices(
-    it->get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
 
   return local_dof_indices;
@@ -56,8 +55,7 @@ void
 check()
 {
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_shell(
-    triangulation, Point<dim>(), 1, 2, (dim == 3) ? 96 : 12, true);
+  GridGenerator::hyper_shell(triangulation, Point<dim>(), 1, 2, (dim == 3) ? 96 : 12, true);
 
   triangulation.refine_global(3);
 
@@ -75,25 +73,22 @@ check()
   DoFHandler<dim> stokes_dof_handler(triangulation);
   stokes_dof_handler.distribute_dofs(fe);
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell =
-         stokes_dof_handler.begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = stokes_dof_handler.begin_active();
        cell != stokes_dof_handler.end();
        ++cell)
     cell->clear_user_flag();
-  std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator>>
-    coloring = GraphColoring::make_graph_coloring(
+  std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator>> coloring =
+    GraphColoring::make_graph_coloring(
       stokes_dof_handler.begin_active(),
       stokes_dof_handler.end(),
       std::function<std::vector<types::global_dof_index>(
-        const typename DoFHandler<dim>::active_cell_iterator &)>(
-        &get_conflict_indices<dim>));
+        const typename DoFHandler<dim>::active_cell_iterator &)>(&get_conflict_indices<dim>));
 
   for (unsigned int c = 0; c < coloring.size(); ++c)
     for (unsigned int i = 0; i < coloring[c].size(); ++i)
       coloring[c][i]->set_user_flag();
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell =
-         stokes_dof_handler.begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = stokes_dof_handler.begin_active();
        cell != stokes_dof_handler.end();
        ++cell)
     AssertThrow(cell->user_flag_set() == true, ExcInternalError());

@@ -46,7 +46,7 @@ main(int argc, char **argv)
 
     // reuse
     solver_control.check(1,
-                         3.e-4); // 1  <----- start from 1st iteration NO-NO-NO
+                         3.e-4);    // 1  <----- start from 1st iteration NO-NO-NO
     solver_control.check(2, 2.e-4); // 2
     solver_control.check(3, 1.e-4); // 3 ==> success
   }

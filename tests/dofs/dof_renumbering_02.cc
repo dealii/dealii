@@ -50,12 +50,11 @@ print_dofs(const DoFHandler<dim> &dof)
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = std::shared_ptr<FEValues<dim>>(
-        new FEValues<dim>(fe, quad, update_quadrature_points));
+      fevalues =
+        std::shared_ptr<FEValues<dim>>(new FEValues<dim>(fe, quad, update_quadrature_points));
     }
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();
        ++cell)
     {
       Point<dim> p = cell->center();
@@ -85,12 +84,11 @@ print_dofs(const DoFHandler<dim> &dof, unsigned int level)
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = std::shared_ptr<FEValues<dim>>(
-        new FEValues<dim>(fe, quad, update_quadrature_points));
+      fevalues =
+        std::shared_ptr<FEValues<dim>>(new FEValues<dim>(fe, quad, update_quadrature_points));
     }
 
-  for (typename DoFHandler<dim>::cell_iterator cell = dof.begin(level);
-       cell != dof.end(level);
+  for (typename DoFHandler<dim>::cell_iterator cell = dof.begin(level); cell != dof.end(level);
        ++cell)
     {
       Point<dim> p = cell->center();
@@ -130,8 +128,7 @@ check_renumbering(DoFHandler<dim> &mgdof)
   DoFRenumbering::downstream(dof, direction);
   print_dofs(dof);
   // Check level ordering
-  for (unsigned int level = 0; level < dof.get_triangulation().n_levels();
-       ++level)
+  for (unsigned int level = 0; level < dof.get_triangulation().n_levels(); ++level)
     {
       deallog << "Level " << level << std::endl;
       DoFRenumbering::downstream(mgdof, level, direction);
@@ -142,8 +139,7 @@ check_renumbering(DoFHandler<dim> &mgdof)
   DoFRenumbering::downstream(dof, direction, true);
   print_dofs(dof);
   // Check level ordering
-  for (unsigned int level = 0; level < dof.get_triangulation().n_levels();
-       ++level)
+  for (unsigned int level = 0; level < dof.get_triangulation().n_levels(); ++level)
     {
       deallog << "Level " << level << std::endl;
       DoFRenumbering::downstream(mgdof, level, direction, true);

@@ -38,10 +38,8 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
-                  << std::endl;
-          Assert(GridTools::maximal_cell_diameter(tria) >=
-                   GridTools::minimal_cell_diameter(tria),
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria) << std::endl;
+          Assert(GridTools::maximal_cell_diameter(tria) >= GridTools::minimal_cell_diameter(tria),
                  ExcInternalError());
         };
     };
@@ -57,10 +55,8 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "max diameter: " << GridTools::maximal_cell_diameter(tria)
-                  << std::endl;
-          Assert(GridTools::maximal_cell_diameter(tria) >=
-                   GridTools::minimal_cell_diameter(tria),
+                  << "max diameter: " << GridTools::maximal_cell_diameter(tria) << std::endl;
+          Assert(GridTools::maximal_cell_diameter(tria) >= GridTools::minimal_cell_diameter(tria),
                  ExcInternalError());
         };
     };
@@ -70,8 +66,7 @@ test1()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   MPILogInitAll mpi_init_log;
 

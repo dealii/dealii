@@ -40,8 +40,7 @@ test()
   // same, but create iterator in a different
   // way
   {
-    BlockVector<double>::const_iterator i =
-      const_cast<const BlockVector<double> &>(v).begin();
+    BlockVector<double>::const_iterator i = const_cast<const BlockVector<double> &>(v).begin();
     AssertThrow(i[0] == 1, ExcInternalError());
     AssertThrow(i[1] == 2, ExcInternalError());
   }
@@ -85,13 +84,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -99,12 +96,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

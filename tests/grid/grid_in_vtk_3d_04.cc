@@ -49,21 +49,18 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
   // now also output boundary ids for all boundary faces. this is
   // where the bug was for which this test was written
   deallog << "Face boundary_ids:" << std::endl;
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
-        deallog << cell << ' ' << f << ": " << (int)cell->face(f)->boundary_id()
-                << std::endl;
+        deallog << cell << ' ' << f << ": " << (int)cell->face(f)->boundary_id() << std::endl;
 }
 
 void
 filename_resolution()
 {
-  check_file<3>(std::string(SOURCE_DIR "/grid_in_vtk_3d_04.vtk"),
-                GridIn<3>::vtk);
+  check_file<3>(std::string(SOURCE_DIR "/grid_in_vtk_3d_04.vtk"), GridIn<3>::vtk);
 }
 
 

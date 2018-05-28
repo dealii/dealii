@@ -94,8 +94,7 @@ class SparseMatrix;
  * @author Ralf Hartmann, 1999; extension for full compatibility with
  * LinearOperator class: Jean-Paul Pelteret, 2015
  */
-template <typename MatrixType = SparseMatrix<double>,
-          typename VectorType = dealii::Vector<double>>
+template <typename MatrixType = SparseMatrix<double>, typename VectorType = dealii::Vector<double>>
 class PreconditionSelector : public Subscriptor
 {
 public:
@@ -187,8 +186,7 @@ private:
    * Matrix that is used for the matrix-builtin preconditioning function. cf.
    * also @p PreconditionUseMatrix.
    */
-  SmartPointer<const MatrixType, PreconditionSelector<MatrixType, VectorType>>
-    A;
+  SmartPointer<const MatrixType, PreconditionSelector<MatrixType, VectorType>> A;
 
   /**
    * Stores the damping parameter of the preconditioner.
@@ -246,8 +244,7 @@ PreconditionSelector<MatrixType, VectorType>::n() const
 
 template <typename MatrixType, typename VectorType>
 void
-PreconditionSelector<MatrixType, VectorType>::vmult(VectorType &      dst,
-                                                    const VectorType &src) const
+PreconditionSelector<MatrixType, VectorType>::vmult(VectorType &dst, const VectorType &src) const
 {
   if (preconditioning == "none")
     {
@@ -277,9 +274,7 @@ PreconditionSelector<MatrixType, VectorType>::vmult(VectorType &      dst,
 
 template <typename MatrixType, typename VectorType>
 void
-PreconditionSelector<MatrixType, VectorType>::Tvmult(
-  VectorType &      dst,
-  const VectorType &src) const
+PreconditionSelector<MatrixType, VectorType>::Tvmult(VectorType &dst, const VectorType &src) const
 {
   if (preconditioning == "none")
     {

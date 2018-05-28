@@ -35,8 +35,7 @@ test()
 {
   const int dim = 2;
   // setup system
-  dealii::parallel::distributed::Triangulation<dim> triangulation(
-    MPI_COMM_WORLD);
+  dealii::parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(triangulation);
 
@@ -53,17 +52,11 @@ test()
   ConstraintMatrix constraints;
 
   // generate sparsity pattern
-  TrilinosWrappers::SparsityPattern sp(dh.locally_owned_dofs(),
-                                       dh.locally_owned_dofs(),
-                                       relevant_partitioning,
-                                       MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(
+    dh.locally_owned_dofs(), dh.locally_owned_dofs(), relevant_partitioning, MPI_COMM_WORLD);
 
   DoFTools::make_sparsity_pattern(
-    dh,
-    sp,
-    constraints,
-    true,
-    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    dh, sp, constraints, true, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
   sp.compress();
 
   // output
@@ -74,9 +67,8 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
+  MPILogInitAll                    log;
 
   test();
 }

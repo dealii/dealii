@@ -65,9 +65,7 @@ template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
-  EnrichmentFunction(const Point<dim> &origin) :
-    Function<dim>(1),
-    origin(origin)
+  EnrichmentFunction(const Point<dim> &origin) : Function<dim>(1), origin(origin)
   {}
 
   virtual double
@@ -98,8 +96,7 @@ public:
       for (unsigned int j = i; j < dim; j++)
         dir_x_dir[i][j] = dir[i] * dir[j];
 
-    return std::exp(-r) *
-           ((1.0 + 0.5 / r) * dir_x_dir - unit_symmetric_tensor<dim>() / r);
+    return std::exp(-r) * ((1.0 + 0.5 / r) * dir_x_dir - unit_symmetric_tensor<dim>() / r);
   }
 
 private:
@@ -158,25 +155,20 @@ check_consistency(const Point<dim> &    p,
 
   // product rule:
   const double         v_s = v_s0 + v_s1 * v_f1 + v_s2 * v_f2 + v_s3 * v_f3;
-  const Tensor<1, dim> g_s = g_s0 + g_s1 * v_f1 + v_s1 * g_f1 + g_s2 * v_f2 +
-                             v_s2 * g_f2 + g_s3 * v_f3 + v_s3 * g_f3;
-  Tensor<2, dim> op1 = outer_product(g_s1, g_f1),
-                 op2 = outer_product(g_s2, g_f2),
+  const Tensor<1, dim> g_s =
+    g_s0 + g_s1 * v_f1 + v_s1 * g_f1 + g_s2 * v_f2 + v_s2 * g_f2 + g_s3 * v_f3 + v_s3 * g_f3;
+  Tensor<2, dim> op1 = outer_product(g_s1, g_f1), op2 = outer_product(g_s2, g_f2),
                  op3 = outer_product(g_s3, g_f3);
 
-  const SymmetricTensor<2, dim> sp1 =
-    symmetrize(op1) * 2.0; // symmetrize does [s+s^T]/2
-  const SymmetricTensor<2, dim> sp2 =
-    symmetrize(op2) * 2.0; // symmetrize does [s+s^T]/2
-  const SymmetricTensor<2, dim> sp3 =
-    symmetrize(op3) * 2.0; // symmetrize does [s+s^T]/2
+  const SymmetricTensor<2, dim> sp1 = symmetrize(op1) * 2.0; // symmetrize does [s+s^T]/2
+  const SymmetricTensor<2, dim> sp2 = symmetrize(op2) * 2.0; // symmetrize does [s+s^T]/2
+  const SymmetricTensor<2, dim> sp3 = symmetrize(op3) * 2.0; // symmetrize does [s+s^T]/2
   // Hessians should be symmetric, but due to round off errors and the fact
   // that deal.II stores hessians in tensors, we may end up with failing check
   // for symmetry in SymmetricTensor class.
   // For a moment stick with usual Tensor
-  const Tensor<2, dim> h_s = h_s0 + h_s1 * v_f1 + sp1 + v_s1 * h_f1 +
-                             h_s2 * v_f2 + sp2 + v_s2 * h_f2 + h_s3 * v_f3 +
-                             sp3 + v_s3 * h_f3;
+  const Tensor<2, dim> h_s = h_s0 + h_s1 * v_f1 + sp1 + v_s1 * h_f1 + h_s2 * v_f2 + sp2 +
+                             v_s2 * h_f2 + h_s3 * v_f3 + sp3 + v_s3 * h_f3;
 
   const double v_d = v_s - v_e;
   AssertThrow(std::abs(v_d) < eps, ExcInternalError());
@@ -219,26 +211,16 @@ test(const FiniteElement<dim> & fe_base,
   fe_enrichements[1] = &fe_en2;
   FE_Nothing<dim> fe_nothing(1, true);
   fe_enrichements[2] = &fe_nothing; // should be ignored
-  std::vector<std::vector<std::function<const Function<dim> *(
-    const typename Triangulation<dim, dim>::cell_iterator &)>>>
+  std::vector<std::vector<
+    std::function<const Function<dim> *(const typename Triangulation<dim, dim>::cell_iterator &)>>>
     functions(3);
   functions[0].resize(1);
-  functions[0][0] =
-    [&](const typename Triangulation<dim, dim>::cell_iterator &) {
-      return &fun1;
-    };
+  functions[0][0] = [&](const typename Triangulation<dim, dim>::cell_iterator &) { return &fun1; };
   functions[1].resize(2);
-  functions[1][0] =
-    [&](const typename Triangulation<dim, dim>::cell_iterator &) {
-      return &fun2;
-    };
-  functions[1][1] =
-    [&](const typename Triangulation<dim, dim>::cell_iterator &) {
-      return &fun3;
-    };
+  functions[1][0] = [&](const typename Triangulation<dim, dim>::cell_iterator &) { return &fun2; };
+  functions[1][1] = [&](const typename Triangulation<dim, dim>::cell_iterator &) { return &fun3; };
   functions[2].resize(1);
-  functions[2][0] = [&](
-                      const typename Triangulation<dim, dim>::cell_iterator &) {
+  functions[2][0] = [&](const typename Triangulation<dim, dim>::cell_iterator &) {
     AssertThrow(false, ExcMessage("Called enrichment function for FE_Nothing"));
     return nullptr;
   };
@@ -255,8 +237,7 @@ test(const FiniteElement<dim> & fe_base,
         p2[d]          = 2.0;
         repetitions[d] = 3;
       }
-    GridGenerator::subdivided_hyper_rectangle(
-      triangulation, repetitions, p1, p2);
+    GridGenerator::subdivided_hyper_rectangle(triangulation, repetitions, p1, p2);
 
     if (distort)
       GridTools::distort_random(0.1, triangulation);
@@ -265,101 +246,92 @@ test(const FiniteElement<dim> & fe_base,
   dof_handler_enriched.distribute_dofs(fe_enriched);
   dof_handler_system.distribute_dofs(fe_system);
 
-  FEValues<dim> fe_values_enriched(fe_enriched,
-                                   volume_quad,
-                                   update_values | update_gradients |
-                                     update_hessians);
+  FEValues<dim> fe_values_enriched(
+    fe_enriched, volume_quad, update_values | update_gradients | update_hessians);
 
   FEValues<dim> fe_values_system(fe_system,
                                  volume_quad,
-                                 update_values | update_gradients |
-                                   update_hessians | update_quadrature_points);
+                                 update_values | update_gradients | update_hessians |
+                                   update_quadrature_points);
 
   FEFaceValues<dim> fe_face_values_enriched(
     fe_enriched, face_quad, update_values | update_gradients | update_hessians);
 
   FEFaceValues<dim> fe_face_values_system(fe_system,
                                           face_quad,
-                                          update_values | update_gradients |
-                                            update_hessians |
+                                          update_values | update_gradients | update_hessians |
                                             update_quadrature_points);
 
-  AssertThrow(dof_handler_enriched.n_dofs() == dof_handler_system.n_dofs(),
-              ExcInternalError());
+  AssertThrow(dof_handler_enriched.n_dofs() == dof_handler_system.n_dofs(), ExcInternalError());
   Vector<double> solution(dof_handler_enriched.n_dofs());
 
   const unsigned int dofs_per_cell = fe_enriched.dofs_per_cell;
-  Assert(fe_enriched.dofs_per_cell == fe_system.dofs_per_cell,
-         ExcInternalError());
+  Assert(fe_enriched.dofs_per_cell == fe_system.dofs_per_cell, ExcInternalError());
 
-  typename DoFHandler<dim>::active_cell_iterator
-    cell_enriched = dof_handler_enriched.begin_active(),
-    endc_enriched = dof_handler_enriched.end(),
-    cell_system   = dof_handler_system.begin_active(),
-    endc_system   = dof_handler_system.end();
+  typename DoFHandler<dim>::active_cell_iterator cell_enriched =
+                                                   dof_handler_enriched.begin_active(),
+                                                 endc_enriched = dof_handler_enriched.end(),
+                                                 cell_system   = dof_handler_system.begin_active(),
+                                                 endc_system   = dof_handler_system.end();
   for (; cell_enriched != endc_enriched; ++cell_enriched, ++cell_system)
     {
       fe_values_enriched.reinit(cell_enriched);
       fe_values_system.reinit(cell_system);
       const unsigned int                     n_q_points = volume_quad.size();
-      const std::vector<dealii::Point<dim>> &q_points =
-        fe_values_system.get_quadrature_points();
+      const std::vector<dealii::Point<dim>> &q_points   = fe_values_system.get_quadrature_points();
 
       // check shape functions
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          check_consistency(
-            q_points[q_point],
-            fun1,
-            fun2,
-            fun3,
-            fe_values_enriched.shape_value(i, q_point),
-            fe_values_enriched.shape_grad(i, q_point),
-            fe_values_enriched.shape_hessian(i, q_point),
-            fe_values_system.shape_value_component(i, q_point, 0),
-            fe_values_system.shape_grad_component(i, q_point, 0),
-            fe_values_system.shape_hessian_component(i, q_point, 0),
-            fe_values_system.shape_value_component(i, q_point, 1),
-            fe_values_system.shape_grad_component(i, q_point, 1),
-            fe_values_system.shape_hessian_component(i, q_point, 1),
-            fe_values_system.shape_value_component(i, q_point, 2),
-            fe_values_system.shape_grad_component(i, q_point, 2),
-            fe_values_system.shape_hessian_component(i, q_point, 2),
-            fe_values_system.shape_value_component(i, q_point, 3),
-            fe_values_system.shape_grad_component(i, q_point, 3),
-            fe_values_system.shape_hessian_component(i, q_point, 3));
+          check_consistency(q_points[q_point],
+                            fun1,
+                            fun2,
+                            fun3,
+                            fe_values_enriched.shape_value(i, q_point),
+                            fe_values_enriched.shape_grad(i, q_point),
+                            fe_values_enriched.shape_hessian(i, q_point),
+                            fe_values_system.shape_value_component(i, q_point, 0),
+                            fe_values_system.shape_grad_component(i, q_point, 0),
+                            fe_values_system.shape_hessian_component(i, q_point, 0),
+                            fe_values_system.shape_value_component(i, q_point, 1),
+                            fe_values_system.shape_grad_component(i, q_point, 1),
+                            fe_values_system.shape_hessian_component(i, q_point, 1),
+                            fe_values_system.shape_value_component(i, q_point, 2),
+                            fe_values_system.shape_grad_component(i, q_point, 2),
+                            fe_values_system.shape_hessian_component(i, q_point, 2),
+                            fe_values_system.shape_value_component(i, q_point, 3),
+                            fe_values_system.shape_grad_component(i, q_point, 3),
+                            fe_values_system.shape_hessian_component(i, q_point, 3));
 
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         {
           fe_face_values_enriched.reinit(cell_enriched, face);
           fe_face_values_system.reinit(cell_system, face);
-          const unsigned int n_q_points_face = face_quad.size();
+          const unsigned int                     n_q_points_face = face_quad.size();
           const std::vector<dealii::Point<dim>> &q_points =
             fe_face_values_system.get_quadrature_points();
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int q_point = 0; q_point < n_q_points_face; ++q_point)
-              check_consistency(
-                q_points[q_point],
-                fun1,
-                fun2,
-                fun3,
-                fe_face_values_enriched.shape_value(i, q_point),
-                fe_face_values_enriched.shape_grad(i, q_point),
-                fe_face_values_enriched.shape_hessian(i, q_point),
-                fe_face_values_system.shape_value_component(i, q_point, 0),
-                fe_face_values_system.shape_grad_component(i, q_point, 0),
-                fe_face_values_system.shape_hessian_component(i, q_point, 0),
-                fe_face_values_system.shape_value_component(i, q_point, 1),
-                fe_face_values_system.shape_grad_component(i, q_point, 1),
-                fe_face_values_system.shape_hessian_component(i, q_point, 1),
-                fe_face_values_system.shape_value_component(i, q_point, 2),
-                fe_face_values_system.shape_grad_component(i, q_point, 2),
-                fe_face_values_system.shape_hessian_component(i, q_point, 2),
-                fe_face_values_system.shape_value_component(i, q_point, 3),
-                fe_face_values_system.shape_grad_component(i, q_point, 3),
-                fe_face_values_system.shape_hessian_component(i, q_point, 3));
+              check_consistency(q_points[q_point],
+                                fun1,
+                                fun2,
+                                fun3,
+                                fe_face_values_enriched.shape_value(i, q_point),
+                                fe_face_values_enriched.shape_grad(i, q_point),
+                                fe_face_values_enriched.shape_hessian(i, q_point),
+                                fe_face_values_system.shape_value_component(i, q_point, 0),
+                                fe_face_values_system.shape_grad_component(i, q_point, 0),
+                                fe_face_values_system.shape_hessian_component(i, q_point, 0),
+                                fe_face_values_system.shape_value_component(i, q_point, 1),
+                                fe_face_values_system.shape_grad_component(i, q_point, 1),
+                                fe_face_values_system.shape_hessian_component(i, q_point, 1),
+                                fe_face_values_system.shape_value_component(i, q_point, 2),
+                                fe_face_values_system.shape_grad_component(i, q_point, 2),
+                                fe_face_values_system.shape_hessian_component(i, q_point, 2),
+                                fe_face_values_system.shape_value_component(i, q_point, 3),
+                                fe_face_values_system.shape_grad_component(i, q_point, 3),
+                                fe_face_values_system.shape_hessian_component(i, q_point, 3));
         }
     }
 
@@ -385,47 +357,25 @@ main(int argc, char **argv)
     {
       {
         const unsigned int dim = 2;
-        test(FE_Q<dim>(3),
-             FE_Q<dim>(2),
-             FE_Q<dim>(1),
-             QGauss<dim>(2),
-             QGauss<dim - 1>(2),
-             false);
-        test(FE_Q<dim>(3),
-             FE_Q<dim>(2),
-             FE_Q<dim>(1),
-             QGauss<dim>(2),
-             QGauss<dim - 1>(2),
-             true);
+        test(FE_Q<dim>(3), FE_Q<dim>(2), FE_Q<dim>(1), QGauss<dim>(2), QGauss<dim - 1>(2), false);
+        test(FE_Q<dim>(3), FE_Q<dim>(2), FE_Q<dim>(1), QGauss<dim>(2), QGauss<dim - 1>(2), true);
       }
 
       {
         const unsigned int dim = 3;
-        test(FE_Q<dim>(3),
-             FE_Q<dim>(2),
-             FE_Q<dim>(1),
-             QGauss<dim>(2),
-             QGauss<dim - 1>(2),
-             false);
-        test(FE_Q<dim>(3),
-             FE_Q<dim>(2),
-             FE_Q<dim>(1),
-             QGauss<dim>(2),
-             QGauss<dim - 1>(2),
-             true);
+        test(FE_Q<dim>(3), FE_Q<dim>(2), FE_Q<dim>(1), QGauss<dim>(2), QGauss<dim - 1>(2), false);
+        test(FE_Q<dim>(3), FE_Q<dim>(2), FE_Q<dim>(1), QGauss<dim>(2), QGauss<dim - 1>(2), true);
       }
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -433,12 +383,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

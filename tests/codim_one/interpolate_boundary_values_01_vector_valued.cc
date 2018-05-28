@@ -73,13 +73,10 @@ test(std::string filename)
   VectorTools::interpolate_boundary_values(dof_handler, 0, X<spacedim>(), bv);
   deallog << bv.size() << " boundary degrees of freedom" << std::endl;
 
-  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin();
-       i != bv.end();
-       ++i)
+  for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin(); i != bv.end(); ++i)
     deallog << i->first << ' ' << i->second << std::endl;
 
-  for (typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename DoFHandler<dim, spacedim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)

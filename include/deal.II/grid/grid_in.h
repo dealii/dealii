@@ -387,8 +387,7 @@ public:
    * or boundaries (flag set to false).
    */
   void
-  read_ucd(std::istream &in,
-           const bool    apply_all_indicators_to_manifolds = false);
+  read_ucd(std::istream &in, const bool apply_all_indicators_to_manifolds = false);
 
   /**
    * Read grid data from an Abaqus file. Numerical and constitutive data is
@@ -430,8 +429,7 @@ public:
    *     - Click apply.
    */
   void
-  read_abaqus(std::istream &in,
-              const bool    apply_all_indicators_to_manifolds = false);
+  read_abaqus(std::istream &in, const bool apply_all_indicators_to_manifolds = false);
 
   /**
    * Read grid data from a file containing data in the DB mesh format.
@@ -509,7 +507,7 @@ public:
    */
   void
   read_assimp(const std::string &filename,
-              const unsigned int mesh_index = numbers::invalid_unsigned_int,
+              const unsigned int mesh_index                       = numbers::invalid_unsigned_int,
               const bool         remove_duplicates                = true,
               const double       tol                              = 1e-12,
               const bool         ignore_unsupported_element_types = true);
@@ -567,24 +565,21 @@ public:
   /**
    * Exception
    */
-  DeclException2(
-    ExcInvalidVertexIndex,
-    int,
-    int,
-    << "While creating cell " << arg1
-    << ", you are referencing a vertex with index " << arg2
-    << " but no vertex with this index has been described in the input file.");
+  DeclException2(ExcInvalidVertexIndex,
+                 int,
+                 int,
+                 << "While creating cell " << arg1 << ", you are referencing a vertex with index "
+                 << arg2 << " but no vertex with this index has been described in the input file.");
   /**
    * Exception
    */
-  DeclException3(
-    ExcInvalidVertexIndexGmsh,
-    int,
-    int,
-    int,
-    << "While creating cell " << arg1 << " (which is numbered as " << arg2
-    << " in the input file), you are referencing a vertex with index " << arg3
-    << " but no vertex with this index has been described in the input file.");
+  DeclException3(ExcInvalidVertexIndexGmsh,
+                 int,
+                 int,
+                 int,
+                 << "While creating cell " << arg1 << " (which is numbered as " << arg2
+                 << " in the input file), you are referencing a vertex with index " << arg3
+                 << " but no vertex with this index has been described in the input file.");
   /**
    * Exception
    */
@@ -594,23 +589,20 @@ public:
    */
   DeclException1(ExcInvalidDBMESHInput,
                  std::string,
-                 << "The string <" << arg1
-                 << "> is not recognized at the present"
+                 << "The string <" << arg1 << "> is not recognized at the present"
                  << " position of a DB Mesh file.");
 
   /**
    * Exception
    */
-  DeclException1(
-    ExcDBMESHWrongDimension,
-    int,
-    << "The specified dimension " << arg1
-    << " is not the same as that of the triangulation to be created.");
+  DeclException1(ExcDBMESHWrongDimension,
+                 int,
+                 << "The specified dimension " << arg1
+                 << " is not the same as that of the triangulation to be created.");
 
   DeclException1(ExcInvalidGMSHInput,
                  std::string,
-                 << "The string <" << arg1
-                 << "> is not recognized at the present"
+                 << "The string <" << arg1 << "> is not recognized at the present"
                  << " position of a Gmsh Mesh file.");
 
   DeclException1(ExcGmshUnsupportedGeometry,

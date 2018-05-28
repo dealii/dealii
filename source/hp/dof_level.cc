@@ -28,8 +28,7 @@ namespace internal
   {
     template <int dim, int spacedim>
     void
-    DoFLevel::compress_data(
-      const dealii::hp::FECollection<dim, spacedim> &fe_collection)
+    DoFLevel::compress_data(const dealii::hp::FECollection<dim, spacedim> &fe_collection)
     {
       (void)fe_collection;
 
@@ -51,12 +50,10 @@ namespace internal
               ++next_cell;
 
             const unsigned int next_offset =
-              (next_cell < dof_offsets.size() ? dof_offsets[next_cell] :
-                                                dof_indices.size());
+              (next_cell < dof_offsets.size() ? dof_offsets[next_cell] : dof_indices.size());
 
             Assert(next_offset - dof_offsets[cell] ==
-                     fe_collection[active_fe_indices[cell]]
-                       .template n_dofs_per_object<dim>(),
+                     fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(),
                    ExcInternalError());
 
             // see if the range of dofs for this cell can be compressed and if
@@ -64,8 +61,7 @@ namespace internal
             if (next_offset > dof_offsets[cell])
               {
                 bool compressible = true;
-                for (unsigned int j = dof_offsets[cell] + 1; j < next_offset;
-                     ++j)
+                for (unsigned int j = dof_offsets[cell] + 1; j < next_offset; ++j)
                   if (dof_indices[j] != dof_indices[j - 1] + 1)
                     {
                       compressible = false;
@@ -86,8 +82,7 @@ namespace internal
       // now allocate the new array and copy into it whatever we need
       std::vector<types::global_dof_index> new_dof_indices;
       new_dof_indices.reserve(new_size);
-      std::vector<offset_type> new_dof_offsets(dof_offsets.size(),
-                                               (offset_type)(-1));
+      std::vector<offset_type> new_dof_offsets(dof_offsets.size(), (offset_type)(-1));
       for (unsigned int cell = 0; cell < dof_offsets.size();)
         // see if this cell is active on the current level
         if (dof_offsets[cell] != (offset_type)(-1))
@@ -99,12 +94,10 @@ namespace internal
               ++next_cell;
 
             const unsigned int next_offset =
-              (next_cell < dof_offsets.size() ? dof_offsets[next_cell] :
-                                                dof_indices.size());
+              (next_cell < dof_offsets.size() ? dof_offsets[next_cell] : dof_indices.size());
 
             Assert(next_offset - dof_offsets[cell] ==
-                     fe_collection[active_fe_indices[cell]]
-                       .template n_dofs_per_object<dim>(),
+                     fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(),
                    ExcInternalError());
 
             new_dof_offsets[cell] = new_dof_indices.size();
@@ -114,8 +107,7 @@ namespace internal
             if (next_offset > dof_offsets[cell])
               {
                 bool compressible = true;
-                for (unsigned int j = dof_offsets[cell] + 1; j < next_offset;
-                     ++j)
+                for (unsigned int j = dof_offsets[cell] + 1; j < next_offset; ++j)
                   if (dof_indices[j] != dof_indices[j - 1] + 1)
                     {
                       compressible = false;
@@ -130,8 +122,7 @@ namespace internal
 
                     // make sure that the current active_fe_index indicates
                     // that this entry hasn't been compressed yet
-                    Assert(is_compressed_entry(active_fe_indices[cell]) ==
-                             false,
+                    Assert(is_compressed_entry(active_fe_indices[cell]) == false,
                            ExcInternalError());
 
                     // then mark the compression
@@ -159,8 +150,7 @@ namespace internal
 
     template <int dim, int spacedim>
     void
-    DoFLevel::uncompress_data(
-      const dealii::hp::FECollection<dim, spacedim> &fe_collection)
+    DoFLevel::uncompress_data(const dealii::hp::FECollection<dim, spacedim> &fe_collection)
     {
       if (dof_offsets.size() == 0 || dof_indices.size() == 0)
         return;
@@ -173,15 +163,13 @@ namespace internal
           {
             // we know now that the slot for this cell is used. extract the
             // active_fe_index for it and see how many entries we need
-            new_size += fe_collection[active_fe_index(cell)]
-                          .template n_dofs_per_object<dim>();
+            new_size += fe_collection[active_fe_index(cell)].template n_dofs_per_object<dim>();
           }
 
       // now allocate the new array and copy into it whatever we need
       std::vector<types::global_dof_index> new_dof_indices;
       new_dof_indices.reserve(new_size);
-      std::vector<offset_type> new_dof_offsets(dof_offsets.size(),
-                                               (offset_type)(-1));
+      std::vector<offset_type> new_dof_offsets(dof_offsets.size(), (offset_type)(-1));
       for (unsigned int cell = 0; cell < dof_offsets.size();)
         // see if this cell is active on the current level
         if (dof_offsets[cell] != (offset_type)(-1))
@@ -193,8 +181,7 @@ namespace internal
               ++next_cell;
 
             const unsigned int next_offset =
-              (next_cell < dof_offsets.size() ? dof_offsets[next_cell] :
-                                                dof_indices.size());
+              (next_cell < dof_offsets.size() ? dof_offsets[next_cell] : dof_indices.size());
 
             // set offset for this cell
             new_dof_offsets[cell] = new_dof_indices.size();
@@ -204,8 +191,7 @@ namespace internal
               {
                 // apparently not. simply copy them
                 Assert(next_offset - dof_offsets[cell] ==
-                         fe_collection[active_fe_indices[cell]]
-                           .template n_dofs_per_object<dim>(),
+                         fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(),
                        ExcInternalError());
                 for (unsigned int i = dof_offsets[cell]; i < next_offset; ++i)
                   new_dof_indices.push_back(dof_indices[i]);
@@ -213,18 +199,15 @@ namespace internal
             else
               {
                 // apparently so. uncompress
-                Assert(next_offset - dof_offsets[cell] == 1,
-                       ExcInternalError());
+                Assert(next_offset - dof_offsets[cell] == 1, ExcInternalError());
                 const unsigned int dofs_per_object =
-                  fe_collection[get_toggled_compression_state(
-                                  active_fe_indices[cell])]
+                  fe_collection[get_toggled_compression_state(active_fe_indices[cell])]
                     .template n_dofs_per_object<dim>();
                 for (unsigned int i = 0; i < dofs_per_object; ++i)
                   new_dof_indices.push_back(dof_indices[dof_offsets[cell]] + i);
 
                 // then mark the uncompression
-                active_fe_indices[cell] =
-                  get_toggled_compression_state(active_fe_indices[cell]);
+                active_fe_indices[cell] = get_toggled_compression_state(active_fe_indices[cell]);
               }
 
             // then move on to the next cell
@@ -258,8 +241,7 @@ namespace internal
     {
       for (unsigned int i = 0; i < active_fe_indices.size(); ++i)
         if (is_compressed_entry(active_fe_indices[i]))
-          active_fe_indices[i] =
-            get_toggled_compression_state(active_fe_indices[i]);
+          active_fe_indices[i] = get_toggled_compression_state(active_fe_indices[i]);
     }
 
 

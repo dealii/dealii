@@ -44,8 +44,7 @@ test_values()
   dofh.initialize(tria, fe);
 
   QGauss<2>   quadrature(8);
-  FEValues<2> fev(
-    fe, quadrature, update_values | update_gradients | update_JxW_values);
+  FEValues<2> fev(fe, quadrature, update_values | update_gradients | update_JxW_values);
   fev.reinit(dofh.begin_active());
 
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)

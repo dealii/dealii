@@ -72,26 +72,24 @@ do_test()
       return make_vectorized_array(val);
     });
   };
-  AlignedVector<VectorizedArray<float>> v1(w1.size()), v2(w1.size()),
-    v3(w1.size());
+  AlignedVector<VectorizedArray<float>> v1(w1.size()), v2(w1.size()), v3(w1.size());
   convert_to_vectorized(w1, v1);
 
-  constexpr unsigned int macro_size = VectorizedArray<float>::n_array_elements;
-  Vector<float>          vec_flat(v1.size() * macro_size);
+  constexpr unsigned int               macro_size = VectorizedArray<float>::n_array_elements;
+  Vector<float>                        vec_flat(v1.size() * macro_size);
   std::array<unsigned int, macro_size> offsets;
   for (unsigned int i = 0; i < macro_size; ++i)
     offsets[i] = v1.size() * i;
-  auto subtract_and_assign =
-    [](AlignedVector<VectorizedArray<float>> &      lhs,
-       const AlignedVector<VectorizedArray<float>> &rhs) {
-      std::transform(
-        lhs.begin(),
-        lhs.end(),
-        rhs.begin(),
-        lhs.begin(),
-        [](const VectorizedArray<float> lval,
-           const VectorizedArray<float> rval) { return lval - rval; });
-    };
+  auto subtract_and_assign = [](AlignedVector<VectorizedArray<float>> &      lhs,
+                                const AlignedVector<VectorizedArray<float>> &rhs) {
+    std::transform(lhs.begin(),
+                   lhs.end(),
+                   rhs.begin(),
+                   lhs.begin(),
+                   [](const VectorizedArray<float> lval, const VectorizedArray<float> rval) {
+                     return lval - rval;
+                   });
+  };
 
   const ArrayView<VectorizedArray<float>> view1(v1.begin(), v1.size());
   const ArrayView<VectorizedArray<float>> view2(v2.begin(), v2.size());
@@ -99,11 +97,9 @@ do_test()
   mat.vmult(view2, view1);
   mat.apply_inverse(view3, view2);
   subtract_and_assign(v3, v1);
-  vectorized_transpose_and_store(
-    false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
+  vectorized_transpose_and_store(false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
   double norm = vec_flat.linfty_norm();
-  deallog << "Verification of vmult and inverse: " << (norm < 1e-3 ? 0. : norm)
-          << std::endl;
+  deallog << "Verification of vmult and inverse: " << (norm < 1e-3 ? 0. : norm) << std::endl;
 
   FullMatrix<float> full(v1.size(), v1.size());
   full = 0.;
@@ -120,30 +116,24 @@ do_test()
                   full(c, cc) = laplace[1](j, jj)[0] * mass[0](k, kk)[0] +
                                 mass[1](j, jj)[0] * laplace[0](k, kk)[0];
                 else if (dim == 3)
-                  full(c, cc) = laplace[2](i, ii)[0] * mass[1](j, jj)[0] *
-                                  mass[0](k, kk)[0] +
-                                mass[2](i, ii)[0] *
-                                  (laplace[1](j, jj)[0] * mass[0](k, kk)[0] +
-                                   mass[1](j, jj)[0] * laplace[0](k, kk)[0]);
+                  full(c, cc) = laplace[2](i, ii)[0] * mass[1](j, jj)[0] * mass[0](k, kk)[0] +
+                                mass[2](i, ii)[0] * (laplace[1](j, jj)[0] * mass[0](k, kk)[0] +
+                                                     mass[1](j, jj)[0] * laplace[0](k, kk)[0]);
   full.vmult(w2, w1);
   convert_to_vectorized(w2, v3);
   subtract_and_assign(v3, v2);
-  vectorized_transpose_and_store(
-    false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
+  vectorized_transpose_and_store(false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
   norm = vec_flat.linfty_norm();
-  deallog << "Verification of vmult: " << (norm < 1e-4 ? 0. : norm)
-          << std::endl;
+  deallog << "Verification of vmult: " << (norm < 1e-4 ? 0. : norm) << std::endl;
 
   full.gauss_jordan();
   full.vmult(w2, w1);
   mat.apply_inverse(view2, view1);
   convert_to_vectorized(w2, v3);
   subtract_and_assign(v3, v2);
-  vectorized_transpose_and_store(
-    false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
+  vectorized_transpose_and_store(false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
   norm = vec_flat.linfty_norm();
-  deallog << "Verification of inverse: " << (norm < 5e-3 ? 0. : norm)
-          << std::endl;
+  deallog << "Verification of inverse: " << (norm < 5e-3 ? 0. : norm) << std::endl;
 }
 
 

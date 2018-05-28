@@ -36,11 +36,9 @@
 
 template <int dim>
 std::vector<types::global_dof_index>
-get_conflict_indices_cfem(
-  typename hp::DoFHandler<dim>::active_cell_iterator const &it)
+get_conflict_indices_cfem(typename hp::DoFHandler<dim>::active_cell_iterator const &it)
 {
-  std::vector<types::global_dof_index> local_dof_indices(
-    it->get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
 
   return local_dof_indices;
@@ -58,8 +56,7 @@ check()
   for (unsigned int degree = 1; degree < 4; ++degree)
     fe_collection.push_back(FE_Q<dim>(degree));
   hp::DoFHandler<dim>                                dof_handler(triangulation);
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
-    dof_handler.begin_active();
+  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
   for (unsigned int degree = 1; cell != dof_handler.end(); ++cell, ++degree)
     cell->set_active_fe_index(degree % 3);
   dof_handler.distribute_dofs(fe_collection);
@@ -73,8 +70,8 @@ check()
   dof_handler.distribute_dofs(fe_collection);
 
   // Create the coloring
-  std::vector<std::vector<typename hp::DoFHandler<dim>::active_cell_iterator>>
-    coloring(GraphColoring::make_graph_coloring(
+  std::vector<std::vector<typename hp::DoFHandler<dim>::active_cell_iterator>> coloring(
+    GraphColoring::make_graph_coloring(
       dof_handler.begin_active(),
       dof_handler.end(),
       std::function<std::vector<types::global_dof_index>(

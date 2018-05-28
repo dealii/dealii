@@ -35,8 +35,7 @@ test(std::ostream &out)
 {
   Triangulation<2> triangulation;
   Triangulation<3> tr;
-  GridGenerator::hyper_rectangle(
-    triangulation, Point<2>(0, 0), Point<2>(1, 1), true);
+  GridGenerator::hyper_rectangle(triangulation, Point<2>(0, 0), Point<2>(1, 1), true);
 
   GridGenerator::extrude_triangulation(triangulation, 3, 2.0, tr);
   GridOut go;

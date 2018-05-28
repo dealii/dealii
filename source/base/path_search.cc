@@ -109,9 +109,7 @@ PathSearch::PathSearch(const std::string &cls, const unsigned int debug) :
 
 
 std::string
-PathSearch::find(const std::string &filename,
-                 const std::string &suffix,
-                 const char *       open_mode)
+PathSearch::find(const std::string &filename, const std::string &suffix, const char *open_mode)
 {
   std::vector<std::string>::const_iterator       path;
   const std::vector<std::string>::const_iterator endp = my_path_list.end();
@@ -119,8 +117,7 @@ PathSearch::find(const std::string &filename,
   std::string real_name;
 
   if (debug > 2)
-    deallog << "PathSearch[" << cls << "] " << my_path_list.size()
-            << " directories " << std::endl;
+    deallog << "PathSearch[" << cls << "] " << my_path_list.size() << " directories " << std::endl;
 
   // Try to open file in the various directories we have
   for (path = my_path_list.begin(); path != endp; ++path)
@@ -131,14 +128,12 @@ PathSearch::find(const std::string &filename,
       {
         real_name = *path + filename;
         if (debug > 1)
-          deallog << "PathSearch[" << cls << "] trying " << real_name
-                  << std::endl;
+          deallog << "PathSearch[" << cls << "] trying " << real_name << std::endl;
         FILE *fp = fopen(real_name.c_str(), open_mode);
         if (fp != nullptr)
           {
             if (debug > 0)
-              deallog << "PathSearch[" << cls << "] opened " << real_name
-                      << std::endl;
+              deallog << "PathSearch[" << cls << "] opened " << real_name << std::endl;
             fclose(fp);
             return real_name;
           }
@@ -150,14 +145,12 @@ PathSearch::find(const std::string &filename,
         {
           real_name = *path + filename + suffix;
           if (debug > 1)
-            deallog << "PathSearch[" << cls << "] trying " << real_name
-                    << std::endl;
+            deallog << "PathSearch[" << cls << "] trying " << real_name << std::endl;
           FILE *fp = fopen(real_name.c_str(), open_mode);
           if (fp != nullptr)
             {
               if (debug > 0)
-                deallog << "PathSearch[" << cls << "] opened " << real_name
-                        << std::endl;
+                deallog << "PathSearch[" << cls << "] opened " << real_name << std::endl;
               fclose(fp);
               return real_name;
             }
@@ -174,9 +167,8 @@ PathSearch::find(const std::string &filename, const char *open_mode)
   const std::vector<std::string>::const_iterator ends = my_suffix_list.end();
 
   if (debug > 2)
-    deallog << "PathSearch[" << cls << "] " << my_path_list.size()
-            << " directories " << my_suffix_list.size() << " suffixes"
-            << std::endl;
+    deallog << "PathSearch[" << cls << "] " << my_path_list.size() << " directories "
+            << my_suffix_list.size() << " suffixes" << std::endl;
 
   for (suffix = my_suffix_list.begin(); suffix != ends; ++suffix)
     {

@@ -114,7 +114,7 @@ public:
   MappingQEulerian(const unsigned int               degree,
                    const DoFHandler<dim, spacedim> &euler_dof_handler,
                    const VectorType &               euler_vector,
-                   const unsigned int level = numbers::invalid_unsigned_int);
+                   const unsigned int               level = numbers::invalid_unsigned_int);
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
@@ -123,8 +123,7 @@ public:
    * addition to the geometry of the cell.
    */
   virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
-    const override;
+  get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell) const override;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -157,25 +156,22 @@ protected:
    * use any cell similarity for this class.
    */
   virtual CellSimilarity::Similarity
-  fill_fe_values(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
-    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &output_data) const override;
+  fill_fe_values(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+                 const CellSimilarity::Similarity                            cell_similarity,
+                 const Quadrature<dim> &                                     quadrature,
+                 const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+                 internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &output_data)
+    const override;
 
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VectorType, MappingQEulerian<dim, VectorType, spacedim>>
-    euler_vector;
+  SmartPointer<const VectorType, MappingQEulerian<dim, VectorType, spacedim>> euler_vector;
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>,
-               MappingQEulerian<dim, VectorType, spacedim>>
+  SmartPointer<const DoFHandler<dim, spacedim>, MappingQEulerian<dim, VectorType, spacedim>>
     euler_dof_handler;
 
 
@@ -196,9 +192,8 @@ private:
     /**
      * Constructor.
      */
-    MappingQEulerianGeneric(
-      const unsigned int                                 degree,
-      const MappingQEulerian<dim, VectorType, spacedim> &mapping_q_eulerian);
+    MappingQEulerianGeneric(const unsigned int                                 degree,
+                            const MappingQEulerian<dim, VectorType, spacedim> &mapping_q_eulerian);
 
     /**
      * Return the mapped vertices of the cell. For the current class, this
@@ -207,8 +202,7 @@ private:
      * field in addition to the geometry of the cell.
      */
     virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-    get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator
-                   &cell) const override;
+    get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell) const override;
 
     /**
      * Compute the positions of the support points in the current
@@ -217,8 +211,7 @@ private:
      */
     virtual std::vector<Point<spacedim>>
     compute_mapping_support_points(
-      const typename Triangulation<dim, spacedim>::cell_iterator &cell)
-      const override;
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell) const override;
 
     /**
      * Always return @p false because MappingQEulerianGeneric does not in general

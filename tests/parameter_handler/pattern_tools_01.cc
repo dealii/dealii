@@ -37,8 +37,7 @@ test(T t)
   deallog << "Pattern  : " << p->description() << std::endl;
   auto s = Convert<T>::to_string(t);
   deallog << "To String: " << s << std::endl;
-  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s))
-          << std::endl;
+  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s)) << std::endl;
 }
 
 int

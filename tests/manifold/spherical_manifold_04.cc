@@ -68,9 +68,8 @@ test(const double R)
 
   FEValues<dim> fe_values(mapping, fe, quadrature_formula, update_JxW_values);
 
-  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-                                        endc = dof_handler.end();
-  const unsigned int n_q_points              = quadrature_formula.size();
+  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
+  const unsigned int                    n_q_points = quadrature_formula.size();
 
   double volume = 0.;
   for (; cell != endc; ++cell)
@@ -81,8 +80,7 @@ test(const double R)
     }
 
   deallog << "Volume:       " << volume << std::endl
-          << "Exact volume: " << 4.0 * numbers::PI * std::pow(R, 3.0) / 3.
-          << std::endl;
+          << "Exact volume: " << 4.0 * numbers::PI * std::pow(R, 3.0) / 3. << std::endl;
 
   dof_handler.clear();
 }

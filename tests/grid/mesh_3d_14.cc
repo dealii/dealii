@@ -42,32 +42,24 @@
 
 void check_this(Triangulation<3> &tria)
 {
-  QTrapez<2>         quadrature;
-  FE_Q<3>            fe(1);
-  FEFaceValues<3>    fe_face_values1(fe,
-                                  quadrature,
-                                  update_quadrature_points | update_JxW_values |
-                                    update_normal_vectors);
+  QTrapez<2>      quadrature;
+  FE_Q<3>         fe(1);
+  FEFaceValues<3> fe_face_values1(
+    fe, quadrature, update_quadrature_points | update_JxW_values | update_normal_vectors);
   FESubfaceValues<3> fe_face_values2(
-    fe,
-    quadrature,
-    update_quadrature_points | update_JxW_values | update_normal_vectors);
+    fe, quadrature, update_quadrature_points | update_JxW_values | update_normal_vectors);
 
   DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
   DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
   for (; cell != dof_handler.end(); ++cell)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell;
-         ++face_no)
-      if (!cell->at_boundary(face_no) &&
-          cell->neighbor(face_no)->has_children())
-        for (unsigned int subface_no = 0;
-             subface_no < GeometryInfo<3>::max_children_per_face;
+    for (unsigned int face_no = 0; face_no < GeometryInfo<3>::faces_per_cell; ++face_no)
+      if (!cell->at_boundary(face_no) && cell->neighbor(face_no)->has_children())
+        for (unsigned int subface_no = 0; subface_no < GeometryInfo<3>::max_children_per_face;
              ++subface_no)
           {
-            const unsigned int neighbor_neighbor =
-              cell->neighbor_of_neighbor(face_no);
+            const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor(face_no);
             // get an iterator
             // pointing to the cell
             // behind the present
@@ -80,16 +72,14 @@ void check_this(Triangulation<3> &tria)
 
             for (unsigned int q = 0; q < quadrature.size(); ++q)
               {
-                AssertThrow((fe_face_values1.quadrature_point(q) -
-                             fe_face_values2.quadrature_point(q))
-                                .norm_square() < 1e-20,
-                            ExcInternalError());
+                AssertThrow(
+                  (fe_face_values1.quadrature_point(q) - fe_face_values2.quadrature_point(q))
+                      .norm_square() < 1e-20,
+                  ExcInternalError());
 
-                AssertThrow(std::fabs(fe_face_values1.JxW(q) -
-                                      fe_face_values2.JxW(q)) < 1e-15,
+                AssertThrow(std::fabs(fe_face_values1.JxW(q) - fe_face_values2.JxW(q)) < 1e-15,
                             ExcInternalError());
-                AssertThrow((fe_face_values1.normal_vector(q) +
-                             fe_face_values2.normal_vector(q))
+                AssertThrow((fe_face_values1.normal_vector(q) + fe_face_values2.normal_vector(q))
                                 .norm_square() < 1e-20,
                             ExcInternalError());
               }

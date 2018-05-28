@@ -35,12 +35,8 @@ template <int dim, int spacedim>
 FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree) :
   FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>(
     TensorProductPolynomialsConst<dim>(
-      Polynomials::generate_complete_Lagrange_basis(
-        QGaussLobatto<1>(degree + 1).get_points())),
-    FiniteElementData<dim>(get_dpo_vector(degree),
-                           1,
-                           degree,
-                           FiniteElementData<dim>::L2),
+      Polynomials::generate_complete_Lagrange_basis(QGaussLobatto<1>(degree + 1).get_points())),
+    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
     get_riaf_vector(degree))
 {
   Assert(degree > 0,
@@ -101,10 +97,9 @@ FE_Q_DG0<dim, spacedim>::get_name() const
   bool                           type     = true;
   const unsigned int             n_points = this->degree + 1;
   std::vector<double>            points(n_points);
-  const unsigned int             dofs_per_cell = this->dofs_per_cell;
-  const std::vector<Point<dim>> &unit_support_points =
-    this->unit_support_points;
-  unsigned int index = 0;
+  const unsigned int             dofs_per_cell       = this->dofs_per_cell;
+  const std::vector<Point<dim>> &unit_support_points = this->unit_support_points;
+  unsigned int                   index               = 0;
 
   // Decode the support points in one coordinate direction.
   for (unsigned int j = 0; j < dofs_per_cell; j++)
@@ -124,9 +119,8 @@ FE_Q_DG0<dim, spacedim>::get_name() const
         }
     }
   // Do not consider the discontinuous node for dimension 1
-  Assert(
-    index == n_points || (dim == 1 && index == n_points + 1),
-    ExcMessage("Could not decode support points in one coordinate direction."));
+  Assert(index == n_points || (dim == 1 && index == n_points + 1),
+         ExcMessage("Could not decode support points in one coordinate direction."));
 
   // Check whether the support points are equidistant.
   for (unsigned int j = 0; j < n_points; j++)
@@ -139,11 +133,11 @@ FE_Q_DG0<dim, spacedim>::get_name() const
   if (type == true)
     {
       if (this->degree > 2)
-        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree << "))";
+        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim) << ">(QIterated(QTrapez(),"
+                << this->degree << "))";
       else
-        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim) << ">("
-                << this->degree << ")";
+        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim) << ">(" << this->degree
+                << ")";
     }
   else
     {
@@ -157,11 +151,11 @@ FE_Q_DG0<dim, spacedim>::get_name() const
             break;
           }
       if (type == true)
-        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim) << ">("
-                << this->degree << ")";
+        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim) << ">(" << this->degree
+                << ")";
       else
-        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim)
-                << ">(QUnknownNodes(" << this->degree << "))";
+        namebuf << "FE_Q_DG0<" << Utilities::dim_string(dim, spacedim) << ">(QUnknownNodes("
+                << this->degree << "))";
     }
   return namebuf.str();
 }
@@ -184,19 +178,16 @@ FE_Q_DG0<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   std::vector<double> &              nodal_dofs) const
 {
   Assert(support_point_values.size() == this->unit_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->unit_support_points.size()));
+         ExcDimensionMismatch(support_point_values.size(), this->unit_support_points.size()));
   Assert(nodal_dofs.size() == this->dofs_per_cell,
          ExcDimensionMismatch(nodal_dofs.size(), this->dofs_per_cell));
-  Assert(
-    support_point_values[0].size() == this->n_components(),
-    ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
+  Assert(support_point_values[0].size() == this->n_components(),
+         ExcDimensionMismatch(support_point_values[0].size(), this->n_components()));
 
   for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
     {
-      const std::pair<unsigned int, unsigned int> index =
-        this->system_to_component_index(i);
-      nodal_dofs[i] = support_point_values[i](index.first);
+      const std::pair<unsigned int, unsigned int> index = this->system_to_component_index(i);
+      nodal_dofs[i]                                     = support_point_values[i](index.first);
     }
 
   // We don't need the discontinuous function for local interpolation
@@ -207,26 +198,23 @@ FE_Q_DG0<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
 
 template <int dim, int spacedim>
 void
-FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(
-  const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(const FiniteElement<dim, spacedim> &x_source_fe,
+                                                  FullMatrix<double> &interpolation_matrix) const
 {
   // this is only implemented, if the source FE is also a Q_DG0 element
   typedef FE_Q_DG0<dim, spacedim> FEQDG0;
 
-  AssertThrow(
-    (x_source_fe.get_name().find("FE_Q_DG0<") == 0) ||
-      (dynamic_cast<const FEQDG0 *>(&x_source_fe) != nullptr),
-    (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
+  AssertThrow((x_source_fe.get_name().find("FE_Q_DG0<") == 0) ||
+                (dynamic_cast<const FEQDG0 *>(&x_source_fe) != nullptr),
+              (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
   Assert(interpolation_matrix.m() == this->dofs_per_cell,
          ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(
-    interpolation_matrix.n() == x_source_fe.dofs_per_cell,
-    ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_cell));
+  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+         ExcDimensionMismatch(interpolation_matrix.m(), x_source_fe.dofs_per_cell));
 
-  this->FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
-    get_interpolation_matrix(x_source_fe, interpolation_matrix);
+  this->FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::get_interpolation_matrix(
+    x_source_fe, interpolation_matrix);
 }
 
 
@@ -258,16 +246,15 @@ FE_Q_DG0<dim, spacedim>::get_dpo_vector(const unsigned int deg)
 
 template <int dim, int spacedim>
 bool
-FE_Q_DG0<dim, spacedim>::has_support_on_face(
-  const unsigned int shape_index,
-  const unsigned int face_index) const
+FE_Q_DG0<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
+                                             const unsigned int face_index) const
 {
   // discontinuous function has support on all faces
   if (shape_index == this->dofs_per_cell - 1)
     return true;
   else
-    return FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
-      has_support_on_face(shape_index, face_index);
+    return FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::has_support_on_face(
+      shape_index, face_index);
 }
 
 
@@ -285,8 +272,8 @@ FE_Q_DG0<dim, spacedim>::get_constant_modes() const
   // 1 represented by DG0 part
   constant_modes(1, this->dofs_per_cell - 1) = true;
 
-  return std::pair<Table<2, bool>, std::vector<unsigned int>>(
-    constant_modes, std::vector<unsigned int>(2, 0));
+  return std::pair<Table<2, bool>, std::vector<unsigned int>>(constant_modes,
+                                                              std::vector<unsigned int>(2, 0));
 }
 
 

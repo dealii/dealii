@@ -37,8 +37,7 @@ test_real_to_unit_cell()
 
   // define a spherical cap boundary
   // to be used for one of the faces
-  const double radius =
-    Point<dim>(1.43757e-10, 4.48023e+06, 4.48023e+06).norm();
+  const double           radius = Point<dim>(1.43757e-10, 4.48023e+06, 4.48023e+06).norm();
   SphericalManifold<dim> boundary;
 
   // create the mesh: a single cell
@@ -77,8 +76,7 @@ test_real_to_unit_cell()
   // now see if the point is inside
   // or outside
   const Point<dim> p(-3.56413e+06, 1.74215e+06, 2.14762e+06);
-  Assert(triangulation.begin_active()->point_inside(p) == false,
-         ExcInternalError());
+  Assert(triangulation.begin_active()->point_inside(p) == false, ExcInternalError());
   deallog << "Point is outside!" << std::endl;
 }
 

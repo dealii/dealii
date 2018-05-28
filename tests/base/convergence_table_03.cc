@@ -43,8 +43,7 @@ main()
       table.add_value("key", i);
     }
   table.omit_column_from_convergence_rate_evaluation("key");
-  table.evaluate_all_convergence_rates("key",
-                                       ConvergenceTable::reduction_rate_log2);
+  table.evaluate_all_convergence_rates("key", ConvergenceTable::reduction_rate_log2);
 
   // output
   table.write_text(deallog.get_file_stream());

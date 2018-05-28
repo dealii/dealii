@@ -44,15 +44,12 @@ test()
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  const std::vector<bool> locally_owned_vertices =
-    GridTools::get_locally_owned_vertices(tr);
+  const std::vector<bool> locally_owned_vertices = GridTools::get_locally_owned_vertices(tr);
 
   if (myid == 0)
     deallog << "#vertices = " << tr.n_vertices() << std::endl
             << "#locally_owned_vertices = "
-            << std::count(locally_owned_vertices.begin(),
-                          locally_owned_vertices.end(),
-                          true)
+            << std::count(locally_owned_vertices.begin(), locally_owned_vertices.end(), true)
             << std::endl;
 
   // now do the move
@@ -69,8 +66,7 @@ test()
         const_cast<Point<dim> &>(tr.get_vertices()[v]) += shift;
         ++n_vertices_moved;
       }
-  Assert(Utilities::MPI::sum(n_vertices_moved, MPI_COMM_WORLD) ==
-           (dim == 2 ? 25 : 125),
+  Assert(Utilities::MPI::sum(n_vertices_moved, MPI_COMM_WORLD) == (dim == 2 ? 25 : 125),
          ExcInternalError());
 
   tr.communicate_locally_moved_vertices(locally_owned_vertices);
@@ -79,9 +75,8 @@ test()
   // then collate
   // write the info on ghost processors and import indices to file
   {
-    std::ofstream file((std::string("communicate_moved_vertices_01.dat.") +
-                        Utilities::int_to_string(myid))
-                         .c_str());
+    std::ofstream file(
+      (std::string("communicate_moved_vertices_01.dat.") + Utilities::int_to_string(myid)).c_str());
     GridOut().write_gnuplot(tr, file);
   }
 
@@ -89,14 +84,11 @@ test()
 
   if (myid == 0)
     {
-      for (unsigned int i = 0;
-           i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-           ++i)
+      for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
         {
           deallog << "Partition " << i << std::endl;
 
-          cat_file((std::string("communicate_moved_vertices_01.dat.") +
-                    Utilities::int_to_string(i))
+          cat_file((std::string("communicate_moved_vertices_01.dat.") + Utilities::int_to_string(i))
                      .c_str());
         }
     }

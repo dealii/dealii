@@ -156,8 +156,7 @@ test()
       // check std::distance
       // algorithm
       deallog << "Check 5: "
-              << (std::distance(v1.begin(), v1.end()) ==
-                      static_cast<signed int>(v1.size()) ?
+              << (std::distance(v1.begin(), v1.end()) == static_cast<signed int>(v1.size()) ?
                     "true" :
                     "false")
               << std::endl;
@@ -169,47 +168,36 @@ test()
       deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
 
       // check std::transform
-      std::transform(
-        v1.begin(),
-        v1.end(),
-        v2.begin(),
-        std::bind(std::multiplies<double>(), std::placeholders::_1, 2.0));
+      std::transform(v1.begin(),
+                     v1.end(),
+                     v2.begin(),
+                     std::bind(std::multiplies<double>(), std::placeholders::_1, 2.0));
       v2 *= 1. / 2.;
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 
 
       // check operators +/-, +=/-=
-      deallog << "Check 8: "
-              << (std::distance(v1.begin(), v1.begin() + 3) == 3 ? "true" :
-                                                                   "false")
+      deallog << "Check 8: " << (std::distance(v1.begin(), v1.begin() + 3) == 3 ? "true" : "false")
               << std::endl;
-      deallog << "Check 9: "
-              << (std::distance(v1.end() - 6, v1.end()) == 6 ? "true" : "false")
+      deallog << "Check 9: " << (std::distance(v1.end() - 6, v1.end()) == 6 ? "true" : "false")
               << std::endl;
       deallog << "Check 10: "
-              << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ?
-                    "true" :
-                    "false")
+              << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ? "true" : "false")
               << std::endl;
       deallog << "Check 11: "
-              << (std::distance(v1.begin(), (v1.begin() += 7)) == 7 ? "true" :
-                                                                      "false")
+              << (std::distance(v1.begin(), (v1.begin() += 7)) == 7 ? "true" : "false")
               << std::endl;
-      deallog << "Check 12: "
-              << (std::distance((v1.end() -= 4), v1.end()) == 4 ? "true" :
-                                                                  "false")
+      deallog << "Check 12: " << (std::distance((v1.end() -= 4), v1.end()) == 4 ? "true" : "false")
               << std::endl;
 
       // check advance
       TrilinosWrappers::MPI::BlockVector::iterator p2 = v1.begin();
       std::advance(p2, v1.size());
-      deallog << "Check 13: " << (p2 == v1.end() ? "true" : "false")
-              << std::endl;
+      deallog << "Check 13: " << (p2 == v1.end() ? "true" : "false") << std::endl;
 
       TrilinosWrappers::MPI::BlockVector::const_iterator p3 = v1.begin();
       std::advance(p3, v1.size());
-      deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false")
-              << std::endl;
+      deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false") << std::endl;
     };
 
   // Check 15: operator[]
@@ -222,8 +210,7 @@ test()
 
       for (unsigned int i = 0; i < v1.size(); ++i)
         {
-          const TrilinosWrappers::MPI::BlockVector::iterator p =
-            (v1.begin() + i);
+          const TrilinosWrappers::MPI::BlockVector::iterator p = (v1.begin() + i);
           for (unsigned int j = 0; j < v1.size(); ++j)
             AssertThrow(p[(signed)j - (signed)i] == j, ExcInternalError());
         };
@@ -244,8 +231,7 @@ main(int argc, char **argv)
   logfile.precision(3);
   deallog.attach(logfile);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
 
   try
@@ -258,12 +244,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       // abort
       return 2;
     }
@@ -271,12 +255,10 @@ main(int argc, char **argv)
     {
       std::cerr << std::endl
                 << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       std::cerr << "Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
+                << "----------------------------------------------------" << std::endl;
       // abort
       return 3;
     };

@@ -70,16 +70,13 @@ namespace internal
           else
             ++n_unused_singles;
         }
-      Assert(n_objects + 2 * n_unused_pairs + n_unused_singles == used.size(),
-             ExcInternalError());
+      Assert(n_objects + 2 * n_unused_pairs + n_unused_singles == used.size(), ExcInternalError());
 
       // how many single objects are needed in addition to
       // n_unused_objects?
-      const int additional_single_objects =
-        new_objects_single - n_unused_singles;
+      const int additional_single_objects = new_objects_single - n_unused_singles;
 
-      unsigned int new_size =
-        used.size() + new_objects_in_pairs - 2 * n_unused_pairs;
+      unsigned int new_size = used.size() + new_objects_in_pairs - 2 * n_unused_pairs;
       if (additional_single_objects > 0)
         new_size += additional_single_objects;
 
@@ -93,22 +90,18 @@ namespace internal
           used.insert(used.end(), new_size - used.size(), false);
 
           user_flags.reserve(new_size);
-          user_flags.insert(
-            user_flags.end(), new_size - user_flags.size(), false);
+          user_flags.insert(user_flags.end(), new_size - user_flags.size(), false);
 
-          const unsigned int factor =
-            GeometryInfo<G::dimension>::max_children_per_cell / 2;
+          const unsigned int factor = GeometryInfo<G::dimension>::max_children_per_cell / 2;
           children.reserve(factor * new_size);
-          children.insert(
-            children.end(), factor * new_size - children.size(), -1);
+          children.insert(children.end(), factor * new_size - children.size(), -1);
 
           if (G::dimension > 1)
             {
               refinement_cases.reserve(new_size);
-              refinement_cases.insert(
-                refinement_cases.end(),
-                new_size - refinement_cases.size(),
-                RefinementCase<G::dimension>::no_refinement);
+              refinement_cases.insert(refinement_cases.end(),
+                                      new_size - refinement_cases.size(),
+                                      RefinementCase<G::dimension>::no_refinement);
             }
 
           // first reserve, then resize. Otherwise the std library can decide to
@@ -120,9 +113,8 @@ namespace internal
           user_data.resize(new_size);
 
           manifold_id.reserve(new_size);
-          manifold_id.insert(manifold_id.end(),
-                             new_size - manifold_id.size(),
-                             numbers::flat_manifold_id);
+          manifold_id.insert(
+            manifold_id.end(), new_size - manifold_id.size(), numbers::flat_manifold_id);
         }
 
       if (n_unused_singles == 0)
@@ -136,9 +128,8 @@ namespace internal
     template <>
     template <int dim, int spacedim>
     typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator
-    TriaObjects<TriaObject<3>>::next_free_hex(
-      const dealii::Triangulation<dim, spacedim> &tria,
-      const unsigned int                          level)
+    TriaObjects<TriaObject<3>>::next_free_hex(const dealii::Triangulation<dim, spacedim> &tria,
+                                              const unsigned int                          level)
     {
       // TODO: Think of a way to ensure that we are using the correct
       // triangulation, i.e. the one containing *this.
@@ -157,8 +148,7 @@ namespace internal
       else
         next_free_pair = pos + 2;
 
-      return typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator(
-        &tria, level, pos);
+      return typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator(&tria, level, pos);
     }
 
 
@@ -166,11 +156,9 @@ namespace internal
     TriaObjectsHex::reserve_space(const unsigned int new_hexes)
     {
       const unsigned int new_size =
-        new_hexes +
-        std::count_if(
-          used.begin(),
-          used.end(),
-          std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
+        new_hexes + std::count_if(used.begin(),
+                                  used.end(),
+                                  std::bind(std::equal_to<bool>(), std::placeholders::_1, true));
 
       // see above...
       if (new_size > cells.size())
@@ -182,8 +170,7 @@ namespace internal
           used.insert(used.end(), new_size - used.size(), false);
 
           user_flags.reserve(new_size);
-          user_flags.insert(
-            user_flags.end(), new_size - user_flags.size(), false);
+          user_flags.insert(user_flags.end(), new_size - user_flags.size(), false);
 
           children.reserve(4 * new_size);
           children.insert(children.end(), 4 * new_size - children.size(), -1);
@@ -196,9 +183,8 @@ namespace internal
           boundary_or_material_id.resize(new_size);
 
           manifold_id.reserve(new_size);
-          manifold_id.insert(manifold_id.end(),
-                             new_size - manifold_id.size(),
-                             numbers::flat_manifold_id);
+          manifold_id.insert(
+            manifold_id.end(), new_size - manifold_id.size(), numbers::flat_manifold_id);
 
           user_data.reserve(new_size);
           user_data.resize(new_size);
@@ -216,13 +202,11 @@ namespace internal
 
           face_flips.reserve(new_size * GeometryInfo<3>::faces_per_cell);
           face_flips.insert(face_flips.end(),
-                            new_size * GeometryInfo<3>::faces_per_cell -
-                              face_flips.size(),
+                            new_size * GeometryInfo<3>::faces_per_cell - face_flips.size(),
                             false);
           face_rotations.reserve(new_size * GeometryInfo<3>::faces_per_cell);
           face_rotations.insert(face_rotations.end(),
-                                new_size * GeometryInfo<3>::faces_per_cell -
-                                  face_rotations.size(),
+                                new_size * GeometryInfo<3>::faces_per_cell - face_rotations.size(),
                                 false);
         }
       next_free_single = next_free_pair = 0;
@@ -267,14 +251,12 @@ namespace internal
           else
             ++n_unused_singles;
         }
-      Assert(n_quads + 2 * n_unused_pairs + n_unused_singles == used.size(),
-             ExcInternalError());
+      Assert(n_quads + 2 * n_unused_pairs + n_unused_singles == used.size(), ExcInternalError());
 
       // how many single quads are needed in addition to n_unused_quads?
       const int additional_single_quads = new_quads_single - n_unused_singles;
 
-      unsigned int new_size =
-        used.size() + new_quads_in_pairs - 2 * n_unused_pairs;
+      unsigned int new_size = used.size() + new_quads_in_pairs - 2 * n_unused_pairs;
       if (additional_single_quads > 0)
         new_size += additional_single_quads;
 
@@ -282,8 +264,7 @@ namespace internal
       if (new_size > cells.size())
         {
           // reseve space for the base class
-          TriaObjects<TriaObject<2>>::reserve_space(new_quads_in_pairs,
-                                                    new_quads_single);
+          TriaObjects<TriaObject<2>>::reserve_space(new_quads_in_pairs, new_quads_single);
           // reserve the field of the derived class
           line_orientations.reserve(new_size * GeometryInfo<2>::lines_per_cell);
           line_orientations.insert(line_orientations.end(),
@@ -304,18 +285,14 @@ namespace internal
     void
     TriaObjects<TriaObject<1>>::monitor_memory(const unsigned int) const
     {
-      Assert(cells.size() == used.size(),
-             ExcMemoryInexact(cells.size(), used.size()));
-      Assert(cells.size() == user_flags.size(),
-             ExcMemoryInexact(cells.size(), user_flags.size()));
-      Assert(cells.size() == children.size(),
-             ExcMemoryInexact(cells.size(), children.size()));
+      Assert(cells.size() == used.size(), ExcMemoryInexact(cells.size(), used.size()));
+      Assert(cells.size() == user_flags.size(), ExcMemoryInexact(cells.size(), user_flags.size()));
+      Assert(cells.size() == children.size(), ExcMemoryInexact(cells.size(), children.size()));
       Assert(cells.size() == boundary_or_material_id.size(),
              ExcMemoryInexact(cells.size(), boundary_or_material_id.size()));
       Assert(cells.size() == manifold_id.size(),
              ExcMemoryInexact(cells.size(), manifold_id.size()));
-      Assert(cells.size() == user_data.size(),
-             ExcMemoryInexact(cells.size(), user_data.size()));
+      Assert(cells.size() == user_data.size(), ExcMemoryInexact(cells.size(), user_data.size()));
     }
 
 
@@ -323,50 +300,38 @@ namespace internal
     void
     TriaObjects<TriaObject<2>>::monitor_memory(const unsigned int) const
     {
-      Assert(cells.size() == used.size(),
-             ExcMemoryInexact(cells.size(), used.size()));
-      Assert(cells.size() == user_flags.size(),
-             ExcMemoryInexact(cells.size(), user_flags.size()));
-      Assert(2 * cells.size() == children.size(),
-             ExcMemoryInexact(cells.size(), children.size()));
+      Assert(cells.size() == used.size(), ExcMemoryInexact(cells.size(), used.size()));
+      Assert(cells.size() == user_flags.size(), ExcMemoryInexact(cells.size(), user_flags.size()));
+      Assert(2 * cells.size() == children.size(), ExcMemoryInexact(cells.size(), children.size()));
       Assert(cells.size() == refinement_cases.size(),
              ExcMemoryInexact(cells.size(), refinement_cases.size()));
       Assert(cells.size() == boundary_or_material_id.size(),
              ExcMemoryInexact(cells.size(), boundary_or_material_id.size()));
       Assert(cells.size() == manifold_id.size(),
              ExcMemoryInexact(cells.size(), manifold_id.size()));
-      Assert(cells.size() == user_data.size(),
-             ExcMemoryInexact(cells.size(), user_data.size()));
+      Assert(cells.size() == user_data.size(), ExcMemoryInexact(cells.size(), user_data.size()));
     }
 
 
     void
     TriaObjectsHex::monitor_memory(const unsigned int) const
     {
-      Assert(cells.size() == used.size(),
-             ExcMemoryInexact(cells.size(), used.size()));
-      Assert(cells.size() == user_flags.size(),
-             ExcMemoryInexact(cells.size(), user_flags.size()));
-      Assert(4 * cells.size() == children.size(),
-             ExcMemoryInexact(cells.size(), children.size()));
+      Assert(cells.size() == used.size(), ExcMemoryInexact(cells.size(), used.size()));
+      Assert(cells.size() == user_flags.size(), ExcMemoryInexact(cells.size(), user_flags.size()));
+      Assert(4 * cells.size() == children.size(), ExcMemoryInexact(cells.size(), children.size()));
       Assert(cells.size() == boundary_or_material_id.size(),
              ExcMemoryInexact(cells.size(), boundary_or_material_id.size()));
       Assert(cells.size() == manifold_id.size(),
              ExcMemoryInexact(cells.size(), manifold_id.size()));
-      Assert(cells.size() == user_data.size(),
-             ExcMemoryInexact(cells.size(), user_data.size()));
-      Assert(cells.size() * GeometryInfo<3>::faces_per_cell ==
-               face_orientations.size(),
-             ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell,
-                              face_orientations.size()));
-      Assert(cells.size() * GeometryInfo<3>::faces_per_cell ==
-               face_flips.size(),
-             ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell,
-                              face_flips.size()));
-      Assert(cells.size() * GeometryInfo<3>::faces_per_cell ==
-               face_rotations.size(),
-             ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell,
-                              face_rotations.size()));
+      Assert(cells.size() == user_data.size(), ExcMemoryInexact(cells.size(), user_data.size()));
+      Assert(
+        cells.size() * GeometryInfo<3>::faces_per_cell == face_orientations.size(),
+        ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell, face_orientations.size()));
+      Assert(cells.size() * GeometryInfo<3>::faces_per_cell == face_flips.size(),
+             ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell, face_flips.size()));
+      Assert(
+        cells.size() * GeometryInfo<3>::faces_per_cell == face_rotations.size(),
+        ExcMemoryInexact(cells.size() * GeometryInfo<3>::faces_per_cell, face_rotations.size()));
     }
 
 
@@ -376,10 +341,9 @@ namespace internal
       // check that we have not allocated too much memory. note that bool
       // vectors allocate their memory in chunks of whole integers, so they
       // may over-allocate by up to as many elements as an integer has bits
-      Assert(cells.size() * GeometryInfo<2>::lines_per_cell ==
-               line_orientations.size(),
-             ExcMemoryInexact(cells.size() * GeometryInfo<2>::lines_per_cell,
-                              line_orientations.size()));
+      Assert(
+        cells.size() * GeometryInfo<2>::lines_per_cell == line_orientations.size(),
+        ExcMemoryInexact(cells.size() * GeometryInfo<2>::lines_per_cell, line_orientations.size()));
       TriaObjects<TriaObject<2>>::monitor_memory(3);
     }
 

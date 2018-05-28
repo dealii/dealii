@@ -35,8 +35,7 @@ test()
   ArrayView<const int> a2 = make_array_view(v); // readable view
   Assert(a2[2] == 42, ExcInternalError());
 
-  ArrayView<const int> a3 =
-    make_array_view(const_cast<const std::vector<int> &>(v));
+  ArrayView<const int> a3 = make_array_view(const_cast<const std::vector<int> &>(v));
   Assert(a3[2] == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;

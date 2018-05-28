@@ -54,8 +54,7 @@ public:
   MyFunction(const double k);
 
   virtual std::complex<double>
-  value(const dealii::Point<dim> &point,
-        const unsigned int        component = 0) const;
+  value(const dealii::Point<dim> &point, const unsigned int component = 0) const;
 
   double
   get_k() const;
@@ -65,15 +64,12 @@ private:
 };
 
 template <int dim>
-MyFunction<dim>::MyFunction(const double k) :
-  dealii::Function<dim, std::complex<double>>(1),
-  k(k)
+MyFunction<dim>::MyFunction(const double k) : dealii::Function<dim, std::complex<double>>(1), k(k)
 {}
 
 template <int dim>
 std::complex<double>
-MyFunction<dim>::value(const dealii::Point<dim> &point,
-                       const unsigned int) const
+MyFunction<dim>::value(const dealii::Point<dim> &point, const unsigned int) const
 {
   const double x = point[0] - 1.0;
 
@@ -98,8 +94,7 @@ public:
   NeumanBC(const double c);
 
   virtual std::complex<double>
-  value(const dealii::Point<dim> &point,
-        const unsigned int        component = 0) const;
+  value(const dealii::Point<dim> &point, const unsigned int component = 0) const;
 
   double
   get_c() const;
@@ -109,9 +104,7 @@ private:
 };
 
 template <int dim>
-NeumanBC<dim>::NeumanBC(const double c) :
-  dealii::Function<dim, std::complex<double>>(1),
-  c(c)
+NeumanBC<dim>::NeumanBC(const double c) : dealii::Function<dim, std::complex<double>>(1), c(c)
 {}
 
 template <int dim>
@@ -183,9 +176,8 @@ output(const std::string                   name,
 {
   dealii::Vector<double> fe_degrees(triangulation.n_active_cells());
   {
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    typename dealii::hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                               endc = dof_handler.end();
     for (unsigned int index = 0; cell != endc; ++cell, ++index)
       fe_degrees(index) = dof_handler.get_fe()[cell->active_fe_index()].degree;
   }
@@ -332,9 +324,8 @@ test_regular(const MyFunction<dim> &func)
                                               p2,
                                               /*colorize*/ false);
 
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    typename dealii::hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                               endc = dof_handler.end();
     for (; cell != endc; cell++)
       if (cell->center()[0] > 1.0)
         {
@@ -387,8 +378,7 @@ test_regular(const MyFunction<dim> &func)
 
   double h, A;
   get_h_area<dim>(h, A, L);
-  const double expected_value_squared =
-    h * A * std::pow(func.get_k(), 2) / 2.0 / std::max(p1, p2);
+  const double expected_value_squared = h * A * std::pow(func.get_k(), 2) / 2.0 / std::max(p1, p2);
   dealii::deallog << "expected:" << std::endl
                   << " " << std::sqrt(expected_value_squared) << std::endl;
   for (unsigned int i = 0; i < error.size(); i++)
@@ -449,15 +439,13 @@ test_irregular(const MyFunction<dim> &func)
                                               /*colorize*/ false);
     // refine left side
     {
-      typename dealii::hp::DoFHandler<dim>::active_cell_iterator cell =
-        dof_handler.begin_active();
+      typename dealii::hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
       cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
     }
 
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    typename dealii::hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                               endc = dof_handler.end();
     for (; cell != endc; cell++)
       if (cell->center()[0] > 1.0) // right
         {
@@ -518,13 +506,10 @@ test_irregular(const MyFunction<dim> &func)
   double h, A;
   get_h_area_sub<dim>(h, A, L);
   //
-  const double expected_squared_1 =
-    h * A * std::pow(func.get_k(), 2) / 2.0 / std::max(p3, p1);
-  const double expected_squared_2 =
-    h * A * std::pow(func.get_k(), 2) / 2.0 / std::max(p2, p1);
-  const double expected_squared_3 =
-    (dim == 2) ? expected_squared_1 + expected_squared_2 :
-                 2 * expected_squared_1 + 2 * expected_squared_2;
+  const double expected_squared_1 = h * A * std::pow(func.get_k(), 2) / 2.0 / std::max(p3, p1);
+  const double expected_squared_2 = h * A * std::pow(func.get_k(), 2) / 2.0 / std::max(p2, p1);
+  const double expected_squared_3 = (dim == 2) ? expected_squared_1 + expected_squared_2 :
+                                                 2 * expected_squared_1 + 2 * expected_squared_2;
 
   std::vector<double> expected_error(error.size(), 0.0);
 
@@ -544,8 +529,7 @@ test_irregular(const MyFunction<dim> &func)
   deallog << std::endl;
 
   for (unsigned int i = 0; i < expected_error.size(); i++)
-    AssertThrow(std::fabs(expected_error[i] - error[i]) < 1e-6,
-                dealii::ExcInternalError());
+    AssertThrow(std::fabs(expected_error[i] - error[i]) < 1e-6, dealii::ExcInternalError());
 
   dof_handler.clear();
 }
@@ -557,27 +541,24 @@ public:
   MySecondFunction();
 
   virtual std::complex<double>
-  value(const dealii::Point<dim> &point,
-        const unsigned int        component = 0) const;
+  value(const dealii::Point<dim> &point, const unsigned int component = 0) const;
 };
 
 template <int dim>
-MySecondFunction<dim>::MySecondFunction() :
-  dealii::Function<dim, std::complex<double>>(1)
+MySecondFunction<dim>::MySecondFunction() : dealii::Function<dim, std::complex<double>>(1)
 {}
 
 template <int dim>
 std::complex<double>
-MySecondFunction<dim>::value(const dealii::Point<dim> &point,
-                             const unsigned int) const
+MySecondFunction<dim>::value(const dealii::Point<dim> &point, const unsigned int) const
 {
   double        f = 0.0;
   const double &x = point[0];
   Assert(dim > 1, dealii::ExcNotImplemented());
   const double &y = point[1];
 
-  return std::complex<double>(
-    0, (1. - x) * (1. - y) * (1. - y) + std::pow(1.0 - y, 4) * std::exp(-x));
+  return std::complex<double>(0,
+                              (1. - x) * (1. - y) * (1. - y) + std::pow(1.0 - y, 4) * std::exp(-x));
 }
 
 template <int dim>
@@ -610,9 +591,8 @@ test(const MySecondFunction<dim> &func)
     // will not carry to the child cells.
     dof_handler.distribute_dofs(fe_collection);
 
-    typename dealii::hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    typename dealii::hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                               endc = dof_handler.end();
     for (; cell != endc; cell++)
       {
         bool in_top_left = true;

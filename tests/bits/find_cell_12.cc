@@ -57,8 +57,7 @@ test()
   n_cells.push_back(2);
 
 
-  GridGenerator::subdivided_hyper_rectangle(
-    triangulation, n_cells, left_bottom, right_top, true);
+  GridGenerator::subdivided_hyper_rectangle(triangulation, n_cells, left_bottom, right_top, true);
 
   Triangulation<2>::active_cell_iterator cell = triangulation.begin_active(),
                                          endc = triangulation.end();
@@ -78,8 +77,7 @@ test()
   try
     {
       std::pair<Triangulation<2>::active_cell_iterator, Point<2>> current_cell =
-        GridTools::find_active_cell_around_point(
-          MappingQGeneric<2>(1), triangulation, test_point);
+        GridTools::find_active_cell_around_point(MappingQGeneric<2>(1), triangulation, test_point);
 
       deallog << "cell: index = " << current_cell.first->index()
               << " level = " << current_cell.first->level() << std::endl;

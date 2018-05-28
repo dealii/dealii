@@ -32,8 +32,7 @@
 DeclException2(ExcNumberMismatch,
                int,
                int,
-               << "The numbers " << arg1 << " and " << arg2
-               << " should be equation, but are not.");
+               << "The numbers " << arg1 << " and " << arg2 << " should be equation, but are not.");
 
 
 
@@ -90,16 +89,13 @@ test()
   if (true)
     {
       const IteratorFilters::LevelEqualTo    predicate(3);
-      FilteredIterator<active_cell_iterator> begin(predicate),
-        end(predicate, tria.end());
+      FilteredIterator<active_cell_iterator> begin(predicate), end(predicate, tria.end());
       begin.set_to_next_positive(tria.begin_active());
 
-      Assert(std::distance(begin, end) ==
-               static_cast<signed int>(tria.n_active_cells(3)),
+      Assert(std::distance(begin, end) == static_cast<signed int>(tria.n_active_cells(3)),
              ExcInternalError());
       logfile << "Check 1: "
-              << (std::distance(begin, end) ==
-                      static_cast<signed int>(tria.n_active_cells(3)) ?
+              << (std::distance(begin, end) == static_cast<signed int>(tria.n_active_cells(3)) ?
                     "OK" :
                     "Failed")
               << std::endl;
@@ -110,18 +106,14 @@ test()
   // on some level in a different way
   if (true)
     {
-      bool (*predicate)(const active_cell_iterator) =
-        &level_equal_to_3<active_cell_iterator>;
-      FilteredIterator<active_cell_iterator> begin(predicate,
-                                                   tria.begin_active(3)),
+      bool (*predicate)(const active_cell_iterator) = &level_equal_to_3<active_cell_iterator>;
+      FilteredIterator<active_cell_iterator> begin(predicate, tria.begin_active(3)),
         end(predicate, tria.end());
 
-      Assert(std::distance(begin, end) ==
-               static_cast<signed int>(tria.n_active_cells(3)),
+      Assert(std::distance(begin, end) == static_cast<signed int>(tria.n_active_cells(3)),
              ExcInternalError());
       logfile << "Check 2: "
-              << (std::distance(begin, end) ==
-                      static_cast<signed int>(tria.n_active_cells(3)) ?
+              << (std::distance(begin, end) == static_cast<signed int>(tria.n_active_cells(3)) ?
                     "OK" :
                     "Failed")
               << std::endl;
@@ -135,16 +127,14 @@ test()
     {
       bool (*predicate)(const active_cell_iterator, const unsigned int) =
         &level_equal_to<active_cell_iterator>;
-      FilteredIterator<active_cell_iterator> begin(
-        std::bind(predicate, std::placeholders::_1, 3), tria.begin_active(3)),
+      FilteredIterator<active_cell_iterator> begin(std::bind(predicate, std::placeholders::_1, 3),
+                                                   tria.begin_active(3)),
         end(std::bind(predicate, std::placeholders::_1, 3), tria.end());
 
-      Assert(std::distance(begin, end) ==
-               static_cast<signed int>(tria.n_active_cells(3)),
+      Assert(std::distance(begin, end) == static_cast<signed int>(tria.n_active_cells(3)),
              ExcInternalError());
       logfile << "Check 3: "
-              << (std::distance(begin, end) ==
-                      static_cast<signed int>(tria.n_active_cells(3)) ?
+              << (std::distance(begin, end) == static_cast<signed int>(tria.n_active_cells(3)) ?
                     "OK" :
                     "Failed")
               << std::endl;
@@ -160,16 +150,13 @@ test()
         &level_equal_to<active_cell_iterator>;
       Assert(std::distance(FI(std::bind(predicate, std::placeholders::_1, 3))
                              .set_to_next_positive(tria.begin_active()),
-                           FI(std::bind(predicate, std::placeholders::_1, 3),
-                              tria.end())) ==
+                           FI(std::bind(predicate, std::placeholders::_1, 3), tria.end())) ==
                static_cast<signed int>(tria.n_active_cells(3)),
              ExcInternalError());
       logfile << "Check 4: "
-              << (std::distance(
-                    FI(std::bind(predicate, std::placeholders::_1, 3))
-                      .set_to_next_positive(tria.begin_active()),
-                    FI(std::bind(predicate, std::placeholders::_1, 3),
-                       tria.end())) ==
+              << (std::distance(FI(std::bind(predicate, std::placeholders::_1, 3))
+                                  .set_to_next_positive(tria.begin_active()),
+                                FI(std::bind(predicate, std::placeholders::_1, 3), tria.end())) ==
                       static_cast<signed int>(tria.n_active_cells(3)) ?
                     "OK" :
                     "Failed")

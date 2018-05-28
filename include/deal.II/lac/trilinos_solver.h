@@ -110,7 +110,7 @@ namespace TrilinosWrappers
        * it is quite inelegant to set a specific option of one solver in the
        * base class for all solvers.
        */
-      explicit AdditionalData(const bool         output_solver_details = false,
+      explicit AdditionalData(const bool         output_solver_details   = false,
                               const unsigned int gmres_restart_parameter = 30);
 
       /**
@@ -128,8 +128,7 @@ namespace TrilinosWrappers
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverBase(SolverControl &       cn,
-               const AdditionalData &data = AdditionalData());
+    SolverBase(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
     /**
      * Second constructor. This constructor takes an enum object that
@@ -259,7 +258,7 @@ namespace TrilinosWrappers
     solve(const SparseMatrix &                                      A,
           dealii::LinearAlgebra::distributed::Vector<double> &      x,
           const dealii::LinearAlgebra::distributed::Vector<double> &b,
-          const PreconditionBase &preconditioner);
+          const PreconditionBase &                                  preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
@@ -272,7 +271,7 @@ namespace TrilinosWrappers
     solve(Epetra_Operator &                                         A,
           dealii::LinearAlgebra::distributed::Vector<double> &      x,
           const dealii::LinearAlgebra::distributed::Vector<double> &b,
-          const PreconditionBase &preconditioner);
+          const PreconditionBase &                                  preconditioner);
 
 
     /**
@@ -343,13 +342,11 @@ namespace TrilinosWrappers
   // provide a declaration for two explicit specializations
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &               solver,
-                                 const PreconditionBase &preconditioner);
+  SolverBase::set_preconditioner(AztecOO &solver, const PreconditionBase &preconditioner);
 
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &              solver,
-                                 const Epetra_Operator &preconditioner);
+  SolverBase::set_preconditioner(AztecOO &solver, const Epetra_Operator &preconditioner);
 
 
 
@@ -459,8 +456,7 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverGMRES(SolverControl &       cn,
-                const AdditionalData &data = AdditionalData());
+    SolverGMRES(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -499,8 +495,7 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverBicgstab(SolverControl &       cn,
-                   const AdditionalData &data = AdditionalData());
+    SolverBicgstab(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -539,8 +534,7 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverTFQMR(SolverControl &       cn,
-                const AdditionalData &data = AdditionalData());
+    SolverTFQMR(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -577,7 +571,7 @@ namespace TrilinosWrappers
        * Set the additional data field to the desired output format.
        */
       explicit AdditionalData(const bool         output_solver_details = false,
-                              const std::string &solver_type = "Amesos_Klu");
+                              const std::string &solver_type           = "Amesos_Klu");
 
       /**
        * Enables/disables the output of solver details (residual in each
@@ -609,8 +603,7 @@ namespace TrilinosWrappers
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverDirect(SolverControl &       cn,
-                 const AdditionalData &data = AdditionalData());
+    SolverDirect(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
     /**
      * Destructor.
@@ -660,9 +653,7 @@ namespace TrilinosWrappers
      * exception will be thrown.
      */
     void
-    solve(const SparseMatrix &          A,
-          dealii::Vector<double> &      x,
-          const dealii::Vector<double> &b);
+    solve(const SparseMatrix &A, dealii::Vector<double> &x, const dealii::Vector<double> &b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> for deal.II's own parallel

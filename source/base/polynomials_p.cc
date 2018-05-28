@@ -21,8 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 PolynomialsP<dim>::PolynomialsP(const unsigned int p) :
-  PolynomialSpace<dim>(
-    Polynomials::Monomial<double>::generate_complete_basis(p)),
+  PolynomialSpace<dim>(Polynomials::Monomial<double>::generate_complete_basis(p)),
   p(p)
 {
   std::vector<unsigned int> index_map(this->n());
@@ -33,11 +32,9 @@ PolynomialsP<dim>::PolynomialsP(const unsigned int p) :
 
 template <>
 void
-PolynomialsP<1>::create_polynomial_ordering(
-  std::vector<unsigned int> &index_map) const
+PolynomialsP<1>::create_polynomial_ordering(std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size() == this->n(),
-         ExcDimensionMismatch(index_map.size(), this->n()));
+  Assert(index_map.size() == this->n(), ExcDimensionMismatch(index_map.size(), this->n()));
 
   // identity
   for (unsigned int i = 0; i < this->n(); ++i)
@@ -58,11 +55,9 @@ namespace
 
 template <>
 void
-PolynomialsP<2>::create_polynomial_ordering(
-  std::vector<unsigned int> &index_map) const
+PolynomialsP<2>::create_polynomial_ordering(std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size() == this->n(),
-         ExcDimensionMismatch(index_map.size(), this->n()));
+  Assert(index_map.size() == this->n(), ExcDimensionMismatch(index_map.size(), this->n()));
   Assert(p <= 5, ExcNotImplemented());
 
   // Given the number i of the
@@ -87,11 +82,9 @@ namespace
 
 template <>
 void
-PolynomialsP<3>::create_polynomial_ordering(
-  std::vector<unsigned int> &index_map) const
+PolynomialsP<3>::create_polynomial_ordering(std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size() == this->n(),
-         ExcDimensionMismatch(index_map.size(), this->n()));
+  Assert(index_map.size() == this->n(), ExcDimensionMismatch(index_map.size(), this->n()));
   Assert(p <= 3, ExcNotImplemented());
 
   // Given the number i of the

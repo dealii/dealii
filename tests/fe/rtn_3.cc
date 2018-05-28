@@ -41,8 +41,7 @@ test()
       if (dim != 3)
         {
           FE_RaviartThomas<dim> fe_rt(degree);
-          deallog << fe_rt.get_name() << ' ' << fe_rt.dofs_per_cell
-                  << std::endl;
+          deallog << fe_rt.get_name() << ' ' << fe_rt.dofs_per_cell << std::endl;
         }
     }
 }

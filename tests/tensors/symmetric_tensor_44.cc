@@ -50,8 +50,7 @@ template <int dim,
           template <int, int, typename> class TensorType2,
           typename NumberType2>
 void
-print(const TensorType1<2, dim, NumberType1> &t2,
-      const TensorType2<4, dim, NumberType2> &t4)
+print(const TensorType1<2, dim, NumberType1> &t2, const TensorType2<4, dim, NumberType2> &t4)
 {
   deallog << t2 << std::endl;
   deallog << t4 << std::endl;
@@ -197,8 +196,7 @@ test_three()
   fill_tensor(t4_2);
 
   deallog << "Double contract" << std::endl;
-  TensorType1<2, dim, typename ProductType<NumberType1, NumberType2>::type>
-    res_dc;
+  TensorType1<2, dim, typename ProductType<NumberType1, NumberType2>::type> res_dc;
   double_contract(res_dc, t4_2, t2_1);
   deallog << res_dc << std::endl;
   double_contract(res_dc, t2_1, t4_2);

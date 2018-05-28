@@ -72,26 +72,24 @@ do_test(const unsigned int size)
       return make_vectorized_array(val);
     });
   };
-  AlignedVector<VectorizedArray<double>> v1(w1.size()), v2(w1.size()),
-    v3(w1.size());
+  AlignedVector<VectorizedArray<double>> v1(w1.size()), v2(w1.size()), v3(w1.size());
   convert_to_vectorized(w1, v1);
 
-  constexpr unsigned int macro_size = VectorizedArray<double>::n_array_elements;
-  Vector<double>         vec_flat(v1.size() * macro_size);
+  constexpr unsigned int               macro_size = VectorizedArray<double>::n_array_elements;
+  Vector<double>                       vec_flat(v1.size() * macro_size);
   std::array<unsigned int, macro_size> offsets;
   for (unsigned int i = 0; i < macro_size; ++i)
     offsets[i] = v1.size() * i;
-  auto subtract_and_assign =
-    [](AlignedVector<VectorizedArray<double>> &      lhs,
-       const AlignedVector<VectorizedArray<double>> &rhs) {
-      std::transform(
-        lhs.begin(),
-        lhs.end(),
-        rhs.begin(),
-        lhs.begin(),
-        [](const VectorizedArray<double> lval,
-           const VectorizedArray<double> rval) { return lval - rval; });
-    };
+  auto subtract_and_assign = [](AlignedVector<VectorizedArray<double>> &      lhs,
+                                const AlignedVector<VectorizedArray<double>> &rhs) {
+    std::transform(lhs.begin(),
+                   lhs.end(),
+                   rhs.begin(),
+                   lhs.begin(),
+                   [](const VectorizedArray<double> lval, const VectorizedArray<double> rval) {
+                     return lval - rval;
+                   });
+  };
 
   const ArrayView<VectorizedArray<double>> view1(v1.begin(), v1.size());
   const ArrayView<VectorizedArray<double>> view2(v2.begin(), v2.size());
@@ -99,10 +97,8 @@ do_test(const unsigned int size)
   mat.vmult(view2, view1);
   mat.apply_inverse(view3, view2);
   subtract_and_assign(v3, v1);
-  vectorized_transpose_and_store(
-    false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
-  deallog << "Verification of vmult and inverse: " << vec_flat.linfty_norm()
-          << std::endl;
+  vectorized_transpose_and_store(false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
+  deallog << "Verification of vmult and inverse: " << vec_flat.linfty_norm() << std::endl;
 
   FullMatrix<double> full(v1.size(), v1.size());
   full = 0.;
@@ -119,16 +115,13 @@ do_test(const unsigned int size)
                   full(c, cc) = laplace[1](j, jj)[0] * mass[0](k, kk)[0] +
                                 mass[1](j, jj)[0] * laplace[0](k, kk)[0];
                 else if (dim == 3)
-                  full(c, cc) = laplace[2](i, ii)[0] * mass[1](j, jj)[0] *
-                                  mass[0](k, kk)[0] +
-                                mass[2](i, ii)[0] *
-                                  (laplace[1](j, jj)[0] * mass[0](k, kk)[0] +
-                                   mass[1](j, jj)[0] * laplace[0](k, kk)[0]);
+                  full(c, cc) = laplace[2](i, ii)[0] * mass[1](j, jj)[0] * mass[0](k, kk)[0] +
+                                mass[2](i, ii)[0] * (laplace[1](j, jj)[0] * mass[0](k, kk)[0] +
+                                                     mass[1](j, jj)[0] * laplace[0](k, kk)[0]);
   full.vmult(w2, w1);
   convert_to_vectorized(w2, v3);
   subtract_and_assign(v3, v2);
-  vectorized_transpose_and_store(
-    false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
+  vectorized_transpose_and_store(false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
   deallog << "Verification of vmult: " << vec_flat.linfty_norm() << std::endl;
 
   full.gauss_jordan();
@@ -136,8 +129,7 @@ do_test(const unsigned int size)
   mat.apply_inverse(view2, view1);
   convert_to_vectorized(w2, v3);
   subtract_and_assign(v3, v2);
-  vectorized_transpose_and_store(
-    false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
+  vectorized_transpose_and_store(false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin());
   deallog << "Verification of inverse: " << vec_flat.linfty_norm() << std::endl;
 }
 

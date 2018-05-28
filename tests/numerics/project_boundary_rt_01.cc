@@ -61,7 +61,7 @@ TestFunction<dim>::TestFunction(unsigned int p) : Function<dim>(dim), degree(p)
 template <int dim>
 void
 TestFunction<dim>::vector_value_list(const std::vector<Point<dim>> &points,
-                                     std::vector<Vector<double>> &values) const
+                                     std::vector<Vector<double>> &  values) const
 {
   for (unsigned int k = 0; k < points.size(); ++k)
     {
@@ -98,17 +98,13 @@ integrate_error(const DoFHandler<dim> &dof,
                 const Function<dim> &  f)
 {
   double                      result = 0.;
-  std::vector<Vector<double>> f_values(fe.n_quadrature_points,
-                                       Vector<double>(dim));
-  std::vector<Vector<double>> fe_values(fe.n_quadrature_points,
-                                        Vector<double>(dim));
+  std::vector<Vector<double>> f_values(fe.n_quadrature_points, Vector<double>(dim));
+  std::vector<Vector<double>> fe_values(fe.n_quadrature_points, Vector<double>(dim));
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();
        ++cell)
     {
-      for (unsigned int face = 0; face != GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face != GeometryInfo<dim>::faces_per_cell; ++face)
         {
           if (!cell->at_boundary(face))
             continue;
@@ -120,8 +116,7 @@ integrate_error(const DoFHandler<dim> &dof,
             {
               double diff = 0.;
               for (unsigned int d = 0; d < dim; ++d)
-                diff +=
-                  fe.normal_vector(k)[d] * (f_values[k](d) - fe_values[k](d));
+                diff += fe.normal_vector(k)[d] * (f_values[k](d) - fe_values[k](d));
               result += fe.JxW(k) * diff * diff;
             }
         }
@@ -134,8 +129,7 @@ template <int dim>
 void
 test_projection(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
-  deallog << fe.get_name() << std::endl
-          << "Cells: " << tr.n_active_cells() << std::endl;
+  deallog << fe.get_name() << std::endl << "Cells: " << tr.n_active_cells() << std::endl;
 
   const unsigned int degree = fe.tensor_degree();
 
@@ -168,8 +162,8 @@ test_projection(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   FEFaceValues<dim> feval(mapping,
                           fe,
                           quadrature,
-                          update_quadrature_points | update_normal_vectors |
-                            update_JxW_values | update_values);
+                          update_quadrature_points | update_normal_vectors | update_JxW_values |
+                            update_values);
   double            err = integrate_error(dof, feval, u, f);
   deallog << err << std::endl;
 }

@@ -1284,9 +1284,7 @@ private:
    * An internal typedef to make the definition of the iterator classes
    * simpler.
    */
-  typedef dealii::internal::TriangulationImplementation::Iterators<dim,
-                                                                   spacedim>
-    IteratorSelector;
+  typedef dealii::internal::TriangulationImplementation::Iterators<dim, spacedim> IteratorSelector;
 
 public:
   /**
@@ -1475,8 +1473,7 @@ public:
      * This flag sums up all smoothing algorithms which may be performed upon
      * refinement by flagging some more cells for refinement.
      */
-    smoothing_on_refinement =
-      (limit_level_difference_at_vertices | eliminate_unrefined_islands),
+    smoothing_on_refinement = (limit_level_difference_at_vertices | eliminate_unrefined_islands),
     /**
      * This flag sums up all smoothing algorithms which may be performed upon
      * coarsening by flagging some more cells for coarsening.
@@ -1554,8 +1551,7 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef TriaActiveIterator<TriaAccessor<dim - 1, dim, spacedim>>
-    active_face_iterator;
+  typedef TriaActiveIterator<TriaAccessor<dim - 1, dim, spacedim>> active_face_iterator;
 
   /**
    * A typedef that defines an iterator type to iterate over
@@ -1579,8 +1575,7 @@ public:
    *
    * @ingroup Iterators
    */
-  typedef TriaActiveIterator<dealii::TriaAccessor<0, dim, spacedim>>
-    active_vertex_iterator;
+  typedef TriaActiveIterator<dealii::TriaAccessor<0, dim, spacedim>> active_vertex_iterator;
 
   typedef typename IteratorSelector::line_iterator        line_iterator;
   typedef typename IteratorSelector::active_line_iterator active_line_iterator;
@@ -1623,8 +1618,7 @@ public:
      * A list of those cells among the coarse mesh cells that are deformed or
      * whose children are deformed.
      */
-    std::list<typename Triangulation<dim, spacedim>::cell_iterator>
-      distorted_cells;
+    std::list<typename Triangulation<dim, spacedim>::cell_iterator> distorted_cells;
   };
 
   /**
@@ -1737,8 +1731,7 @@ public:
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   void
-  set_manifold(const types::manifold_id       number,
-               const Manifold<dim, spacedim> &manifold_object);
+  set_manifold(const types::manifold_id number, const Manifold<dim, spacedim> &manifold_object);
 
 
   /**
@@ -1820,8 +1813,7 @@ public:
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   void
-  set_all_manifold_ids_on_boundary(const types::boundary_id b_id,
-                                   const types::manifold_id number);
+  set_all_manifold_ids_on_boundary(const types::boundary_id b_id, const types::manifold_id number);
 
   /**
    * Return a constant reference to a Manifold object used for this
@@ -1949,10 +1941,9 @@ public:
    * can throw the same exception as the other function.
    */
   virtual void
-  create_triangulation_compatibility(
-    const std::vector<Point<spacedim>> &vertices,
-    const std::vector<CellData<dim>> &  cells,
-    const SubCellData &                 subcelldata);
+  create_triangulation_compatibility(const std::vector<Point<spacedim>> &vertices,
+                                     const std::vector<CellData<dim>> &  cells,
+                                     const SubCellData &                 subcelldata);
 
   /**
    * Revert or flip the direction_flags of a dim<spacedim triangulation, see
@@ -2168,8 +2159,7 @@ public:
      * of active cells as argument. The children of this parent cell will
      * subsequently be coarsened away.
      */
-    boost::signals2::signal<void(
-      const typename Triangulation<dim, spacedim>::cell_iterator &cell)>
+    boost::signals2::signal<void(const typename Triangulation<dim, spacedim>::cell_iterator &cell)>
       pre_coarsening_on_cell;
 
     /**
@@ -2178,8 +2168,7 @@ public:
      * @note The signal parameter @p cell corresponds to the immediate parent
      * cell of a set of newly created active cells.
      */
-    boost::signals2::signal<void(
-      const typename Triangulation<dim, spacedim>::cell_iterator &cell)>
+    boost::signals2::signal<void(const typename Triangulation<dim, spacedim>::cell_iterator &cell)>
       post_refinement_on_cell;
 
     /**
@@ -2188,9 +2177,7 @@ public:
      * Triangulation::copy_triangulation() (i.e. it is triggered on the
      * <i>old</i> triangulation, but the new one is passed as an argument).
      */
-    boost::signals2::signal<void(
-      const Triangulation<dim, spacedim> &destination_tria)>
-      copy;
+    boost::signals2::signal<void(const Triangulation<dim, spacedim> &destination_tria)> copy;
 
     /**
      * This signal is triggered whenever the Triangulation::clear() function
@@ -2241,8 +2228,7 @@ public:
      * functions are connected to this signal, their return values will be
      * summed to calculate the final weight.
      */
-    boost::signals2::signal<unsigned int(const cell_iterator &,
-                                         const CellStatus),
+    boost::signals2::signal<unsigned int(const cell_iterator &, const CellStatus),
                             CellWeightSum<unsigned int>>
       cell_weight;
 
@@ -3287,15 +3273,13 @@ public:
    * initialized and must not be refined.
    */
   virtual void
-  add_periodicity(
-    const std::vector<GridTools::PeriodicFacePair<cell_iterator>> &);
+  add_periodicity(const std::vector<GridTools::PeriodicFacePair<cell_iterator>> &);
 
   /**
    * Return the periodic_face_map.
    */
-  const std::map<
-    std::pair<cell_iterator, unsigned int>,
-    std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>> &
+  const std::map<std::pair<cell_iterator, unsigned int>,
+                 std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>> &
   get_periodic_face_map() const;
 
 
@@ -3313,22 +3297,20 @@ public:
    */
   DeclException1(ExcInvalidLevel,
                  int,
-                 << "The given level " << arg1
-                 << " is not in the valid range!");
+                 << "The given level " << arg1 << " is not in the valid range!");
   /**
    * The function raising this exception can only operate on an empty
    * Triangulation, i.e., a Triangulation without grid cells.
    *
    * @ingroup Exceptions
    */
-  DeclException2(
-    ExcTriangulationNotEmpty,
-    int,
-    int,
-    << "You are trying to perform an operation on a triangulation "
-    << "that is only allowed if the triangulation is currently empty. "
-    << "However, it currently stores " << arg1 << " vertices and has "
-    << "cells on " << arg2 << " levels.");
+  DeclException2(ExcTriangulationNotEmpty,
+                 int,
+                 int,
+                 << "You are trying to perform an operation on a triangulation "
+                 << "that is only allowed if the triangulation is currently empty. "
+                 << "However, it currently stores " << arg1 << " vertices and has "
+                 << "cells on " << arg2 << " levels.");
   /**
    * Trying to re-read a grid, an error occurred.
    *
@@ -3347,8 +3329,7 @@ public:
    */
   DeclException1(ExcEmptyLevel,
                  int,
-                 << "You tried to do something on level " << arg1
-                 << ", but this level is empty.");
+                 << "You tried to do something on level " << arg1 << ", but this level is empty.");
   /**
    * Exception
    *
@@ -3365,8 +3346,7 @@ public:
    */
   DeclException1(ExcBoundaryIdNotFound,
                  types::boundary_id,
-                 << "The given boundary_id " << arg1
-                 << " is not defined in this Triangulation!");
+                 << "The given boundary_id " << arg1 << " is not defined in this Triangulation!");
 
   /*
    * @}
@@ -3423,8 +3403,7 @@ private:
    * cells for the multigrid hierarchy and for setting up the
    * periodic_face_map.
    */
-  std::vector<GridTools::PeriodicFacePair<cell_iterator>>
-    periodic_face_pairs_level_0;
+  std::vector<GridTools::PeriodicFacePair<cell_iterator>> periodic_face_pairs_level_0;
 
   /**
    * If add_periodicity() is called, this variable stores the active periodic
@@ -3447,14 +3426,12 @@ private:
    * Since users should never have to access these internal properties of how
    * we store data, these iterator types are made private.
    */
-  typedef TriaRawIterator<CellAccessor<dim, spacedim>> raw_cell_iterator;
-  typedef TriaRawIterator<TriaAccessor<dim - 1, dim, spacedim>>
-    raw_face_iterator;
-  typedef TriaRawIterator<dealii::TriaAccessor<0, dim, spacedim>>
-                                                       raw_vertex_iterator;
-  typedef typename IteratorSelector::raw_line_iterator raw_line_iterator;
-  typedef typename IteratorSelector::raw_quad_iterator raw_quad_iterator;
-  typedef typename IteratorSelector::raw_hex_iterator  raw_hex_iterator;
+  typedef TriaRawIterator<CellAccessor<dim, spacedim>>            raw_cell_iterator;
+  typedef TriaRawIterator<TriaAccessor<dim - 1, dim, spacedim>>   raw_face_iterator;
+  typedef TriaRawIterator<dealii::TriaAccessor<0, dim, spacedim>> raw_vertex_iterator;
+  typedef typename IteratorSelector::raw_line_iterator            raw_line_iterator;
+  typedef typename IteratorSelector::raw_quad_iterator            raw_quad_iterator;
+  typedef typename IteratorSelector::raw_hex_iterator             raw_hex_iterator;
 
   /**
    * Iterator to the first cell, used or not, on level @p level. If a level
@@ -3644,8 +3621,7 @@ private:
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
-  std::vector<std::unique_ptr<
-    dealii::internal::TriangulationImplementation::TriaLevel<dim>>>
+  std::vector<std::unique_ptr<dealii::internal::TriangulationImplementation::TriaLevel<dim>>>
     levels;
 
   /**
@@ -3653,8 +3629,7 @@ private:
    * in 2D it contains data concerning lines and in 3D quads and lines.  All
    * of these have no level and are therefore treated separately.
    */
-  std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces<dim>>
-    faces;
+  std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces<dim>> faces;
 
 
   /**
@@ -3671,8 +3646,7 @@ private:
    * Collection of manifold objects. We store only objects, which are not of
    * type FlatManifold.
    */
-  std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>>
-    manifold;
+  std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>> manifold;
 
   /**
    * Flag indicating whether anisotropic refinement took place.
@@ -3711,8 +3685,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_boundary_id) were
    * not a pointer.
    */
-  std::unique_ptr<std::map<unsigned int, types::boundary_id>>
-    vertex_to_boundary_id_map_1d;
+  std::unique_ptr<std::map<unsigned int, types::boundary_id>> vertex_to_boundary_id_map_1d;
 
 
   /**
@@ -3734,8 +3707,7 @@ private:
    * this field (that can be modified by TriaAccessor::set_manifold_id) were
    * not a pointer.
    */
-  std::unique_ptr<std::map<unsigned int, types::manifold_id>>
-    vertex_to_manifold_id_map_1d;
+  std::unique_ptr<std::map<unsigned int, types::manifold_id>> vertex_to_manifold_id_map_1d;
 
   // make a couple of classes friends
   template <int, int, int>
@@ -3825,8 +3797,7 @@ template <int dim, int spacedim>
 inline bool
 Triangulation<dim, spacedim>::vertex_used(const unsigned int index) const
 {
-  Assert(index < vertices_used.size(),
-         ExcIndexRange(index, 0, vertices_used.size()));
+  Assert(index < vertices_used.size(), ExcIndexRange(index, 0, vertices_used.size()));
   return vertices_used[index];
 }
 
@@ -3920,9 +3891,8 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   levels.resize(size);
   for (unsigned int i = 0; i < levels.size(); ++i)
     {
-      std::unique_ptr<internal::TriangulationImplementation::TriaLevel<dim>>
-          level;
-      ar &level;
+      std::unique_ptr<internal::TriangulationImplementation::TriaLevel<dim>> level;
+      ar &                                                                   level;
       levels[i] = std::move(level);
     }
 

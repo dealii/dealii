@@ -87,10 +87,8 @@ exact_third(Point<dim> &p, Tensor<3, dim> &third)
 {
   double x = p[0], y = p[1];
   // array of function and its derivatives
-  double dx[4] = {
-    sin(a * x), a * cos(a * x), -a * a * sin(a * x), -a * a * a * cos(a * x)};
-  double dy[4] = {
-    cos(b * y), -b * sin(b * y), -b * b * cos(b * y), b * b * b * sin(b * y)};
+  double dx[4] = {sin(a * x), a * cos(a * x), -a * a * sin(a * x), -a * a * a * cos(a * x)};
+  double dy[4] = {cos(b * y), -b * sin(b * y), -b * b * cos(b * y), b * b * b * sin(b * y)};
 
   for (int i = 0; i < dim; ++i)
     for (int j = 0; j < dim; ++j)
@@ -151,15 +149,14 @@ derivatives()
   Vector<double>       solution;
   MappingQGeneric<dim> mapping(1);
   QMidpoint<dim>       q_midpoint;
-  FEValues<dim> fe_values(mapping, fe, q_midpoint, update_quadrature_points);
+  FEValues<dim>        fe_values(mapping, fe, q_midpoint, update_quadrature_points);
 
   dof_handler.distribute_dofs(fe);
   solution.reinit(dof_handler.n_dofs());
 
   VectorTools::interpolate(mapping, dof_handler, function, solution);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
 
   for (; cell != endc; ++cell)
@@ -182,16 +179,14 @@ derivatives()
       double normthird = DerivativeApproximation::derivative_norm(third);
 
       // symmetry of second derivative
-      Assert(second == transpose(second),
-             ExcMessage("Second derivative is not symmetric"));
+      Assert(second == transpose(second), ExcMessage("Second derivative is not symmetric"));
 
       // symmetry of third derivative note,
       // that this is only part of the truth,
       // we would have to test more here to be
       // really sure, but this should be enough
       for (unsigned int i = 0; i < dim; ++i)
-        Assert(third[i] == transpose(third[i]),
-               ExcMessage("Third derivative is not symmetric"));
+        Assert(third[i] == transpose(third[i]), ExcMessage("Third derivative is not symmetric"));
 
       // get exact derivatives
       fe_values.reinit(cell);
@@ -202,24 +197,20 @@ derivatives()
       exact_second(q_point[0], ex_second);
       exact_third(q_point[0], ex_third);
 
-      double ex_normgrad = DerivativeApproximation::derivative_norm(ex_grad);
-      double ex_normsecond =
-        DerivativeApproximation::derivative_norm(ex_second);
-      double ex_normthird = DerivativeApproximation::derivative_norm(ex_third);
+      double ex_normgrad   = DerivativeApproximation::derivative_norm(ex_grad);
+      double ex_normsecond = DerivativeApproximation::derivative_norm(ex_second);
+      double ex_normthird  = DerivativeApproximation::derivative_norm(ex_third);
 
       // output of all values for comparison
       deallog << "cell " << cell << endl;
       deallog << "approx. gradient: " << grad << " , norm: " << normgrad << endl
-              << "  exact gradient: " << ex_grad << " , norm: " << ex_normgrad
-              << endl;
-      deallog << "approx. second derivative (hessian): " << second
-              << " , norm: " << normsecond << endl
+              << "  exact gradient: " << ex_grad << " , norm: " << ex_normgrad << endl;
+      deallog << "approx. second derivative (hessian): " << second << " , norm: " << normsecond
+              << endl
               << "  exact second derivative (hessian): " << ex_second
               << " , norm: " << ex_normsecond << endl;
-      deallog << "approx. third derivative: " << third
-              << " , norm: " << normthird << endl
-              << "  exact third derivative: " << ex_third
-              << " , norm: " << ex_normthird << endl
+      deallog << "approx. third derivative: " << third << " , norm: " << normthird << endl
+              << "  exact third derivative: " << ex_third << " , norm: " << ex_normthird << endl
               << endl;
     }
 }

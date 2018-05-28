@@ -45,8 +45,7 @@ test()
   // the following should yield an exception:
   try
     {
-      Assert(BlockMask(12, true).first_selected_block(13) == 0,
-             ExcInternalError());
+      Assert(BlockMask(12, true).first_selected_block(13) == 0, ExcInternalError());
     }
   catch (ExceptionBase &e)
     {
@@ -56,8 +55,7 @@ test()
   // as should this:
   try
     {
-      Assert(BlockMask(12, false).first_selected_block() == 0,
-             ExcInternalError());
+      Assert(BlockMask(12, false).first_selected_block() == 0, ExcInternalError());
     }
   catch (ExceptionBase &e)
     {

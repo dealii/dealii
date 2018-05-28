@@ -37,8 +37,7 @@ test(int n)
 
     deallog << std::endl
             << "# Area: "
-            << std::accumulate(
-                 quad.get_weights().begin(), quad.get_weights().end(), 0.0)
+            << std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)
             << std::endl
             << std::endl;
 
@@ -55,8 +54,7 @@ test(int n)
 
     deallog << std::endl
             << "# Area: "
-            << std::accumulate(
-                 quad.get_weights().begin(), quad.get_weights().end(), 0.0)
+            << std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)
             << std::endl
             << std::endl;
     if (quad.size() == n * n * 3)
@@ -72,8 +70,7 @@ test(int n)
 
     deallog << std::endl
             << "# Area: "
-            << std::accumulate(
-                 quad.get_weights().begin(), quad.get_weights().end(), 0.0)
+            << std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.0)
             << std::endl
             << std::endl;
     if (quad.size() == n * n * 2)

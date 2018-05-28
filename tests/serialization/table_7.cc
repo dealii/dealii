@@ -25,12 +25,9 @@
 void
 test()
 {
-  unsigned int index1 = 3, index2 = 4, index3 = 2, index4 = 5, index5 = 1,
-               index6 = 7, index7 = 6;
-  TableIndices<7> indices1(
-    index1, index2, index3, index4, index5, index6, index7);
-  unsigned int sum_of_indices =
-    index1 + index2 + index3 + index4 + index5 + index6 + index7;
+  unsigned int index1 = 3, index2 = 4, index3 = 2, index4 = 5, index5 = 1, index6 = 7, index7 = 6;
+  TableIndices<7> indices1(index1, index2, index3, index4, index5, index6, index7);
+  unsigned int    sum_of_indices = index1 + index2 + index3 + index4 + index5 + index6 + index7;
 
   Table<7, int> t1(index1, index2, index3, index4, index5, index6, index7);
   Table<7, int> t2(index1, index2, index3, index4, index5, index6, index7);
@@ -60,8 +57,7 @@ test()
                           for (unsigned int i7 = 0; i7 < indices1[6]; ++i7)
                             {
                               t1[i1][i2][i3][i4][i5][i6][i7] = counter++;
-                              t2[i1][i2][i3][i4][i5][i6][i7] =
-                                counter + sum_of_indices;
+                              t2[i1][i2][i3][i4][i5][i6][i7] = counter + sum_of_indices;
                             }
                         }
                     }

@@ -64,7 +64,6 @@ main(int argc, char **argv)
     PETScWrappers::SolverTCQMR        solver(control);
     PETScWrappers::PreconditionJacobi preconditioner(A);
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 43, 45);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner), control.last_step(), 43, 45);
   }
 }

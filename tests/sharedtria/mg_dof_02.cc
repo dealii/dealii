@@ -64,11 +64,9 @@ write_dof_data(DoFHandler<dim> &dof_handler)
           if (cell->level_subdomain_id() == numbers::artificial_subdomain_id)
             continue;
 
-          std::vector<types::global_dof_index> local_mg_dof_indices(
-            fe.dofs_per_cell);
+          std::vector<types::global_dof_index> local_mg_dof_indices(fe.dofs_per_cell);
           cell->get_mg_dof_indices(local_mg_dof_indices);
-          deallog << "proc " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-                  << ", "
+          deallog << "proc " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) << ", "
                   << "cell " << cell->id() << ", mg_dof_indices: ";
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
             deallog << local_mg_dof_indices[i] << " ";
@@ -98,8 +96,7 @@ test()
 
   tria.refine_global(1);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     {
@@ -114,8 +111,7 @@ test()
 
   deallog << "proc " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
           << ", level_ghost_owners: ";
-  for (std::set<types::subdomain_id>::iterator it =
-         tria.level_ghost_owners().begin();
+  for (std::set<types::subdomain_id>::iterator it = tria.level_ghost_owners().begin();
        it != tria.level_ghost_owners().end();
        ++it)
     deallog << *it << " ";

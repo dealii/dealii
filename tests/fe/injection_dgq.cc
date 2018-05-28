@@ -34,8 +34,7 @@ test()
         do_check(FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), i)),
                  FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), j)));
       else if (j > 0)
-        do_check(FE_DGQ<dim>(0),
-                 FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), j)));
+        do_check(FE_DGQ<dim>(0), FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), j)));
       else
         do_check(FE_DGQ<dim>(0), FE_DGQ<dim>(0));
 }

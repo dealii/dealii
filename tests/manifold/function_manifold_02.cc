@@ -51,14 +51,12 @@ test(unsigned int ref = 1)
         Assert(false, ExcInternalError());
     }
 
-  FunctionManifold<dim, spacedim, spacedim> manifold(push_forward_expression,
-                                                     pull_back_expression);
+  FunctionManifold<dim, spacedim, spacedim> manifold(push_forward_expression, pull_back_expression);
 
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria, 0, 1);
 
-  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     {

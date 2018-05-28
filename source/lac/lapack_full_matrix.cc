@@ -39,8 +39,7 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n) :
 
 
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type m,
-                                           const size_type n) :
+LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type m, const size_type n) :
   TransposeTable<number>(m, n),
   state(matrix),
   property(general)
@@ -93,8 +92,7 @@ LAPACKFullMatrix<number>::grow_or_shrink(const size_type n)
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::remove_row_and_column(const size_type row,
-                                                const size_type col)
+LAPACKFullMatrix<number>::remove_row_and_column(const size_type row, const size_type col)
 {
   AssertIndexRange(row, this->m());
   AssertIndexRange(col, this->n());
@@ -180,9 +178,7 @@ template <typename number>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator*=(const number factor)
 {
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix,
-         ExcState(state));
+  Assert(state == LAPACKSupport::matrix || state == LAPACKSupport::inverse_matrix, ExcState(state));
 
   AssertIsFinite(factor);
   const char            type  = 'G';
@@ -208,9 +204,7 @@ template <typename number>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator/=(const number factor)
 {
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix,
-         ExcState(state));
+  Assert(state == LAPACKSupport::matrix || state == LAPACKSupport::inverse_matrix, ExcState(state));
 
   AssertIsFinite(factor);
   Assert(factor != number(0.), ExcZero());
@@ -239,9 +233,7 @@ template <typename number>
 void
 LAPACKFullMatrix<number>::add(const number a, const LAPACKFullMatrix<number> &A)
 {
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix,
-         ExcState(state));
+  Assert(state == LAPACKSupport::matrix || state == LAPACKSupport::inverse_matrix, ExcState(state));
 
   Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
   Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
@@ -265,9 +257,7 @@ namespace
 {
   template <typename number>
   void
-  cholesky_rank1(LAPACKFullMatrix<number> &A,
-                 const number              a,
-                 const Vector<number> &    v)
+  cholesky_rank1(LAPACKFullMatrix<number> &A, const number a, const Vector<number> &v)
   {
     const typename LAPACKFullMatrix<number>::size_type N = A.n();
     Vector<number>                                     z(v);
@@ -295,8 +285,7 @@ namespace
             const std::array<number, 3> csr =
               Utilities::LinearAlgebra::givens_rotation(A(k, k), z(k));
             A(k, k) = csr[2];
-            for (typename LAPACKFullMatrix<number>::size_type i = k + 1; i < N;
-                 ++i)
+            for (typename LAPACKFullMatrix<number>::size_type i = k + 1; i < N; ++i)
               {
                 const number t = A(i, k);
                 A(i, k)        = csr[0] * A(i, k) + csr[1] * z(i);
@@ -338,8 +327,7 @@ namespace
             const std::array<number, 3> csr =
               Utilities::LinearAlgebra::hyperbolic_rotation(A(k, k), z(k));
             A(k, k) = csr[2];
-            for (typename LAPACKFullMatrix<number>::size_type i = k + 1; i < N;
-                 ++i)
+            for (typename LAPACKFullMatrix<number>::size_type i = k + 1; i < N; ++i)
               {
                 const number t = A(i, k);
                 A(i, k)        = csr[0] * A(i, k) - csr[1] * z(i);
@@ -404,9 +392,7 @@ LAPACKFullMatrix<number>::rank1_update(const number a, const Vector<number> &v)
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
-                                const Vector<number> &v,
-                                const bool            adding) const
+LAPACKFullMatrix<number>::vmult(Vector<number> &w, const Vector<number> &v, const bool adding) const
 {
   const types::blas_int mm    = this->m();
   const types::blas_int nn    = this->n();
@@ -415,8 +401,8 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
   const number          null  = 0.;
 
   // use trmv for triangular matrices
-  if ((property == upper_triangular || property == lower_triangular) &&
-      (mm == nn) && state == matrix)
+  if ((property == upper_triangular || property == lower_triangular) && (mm == nn) &&
+      state == matrix)
     {
       Assert(adding == false, ExcNotImplemented());
 
@@ -425,8 +411,7 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
 
       const char diag  = 'N';
       const char trans = 'N';
-      const char uplo =
-        (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+      const char uplo  = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
 
       w = v;
 
@@ -549,8 +534,8 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
   const number          null  = 0.;
 
   // use trmv for triangular matrices
-  if ((property == upper_triangular || property == lower_triangular) &&
-      (mm == nn) && state == matrix)
+  if ((property == upper_triangular || property == lower_triangular) && (mm == nn) &&
+      state == matrix)
     {
       Assert(adding == false, ExcNotImplemented());
 
@@ -559,8 +544,7 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
 
       const char diag  = 'N';
       const char trans = 'T';
-      const char uplo =
-        (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+      const char uplo  = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
 
       w = v;
 
@@ -675,8 +659,7 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::vmult_add(Vector<number> &      w,
-                                    const Vector<number> &v) const
+LAPACKFullMatrix<number>::vmult_add(Vector<number> &w, const Vector<number> &v) const
 {
   vmult(w, v, true);
 }
@@ -684,8 +667,7 @@ LAPACKFullMatrix<number>::vmult_add(Vector<number> &      w,
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::Tvmult_add(Vector<number> &      w,
-                                     const Vector<number> &v) const
+LAPACKFullMatrix<number>::Tvmult_add(Vector<number> &w, const Vector<number> &v) const
 {
   Tvmult(w, v, true);
 }
@@ -797,8 +779,7 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
   for (types::blas_int j = 0; j < nn; ++j)
     for (types::blas_int i = 0; i < kk; ++i)
       {
-        Assert(j * kk + i < static_cast<types::blas_int>(work.size()),
-               ExcInternalError());
+        Assert(j * kk + i < static_cast<types::blas_int>(work.size()), ExcInternalError());
         work[j * kk + i] = V(i) * B(i, j);
       }
 
@@ -860,16 +841,8 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
 
   if (PointerComparison::equal(this, &B))
     {
-      syrk(&LAPACKSupport::U,
-           "T",
-           &nn,
-           &kk,
-           &alpha,
-           &this->values[0],
-           &kk,
-           &beta,
-           &C.values[0],
-           &nn);
+      syrk(
+        &LAPACKSupport::U, "T", &nn, &kk, &alpha, &this->values[0], &kk, &beta, &C.values[0], &nn);
 
       // fill-in lower triangular part
       for (types::blas_int j = 0; j < nn; ++j)
@@ -952,16 +925,8 @@ LAPACKFullMatrix<number>::mTmult(LAPACKFullMatrix<number> &      C,
 
   if (PointerComparison::equal(this, &B))
     {
-      syrk(&LAPACKSupport::U,
-           "N",
-           &nn,
-           &kk,
-           &alpha,
-           &this->values[0],
-           &nn,
-           &beta,
-           &C.values[0],
-           &nn);
+      syrk(
+        &LAPACKSupport::U, "N", &nn, &kk, &alpha, &this->values[0], &nn, &beta, &C.values[0], &nn);
 
       // fill-in lower triangular part
       for (types::blas_int j = 0; j < nn; ++j)
@@ -1163,8 +1128,7 @@ LAPACKFullMatrix<number>::norm(const char type) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
 
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix,
+  Assert(state == LAPACKSupport::matrix || state == LAPACKSupport::inverse_matrix,
          ExcMessage("norms can be called in matrix state only."));
 
   const types::blas_int N      = this->n();
@@ -1180,9 +1144,8 @@ LAPACKFullMatrix<number>::norm(const char type) const
     }
   else
     {
-      const types::blas_int lda = std::max<types::blas_int>(1, M);
-      const types::blas_int lwork =
-        (type == 'I') ? std::max<types::blas_int>(1, M) : 0;
+      const types::blas_int lda   = std::max<types::blas_int>(1, M);
+      const types::blas_int lwork = (type == 'I') ? std::max<types::blas_int>(1, M) : 0;
       work.resize(lwork);
       return lange(&type, &M, &N, values, &lda, work.data());
     }
@@ -1194,8 +1157,7 @@ template <typename number>
 number
 LAPACKFullMatrix<number>::trace() const
 {
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix,
+  Assert(state == LAPACKSupport::matrix || state == LAPACKSupport::inverse_matrix,
          ExcMessage("Trace can be called in matrix state only."));
   Assert(this->n() == this->m(), ExcDimensionMismatch(this->n(), this->m()));
 
@@ -1251,15 +1213,7 @@ LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
   iwork.resize(N);
 
   // use the same uplo as in Cholesky
-  pocon(&LAPACKSupport::L,
-        &N,
-        values,
-        &lda,
-        &a_norm,
-        &rcond,
-        work.data(),
-        iwork.data(),
-        &info);
+  pocon(&LAPACKSupport::L, &N, values, &lda, &a_norm, &rcond, work.data(), iwork.data(), &info);
 
   Assert(info >= 0, ExcInternalError());
 
@@ -1273,8 +1227,7 @@ number
 LAPACKFullMatrix<number>::reciprocal_condition_number() const
 {
   Threads::Mutex::ScopedLock lock(mutex);
-  Assert(property == upper_triangular || property == lower_triangular,
-         ExcProperty(property));
+  Assert(property == upper_triangular || property == lower_triangular, ExcProperty(property));
   number rcond = 0.;
 
   const types::blas_int N      = this->m();
@@ -1286,18 +1239,8 @@ LAPACKFullMatrix<number>::reciprocal_condition_number() const
 
   const char norm = '1';
   const char diag = 'N';
-  const char uplo =
-    (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
-  trcon(&norm,
-        &uplo,
-        &diag,
-        &N,
-        values,
-        &lda,
-        &rcond,
-        work.data(),
-        iwork.data(),
-        &info);
+  const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+  trcon(&norm, &uplo, &diag, &N, values, &lda, &rcond, work.data(), iwork.data(), &info);
 
   Assert(info >= 0, ExcInternalError());
 
@@ -1320,9 +1263,9 @@ LAPACKFullMatrix<number>::compute_svd()
   std::fill(wr.begin(), wr.end(), 0.);
   ipiv.resize(8 * mm);
 
-  svd_u              = std_cxx14::make_unique<LAPACKFullMatrix<number>>(mm, mm);
-  svd_vt             = std_cxx14::make_unique<LAPACKFullMatrix<number>>(nn, nn);
-  number *const   mu = &svd_u->values[0];
+  svd_u                = std_cxx14::make_unique<LAPACKFullMatrix<number>>(mm, mm);
+  svd_vt               = std_cxx14::make_unique<LAPACKFullMatrix<number>>(nn, nn);
+  number *const   mu   = &svd_u->values[0];
   number *const   mvt  = &svd_vt->values[0];
   types::blas_int info = 0;
 
@@ -1397,8 +1340,7 @@ LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::compute_inverse_svd_with_kernel(
-  const unsigned int kernel_size)
+LAPACKFullMatrix<number>::compute_inverse_svd_with_kernel(const unsigned int kernel_size)
 {
   if (state == LAPACKSupport::matrix)
     compute_svd();
@@ -1472,8 +1414,7 @@ LAPACKFullMatrix<number>::solve(Vector<number> &v, const bool transposed) const
 
   if (state == lu)
     {
-      getrs(
-        trans, &nn, &n_rhs, values, &nn, ipiv.data(), v.begin(), &nn, &info);
+      getrs(trans, &nn, &n_rhs, values, &nn, ipiv.data(), v.begin(), &nn, &info);
     }
   else if (state == cholesky)
     {
@@ -1481,19 +1422,15 @@ LAPACKFullMatrix<number>::solve(Vector<number> &v, const bool transposed) const
     }
   else if (property == upper_triangular || property == lower_triangular)
     {
-      const char uplo =
-        (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
 
       const types::blas_int lda = nn;
       const types::blas_int ldb = nn;
-      trtrs(
-        &uplo, trans, "N", &nn, &n_rhs, values, &lda, v.begin(), &ldb, &info);
+      trtrs(&uplo, trans, "N", &nn, &n_rhs, values, &lda, v.begin(), &ldb, &info);
     }
   else
     {
-      Assert(
-        false,
-        ExcMessage("The matrix has to be either factorized or triangular."));
+      Assert(false, ExcMessage("The matrix has to be either factorized or triangular."));
     }
 
   Assert(info == 0, ExcInternalError());
@@ -1503,8 +1440,7 @@ LAPACKFullMatrix<number>::solve(Vector<number> &v, const bool transposed) const
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
-                                const bool                transposed) const
+LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B, const bool transposed) const
 {
   Assert(B.state == matrix, ExcState(B.state));
 
@@ -1518,37 +1454,23 @@ LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
 
   if (state == lu)
     {
-      getrs(
-        trans, &nn, &n_rhs, values, &nn, ipiv.data(), &B.values[0], &nn, &info);
+      getrs(trans, &nn, &n_rhs, values, &nn, ipiv.data(), &B.values[0], &nn, &info);
     }
   else if (state == cholesky)
     {
-      potrs(
-        &LAPACKSupport::L, &nn, &n_rhs, values, &nn, &B.values[0], &nn, &info);
+      potrs(&LAPACKSupport::L, &nn, &n_rhs, values, &nn, &B.values[0], &nn, &info);
     }
   else if (property == upper_triangular || property == lower_triangular)
     {
-      const char uplo =
-        (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
 
       const types::blas_int lda = nn;
       const types::blas_int ldb = nn;
-      trtrs(&uplo,
-            trans,
-            "N",
-            &nn,
-            &n_rhs,
-            values,
-            &lda,
-            &B.values[0],
-            &ldb,
-            &info);
+      trtrs(&uplo, trans, "N", &nn, &n_rhs, values, &lda, &B.values[0], &ldb, &info);
     }
   else
     {
-      Assert(
-        false,
-        ExcMessage("The matrix has to be either factorized or triangular."));
+      Assert(false, ExcMessage("The matrix has to be either factorized or triangular."));
     }
 
   Assert(info == 0, ExcInternalError());
@@ -1558,8 +1480,7 @@ LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
-                                                 const bool transposed) const
+LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v, const bool transposed) const
 {
   solve(v, transposed);
 }
@@ -1569,7 +1490,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
 template <typename number>
 void
 LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
-                                                 const bool transposed) const
+                                                 const bool                transposed) const
 {
   solve(B, transposed);
 }
@@ -1601,8 +1522,7 @@ LAPACKFullMatrix<number>::determinant() const
   Assert(ipiv.size() == this->m(), ExcInternalError());
   number det = 1.0;
   for (size_type i = 0; i < this->m(); ++i)
-    det *=
-      (ipiv[i] == types::blas_int(i + 1) ? this->el(i, i) : -this->el(i, i));
+    det *= (ipiv[i] == types::blas_int(i + 1) ? this->el(i, i) : -this->el(i, i));
   return det;
 }
 
@@ -1691,12 +1611,11 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
-  const number        lower_bound,
-  const number        upper_bound,
-  const number        abs_accuracy,
-  Vector<number> &    eigenvalues,
-  FullMatrix<number> &eigenvectors)
+LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lower_bound,
+                                                        const number        upper_bound,
+                                                        const number        abs_accuracy,
+                                                        Vector<number> &    eigenvalues,
+                                                        FullMatrix<number> &eigenvectors)
 {
   Assert(state == matrix, ExcState(state));
   const types::blas_int nn = (this->n() > 0 ? this->n() : 1);
@@ -1963,18 +1882,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
    */
   work.resize(1);
 
-  sygv(&itype,
-       jobz,
-       uplo,
-       &nn,
-       values_A,
-       &nn,
-       values_B,
-       &nn,
-       wr.data(),
-       work.data(),
-       &lwork,
-       &info);
+  sygv(
+    &itype, jobz, uplo, &nn, values_A, &nn, values_B, &nn, wr.data(), work.data(), &lwork, &info);
   // sygv returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert(info == 0, ExcInternalError());
@@ -1986,18 +1895,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   work.resize(static_cast<size_type>(lwork));
 
   // Finally compute the generalized eigenvalues.
-  sygv(&itype,
-       jobz,
-       uplo,
-       &nn,
-       values_A,
-       &nn,
-       values_B,
-       &nn,
-       wr.data(),
-       work.data(),
-       &lwork,
-       &info);
+  sygv(
+    &itype, jobz, uplo, &nn, values_A, &nn, values_B, &nn, wr.data(), work.data(), &lwork, &info);
   // Negative return value implies a wrong argument. This should be internal.
 
   Assert(info >= 0, ExcInternalError());
@@ -2030,8 +1929,7 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream &     out,
   unsigned int width = width_;
 
   Assert((!this->empty()) || (this->n() + this->m() == 0), ExcInternalError());
-  Assert(state == LAPACKSupport::matrix ||
-           state == LAPACKSupport::inverse_matrix ||
+  Assert(state == LAPACKSupport::matrix || state == LAPACKSupport::inverse_matrix ||
            state == LAPACKSupport::cholesky,
          ExcState(state));
 
@@ -2099,8 +1997,7 @@ PreconditionLU<number>::initialize(const LAPACKFullMatrix<number> &M,
 
 template <typename number>
 void
-PreconditionLU<number>::vmult(Vector<number> &      dst,
-                              const Vector<number> &src) const
+PreconditionLU<number>::vmult(Vector<number> &dst, const Vector<number> &src) const
 {
   dst = src;
   matrix->apply_lu_factorization(dst, false);
@@ -2109,8 +2006,7 @@ PreconditionLU<number>::vmult(Vector<number> &      dst,
 
 template <typename number>
 void
-PreconditionLU<number>::Tvmult(Vector<number> &      dst,
-                               const Vector<number> &src) const
+PreconditionLU<number>::Tvmult(Vector<number> &dst, const Vector<number> &src) const
 {
   dst = src;
   matrix->apply_lu_factorization(dst, true);
@@ -2119,8 +2015,7 @@ PreconditionLU<number>::Tvmult(Vector<number> &      dst,
 
 template <typename number>
 void
-PreconditionLU<number>::vmult(BlockVector<number> &      dst,
-                              const BlockVector<number> &src) const
+PreconditionLU<number>::vmult(BlockVector<number> &dst, const BlockVector<number> &src) const
 {
   Assert(mem != nullptr, ExcNotInitialized());
   Vector<number> *aux = mem->alloc();
@@ -2132,8 +2027,7 @@ PreconditionLU<number>::vmult(BlockVector<number> &      dst,
 
 template <typename number>
 void
-PreconditionLU<number>::Tvmult(BlockVector<number> &      dst,
-                               const BlockVector<number> &src) const
+PreconditionLU<number>::Tvmult(BlockVector<number> &dst, const BlockVector<number> &src) const
 {
   Assert(mem != nullptr, ExcNotInitialized());
   Vector<number> *aux = mem->alloc();

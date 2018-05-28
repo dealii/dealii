@@ -52,8 +52,7 @@ test()
   if (dim == 2)
     tria.refine_global(1);
   {
-    typename Triangulation<dim>::active_cell_iterator cell =
-      tria.begin_active();
+    typename Triangulation<dim>::active_cell_iterator cell    = tria.begin_active();
     typename Triangulation<dim>::active_cell_iterator endc    = tria.end();
     unsigned int                                      counter = 0;
     for (; cell != endc; ++cell, ++counter)
@@ -82,13 +81,11 @@ test()
   MatrixFree<dim, double>                          mf_data;
   const QGauss<1>                                  quad(fe_degree + 1);
   typename MatrixFree<dim, double>::AdditionalData data;
-  data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
-  data.tasks_block_size      = 3;
-  data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
-  data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
-  data.initialize_mapping = false;
+  data.tasks_parallel_scheme               = MatrixFree<dim, double>::AdditionalData::none;
+  data.tasks_block_size                    = 3;
+  data.mapping_update_flags_inner_faces    = (update_gradients | update_JxW_values);
+  data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
+  data.initialize_mapping                  = false;
 
   mf_data.reinit(mapping, dof, constraints, quad, data);
 
@@ -112,11 +109,7 @@ test()
     }
 
 
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 fe_degree + 1,
-                 double,
-                 LinearAlgebra::distributed::Vector<double>>
+  MatrixFreeTest<dim, fe_degree, fe_degree + 1, double, LinearAlgebra::distributed::Vector<double>>
     mf(mf_data);
   mf.vmult(out, in);
 

@@ -80,8 +80,7 @@ test()
   cell->set_dof_values_by_interpolation(local, solution, 0);
 
   // for comparison purposes, also output the values of DoFs on all cells
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {

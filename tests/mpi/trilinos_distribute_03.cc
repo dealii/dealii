@@ -30,9 +30,8 @@
 void
 test()
 {
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  const unsigned int n_processes =
-    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  const unsigned int myid        = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int n_processes = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   // create a vector that consists of elements indexed from 0 to 100
   // everything belongs to proc 0
@@ -42,8 +41,7 @@ test()
 
   TrilinosWrappers::MPI::Vector vec(idx, MPI_COMM_WORLD);
 
-  for (unsigned int i = vec.local_range().first; i < vec.local_range().second;
-       ++i)
+  for (unsigned int i = vec.local_range().first; i < vec.local_range().second; ++i)
     vec(i) = i;
   vec.compress(VectorOperation::insert);
 

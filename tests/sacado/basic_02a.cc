@@ -38,11 +38,7 @@ f(const NumberType &x, const NumberType &y, const NumberType2 &z)
 
 // The analytic derivative of f(x,y,z) with respect to x and y
 void
-df(const double &x,
-   const double &y,
-   const double &z,
-   double &      df_dx,
-   double &      df_dy)
+df(const double &x, const double &y, const double &z, double &df_dx, double &df_dy)
 {
   df_dx = z * (3.0 * x * x + 0.5 * y * y);
   df_dy = z * (2.0 * z * y + x * y);
@@ -76,10 +72,8 @@ main()
   const int num_deriv = 2;
 
   // FAD objects: Independent variables
-  Sacado::Rad::ADvar<Sacado::Fad::DFad<double>> x_ad(
-    Sacado::Fad::DFad<double>(num_deriv, 0, x));
-  Sacado::Rad::ADvar<Sacado::Fad::DFad<double>> y_ad(
-    Sacado::Fad::DFad<double>(num_deriv, 1, y));
+  Sacado::Rad::ADvar<Sacado::Fad::DFad<double>> x_ad(Sacado::Fad::DFad<double>(num_deriv, 0, x));
+  Sacado::Rad::ADvar<Sacado::Fad::DFad<double>> y_ad(Sacado::Fad::DFad<double>(num_deriv, 1, y));
   // FAD objects: Passive variables
   const Sacado::Rad::ADvar<Sacado::Fad::DFad<double>> z_ad(z);
 
@@ -99,8 +93,7 @@ main()
   d2f(x, y, z, d2f_dx_dx, d2f_dy_dy, d2f_dy_dx);
 
   // Compute function and derivative with AD
-  const Sacado::Rad::ADvar<Sacado::Fad::DFad<double>> f_rfad =
-    ::f(x_ad, y_ad, z_ad);
+  const Sacado::Rad::ADvar<Sacado::Fad::DFad<double>> f_rfad = ::f(x_ad, y_ad, z_ad);
   Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>::Gradcomp();
 
   deallog << "f_rad: " << f_rfad.val() << std::endl;
@@ -118,8 +111,7 @@ main()
   Assert(std::fabs(f - f_ad) < tol, ExcMessage("Computation incorrect: Value"));
   Assert(std::fabs(df_dx - df_dx_ad) < tol && std::fabs(df_dy - df_dy_ad) < tol,
          ExcMessage("Computation incorrect: First derivative"));
-  Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol &&
-           std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol &&
+  Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol && std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol &&
            std::fabs(d2f_dy_dx - d2f_dy_dx_ad) < tol,
          ExcMessage("Computation incorrect: Second derivative"));
 

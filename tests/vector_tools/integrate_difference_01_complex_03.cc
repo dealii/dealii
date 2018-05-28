@@ -61,8 +61,7 @@ public:
       return (p[0] * p[0] + p[1] * p[1]) *
              std::complex<double>(1. / std::sqrt(2.), 1. / std::sqrt(2.));
     if (c == 2)
-      return (p[2] + p[0] * p[1]) *
-             std::complex<double>(1. / std::sqrt(2.), 1. / std::sqrt(2.));
+      return (p[2] + p[0] * p[1]) * std::complex<double>(1. / std::sqrt(2.), 1. / std::sqrt(2.));
     else
       return numbers::signaling_nan<double>();
   }
@@ -86,18 +85,14 @@ test(VectorTools::NormType norm, double value)
   VectorTools::interpolate(dofh, Ref<dim>(), solution);
 
   Vector<double> cellwise_errors(tria.n_active_cells());
-  VectorTools::integrate_difference(dofh,
-                                    solution,
-                                    Functions::ZeroFunction<dim>(dim),
-                                    cellwise_errors,
-                                    QGauss<dim>(5),
-                                    norm);
+  VectorTools::integrate_difference(
+    dofh, solution, Functions::ZeroFunction<dim>(dim), cellwise_errors, QGauss<dim>(5), norm);
 
   const double error = cellwise_errors.l2_norm();
 
   const double difference = std::abs(error - value);
-  deallog << "computed: " << error << " expected: " << value
-          << " difference: " << difference << std::endl;
+  deallog << "computed: " << error << " expected: " << value << " difference: " << difference
+          << std::endl;
   Assert(difference < 1e-10, ExcMessage("Error in integrate_difference"));
 }
 

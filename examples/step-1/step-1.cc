@@ -93,8 +93,7 @@ void second_grid()
   // but we choose to set it explicitly to 10 as the last argument:
   const Point<2> center(1, 0);
   const double   inner_radius = 0.5, outer_radius = 1.0;
-  GridGenerator::hyper_shell(
-    triangulation, center, inner_radius, outer_radius, 10);
+  GridGenerator::hyper_shell(triangulation, center, inner_radius, outer_radius, 10);
   // By default, the triangulation assumes that all boundaries are
   // straight lines, and all cells are bi-linear quads or tri-linear
   // hexes, and that they are defined by the cells of the coarse grid
@@ -219,8 +218,7 @@ void second_grid()
               // with this property flag this cell for later refinement. We can
               // then also break the loop over all vertices and move on to the
               // next cell.
-              const double distance_from_center =
-                center.distance(cell->vertex(v));
+              const double distance_from_center = center.distance(cell->vertex(v));
 
               if (std::fabs(distance_from_center - inner_radius) < 1e-10)
                 {

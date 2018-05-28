@@ -79,10 +79,8 @@ test(const Triangulation<dim> &tr)
   dof.distribute_dofs(fe);
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(mapping,
-                          fe,
-                          quadrature,
-                          update_values | update_gradients | update_JxW_values);
+  FEValues<dim>     fe_values(
+    mapping, fe, quadrature, update_values | update_gradients | update_JxW_values);
 
   FullMatrix<double> mass_matrix[2], laplace_matrix[2];
   mass_matrix[0].reinit(fe.dofs_per_cell, fe.dofs_per_cell);
@@ -90,8 +88,7 @@ test(const Triangulation<dim> &tr)
   laplace_matrix[0].reinit(fe.dofs_per_cell, fe.dofs_per_cell);
   laplace_matrix[1].reinit(fe.dofs_per_cell, fe.dofs_per_cell);
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(); cell != dof.end();
        ++cell)
     {
       fe_values.reinit(cell);
@@ -100,24 +97,21 @@ test(const Triangulation<dim> &tr)
         for (unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
           for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
             {
-              mass_matrix[cell->index()](i, j) += fe_values.shape_value(i, q) *
-                                                  fe_values.shape_value(j, q) *
-                                                  fe_values.JxW(q);
+              mass_matrix[cell->index()](i, j) +=
+                fe_values.shape_value(i, q) * fe_values.shape_value(j, q) * fe_values.JxW(q);
               laplace_matrix[cell->index()](i, j) +=
-                fe_values.shape_grad(i, q) * fe_values.shape_grad(j, q) *
-                fe_values.JxW(q);
+                fe_values.shape_grad(i, q) * fe_values.shape_grad(j, q) * fe_values.JxW(q);
             }
     }
 
   // check what we expect for this mapping
   // about equality or inequality of the
   // matrices
-  deallog << "Mass matrices "
-          << (equal(mass_matrix[0], mass_matrix[1]) ? "are" : "are not")
+  deallog << "Mass matrices " << (equal(mass_matrix[0], mass_matrix[1]) ? "are" : "are not")
           << " equal." << std::endl;
   deallog << "Laplace matrices "
-          << (equal(laplace_matrix[0], laplace_matrix[1]) ? "are" : "are not")
-          << " equal." << std::endl;
+          << (equal(laplace_matrix[0], laplace_matrix[1]) ? "are" : "are not") << " equal."
+          << std::endl;
 
   for (unsigned int cell = 0; cell < 2; ++cell)
     {
@@ -146,9 +140,9 @@ template <int dim>
 void
 test()
 {
-  Triangulation<dim> tr;
-  Point<dim>         p1 = Point<dim>();
-  Point<dim>         p2 = (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2, 1, 1));
+  Triangulation<dim>        tr;
+  Point<dim>                p1 = Point<dim>();
+  Point<dim>                p2 = (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2, 1, 1));
   std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, p1, p2);

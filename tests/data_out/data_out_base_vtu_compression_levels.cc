@@ -65,8 +65,7 @@ check_all(std::ostream &log)
             flags.compression_level = DataOutBase::VtkFlags::best_compression;
             break;
           case (3):
-            flags.compression_level =
-              DataOutBase::VtkFlags::default_compression;
+            flags.compression_level = DataOutBase::VtkFlags::default_compression;
             break;
           default:
             Assert(false, ExcInternalError());

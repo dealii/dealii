@@ -38,16 +38,14 @@ namespace internal
     template <int dim, int spacedim>
     struct ParallelData : public ParallelDataBase<dim, spacedim>
     {
-      ParallelData(
-        const unsigned int               n_datasets,
-        const unsigned int               n_subdivisions,
-        const std::vector<unsigned int> &n_postprocessor_outputs,
-        const Mapping<dim, spacedim> &   mapping,
-        const std::vector<
-          std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-          &                                           finite_elements,
-        const UpdateFlags                             update_flags,
-        const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map);
+      ParallelData(const unsigned int               n_datasets,
+                   const unsigned int               n_subdivisions,
+                   const std::vector<unsigned int> &n_postprocessor_outputs,
+                   const Mapping<dim, spacedim> &   mapping,
+                   const std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+                     &                                           finite_elements,
+                   const UpdateFlags                             update_flags,
+                   const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map);
 
       std::vector<Point<spacedim>> patch_evaluation_points;
 
@@ -166,15 +164,13 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef
-    typename DataOut_DoFData<DoFHandlerType,
-                             DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension>::cell_iterator
-      cell_iterator;
-  typedef typename DataOut_DoFData<
-    DoFHandlerType,
-    DoFHandlerType::dimension,
-    DoFHandlerType::space_dimension>::active_cell_iterator active_cell_iterator;
+  typedef typename DataOut_DoFData<DoFHandlerType,
+                                   DoFHandlerType::dimension,
+                                   DoFHandlerType::space_dimension>::cell_iterator cell_iterator;
+  typedef typename DataOut_DoFData<DoFHandlerType,
+                                   DoFHandlerType::dimension,
+                                   DoFHandlerType::space_dimension>::active_cell_iterator
+    active_cell_iterator;
 
   /**
    * Enumeration describing the part of the domain in which cells
@@ -295,8 +291,7 @@ public:
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
   virtual void
-  build_patches(const Mapping<DoFHandlerType::dimension,
-                              DoFHandlerType::space_dimension> &mapping,
+  build_patches(const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &mapping,
                 const unsigned int     n_subdivisions = 0,
                 const CurvedCellRegion curved_region  = curved_boundary);
 
@@ -349,12 +344,12 @@ private:
    * reasons.
    */
   void
-  build_one_patch(const std::pair<cell_iterator, unsigned int> *cell_and_index,
-                  internal::DataOutImplementation::ParallelData<
-                    DoFHandlerType::dimension,
-                    DoFHandlerType::space_dimension> &scratch_data,
-                  const unsigned int                  n_subdivisions,
-                  const CurvedCellRegion              curved_cell_region);
+  build_one_patch(
+    const std::pair<cell_iterator, unsigned int> *                                  cell_and_index,
+    internal::DataOutImplementation::ParallelData<DoFHandlerType::dimension,
+                                                  DoFHandlerType::space_dimension> &scratch_data,
+    const unsigned int                                                              n_subdivisions,
+    const CurvedCellRegion curved_cell_region);
 };
 
 

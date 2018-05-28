@@ -47,8 +47,8 @@ test()
   tria.refine_global(1);
   for (unsigned int cycle = 0; cycle < 2; ++cycle)
     {
-      for (typename parallel::distributed::Triangulation<
-             dim>::active_cell_iterator cell = tria.begin_active();
+      for (typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell =
+             tria.begin_active();
            cell != tria.end();
            ++cell)
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -70,10 +70,8 @@ test()
       tria.execute_coarsening_and_refinement();
     }
 
-  const unsigned int max_possible_level =
-    MGTools::max_level_for_coarse_mesh(tria);
-  deallog << "Max possible level for coarse mesh: " << max_possible_level
-          << std::endl;
+  const unsigned int max_possible_level = MGTools::max_level_for_coarse_mesh(tria);
+  deallog << "Max possible level for coarse mesh: " << max_possible_level << std::endl;
 }
 
 

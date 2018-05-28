@@ -42,10 +42,8 @@ test()
   SparseMatrix<double>::const_iterator i = m.begin();
   for (; i != m.end(); ++i)
     {
-      deallog << i->row() << ' ' << i->column() << ' ' << i->value()
-              << std::endl;
-      Assert(std::fabs(i->value() - i->row() * i->column()) < 1e-14,
-             ExcInternalError());
+      deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
+      Assert(std::fabs(i->value() - i->row() * i->column()) < 1e-14, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -66,13 +64,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -80,12 +76,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

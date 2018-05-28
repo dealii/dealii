@@ -53,8 +53,7 @@ test(const double max_n_cell_ratio)
   {
     unsigned int cell_index    = 0;
     unsigned int my_cell_index = 0;
-    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-         cell != tr.end();
+    for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end();
          ++cell, ++cell_index)
       if (cell->subdomain_id() == myid)
         {
@@ -73,26 +72,21 @@ test(const double max_n_cell_ratio)
   // coarsening. we have to
   // accumulate over all processors
   unsigned int my_refined = 0, my_coarsened = 0;
-  for (Triangulation<2>::active_cell_iterator cell = tr.begin_active();
-       cell != tr.end();
-       ++cell)
+  for (Triangulation<2>::active_cell_iterator cell = tr.begin_active(); cell != tr.end(); ++cell)
     if (cell->refine_flag_set())
       ++my_refined;
     else if (cell->coarsen_flag_set())
       ++my_coarsened;
 
   unsigned int n_refined = 0, n_coarsened = 0;
-  MPI_Reduce(
-    &my_refined, &n_refined, 1, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
-  MPI_Reduce(
-    &my_coarsened, &n_coarsened, 1, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&my_refined, &n_refined, 1, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&my_coarsened, &n_coarsened, 1, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
 
   // make sure we have indeed flagged
   // exactly 20% of cells
   if (myid == 0)
     {
-      deallog << "total active cells = " << tr.n_global_active_cells()
-              << std::endl;
+      deallog << "total active cells = " << tr.n_global_active_cells() << std::endl;
       deallog << "n_refined = " << n_refined << std::endl;
       deallog << "n_coarsened = " << n_coarsened << std::endl;
     }
@@ -100,8 +94,7 @@ test(const double max_n_cell_ratio)
   tr.execute_coarsening_and_refinement();
   if (myid == 0)
     {
-      deallog << "total active cells = " << tr.n_global_active_cells()
-              << std::endl;
+      deallog << "total active cells = " << tr.n_global_active_cells() << std::endl;
       deallog << "cell number upper limit = " << max_n_cell << std::endl;
     }
 }

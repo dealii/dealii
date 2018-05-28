@@ -31,21 +31,17 @@ std::ofstream logfile("output");
 
 template <int dim, int spacedim>
 void
-pre_refinement_notification(const std::string &                 prefix,
-                            const Triangulation<dim, spacedim> &tria)
+pre_refinement_notification(const std::string &prefix, const Triangulation<dim, spacedim> &tria)
 {
-  deallog << prefix << ' ' << "Pre-refinement: " << tria.n_active_cells()
-          << std::endl;
+  deallog << prefix << ' ' << "Pre-refinement: " << tria.n_active_cells() << std::endl;
 }
 
 
 template <int dim, int spacedim>
 void
-post_refinement_notification(const std::string &                 prefix,
-                             const Triangulation<dim, spacedim> &tria)
+post_refinement_notification(const std::string &prefix, const Triangulation<dim, spacedim> &tria)
 {
-  deallog << prefix << ' ' << "Post-refinement: " << tria.n_active_cells()
-          << std::endl;
+  deallog << prefix << ' ' << "Post-refinement: " << tria.n_active_cells() << std::endl;
 }
 
 
@@ -62,8 +58,7 @@ copy_notification(const std::string &                 prefix,
 
 template <int dim, int spacedim>
 void
-create_notification(const std::string &                 prefix,
-                    const Triangulation<dim, spacedim> &tria)
+create_notification(const std::string &prefix, const Triangulation<dim, spacedim> &tria)
 {
   deallog << prefix << ' ' << "Create: " << tria.n_active_cells() << std::endl;
 }
@@ -80,27 +75,23 @@ test()
   GridGenerator::hyper_cube(tria_2);
 
   boost::signals2::connection connections_1[4] = {
-    tria_1.signals.pre_refinement.connect(std::bind(
-      &pre_refinement_notification<dim, dim>, "tria_1", std::cref(tria_1))),
-    tria_1.signals.post_refinement.connect(std::bind(
-      &post_refinement_notification<dim, dim>, "tria_1", std::cref(tria_1))),
+    tria_1.signals.pre_refinement.connect(
+      std::bind(&pre_refinement_notification<dim, dim>, "tria_1", std::cref(tria_1))),
+    tria_1.signals.post_refinement.connect(
+      std::bind(&post_refinement_notification<dim, dim>, "tria_1", std::cref(tria_1))),
     tria_1.signals.create.connect(
       std::bind(&create_notification<dim, dim>, "tria_1", std::cref(tria_1))),
-    tria_1.signals.copy.connect(std::bind(&copy_notification<dim, dim>,
-                                          "tria_1",
-                                          std::placeholders::_1,
-                                          std::cref(tria_1)))};
+    tria_1.signals.copy.connect(
+      std::bind(&copy_notification<dim, dim>, "tria_1", std::placeholders::_1, std::cref(tria_1)))};
   boost::signals2::connection connections_2[4] = {
-    tria_2.signals.pre_refinement.connect(std::bind(
-      &pre_refinement_notification<dim, dim>, "tria_2", std::cref(tria_2))),
-    tria_2.signals.post_refinement.connect(std::bind(
-      &post_refinement_notification<dim, dim>, "tria_2", std::cref(tria_2))),
+    tria_2.signals.pre_refinement.connect(
+      std::bind(&pre_refinement_notification<dim, dim>, "tria_2", std::cref(tria_2))),
+    tria_2.signals.post_refinement.connect(
+      std::bind(&post_refinement_notification<dim, dim>, "tria_2", std::cref(tria_2))),
     tria_2.signals.create.connect(
       std::bind(&create_notification<dim, dim>, "tria_2", std::cref(tria_2))),
-    tria_2.signals.copy.connect(std::bind(&copy_notification<dim, dim>,
-                                          "tria_2",
-                                          std::placeholders::_1,
-                                          std::cref(tria_2)))};
+    tria_2.signals.copy.connect(
+      std::bind(&copy_notification<dim, dim>, "tria_2", std::placeholders::_1, std::cref(tria_2)))};
 
 
 

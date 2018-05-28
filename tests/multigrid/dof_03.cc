@@ -45,22 +45,22 @@ check()
   // in their natural order
   {
     DoFHandler<dim> dof(tr);
-    deallog << "check " << dim << " before distribute " << dof.has_active_dofs()
-            << ' ' << dof.has_level_dofs() << std::endl;
+    deallog << "check " << dim << " before distribute " << dof.has_active_dofs() << ' '
+            << dof.has_level_dofs() << std::endl;
 
     dof.distribute_dofs(fe);
-    deallog << "check " << dim << " after  distribute " << dof.has_active_dofs()
-            << ' ' << dof.has_level_dofs() << std::endl;
+    deallog << "check " << dim << " after  distribute " << dof.has_active_dofs() << ' '
+            << dof.has_level_dofs() << std::endl;
 
 
     dof.distribute_dofs(fe);
     dof.distribute_mg_dofs(fe);
-    deallog << "check " << dim << " level  distribute " << dof.has_active_dofs()
-            << ' ' << dof.has_level_dofs() << std::endl;
+    deallog << "check " << dim << " level  distribute " << dof.has_active_dofs() << ' '
+            << dof.has_level_dofs() << std::endl;
 
     dof.clear();
-    deallog << "check " << dim << " after  clear      " << dof.has_active_dofs()
-            << ' ' << dof.has_level_dofs() << std::endl;
+    deallog << "check " << dim << " after  clear      " << dof.has_active_dofs() << ' '
+            << dof.has_level_dofs() << std::endl;
   }
 }
 

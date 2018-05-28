@@ -45,12 +45,10 @@ main()
   // plus 5 faces each for the top
   // and bottom of the cylinder)
   unsigned int external_faces = 0;
-  for (Triangulation<3>::face_iterator face = tria.begin_face();
-       face != tria.end_face();
-       ++face)
+  for (Triangulation<3>::face_iterator face = tria.begin_face(); face != tria.end_face(); ++face)
     {
-      deallog << face << "   " << face->boundary_id() << "  " << '<'
-              << face->vertex(0) << '>' << std::endl
+      deallog << face << "   " << face->boundary_id() << "  " << '<' << face->vertex(0) << '>'
+              << std::endl
               << "           <" << face->vertex(1) << '>' << std::endl
               << "           <" << face->vertex(2) << '>' << std::endl
               << "           <" << face->vertex(3) << '>' << std::endl;

@@ -41,8 +41,7 @@ testor(IndexSet &a, IndexSet &other, bool verbose = true)
 
   for (unsigned int i = 0; i < merged.size(); ++i)
     {
-      Assert(merged.is_element(i) == (a.is_element(i) || other.is_element(i)),
-             ExcInternalError());
+      Assert(merged.is_element(i) == (a.is_element(i) || other.is_element(i)), ExcInternalError());
     }
 }
 

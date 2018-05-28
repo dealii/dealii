@@ -66,9 +66,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann 2004, Guido Kanschat, 2009
  */
 
-template <class PolynomialType,
-          int dim      = PolynomialType::dimension,
-          int spacedim = dim>
+template <class PolynomialType, int dim = PolynomialType::dimension, int spacedim = dim>
 class FE_Poly : public FiniteElement<dim, spacedim>
 {
 public:
@@ -181,8 +179,7 @@ public:
    * for more information about the semantics of this function.
    */
   virtual Tensor<3, dim>
-  shape_3rd_derivative(const unsigned int i,
-                       const Point<dim> & p) const override;
+  shape_3rd_derivative(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the third derivative of the <tt>component</tt>th vector component
@@ -205,8 +202,7 @@ public:
    * class for more information about the semantics of this function.
    */
   virtual Tensor<4, dim>
-  shape_4th_derivative(const unsigned int i,
-                       const Point<dim> & p) const override;
+  shape_4th_derivative(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the fourth derivative of the <tt>component</tt>th vector component
@@ -231,15 +227,12 @@ protected:
    */
 
 
-  virtual std::unique_ptr<
-    typename FiniteElement<dim, spacedim>::InternalDataBase>
-  get_data(
-    const UpdateFlags update_flags,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim> &quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override
+  virtual std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+  get_data(const UpdateFlags update_flags,
+           const Mapping<dim, spacedim> & /*mapping*/,
+           const Quadrature<dim> &quadrature,
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
+             &output_data) const override
   {
     // generate a new data object and
     // initialize some fields
@@ -251,16 +244,13 @@ protected:
     // initialize some scratch arrays. we need them for the underlying
     // polynomial to put the values and derivatives of shape functions
     // to put there, depending on what the user requested
-    std::vector<double> values(
-      update_flags & update_values ? this->dofs_per_cell : 0);
-    std::vector<Tensor<1, dim>> grads(
-      update_flags & update_gradients ? this->dofs_per_cell : 0);
-    std::vector<Tensor<2, dim>> grad_grads(
-      update_flags & update_hessians ? this->dofs_per_cell : 0);
+    std::vector<double>         values(update_flags & update_values ? this->dofs_per_cell : 0);
+    std::vector<Tensor<1, dim>> grads(update_flags & update_gradients ? this->dofs_per_cell : 0);
+    std::vector<Tensor<2, dim>> grad_grads(update_flags & update_hessians ? this->dofs_per_cell :
+                                                                            0);
     std::vector<Tensor<3, dim>> third_derivatives(
       update_flags & update_3rd_derivatives ? this->dofs_per_cell : 0);
-    std::vector<Tensor<4, dim>>
-      fourth_derivatives; // won't be needed, so leave empty
+    std::vector<Tensor<4, dim>> fourth_derivatives; // won't be needed, so leave empty
 
     // now also initialize fields the fields of this class's own
     // temporary storage, depending on what we need for the given
@@ -278,9 +268,8 @@ protected:
     // quadrature points summed over *all* faces or subfaces, whereas
     // the number of output slots equals the number of quadrature
     // points on only *one* face)
-    if ((update_flags & update_values) &&
-        !((output_data.shape_values.n_rows() > 0) &&
-          (output_data.shape_values.n_cols() == n_q_points)))
+    if ((update_flags & update_values) && !((output_data.shape_values.n_rows() > 0) &&
+                                            (output_data.shape_values.n_cols() == n_q_points)))
       data->shape_values.reinit(this->dofs_per_cell, n_q_points);
 
     if (update_flags & update_gradients)
@@ -295,16 +284,12 @@ protected:
     // next already fill those fields of which we have information by
     // now. note that the shape gradients are only those on the unit
     // cell, and need to be transformed when visiting an actual cell
-    if (update_flags & (update_values | update_gradients | update_hessians |
-                        update_3rd_derivatives))
+    if (update_flags &
+        (update_values | update_gradients | update_hessians | update_3rd_derivatives))
       for (unsigned int i = 0; i < n_q_points; ++i)
         {
-          poly_space.compute(quadrature.point(i),
-                             values,
-                             grads,
-                             grad_grads,
-                             third_derivatives,
-                             fourth_derivatives);
+          poly_space.compute(
+            quadrature.point(i), values, grads, grad_grads, third_derivatives, fourth_derivatives);
 
           // the values of shape functions at quadrature points don't change.
           // consequently, write these values right into the output array if
@@ -348,14 +333,11 @@ protected:
     const CellSimilarity::Similarity                            cell_similarity,
     const Quadrature<dim> &                                     quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_face_values(
@@ -363,14 +345,11 @@ protected:
     const unsigned int                                          face_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   virtual void
   fill_fe_subface_values(
@@ -379,14 +358,11 @@ protected:
     const unsigned int                                          sub_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
-    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
-      &                                                            mapping_data,
-    const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                       spacedim>
-      &output_data) const override;
+    const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase &                    fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data)
+    const override;
 
   /**
    * Fields of cell-independent data.
@@ -466,12 +442,10 @@ protected:
    */
   void
   correct_third_derivatives(
-    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
-      &output_data,
-    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                mapping_data,
-    const unsigned int n_q_points,
-    const unsigned int dof) const;
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data,
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+    const unsigned int                                                         n_q_points,
+    const unsigned int                                                         dof) const;
 
   /**
    * The polynomial space. Its type is given by the template parameter

@@ -108,8 +108,7 @@ public:
    * which describe the box: one for the bottom and one for the top
    * corner.
    */
-  BoundingBox(const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
-                &boundary_points);
+  BoundingBox(const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &boundary_points);
 
   /**
    * Return the boundary_points
@@ -164,8 +163,7 @@ private:
 
 template <int spacedim, typename Number>
 inline BoundingBox<spacedim, Number>::BoundingBox(
-  const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
-    &boundary_points)
+  const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &boundary_points)
 {
   // We check the Bounding Box is not degenerate
   for (unsigned int i = 0; i < spacedim; ++i)
@@ -180,8 +178,7 @@ inline BoundingBox<spacedim, Number>::BoundingBox(
 template <int spacedim, typename Number>
 template <class Archive>
 void
-BoundingBox<spacedim, Number>::serialize(Archive &ar,
-                                         const unsigned int /*version*/)
+BoundingBox<spacedim, Number>::serialize(Archive &ar, const unsigned int /*version*/)
 {
   ar &boundary_points;
 }

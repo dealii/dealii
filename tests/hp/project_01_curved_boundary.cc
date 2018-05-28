@@ -93,8 +93,7 @@ test()
 
   // use the implicit Q1 mapping. this will yield a zero solution
   {
-    VectorTools::project(
-      dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);
+    VectorTools::project(dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() == 0, ExcInternalError());
   }
@@ -159,14 +158,12 @@ test()
                          true);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() != 0, ExcInternalError());
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-           dh.begin_active();
+    for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
          cell != dh.end();
          ++cell)
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         deallog << cell->vertex(i) << ' '
-                << v(cell->vertex_dof_index(i, 0, cell->active_fe_index()))
-                << std::endl;
+                << v(cell->vertex_dof_index(i, 0, cell->active_fe_index())) << std::endl;
   }
 
 
@@ -185,14 +182,12 @@ test()
                          true);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() != 0, ExcInternalError());
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-           dh.begin_active();
+    for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
          cell != dh.end();
          ++cell)
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         deallog << cell->vertex(i) << ' '
-                << v(cell->vertex_dof_index(i, 0, cell->active_fe_index()))
-                << std::endl;
+                << v(cell->vertex_dof_index(i, 0, cell->active_fe_index())) << std::endl;
   }
 }
 

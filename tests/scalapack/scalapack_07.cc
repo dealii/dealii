@@ -36,10 +36,8 @@ void
 test(const unsigned int block_size_i, const unsigned int block_size_j)
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
@@ -57,35 +55,32 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
       mpi_communicator, size, size, block_size_i, block_size_i);
   // create 1d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid_1d =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, n_mpi_processes, 1);
+    std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator, n_mpi_processes, 1);
   // create process grid containing one process
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid_single =
     std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator, 1, 1);
 
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_2d(
-    size, size, grid_2d, block_size_i, block_size_i);
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_1d(
-    size, size, grid_1d, block_size_j, block_size_j);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_2d(size, size, grid_2d, block_size_i, block_size_i);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_1d(size, size, grid_1d, block_size_j, block_size_j);
   ScaLAPACKMatrix<NumberType> scalapack_matrix_single(
     size, size, grid_single, block_size_i, block_size_j);
   ScaLAPACKMatrix<NumberType> scalapack_matrix_source(
     size, size, grid_single, block_size_j, block_size_i);
 
-  pcout << "2D grid matrix: dim=" << scalapack_matrix_2d.m() << "x"
-        << scalapack_matrix_2d.n() << ";  blocks=" << block_size_i << "x"
-        << block_size_i << ";  grid=" << grid_2d->get_process_grid_rows() << "x"
+  pcout << "2D grid matrix: dim=" << scalapack_matrix_2d.m() << "x" << scalapack_matrix_2d.n()
+        << ";  blocks=" << block_size_i << "x" << block_size_i
+        << ";  grid=" << grid_2d->get_process_grid_rows() << "x"
         << grid_2d->get_process_grid_columns() << std::endl;
 
-  pcout << "1D grid matrix: " << scalapack_matrix_1d.m() << "x"
-        << scalapack_matrix_1d.n() << ";  blocks=" << block_size_j << "x"
-        << block_size_j << ";  grid=" << grid_1d->get_process_grid_rows() << "x"
+  pcout << "1D grid matrix: " << scalapack_matrix_1d.m() << "x" << scalapack_matrix_1d.n()
+        << ";  blocks=" << block_size_j << "x" << block_size_j
+        << ";  grid=" << grid_1d->get_process_grid_rows() << "x"
         << grid_1d->get_process_grid_columns() << std::endl;
 
   pcout << "single process matrix: " << scalapack_matrix_single.m() << "x"
-        << scalapack_matrix_single.n() << ";  blocks=" << block_size_i << "x"
-        << block_size_j << ";  grid=" << grid_single->get_process_grid_rows()
-        << "x" << grid_single->get_process_grid_columns() << std::endl
+        << scalapack_matrix_single.n() << ";  blocks=" << block_size_i << "x" << block_size_j
+        << ";  grid=" << grid_single->get_process_grid_rows() << "x"
+        << grid_single->get_process_grid_columns() << std::endl
         << std::endl;
 
   scalapack_matrix_source = full;
@@ -112,8 +107,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   const std::vector<unsigned int> blocks_i = {{16, 32, 64}};
   const std::vector<unsigned int> blocks_j = {{16, 32, 64}};

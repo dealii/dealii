@@ -57,9 +57,7 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  F(const unsigned int q, const unsigned int n_components) :
-    Function<dim>(n_components),
-    q(q)
+  F(const unsigned int q, const unsigned int n_components) : Function<dim>(n_components), q(q)
   {}
 
   virtual double
@@ -127,29 +125,24 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
       double     field_l2_norm = 0.;
       {
         QGauss<dim> quadrature_formula(p + 2);
-        CellDataStorage<typename parallel::distributed::
-                          Triangulation<dim, dim>::cell_iterator,
+        CellDataStorage<typename parallel::distributed::Triangulation<dim, dim>::cell_iterator,
                         QData>
           qp_manager;
         {
-          FEValues<dim> fe_values(
-            fe, quadrature_formula, update_quadrature_points);
+          FEValues<dim> fe_values(fe, quadrature_formula, update_quadrature_points);
 
           const unsigned int n_q_points = quadrature_formula.size();
 
-          typename DoFHandler<dim>::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
+          typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                         endc = dof_handler.end();
           for (; cell != endc; ++cell)
             if (cell->is_locally_owned())
               {
                 fe_values.reinit(cell);
                 qp_manager.initialize(cell, quadrature_formula.size());
-                std::vector<std::shared_ptr<QData>> qpd =
-                  qp_manager.get_data(cell);
+                std::vector<std::shared_ptr<QData>> qpd = qp_manager.get_data(cell);
                 for (unsigned int q = 0; q < n_q_points; ++q)
-                  qpd[q]->density =
-                    function.value(fe_values.quadrature_point(q));
+                  qpd[q]->density = function.value(fe_values.quadrature_point(q));
               }
         }
 
@@ -160,14 +153,11 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
           constraints,
           quadrature_formula,
           [=](const typename DoFHandler<dim>::active_cell_iterator &cell,
-              const unsigned int q) -> double {
-            return qp_manager.get_data(cell)[q]->density;
-          },
+              const unsigned int q) -> double { return qp_manager.get_data(cell)[q]->density; },
           field);
 
-        field_relevant.reinit(dof_handler.locally_owned_dofs(),
-                              locally_relevant_dofs,
-                              MPI_COMM_WORLD);
+        field_relevant.reinit(
+          dof_handler.locally_owned_dofs(), locally_relevant_dofs, MPI_COMM_WORLD);
         field_relevant = field;
 
         field_l2_norm = field.l2_norm();
@@ -179,15 +169,13 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
         QGauss<dim>   quadrature_formula_error(std::max(p, q) + 1);
         FEValues<dim> fe_values(fe,
                                 quadrature_formula_error,
-                                update_values | update_quadrature_points |
-                                  update_JxW_values);
+                                update_values | update_quadrature_points | update_JxW_values);
 
         const unsigned int  dofs_per_cell = fe.dofs_per_cell;
         const unsigned int  n_q_points    = quadrature_formula_error.size();
         std::vector<double> values(n_q_points);
 
-        typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
+        typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                        endc = dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->is_locally_owned())
@@ -197,9 +185,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 L2_norm +=
-                  Utilities::fixed_power<2>(
-                    values[q_point] -
-                    function.value(fe_values.quadrature_point(q_point))) *
+                  Utilities::fixed_power<2>(values[q_point] -
+                                            function.value(fe_values.quadrature_point(q_point))) *
                   fe_values.JxW(q_point);
             }
       }
@@ -207,13 +194,13 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
       L2_norm = Utilities::MPI::sum(L2_norm, MPI_COMM_WORLD);
       L2_norm = std::sqrt(L2_norm);
 
-      deallog << fe.get_name() << ", P_" << q
-              << ", rel. error=" << L2_norm / field_l2_norm << std::endl;
+      deallog << fe.get_name() << ", P_" << q << ", rel. error=" << L2_norm / field_l2_norm
+              << std::endl;
 
       if (q <= p)
         if (L2_norm > 1e-10 * field_l2_norm)
-          deallog << "Projection failed with relative error "
-                  << L2_norm / field_l2_norm << std::endl;
+          deallog << "Projection failed with relative error " << L2_norm / field_l2_norm
+                  << std::endl;
     }
 }
 

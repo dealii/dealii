@@ -33,16 +33,13 @@
 
 template <int dim>
 void
-check_function_consistency(const Function<dim> &f,
-                           const Function<dim> &gradf,
-                           unsigned int         sub)
+check_function_consistency(const Function<dim> &f, const Function<dim> &gradf, unsigned int sub)
 {
   QMidpoint<1>   mid;
   QIterated<dim> quadrature(mid, sub);
 
   std::vector<Tensor<1, dim>>              fg1(quadrature.size());
-  std::vector<std::vector<Tensor<1, dim>>> fg2(quadrature.size(),
-                                               std::vector<Tensor<1, dim>>(1));
+  std::vector<std::vector<Tensor<1, dim>>> fg2(quadrature.size(), std::vector<Tensor<1, dim>>(1));
 
   std::vector<double>         g1(quadrature.size());
   std::vector<Vector<double>> g2(quadrature.size(), Vector<double>(dim));
@@ -124,10 +121,8 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
           ++vertex_number;
         }
 
-  std::vector<Vector<double>>      values(points.size(),
-                                          Vector<double>(f.n_components));
-  std::vector<std::vector<double>> values2(f.n_components,
-                                           std::vector<double>(points.size()));
+  std::vector<Vector<double>>      values(points.size(), Vector<double>(f.n_components));
+  std::vector<std::vector<double>> values2(f.n_components, std::vector<double>(points.size()));
   f.vector_value_list(points, values);
   f.vector_values(points, values2);
   for (unsigned int i = 0; i < values.size(); ++i)
@@ -148,12 +143,12 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
 
   deallog << "Gradients ";
   // Compute gradients and difference approximations
-  std::vector<std::vector<Tensor<1, dim>>> gradients(
-    f.n_components, std::vector<Tensor<1, dim>>(points.size()));
-  std::vector<std::vector<Tensor<1, dim>>> gradients1(
-    points.size(), std::vector<Tensor<1, dim>>(f.n_components));
-  std::vector<std::vector<Tensor<1, dim>>> gradients2(
-    points.size(), std::vector<Tensor<1, dim>>(f.n_components));
+  std::vector<std::vector<Tensor<1, dim>>> gradients(f.n_components,
+                                                     std::vector<Tensor<1, dim>>(points.size()));
+  std::vector<std::vector<Tensor<1, dim>>> gradients1(points.size(),
+                                                      std::vector<Tensor<1, dim>>(f.n_components));
+  std::vector<std::vector<Tensor<1, dim>>> gradients2(points.size(),
+                                                      std::vector<Tensor<1, dim>>(f.n_components));
 
   f.vector_gradients(points, gradients);
   dtest1.vector_gradient_list(points, gradients1);
@@ -179,15 +174,13 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
             // bit generous
             if (d2.norm() < 12. * d1.norm())
               {
-                deallog << "Gradient error: point " << i << " (" << points[i]
-                        << " )"
+                deallog << "Gradient error: point " << i << " (" << points[i] << " )"
                         << " comp "
                         << k
                         //      << " norms " << d1.norm() << " " << d2.norm()
                         << std::endl;
                 for (unsigned int d = 0; d < dim; ++d)
-                  deallog << " " << gradients[k][i][d] << " "
-                          << gradients1[i][k][d] << std::endl;
+                  deallog << " " << gradients[k][i][d] << " " << gradients1[i][k][d] << std::endl;
               }
           }
       }

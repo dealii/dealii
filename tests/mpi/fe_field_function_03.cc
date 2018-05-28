@@ -83,8 +83,7 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-                                             MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   VectorTools::interpolate(dofh, LinearFunction<dim>(), interpolated);
 
   IndexSet relevant_set;
@@ -92,9 +91,8 @@ test()
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = interpolated;
 
-  typename Functions::
-    FEFieldFunction<dim, DoFHandler<dim>, TrilinosWrappers::MPI::Vector>
-      field_func(dofh, x_rel);
+  typename Functions::FEFieldFunction<dim, DoFHandler<dim>, TrilinosWrappers::MPI::Vector>
+    field_func(dofh, x_rel);
 
   Point<2>              p(0.1, 0.0);
   std::vector<Point<2>> points;
@@ -199,8 +197,7 @@ test()
         }
       catch (...)
         {
-          deallog << "  Oh no! Some other error that we shouldn't get."
-                  << std::endl;
+          deallog << "  Oh no! Some other error that we shouldn't get." << std::endl;
         }
     }
 

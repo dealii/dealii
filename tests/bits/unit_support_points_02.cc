@@ -40,8 +40,7 @@ void
 check2(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  const std::vector<Point<dim - 1>> unit_f_s_p =
-    fe.get_unit_face_support_points();
+  const std::vector<Point<dim - 1>> unit_f_s_p = fe.get_unit_face_support_points();
   for (unsigned int i = 0; i < unit_f_s_p.size(); ++i)
     deallog << i << ' ' << unit_f_s_p[i] << std::endl;
 }

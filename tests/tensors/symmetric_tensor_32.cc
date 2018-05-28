@@ -37,8 +37,7 @@ check()
     {
       t.access_raw_entry(i)  = 1.0 * (i + 1);
       ti.access_raw_entry(i) = std::complex<double>(0, 1.0 * (i + 1));
-      tc.access_raw_entry(i) =
-        std::complex<double>(1.0 * (i + 1), 1.0 * (i + 1));
+      tc.access_raw_entry(i) = std::complex<double>(1.0 * (i + 1), 1.0 * (i + 1));
     }
 
   deallog << t.norm() << ' ' << ti.norm() << ' ' << tc.norm() << std::endl;

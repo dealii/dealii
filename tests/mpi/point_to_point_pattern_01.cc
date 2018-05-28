@@ -29,7 +29,7 @@ test_mpi()
 {
   Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
-  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int       myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   // select a few destinations
@@ -72,8 +72,7 @@ test_mpi()
     deallog << "Exchanging data..." << std::endl;
 
   std::vector<unsigned int> origins =
-    Utilities::MPI::compute_point_to_point_communication_pattern(MPI_COMM_WORLD,
-                                                                 destinations);
+    Utilities::MPI::compute_point_to_point_communication_pattern(MPI_COMM_WORLD, destinations);
 
   if (myid == 0)
     {
@@ -109,8 +108,7 @@ test_mpi()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {

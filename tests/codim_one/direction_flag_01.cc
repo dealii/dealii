@@ -37,26 +37,22 @@ test()
   Triangulation<spacedim>      volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
   GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
-  for (Triangulation<dim, spacedim>::active_cell_iterator cell =
-         boundary_mesh.begin_active();
+  for (Triangulation<dim, spacedim>::active_cell_iterator cell = boundary_mesh.begin_active();
        cell != boundary_mesh.end();
        ++cell)
     {
       deallog << "Cell=" << cell;
-      deallog << ", direction flag="
-              << (cell->direction_flag() ? "true" : "false") << std::endl;
+      deallog << ", direction flag=" << (cell->direction_flag() ? "true" : "false") << std::endl;
     }
 
   boundary_mesh.refine_global(1);
 
-  for (Triangulation<dim, spacedim>::active_cell_iterator cell =
-         boundary_mesh.begin_active();
+  for (Triangulation<dim, spacedim>::active_cell_iterator cell = boundary_mesh.begin_active();
        cell != boundary_mesh.end();
        ++cell)
     {
       deallog << "Cell=" << cell << std::endl;
-      deallog << ", direction flag="
-              << (cell->direction_flag() ? "true" : "false") << std::endl;
+      deallog << ", direction flag=" << (cell->direction_flag() ? "true" : "false") << std::endl;
     }
 }
 

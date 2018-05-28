@@ -36,8 +36,8 @@ sub_test(const DoFHandler<dim> &  dof,
          MatrixFree<dim, number> &mf_data,
          Vector<number> &         solution)
 {
-  deallog << "Test with fe_degree " << fe_degree
-          << ", n_q_points_1d: " << (n_q_points_1d) << std::endl;
+  deallog << "Test with fe_degree " << fe_degree << ", n_q_points_1d: " << (n_q_points_1d)
+          << std::endl;
   const QGauss<1>                                  quad(n_q_points_1d);
   MappingQ<dim>                                    mapping(2);
   typename MatrixFree<dim, number>::AdditionalData data;
@@ -58,8 +58,7 @@ test()
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
@@ -106,13 +105,9 @@ test()
 
   MatrixFree<dim, number> mf_data;
   if (fe_degree > 1)
-    sub_test<dim, fe_degree, fe_degree - 1, number>(
-      dof, constraints, mf_data, solution);
-  sub_test<dim, fe_degree, fe_degree, number>(
-    dof, constraints, mf_data, solution);
-  sub_test<dim, fe_degree, fe_degree + 2, number>(
-    dof, constraints, mf_data, solution);
+    sub_test<dim, fe_degree, fe_degree - 1, number>(dof, constraints, mf_data, solution);
+  sub_test<dim, fe_degree, fe_degree, number>(dof, constraints, mf_data, solution);
+  sub_test<dim, fe_degree, fe_degree + 2, number>(dof, constraints, mf_data, solution);
   if (dim == 2)
-    sub_test<dim, fe_degree, fe_degree + 3, number>(
-      dof, constraints, mf_data, solution);
+    sub_test<dim, fe_degree, fe_degree + 3, number>(dof, constraints, mf_data, solution);
 }

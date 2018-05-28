@@ -236,8 +236,7 @@ namespace IteratorFilters
      * Constructor. Store the material id which iterators shall have to be
      * evaluated to true and state if the iterator must be locally owned.
      */
-    MaterialIdEqualTo(const types::material_id material_id,
-                      const bool               only_locally_owned = false);
+    MaterialIdEqualTo(const types::material_id material_id, const bool only_locally_owned = false);
 
     /**
      * Constructor. Store a collection of material ids which iterators shall
@@ -245,7 +244,7 @@ namespace IteratorFilters
      * owned.
      */
     MaterialIdEqualTo(const std::set<types::material_id> &material_ids,
-                      const bool only_locally_owned = false);
+                      const bool                          only_locally_owned = false);
 
     /**
      * Evaluation operator. Returns true if the material id of the object
@@ -283,8 +282,7 @@ namespace IteratorFilters
      * Constructor. Store the active FE index which iterators shall have to be
      * evaluated to true and state if the iterator must be locally owned.
      */
-    ActiveFEIndexEqualTo(const unsigned int active_fe_index,
-                         const bool         only_locally_owned = false);
+    ActiveFEIndexEqualTo(const unsigned int active_fe_index, const bool only_locally_owned = false);
 
     /**
      * Constructor. Store a collection of active FE indices which iterators
@@ -292,7 +290,7 @@ namespace IteratorFilters
      * locally owned.
      */
     ActiveFEIndexEqualTo(const std::set<unsigned int> &active_fe_indices,
-                         const bool only_locally_owned = false);
+                         const bool                    only_locally_owned = false);
 
     /**
      * Evaluation operator. Returns true if the active FE index of the object
@@ -690,12 +688,10 @@ public:
   /**
    * Exception.
    */
-  DeclException1(
-    ExcInvalidElement,
-    BaseIterator,
-    << "The element " << arg1
-    << " with which you want to compare or which you want to"
-    << " assign from is invalid since it does not satisfy the predicate.");
+  DeclException1(ExcInvalidElement,
+                 BaseIterator,
+                 << "The element " << arg1 << " with which you want to compare or which you want to"
+                 << " assign from is invalid since it does not satisfy the predicate.");
 
 private:
   /**
@@ -819,8 +815,7 @@ namespace internal
     struct NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>
     {
       typedef ::dealii::FilteredIterator<
-        typename NestFilteredIterators<BaseIterator,
-                                       std::tuple<Targs...>>::type>
+        typename NestFilteredIterators<BaseIterator, std::tuple<Targs...>>::type>
         type;
     };
   } // namespace FilteredIteratorImplementation
@@ -907,12 +902,9 @@ filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate, typename... Targs>
-IteratorRange<
-  typename internal::FilteredIteratorImplementation::
-    NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>::type>
-filter_iterators(IteratorRange<BaseIterator> i,
-                 const Predicate &           p,
-                 const Targs... args)
+IteratorRange<typename internal::FilteredIteratorImplementation::
+                NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>::type>
+filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p, const Targs... args)
 {
   // Recursively create filtered iterators, one predicate at a time
   auto fi = filter_iterators(i, p);
@@ -933,9 +925,7 @@ inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate p) :
 
 template <typename BaseIterator>
 template <typename Predicate>
-inline FilteredIterator<BaseIterator>::FilteredIterator(
-  Predicate           p,
-  const BaseIterator &bi) :
+inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate p, const BaseIterator &bi) :
   BaseIterator(bi),
   predicate(new PredicateTemplate<Predicate>(p))
 {
@@ -946,8 +936,7 @@ inline FilteredIterator<BaseIterator>::FilteredIterator(
 
 
 template <typename BaseIterator>
-inline FilteredIterator<BaseIterator>::FilteredIterator(
-  const FilteredIterator &fi) :
+inline FilteredIterator<BaseIterator>::FilteredIterator(const FilteredIterator &fi) :
   // this construction looks strange, but without going through the
   // address of fi, GCC would not cast fi to the base class of type
   // BaseIterator but tries to go through constructing a new
@@ -985,8 +974,7 @@ template <typename BaseIterator>
 inline FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::operator=(const BaseIterator &bi)
 {
-  Assert((bi.state() != IteratorState::valid) || (*predicate)(bi),
-         ExcInvalidElement(bi));
+  Assert((bi.state() != IteratorState::valid) || (*predicate)(bi), ExcInvalidElement(bi));
   BaseIterator::operator=(bi);
   return *this;
 }
@@ -1023,8 +1011,7 @@ template <typename BaseIterator>
 inline bool
 FilteredIterator<BaseIterator>::operator==(const FilteredIterator &fi) const
 {
-  return (static_cast<const BaseIterator &>(*this) ==
-          static_cast<const BaseIterator &>(fi));
+  return (static_cast<const BaseIterator &>(*this) == static_cast<const BaseIterator &>(fi));
 }
 
 
@@ -1033,8 +1020,7 @@ template <typename BaseIterator>
 inline bool
 FilteredIterator<BaseIterator>::operator!=(const FilteredIterator &fi) const
 {
-  return (static_cast<const BaseIterator &>(*this) !=
-          static_cast<const BaseIterator &>(fi));
+  return (static_cast<const BaseIterator &>(*this) != static_cast<const BaseIterator &>(fi));
 }
 
 
@@ -1043,8 +1029,7 @@ template <typename BaseIterator>
 inline bool
 FilteredIterator<BaseIterator>::operator<(const FilteredIterator &fi) const
 {
-  return (static_cast<const BaseIterator &>(*this) <
-          static_cast<const BaseIterator &>(fi));
+  return (static_cast<const BaseIterator &>(*this) < static_cast<const BaseIterator &>(fi));
 }
 
 
@@ -1133,8 +1118,8 @@ FilteredIterator<BaseIterator>::operator--(int)
 
 template <typename BaseIterator>
 template <typename Predicate>
-inline FilteredIterator<BaseIterator>::PredicateTemplate<
-  Predicate>::PredicateTemplate(const Predicate &predicate) :
+inline FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::PredicateTemplate(
+  const Predicate &predicate) :
   predicate(predicate)
 {}
 
@@ -1209,8 +1194,7 @@ namespace IteratorFilters
 
 
   // ---------------- IteratorFilters::SubdomainEqualTo ---------
-  inline SubdomainEqualTo::SubdomainEqualTo(
-    const types::subdomain_id subdomain_id) :
+  inline SubdomainEqualTo::SubdomainEqualTo(const types::subdomain_id subdomain_id) :
     subdomain_id(subdomain_id)
   {}
 
@@ -1247,18 +1231,16 @@ namespace IteratorFilters
 
 
   // ---------------- IteratorFilters::MaterialIdEqualTo ---------
-  inline MaterialIdEqualTo::MaterialIdEqualTo(
-    const types::material_id material_id,
-    const bool               only_locally_owned) :
+  inline MaterialIdEqualTo::MaterialIdEqualTo(const types::material_id material_id,
+                                              const bool               only_locally_owned) :
     material_ids{material_id},
     only_locally_owned(only_locally_owned)
   {}
 
 
 
-  inline MaterialIdEqualTo::MaterialIdEqualTo(
-    const std::set<types::material_id> &material_ids,
-    const bool                          only_locally_owned) :
+  inline MaterialIdEqualTo::MaterialIdEqualTo(const std::set<types::material_id> &material_ids,
+                                              const bool only_locally_owned) :
     material_ids(material_ids),
     only_locally_owned(only_locally_owned)
   {}
@@ -1270,26 +1252,23 @@ namespace IteratorFilters
   MaterialIdEqualTo::operator()(const Iterator &i) const
   {
     return only_locally_owned == true ?
-             (material_ids.find(i->material_id()) != material_ids.end() &&
-              i->is_locally_owned()) :
+             (material_ids.find(i->material_id()) != material_ids.end() && i->is_locally_owned()) :
              material_ids.find(i->material_id()) != material_ids.end();
   }
 
 
 
   // ---------------- IteratorFilters::ActiveFEIndexEqualTo ---------
-  inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(
-    const unsigned int active_fe_index,
-    const bool         only_locally_owned) :
+  inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(const unsigned int active_fe_index,
+                                                    const bool         only_locally_owned) :
     active_fe_indices{active_fe_index},
     only_locally_owned(only_locally_owned)
   {}
 
 
 
-  inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(
-    const std::set<unsigned int> &active_fe_indices,
-    const bool                    only_locally_owned) :
+  inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(const std::set<unsigned int> &active_fe_indices,
+                                                    const bool only_locally_owned) :
     active_fe_indices(active_fe_indices),
     only_locally_owned(only_locally_owned)
   {}
@@ -1301,11 +1280,9 @@ namespace IteratorFilters
   ActiveFEIndexEqualTo::operator()(const Iterator &i) const
   {
     return only_locally_owned == true ?
-             (active_fe_indices.find(i->active_fe_index()) !=
-                active_fe_indices.end() &&
+             (active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end() &&
               i->is_locally_owned()) :
-             active_fe_indices.find(i->active_fe_index()) !=
-               active_fe_indices.end();
+             active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end();
   }
 
 

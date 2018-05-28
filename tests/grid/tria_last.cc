@@ -41,16 +41,15 @@ test()
   tria.refine_global(3);
   for (unsigned int i = 0; i < 2; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             tria.begin_active(2);
+      for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(2);
            cell != tria.end();
            ++cell)
         cell->set_coarsen_flag();
       tria.execute_coarsening_and_refinement();
     }
 
-  deallog << tria.n_levels() << ' ' << tria.n_global_levels() << ' '
-          << tria.last() << ' ' << tria.last_active() << std::endl;
+  deallog << tria.n_levels() << ' ' << tria.n_global_levels() << ' ' << tria.last() << ' '
+          << tria.last_active() << std::endl;
 }
 
 

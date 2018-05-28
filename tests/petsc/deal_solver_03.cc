@@ -68,8 +68,7 @@ main(int argc, char **argv)
     SolverGMRES<PETScWrappers::MPI::Vector>         solver(control, mem);
     PreconditionIdentity                            preconditioner;
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
-    check_solver_within_range(
-      solver.solve(A, u, f, preconditioner), control.last_step(), 74, 76);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner), control.last_step(), 74, 76);
   }
   GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
 }

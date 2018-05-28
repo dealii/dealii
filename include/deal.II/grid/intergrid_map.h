@@ -207,8 +207,7 @@ private:
    * on the @p dst_grid.
    */
   void
-  set_entries_to_cell(const cell_iterator &src_cell,
-                      const cell_iterator &dst_cell);
+  set_entries_to_cell(const cell_iterator &src_cell, const cell_iterator &dst_cell);
 };
 
 

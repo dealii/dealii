@@ -43,8 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 template <int dim, int spacedim = dim>
-class FE_TraceQ
-  : public FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>
+class FE_TraceQ : public FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>
 {
 public:
   /**
@@ -82,8 +81,7 @@ public:
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, it
@@ -109,7 +107,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -122,7 +120,7 @@ public:
   virtual void
   get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                    const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+                                   FullMatrix<double> &                matrix) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -134,8 +132,7 @@ public:
    * @ref hp_paper "hp paper".
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  compare_for_face_domination(const FiniteElement<dim, spacedim> &fe_other) const override;
 
 private:
   /**

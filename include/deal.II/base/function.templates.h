@@ -58,8 +58,7 @@ Function<dim, RangeNumberType>::operator=(const Function &f)
 
 template <int dim, typename RangeNumberType>
 RangeNumberType
-Function<dim, RangeNumberType>::value(const Point<dim> &,
-                                      const unsigned int) const
+Function<dim, RangeNumberType>::value(const Point<dim> &, const unsigned int) const
 {
   Assert(false, ExcPureFunctionCalled());
   return 0;
@@ -68,8 +67,7 @@ Function<dim, RangeNumberType>::value(const Point<dim> &,
 
 template <int dim, typename RangeNumberType>
 void
-Function<dim, RangeNumberType>::vector_value(const Point<dim> &       p,
-                                             Vector<RangeNumberType> &v) const
+Function<dim, RangeNumberType>::vector_value(const Point<dim> &p, Vector<RangeNumberType> &v) const
 {
   AssertDimension(v.size(), this->n_components);
   for (unsigned int i = 0; i < this->n_components; ++i)
@@ -79,15 +77,13 @@ Function<dim, RangeNumberType>::vector_value(const Point<dim> &       p,
 
 template <int dim, typename RangeNumberType>
 void
-Function<dim, RangeNumberType>::value_list(
-  const std::vector<Point<dim>> &points,
-  std::vector<RangeNumberType> & values,
-  const unsigned int             component) const
+Function<dim, RangeNumberType>::value_list(const std::vector<Point<dim>> &points,
+                                           std::vector<RangeNumberType> & values,
+                                           const unsigned int             component) const
 {
   // check whether component is in the valid range is up to the derived
   // class
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     values[i] = this->value(points[i], component);
@@ -102,8 +98,7 @@ Function<dim, RangeNumberType>::vector_value_list(
 {
   // check whether component is in the valid range is up to the derived
   // class
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     this->vector_value(points[i], values[i]);
@@ -125,8 +120,7 @@ Function<dim, RangeNumberType>::vector_values(
 
 template <int dim, typename RangeNumberType>
 Tensor<1, dim, RangeNumberType>
-Function<dim, RangeNumberType>::gradient(const Point<dim> &,
-                                         const unsigned int) const
+Function<dim, RangeNumberType>::gradient(const Point<dim> &, const unsigned int) const
 {
   Assert(false, ExcPureFunctionCalled());
   return Tensor<1, dim, RangeNumberType>();
@@ -152,8 +146,7 @@ Function<dim, RangeNumberType>::gradient_list(
   std::vector<Tensor<1, dim, RangeNumberType>> &gradients,
   const unsigned int                            component) const
 {
-  Assert(gradients.size() == points.size(),
-         ExcDimensionMismatch(gradients.size(), points.size()));
+  Assert(gradients.size() == points.size(), ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     gradients[i] = gradient(points[i], component);
@@ -166,8 +159,7 @@ Function<dim, RangeNumberType>::vector_gradient_list(
   const std::vector<Point<dim>> &                            points,
   std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const
 {
-  Assert(gradients.size() == points.size(),
-         ExcDimensionMismatch(gradients.size(), points.size()));
+  Assert(gradients.size() == points.size(), ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     {
@@ -194,8 +186,7 @@ Function<dim, RangeNumberType>::vector_gradients(
 
 template <int dim, typename RangeNumberType>
 RangeNumberType
-Function<dim, RangeNumberType>::laplacian(const Point<dim> &,
-                                          const unsigned int) const
+Function<dim, RangeNumberType>::laplacian(const Point<dim> &, const unsigned int) const
 {
   Assert(false, ExcPureFunctionCalled());
   return 0;
@@ -204,9 +195,8 @@ Function<dim, RangeNumberType>::laplacian(const Point<dim> &,
 
 template <int dim, typename RangeNumberType>
 void
-Function<dim, RangeNumberType>::vector_laplacian(
-  const Point<dim> &,
-  Vector<RangeNumberType> &) const
+Function<dim, RangeNumberType>::vector_laplacian(const Point<dim> &,
+                                                 Vector<RangeNumberType> &) const
 {
   Assert(false, ExcPureFunctionCalled());
 }
@@ -215,10 +205,9 @@ Function<dim, RangeNumberType>::vector_laplacian(
 
 template <int dim, typename RangeNumberType>
 void
-Function<dim, RangeNumberType>::laplacian_list(
-  const std::vector<Point<dim>> &points,
-  std::vector<RangeNumberType> & laplacians,
-  const unsigned int             component) const
+Function<dim, RangeNumberType>::laplacian_list(const std::vector<Point<dim>> &points,
+                                               std::vector<RangeNumberType> & laplacians,
+                                               const unsigned int             component) const
 {
   // check whether component is in the valid range is up to the derived
   // class
@@ -248,8 +237,7 @@ Function<dim, RangeNumberType>::vector_laplacian_list(
 
 template <int dim, typename RangeNumberType>
 SymmetricTensor<2, dim, RangeNumberType>
-Function<dim, RangeNumberType>::hessian(const Point<dim> &,
-                                        const unsigned int) const
+Function<dim, RangeNumberType>::hessian(const Point<dim> &, const unsigned int) const
 {
   Assert(false, ExcPureFunctionCalled());
   return SymmetricTensor<2, dim, RangeNumberType>();
@@ -275,8 +263,7 @@ Function<dim, RangeNumberType>::hessian_list(
   std::vector<SymmetricTensor<2, dim, RangeNumberType>> &hessians,
   const unsigned int                                     component) const
 {
-  Assert(hessians.size() == points.size(),
-         ExcDimensionMismatch(hessians.size(), points.size()));
+  Assert(hessians.size() == points.size(), ExcDimensionMismatch(hessians.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     hessians[i] = hessian(points[i], component);
@@ -287,11 +274,9 @@ template <int dim, typename RangeNumberType>
 void
 Function<dim, RangeNumberType>::vector_hessian_list(
   const std::vector<Point<dim>> &                                     points,
-  std::vector<std::vector<SymmetricTensor<2, dim, RangeNumberType>>> &hessians)
-  const
+  std::vector<std::vector<SymmetricTensor<2, dim, RangeNumberType>>> &hessians) const
 {
-  Assert(hessians.size() == points.size(),
-         ExcDimensionMismatch(hessians.size(), points.size()));
+  Assert(hessians.size() == points.size(), ExcDimensionMismatch(hessians.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     {
@@ -318,8 +303,7 @@ Function<dim, RangeNumberType>::memory_consumption() const
 namespace Functions
 {
   template <int dim, typename RangeNumberType>
-  ZeroFunction<dim, RangeNumberType>::ZeroFunction(
-    const unsigned int n_components) :
+  ZeroFunction<dim, RangeNumberType>::ZeroFunction(const unsigned int n_components) :
     ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
   {}
 
@@ -330,9 +314,8 @@ namespace Functions
 namespace Functions
 {
   template <int dim, typename RangeNumberType>
-  ConstantFunction<dim, RangeNumberType>::ConstantFunction(
-    const RangeNumberType value,
-    const unsigned int    n_components) :
+  ConstantFunction<dim, RangeNumberType>::ConstantFunction(const RangeNumberType value,
+                                                           const unsigned int    n_components) :
     Function<dim, RangeNumberType>(n_components),
     function_value_vector(n_components, value)
   {}
@@ -346,8 +329,7 @@ namespace Functions
 
 
   template <int dim, typename RangeNumberType>
-  ConstantFunction<dim, RangeNumberType>::ConstantFunction(
-    const Vector<RangeNumberType> &values) :
+  ConstantFunction<dim, RangeNumberType>::ConstantFunction(const Vector<RangeNumberType> &values) :
     Function<dim, RangeNumberType>(values.size()),
     function_value_vector(values.size())
   {
@@ -358,27 +340,23 @@ namespace Functions
 
 
   template <int dim, typename RangeNumberType>
-  ConstantFunction<dim, RangeNumberType>::ConstantFunction(
-    const RangeNumberType *begin_ptr,
-    const unsigned int     n_components) :
+  ConstantFunction<dim, RangeNumberType>::ConstantFunction(const RangeNumberType *begin_ptr,
+                                                           const unsigned int     n_components) :
     Function<dim, RangeNumberType>(n_components),
     function_value_vector(n_components)
   {
     Assert(begin_ptr != nullptr, ExcMessage("Null pointer encountered!"));
-    std::copy(
-      begin_ptr, begin_ptr + n_components, function_value_vector.begin());
+    std::copy(begin_ptr, begin_ptr + n_components, function_value_vector.begin());
   }
 
 
 
   template <int dim, typename RangeNumberType>
   RangeNumberType
-  ConstantFunction<dim, RangeNumberType>::value(
-    const Point<dim> &,
-    const unsigned int component) const
+  ConstantFunction<dim, RangeNumberType>::value(const Point<dim> &,
+                                                const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    Assert(component < this->n_components, ExcIndexRange(component, 0, this->n_components));
     return function_value_vector[component];
   }
 
@@ -386,37 +364,30 @@ namespace Functions
 
   template <int dim, typename RangeNumberType>
   void
-  ConstantFunction<dim, RangeNumberType>::vector_value(
-    const Point<dim> &,
-    Vector<RangeNumberType> &return_value) const
+  ConstantFunction<dim, RangeNumberType>::vector_value(const Point<dim> &,
+                                                       Vector<RangeNumberType> &return_value) const
   {
     Assert(return_value.size() == this->n_components,
            ExcDimensionMismatch(return_value.size(), this->n_components));
 
-    std::copy(function_value_vector.begin(),
-              function_value_vector.end(),
-              return_value.begin());
+    std::copy(function_value_vector.begin(), function_value_vector.end(), return_value.begin());
   }
 
 
 
   template <int dim, typename RangeNumberType>
   void
-  ConstantFunction<dim, RangeNumberType>::value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<RangeNumberType> & return_values,
-    const unsigned int             component) const
+  ConstantFunction<dim, RangeNumberType>::value_list(const std::vector<Point<dim>> &points,
+                                                     std::vector<RangeNumberType> & return_values,
+                                                     const unsigned int             component) const
   {
     // To avoid warning of unused parameter
     (void)points;
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    Assert(component < this->n_components, ExcIndexRange(component, 0, this->n_components));
     Assert(return_values.size() == points.size(),
            ExcDimensionMismatch(return_values.size(), points.size()))
 
-      std::fill(return_values.begin(),
-                return_values.end(),
-                function_value_vector[component]);
+      std::fill(return_values.begin(), return_values.end(), function_value_vector[component]);
   }
 
 
@@ -432,12 +403,10 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(
-          return_values[i].size() == this->n_components,
-          ExcDimensionMismatch(return_values[i].size(), this->n_components));
-        std::copy(function_value_vector.begin(),
-                  function_value_vector.end(),
-                  return_values[i].begin());
+        Assert(return_values[i].size() == this->n_components,
+               ExcDimensionMismatch(return_values[i].size(), this->n_components));
+        std::copy(
+          function_value_vector.begin(), function_value_vector.end(), return_values[i].begin());
       };
   }
 
@@ -455,8 +424,7 @@ namespace Functions
 
   template <int dim, typename RangeNumberType>
   Tensor<1, dim, RangeNumberType>
-  ConstantFunction<dim, RangeNumberType>::gradient(const Point<dim> &,
-                                                   const unsigned int) const
+  ConstantFunction<dim, RangeNumberType>::gradient(const Point<dim> &, const unsigned int) const
   {
     return Tensor<1, dim, RangeNumberType>();
   }
@@ -588,12 +556,10 @@ ComponentSelectFunction<dim, RangeNumberType>::vector_value_list(
   const std::vector<Point<dim>> &       points,
   std::vector<Vector<RangeNumberType>> &values) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  Assert(values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
-    ComponentSelectFunction<dim, RangeNumberType>::vector_value(points[i],
-                                                                values[i]);
+    ComponentSelectFunction<dim, RangeNumberType>::vector_value(points[i], values[i]);
 }
 
 
@@ -612,9 +578,8 @@ ComponentSelectFunction<dim, RangeNumberType>::memory_consumption() const
 //---------------------------------------------------------------------------
 
 template <int dim, typename RangeNumberType>
-ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
-  ScalarFunctionFromFunctionObject(
-    const std::function<RangeNumberType(const Point<dim> &)> &function_object) :
+ScalarFunctionFromFunctionObject<dim, RangeNumberType>::ScalarFunctionFromFunctionObject(
+  const std::function<RangeNumberType(const Point<dim> &)> &function_object) :
   Function<dim, RangeNumberType>(1),
   function_object(function_object)
 {}
@@ -623,13 +588,11 @@ ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
 
 template <int dim, typename RangeNumberType>
 RangeNumberType
-ScalarFunctionFromFunctionObject<dim, RangeNumberType>::value(
-  const Point<dim> & p,
-  const unsigned int component) const
+ScalarFunctionFromFunctionObject<dim, RangeNumberType>::value(const Point<dim> & p,
+                                                              const unsigned int component) const
 {
   (void)component;
-  Assert(component == 0,
-         ExcMessage("This object represents only scalar functions"));
+  Assert(component == 0, ExcMessage("This object represents only scalar functions"));
   return function_object(p);
 }
 
@@ -639,8 +602,8 @@ template <int dim, typename RangeNumberType>
 VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::
   VectorFunctionFromScalarFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object,
-    const unsigned int selected_component,
-    const unsigned int n_components) :
+    const unsigned int                                        selected_component,
+    const unsigned int                                        n_components) :
   Function<dim, RangeNumberType>(n_components),
   function_object(function_object),
   selected_component(selected_component)
@@ -657,8 +620,7 @@ VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::value(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  Assert(component < this->n_components, ExcIndexRange(component, 0, this->n_components));
 
   if (component == selected_component)
     return function_object(p);
@@ -689,11 +651,10 @@ VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::vector_value(
  * initiates the return vector to be size <tt>n_components</tt>.
  */
 template <int dim, typename RangeNumberType>
-VectorFunctionFromTensorFunction<dim, RangeNumberType>::
-  VectorFunctionFromTensorFunction(
-    const TensorFunction<1, dim, RangeNumberType> &tensor_function,
-    const unsigned int                             selected_component,
-    const unsigned int                             n_components) :
+VectorFunctionFromTensorFunction<dim, RangeNumberType>::VectorFunctionFromTensorFunction(
+  const TensorFunction<1, dim, RangeNumberType> &tensor_function,
+  const unsigned int                             selected_component,
+  const unsigned int                             n_components) :
   Function<dim, RangeNumberType>(n_components),
   tensor_function(tensor_function),
   selected_component(selected_component)
@@ -708,17 +669,14 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::
 
 template <int dim, typename RangeNumberType>
 inline RangeNumberType
-VectorFunctionFromTensorFunction<dim, RangeNumberType>::value(
-  const Point<dim> & p,
-  const unsigned int component) const
+VectorFunctionFromTensorFunction<dim, RangeNumberType>::value(const Point<dim> & p,
+                                                              const unsigned int component) const
 {
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  Assert(component < this->n_components, ExcIndexRange(component, 0, this->n_components));
 
   // if the requested component is out of the range selected, then we can
   // return early
-  if ((component < selected_component) ||
-      (component >= selected_component + dim))
+  if ((component < selected_component) || (component >= selected_component + dim))
     return 0;
 
   // otherwise retrieve the values from the <tt>tensor_function</tt> to be
@@ -775,8 +733,7 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value_list(
   const unsigned int n_points = points.size();
 
   for (unsigned int p = 0; p < n_points; ++p)
-    VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value(
-      points[p], value_list[p]);
+    VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value(points[p], value_list[p]);
 }
 
 

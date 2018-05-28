@@ -104,11 +104,8 @@ namespace pdd
     repetitions.push_back(10);
     repetitions.push_back(12);
 
-    GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                              repetitions,
-                                              Point<dim>(-1., -1.),
-                                              Point<dim>(1., 1.),
-                                              true);
+    GridGenerator::subdivided_hyper_rectangle(
+      triangulation, repetitions, Point<dim>(-1., -1.), Point<dim>(1., 1.), true);
     // triangulation.refine_global (1);
 
     // Print out the mesh
@@ -194,25 +191,21 @@ main(int argc, char *argv[])
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

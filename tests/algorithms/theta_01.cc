@@ -86,8 +86,7 @@ main()
   deallog << "Initial: " << value(0) << ' ' << value(1) << std::endl;
   solver.notify(Events::initial);
   solver(outdata, indata);
-  deallog << "Result: " << value(0) << ' ' << value(1) << " Norm "
-          << value.l2_norm() << std::endl;
+  deallog << "Result: " << value(0) << ' ' << value(1) << " Norm " << value.l2_norm() << std::endl;
 }
 
 

@@ -62,8 +62,7 @@ namespace LinearAlgebra
    * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
-  class Vector : public ReadWriteVector<Number>,
-                 public VectorSpaceVector<Number>
+  class Vector : public ReadWriteVector<Number>, public VectorSpaceVector<Number>
   {
   public:
     typedef types::global_dof_index                      size_type;
@@ -108,8 +107,7 @@ namespace LinearAlgebra
      * user must make sure to fill it with reasonable data before using it).
      */
     virtual void
-    reinit(const size_type size,
-           const bool      omit_zeroing_entries = false) override;
+    reinit(const size_type size, const bool omit_zeroing_entries = false) override;
 
     /**
      * Uses the same IndexSet as the one of the input vector @p in_vector and
@@ -121,8 +119,7 @@ namespace LinearAlgebra
      */
     template <typename Number2>
     void
-    reinit(const ReadWriteVector<Number2> &in_vector,
-           const bool                      omit_zeroing_entries = false);
+    reinit(const ReadWriteVector<Number2> &in_vector, const bool omit_zeroing_entries = false);
 
     /**
      * Initializes the vector. The indices are specified by @p
@@ -143,8 +140,7 @@ namespace LinearAlgebra
      * copied.
      */
     virtual void
-    reinit(const VectorSpaceVector<Number> &V,
-           const bool omit_zeroing_entries = false) override;
+    reinit(const VectorSpaceVector<Number> &V, const bool omit_zeroing_entries = false) override;
 
     /**
      * Copies the data of the input vector @p in_vector.
@@ -199,11 +195,10 @@ namespace LinearAlgebra
      * This function is not implemented and will throw an exception.
      */
     virtual void
-    import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>()) override;
+    import(const ReadWriteVector<Number> &                 V,
+           VectorOperation::values                         operation,
+           std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+             std::shared_ptr<const CommunicationPatternBase>()) override;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -232,9 +227,7 @@ namespace LinearAlgebra
      * s*(*this)+a*V</tt>.
      */
     virtual void
-    sadd(const Number                     s,
-         const Number                     a,
-         const VectorSpaceVector<Number> &V) override;
+    sadd(const Number s, const Number a, const VectorSpaceVector<Number> &V) override;
 
     /**
      * Scale each element of this vector by the corresponding element in the
@@ -396,8 +389,7 @@ namespace LinearAlgebra
   /*--------------------------- Inline functions ----------------------------*/
 
   template <typename Number>
-  inline Vector<Number>::Vector(const Vector<Number> &V) :
-    ReadWriteVector<Number>(V)
+  inline Vector<Number>::Vector(const Vector<Number> &V) : ReadWriteVector<Number>(V)
   {}
 
 
@@ -410,8 +402,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   template <typename InputIterator>
-  inline Vector<Number>::Vector(const InputIterator first,
-                                const InputIterator last)
+  inline Vector<Number>::Vector(const InputIterator first, const InputIterator last)
   {
     this->reinit(complete_index_set(std::distance(first, last)), true);
     std::copy(first, last, this->begin());

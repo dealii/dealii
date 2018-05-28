@@ -64,21 +64,18 @@ main()
 
   unsigned int n_intermediates = 16;
 
-  out << "set size ratio -1" << std::endl
-      << "plot '-' with vectors " << std::endl;
+  out << "set size ratio -1" << std::endl << "plot '-' with vectors " << std::endl;
 
   Point<2> center;
 
-  out << center << " " << sp[0] << std::endl
-      << center << " " << sp[1] << std::endl;
+  out << center << " " << sp[0] << std::endl << center << " " << sp[1] << std::endl;
 
   for (unsigned int i = 0; i < n_intermediates + 1; ++i)
     {
       w[0] = 1.0 - (double)i / ((double)n_intermediates);
       w[1] = 1.0 - w[0];
 
-      Point<spacedim> ip =
-        manifold.get_new_point(make_array_view(sp), make_array_view(w));
+      Point<spacedim>     ip = manifold.get_new_point(make_array_view(sp), make_array_view(w));
       Tensor<1, spacedim> t1 = manifold.get_tangent_vector(ip, sp[0]);
       Tensor<1, spacedim> t2 = manifold.get_tangent_vector(ip, sp[1]);
 

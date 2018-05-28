@@ -255,17 +255,15 @@ namespace MeshWorker
      * base element.
      */
     virtual void
-    fill(std::vector<std::vector<std::vector<Number>>> &values,
-         std::vector<std::vector<std::vector<Tensor<1, spacedim, Number>>>>
-           &gradients,
-         std::vector<std::vector<std::vector<Tensor<2, spacedim, Number>>>>
-           &                                         hessians,
-         const FEValuesBase<dim, spacedim> &         fe,
-         const std::vector<types::global_dof_index> &index,
-         const unsigned int                          component,
-         const unsigned int                          n_comp,
-         const unsigned int                          start,
-         const unsigned int                          size) const;
+    fill(std::vector<std::vector<std::vector<Number>>> &                     values,
+         std::vector<std::vector<std::vector<Tensor<1, spacedim, Number>>>> &gradients,
+         std::vector<std::vector<std::vector<Tensor<2, spacedim, Number>>>> &hessians,
+         const FEValuesBase<dim, spacedim> &                                 fe,
+         const std::vector<types::global_dof_index> &                        index,
+         const unsigned int                                                  component,
+         const unsigned int                                                  n_comp,
+         const unsigned int                                                  start,
+         const unsigned int                                                  size) const;
 
     /**
      * Fill the local data vector from level vectors. Performs exactly what
@@ -274,18 +272,16 @@ namespace MeshWorker
      * the active cells.
      */
     virtual void
-    mg_fill(std::vector<std::vector<std::vector<Number>>> &values,
-            std::vector<std::vector<std::vector<Tensor<1, spacedim, Number>>>>
-              &gradients,
-            std::vector<std::vector<std::vector<Tensor<2, spacedim, Number>>>>
-              &                                         hessians,
-            const FEValuesBase<dim, spacedim> &         fe,
-            const unsigned int                          level,
-            const std::vector<types::global_dof_index> &index,
-            const unsigned int                          component,
-            const unsigned int                          n_comp,
-            const unsigned int                          start,
-            const unsigned int                          size) const;
+    mg_fill(std::vector<std::vector<std::vector<Number>>> &                     values,
+            std::vector<std::vector<std::vector<Tensor<1, spacedim, Number>>>> &gradients,
+            std::vector<std::vector<std::vector<Tensor<2, spacedim, Number>>>> &hessians,
+            const FEValuesBase<dim, spacedim> &                                 fe,
+            const unsigned int                                                  level,
+            const std::vector<types::global_dof_index> &                        index,
+            const unsigned int                                                  component,
+            const unsigned int                                                  n_comp,
+            const unsigned int                                                  start,
+            const unsigned int                                                  size) const;
 
   protected:
     AnyData data;
@@ -301,8 +297,7 @@ namespace MeshWorker
    * @author Guido Kanschat, 2009
    */
   template <typename VectorType, int dim, int spacedim = dim>
-  class VectorData
-    : public VectorDataBase<dim, spacedim, typename VectorType::value_type>
+  class VectorData : public VectorDataBase<dim, spacedim, typename VectorType::value_type>
   {
   public:
     /**
@@ -332,13 +327,10 @@ namespace MeshWorker
     initialize(const VectorType *, const std::string &name);
 
     virtual void
-    fill(std::vector<std::vector<std::vector<typename VectorType::value_type>>>
-           &values,
-         std::vector<std::vector<
-           std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
+    fill(std::vector<std::vector<std::vector<typename VectorType::value_type>>> &values,
+         std::vector<std::vector<std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
            &gradients,
-         std::vector<std::vector<
-           std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
+         std::vector<std::vector<std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
            &                                         hessians,
          const FEValuesBase<dim, spacedim> &         fe,
          const std::vector<types::global_dof_index> &index,
@@ -349,13 +341,10 @@ namespace MeshWorker
 
     virtual void
     mg_fill(
-      std::vector<std::vector<std::vector<typename VectorType::value_type>>>
-        &values,
-      std::vector<std::vector<
-        std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
+      std::vector<std::vector<std::vector<typename VectorType::value_type>>> &values,
+      std::vector<std::vector<std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
         &gradients,
-      std::vector<std::vector<
-        std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
+      std::vector<std::vector<std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
         &                                         hessians,
       const FEValuesBase<dim, spacedim> &         fe,
       const unsigned int                          level,

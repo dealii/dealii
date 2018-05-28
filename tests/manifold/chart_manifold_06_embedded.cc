@@ -35,8 +35,7 @@ public:
   virtual std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override
   {
-    return std::unique_ptr<Manifold<dim, spacedim>>(
-      new MyFlatManifold(this->get_periodicity()));
+    return std::unique_ptr<Manifold<dim, spacedim>>(new MyFlatManifold(this->get_periodicity()));
   }
 
   virtual Point<spacedim>

@@ -98,10 +98,9 @@ namespace CUDAWrappers
 
     struct AdditionalData
     {
-      AdditionalData(
-        const ParallelizationScheme parallelization_scheme = parallel_in_elem,
-        const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values) :
+      AdditionalData(const ParallelizationScheme parallelization_scheme = parallel_in_elem,
+                     const UpdateFlags           mapping_update_flags   = update_gradients |
+                                                              update_JxW_values) :
         parallelization_scheme(parallelization_scheme),
         mapping_update_flags(mapping_update_flags)
       {}
@@ -186,13 +185,10 @@ namespace CUDAWrappers
      */
     template <typename functor>
     void
-    cell_loop(const functor &           func,
-              const CUDAVector<Number> &src,
-              CUDAVector<Number> &      dst) const;
+    cell_loop(const functor &func, const CUDAVector<Number> &src, CUDAVector<Number> &dst) const;
 
     void
-    copy_constrained_values(const CUDAVector<Number> &src,
-                            CUDAVector<Number> &      dst) const;
+    copy_constrained_values(const CUDAVector<Number> &src, CUDAVector<Number> &dst) const;
 
     void
     set_constrained_values(const Number val, CUDAVector<Number> &dst) const;
@@ -313,10 +309,8 @@ namespace CUDAWrappers
            cells_per_block_shmem(int dim, int fe_degree)
   {
     return dim == 2 ?
-             (fe_degree == 1 ?
-                32 :
-                fe_degree == 2 ? 8 :
-                                 fe_degree == 3 ? 4 : fe_degree == 4 ? 4 : 1) :
+             (fe_degree == 1 ? 32 :
+                               fe_degree == 2 ? 8 : fe_degree == 3 ? 4 : fe_degree == 4 ? 4 : 1) :
              dim == 3 ? (fe_degree == 1 ? 8 : fe_degree == 2 ? 2 : 1) : 1;
   }
 } // namespace CUDAWrappers

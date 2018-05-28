@@ -47,8 +47,8 @@ test()
     for (unsigned int i = 0; i < n_vectors; ++i)
       if (arr[j][i] != i * n_numbers + j)
         ++n_errors;
-  deallog << "load_and_transpose at          n=" << n_numbers
-          << ": #errors: " << n_errors << std::endl;
+  deallog << "load_and_transpose at          n=" << n_numbers << ": #errors: " << n_errors
+          << std::endl;
   if (n_errors > 0)
     for (unsigned int i = 0; i < n_numbers; ++i)
       {
@@ -63,8 +63,8 @@ test()
     for (unsigned int j = 0; j < n_numbers; ++j)
       if (other[i * n_numbers + j] != 2. * (i * n_numbers + j))
         ++n_errors;
-  deallog << "transpose_and_store (  add) at n=" << n_numbers
-          << ": #errors: " << n_errors << std::endl;
+  deallog << "transpose_and_store (  add) at n=" << n_numbers << ": #errors: " << n_errors
+          << std::endl;
   if (n_errors > 0)
     for (unsigned int i = 0; i < n_vectors; ++i)
       {
@@ -79,8 +79,8 @@ test()
     for (unsigned int j = 0; j < n_numbers; ++j)
       if (other[i * n_numbers + j] != (i * n_numbers + j))
         ++n_errors;
-  deallog << "transpose_and_store (noadd) at n=" << n_numbers
-          << ": #errors: " << n_errors << std::endl;
+  deallog << "transpose_and_store (noadd) at n=" << n_numbers << ": #errors: " << n_errors
+          << std::endl;
   if (n_errors > 0)
     for (unsigned int i = 0; i < n_vectors; ++i)
       {

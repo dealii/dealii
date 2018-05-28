@@ -55,9 +55,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    mass_matrix(FullMatrix<double> &     M,
-                const FEValuesBase<dim> &fe,
-                const double             factor = 1.)
+    mass_matrix(FullMatrix<double> &M, const FEValuesBase<dim> &fe, const double factor = 1.)
     {
       const unsigned int n_dofs       = fe.dofs_per_cell;
       const unsigned int n_components = fe.get_fe().n_components();
@@ -69,8 +67,7 @@ namespace LocalIntegrators
             {
               double Mii = 0.0;
               for (unsigned int d = 0; d < n_components; ++d)
-                Mii += dx * fe.shape_value_component(i, k, d) *
-                       fe.shape_value_component(i, k, d);
+                Mii += dx * fe.shape_value_component(i, k, d) * fe.shape_value_component(i, k, d);
 
               M(i, i) += Mii;
 
@@ -78,8 +75,8 @@ namespace LocalIntegrators
                 {
                   double Mij = 0.0;
                   for (unsigned int d = 0; d < n_components; ++d)
-                    Mij += dx * fe.shape_value_component(j, k, d) *
-                           fe.shape_value_component(i, k, d);
+                    Mij +=
+                      dx * fe.shape_value_component(j, k, d) * fe.shape_value_component(i, k, d);
 
                   M(i, j) += Mij;
                   M(j, i) += Mij;
@@ -122,8 +119,7 @@ namespace LocalIntegrators
             {
               double Mii = 0.0;
               for (unsigned int d = 0; d < n_components; ++d)
-                Mii += dx * fe.shape_value_component(i, k, d) *
-                       fe.shape_value_component(i, k, d);
+                Mii += dx * fe.shape_value_component(i, k, d) * fe.shape_value_component(i, k, d);
 
               M(i, i) += Mii;
 
@@ -131,8 +127,8 @@ namespace LocalIntegrators
                 {
                   double Mij = 0.0;
                   for (unsigned int d = 0; d < n_components; ++d)
-                    Mij += dx * fe.shape_value_component(j, k, d) *
-                           fe.shape_value_component(i, k, d);
+                    Mij +=
+                      dx * fe.shape_value_component(j, k, d) * fe.shape_value_component(i, k, d);
 
                   M(i, j) += Mij;
                   M(j, i) += Mij;
@@ -190,8 +186,7 @@ namespace LocalIntegrators
       for (unsigned int k = 0; k < fe.n_quadrature_points; ++k)
         for (unsigned int i = 0; i < n_dofs; ++i)
           for (unsigned int d = 0; d < n_components; ++d)
-            result(i) += fe.JxW(k) * factor *
-                         fe.shape_value_component(i, k, d) * input[d][k];
+            result(i) += fe.JxW(k) * factor * fe.shape_value_component(i, k, d) * input[d][k];
     }
 
     /**
@@ -241,14 +236,10 @@ namespace LocalIntegrators
             for (unsigned int j = 0; j < n1_dofs; ++j)
               for (unsigned int d = 0; d < n_components; ++d)
                 {
-                  const double u1 =
-                    factor1 * fe1.shape_value_component(j, k, d);
-                  const double u2 =
-                    -factor2 * fe2.shape_value_component(j, k, d);
-                  const double v1 =
-                    factor1 * fe1.shape_value_component(i, k, d);
-                  const double v2 =
-                    -factor2 * fe2.shape_value_component(i, k, d);
+                  const double u1 = factor1 * fe1.shape_value_component(j, k, d);
+                  const double u2 = -factor2 * fe2.shape_value_component(j, k, d);
+                  const double v1 = factor1 * fe1.shape_value_component(i, k, d);
+                  const double v2 = -factor2 * fe2.shape_value_component(i, k, d);
 
                   M11(i, j) += dx * u1 * v1;
                   M12(i, j) += dx * u2 * v1;

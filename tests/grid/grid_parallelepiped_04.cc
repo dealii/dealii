@@ -78,33 +78,27 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
 
   Triangulation<dim> triangulation;
 
-  GridGenerator::subdivided_parallelepiped(
-    triangulation, subd, corners, colorize);
+  GridGenerator::subdivided_parallelepiped(triangulation, subd, corners, colorize);
 
   {
     std::map<unsigned int, unsigned int>              boundary_count;
-    typename Triangulation<dim>::active_cell_iterator cell = triangulation
-                                                               .begin_active(),
-                                                      endc =
-                                                        triangulation.end();
+    typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active(),
+                                                      endc = triangulation.end();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
               {
                 boundary_count[cell->face(face)->boundary_id()]++;
                 deallog << " center: " << cell->face(face)->center()
-                        << " id: " << (int)cell->face(face)->boundary_id()
-                        << std::endl;
+                        << " id: " << (int)cell->face(face)->boundary_id() << std::endl;
               }
           }
       }
 
     deallog << " boundary indicators: ";
-    for (std::map<unsigned int, unsigned int>::iterator it =
-           boundary_count.begin();
+    for (std::map<unsigned int, unsigned int>::iterator it = boundary_count.begin();
          it != boundary_count.end();
          ++it)
       {

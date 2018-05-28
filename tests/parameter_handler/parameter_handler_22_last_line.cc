@@ -32,8 +32,7 @@ check(const char *p, std::string last_line)
   std::ifstream in(p);
   prm.parse_input(in, "input file", last_line);
 
-  deallog << "var_1=" << prm.get("var_1") << std::endl
-          << "var_2=" << prm.get("var_2") << std::endl;
+  deallog << "var_1=" << prm.get("var_1") << std::endl << "var_2=" << prm.get("var_2") << std::endl;
 }
 
 

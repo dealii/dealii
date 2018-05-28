@@ -66,8 +66,7 @@ test()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
-  deallog << "Number of constraints: " << constraints.n_constraints()
-          << std::endl;
+  deallog << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
   // then set up a sparsity pattern and a
   // matrix on top of it
@@ -78,9 +77,8 @@ test()
   BlockSparsityPattern sparsity(2, 2);
   for (unsigned int i = 0; i < 2; ++i)
     for (unsigned int j = 0; j < 2; ++j)
-      sparsity.block(i, j).reinit(block_sizes[i],
-                                  block_sizes[j],
-                                  dof_handler.max_couplings_between_dofs());
+      sparsity.block(i, j).reinit(
+        block_sizes[i], block_sizes[j], dof_handler.max_couplings_between_dofs());
   sparsity.collect_sizes();
 
   DoFTools::make_sparsity_pattern(dof_handler, sparsity);
@@ -90,9 +88,8 @@ test()
   // then fill the matrix by setting up
   // bogus matrix entries
   std::vector<types::global_dof_index> local_dofs(fe.dofs_per_cell);
-  FullMatrix<double> local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
-  for (typename DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  FullMatrix<double>                   local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
@@ -100,8 +97,7 @@ test()
       local_matrix = 0;
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-          local_matrix(i, j) =
-            (i + 1.) * (j + 1.) * (local_dofs[i] + 1.) * (local_dofs[j] + 1.);
+          local_matrix(i, j) = (i + 1.) * (j + 1.) * (local_dofs[i] + 1.) * (local_dofs[j] + 1.);
 
       // copy local to global
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
@@ -113,10 +109,9 @@ test()
   constraints.condense(A);
 
   // and output what we have
-  for (BlockSparseMatrix<double>::const_iterator i = A.begin(); i != A.end();
-       ++i)
-    deallog << i->block_row() << ' ' << i->block_column() << ' ' << i->row()
-            << ' ' << i->column() << ' ' << i->value() << std::endl;
+  for (BlockSparseMatrix<double>::const_iterator i = A.begin(); i != A.end(); ++i)
+    deallog << i->block_row() << ' ' << i->block_column() << ' ' << i->row() << ' ' << i->column()
+            << ' ' << i->value() << std::endl;
 }
 
 
@@ -136,13 +131,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -150,12 +143,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

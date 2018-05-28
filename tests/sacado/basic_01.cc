@@ -36,11 +36,7 @@ f(const NumberType &x, const NumberType &y, const NumberType &z)
 
 // The analytic derivative of f(x,y,z) with respect to x and y
 void
-df(const double &x,
-   const double &y,
-   const double &z,
-   double &      df_dx,
-   double &      df_dy)
+df(const double &x, const double &y, const double &z, double &df_dx, double &df_dy)
 {
   df_dx = z * (1.0 + y);
   df_dy = z * (z + x);

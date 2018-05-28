@@ -51,9 +51,7 @@ main()
   LAPACKFullMatrix<double> LA(4, 4), LB(4, 4);
   for (unsigned int itype = 1; itype <= 3; ++itype)
     {
-      deallog << std::endl
-              << "generalized eigenvalue problem of type " << itype
-              << std::endl;
+      deallog << std::endl << "generalized eigenvalue problem of type " << itype << std::endl;
       LA = A;
       LB = B;
       std::vector<Vector<double>> eigenvectors(0);
@@ -64,13 +62,11 @@ main()
 
       for (unsigned int i = 0; i < eigenvectors.size(); ++i)
         {
-          deallog << "generalized eigenvalue " << std::scientific
-                  << eigenvalues(i) << std::endl
+          deallog << "generalized eigenvalue " << std::scientific << eigenvalues(i) << std::endl
                   << "generalized eigenvector ";
           for (unsigned int j = 0; j < A.m(); ++j)
             {
-              deallog << std::scientific
-                      << eigenvectors[i](j) / eigenvectors[i](0) << '\t';
+              deallog << std::scientific << eigenvectors[i](j) / eigenvectors[i](0) << '\t';
             }
           deallog << std::endl;
         }

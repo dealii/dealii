@@ -62,8 +62,7 @@ test()
   std::function<bool(const cell_iterator &)> predicate = pred_mat_id<dim>;
 
   // Find bounding box that surrounds cells with material id 2
-  auto bounding_box =
-    GridTools::compute_bounding_box(tria, predicate); // General predicate
+  auto bounding_box = GridTools::compute_bounding_box(tria, predicate); // General predicate
 
   deallog << bounding_box.first << " " << bounding_box.second << std::endl;
 }

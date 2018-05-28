@@ -36,8 +36,7 @@ test()
   unsigned int rank = Utilities::MPI::this_mpi_process(mpi_comm);
   if (rank == 0)
     {
-      typename Triangulation<2>::active_cell_iterator cell =
-                                                        tria.begin_active(),
+      typename Triangulation<2>::active_cell_iterator cell     = tria.begin_active(),
                                                       end_cell = tria.end();
       for (; cell != end_cell; ++cell)
         if (cell->is_locally_owned())
@@ -46,11 +45,10 @@ test()
 
   tria.execute_coarsening_and_refinement();
 
-  std::vector<std::set<typename Triangulation<2>::active_cell_iterator>>
-    vertex_to_cell = GridTools::vertex_to_cell_map(tria);
+  std::vector<std::set<typename Triangulation<2>::active_cell_iterator>> vertex_to_cell =
+    GridTools::vertex_to_cell_map(tria);
 
-  AssertThrow(tria.n_vertices() == vertex_to_cell.size(),
-              ExcMessage("Wrong number of vertices"));
+  AssertThrow(tria.n_vertices() == vertex_to_cell.size(), ExcMessage("Wrong number of vertices"));
   std::vector<unsigned int> n_cells;
   for (unsigned int i = 0; i < vertex_to_cell.size(); ++i)
     n_cells.push_back(vertex_to_cell[i].size());

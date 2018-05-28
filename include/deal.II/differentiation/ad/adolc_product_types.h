@@ -236,8 +236,7 @@ namespace internal
   };
 
   template <>
-  struct ProductTypeImpl<std::complex<adtl::adouble>,
-                         std::complex<adtl::adouble>>
+  struct ProductTypeImpl<std::complex<adtl::adouble>, std::complex<adtl::adouble>>
   {
     typedef std::complex<adtl::adouble> type;
   };

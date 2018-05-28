@@ -61,8 +61,7 @@ test()
   triangulation.reset_manifold(0);
   triangulation.refine_global(2);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell =
-         triangulation.begin_active();
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     if (!cell->is_ghost() && !cell->is_artificial())
@@ -75,8 +74,7 @@ test()
 
   {
     unsigned int n_flagged_cells = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       if (!cell->is_ghost() && !cell->is_artificial())
@@ -84,8 +82,7 @@ test()
           ++n_flagged_cells;
 
     unsigned int global_f_c = 0;
-    MPI_Allreduce(
-      &n_flagged_cells, &global_f_c, 1, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&n_flagged_cells, &global_f_c, 1, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
     if (myid == 0)
       deallog << "# flagged cells = " << global_f_c << std::endl;
   }
@@ -94,8 +91,7 @@ test()
   triangulation.execute_coarsening_and_refinement();
 
   if (myid == 0)
-    deallog << "#cells = " << triangulation.n_global_active_cells()
-            << std::endl;
+    deallog << "#cells = " << triangulation.n_global_active_cells() << std::endl;
 
   // create FE_System and fill in no-normal flux
   // conditions on boundary 1 (outer)
@@ -123,18 +119,11 @@ test()
   // orders, copy all numbers to root processor
   std::vector<unsigned int> n_constraints_glob(numprocs);
   unsigned int              n_constraints = constraints.n_constraints();
-  MPI_Gather(&n_constraints,
-             1,
-             MPI_UNSIGNED,
-             &n_constraints_glob[0],
-             1,
-             MPI_UNSIGNED,
-             0,
-             MPI_COMM_WORLD);
+  MPI_Gather(
+    &n_constraints, 1, MPI_UNSIGNED, &n_constraints_glob[0], 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
   if (myid == 0)
     for (unsigned int i = 0; i < numprocs; ++i)
-      deallog << "#constraints on " << i << ": " << n_constraints_glob[i]
-              << std::endl;
+      deallog << "#constraints on " << i << ": " << n_constraints_glob[i] << std::endl;
 
   // dummy assembly: put 1 in all components of
   // the vector
@@ -146,14 +135,12 @@ test()
     Vector<double>                       local_vector(dofs_per_cell);
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       local_vector(i) = 1.;
-    typename DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active(),
-                                                   endc = dofh.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active(), endc = dofh.end();
     for (; cell != endc; ++cell)
       if (cell->subdomain_id() == triangulation.locally_owned_subdomain())
         {
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            local_vector, local_dof_indices, vector);
+          constraints.distribute_local_to_global(local_vector, local_dof_indices, vector);
         }
     vector.compress(VectorOperation::add);
   }
@@ -175,9 +162,8 @@ int
 main(int argc, char *argv[])
 {
   {
-    Utilities::MPI::MPI_InitFinalize mpi_initialization(
-      argc, argv, testing_max_num_threads());
-    unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+    Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
+    unsigned int                     myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
 
     deallog.push(Utilities::int_to_string(myid));

@@ -104,9 +104,7 @@ public:
      * Constructor. Since we use accessors only for read access, a const
      * matrix pointer is sufficient.
      */
-    Accessor(const FullMatrix<number> *matrix,
-             const size_type           row,
-             const size_type           col);
+    Accessor(const FullMatrix<number> *matrix, const size_type row, const size_type col);
 
     /**
      * Row number of the element represented by this object.
@@ -157,9 +155,7 @@ public:
     /**
      * Constructor.
      */
-    const_iterator(const FullMatrix<number> *matrix,
-                   const size_type           row,
-                   const size_type           col);
+    const_iterator(const FullMatrix<number> *matrix, const size_type row, const size_type col);
 
     /**
      * Prefix increment.
@@ -510,8 +506,7 @@ public:
    */
   template <typename number2>
   number2
-  matrix_scalar_product(const Vector<number2> &u,
-                        const Vector<number2> &v) const;
+  matrix_scalar_product(const Vector<number2> &u, const Vector<number2> &v) const;
 
   /**
    * Return the <i>l<sub>1</sub></i>-norm of the matrix, where $||M||_1 =
@@ -572,9 +567,7 @@ public:
    */
   template <class StreamType>
   void
-  print(StreamType &       s,
-        const unsigned int width     = 5,
-        const unsigned int precision = 2) const;
+  print(StreamType &s, const unsigned int width = 5, const unsigned int precision = 2) const;
 
   /**
    * Print the matrix and allow formatting of entries.
@@ -678,10 +671,7 @@ public:
    */
   template <typename number2>
   void
-  add(const number               a,
-      const FullMatrix<number2> &A,
-      const number               b,
-      const FullMatrix<number2> &B);
+  add(const number a, const FullMatrix<number2> &A, const number b, const FullMatrix<number2> &B);
 
   /**
    * Multiple addition of scaled matrices, i.e. <tt>*this += a*A + b*B +
@@ -784,11 +774,7 @@ public:
    * rows of this.
    */
   void
-  add_row(const size_type i,
-          const number    s,
-          const size_type j,
-          const number    t,
-          const size_type k);
+  add_row(const size_type i, const number s, const size_type j, const number t, const size_type k);
 
   /**
    * <i>A(1...n,i) += s*A(1...n,j)</i>.  Simple addition of columns of this.
@@ -801,11 +787,7 @@ public:
    * columns of this.
    */
   void
-  add_col(const size_type i,
-          const number    s,
-          const size_type j,
-          const number    t,
-          const size_type k);
+  add_col(const size_type i, const number s, const size_type j, const number t, const size_type k);
 
   /**
    * Swap <i>A(i,1...n) <-> A(j,1...n)</i>.  Swap rows i and j of this
@@ -838,10 +820,7 @@ public:
    */
   template <typename number2>
   void
-  equ(const number               a,
-      const FullMatrix<number2> &A,
-      const number               b,
-      const FullMatrix<number2> &B);
+  equ(const number a, const FullMatrix<number2> &A, const number b, const FullMatrix<number2> &B);
 
   /**
    * Assignment <tt>*this = a*A + b*B + c*C</tt>.
@@ -953,9 +932,7 @@ public:
    */
   template <typename number2>
   void
-  mmult(FullMatrix<number2> &      C,
-        const FullMatrix<number2> &B,
-        const bool                 adding = false) const;
+  mmult(FullMatrix<number2> &C, const FullMatrix<number2> &B, const bool adding = false) const;
 
   /**
    * Matrix-matrix-multiplication using transpose of <tt>this</tt>.
@@ -977,9 +954,7 @@ public:
    */
   template <typename number2>
   void
-  Tmmult(FullMatrix<number2> &      C,
-         const FullMatrix<number2> &B,
-         const bool                 adding = false) const;
+  Tmmult(FullMatrix<number2> &C, const FullMatrix<number2> &B, const bool adding = false) const;
 
   /**
    * Matrix-matrix-multiplication using transpose of <tt>B</tt>.
@@ -1001,9 +976,7 @@ public:
    */
   template <typename number2>
   void
-  mTmult(FullMatrix<number2> &      C,
-         const FullMatrix<number2> &B,
-         const bool                 adding = false) const;
+  mTmult(FullMatrix<number2> &C, const FullMatrix<number2> &B, const bool adding = false) const;
 
   /**
    * Matrix-matrix-multiplication using transpose of <tt>this</tt> and
@@ -1026,9 +999,7 @@ public:
    */
   template <typename number2>
   void
-  TmTmult(FullMatrix<number2> &      C,
-          const FullMatrix<number2> &B,
-          const bool                 adding = false) const;
+  TmTmult(FullMatrix<number2> &C, const FullMatrix<number2> &B, const bool adding = false) const;
 
   /**
    * Add to the current matrix the triple product <b>B A D</b>. Optionally,
@@ -1062,9 +1033,7 @@ public:
    */
   template <typename number2>
   void
-  vmult(Vector<number2> &      w,
-        const Vector<number2> &v,
-        const bool             adding = false) const;
+  vmult(Vector<number2> &w, const Vector<number2> &v, const bool adding = false) const;
 
   /**
    * Adding Matrix-vector-multiplication.  <i>w += A*v</i>
@@ -1090,9 +1059,7 @@ public:
    */
   template <typename number2>
   void
-  Tvmult(Vector<number2> &      w,
-         const Vector<number2> &v,
-         const bool             adding = false) const;
+  Tvmult(Vector<number2> &w, const Vector<number2> &v, const bool adding = false) const;
 
   /**
    * Adding transpose matrix-vector-multiplication.  <i>w +=
@@ -1123,9 +1090,7 @@ public:
    */
   template <typename number2, typename number3>
   number
-  residual(Vector<number2> &      dst,
-           const Vector<number2> &x,
-           const Vector<number3> &b) const;
+  residual(Vector<number2> &dst, const Vector<number2> &x, const Vector<number3> &b) const;
 
   /**
    * Forward elimination of lower triangle.  Inverts the lower triangle of a
@@ -1167,11 +1132,10 @@ public:
   /**
    * Exception
    */
-  DeclException1(
-    ExcNotRegular,
-    number,
-    << "The maximal pivot is " << arg1
-    << ", which is below the threshold. The matrix may be singular.");
+  DeclException1(ExcNotRegular,
+                 number,
+                 << "The maximal pivot is " << arg1
+                 << ", which is below the threshold. The matrix may be singular.");
   /**
    * Exception
    */
@@ -1179,9 +1143,8 @@ public:
                  size_type,
                  size_type,
                  size_type,
-                 << "Target region not in matrix: size in this direction="
-                 << arg1 << ", size of new matrix=" << arg2
-                 << ", offset=" << arg3);
+                 << "Target region not in matrix: size in this direction=" << arg1
+                 << ", size of new matrix=" << arg2 << ", offset=" << arg3);
   /**
    * Exception
    */
@@ -1261,9 +1224,7 @@ FullMatrix<number>::copy_from(const MatrixType &M)
   for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MatrixType::const_iterator end_row = M.end(row);
-      for (typename MatrixType::const_iterator entry = M.begin(row);
-           entry != end_row;
-           ++entry)
+      for (typename MatrixType::const_iterator entry = M.begin(row); entry != end_row; ++entry)
         this->el(row, entry->column()) = entry->value();
     }
 }
@@ -1283,9 +1244,7 @@ FullMatrix<number>::copy_transposed(const MatrixType &M)
   for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MatrixType::const_iterator end_row = M.end(row);
-      for (typename MatrixType::const_iterator entry = M.begin(row);
-           entry != end_row;
-           ++entry)
+      for (typename MatrixType::const_iterator entry = M.begin(row); entry != end_row; ++entry)
         this->el(entry->column(), row) = entry->value();
     }
 }
@@ -1295,10 +1254,9 @@ FullMatrix<number>::copy_transposed(const MatrixType &M)
 template <typename number>
 template <typename MatrixType, typename index_type>
 inline void
-FullMatrix<number>::extract_submatrix_from(
-  const MatrixType &             matrix,
-  const std::vector<index_type> &row_index_set,
-  const std::vector<index_type> &column_index_set)
+FullMatrix<number>::extract_submatrix_from(const MatrixType &             matrix,
+                                           const std::vector<index_type> &row_index_set,
+                                           const std::vector<index_type> &column_index_set)
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
@@ -1308,8 +1266,7 @@ FullMatrix<number>::extract_submatrix_from(
 
   for (size_type sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
     for (size_type sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
-      (*this)(sub_row, sub_col) =
-        matrix.el(row_index_set[sub_row], column_index_set[sub_col]);
+      (*this)(sub_row, sub_col) = matrix.el(row_index_set[sub_row], column_index_set[sub_col]);
 }
 
 
@@ -1317,10 +1274,9 @@ FullMatrix<number>::extract_submatrix_from(
 template <typename number>
 template <typename MatrixType, typename index_type>
 inline void
-FullMatrix<number>::scatter_matrix_to(
-  const std::vector<index_type> &row_index_set,
-  const std::vector<index_type> &column_index_set,
-  MatrixType &                   matrix) const
+FullMatrix<number>::scatter_matrix_to(const std::vector<index_type> &row_index_set,
+                                      const std::vector<index_type> &column_index_set,
+                                      MatrixType &                   matrix) const
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
@@ -1330,17 +1286,13 @@ FullMatrix<number>::scatter_matrix_to(
 
   for (size_type sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
     for (size_type sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
-      matrix.set(row_index_set[sub_row],
-                 column_index_set[sub_col],
-                 (*this)(sub_row, sub_col));
+      matrix.set(row_index_set[sub_row], column_index_set[sub_col], (*this)(sub_row, sub_col));
 }
 
 
 template <typename number>
 inline void
-FullMatrix<number>::set(const size_type i,
-                        const size_type j,
-                        const number    value)
+FullMatrix<number>::set(const size_type i, const size_type j, const number value)
 {
   (*this)(i, j) = value;
 }
@@ -1350,8 +1302,7 @@ FullMatrix<number>::set(const size_type i,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::vmult_add(Vector<number2> &      w,
-                              const Vector<number2> &v) const
+FullMatrix<number>::vmult_add(Vector<number2> &w, const Vector<number2> &v) const
 {
   vmult(w, v, true);
 }
@@ -1360,8 +1311,7 @@ FullMatrix<number>::vmult_add(Vector<number2> &      w,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::Tvmult_add(Vector<number2> &      w,
-                               const Vector<number2> &v) const
+FullMatrix<number>::Tvmult_add(Vector<number2> &w, const Vector<number2> &v) const
 {
   Tvmult(w, v, true);
 }
@@ -1406,10 +1356,9 @@ FullMatrix<number>::Accessor::value() const
 
 
 template <typename number>
-inline FullMatrix<number>::const_iterator::const_iterator(
-  const FullMatrix<number> *matrix,
-  const size_type           r,
-  const size_type           c) :
+inline FullMatrix<number>::const_iterator::const_iterator(const FullMatrix<number> *matrix,
+                                                          const size_type           r,
+                                                          const size_type           c) :
   accessor(matrix, r, c)
 {}
 
@@ -1442,16 +1391,16 @@ FullMatrix<number>::const_iterator::operator++(int)
 
 
 template <typename number>
-inline const typename FullMatrix<number>::Accessor &
-  FullMatrix<number>::const_iterator::operator*() const
+inline const typename FullMatrix<number>::Accessor &FullMatrix<number>::const_iterator::
+                                                    operator*() const
 {
   return accessor;
 }
 
 
 template <typename number>
-inline const typename FullMatrix<number>::Accessor *
-  FullMatrix<number>::const_iterator::operator->() const
+inline const typename FullMatrix<number>::Accessor *FullMatrix<number>::const_iterator::
+                                                    operator->() const
 {
   return &accessor;
 }
@@ -1459,18 +1408,15 @@ inline const typename FullMatrix<number>::Accessor *
 
 template <typename number>
 inline bool
-FullMatrix<number>::const_iterator::
-operator==(const const_iterator &other) const
+FullMatrix<number>::const_iterator::operator==(const const_iterator &other) const
 {
-  return (accessor.row() == other.accessor.row() &&
-          accessor.column() == other.accessor.column());
+  return (accessor.row() == other.accessor.row() && accessor.column() == other.accessor.column());
 }
 
 
 template <typename number>
 inline bool
-FullMatrix<number>::const_iterator::
-operator!=(const const_iterator &other) const
+FullMatrix<number>::const_iterator::operator!=(const const_iterator &other) const
 {
   return !(*this == other);
 }
@@ -1481,8 +1427,7 @@ inline bool
 FullMatrix<number>::const_iterator::operator<(const const_iterator &other) const
 {
   return (accessor.row() < other.accessor.row() ||
-          (accessor.row() == other.accessor.row() &&
-           accessor.column() < other.accessor.column()));
+          (accessor.row() == other.accessor.row() && accessor.column() < other.accessor.column()));
 }
 
 
@@ -1564,9 +1509,7 @@ FullMatrix<number>::add(const size_type   row,
 template <typename number>
 template <class StreamType>
 inline void
-FullMatrix<number>::print(StreamType &       s,
-                          const unsigned int w,
-                          const unsigned int p) const
+FullMatrix<number>::print(StreamType &s, const unsigned int w, const unsigned int p) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 

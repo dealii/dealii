@@ -26,9 +26,7 @@
 
 
 
-void my_cylinder(Triangulation<3> &tria,
-                 const double      radius,
-                 const double      half_length)
+void my_cylinder(Triangulation<3> &tria, const double radius, const double half_length)
 {
   // Copy the base from hyper_ball<3>
   // and transform it to yz
@@ -90,26 +88,19 @@ check_grid()
 
   my_cylinder(triangulation, 0.5, 1.0);
 
-  Triangulation<dim>::active_cell_iterator cell = triangulation.begin(),
-                                           endc = triangulation.end();
+  Triangulation<dim>::active_cell_iterator cell = triangulation.begin(), endc = triangulation.end();
   for (; cell != endc; ++cell)
     {
       deallog << cell << std::endl;
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         {
-          deallog << face << ": "
-                  << (cell->face_orientation(face) ? "true " : "false ")
+          deallog << face << ": " << (cell->face_orientation(face) ? "true " : "false ")
                   << (cell->face_flip(face) ? "true " : "false ")
-                  << (cell->face_rotation(face) ? "true" : "false")
-                  << std::endl;
+                  << (cell->face_rotation(face) ? "true" : "false") << std::endl;
         }
-      for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
-           ++line)
+      for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell; ++line)
         {
-          deallog << line << ": "
-                  << (cell->line_orientation(line) ? "true" : "false")
-                  << std::endl;
+          deallog << line << ": " << (cell->line_orientation(line) ? "true" : "false") << std::endl;
           Assert(cell->line_orientation(line) == true, ExcInternalError());
         }
     }

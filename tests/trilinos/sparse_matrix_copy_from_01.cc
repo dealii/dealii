@@ -31,8 +31,7 @@
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   initlog();
 
@@ -47,18 +46,14 @@ main(int argc, char **argv)
   SparseMatrix<double> matrix(sparsity);
   {
     double value = 1;
-    for (SparseMatrix<double>::iterator p = matrix.begin(); p != matrix.end();
-         ++p, ++value)
+    for (SparseMatrix<double>::iterator p = matrix.begin(); p != matrix.end(); ++p, ++value)
       p->value() = value;
   }
   deallog << "Original:" << std::endl;
   matrix.print_formatted(deallog.get_file_stream());
 
   // now copy everything into a Trilinos matrix
-  Epetra_Map                     map(TrilinosWrappers::types::int_type(5),
-                 5,
-                 0,
-                 Utilities::Trilinos::comm_world());
+  Epetra_Map map(TrilinosWrappers::types::int_type(5), 5, 0, Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix tmatrix;
   tmatrix.reinit(map, map, matrix);
 
@@ -71,9 +66,6 @@ main(int argc, char **argv)
   matrix.print(deallog.get_file_stream());
 
   // also compare for equality with the original
-  for (SparsityPattern::const_iterator p = sparsity.begin();
-       p != sparsity.end();
-       ++p)
-    AssertThrow(copy(p->row(), p->column()) == matrix(p->row(), p->column()),
-                ExcInternalError());
+  for (SparsityPattern::const_iterator p = sparsity.begin(); p != sparsity.end(); ++p)
+    AssertThrow(copy(p->row(), p->column()) == matrix(p->row(), p->column()), ExcInternalError());
 }

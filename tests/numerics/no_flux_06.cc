@@ -60,8 +60,7 @@ test_hyper_cube()
 
   ConstraintMatrix    cm;
   const MappingQ<dim> mapping(4);
-  VectorTools::compute_no_normal_flux_constraints(
-    dof, 0, boundary_ids, cm, mapping);
+  VectorTools::compute_no_normal_flux_constraints(dof, 0, boundary_ids, cm, mapping);
   cm.close();
 
   cm.print(deallog.get_file_stream());

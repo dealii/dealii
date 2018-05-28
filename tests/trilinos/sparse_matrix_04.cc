@@ -32,8 +32,7 @@
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   initlog();
 
@@ -46,8 +45,7 @@ main(int argc, char **argv)
   SparseMatrix<double> matrix(sparsity);
   {
     double value = 1;
-    for (SparseMatrix<double>::iterator p = matrix.begin(); p != matrix.end();
-         ++p, ++value)
+    for (SparseMatrix<double>::iterator p = matrix.begin(); p != matrix.end(); ++p, ++value)
       p->value() = value;
   }
   deallog << "Original:" << std::endl;

@@ -35,9 +35,8 @@ main()
   t[0][1][2][0][1][2][0][1][2] = 42;
 
   // Reorder index 4 (count begins at 0) to last place:
-  TensorAccessors::internal::
-    ReorderedIndexView<4, 9, Tensor<9, 3, int>> // auto ...
-      foo = TensorAccessors::reordered_index_view<4, 9>(t);
+  TensorAccessors::internal::ReorderedIndexView<4, 9, Tensor<9, 3, int>> // auto ...
+    foo = TensorAccessors::reordered_index_view<4, 9>(t);
 
   // test access and assignment:
   {
@@ -57,9 +56,8 @@ main()
   {
     const Tensor<9, 3, int> &t_ref = t;
 
-    TensorAccessors::internal::
-      ReorderedIndexView<4, 9, const Tensor<9, 3, int>> // auto ...
-        const_foo = TensorAccessors::reordered_index_view<4, 9>(t_ref);
+    TensorAccessors::internal::ReorderedIndexView<4, 9, const Tensor<9, 3, int>> // auto ...
+      const_foo = TensorAccessors::reordered_index_view<4, 9>(t_ref);
 
     //                     0  1  2  3  5  6  7  8  4
     deallog << const_foo[0][1][2][0][2][0][1][2][1] << std::endl;
@@ -74,8 +72,7 @@ main()
     TensorAccessors::internal::ReorderedIndexView<
       0,
       9,
-      TensorAccessors::internal::
-        ReorderedIndexView<4, 9, Tensor<9, 3, int>>> // auto ...
+      TensorAccessors::internal::ReorderedIndexView<4, 9, Tensor<9, 3, int>>> // auto ...
       foo2 = TensorAccessors::reordered_index_view<0, 9>(foo);
 
     //              t 0  1  2  3  4  5  6  7  8
@@ -89,33 +86,29 @@ main()
   {
     // check whether all special cases of reordering work as expected:
 
-    int initializer[2][2][2] = {{{0, 1}, {2, 3}}, {{4, 5}, {6, 7}}};
+    int               initializer[2][2][2] = {{{0, 1}, {2, 3}}, {{4, 5}, {6, 7}}};
     Tensor<3, 2, int> t(initializer);
 
     deallog << "Order of indices 0 1 2  -->  ";
-    TensorAccessors::internal::
-      ReorderedIndexView<2, 3, Tensor<3, 2, int>> // auto ...
-        foo012 = TensorAccessors::reordered_index_view<2, 3>(t);
+    TensorAccessors::internal::ReorderedIndexView<2, 3, Tensor<3, 2, int>> // auto ...
+      foo012 = TensorAccessors::reordered_index_view<2, 3>(t);
     PRINTME(foo012);
 
     deallog << "Order of indices 0 2 1  -->  ";
-    TensorAccessors::internal::
-      ReorderedIndexView<1, 3, Tensor<3, 2, int>> // auto ...
-        foo021 = TensorAccessors::reordered_index_view<1, 3>(t);
+    TensorAccessors::internal::ReorderedIndexView<1, 3, Tensor<3, 2, int>> // auto ...
+      foo021 = TensorAccessors::reordered_index_view<1, 3>(t);
     PRINTME(foo021);
 
     deallog << "Order of indices 1 2 0  -->  ";
-    TensorAccessors::internal::
-      ReorderedIndexView<0, 3, Tensor<3, 2, int>> // auto ...
-        foo120 = TensorAccessors::reordered_index_view<0, 3>(t);
+    TensorAccessors::internal::ReorderedIndexView<0, 3, Tensor<3, 2, int>> // auto ...
+      foo120 = TensorAccessors::reordered_index_view<0, 3>(t);
     PRINTME(foo120);
 
     deallog << "Order of indices 1 0 2  -->  ";
     TensorAccessors::internal::ReorderedIndexView<
       1,
       3,
-      TensorAccessors::internal::
-        ReorderedIndexView<0, 3, Tensor<3, 2, int>>> // auto ...
+      TensorAccessors::internal::ReorderedIndexView<0, 3, Tensor<3, 2, int>>> // auto ...
       foo102 = TensorAccessors::reordered_index_view<1, 3>(foo120);
     PRINTME(foo102);
 
@@ -123,8 +116,7 @@ main()
     TensorAccessors::internal::ReorderedIndexView<
       0,
       3,
-      TensorAccessors::internal::
-        ReorderedIndexView<0, 3, Tensor<3, 2, int>>> // auto ...
+      TensorAccessors::internal::ReorderedIndexView<0, 3, Tensor<3, 2, int>>> // auto ...
       foo201 = TensorAccessors::reordered_index_view<0, 3>(foo120);
     PRINTME(foo201);
 
@@ -132,8 +124,7 @@ main()
     TensorAccessors::internal::ReorderedIndexView<
       0,
       3,
-      TensorAccessors::internal::
-        ReorderedIndexView<1, 3, Tensor<3, 2, int>>> // auto ...
+      TensorAccessors::internal::ReorderedIndexView<1, 3, Tensor<3, 2, int>>> // auto ...
       foo210 = TensorAccessors::reordered_index_view<0, 3>(foo021);
     PRINTME(foo210);
   }
@@ -143,9 +134,8 @@ main()
     double t[3][3][3][3][3];
     t[0][1][2][0][1] = 42.;
 
-    dealii::TensorAccessors::internal::
-      ReorderedIndexView<2, 5, double[3][3][3][3][3]> // auto ...
-        foo = TensorAccessors::reordered_index_view<2, 5>(t);
+    dealii::TensorAccessors::internal::ReorderedIndexView<2, 5, double[3][3][3][3][3]> // auto ...
+      foo = TensorAccessors::reordered_index_view<2, 5>(t);
     deallog << foo[0][1][0][1][2] << std::endl;
 
     const double(&t_ref)[3][3][3][3][3] = t;
@@ -160,8 +150,7 @@ main()
     // absolutely nothing?
 
     Tensor<1, 3, int> t;
-    TensorAccessors::internal::
-      ReorderedIndexView<0, 1, Tensor<1, 3, int>> // auto ...
-        foo = TensorAccessors::reordered_index_view<0, 1>(t);
+    TensorAccessors::internal::ReorderedIndexView<0, 1, Tensor<1, 3, int>> // auto ...
+      foo = TensorAccessors::reordered_index_view<0, 1>(t);
   }
 }

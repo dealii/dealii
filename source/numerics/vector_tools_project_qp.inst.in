@@ -25,8 +25,7 @@ for (VEC : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS)
         const ConstraintMatrix &,
         const Quadrature<deal_II_dimension> &,
         const std::function<VEC::value_type(
-          const DoFHandler<deal_II_dimension,
-                           deal_II_dimension>::active_cell_iterator &,
+          const DoFHandler<deal_II_dimension, deal_II_dimension>::active_cell_iterator &,
           const unsigned int)> &,
         VEC &);
 

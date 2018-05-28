@@ -81,8 +81,7 @@ protected:
    */
   template <int dim, int spacedim>
   void
-  build_matrices(const DoFHandler<dim, spacedim> &dof,
-                 const DoFHandler<dim, spacedim> &mg_dof);
+  build_matrices(const DoFHandler<dim, spacedim> &dof, const DoFHandler<dim, spacedim> &mg_dof);
 
   /**
    * Flag of selected components.
@@ -173,8 +172,7 @@ protected:
  * @author Guido Kanschat, 2001, 2002, 2003
  */
 template <typename number>
-class MGTransferSelect : public MGTransferBase<Vector<number>>,
-                         private MGTransferComponentBase
+class MGTransferSelect : public MGTransferBase<Vector<number>>, private MGTransferComponentBase
 {
 public:
   /**
@@ -221,17 +219,14 @@ public:
    */
   template <int dim, int spacedim>
   void
-  build_matrices(
-    const DoFHandler<dim, spacedim> &dof,
-    const DoFHandler<dim, spacedim> &mg_dof,
-    unsigned int                     selected,
-    unsigned int                     mg_selected,
-    const std::vector<unsigned int> &target_component =
-      std::vector<unsigned int>(),
-    const std::vector<unsigned int> &mg_target_component =
-      std::vector<unsigned int>(),
-    const std::vector<std::set<types::global_dof_index>> &boundary_indices =
-      std::vector<std::set<types::global_dof_index>>());
+  build_matrices(const DoFHandler<dim, spacedim> &dof,
+                 const DoFHandler<dim, spacedim> &mg_dof,
+                 unsigned int                     selected,
+                 unsigned int                     mg_selected,
+                 const std::vector<unsigned int> &target_component    = std::vector<unsigned int>(),
+                 const std::vector<unsigned int> &mg_target_component = std::vector<unsigned int>(),
+                 const std::vector<std::set<types::global_dof_index>> &boundary_indices =
+                   std::vector<std::set<types::global_dof_index>>());
 
   /**
    * Change selected component. Handle with care!
@@ -381,8 +376,7 @@ public:
 //---------------------------------------------------------------------------
 template <typename number>
 inline void
-MGTransferSelect<number>::select(const unsigned int component,
-                                 const unsigned int mg_component)
+MGTransferSelect<number>::select(const unsigned int component, const unsigned int mg_component)
 {
   selected_component = component;
   mg_selected_component =

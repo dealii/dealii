@@ -83,8 +83,7 @@ SquareRoot::solve(AnyData &out, const AnyData &in)
   Vector<double> &v       = *out.entry<Vector<double> *>(0);
   v(0)                    = 0;
   const Vector<double> &x = *in.entry<const Vector<double> *>("Newton iterate");
-  const Vector<double> &r =
-    *in.entry<const Vector<double> *>("Newton residual");
+  const Vector<double> &r = *in.entry<const Vector<double> *>("Newton residual");
 
   v(0) = 1. / 2. / x(0) * r(0);
 }
@@ -114,8 +113,7 @@ test()
   newton.control.log_history(true);
   newton.debug_vectors = true;
   newton(out_data, in_data);
-  deallog << " square root " << (*out_data.read<Vector<double> *>(0))(0)
-          << std::endl;
+  deallog << " square root " << (*out_data.read<Vector<double> *>(0))(0) << std::endl;
 }
 
 

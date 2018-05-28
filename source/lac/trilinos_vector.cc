@@ -48,14 +48,12 @@ namespace TrilinosWrappers
       // ourselves, so we can use []. Note that we can only get local values.
 
       const TrilinosWrappers::types::int_type local_index =
-        vector.vector->Map().LID(
-          static_cast<TrilinosWrappers::types::int_type>(index));
+        vector.vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
       Assert(local_index >= 0,
-             MPI::Vector::ExcAccessToNonLocalElement(
-               index,
-               vector.local_size(),
-               vector.vector->Map().MinMyGID(),
-               vector.vector->Map().MaxMyGID()));
+             MPI::Vector::ExcAccessToNonLocalElement(index,
+                                                     vector.local_size(),
+                                                     vector.vector->Map().MinMyGID(),
+                                                     vector.vector->Map().MaxMyGID()));
 
 
       return (*(vector.vector))[0][local_index];
@@ -69,15 +67,12 @@ namespace TrilinosWrappers
       last_action(Zero),
       compressed(true),
       has_ghosts(false),
-      vector(new Epetra_FEVector(
-        Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
+      vector(new Epetra_FEVector(Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
 
 
 
-    Vector::Vector(const IndexSet &parallel_partitioning,
-                   const MPI_Comm &communicator) :
-      Vector()
+    Vector::Vector(const IndexSet &parallel_partitioning, const MPI_Comm &communicator) : Vector()
     {
       reinit(parallel_partitioning, communicator);
     }
@@ -107,11 +102,9 @@ namespace TrilinosWrappers
       Vector()
     {
       AssertThrow(parallel_partitioner.size() ==
-                    static_cast<size_type>(
-                      TrilinosWrappers::n_global_elements(v.vector->Map())),
-                  ExcDimensionMismatch(
-                    parallel_partitioner.size(),
-                    TrilinosWrappers::n_global_elements(v.vector->Map())));
+                    static_cast<size_type>(TrilinosWrappers::n_global_elements(v.vector->Map())),
+                  ExcDimensionMismatch(parallel_partitioner.size(),
+                                       TrilinosWrappers::n_global_elements(v.vector->Map())));
 
       vector = std_cxx14::make_unique<Epetra_FEVector>(
         parallel_partitioner.make_trilinos_map(communicator, true));
@@ -120,9 +113,7 @@ namespace TrilinosWrappers
 
 
 
-    Vector::Vector(const IndexSet &local,
-                   const IndexSet &ghost,
-                   const MPI_Comm &communicator) :
+    Vector::Vector(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &communicator) :
       Vector()
     {
       reinit(local, ghost, communicator, false);
@@ -155,8 +146,7 @@ namespace TrilinosWrappers
     {
       nonlocal_vector.reset();
 
-      Epetra_Map map =
-        parallel_partitioner.make_trilinos_map(communicator, true);
+      Epetra_Map map = parallel_partitioner.make_trilinos_map(communicator, true);
 
       vector = std_cxx14::make_unique<Epetra_FEVector>(map);
 
@@ -203,20 +193,16 @@ namespace TrilinosWrappers
           // otherwise we might access an MPI_Comm object that has been
           // deleted
 #  ifdef DEAL_II_WITH_MPI
-          const Epetra_MpiComm *my_comm =
-            dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
-          const Epetra_MpiComm *v_comm =
-            dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
-          const bool same_communicators =
-            my_comm != nullptr && v_comm != nullptr &&
-            my_comm->DataPtr() == v_comm->DataPtr();
+          const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
+          const Epetra_MpiComm *v_comm  = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
+          const bool            same_communicators =
+            my_comm != nullptr && v_comm != nullptr && my_comm->DataPtr() == v_comm->DataPtr();
 #  else
           const bool same_communicators = true;
 #  endif
-          if (!same_communicators ||
-              vector->Map().SameAs(v.vector->Map()) == false)
+          if (!same_communicators || vector->Map().SameAs(v.vector->Map()) == false)
             {
-              vector = std_cxx14::make_unique<Epetra_FEVector>(v.vector->Map());
+              vector         = std_cxx14::make_unique<Epetra_FEVector>(v.vector->Map());
               has_ghosts     = v.has_ghosts;
               last_action    = Zero;
               owned_elements = v.owned_elements;
@@ -244,13 +230,11 @@ namespace TrilinosWrappers
       else
         {
           Assert(omit_zeroing_entries == false,
-                 ExcMessage(
-                   "It is not possible to exchange data with the "
-                   "option 'omit_zeroing_entries' set, which would not write "
-                   "elements."));
+                 ExcMessage("It is not possible to exchange data with the "
+                            "option 'omit_zeroing_entries' set, which would not write "
+                            "elements."));
 
-          AssertThrow(size() == v.size(),
-                      ExcDimensionMismatch(size(), v.size()));
+          AssertThrow(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
           Epetra_Import data_exchange(vector->Map(), v.vector->Map());
 
@@ -260,8 +244,7 @@ namespace TrilinosWrappers
           last_action = Insert;
         }
 #  if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
-      const Epetra_MpiComm *comm_ptr =
-        dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
+      const Epetra_MpiComm *comm_ptr = dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
       Assert(comm_ptr != nullptr, ExcInternalError());
       const size_type n_elements_global =
         Utilities::MPI::sum(owned_elements.n_elements(), comm_ptr->Comm());
@@ -293,21 +276,16 @@ namespace TrilinosWrappers
       for (size_type block = 0; block < v.n_blocks(); ++block)
         {
           TrilinosWrappers::types::int_type *glob_elements =
-            TrilinosWrappers::my_global_elements(
-              v.block(block).vector_partitioner());
+            TrilinosWrappers::my_global_elements(v.block(block).vector_partitioner());
           for (size_type i = 0; i < v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
-          owned_elements.add_indices(v.block(block).owned_elements,
-                                     block_offset);
+          owned_elements.add_indices(v.block(block).owned_elements, block_offset);
           block_offset += v.block(block).size();
         }
 
       Assert(n_elements == added_elements, ExcInternalError());
-      Epetra_Map new_map(v.size(),
-                         n_elements,
-                         global_ids.data(),
-                         0,
-                         v.block(0).vector_partitioner().Comm());
+      Epetra_Map new_map(
+        v.size(), n_elements, global_ids.data(), 0, v.block(0).vector_partitioner().Comm());
 
       auto actual_vec = std_cxx14::make_unique<Epetra_FEVector>(new_map);
 
@@ -320,11 +298,9 @@ namespace TrilinosWrappers
 
       if (import_data == true)
         {
-          AssertThrow(
-            static_cast<size_type>(
-              TrilinosWrappers::global_length(*actual_vec)) == v.size(),
-            ExcDimensionMismatch(TrilinosWrappers::global_length(*actual_vec),
-                                 v.size()));
+          AssertThrow(static_cast<size_type>(TrilinosWrappers::global_length(*actual_vec)) ==
+                        v.size(),
+                      ExcDimensionMismatch(TrilinosWrappers::global_length(*actual_vec), v.size()));
 
           Epetra_Import data_exchange(vector->Map(), actual_vec->Map());
 
@@ -336,8 +312,7 @@ namespace TrilinosWrappers
       else
         vector = std::move(actual_vec);
 #  if defined(DEBUG) && defined(DEAL_II_WITH_MPI)
-      const Epetra_MpiComm *comm_ptr =
-        dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+      const Epetra_MpiComm *comm_ptr = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
       Assert(comm_ptr != nullptr, ExcInternalError());
       const size_type n_elements_global =
         Utilities::MPI::sum(owned_elements.n_elements(), comm_ptr->Comm());
@@ -360,14 +335,12 @@ namespace TrilinosWrappers
         {
           IndexSet parallel_partitioner = locally_owned_entries;
           parallel_partitioner.add_indices(ghost_entries);
-          Epetra_Map map =
-            parallel_partitioner.make_trilinos_map(communicator, true);
-          vector = std_cxx14::make_unique<Epetra_FEVector>(map);
+          Epetra_Map map = parallel_partitioner.make_trilinos_map(communicator, true);
+          vector         = std_cxx14::make_unique<Epetra_FEVector>(map);
         }
       else
         {
-          Epetra_Map map =
-            locally_owned_entries.make_trilinos_map(communicator, true);
+          Epetra_Map map = locally_owned_entries.make_trilinos_map(communicator, true);
           Assert(map.IsOneToOne(),
                  ExcMessage("A writable vector must not have ghost entries in "
                             "its parallel partitioning"));
@@ -385,10 +358,8 @@ namespace TrilinosWrappers
           nonlocal_entries.subtract_set(locally_owned_entries);
           if (Utilities::MPI::n_mpi_processes(communicator) > 1)
             {
-              Epetra_Map nonlocal_map =
-                nonlocal_entries.make_trilinos_map(communicator, true);
-              nonlocal_vector =
-                std_cxx14::make_unique<Epetra_MultiVector>(nonlocal_map, 1);
+              Epetra_Map nonlocal_map = nonlocal_entries.make_trilinos_map(communicator, true);
+              nonlocal_vector         = std_cxx14::make_unique<Epetra_MultiVector>(nonlocal_map, 1);
             }
         }
 
@@ -409,18 +380,15 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator=(const Vector &v)
     {
-      Assert(vector.get() != nullptr,
-             ExcMessage("Vector is not constructed properly."));
+      Assert(vector.get() != nullptr, ExcMessage("Vector is not constructed properly."));
 
       // check equality for MPI communicators to avoid accessing a possibly
       // invalid MPI_Comm object
 #  ifdef DEAL_II_WITH_MPI
-      const Epetra_MpiComm *my_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
-      const Epetra_MpiComm *v_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
-      const bool same_communicators = my_comm != nullptr && v_comm != nullptr &&
-                                      my_comm->DataPtr() == v_comm->DataPtr();
+      const Epetra_MpiComm *my_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
+      const Epetra_MpiComm *v_comm  = dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
+      const bool            same_communicators =
+        my_comm != nullptr && v_comm != nullptr && my_comm->DataPtr() == v_comm->DataPtr();
       // Need to ask MPI whether the communicators are the same. We would like
       // to use the following checks but currently we cannot make sure the
       // memory of my_comm is not stale from some MPI_Comm_free
@@ -453,16 +421,15 @@ namespace TrilinosWrappers
         {
           *vector = *v.vector;
           if (v.nonlocal_vector.get() != nullptr)
-            nonlocal_vector = std_cxx14::make_unique<Epetra_MultiVector>(
-              v.nonlocal_vector->Map(), 1);
+            nonlocal_vector =
+              std_cxx14::make_unique<Epetra_MultiVector>(v.nonlocal_vector->Map(), 1);
           last_action = Zero;
         }
       // Second case: vectors have the same global
       // size, but different parallel layouts (and
       // one of them a one-to-one mapping). Then we
       // can call the import/export functionality.
-      else if (size() == v.size() &&
-               (v.vector->Map().UniqueGIDs() || vector->Map().UniqueGIDs()))
+      else if (size() == v.size() && (v.vector->Map().UniqueGIDs() || vector->Map().UniqueGIDs()))
         {
           reinit(v, false, true);
         }
@@ -477,8 +444,7 @@ namespace TrilinosWrappers
         }
 
       if (v.nonlocal_vector.get() != nullptr)
-        nonlocal_vector = std_cxx14::make_unique<Epetra_MultiVector>(
-          v.nonlocal_vector->Map(), 1);
+        nonlocal_vector = std_cxx14::make_unique<Epetra_MultiVector>(v.nonlocal_vector->Map(), 1);
 
       return *this;
     }
@@ -515,8 +481,7 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::import_nonlocal_data_for_fe(const TrilinosWrappers::SparseMatrix &m,
-                                        const Vector &                        v)
+    Vector::import_nonlocal_data_for_fe(const TrilinosWrappers::SparseMatrix &m, const Vector &v)
     {
       Assert(m.trilinos_matrix().Filled() == true,
              ExcMessage("Matrix is not compressed. "
@@ -526,8 +491,7 @@ namespace TrilinosWrappers
                         "which is not allowed."));
 
       if (vector->Map().SameAs(m.trilinos_matrix().ColMap()) == false)
-        vector =
-          std_cxx14::make_unique<Epetra_FEVector>(m.trilinos_matrix().ColMap());
+        vector = std_cxx14::make_unique<Epetra_FEVector>(m.trilinos_matrix().ColMap());
 
       Epetra_Import data_exchange(vector->Map(), v.vector->Map());
       const int     ierr = vector->Import(*v.vector, data_exchange, Insert);
@@ -558,10 +522,8 @@ namespace TrilinosWrappers
       else
         {
           Assert(
-            ((last_action == Add) &&
-             (given_last_action == ::dealii::VectorOperation::add)) ||
-              ((last_action == Insert) &&
-               (given_last_action == ::dealii::VectorOperation::insert)),
+            ((last_action == Add) && (given_last_action == ::dealii::VectorOperation::add)) ||
+              ((last_action == Insert) && (given_last_action == ::dealii::VectorOperation::insert)),
             ExcMessage(
               "The last operation on the Vector and the given last action in the compress() call do not agree!"));
         }
@@ -578,11 +540,10 @@ namespace TrilinosWrappers
       Assert(comm_ptr != nullptr, ExcInternalError());
       Utilities::MPI::MinMaxAvg result =
         Utilities::MPI::min_max_avg(double_mode, comm_ptr->GetMpiComm());
-      Assert(
-        result.max - result.min < 1e-5,
-        ExcMessage("Not all processors agree whether the last operation on "
-                   "this vector was an addition or a set operation. This will "
-                   "prevent the compress() operation from succeeding."));
+      Assert(result.max - result.min < 1e-5,
+             ExcMessage("Not all processors agree whether the last operation on "
+                        "this vector was an addition or a set operation. This will "
+                        "prevent the compress() operation from succeeding."));
 
 #    endif
 #  endif
@@ -610,8 +571,8 @@ namespace TrilinosWrappers
     Vector::operator()(const size_type index) const
     {
       // Extract local indices in the vector.
-      TrilinosWrappers::types::int_type trilinos_i = vector->Map().LID(
-        static_cast<TrilinosWrappers::types::int_type>(index));
+      TrilinosWrappers::types::int_type trilinos_i =
+        vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
       TrilinosScalar value = 0.;
 
       // If the element is not present on the current processor, we can't
@@ -619,10 +580,8 @@ namespace TrilinosWrappers
       if (trilinos_i == -1)
         {
           Assert(false,
-                 ExcAccessToNonLocalElement(index,
-                                            local_size(),
-                                            vector->Map().MinMyGID(),
-                                            vector->Map().MaxMyGID()));
+                 ExcAccessToNonLocalElement(
+                   index, local_size(), vector->Map().MinMyGID(), vector->Map().MaxMyGID()));
         }
       else
         value = (*vector)[0][trilinos_i];
@@ -640,13 +599,11 @@ namespace TrilinosWrappers
       else
         {
           Assert(!has_ghost_elements(), ExcGhostsPresent());
-          AssertThrow(size() == v.size(),
-                      ExcDimensionMismatch(size(), v.size()));
+          AssertThrow(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(11, 11, 0)
           Epetra_Import data_exchange(vector->Map(), v.vector->Map());
-          int           ierr =
-            vector->Import(*v.vector, data_exchange, Epetra_AddLocalAlso);
+          int           ierr = vector->Import(*v.vector, data_exchange, Epetra_AddLocalAlso);
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           last_action = Add;
 #  else
@@ -715,8 +672,7 @@ namespace TrilinosWrappers
 #  ifdef DEAL_II_WITH_MPI
       // in parallel, check that the vector
       // is zero on _all_ processors.
-      const Epetra_MpiComm *mpi_comm =
-        dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
+      const Epetra_MpiComm *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
       Assert(mpi_comm != nullptr, ExcInternalError());
       unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
       return num_nonzero == 0;
@@ -742,7 +698,7 @@ namespace TrilinosWrappers
       // loop over all the elements
       TrilinosScalar *start_ptr;
       int             leading_dimension;
-      int ierr = vector->ExtractView(&start_ptr, &leading_dimension);
+      int             ierr = vector->ExtractView(&start_ptr, &leading_dimension);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
       // TODO: This
@@ -785,14 +741,11 @@ namespace TrilinosWrappers
       if (size() != local_size())
         {
           auto global_id = [&](const size_type index) {
-            return gid(vector->Map(),
-                       static_cast<TrilinosWrappers::types::int_type>(index));
+            return gid(vector->Map(), static_cast<TrilinosWrappers::types::int_type>(index));
           };
-          out << "size:" << size() << " local_size:" << local_size() << " :"
-              << std::endl;
+          out << "size:" << size() << " local_size:" << local_size() << " :" << std::endl;
           for (size_type i = 0; i < local_size(); ++i)
-            out << "[" << global_id(i) << "]: " << (*(vector))[0][i]
-                << std::endl;
+            out << "[" << global_id(i) << "]: " << (*(vector))[0][i] << std::endl;
         }
       else
         {
@@ -837,8 +790,7 @@ namespace TrilinosWrappers
       // one index and the value per local
       // entry.
       return sizeof(*this) +
-             this->local_size() *
-               (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));
+             this->local_size() * (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));
     }
   } /* end of namespace MPI */
 } /* end of namespace TrilinosWrappers */

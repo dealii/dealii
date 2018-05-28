@@ -41,29 +41,27 @@ test()
 
   const unsigned int    dim          = 1;
   static const Point<3> vertices_1[] = {
-    Point<3>(0, 0, 0), Point<3>(1, 0, 0), Point<3>(1, 0, 0), Point<3>(1, 1, 0),
-    Point<3>(1, 1, 0), Point<3>(0, 1, 0), Point<3>(0, 1, 0), Point<3>(0, 0, 0),
-    Point<3>(0, 0, 1), Point<3>(1, 0, 1), Point<3>(1, 0, 1), Point<3>(1, 1, 1),
-    Point<3>(1, 1, 1), Point<3>(0, 1, 1), Point<3>(0, 1, 1), Point<3>(0, 0, 1),
-    Point<3>(0, 0, 0), Point<3>(0, 0, 1), Point<3>(1, 0, 0), Point<3>(1, 0, 1),
+    Point<3>(0, 0, 0), Point<3>(1, 0, 0), Point<3>(1, 0, 0), Point<3>(1, 1, 0), Point<3>(1, 1, 0),
+    Point<3>(0, 1, 0), Point<3>(0, 1, 0), Point<3>(0, 0, 0), Point<3>(0, 0, 1), Point<3>(1, 0, 1),
+    Point<3>(1, 0, 1), Point<3>(1, 1, 1), Point<3>(1, 1, 1), Point<3>(0, 1, 1), Point<3>(0, 1, 1),
+    Point<3>(0, 0, 1), Point<3>(0, 0, 0), Point<3>(0, 0, 1), Point<3>(1, 0, 0), Point<3>(1, 0, 1),
     Point<3>(1, 1, 0), Point<3>(1, 1, 1), Point<3>(0, 1, 0), Point<3>(0, 1, 1)};
-  const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
+  const unsigned int          n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
   const std::vector<Point<3>> vertices(&vertices_1[0], &vertices_1[n_vertices]);
 
-  static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
-    {0, 1},
-    {2, 3},
-    {4, 5},
-    {6, 7},
-    {8, 9},
-    {10, 11},
-    {12, 13},
-    {14, 15},
-    {16, 17},
-    {18, 19},
-    {20, 21},
-    {22, 23}};
-  const unsigned int n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+  static const int           cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {{0, 1},
+                                                                            {2, 3},
+                                                                            {4, 5},
+                                                                            {6, 7},
+                                                                            {8, 9},
+                                                                            {10, 11},
+                                                                            {12, 13},
+                                                                            {14, 15},
+                                                                            {16, 17},
+                                                                            {18, 19},
+                                                                            {20, 21},
+                                                                            {22, 23}};
+  const unsigned int         n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
 
   for (unsigned int i = 0; i < n_cells; ++i)

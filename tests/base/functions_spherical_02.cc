@@ -50,9 +50,7 @@ template <int dim>
 class RefFunc : public Function<dim>
 {
 public:
-  RefFunc(const Point<dim> origin = Point<dim>()) :
-    Function<dim>(1),
-    origin(origin)
+  RefFunc(const Point<dim> origin = Point<dim>()) : Function<dim>(1), origin(origin)
   {}
 
   virtual double
@@ -123,8 +121,7 @@ template <int dim>
 class SphFunc : public Functions::Spherical<dim>
 {
 public:
-  SphFunc(const Point<dim> origin = Point<dim>()) :
-    Functions::Spherical<dim>(origin)
+  SphFunc(const Point<dim> origin = Point<dim>()) : Functions::Spherical<dim>(origin)
   {}
 
 private:
@@ -192,8 +189,7 @@ check()
           // check values:
           const double v1 = func.value(p);
           const double v2 = func2.value(p);
-          AssertThrow(std::fabs(v1 - v2) <= std::abs(v1) * 1e-10,
-                      ExcInternalError());
+          AssertThrow(std::fabs(v1 - v2) <= std::abs(v1) * 1e-10, ExcInternalError());
 
           // check gradients:
           const Tensor<1, dim> g1 = func.gradient(p);

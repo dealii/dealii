@@ -37,10 +37,8 @@ void
 test(const unsigned int block_size_i, const unsigned int block_size_j)
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
   std::cout << std::setprecision(10);
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
@@ -49,9 +47,8 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   const unsigned int proc_columns = std::floor(n_mpi_processes / proc_rows);
   // create 2d process grid
   const std::vector<unsigned int>              sizes = {{400, 500}};
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, sizes[0], sizes[1], block_size_i, block_size_i);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(
+    mpi_communicator, sizes[0], sizes[1], block_size_i, block_size_i);
   pcout << "2D process grid: " << grid->get_process_grid_rows() << "x"
         << grid->get_process_grid_columns() << std::endl
         << std::endl;
@@ -64,8 +61,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   for (unsigned int i = 0; i < scaling_factors.size(); ++i)
     scaling_factors[i] = std::sqrt(i + 1);
 
-  ScaLAPACKMatrix<NumberType> scalapack_A(
-    full_A.m(), full_A.n(), grid, block_size_i, block_size_j);
+  ScaLAPACKMatrix<NumberType> scalapack_A(full_A.m(), full_A.n(), grid, block_size_i, block_size_j);
   scalapack_A = full_A;
   const ArrayView<NumberType> view_columns(scaling_factors);
   scalapack_A.scale_columns(view_columns);
@@ -77,11 +73,9 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
       full_A(i, j) *= scaling_factors[j];
 
   pcout << "   Column scaling for"
-        << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << ")"
-        << std::endl;
-  pcout << "   norms: " << tmp_full_A.frobenius_norm() << " & "
-        << full_A.frobenius_norm() << "  for " << typeid(NumberType).name()
-        << std::endl
+        << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << ")" << std::endl;
+  pcout << "   norms: " << tmp_full_A.frobenius_norm() << " & " << full_A.frobenius_norm()
+        << "  for " << typeid(NumberType).name() << std::endl
         << std::endl;
   pcout << std::endl;
 }
@@ -91,8 +85,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   const std::vector<unsigned int> blocks_i = {{16, 32, 64}};
   const std::vector<unsigned int> blocks_j = {{16, 32, 64}};

@@ -50,16 +50,15 @@ check()
   for (unsigned int cycle = 0; cycle < (dim == 2 ? 10 : 7); ++cycle)
     {
       // adaptive refinement into a circle
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             tr.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
            cell != tr.end();
            ++cell)
         if (cell->is_locally_owned() && cell->vertex(0).norm() < 1e-10)
           cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
 
-      deallog << "no. cells: " << tr.n_global_active_cells() << " on "
-              << tr.n_global_levels() << " levels" << std::endl;
+      deallog << "no. cells: " << tr.n_global_active_cells() << " on " << tr.n_global_levels()
+              << " levels" << std::endl;
 
       DoFHandler<dim> mgdof(tr);
       mgdof.distribute_dofs(fe);
@@ -75,12 +74,11 @@ check()
 
       if (0)
         {
-          std::ofstream grid_output(
-            ("out" + Utilities::to_string(myid) + ".svg").c_str());
+          std::ofstream     grid_output(("out" + Utilities::to_string(myid) + ".svg").c_str());
           GridOut           grid_out;
           GridOutFlags::Svg flags;
-          flags.label_level_subdomain_id = true;
-          flags.coloring = GridOutFlags::Svg::level_subdomain_id;
+          flags.label_level_subdomain_id       = true;
+          flags.coloring                       = GridOutFlags::Svg::level_subdomain_id;
           flags.convert_level_number_to_height = true;
           grid_out.set_flags(flags);
 
@@ -90,8 +88,8 @@ check()
       {
         // MGTransferPrebuilt internally uses Trilinos matrices, so only
         // create this if we have Trilinos
-        MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>>
-          transfer_ref(mg_constrained_dofs);
+        MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>> transfer_ref(
+          mg_constrained_dofs);
         transfer_ref.build_matrices(mgdof);
       }
 #endif

@@ -40,15 +40,13 @@ using namespace std;
 template <int s_dim, int spacedim>
 bool
 test_vertices_orientation(
-  const Triangulation<s_dim, spacedim> &boundary_mesh,
+  const Triangulation<s_dim, spacedim> &                           boundary_mesh,
   map<typename Triangulation<s_dim, spacedim>::cell_iterator,
-      typename Triangulation<s_dim + 1, spacedim>::face_iterator>
-    &       surface_to_volume_mapping,
-  const int verbosity = 1)
+      typename Triangulation<s_dim + 1, spacedim>::face_iterator> &surface_to_volume_mapping,
+  const int                                                        verbosity = 1)
 {
-  typename Triangulation<s_dim, spacedim>::active_cell_iterator
-    cell = boundary_mesh.begin_active(),
-    endc = boundary_mesh.end();
+  typename Triangulation<s_dim, spacedim>::active_cell_iterator cell = boundary_mesh.begin_active(),
+                                                                endc = boundary_mesh.end();
   typename Triangulation<s_dim + 1, spacedim>::face_iterator face;
 
   bool success = true;
@@ -111,8 +109,7 @@ main()
     const int dim = 3;
     deallog << "Testing hyper_ball in dim: " << dim << "..." << endl;
 
-    map<Triangulation<dim - 1, dim>::cell_iterator,
-        Triangulation<dim, dim>::face_iterator>
+    map<Triangulation<dim - 1, dim>::cell_iterator, Triangulation<dim, dim>::face_iterator>
                        surface_to_volume_mapping;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
@@ -122,8 +119,7 @@ main()
 
     Triangulation<dim - 1, dim> boundary_mesh;
 
-    surface_to_volume_mapping =
-      GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
+    surface_to_volume_mapping = GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
 
     if (!test_vertices_orientation(boundary_mesh, surface_to_volume_mapping, 2))
       Assert(false, ExcInternalError());

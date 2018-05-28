@@ -47,15 +47,13 @@ main()
     {
       deallog << "Cell = " << cell << std::endl;
       for (unsigned int i = 0; i < GeometryInfo<3>::lines_per_cell; ++i)
-        deallog << "    Line = " << cell->line(i) << " : "
-                << cell->line(i)->vertex_index(0) << " -> "
-                << cell->line(i)->vertex_index(1) << std::endl;
+        deallog << "    Line = " << cell->line(i) << " : " << cell->line(i)->vertex_index(0)
+                << " -> " << cell->line(i)->vertex_index(1) << std::endl;
 
       for (unsigned int i = 0; i < GeometryInfo<3>::quads_per_cell; ++i)
-        deallog << "    Quad = " << cell->quad(i) << " : "
-                << cell->quad(i)->vertex_index(0) << " -> "
-                << cell->quad(i)->vertex_index(1) << " -> "
-                << cell->quad(i)->vertex_index(2) << " -> "
-                << cell->quad(i)->vertex_index(3) << std::endl;
+        deallog << "    Quad = " << cell->quad(i) << " : " << cell->quad(i)->vertex_index(0)
+                << " -> " << cell->quad(i)->vertex_index(1) << " -> "
+                << cell->quad(i)->vertex_index(2) << " -> " << cell->quad(i)->vertex_index(3)
+                << std::endl;
     }
 }

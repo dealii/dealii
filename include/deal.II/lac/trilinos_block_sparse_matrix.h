@@ -314,9 +314,7 @@ namespace TrilinosWrappers
      * This function only applicable if the matrix only has one block row.
      */
     TrilinosScalar
-    residual(MPI::BlockVector &      dst,
-             const MPI::BlockVector &x,
-             const MPI::BlockVector &b) const;
+    residual(MPI::BlockVector &dst, const MPI::BlockVector &x, const MPI::BlockVector &b) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -326,9 +324,7 @@ namespace TrilinosWrappers
      * This function is only applicable if the matrix only has one block row.
      */
     TrilinosScalar
-    residual(MPI::BlockVector &      dst,
-             const MPI::Vector &     x,
-             const MPI::BlockVector &b) const;
+    residual(MPI::BlockVector &dst, const MPI::Vector &x, const MPI::BlockVector &b) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -338,9 +334,7 @@ namespace TrilinosWrappers
      * This function is only applicable if the matrix only has one block column.
      */
     TrilinosScalar
-    residual(MPI::Vector &           dst,
-             const MPI::BlockVector &x,
-             const MPI::Vector &     b) const;
+    residual(MPI::Vector &dst, const MPI::BlockVector &x, const MPI::Vector &b) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -350,9 +344,7 @@ namespace TrilinosWrappers
      * This function is only applicable if the matrix only has one block.
      */
     TrilinosScalar
-    residual(MPI::Vector &      dst,
-             const MPI::Vector &x,
-             const MPI::Vector &b) const;
+    residual(MPI::Vector &dst, const MPI::Vector &x, const MPI::Vector &b) const;
 
     /**
      * Make the clear() function in the base class visible, though it is
@@ -373,8 +365,8 @@ namespace TrilinosWrappers
                    int,
                    int,
                    int,
-                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
-                   << ',' << arg4 << "] have differing row numbers.");
+                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3 << ',' << arg4
+                   << "] have differing row numbers.");
 
     /**
      * Exception
@@ -384,8 +376,8 @@ namespace TrilinosWrappers
                    int,
                    int,
                    int,
-                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
-                   << ',' << arg4 << "] have differing column numbers.");
+                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3 << ',' << arg4
+                   << "] have differing column numbers.");
     ///@}
 
   private:
@@ -575,8 +567,7 @@ namespace TrilinosWrappers
 
     std::vector<IndexSet> domain_indices;
     for (size_type c = 0; c < this->n_block_cols(); ++c)
-      domain_indices.push_back(
-        this->sub_objects[0][c]->locally_owned_domain_indices());
+      domain_indices.push_back(this->sub_objects[0][c]->locally_owned_domain_indices());
 
     return domain_indices;
   }
@@ -591,8 +582,7 @@ namespace TrilinosWrappers
 
     std::vector<IndexSet> range_indices;
     for (size_type r = 0; r < this->n_block_rows(); ++r)
-      range_indices.push_back(
-        this->sub_objects[r][0]->locally_owned_range_indices());
+      range_indices.push_back(this->sub_objects[r][0]->locally_owned_range_indices());
 
     return range_indices;
   }
@@ -639,10 +629,9 @@ namespace TrilinosWrappers
         template <typename... Args>
         TrilinosBlockPayload(const Args &...)
         {
-          static_assert(
-            typeid(PayloadBlockType) ==
-              typeid(internal::LinearOperatorImplementation::TrilinosPayload),
-            "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
+          static_assert(typeid(PayloadBlockType) ==
+                          typeid(internal::LinearOperatorImplementation::TrilinosPayload),
+                        "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
         }
       };
 

@@ -37,10 +37,8 @@ void
 test()
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
   std::cout << std::setprecision(10);
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
@@ -49,8 +47,7 @@ test()
   const unsigned int proc_columns = std::floor(n_mpi_processes / proc_rows);
   // create 2d process grid
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, proc_rows, proc_columns);
+    std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator, proc_rows, proc_columns);
   pcout << "2D process grid: " << grid->get_process_grid_rows() << "x"
         << grid->get_process_grid_columns() << std::endl
         << std::endl;
@@ -69,12 +66,9 @@ test()
   const unsigned int nb_B = mb_A, mb_C = nb_A;
   const unsigned int nb_C = mb_B;
 
-  ScaLAPACKMatrix<NumberType> scalapack_A(
-    full_A.m(), full_A.n(), grid, mb_A, nb_A);
-  ScaLAPACKMatrix<NumberType> scalapack_B(
-    full_B.m(), full_B.n(), grid, mb_B, nb_B);
-  ScaLAPACKMatrix<NumberType> scalapack_C(
-    full_C.m(), full_C.n(), grid, mb_C, nb_C);
+  ScaLAPACKMatrix<NumberType> scalapack_A(full_A.m(), full_A.n(), grid, mb_A, nb_A);
+  ScaLAPACKMatrix<NumberType> scalapack_B(full_B.m(), full_B.n(), grid, mb_B, nb_B);
+  ScaLAPACKMatrix<NumberType> scalapack_C(full_C.m(), full_C.n(), grid, mb_C, nb_C);
   scalapack_A = full_A;
   scalapack_B = full_B;
   scalapack_C = full_C;
@@ -92,11 +86,9 @@ test()
   pcout << "   computing C = b A^T * B^T + c C with"
         << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
         << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
-        << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")"
-        << std::endl;
-  pcout << "   norms: " << tmp_full_C.frobenius_norm() << " & "
-        << full_C.frobenius_norm() << "  for " << typeid(NumberType).name()
-        << std::endl
+        << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
+  pcout << "   norms: " << tmp_full_C.frobenius_norm() << " & " << full_C.frobenius_norm()
+        << "  for " << typeid(NumberType).name() << std::endl
         << std::endl;
   pcout << std::endl;
 }
@@ -106,8 +98,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   test<double>();
 }

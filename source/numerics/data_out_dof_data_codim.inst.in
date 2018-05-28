@@ -14,42 +14,35 @@
 // ---------------------------------------------------------------------
 
 
-for (VEC : REAL_VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
-     deal_II_dimension : DIMENSIONS;
+for (VEC : REAL_VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension < deal_II_space_dimension
-    template void
-    DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
-                    deal_II_dimension,
-                    deal_II_space_dimension>::
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_space_dimension>::
       add_data_vector_internal<VEC>(
         const DH<deal_II_dimension, deal_II_space_dimension> *,
         const VEC &,
         const std::vector<std::string> &,
         const DataVectorType,
-        const std::vector<
-          DataComponentInterpretation::DataComponentInterpretation> &,
+        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &,
         const bool);
 
-    template void
-    DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
-                    deal_II_dimension,
-                    deal_II_space_dimension>::
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_space_dimension>::
       add_data_vector<VEC>(
         const VEC &,
-        const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+        const DataPostprocessor<DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
 
-    template void
-    DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
-                    deal_II_dimension,
-                    deal_II_space_dimension>::
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_space_dimension>::
       add_data_vector<VEC>(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const VEC &,
-        const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+        const DataPostprocessor<DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
 #endif
   }
 
@@ -59,27 +52,23 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : DIMENSIONS)
   {
 #if deal_II_dimension < deal_II_space_dimension
-    template void
-    DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
-                    deal_II_dimension,
-                    deal_II_space_dimension>::
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_space_dimension>::
       add_data_vector_internal<IndexSet>(
         const DH<deal_II_dimension, deal_II_space_dimension> *,
         const IndexSet &,
         const std::vector<std::string> &,
         const DataVectorType,
-        const std::vector<
-          DataComponentInterpretation::DataComponentInterpretation> &,
+        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &,
         const bool);
 
-    template void
-    DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
-                    deal_II_dimension,
-                    deal_II_space_dimension>::
+    template void DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
+                                  deal_II_dimension,
+                                  deal_II_space_dimension>::
       add_data_vector<IndexSet>(
         const IndexSet &,
-        const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+        const DataPostprocessor<DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
 #endif
   }
 
@@ -106,8 +95,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
       namespace DataOutImplementation
       \{
 #if deal_II_dimension < deal_II_space_dimension
-        template struct ParallelDataBase<deal_II_dimension,
-                                         deal_II_space_dimension>;
+        template struct ParallelDataBase<deal_II_dimension, deal_II_space_dimension>;
 #endif
       \}
     \}
@@ -123,16 +111,14 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
       \{
 #if deal_II_dimension < deal_II_space_dimension
         template void
-        ParallelDataBase<deal_II_dimension, deal_II_space_dimension>::
-          reinit_all_fe_values<
-            dealii::DH<deal_II_dimension, deal_II_space_dimension>>(
-            std::vector<std::shared_ptr<DataEntryBase<
-              dealii::DH<deal_II_dimension, deal_II_space_dimension>>>>
-              &dof_data,
-            const dealii::Triangulation<deal_II_dimension,
-                                        deal_II_space_dimension>::cell_iterator
-              &                cell,
-            const unsigned int face);
+        ParallelDataBase<deal_II_dimension, deal_II_space_dimension>::reinit_all_fe_values<
+          dealii::DH<deal_II_dimension, deal_II_space_dimension>>(
+          std::vector<
+            std::shared_ptr<DataEntryBase<dealii::DH<deal_II_dimension, deal_II_space_dimension>>>>
+            &dof_data,
+          const dealii::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator
+            &                cell,
+          const unsigned int face);
 #endif
       \}
     \}

@@ -1011,8 +1011,7 @@ TimerOutput::exit_section(const std::string &section_name)
   leave_subsection(section_name);
 }
 
-inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
-                                 const std::string &  section_name_) :
+inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_, const std::string &section_name_) :
   timer(timer_),
   section_name(section_name_),
   in(true)

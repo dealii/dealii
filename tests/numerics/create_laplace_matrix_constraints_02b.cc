@@ -78,8 +78,7 @@ check()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values(
-    dof, 0, Functions::ZeroFunction<dim>(2), constraints);
+  VectorTools::interpolate_boundary_values(dof, 0, Functions::ZeroFunction<dim>(2), constraints);
   constraints.close();
 
   // create sparsity pattern. note
@@ -103,8 +102,7 @@ check()
   constraints.condense(matrix_ref);
 
   const Function<dim> *const dummy = nullptr;
-  MatrixTools::create_laplace_matrix(
-    mapping, dof, quadrature, matrix, dummy, constraints);
+  MatrixTools::create_laplace_matrix(mapping, dof, quadrature, matrix, dummy, constraints);
 
   // compute reference: need to cancel constrained entries as these will in
   // general get different values

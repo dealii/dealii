@@ -49,8 +49,7 @@ test(const unsigned int chunk_size)
   // compare against the exact value of the
   // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
-  Assert(std::fabs((m.frobenius_norm() - norm) / norm) < 1e-14,
-         ExcInternalError());
+  Assert(std::fabs((m.frobenius_norm() - norm) / norm) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -65,21 +64,18 @@ main()
   try
     {
       const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
-      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
-           ++i)
+      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]); ++i)
         test(chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -87,12 +83,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

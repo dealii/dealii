@@ -110,8 +110,7 @@ public:
 
 template <int dim>
 double
-BoundaryValues<dim>::value(const Point<dim> &p,
-                           const unsigned int /*component*/) const
+BoundaryValues<dim>::value(const Point<dim> &p, const unsigned int /*component*/) const
 {
   return -0.5 / dim * p.norm_square();
 }
@@ -120,10 +119,10 @@ BoundaryValues<dim>::value(const Point<dim> &p,
 
 template <int dim>
 Step4<dim>::Step4() :
-  triangulation(MPI_COMM_WORLD,
-                typename Triangulation<dim>::MeshSmoothing(
-                  Triangulation<dim>::smoothing_on_refinement |
-                  Triangulation<dim>::smoothing_on_coarsening)),
+  triangulation(
+    MPI_COMM_WORLD,
+    typename Triangulation<dim>::MeshSmoothing(Triangulation<dim>::smoothing_on_refinement |
+                                               Triangulation<dim>::smoothing_on_coarsening)),
   fe(1),
   dof_handler(triangulation)
 {}
@@ -147,8 +146,7 @@ Step4<dim>::setup_system()
 
   constraints.clear();
   std::map<unsigned int, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, BoundaryValues<dim>(), constraints);
+  VectorTools::interpolate_boundary_values(dof_handler, 0, BoundaryValues<dim>(), constraints);
   constraints.close();
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
@@ -160,20 +158,15 @@ Step4<dim>::setup_system()
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
   SparsityTools::distribute_sparsity_pattern(
-    dsp,
-    dof_handler.n_locally_owned_dofs_per_processor(),
-    MPI_COMM_WORLD,
-    locally_relevant_dofs);
+    dsp, dof_handler.n_locally_owned_dofs_per_processor(), MPI_COMM_WORLD, locally_relevant_dofs);
 
-  system_matrix.reinit(
-    locally_owned_dofs, locally_owned_dofs, dsp, MPI_COMM_WORLD);
+  system_matrix.reinit(locally_owned_dofs, locally_owned_dofs, dsp, MPI_COMM_WORLD);
 
   solution.reinit(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
 
   system_rhs.reinit(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
 
-  system_rhs_two.reinit(
-    locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
+  system_rhs_two.reinit(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
 }
 
 
@@ -185,8 +178,8 @@ Step4<dim>::assemble_system()
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients | update_quadrature_points |
+                            update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -197,8 +190,7 @@ Step4<dim>::assemble_system()
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
 
   for (; cell != endc; ++cell)
@@ -214,20 +206,17 @@ Step4<dim>::assemble_system()
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  cell_matrix(i, j) +=
-                    (fe_values.shape_grad(i, q_point) *
-                     fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
+                  cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                        fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
-                cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 *
-                                fe_values.JxW(q_point));
+                cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 * fe_values.JxW(q_point));
 
-                cell_rhs_two(i) += (fe_values.shape_value(i, q_point) * 2.0 *
-                                    fe_values.JxW(q_point));
+                cell_rhs_two(i) +=
+                  (fe_values.shape_value(i, q_point) * 2.0 * fe_values.JxW(q_point));
               }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
-            cell_matrix, local_dof_indices, system_matrix);
+          constraints.distribute_local_to_global(cell_matrix, local_dof_indices, system_matrix);
 
           constraints.distribute_local_to_global(
             cell_rhs, local_dof_indices, system_rhs, cell_matrix);
@@ -272,8 +261,7 @@ Step4<dim>::solve()
                                     QGauss<dim>(3),
                                     VectorTools::L2_norm);
   deallog << " L2 error: "
-          << VectorTools::compute_global_error(
-               triangulation, cellwise_error, VectorTools::L2_norm)
+          << VectorTools::compute_global_error(triangulation, cellwise_error, VectorTools::L2_norm)
           << std::endl;
 
   // do solve 2 without refactorizing
@@ -303,8 +291,7 @@ Step4<dim>::run()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
   mpi_initlog();
   deallog << std::setprecision(10);
 

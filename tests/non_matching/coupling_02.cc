@@ -56,8 +56,7 @@ test()
   space_tria.refine_global(2);
 
   FE_Q<dim, spacedim>          fe(1);
-  FESystem<spacedim, spacedim> space_fe(FE_Q<spacedim, spacedim>(1),
-                                        spacedim + 1);
+  FESystem<spacedim, spacedim> space_fe(FE_Q<spacedim, spacedim>(1), spacedim + 1);
   ComponentMask                space_mask(spacedim + 1, false);
   space_mask.set(spacedim, true);
 
@@ -80,13 +79,11 @@ test()
   SparsityPattern sparsity;
   {
     DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
-    NonMatching::create_coupling_sparsity_pattern(
-      space_dh, dh, quad, dsp, constraints, space_mask);
+    NonMatching::create_coupling_sparsity_pattern(space_dh, dh, quad, dsp, constraints, space_mask);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
-  NonMatching::create_coupling_mass_matrix(
-    space_dh, dh, quad, coupling, constraints, space_mask);
+  NonMatching::create_coupling_mass_matrix(space_dh, dh, quad, coupling, constraints, space_mask);
 
   SparsityPattern mass_sparsity;
   {

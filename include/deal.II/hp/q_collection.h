@@ -163,11 +163,9 @@ namespace hp
 
 
   template <int dim>
-  inline const Quadrature<dim> &QCollection<dim>::
-                                operator[](const unsigned int index) const
+  inline const Quadrature<dim> &QCollection<dim>::operator[](const unsigned int index) const
   {
-    Assert(index < quadratures.size(),
-           ExcIndexRange(index, 0, quadratures.size()));
+    Assert(index < quadratures.size(), ExcIndexRange(index, 0, quadratures.size()));
     return *quadratures[index];
   }
 
@@ -193,8 +191,7 @@ namespace hp
   inline void
   QCollection<dim>::push_back(const Quadrature<dim> &new_quadrature)
   {
-    quadratures.push_back(
-      std::make_shared<const Quadrature<dim>>(new_quadrature));
+    quadratures.push_back(std::make_shared<const Quadrature<dim>>(new_quadrature));
   }
 
 } // namespace hp

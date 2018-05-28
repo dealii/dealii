@@ -90,8 +90,7 @@ test_compute_pt_loc(unsigned int n_points)
           if (real_quad[q].distance(points[local_map[q]]) > 1e-10)
             deallog << "Error on cell : " << cell << " at local point " << i
                     << ", corresponding to real point " << points[local_map[q]]
-                    << ", that got transformed to " << real_quad[q]
-                    << " instead." << std::endl;
+                    << ", that got transformed to " << real_quad[q] << " instead." << std::endl;
         }
     }
   deallog << "Test finished" << std::endl;

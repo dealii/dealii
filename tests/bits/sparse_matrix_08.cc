@@ -49,8 +49,7 @@ test()
   // compare against the exact value of the
   // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
-  AssertThrow(std::fabs((m.frobenius_norm() - norm) / norm) < 1e-14,
-              ExcInternalError());
+  AssertThrow(std::fabs((m.frobenius_norm() - norm) / norm) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -70,13 +69,11 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Exception on processing: " << std::endl
               << exc.what() << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
 
       return 1;
     }
@@ -84,12 +81,10 @@ main()
     {
       deallog << std::endl
               << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       deallog << "Unknown exception!" << std::endl
               << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
+              << "----------------------------------------------------" << std::endl;
       return 1;
     };
 }

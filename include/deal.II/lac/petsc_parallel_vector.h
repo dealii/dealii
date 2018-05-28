@@ -184,9 +184,7 @@ namespace PETScWrappers
        * <tt>v=Vector@<number@>(0);</tt>, i.e. the vector is replaced by one
        * of length zero.
        */
-      explicit Vector(const MPI_Comm &communicator,
-                      const size_type n,
-                      const size_type local_size);
+      explicit Vector(const MPI_Comm &communicator, const size_type n, const size_type local_size);
 
 
       /**
@@ -245,9 +243,7 @@ namespace PETScWrappers
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      Vector(const IndexSet &local,
-             const IndexSet &ghost,
-             const MPI_Comm &communicator);
+      Vector(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &communicator);
 
       /**
        * Construct a new parallel PETSc vector without ghost elements from an
@@ -340,9 +336,7 @@ namespace PETScWrappers
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void
-      reinit(const IndexSet &local,
-             const IndexSet &ghost,
-             const MPI_Comm &communicator);
+      reinit(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &communicator);
 
       /**
        * Reinit as a vector without ghost elements. See constructor with same
@@ -405,9 +399,7 @@ namespace PETScWrappers
        * update_ghost_values() before accessing those.
        */
       virtual void
-      create_vector(const size_type n,
-                    const size_type local_size,
-                    const IndexSet &ghostnodes);
+      create_vector(const size_type n, const size_type local_size, const IndexSet &ghostnodes);
 
 
     private:
@@ -534,8 +526,7 @@ namespace internal
                           PETScWrappers::MPI::Vector &v,
                           bool /*omit_zeroing_entries*/)
       {
-        v.reinit(matrix.locally_owned_range_indices(),
-                 matrix.get_mpi_communicator());
+        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator());
       }
 
       template <typename Matrix>
@@ -544,8 +535,7 @@ namespace internal
                            PETScWrappers::MPI::Vector &v,
                            bool /*omit_zeroing_entries*/)
       {
-        v.reinit(matrix.locally_owned_domain_indices(),
-                 matrix.get_mpi_communicator());
+        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator());
       }
     };
 

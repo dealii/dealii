@@ -76,9 +76,7 @@ test()
 
   if (myid == 0)
     {
-      for (unsigned int i = 0;
-           i < dofh.n_locally_owned_dofs_per_processor().size();
-           ++i)
+      for (unsigned int i = 0; i < dofh.n_locally_owned_dofs_per_processor().size(); ++i)
         deallog << dofh.n_locally_owned_dofs_per_processor()[i] << std::endl;
       data_out.write_vtu(deallog.get_file_stream());
     }

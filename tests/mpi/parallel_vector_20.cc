@@ -38,7 +38,7 @@ test()
   read_write_owned.add_range(my_id * 2, my_id * 2 + 2);
 
   LinearAlgebra::distributed::Vector<double> v(locally_owned, MPI_COMM_WORLD);
-  LinearAlgebra::ReadWriteVector<double> read_write_vector(read_write_owned);
+  LinearAlgebra::ReadWriteVector<double>     read_write_vector(read_write_owned);
   read_write_vector.local_element(0) = 1.;
   read_write_vector.local_element(1) = 2.;
 
@@ -68,8 +68,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

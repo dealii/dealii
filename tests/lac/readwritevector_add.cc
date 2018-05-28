@@ -58,14 +58,10 @@ test()
   double_vector_1.add(indices, float_vector);
   double_vector_2.add(size, &indices[0], &double_values[0]);
   double_vector_1.swap(double_vector_2);
-  LinearAlgebra::ReadWriteVector<double>::iterator val_1 =
-    double_vector_1.begin();
-  LinearAlgebra::ReadWriteVector<double>::iterator end_1 =
-    double_vector_1.end();
-  LinearAlgebra::ReadWriteVector<double>::iterator val_2 =
-    double_vector_2.begin();
-  LinearAlgebra::ReadWriteVector<double>::iterator end_2 =
-    double_vector_2.end();
+  LinearAlgebra::ReadWriteVector<double>::iterator val_1 = double_vector_1.begin();
+  LinearAlgebra::ReadWriteVector<double>::iterator end_1 = double_vector_1.end();
+  LinearAlgebra::ReadWriteVector<double>::iterator val_2 = double_vector_2.begin();
+  LinearAlgebra::ReadWriteVector<double>::iterator end_2 = double_vector_2.end();
   deallog << "double_vector_1" << std::endl;
   for (; val_1 < end_1; ++val_1)
     deallog << *val_1 << std::endl;

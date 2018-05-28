@@ -49,8 +49,7 @@ namespace PETScWrappers
       const PetscInt *   colnums;
       const PetscScalar *values;
 
-      PetscErrorCode ierr =
-        MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);
+      PetscErrorCode ierr = MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // copy it into our caches if the line
@@ -60,10 +59,8 @@ namespace PETScWrappers
       // iterator for an empty line (what
       // would it point to?)
       Assert(ncols != 0, ExcInternalError());
-      colnum_cache =
-        std::make_shared<std::vector<size_type>>(colnums, colnums + ncols);
-      value_cache =
-        std::make_shared<std::vector<PetscScalar>>(values, values + ncols);
+      colnum_cache = std::make_shared<std::vector<size_type>>(colnums, colnums + ncols);
+      value_cache  = std::make_shared<std::vector<PetscScalar>>(values, values + ncols);
 
       // and finally restore the matrix
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);
@@ -73,9 +70,7 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::MatrixBase() :
-    matrix(nullptr),
-    last_action(VectorOperation::unknown)
+  MatrixBase::MatrixBase() : matrix(nullptr), last_action(VectorOperation::unknown)
   {}
 
 
@@ -99,8 +94,8 @@ namespace PETScWrappers
     // ...and replace it by an empty
     // sequential matrix
     const int            m = 0, n = 0, n_nonzero_per_row = 0;
-    const PetscErrorCode ierr = MatCreateSeqAIJ(
-      PETSC_COMM_SELF, m, n, n_nonzero_per_row, nullptr, &matrix);
+    const PetscErrorCode ierr =
+      MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row, nullptr, &matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -132,8 +127,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::clear_rows(const std::vector<size_type> &rows,
-                         const PetscScalar             new_diag_value)
+  MatrixBase::clear_rows(const std::vector<size_type> &rows, const PetscScalar new_diag_value)
   {
     assert_is_compressed();
 
@@ -146,14 +140,10 @@ namespace PETScWrappers
     // since this is a collective operation
     IS index_set;
 
-    ISCreateGeneral(get_mpi_communicator(),
-                    rows.size(),
-                    petsc_rows.data(),
-                    PETSC_COPY_VALUES,
-                    &index_set);
+    ISCreateGeneral(
+      get_mpi_communicator(), rows.size(), petsc_rows.data(), PETSC_COPY_VALUES, &index_set);
 
-    const PetscErrorCode ierr =
-      MatZeroRowsIS(matrix, index_set, new_diag_value, nullptr, nullptr);
+    const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value, nullptr, nullptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     ISDestroy(&index_set);
   }
@@ -167,8 +157,7 @@ namespace PETScWrappers
 
     PetscScalar value;
 
-    const PetscErrorCode ierr =
-      MatGetValues(matrix, 1, &petsc_i, 1, &petsc_j, &value);
+    const PetscErrorCode ierr = MatGetValues(matrix, 1, &petsc_i, 1, &petsc_j, &value);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return value;
@@ -199,26 +188,19 @@ namespace PETScWrappers
       int my_int_last_action = last_action;
       int all_int_last_action;
 
-      const int ierr = MPI_Allreduce(&my_int_last_action,
-                                     &all_int_last_action,
-                                     1,
-                                     MPI_INT,
-                                     MPI_BOR,
-                                     get_mpi_communicator());
+      const int ierr = MPI_Allreduce(
+        &my_int_last_action, &all_int_last_action, 1, MPI_INT, MPI_BOR, get_mpi_communicator());
       AssertThrowMPI(ierr);
 
-      AssertThrow(all_int_last_action !=
-                    (VectorOperation::add | VectorOperation::insert),
+      AssertThrow(all_int_last_action != (VectorOperation::add | VectorOperation::insert),
                   ExcMessage("Error: not all processors agree on the last "
                              "VectorOperation before this compress() call."));
 #    endif
 #  endif
     }
 
-    AssertThrow(
-      last_action == VectorOperation::unknown || last_action == operation,
-      ExcMessage(
-        "Missing compress() or calling with wrong VectorOperation argument."));
+    AssertThrow(last_action == VectorOperation::unknown || last_action == operation,
+                ExcMessage("Missing compress() or calling with wrong VectorOperation argument."));
 
     // flush buffers
     PetscErrorCode ierr = MatAssemblyBegin(matrix, MAT_FINAL_ASSEMBLY);
@@ -326,7 +308,7 @@ namespace PETScWrappers
     // now dangling. as a consequence, we need to save the size of the array
     // and return the saved value.
     const PetscInt ncols_saved = ncols;
-    ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
+    ierr                       = MatRestoreRow(*this, row, &ncols, &colnums, &values);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return ncols_saved;
@@ -381,8 +363,7 @@ namespace PETScWrappers
 
 
   PetscScalar
-  MatrixBase::matrix_scalar_product(const VectorBase &u,
-                                    const VectorBase &v) const
+  MatrixBase::matrix_scalar_product(const VectorBase &u, const VectorBase &v) const
   {
     VectorBase tmp(u);
     vmult(tmp, v);
@@ -428,8 +409,7 @@ namespace PETScWrappers
   MatrixBase &
   MatrixBase::add(const PetscScalar factor, const MatrixBase &other)
   {
-    const PetscErrorCode ierr =
-      MatAXPY(matrix, factor, other, DIFFERENT_NONZERO_PATTERN);
+    const PetscErrorCode ierr = MatAXPY(matrix, factor, other, DIFFERENT_NONZERO_PATTERN);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -516,20 +496,14 @@ namespace PETScWrappers
         {
           if (transpose_left)
             {
-              ierr = MatTransposeMatMult(inputleft,
-                                         inputright,
-                                         MAT_INITIAL_MATRIX,
-                                         PETSC_DEFAULT,
-                                         &result.petsc_matrix());
+              ierr = MatTransposeMatMult(
+                inputleft, inputright, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &result.petsc_matrix());
               AssertThrow(ierr == 0, ExcPETScError(ierr));
             }
           else
             {
-              ierr = MatMatMult(inputleft,
-                                inputright,
-                                MAT_INITIAL_MATRIX,
-                                PETSC_DEFAULT,
-                                &result.petsc_matrix());
+              ierr = MatMatMult(
+                inputleft, inputright, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &result.petsc_matrix());
               AssertThrow(ierr == 0, ExcPETScError(ierr));
             }
         }
@@ -549,36 +523,27 @@ namespace PETScWrappers
             }
           ierr = MatDiagonalScale(tmp, nullptr, V);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
-          ierr = MatMatMult(tmp,
-                            inputright,
-                            MAT_INITIAL_MATRIX,
-                            PETSC_DEFAULT,
-                            &result.petsc_matrix());
+          ierr =
+            MatMatMult(tmp, inputright, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &result.petsc_matrix());
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
     }
   } // namespace internals
 
   void
-  MatrixBase::mmult(MatrixBase &      C,
-                    const MatrixBase &B,
-                    const VectorBase &V) const
+  MatrixBase::mmult(MatrixBase &C, const MatrixBase &B, const VectorBase &V) const
   {
     internals::perform_mmult(*this, B, C, V, false);
   }
 
   void
-  MatrixBase::Tmmult(MatrixBase &      C,
-                     const MatrixBase &B,
-                     const VectorBase &V) const
+  MatrixBase::Tmmult(MatrixBase &C, const MatrixBase &B, const VectorBase &V) const
   {
     internals::perform_mmult(*this, B, C, V, true);
   }
 
   PetscScalar
-  MatrixBase::residual(VectorBase &      dst,
-                       const VectorBase &x,
-                       const VectorBase &b) const
+  MatrixBase::residual(VectorBase &dst, const VectorBase &x, const VectorBase &b) const
   {
     // avoid the use of a temporary, and
     // rather do one negation pass more than
@@ -638,8 +603,7 @@ namespace PETScWrappers
     assert_is_compressed();
 
     // Set options
-    PetscErrorCode ierr =
-      PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, format);
+    PetscErrorCode ierr = PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, format);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
@@ -650,8 +614,7 @@ namespace PETScWrappers
   void
   MatrixBase::print(std::ostream &out, const bool /*alternative_output*/) const
   {
-    std::pair<MatrixBase::size_type, MatrixBase::size_type> loc_range =
-      local_range();
+    std::pair<MatrixBase::size_type, MatrixBase::size_type> loc_range = local_range();
 
     PetscInt           ncols;
     const PetscInt *   colnums;
@@ -665,8 +628,7 @@ namespace PETScWrappers
 
         for (PetscInt col = 0; col < ncols; ++col)
           {
-            out << "(" << row << "," << colnums[col] << ") " << values[col]
-                << std::endl;
+            out << "(" << row << "," << colnums[col] << ") " << values[col] << std::endl;
           }
 
         ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);

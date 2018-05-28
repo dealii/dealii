@@ -58,16 +58,16 @@ main()
           {
             FunctionParser<2> function(i);
             function.initialize(variables, expressions, constants);
-            deallog << "Initialize Succeeded with dim = 2, " << i
-                    << " components, " << expressions.size() << " expressions, "
-                    << variables << " as variables." << std::endl;
+            deallog << "Initialize Succeeded with dim = 2, " << i << " components, "
+                    << expressions.size() << " expressions, " << variables << " as variables."
+                    << std::endl;
           }
         }
       catch (...)
         {
           deallog << "Initialize Failed with dim = 2, " << i << " components, "
-                  << expressions.size() << " expressions, " << variables
-                  << " as variables." << std::endl;
+                  << expressions.size() << " expressions, " << variables << " as variables."
+                  << std::endl;
         }
 
       try
@@ -75,16 +75,14 @@ main()
           {
             FunctionParser<2> function_bis(i);
             function_bis.initialize(variables, concatenated, constants);
-            deallog << "Initialize Succeeded with dim = 2, " << i
-                    << " components, " << concatenated << " as function and "
-                    << variables << " as variables." << std::endl;
+            deallog << "Initialize Succeeded with dim = 2, " << i << " components, " << concatenated
+                    << " as function and " << variables << " as variables." << std::endl;
           }
         }
       catch (...)
         {
-          deallog << "Initialize Failed with dim = 2, " << i << " components, "
-                  << concatenated << " as function and " << variables
-                  << " as variables." << std::endl;
+          deallog << "Initialize Failed with dim = 2, " << i << " components, " << concatenated
+                  << " as function and " << variables << " as variables." << std::endl;
         }
 
       concatenated += "; " + expressions[i - 1];

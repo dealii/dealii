@@ -49,8 +49,7 @@ main()
 
   // now do some sort of random, anisotropic
   // refinement
-  Triangulation<2>::active_cell_iterator cell = tri.begin_active(),
-                                         end  = tri.end();
+  Triangulation<2>::active_cell_iterator cell = tri.begin_active(), end = tri.end();
   for (; cell != end; ++cell)
     {
       switch (Testing::rand() % 4)

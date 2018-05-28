@@ -52,8 +52,7 @@ namespace Functions
      * quantities -- not as the components of a vector that will be
      * re-interpreted in a different coordinate system.
      */
-    Spherical(const Point<dim> & center       = Point<dim>(),
-              const unsigned int n_components = 1);
+    Spherical(const Point<dim> &center = Point<dim>(), const unsigned int n_components = 1);
 
     /**
      * Return the value of the function at the given point.
@@ -62,8 +61,7 @@ namespace Functions
      * calls svalue() with it, and returns the result.
      */
     virtual double
-    value(const Point<dim> & point,
-          const unsigned int component = 0) const override;
+    value(const Point<dim> &point, const unsigned int component = 0) const override;
 
     /**
      * Return the gradient with respect to the Cartesian coordinates at point @p p.
@@ -73,8 +71,7 @@ namespace Functions
      * coordinates.
      */
     virtual Tensor<1, dim>
-    gradient(const Point<dim> & p,
-             const unsigned int component = 0) const override;
+    gradient(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Return the Hessian with respect to the Cartesian coordinates at point @p p.
@@ -84,8 +81,7 @@ namespace Functions
      * Cartesian coordinates.
      */
     virtual SymmetricTensor<2, dim>
-    hessian(const Point<dim> & p,
-            const unsigned int component = 0) const override;
+    hessian(const Point<dim> &p, const unsigned int component = 0) const override;
 
     std::size_t
     memory_consumption() const;
@@ -96,8 +92,7 @@ namespace Functions
      * coordinates.
      */
     virtual double
-    svalue(const std::array<double, dim> &sp,
-           const unsigned int             component) const;
+    svalue(const std::array<double, dim> &sp, const unsigned int component) const;
 
     /**
      * Return the gradient in spherical coordinates.
@@ -106,8 +101,7 @@ namespace Functions
      * $\{ f_{,r},\, f_{,\theta},\, f_{,\phi}\}$.
      */
     virtual std::array<double, dim>
-    sgradient(const std::array<double, dim> &sp,
-              const unsigned int             component) const;
+    sgradient(const std::array<double, dim> &sp, const unsigned int component) const;
 
     /**
      * Return the Hessian in spherical coordinates.
@@ -117,8 +111,7 @@ namespace Functions
      * f_{,r\phi},\, f_{,\theta\phi}\}$.
      */
     virtual std::array<double, 6>
-    shessian(const std::array<double, dim> &sp,
-             const unsigned int             component) const;
+    shessian(const std::array<double, dim> &sp, const unsigned int component) const;
 
     /**
      * A vector from the origin to the center of spherical coordinate system.

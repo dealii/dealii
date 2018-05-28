@@ -145,17 +145,14 @@ void
 test_global_refinement(void (*test_block_list)(const Triangulation<dim> &tr,
                                                const FiniteElement<dim> &fe))
 {
-  Triangulation<dim> trc(
-    Triangulation<dim>::limit_level_difference_at_vertices);
-  Triangulation<dim> trl(
-    Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> trc(Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> trl(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(trc);
   trc.refine_global(2);
   GridGenerator::hyper_L(trl);
   trl.refine_global(1);
 
-  FESystem<dim, dim> fe1(
-    FESystem<dim, dim>(FE_Q<dim, dim>(2), dim), 1, FE_Q<dim, dim>(1), 1);
+  FESystem<dim, dim> fe1(FESystem<dim, dim>(FE_Q<dim, dim>(2), dim), 1, FE_Q<dim, dim>(1), 1);
 
   deallog.push("Square");
   test_block_list(trc, fe1);

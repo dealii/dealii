@@ -29,10 +29,8 @@ template <typename T, typename U, typename CompareType>
 void
 check()
 {
-  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType),
-              ExcInternalError());
-  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(T() * U()),
-              ExcInternalError());
+  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType), ExcInternalError());
+  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(T() * U()), ExcInternalError());
 }
 
 
@@ -51,12 +49,8 @@ main()
   // around, so stay within the same type system
   check<std::complex<double>, double, std::complex<double>>();
   check<std::complex<float>, float, std::complex<float>>();
-  check<SymmetricTensor<2, 2>,
-        std::complex<double>,
-        SymmetricTensor<2, 2, std::complex<double>>>();
-  check<std::complex<double>,
-        SymmetricTensor<2, 2>,
-        SymmetricTensor<2, 2, std::complex<double>>>();
+  check<SymmetricTensor<2, 2>, std::complex<double>, SymmetricTensor<2, 2, std::complex<double>>>();
+  check<std::complex<double>, SymmetricTensor<2, 2>, SymmetricTensor<2, 2, std::complex<double>>>();
 
   deallog << "OK" << std::endl;
 }

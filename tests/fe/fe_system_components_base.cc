@@ -64,19 +64,14 @@ test(const bool renumber = false)
 
   for (unsigned int i = 0; i < n_dofs; ++i)
     {
-      const unsigned int component =
-        fe_basis.system_to_component_index(i).first;
-      const unsigned int within_base =
-        fe_basis.system_to_component_index(i).second;
-      const unsigned int base = fe_basis.system_to_base_index(i).first.first;
-      const unsigned int multiplicity =
-        fe_basis.system_to_base_index(i).first.second;
-      const unsigned int within_base_ =
-        fe_basis.system_to_base_index(i).second; // same as above
-      std::cout << std::setfill(' ') << " * | " << std::setw(6) << i << " | "
-                << std::setw(10) << component << " | " << std::setw(12) << base
-                << " | " << std::setw(26) << within_base << " | "
-                << std::setw(12) << multiplicity << " |" << std::endl;
+      const unsigned int component    = fe_basis.system_to_component_index(i).first;
+      const unsigned int within_base  = fe_basis.system_to_component_index(i).second;
+      const unsigned int base         = fe_basis.system_to_base_index(i).first.first;
+      const unsigned int multiplicity = fe_basis.system_to_base_index(i).first.second;
+      const unsigned int within_base_ = fe_basis.system_to_base_index(i).second; // same as above
+      std::cout << std::setfill(' ') << " * | " << std::setw(6) << i << " | " << std::setw(10)
+                << component << " | " << std::setw(12) << base << " | " << std::setw(26)
+                << within_base << " | " << std::setw(12) << multiplicity << " |" << std::endl;
     }
 
   // print grid and DoFs for visual inspection
@@ -84,15 +79,13 @@ test(const bool renumber = false)
     {
       std::map<types::global_dof_index, Point<dim>> support_points;
       MappingQ1<dim>                                mapping;
-      DoFTools::map_dofs_to_support_points(
-        mapping, dof_handler, support_points);
+      DoFTools::map_dofs_to_support_points(mapping, dof_handler, support_points);
 
-      const std::string filename = "grid" + Utilities::int_to_string(dim) +
-                                   Utilities::int_to_string(renumber) + ".gp";
+      const std::string filename =
+        "grid" + Utilities::int_to_string(dim) + Utilities::int_to_string(renumber) + ".gp";
       std::ofstream f(filename.c_str());
 
-      f << "set terminal png size 420,440 enhanced font \"Helvetica,16\""
-        << std::endl
+      f << "set terminal png size 420,440 enhanced font \"Helvetica,16\"" << std::endl
         << "set output \"grid" << Utilities::int_to_string(dim)
         << Utilities::int_to_string(renumber) << ".png\"" << std::endl
         << "set size square" << std::endl

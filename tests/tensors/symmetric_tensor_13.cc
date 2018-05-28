@@ -32,8 +32,7 @@ test()
     for (unsigned int j = i; j < dim; ++j)
       t[i][j] = (1. + (i + 1) * (j * 2));
 
-  AssertThrow(trace(deviator_tensor<dim>() * t) < 1e-15 * t.norm(),
-              ExcInternalError());
+  AssertThrow(trace(deviator_tensor<dim>() * t) < 1e-15 * t.norm(), ExcInternalError());
 }
 
 

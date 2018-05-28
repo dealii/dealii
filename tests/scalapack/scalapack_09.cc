@@ -37,16 +37,13 @@ void
 test(const unsigned int block_size, const NumberType tol)
 {
   MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(
-    Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(
-    Utilities::MPI::this_mpi_process(mpi_communicator));
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
   ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid_2d =
-    std::make_shared<Utilities::MPI::ProcessGrid>(
-      mpi_communicator, 4, 3, block_size, block_size);
+    std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator, 4, 3, block_size, block_size);
 
   // examples from
   // https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
@@ -111,10 +108,8 @@ test(const unsigned int block_size, const NumberType tol)
   full_X_I(3, 4) = 0.;
 
   // compute eigenpairs of s.p.d matrix
-  ScaLAPACKMatrix<NumberType> scalapack_A(
-    4, 3, grid_2d, block_size, block_size);
-  ScaLAPACKMatrix<NumberType> scalapack_B(
-    4, 5, grid_2d, block_size, block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_A(4, 3, grid_2d, block_size, block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_B(4, 5, grid_2d, block_size, block_size);
   scalapack_A.set_property(LAPACKSupport::Property::general);
   scalapack_A = full_A_I;
   scalapack_B = full_B_I;
@@ -123,8 +118,7 @@ test(const unsigned int block_size, const NumberType tol)
   scalapack_B.copy_to(result);
 
   result.add(-1, full_X_I);
-  AssertThrow(result.frobenius_norm() < tol,
-              ExcMessage("solution deviates from reference"));
+  AssertThrow(result.frobenius_norm() < tol, ExcMessage("solution deviates from reference"));
 }
 
 
@@ -132,8 +126,7 @@ test(const unsigned int block_size, const NumberType tol)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   const std::vector<unsigned int> blocks     = {{1, 2}};
   const double                    tol_double = 1e-10;

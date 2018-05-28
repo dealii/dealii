@@ -43,8 +43,7 @@ void
 output(parallel::distributed::Triangulation<dim> &tr)
 {
   const std::string filename =
-    ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
-     ".fig");
+    ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) + ".fig");
   std::ofstream stream(filename.c_str());
 
   GridOutFlags::XFig flags;
@@ -85,8 +84,7 @@ test()
           deallog << "ID = " << i << std::endl;
           for (unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)
             {
-              typename Triangulation<dim>::cell_iterator cell = tr.begin(lvl),
-                                                         endc = tr.end(lvl);
+              typename Triangulation<dim>::cell_iterator cell = tr.begin(lvl), endc = tr.end(lvl);
 
               for (; cell != endc; ++cell)
                 if (cell->level_subdomain_id() != 4294967294)
@@ -100,8 +98,8 @@ test()
     }
 
   if (myid == 0)
-    deallog << "my levels: " << tr.n_levels()
-            << "<= global levels:" << tr.n_global_levels() << std::endl;
+    deallog << "my levels: " << tr.n_levels() << "<= global levels:" << tr.n_global_levels()
+            << std::endl;
 }
 
 

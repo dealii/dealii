@@ -64,8 +64,7 @@ test()
     },
     [&](const cell_iterator &cell, const DT &data) {
       std::ostringstream oss;
-      oss << "unpack " << cell->id() << " " << data << " from "
-          << cell->subdomain_id();
+      oss << "unpack " << cell->id() << " " << data << " from " << cell->subdomain_id();
 
       output.insert(oss.str());
     });

@@ -54,8 +54,8 @@ check()
           check.print(deallog);
         }
 
-      deallog << "Add and dot should be " << prod / static_cast<number>(size)
-              << ", is " << prod_check / static_cast<number>(size) << std::endl;
+      deallog << "Add and dot should be " << prod / static_cast<number>(size) << ", is "
+              << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 

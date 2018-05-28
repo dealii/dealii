@@ -45,8 +45,7 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
   gi.read(name, format);
   std::string source_dir(SOURCE_DIR "/");
   std::string relative_name(name.begin() + source_dir.size(), name.end());
-  deallog << relative_name << '\t' << tria.n_vertices() << '\t'
-          << tria.n_cells() << std::endl;
+  deallog << relative_name << '\t' << tria.n_vertices() << '\t' << tria.n_cells() << std::endl;
 
   GridOut grid_out;
   grid_out.write_gnuplot(tria, deallog.get_file_stream());

@@ -119,8 +119,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
   std::vector<CellData<3>> cells(2, CellData<3>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {
-    0, 1, 2, 3, 4, 5, 6, 7};
+  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {0, 1, 2, 3, 4, 5, 6, 7};
 
   /* cell 1 */
   int cell_vertices_1[8][GeometryInfo<3>::vertices_per_cell] = {
@@ -208,18 +207,16 @@ main()
 
       generate_grid(triangulation, i);
 
-      typedef Triangulation<2>::cell_iterator CellIterator;
+      typedef Triangulation<2>::cell_iterator                        CellIterator;
       typedef std::vector<GridTools::PeriodicFacePair<CellIterator>> FaceVector;
       FaceVector                                                     test;
-      GridTools::collect_periodic_faces(
-        triangulation, 42, 43, 1, test, dealii::Tensor<1, 2>());
+      GridTools::collect_periodic_faces(triangulation, 42, 43, 1, test, dealii::Tensor<1, 2>());
 
       deallog << "Triangulation: " << i << std::endl;
 
       for (FaceVector::iterator it = test.begin(); it != test.end(); ++it)
-        print_match(it->cell[0]->face(it->face_idx[0]),
-                    it->cell[1]->face(it->face_idx[1]),
-                    it->orientation);
+        print_match(
+          it->cell[0]->face(it->face_idx[0]), it->cell[1]->face(it->face_idx[1]), it->orientation);
     }
 
   deallog << "Test for 3D: Hypercube" << std::endl << std::endl;
@@ -231,18 +228,16 @@ main()
 
       generate_grid(triangulation, i);
 
-      typedef Triangulation<3>::cell_iterator CellIterator;
+      typedef Triangulation<3>::cell_iterator                        CellIterator;
       typedef std::vector<GridTools::PeriodicFacePair<CellIterator>> FaceVector;
       FaceVector                                                     test;
-      GridTools::collect_periodic_faces(
-        triangulation, 42, 43, 2, test, dealii::Tensor<1, 3>());
+      GridTools::collect_periodic_faces(triangulation, 42, 43, 2, test, dealii::Tensor<1, 3>());
 
       deallog << "Triangulation: " << i << std::endl;
 
       for (FaceVector::iterator it = test.begin(); it != test.end(); ++it)
-        print_match(it->cell[0]->face(it->face_idx[0]),
-                    it->cell[1]->face(it->face_idx[1]),
-                    it->orientation);
+        print_match(
+          it->cell[0]->face(it->face_idx[0]), it->cell[1]->face(it->face_idx[1]), it->orientation);
     }
 
   return 0;

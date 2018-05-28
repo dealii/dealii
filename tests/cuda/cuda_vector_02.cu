@@ -52,8 +52,7 @@ test()
   a.add(1.);
   read_write_3.import(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(1. + read_write_1[i] == read_write_3[i],
-                ExcMessage("Problem in add(scalar)."));
+    AssertThrow(1. + read_write_1[i] == read_write_3[i], ExcMessage("Problem in add(scalar)."));
 
   a.add(2., b);
   read_write_3.import(a, VectorOperation::insert);
@@ -65,8 +64,7 @@ test()
   a.add(2., b, 3., d);
   read_write_3.import(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(4. + 4. * read_write_1[i] + 10. * read_write_2[i] ==
-                  read_write_3[i],
+    AssertThrow(4. + 4. * read_write_1[i] + 10. * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
 
   a.import(read_write_1, VectorOperation::insert);
@@ -86,16 +84,14 @@ test()
   a.equ(2., c);
   read_write_3.import(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(2. * read_write_2[i] == read_write_3[i],
-                ExcMessage("Problem in equ."));
+    AssertThrow(2. * read_write_2[i] == read_write_3[i], ExcMessage("Problem in equ."));
 
   AssertThrow(b.mean_value() == 54.50, ExcMessage("Problem in mean_value."));
 
   AssertThrow(b.l1_norm() == 5450., ExcMessage("Problem in l1_norm."));
 
   const double eps = 1e-3;
-  AssertThrow(std::fabs(b.l2_norm() - 616.725222) < eps,
-              ExcMessage("Problem in l2_norm"));
+  AssertThrow(std::fabs(b.l2_norm() - 616.725222) < eps, ExcMessage("Problem in l2_norm"));
 
   AssertThrow(b.linfty_norm() == 104., ExcMessage("Problem in linfty_norm."));
 

@@ -33,8 +33,7 @@ public:
   C()
   {
     object_number = ::object_number++;
-    deallog << "Default constructor. Object number " << object_number
-            << std::endl;
+    deallog << "Default constructor. Object number " << object_number << std::endl;
   }
 
   C(const C &)
@@ -52,8 +51,8 @@ public:
   void
   serialize(Archive &ar, const unsigned int version)
   {
-    deallog << "Serializing object number " << object_number << " via "
-            << typeid(Archive).name() << std::endl;
+    deallog << "Serializing object number " << object_number << " via " << typeid(Archive).name()
+            << std::endl;
   }
 
   bool

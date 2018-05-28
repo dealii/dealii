@@ -66,12 +66,10 @@ main()
   sparsity_pattern.reinit(2, 2);
   sparsity_pattern.collect_sizes();
 
-  sparsity_pattern.block(0, 0).reinit(dof_handler.n_dofs(),
-                                      dof_handler.n_dofs(),
-                                      dof_handler.max_couplings_between_dofs());
+  sparsity_pattern.block(0, 0).reinit(
+    dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
   sparsity_pattern.block(0, 1).reinit(dof_handler.n_dofs(), 1, 1);
-  sparsity_pattern.block(1, 0).reinit(
-    1, dof_handler.n_dofs(), dof_handler.n_dofs());
+  sparsity_pattern.block(1, 0).reinit(1, dof_handler.n_dofs(), dof_handler.n_dofs());
   sparsity_pattern.block(1, 1).reinit(1, 1, 1);
   sparsity_pattern.collect_sizes();
 
@@ -89,11 +87,10 @@ main()
   B.reinit(sparsity_pattern);
 
   QGauss<2>   qr(2);
-  FEValues<2> fe_values(dof_handler.get_fe(),
-                        qr,
-                        UpdateFlags(update_values | update_gradients |
-                                    update_quadrature_points |
-                                    update_JxW_values));
+  FEValues<2> fe_values(
+    dof_handler.get_fe(),
+    qr,
+    UpdateFlags(update_values | update_gradients | update_quadrature_points | update_JxW_values));
 
   MatrixTools::create_laplace_matrix(dof_handler, qr, B.block(0, 0));
   B.block(1, 1).add(0, 0, 1.);

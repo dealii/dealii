@@ -29,8 +29,7 @@
 #include "../tests.h"
 
 void
-logvec(const std::vector<types::global_dof_index> &v,
-       const std::vector<types::global_dof_index> &w)
+logvec(const std::vector<types::global_dof_index> &v, const std::vector<types::global_dof_index> &w)
 {
   deallog << '[';
   for (unsigned int i = 0; i < w.size(); ++i)

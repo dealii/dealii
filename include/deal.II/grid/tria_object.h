@@ -132,10 +132,7 @@ namespace internal
 
 
     template <int structdim>
-    inline TriaObject<structdim>::TriaObject(const int i0,
-                                             const int i1,
-                                             const int i2,
-                                             const int i3)
+    inline TriaObject<structdim>::TriaObject(const int i0, const int i1, const int i2, const int i3)
     {
       Assert(structdim == 2, ExcImpossibleInDim(structdim));
       faces[0] = i0;

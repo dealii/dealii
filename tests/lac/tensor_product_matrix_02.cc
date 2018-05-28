@@ -56,8 +56,7 @@ do_test()
   mat.vmult(view2, view1);
   mat.apply_inverse(view3, view2);
   v3 -= v1;
-  deallog << "Verification of vmult and inverse: " << v3.linfty_norm()
-          << std::endl;
+  deallog << "Verification of vmult and inverse: " << v3.linfty_norm() << std::endl;
 
   FullMatrix<double> full(v1.size(), v1.size());
   for (unsigned int i = 0, c = 0; i < (dim > 2 ? size : 1); ++i)
@@ -69,13 +68,11 @@ do_test()
               if (dim == 1)
                 full(c, cc) = laplace(k, kk);
               else if (dim == 2)
-                full(c, cc) =
-                  laplace(k, kk) * mass(j, jj) + laplace(j, jj) * mass(k, kk);
+                full(c, cc) = laplace(k, kk) * mass(j, jj) + laplace(j, jj) * mass(k, kk);
               else if (dim == 3)
-                full(c, cc) = (laplace(k, kk) * mass(j, jj) +
-                               laplace(j, jj) * mass(k, kk)) *
-                                mass(i, ii) +
-                              laplace(i, ii) * mass(j, jj) * mass(k, kk);
+                full(c, cc) =
+                  (laplace(k, kk) * mass(j, jj) + laplace(j, jj) * mass(k, kk)) * mass(i, ii) +
+                  laplace(i, ii) * mass(j, jj) * mass(k, kk);
   full.vmult(v3, v1);
   v3 -= v2;
   deallog << "Verification of vmult: " << v3.linfty_norm() << std::endl;

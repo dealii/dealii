@@ -50,11 +50,9 @@ test(unsigned int degree)
   for (unsigned int i = 0; i < dim; ++i)
     p[i] = .2;
 
-  Point<dim - 1> q =
-    mapping.transform_real_to_unit_cell(mesh.begin_active(), p);
+  Point<dim - 1> q = mapping.transform_real_to_unit_cell(mesh.begin_active(), p);
 
-  deallog << "Mapping Q(" << degree << "): P: " << p << ", on unit: " << q
-          << std::endl;
+  deallog << "Mapping Q(" << degree << "): P: " << p << ", on unit: " << q << std::endl;
 }
 
 

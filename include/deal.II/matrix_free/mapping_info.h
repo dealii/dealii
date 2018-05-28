@@ -120,7 +120,7 @@ namespace internal
          */
         void
         initialize(const Quadrature<1> &quadrature_1d,
-                   const UpdateFlags update_flags_inner_faces = update_default);
+                   const UpdateFlags    update_flags_inner_faces = update_default);
 
         /**
          * Returns the memory consumption in bytes.
@@ -191,8 +191,7 @@ namespace internal
        *
        * Indexed by @p data_index_offsets.
        */
-      AlignedVector<Tensor<1, spacedim, VectorizedArray<Number>>>
-        normal_vectors;
+      AlignedVector<Tensor<1, spacedim, VectorizedArray<Number>>> normal_vectors;
 
       /**
        * The storage of covariant transformation on quadrature points, i.e.,
@@ -222,9 +221,8 @@ namespace internal
        * but the default case (cell integrals or boundary integrals) only
        * fills the zeroth component and ignores the first one.
        */
-      AlignedVector<Tensor<1,
-                           spacedim *(spacedim + 1) / 2,
-                           Tensor<1, spacedim, VectorizedArray<Number>>>>
+      AlignedVector<
+        Tensor<1, spacedim *(spacedim + 1) / 2, Tensor<1, spacedim, VectorizedArray<Number>>>>
         jacobian_gradients[2];
 
       /**
@@ -234,8 +232,7 @@ namespace internal
        *
        * Indexed by @p data_index_offsets.
        */
-      AlignedVector<Tensor<1, spacedim, VectorizedArray<Number>>>
-        normals_times_jacobians[2];
+      AlignedVector<Tensor<1, spacedim, VectorizedArray<Number>>> normals_times_jacobians[2];
 
       /**
        * Stores the index offset of a particular cell into the quadrature
@@ -269,8 +266,7 @@ namespace internal
        */
       template <typename StreamType>
       void
-      print_memory_consumption(StreamType &    out,
-                               const SizeInfo &task_info) const;
+      print_memory_consumption(StreamType &out, const SizeInfo &task_info) const;
 
       /**
        * Returns the memory consumption in bytes.
@@ -306,17 +302,16 @@ namespace internal
        * and several quadrature formulas are given.
        */
       void
-      initialize(
-        const dealii::Triangulation<dim> &                         tria,
-        const std::vector<std::pair<unsigned int, unsigned int>> & cells,
-        const FaceInfo<VectorizedArray<Number>::n_array_elements> &faces,
-        const std::vector<unsigned int> &              active_fe_index,
-        const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
-        const UpdateFlags                              update_flags_cells,
-        const UpdateFlags update_flags_boundary_faces,
-        const UpdateFlags update_flags_inner_faces,
-        const UpdateFlags update_flags_faces_by_cells);
+      initialize(const dealii::Triangulation<dim> &                         tria,
+                 const std::vector<std::pair<unsigned int, unsigned int>> & cells,
+                 const FaceInfo<VectorizedArray<Number>::n_array_elements> &faces,
+                 const std::vector<unsigned int> &                          active_fe_index,
+                 const Mapping<dim> &                                       mapping,
+                 const std::vector<dealii::hp::QCollection<1>> &            quad,
+                 const UpdateFlags                                          update_flags_cells,
+                 const UpdateFlags update_flags_boundary_faces,
+                 const UpdateFlags update_flags_inner_faces,
+                 const UpdateFlags update_flags_faces_by_cells);
 
       /**
        * Return the type of a given cell as detected during initialization.
@@ -342,8 +337,7 @@ namespace internal
        */
       template <typename StreamType>
       void
-      print_memory_consumption(StreamType &    out,
-                               const TaskInfo &task_info) const;
+      print_memory_consumption(StreamType &out, const TaskInfo &task_info) const;
 
       /**
        * Stores whether a cell is Cartesian (cell type 0), has constant
@@ -383,13 +377,12 @@ namespace internal
        * initialize.
        */
       void
-      initialize_cells(
-        const dealii::Triangulation<dim> &                        tria,
-        const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<unsigned int> &              active_fe_index,
-        const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
-        const UpdateFlags                              update_flags_cells);
+      initialize_cells(const dealii::Triangulation<dim> &                        tria,
+                       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+                       const std::vector<unsigned int> &                         active_fe_index,
+                       const Mapping<dim> &                                      mapping,
+                       const std::vector<dealii::hp::QCollection<1>> &           quad,
+                       const UpdateFlags update_flags_cells);
 
       /**
        * Computes the information in the given faces, called within
@@ -397,12 +390,11 @@ namespace internal
        */
       void
       initialize_faces(
-        const dealii::Triangulation<dim> &                        tria,
-        const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<
-          FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
-        const Mapping<dim> &                           mapping,
-        const std::vector<dealii::hp::QCollection<1>> &quad,
+        const dealii::Triangulation<dim> &                                                tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &                        cells,
+        const std::vector<FaceToCellTopology<VectorizedArray<Number>::n_array_elements>> &faces,
+        const Mapping<dim> &                                                              mapping,
+        const std::vector<dealii::hp::QCollection<1>> &                                   quad,
         const UpdateFlags update_flags_boundary_faces,
         const UpdateFlags update_flags_inner_faces);
 
@@ -411,19 +403,18 @@ namespace internal
        * initialize.
        */
       void
-      initialize_faces_by_cells(
-        const dealii::Triangulation<dim> &                        tria,
-        const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const Mapping<dim> &                                      mapping,
-        const std::vector<dealii::hp::QCollection<1>> &           quad,
-        const UpdateFlags update_flags_faces_by_cells);
+      initialize_faces_by_cells(const dealii::Triangulation<dim> &                        tria,
+                                const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+                                const Mapping<dim> &                                      mapping,
+                                const std::vector<dealii::hp::QCollection<1>> &           quad,
+                                const UpdateFlags update_flags_faces_by_cells);
 
       /**
        * Helper function to determine which update flags must be set in the
        * internal functions to initialize all data as requested by the user.
        */
       static UpdateFlags
-      compute_update_flags(const UpdateFlags update_flags,
+      compute_update_flags(const UpdateFlags                              update_flags,
                            const std::vector<dealii::hp::QCollection<1>> &quad =
                              std::vector<dealii::hp::QCollection<1>>());
     };
@@ -443,8 +434,7 @@ namespace internal
     struct MappingInfoCellsOrFaces<dim, Number, false>
     {
       static const MappingInfoStorage<dim, dim, Number> *
-      get(const MappingInfo<dim, Number> &mapping_info,
-          const unsigned int              quad_no)
+      get(const MappingInfo<dim, Number> &mapping_info, const unsigned int quad_no)
       {
         AssertIndexRange(quad_no, mapping_info.cell_data.size());
         return &mapping_info.cell_data[quad_no];
@@ -455,8 +445,7 @@ namespace internal
     struct MappingInfoCellsOrFaces<dim, Number, true>
     {
       static const MappingInfoStorage<dim - 1, dim, Number> *
-      get(const MappingInfo<dim, Number> &mapping_info,
-          const unsigned int              quad_no)
+      get(const MappingInfo<dim, Number> &mapping_info, const unsigned int quad_no)
       {
         AssertIndexRange(quad_no, mapping_info.face_data.size());
         return &mapping_info.face_data[quad_no];
@@ -482,39 +471,24 @@ namespace internal
       FPArrayComparator(const Number scaling);
 
       bool
-      operator()(const std::vector<Number> &v1,
-                 const std::vector<Number> &v2) const;
+      operator()(const std::vector<Number> &v1, const std::vector<Number> &v2) const;
 
       bool
+      operator()(const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t1,
+                 const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t2) const;
+
+      template <int dim>
+      bool
       operator()(
-        const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t1,
-        const Tensor<1, VectorizedArray<Number>::n_array_elements, Number> &t2)
+        const Tensor<1, dim, Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t1,
+        const Tensor<1, dim, Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t2)
         const;
 
       template <int dim>
       bool
       operator()(
-        const Tensor<
-          1,
-          dim,
-          Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t1,
-        const Tensor<
-          1,
-          dim,
-          Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t2)
-        const;
-
-      template <int dim>
-      bool
-      operator()(
-        const Tensor<
-          2,
-          dim,
-          Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t1,
-        const Tensor<
-          2,
-          dim,
-          Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t2)
+        const Tensor<2, dim, Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t1,
+        const Tensor<2, dim, Tensor<1, VectorizedArray<Number>::n_array_elements, Number>> &t2)
         const;
 
       Number tolerance;

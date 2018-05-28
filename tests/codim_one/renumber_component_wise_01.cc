@@ -54,8 +54,7 @@ test(std::string filename)
   deallog << dof_handler.n_dofs() << " degrees of freedom" << std::endl;
   DoFRenumbering::component_wise(dof_handler);
 
-  for (typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (typename DoFHandler<dim, spacedim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {

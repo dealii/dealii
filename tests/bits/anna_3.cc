@@ -73,13 +73,11 @@ SystemTest<dim>::make_grid_and_dofs()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(0);
-  deallog << "Number of active cells: " << triangulation.n_active_cells()
-          << std::endl;
+  deallog << "Number of active cells: " << triangulation.n_active_cells() << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
   dof_handler.distribute_dofs(fe);
-  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 }
 
 
@@ -100,8 +98,8 @@ SystemTest<dim>::check()
           deallog << "  DoF " << i << std::endl;
     };
 
-  std::vector<types::global_dof_index> dofs_per_component(
-    fe.n_components(), static_cast<types::global_dof_index>(0));
+  std::vector<types::global_dof_index> dofs_per_component(fe.n_components(),
+                                                          static_cast<types::global_dof_index>(0));
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
   deallog << "DoFs per component: ";
   for (unsigned int i = 0; i < fe.n_components(); ++i)

@@ -17,19 +17,16 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension != 1 && deal_II_dimension <= deal_II_space_dimension
-    template class KellyErrorEstimator<deal_II_dimension,
-                                       deal_II_space_dimension>;
+    template class KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>;
 #endif
   }
 
-for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS;
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      DH : DOFHANDLER_TEMPLATES)
   {
 #if deal_II_dimension != 1 && deal_II_dimension <= deal_II_space_dimension
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DH<deal_II_dimension, deal_II_space_dimension> &,
@@ -42,11 +39,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const Quadrature<deal_II_dimension - 1> &,
@@ -58,11 +53,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DH<deal_II_dimension, deal_II_space_dimension> &,
@@ -75,11 +68,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const Quadrature<deal_II_dimension - 1> &,
@@ -91,11 +82,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DH<deal_II_dimension, deal_II_space_dimension> &,
@@ -108,11 +97,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const hp::QCollection<deal_II_dimension - 1> &,
@@ -124,11 +111,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const DH<deal_II_dimension, deal_II_space_dimension> &,
@@ -141,11 +126,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
-    template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+    template void KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
       estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const hp::QCollection<deal_II_dimension - 1> &,
@@ -157,8 +140,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const unsigned int,
         const types::subdomain_id,
         const types::material_id,
-        const KellyErrorEstimator<deal_II_dimension,
-                                  deal_II_space_dimension>::Strategy);
+        const KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::Strategy);
 
 #endif
   }

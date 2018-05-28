@@ -43,9 +43,8 @@
 
 #include "../tests.h"
 
-#define PRINTME(name, var)                                            \
-  deallog << name << ": [block 0] " << var.block(0) << "  [block 1] " \
-          << var.block(1) << std::endl;
+#define PRINTME(name, var) \
+  deallog << name << ": [block 0] " << var.block(0) << "  [block 1] " << var.block(1) << std::endl;
 
 
 using namespace dealii;
@@ -202,10 +201,8 @@ main()
   SolverCG<BlockVector<double>> inner_solver(solver_control);
 
   deallog.depth_file(0);
-  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()),
-               v,
-               u,
-               PreconditionIdentity());
+  solver.solve(
+    inverse_operator(op_b, inner_solver, PreconditionIdentity()), v, u, PreconditionIdentity());
   deallog.depth_file(3);
   PRINTME("solve(inverse_operator(B), v, u) == Bu", v);
 

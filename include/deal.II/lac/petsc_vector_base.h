@@ -172,9 +172,8 @@ namespace PETScWrappers
                      int,
                      int,
                      << "You tried to access element " << arg1
-                     << " of a distributed vector, but only elements " << arg2
-                     << " through " << arg3
-                     << " are stored locally and can be accessed.");
+                     << " of a distributed vector, but only elements " << arg2 << " through "
+                     << arg3 << " are stored locally and can be accessed.");
       /**
        * Exception.
        */
@@ -428,8 +427,7 @@ namespace PETScWrappers
      * the corresponding values in the second.
      */
     void
-    set(const std::vector<size_type> &  indices,
-        const std::vector<PetscScalar> &values);
+    set(const std::vector<size_type> &indices, const std::vector<PetscScalar> &values);
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -488,16 +486,14 @@ namespace PETScWrappers
      * stored in @p values to the vector components specified by @p indices.
      */
     void
-    add(const std::vector<size_type> &  indices,
-        const std::vector<PetscScalar> &values);
+    add(const std::vector<size_type> &indices, const std::vector<PetscScalar> &values);
 
     /**
      * This is a second collective add operation. As a difference, this
      * function takes a deal.II vector of values.
      */
     void
-    add(const std::vector<size_type> &       indices,
-        const ::dealii::Vector<PetscScalar> &values);
+    add(const std::vector<size_type> &indices, const ::dealii::Vector<PetscScalar> &values);
 
     /**
      * Take an address where <tt>n_elements</tt> are stored contiguously and
@@ -505,9 +501,7 @@ namespace PETScWrappers
      * the other two <tt>add()</tt> functions above.
      */
     void
-    add(const size_type    n_elements,
-        const size_type *  indices,
-        const PetscScalar *values);
+    add(const size_type n_elements, const size_type *indices, const PetscScalar *values);
 
     /**
      * Return the scalar product of two vectors. The vectors must have the
@@ -651,10 +645,7 @@ namespace PETScWrappers
      * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
      */
     void
-    add(const PetscScalar a,
-        const VectorBase &V,
-        const PetscScalar b,
-        const VectorBase &W);
+    add(const PetscScalar a, const VectorBase &V, const PetscScalar b, const VectorBase &W);
 
     /**
      * Scaling and simple vector addition, i.e. <tt>*this = s*(*this)+V</tt>.
@@ -838,8 +829,7 @@ namespace PETScWrappers
 #    ifndef DOXYGEN
   namespace internal
   {
-    inline VectorReference::VectorReference(const VectorBase &vector,
-                                            const size_type   index) :
+    inline VectorReference::VectorReference(const VectorBase &vector, const size_type index) :
       vector(vector),
       index(index)
     {}
@@ -884,8 +874,7 @@ namespace PETScWrappers
 
       const PetscInt petsc_i = index;
 
-      const PetscErrorCode ierr =
-        VecSetValues(vector, 1, &petsc_i, &value, INSERT_VALUES);
+      const PetscErrorCode ierr = VecSetValues(vector, 1, &petsc_i, &value, INSERT_VALUES);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       vector.last_action = VectorOperation::insert;
@@ -918,8 +907,7 @@ namespace PETScWrappers
 
       // use the PETSc function to add something
       const PetscInt       petsc_i = index;
-      const PetscErrorCode ierr =
-        VecSetValues(vector, 1, &petsc_i, &value, ADD_VALUES);
+      const PetscErrorCode ierr    = VecSetValues(vector, 1, &petsc_i, &value, ADD_VALUES);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
 
@@ -953,8 +941,7 @@ namespace PETScWrappers
       // add something
       const PetscInt       petsc_i     = index;
       const PetscScalar    subtractand = -value;
-      const PetscErrorCode ierr =
-        VecSetValues(vector, 1, &petsc_i, &subtractand, ADD_VALUES);
+      const PetscErrorCode ierr = VecSetValues(vector, 1, &petsc_i, &subtractand, ADD_VALUES);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -986,8 +973,7 @@ namespace PETScWrappers
       const PetscInt    petsc_i   = index;
       const PetscScalar new_value = static_cast<PetscScalar>(*this) * value;
 
-      const PetscErrorCode ierr =
-        VecSetValues(vector, 1, &petsc_i, &new_value, INSERT_VALUES);
+      const PetscErrorCode ierr = VecSetValues(vector, 1, &petsc_i, &new_value, INSERT_VALUES);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -1019,8 +1005,7 @@ namespace PETScWrappers
       const PetscInt    petsc_i   = index;
       const PetscScalar new_value = static_cast<PetscScalar>(*this) / value;
 
-      const PetscErrorCode ierr =
-        VecSetValues(vector, 1, &petsc_i, &new_value, INSERT_VALUES);
+      const PetscErrorCode ierr = VecSetValues(vector, 1, &petsc_i, &new_value, INSERT_VALUES);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       return *this;
@@ -1060,8 +1045,7 @@ namespace PETScWrappers
       VecGetOwnershipRange(static_cast<const Vec &>(vector), &begin, &end);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return ((index >= static_cast<size_type>(begin)) &&
-            (index < static_cast<size_type>(end)));
+    return ((index >= static_cast<size_type>(begin)) && (index < static_cast<size_type>(end)));
   }
 
 
@@ -1132,8 +1116,7 @@ namespace PETScWrappers
   VectorBase::extract_subvector_to(const std::vector<size_type> &indices,
                                    std::vector<PetscScalar> &    values) const
   {
-    extract_subvector_to(
-      &(indices[0]), &(indices[0]) + indices.size(), &(values[0]));
+    extract_subvector_to(&(indices[0]), &(indices[0]) + indices.size(), &(values[0]));
   }
 
   template <typename ForwardIterator, typename OutputIterator>
@@ -1172,7 +1155,7 @@ namespace PETScWrappers
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         Vec locally_stored_elements = nullptr;
-        ierr = VecGhostGetLocalForm(vector, &locally_stored_elements);
+        ierr                        = VecGhostGetLocalForm(vector, &locally_stored_elements);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         PetscInt lsize;
@@ -1186,8 +1169,7 @@ namespace PETScWrappers
         for (PetscInt i = 0; i < n_idx; ++i)
           {
             const unsigned int index = *(indices_begin + i);
-            if (index >= static_cast<unsigned int>(begin) &&
-                index < static_cast<unsigned int>(end))
+            if (index >= static_cast<unsigned int>(begin) && index < static_cast<unsigned int>(end))
               {
                 // local entry
                 *(values_begin + i) = *(ptr + index - begin);
@@ -1195,11 +1177,9 @@ namespace PETScWrappers
             else
               {
                 // ghost entry
-                const unsigned int ghostidx =
-                  ghost_indices.index_within_set(index);
+                const unsigned int ghostidx = ghost_indices.index_within_set(index);
 
-                Assert(ghostidx + end - begin < (unsigned int)lsize,
-                       ExcInternalError());
+                Assert(ghostidx + end - begin < (unsigned int)lsize, ExcInternalError());
                 *(values_begin + i) = *(ptr + ghostidx + end - begin);
               }
           }

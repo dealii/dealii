@@ -46,12 +46,10 @@ void
 write_mat_id_to_file(const Triangulation<dim> &tria)
 {
   int                                               count = 0;
-  typename Triangulation<dim>::active_cell_iterator cell  = tria.begin_active(),
-                                                    endc  = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell, ++count)
     {
-      deallog << count << " " << static_cast<int>(cell->material_id())
-              << std::endl;
+      deallog << count << " " << static_cast<int>(cell->material_id()) << std::endl;
     }
   deallog << std::endl;
 }
@@ -64,8 +62,7 @@ test()
   deallog << "dim = " << dim << std::endl;
 
 
-  std::vector<double>
-    step_sizes_i; // step sizes in i direction (similar in all directions)
+  std::vector<double> step_sizes_i; // step sizes in i direction (similar in all directions)
   std::vector<std::vector<double>>
     step_sizes; // step sizes as input to the subdivided_hyper_rectangle
 
@@ -83,12 +80,10 @@ test()
 
   const Point<dim> bottom_left;
   const Point<dim> upper_right =
-    dim == 1 ? Point<dim>(size) :
-               dim == 2 ? Point<dim>(size, size) : Point<dim>(size, size, size);
+    dim == 1 ? Point<dim>(size) : dim == 2 ? Point<dim>(size, size) : Point<dim>(size, size, size);
 
   Triangulation<dim> tria;
-  GridGenerator::subdivided_hyper_rectangle(
-    tria, step_sizes, bottom_left, upper_right, true);
+  GridGenerator::subdivided_hyper_rectangle(tria, step_sizes, bottom_left, upper_right, true);
 
   typedef typename Triangulation<dim>::active_cell_iterator cell_iterator;
 
@@ -111,9 +106,8 @@ test()
 #ifdef WRITE_VTK
   // Write to file to visually check result
   {
-    const std::string filename =
-      "grid_no_skin_" + Utilities::int_to_string(dim) + "d.vtk";
-    std::ofstream f(filename.c_str());
+    const std::string filename = "grid_no_skin_" + Utilities::int_to_string(dim) + "d.vtk";
+    std::ofstream     f(filename.c_str());
     GridOut().write_vtk(tria, f);
   }
 #endif
@@ -129,8 +123,7 @@ test()
   // extra layer of cells)
 
   AssertThrow(cells_within_skin.size() > 0, ExcMessage("No skin cells found."));
-  for (typename std::vector<cell_iterator>::const_iterator it =
-         cells_within_skin.begin();
+  for (typename std::vector<cell_iterator>::const_iterator it = cells_within_skin.begin();
        it != cells_within_skin.end();
        ++it)
     {
@@ -143,9 +136,8 @@ test()
 #ifdef WRITE_VTK
   // Write to file to visually check result
   {
-    const std::string filename =
-      "grid_with_skin_" + Utilities::int_to_string(dim) + "d.vtk";
-    std::ofstream f(filename.c_str());
+    const std::string filename = "grid_with_skin_" + Utilities::int_to_string(dim) + "d.vtk";
+    std::ofstream     f(filename.c_str());
     GridOut().write_vtk(tria, f);
   }
 #endif

@@ -83,18 +83,14 @@ main()
         {
           for (unsigned int power = 0; power < 13; ++power)
             {
-              exact_integral =
-                log_integral(power, origins[nos][0], alphas[nas]);
-              deallog << "=================================================="
-                      << endl;
-              deallog << "int_0^1 x^" << power << " ln(|x-" << origins[nos]
-                      << "|/" << alphas[nas] << ") = " << exact_integral
-                      << endl;
+              exact_integral = log_integral(power, origins[nos][0], alphas[nas]);
+              deallog << "==================================================" << endl;
+              deallog << "int_0^1 x^" << power << " ln(|x-" << origins[nos] << "|/" << alphas[nas]
+                      << ") = " << exact_integral << endl;
               for (unsigned int nq = 2; nq < 13; ++nq)
                 {
                   QGaussLogR<1> quad(nq, origins[nos], alphas[nas]);
-                  QGaussLogR<1> factored_quad(
-                    nq, origins[nos], alphas[nas], true);
+                  QGaussLogR<1> factored_quad(nq, origins[nos], alphas[nas], true);
 
                   double approx_integral          = 0;
                   double approx_integral_factored = 0;
@@ -102,17 +98,15 @@ main()
                     {
                       double qpow = pow(quad.point(q)[0], (double)power);
                       approx_integral += qpow * quad.weight(q);
-                      double factor = log(
-                        std::abs((factored_quad.point(q) - origins[nos])[0]) /
-                        alphas[nas]);
+                      double factor =
+                        log(std::abs((factored_quad.point(q) - origins[nos])[0]) / alphas[nas]);
                       // This code cannot work if factor is equal to
                       // zero. In this case, just pass the other
                       // quadrature formula, which should be valid anyway.
                       if (factor != 0.0)
                         {
                           qpow *= factor;
-                          approx_integral_factored +=
-                            qpow * factored_quad.weight(q);
+                          approx_integral_factored += qpow * factored_quad.weight(q);
                         }
                       else
                         {
@@ -122,16 +116,13 @@ main()
 
                   deallog << "   Error(n=" << quad.size()
                           << ") = " << (approx_integral - exact_integral);
-                  if (std::abs(approx_integral - approx_integral_factored) >
-                      eps)
-                    deallog
-                      << ", difference between factored and unfactored: "
-                      << std::abs(approx_integral - approx_integral_factored);
+                  if (std::abs(approx_integral - approx_integral_factored) > eps)
+                    deallog << ", difference between factored and unfactored: "
+                            << std::abs(approx_integral - approx_integral_factored);
                   deallog << endl;
                 }
             }
-          deallog << "=================================================="
-                  << endl;
+          deallog << "==================================================" << endl;
         }
     }
 }
@@ -196,115 +187,93 @@ log_integral(const unsigned int N, const double point, const double alpha)
       switch (N)
         {
           case 0:
-            result = point * log(point) + log(0.1e1 - point) - log(alpha) -
-                     0.1e1 - point * log(0.1e1 - point);
+            result = point * log(point) + log(0.1e1 - point) - log(alpha) - 0.1e1 -
+                     point * log(0.1e1 - point);
             break;
           case 1:
             result = pow(point, 0.2e1) * log(point) / 0.2e1 -
-                     pow(point, 0.2e1) * log(0.1e1 - point) / 0.2e1 +
-                     log(0.1e1 - point) / 0.2e1 - log(alpha) / 0.2e1 -
-                     0.1e1 / 0.4e1 - point / 0.2e1;
+                     pow(point, 0.2e1) * log(0.1e1 - point) / 0.2e1 + log(0.1e1 - point) / 0.2e1 -
+                     log(alpha) / 0.2e1 - 0.1e1 / 0.4e1 - point / 0.2e1;
             break;
           case 2:
             result = pow(point, 0.3e1) * log(point) / 0.3e1 - point / 0.6e1 -
-                     pow(point, 0.3e1) * log(0.1e1 - point) / 0.3e1 -
-                     pow(point, 0.2e1) / 0.3e1 + log(0.1e1 - point) / 0.3e1 -
-                     log(alpha) / 0.3e1 - 0.1e1 / 0.9e1;
+                     pow(point, 0.3e1) * log(0.1e1 - point) / 0.3e1 - pow(point, 0.2e1) / 0.3e1 +
+                     log(0.1e1 - point) / 0.3e1 - log(alpha) / 0.3e1 - 0.1e1 / 0.9e1;
             break;
           case 3:
-            result = pow(point, 0.4e1) * log(point) / 0.4e1 +
-                     log(0.1e1 - point) / 0.4e1 - log(alpha) / 0.4e1 -
-                     pow(point, 0.4e1) * log(0.1e1 - point) / 0.4e1 -
-                     point / 0.12e2 - pow(point, 0.3e1) / 0.4e1 -
-                     pow(point, 0.2e1) / 0.8e1 - 0.1e1 / 0.16e2;
+            result = pow(point, 0.4e1) * log(point) / 0.4e1 + log(0.1e1 - point) / 0.4e1 -
+                     log(alpha) / 0.4e1 - pow(point, 0.4e1) * log(0.1e1 - point) / 0.4e1 -
+                     point / 0.12e2 - pow(point, 0.3e1) / 0.4e1 - pow(point, 0.2e1) / 0.8e1 -
+                     0.1e1 / 0.16e2;
             break;
           case 4:
             result = pow(point, 0.5e1) * log(point) / 0.5e1 - 0.1e1 / 0.25e2 +
-                     log(0.1e1 - point) / 0.5e1 - log(alpha) / 0.5e1 -
-                     pow(point, 0.4e1) / 0.5e1 - point / 0.20e2 -
-                     pow(point, 0.5e1) * log(0.1e1 - point) / 0.5e1 -
+                     log(0.1e1 - point) / 0.5e1 - log(alpha) / 0.5e1 - pow(point, 0.4e1) / 0.5e1 -
+                     point / 0.20e2 - pow(point, 0.5e1) * log(0.1e1 - point) / 0.5e1 -
                      pow(point, 0.2e1) / 0.15e2 - pow(point, 0.3e1) / 0.10e2;
             break;
           case 5:
-            result = pow(point, 0.6e1) * log(point) / 0.6e1 -
-                     pow(point, 0.3e1) / 0.18e2 - pow(point, 0.5e1) / 0.6e1 -
-                     point / 0.30e2 - pow(point, 0.2e1) / 0.24e2 -
-                     pow(point, 0.6e1) * log(0.1e1 - point) / 0.6e1 +
-                     log(0.1e1 - point) / 0.6e1 - log(alpha) / 0.6e1 -
-                     0.1e1 / 0.36e2 - pow(point, 0.4e1) / 0.12e2;
+            result = pow(point, 0.6e1) * log(point) / 0.6e1 - pow(point, 0.3e1) / 0.18e2 -
+                     pow(point, 0.5e1) / 0.6e1 - point / 0.30e2 - pow(point, 0.2e1) / 0.24e2 -
+                     pow(point, 0.6e1) * log(0.1e1 - point) / 0.6e1 + log(0.1e1 - point) / 0.6e1 -
+                     log(alpha) / 0.6e1 - 0.1e1 / 0.36e2 - pow(point, 0.4e1) / 0.12e2;
             break;
           case 6:
-            result = pow(point, 0.7e1) * log(point) / 0.7e1 -
-                     pow(point, 0.4e1) / 0.21e2 - pow(point, 0.5e1) / 0.14e2 -
-                     point / 0.42e2 - pow(point, 0.2e1) / 0.35e2 -
-                     pow(point, 0.7e1) * log(0.1e1 - point) / 0.7e1 -
-                     pow(point, 0.3e1) / 0.28e2 - 0.1e1 / 0.49e2 -
-                     pow(point, 0.6e1) / 0.7e1 + log(0.1e1 - point) / 0.7e1 -
+            result = pow(point, 0.7e1) * log(point) / 0.7e1 - pow(point, 0.4e1) / 0.21e2 -
+                     pow(point, 0.5e1) / 0.14e2 - point / 0.42e2 - pow(point, 0.2e1) / 0.35e2 -
+                     pow(point, 0.7e1) * log(0.1e1 - point) / 0.7e1 - pow(point, 0.3e1) / 0.28e2 -
+                     0.1e1 / 0.49e2 - pow(point, 0.6e1) / 0.7e1 + log(0.1e1 - point) / 0.7e1 -
                      log(alpha) / 0.7e1;
             break;
           case 7:
             result = pow(point, 0.8e1) * log(point) / 0.8e1 - 0.1e1 / 0.64e2 +
-                     log(0.1e1 - point) / 0.8e1 - log(alpha) / 0.8e1 -
-                     pow(point, 0.6e1) / 0.16e2 -
-                     pow(point, 0.8e1) * log(0.1e1 - point) / 0.8e1 -
-                     pow(point, 0.5e1) / 0.24e2 - pow(point, 0.3e1) / 0.40e2 -
-                     pow(point, 0.7e1) / 0.8e1 - pow(point, 0.2e1) / 0.48e2 -
-                     point / 0.56e2 - pow(point, 0.4e1) / 0.32e2;
+                     log(0.1e1 - point) / 0.8e1 - log(alpha) / 0.8e1 - pow(point, 0.6e1) / 0.16e2 -
+                     pow(point, 0.8e1) * log(0.1e1 - point) / 0.8e1 - pow(point, 0.5e1) / 0.24e2 -
+                     pow(point, 0.3e1) / 0.40e2 - pow(point, 0.7e1) / 0.8e1 -
+                     pow(point, 0.2e1) / 0.48e2 - point / 0.56e2 - pow(point, 0.4e1) / 0.32e2;
             break;
           case 8:
-            result = pow(point, 0.9e1) * log(point) / 0.9e1 -
-                     pow(point, 0.4e1) / 0.45e2 -
-                     pow(point, 0.9e1) * log(0.1e1 - point) / 0.9e1 -
-                     pow(point, 0.6e1) / 0.27e2 - pow(point, 0.2e1) / 0.63e2 +
-                     log(0.1e1 - point) / 0.9e1 - log(alpha) / 0.9e1 -
-                     pow(point, 0.8e1) / 0.9e1 - 0.1e1 / 0.81e2 -
-                     pow(point, 0.5e1) / 0.36e2 - point / 0.72e2 -
-                     pow(point, 0.3e1) / 0.54e2 - pow(point, 0.7e1) / 0.18e2;
+            result = pow(point, 0.9e1) * log(point) / 0.9e1 - pow(point, 0.4e1) / 0.45e2 -
+                     pow(point, 0.9e1) * log(0.1e1 - point) / 0.9e1 - pow(point, 0.6e1) / 0.27e2 -
+                     pow(point, 0.2e1) / 0.63e2 + log(0.1e1 - point) / 0.9e1 - log(alpha) / 0.9e1 -
+                     pow(point, 0.8e1) / 0.9e1 - 0.1e1 / 0.81e2 - pow(point, 0.5e1) / 0.36e2 -
+                     point / 0.72e2 - pow(point, 0.3e1) / 0.54e2 - pow(point, 0.7e1) / 0.18e2;
             break;
           case 9:
-            result = pow(point, 0.10e2) * log(point) / 0.10e2 +
-                     log(0.1e1 - point) / 0.10e2 - log(alpha) / 0.10e2 -
-                     pow(point, 0.2e1) / 0.80e2 - 0.1e1 / 0.100e3 -
-                     point / 0.90e2 - pow(point, 0.4e1) / 0.60e2 -
-                     pow(point, 0.9e1) / 0.10e2 - pow(point, 0.8e1) / 0.20e2 -
-                     pow(point, 0.6e1) / 0.40e2 - pow(point, 0.5e1) / 0.50e2 -
-                     pow(point, 0.3e1) / 0.70e2 -
-                     pow(point, 0.10e2) * log(0.1e1 - point) / 0.10e2 -
-                     pow(point, 0.7e1) / 0.30e2;
+            result = pow(point, 0.10e2) * log(point) / 0.10e2 + log(0.1e1 - point) / 0.10e2 -
+                     log(alpha) / 0.10e2 - pow(point, 0.2e1) / 0.80e2 - 0.1e1 / 0.100e3 -
+                     point / 0.90e2 - pow(point, 0.4e1) / 0.60e2 - pow(point, 0.9e1) / 0.10e2 -
+                     pow(point, 0.8e1) / 0.20e2 - pow(point, 0.6e1) / 0.40e2 -
+                     pow(point, 0.5e1) / 0.50e2 - pow(point, 0.3e1) / 0.70e2 -
+                     pow(point, 0.10e2) * log(0.1e1 - point) / 0.10e2 - pow(point, 0.7e1) / 0.30e2;
             break;
           case 10:
-            result = pow(point, 0.11e2) * log(point) / 0.11e2 +
-                     log(0.1e1 - point) / 0.11e2 - log(alpha) / 0.11e2 -
-                     pow(point, 0.2e1) / 0.99e2 -
-                     pow(point, 0.11e2) * log(0.1e1 - point) / 0.11e2 -
-                     0.1e1 / 0.121e3 - pow(point, 0.3e1) / 0.88e2 -
-                     pow(point, 0.4e1) / 0.77e2 - pow(point, 0.8e1) / 0.33e2 -
-                     pow(point, 0.5e1) / 0.66e2 - pow(point, 0.10e2) / 0.11e2 -
-                     pow(point, 0.7e1) / 0.44e2 - pow(point, 0.9e1) / 0.22e2 -
-                     point / 0.110e3 - pow(point, 0.6e1) / 0.55e2;
+            result = pow(point, 0.11e2) * log(point) / 0.11e2 + log(0.1e1 - point) / 0.11e2 -
+                     log(alpha) / 0.11e2 - pow(point, 0.2e1) / 0.99e2 -
+                     pow(point, 0.11e2) * log(0.1e1 - point) / 0.11e2 - 0.1e1 / 0.121e3 -
+                     pow(point, 0.3e1) / 0.88e2 - pow(point, 0.4e1) / 0.77e2 -
+                     pow(point, 0.8e1) / 0.33e2 - pow(point, 0.5e1) / 0.66e2 -
+                     pow(point, 0.10e2) / 0.11e2 - pow(point, 0.7e1) / 0.44e2 -
+                     pow(point, 0.9e1) / 0.22e2 - point / 0.110e3 - pow(point, 0.6e1) / 0.55e2;
             break;
           case 11:
-            result = pow(point, 0.12e2) * log(point) / 0.12e2 -
-                     pow(point, 0.8e1) / 0.48e2 - pow(point, 0.2e1) / 0.120e3 -
-                     pow(point, 0.11e2) / 0.12e2 - pow(point, 0.4e1) / 0.96e2 -
-                     pow(point, 0.10e2) / 0.24e2 - pow(point, 0.5e1) / 0.84e2 -
-                     0.1e1 / 0.144e3 - pow(point, 0.3e1) / 0.108e3 -
-                     point / 0.132e3 - pow(point, 0.9e1) / 0.36e2 +
-                     log(0.1e1 - point) / 0.12e2 - log(alpha) / 0.12e2 -
-                     pow(point, 0.7e1) / 0.60e2 - pow(point, 0.6e1) / 0.72e2 -
+            result = pow(point, 0.12e2) * log(point) / 0.12e2 - pow(point, 0.8e1) / 0.48e2 -
+                     pow(point, 0.2e1) / 0.120e3 - pow(point, 0.11e2) / 0.12e2 -
+                     pow(point, 0.4e1) / 0.96e2 - pow(point, 0.10e2) / 0.24e2 -
+                     pow(point, 0.5e1) / 0.84e2 - 0.1e1 / 0.144e3 - pow(point, 0.3e1) / 0.108e3 -
+                     point / 0.132e3 - pow(point, 0.9e1) / 0.36e2 + log(0.1e1 - point) / 0.12e2 -
+                     log(alpha) / 0.12e2 - pow(point, 0.7e1) / 0.60e2 - pow(point, 0.6e1) / 0.72e2 -
                      pow(point, 0.12e2) * log(0.1e1 - point) / 0.12e2;
             break;
           case 12:
-            result = pow(point, 0.13e2) * log(point) / 0.13e2 -
-                     pow(point, 0.4e1) / 0.117e3 - pow(point, 0.7e1) / 0.78e2 -
-                     pow(point, 0.5e1) / 0.104e3 - pow(point, 0.11e2) / 0.26e2 -
-                     pow(point, 0.13e2) * log(0.1e1 - point) / 0.13e2 -
-                     pow(point, 0.3e1) / 0.130e3 - pow(point, 0.6e1) / 0.91e2 -
-                     point / 0.156e3 - pow(point, 0.2e1) / 0.143e3 -
-                     pow(point, 0.10e2) / 0.39e2 + log(0.1e1 - point) / 0.13e2 -
-                     log(alpha) / 0.13e2 - 0.1e1 / 0.169e3 -
-                     pow(point, 0.9e1) / 0.52e2 - pow(point, 0.12e2) / 0.13e2 -
-                     pow(point, 0.8e1) / 0.65e2;
+            result =
+              pow(point, 0.13e2) * log(point) / 0.13e2 - pow(point, 0.4e1) / 0.117e3 -
+              pow(point, 0.7e1) / 0.78e2 - pow(point, 0.5e1) / 0.104e3 -
+              pow(point, 0.11e2) / 0.26e2 - pow(point, 0.13e2) * log(0.1e1 - point) / 0.13e2 -
+              pow(point, 0.3e1) / 0.130e3 - pow(point, 0.6e1) / 0.91e2 - point / 0.156e3 -
+              pow(point, 0.2e1) / 0.143e3 - pow(point, 0.10e2) / 0.39e2 +
+              log(0.1e1 - point) / 0.13e2 - log(alpha) / 0.13e2 - 0.1e1 / 0.169e3 -
+              pow(point, 0.9e1) / 0.52e2 - pow(point, 0.12e2) / 0.13e2 - pow(point, 0.8e1) / 0.65e2;
             break;
         }
     }

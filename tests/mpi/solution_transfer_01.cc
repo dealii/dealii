@@ -55,9 +55,8 @@ test()
 {
   parallel::distributed::Triangulation<2> tria(
     MPI_COMM_WORLD,
-    typename Triangulation<2>::MeshSmoothing(
-      Triangulation<2>::smoothing_on_refinement |
-      Triangulation<2>::smoothing_on_coarsening));
+    typename Triangulation<2>::MeshSmoothing(Triangulation<2>::smoothing_on_refinement |
+                                             Triangulation<2>::smoothing_on_coarsening));
 
   GridGenerator::hyper_cube(tria, -1.0, 1.0);
 
@@ -71,11 +70,9 @@ test()
 
   DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
 
-  PETScWrappers::MPI::Vector solution(
-    locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector solution(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
 
-  parallel::distributed::SolutionTransfer<2, PETScWrappers::MPI::Vector>
-    soltrans(dh);
+  parallel::distributed::SolutionTransfer<2, PETScWrappers::MPI::Vector> soltrans(dh);
 
   tria.set_all_refine_flags();
   tria.prepare_coarsening_and_refinement();

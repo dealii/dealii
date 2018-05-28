@@ -57,8 +57,7 @@ namespace OpenCASCADE
    * this class but satisfies the modern Manifold-based naming convention.
    */
   template <int dim, int spacedim>
-  class DEAL_II_DEPRECATED NormalProjectionBoundary
-    : public NormalProjectionManifold<dim, spacedim>
+  class DEAL_II_DEPRECATED NormalProjectionBoundary : public NormalProjectionManifold<dim, spacedim>
   {
   public:
     /**
@@ -105,8 +104,7 @@ namespace OpenCASCADE
     /**
      * Inherit all constructors.
      */
-    using DirectionalProjectionManifold<dim, spacedim>::
-      DirectionalProjectionManifold;
+    using DirectionalProjectionManifold<dim, spacedim>::DirectionalProjectionManifold;
 
     /**
      * Clone the current Manifold.
@@ -171,8 +169,7 @@ namespace OpenCASCADE
     /**
      * Inherit all constructors.
      */
-    using NormalToMeshProjectionManifold<dim, spacedim>::
-      NormalToMeshProjectionManifold;
+    using NormalToMeshProjectionManifold<dim, spacedim>::NormalToMeshProjectionManifold;
 
     /**
      * Clone the current Manifold.

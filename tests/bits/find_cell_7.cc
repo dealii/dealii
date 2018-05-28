@@ -40,9 +40,7 @@
 
 bool inside(Triangulation<3> &tria, Point<3> &p)
 {
-  for (Triangulation<3>::cell_iterator cell = tria.begin(0);
-       cell != tria.end(0);
-       ++cell)
+  for (Triangulation<3>::cell_iterator cell = tria.begin(0); cell != tria.end(0); ++cell)
     if (cell->point_inside(p))
       return true;
 
@@ -61,8 +59,7 @@ check2()
   Point<3> p2(304.767, -57.0113, 254.766);
 
   int idx = 0;
-  for (Triangulation<3>::active_cell_iterator cell = tria.begin_active();
-       cell != tria.end();
+  for (Triangulation<3>::active_cell_iterator cell = tria.begin_active(); cell != tria.end();
        ++cell, ++idx)
     {
       if (idx == 21)
@@ -83,8 +80,7 @@ check2()
   hp::DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fes);
 
-  GridTools::find_active_cell_around_point(
-    mappings, dof_handler, p2); // triggered exception
+  GridTools::find_active_cell_around_point(mappings, dof_handler, p2); // triggered exception
 }
 
 

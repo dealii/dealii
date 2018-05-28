@@ -36,8 +36,7 @@ dim_2(std::ostream &os)
   const double       inner = 0.2, outer = 1.0;
   Triangulation<d>   tr;
 
-  GridGenerator::hyper_cube_with_cylindrical_hole(
-    tr, inner, outer, outer, true);
+  GridGenerator::hyper_cube_with_cylindrical_hole(tr, inner, outer, outer, true);
   tr.set_all_manifold_ids(numbers::flat_manifold_id);
   tr.reset_manifold(0);
   SphericalManifold<d> boundary;
@@ -60,8 +59,7 @@ dim_3(std::ostream &os)
   const double     inner = 0.2, outer = 1.0;
   Triangulation<d> tr;
 
-  GridGenerator::hyper_cube_with_cylindrical_hole(
-    tr, inner, outer, outer, true);
+  GridGenerator::hyper_cube_with_cylindrical_hole(tr, inner, outer, outer, true);
   tr.set_all_manifold_ids(numbers::flat_manifold_id);
   tr.reset_manifold(0);
   CylindricalManifold<d> boundary(2);

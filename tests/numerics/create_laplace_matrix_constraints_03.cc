@@ -103,14 +103,8 @@ check()
     mapping, dof, quadrature, matrix_ref, rhs_function, rhs_ref, &rhs_function);
   constraints.condense(matrix_ref, rhs_ref);
 
-  MatrixTools::create_laplace_matrix(mapping,
-                                     dof,
-                                     quadrature,
-                                     matrix,
-                                     rhs_function,
-                                     rhs,
-                                     &rhs_function,
-                                     constraints);
+  MatrixTools::create_laplace_matrix(
+    mapping, dof, quadrature, matrix, rhs_function, rhs, &rhs_function, constraints);
 
   // compute reference: need to cancel constrained entries as these will in
   // general get different values

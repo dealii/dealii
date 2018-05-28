@@ -24,20 +24,16 @@ template <typename number>
 void
 checkReinit3(const Vector<number> &V)
 {
-  deallog
-    << "Reinit a ReadOnly VectorView<number> with const Vector<number> and const size"
-    << std::endl;
+  deallog << "Reinit a ReadOnly VectorView<number> with const Vector<number> and const size"
+          << std::endl;
 
-  deallog
-    << "Creating dummy Vector<number> of size V.size() and filling with zeros"
-    << std::endl;
+  deallog << "Creating dummy Vector<number> of size V.size() and filling with zeros" << std::endl;
 
   Vector<number> _V(V.size());
   for (unsigned int i = 0; i < _V.size(); i++)
     _V(i) = 0;
 
-  deallog << "Creating VectorView<number> pointing to dummy Vector<number>"
-          << std::endl;
+  deallog << "Creating VectorView<number> pointing to dummy Vector<number>" << std::endl;
   VectorView<number> VV(_V.size(), _V.begin());
 
   deallog << "Printing dummy Vector<number>" << std::endl;
@@ -45,8 +41,7 @@ checkReinit3(const Vector<number> &V)
     deallog << _V(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Printing VectorView<number> pointing to dummy Vector<number>"
-          << std::endl;
+  deallog << "Printing VectorView<number> pointing to dummy Vector<number>" << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     deallog << VV(i) << '\t';
   deallog << std::endl;
@@ -59,8 +54,7 @@ checkReinit3(const Vector<number> &V)
     deallog << V(i) << '\t';
   deallog << std::endl;
 
-  deallog << "Printing VectorView<number> pointing to half of Vector<number>"
-          << std::endl;
+  deallog << "Printing VectorView<number> pointing to half of Vector<number>" << std::endl;
   for (unsigned int i = 0; i < VV.size(); ++i)
     deallog << VV(i) << '\t';
   deallog << std::endl;

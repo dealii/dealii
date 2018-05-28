@@ -31,10 +31,8 @@ template <typename T, typename U, typename CompareType>
 void
 check()
 {
-  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType),
-              ExcInternalError());
-  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(T() * U()),
-              ExcInternalError());
+  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType), ExcInternalError());
+  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(T() * U()), ExcInternalError());
 }
 
 
@@ -44,20 +42,15 @@ main()
   initlog();
 
   check<double, double, double>();
-  deallog << ProductType<double, double>::type(2.345) *
-               ProductType<double, double>::type(3.456)
-          << ' ' << ProductType<double, double>::type(2.345 * 3.456)
-          << std::endl;
+  deallog << ProductType<double, double>::type(2.345) * ProductType<double, double>::type(3.456)
+          << ' ' << ProductType<double, double>::type(2.345 * 3.456) << std::endl;
 
   check<std::complex<double>, std::complex<double>, std::complex<double>>();
-  deallog << (ProductType<std::complex<double>, std::complex<double>>::type(
-                2.345, 1.23) *
-              ProductType<std::complex<double>, std::complex<double>>::type(
-                3.456, 2.45))
+  deallog << (ProductType<std::complex<double>, std::complex<double>>::type(2.345, 1.23) *
+              ProductType<std::complex<double>, std::complex<double>>::type(3.456, 2.45))
           << ' '
           << (ProductType<std::complex<double>, std::complex<double>>::type(
-               std::complex<double>(2.345, 1.23) *
-               std::complex<double>(3.456, 2.45)))
+               std::complex<double>(2.345, 1.23) * std::complex<double>(3.456, 2.45)))
           << std::endl;
 
   deallog << "OK" << std::endl;

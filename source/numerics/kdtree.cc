@@ -8,8 +8,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
-KDTree<dim>::KDTree(const unsigned int &           max_leaf_size,
-                    const std::vector<Point<dim>> &pts) :
+KDTree<dim>::KDTree(const unsigned int &max_leaf_size, const std::vector<Point<dim>> &pts) :
   max_leaf_size(max_leaf_size)
 {
   if (pts.size() > 0)
@@ -42,8 +41,7 @@ KDTree<dim>::get_points_within_ball(const Point<dim> &center,
 
 template <int dim>
 std::vector<std::pair<unsigned int, double>>
-KDTree<dim>::get_closest_points(const Point<dim> & target,
-                                const unsigned int n_points) const
+KDTree<dim>::get_closest_points(const Point<dim> &target, const unsigned int n_points) const
 {
   Assert(adaptor, ExcNotInitialized());
   Assert(kdtree, ExcInternalError());

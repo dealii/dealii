@@ -47,8 +47,7 @@ test()
   shared_tria.signals.post_refinement.connect([&shared_tria]() {
     const unsigned int nproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-    typename Triangulation<dim>::active_cell_iterator cell =
-      shared_tria.begin_active();
+    typename Triangulation<dim>::active_cell_iterator cell = shared_tria.begin_active();
     for (unsigned int i = 0; i < shared_tria.n_active_cells(); ++i)
       {
         unsigned int j = 0;
@@ -65,19 +64,16 @@ test()
 
   GridGenerator::hyper_L(shared_tria);
   shared_tria.refine_global();
-  typename Triangulation<dim>::active_cell_iterator it =
-    shared_tria.begin_active();
+  typename Triangulation<dim>::active_cell_iterator it = shared_tria.begin_active();
   it->set_refine_flag();
   shared_tria.execute_coarsening_and_refinement();
 
   deallog << "(CellId,subdomain_id) for each active cell:" << std::endl;
-  typename Triangulation<dim>::active_cell_iterator cell = shared_tria
-                                                             .begin_active(),
+  typename Triangulation<dim>::active_cell_iterator cell = shared_tria.begin_active(),
                                                     endc = shared_tria.end();
   for (; cell != endc; ++cell)
     if (cell->subdomain_id() != numbers::artificial_subdomain_id)
-      deallog << "(" << cell->id().to_string() << "," << cell->subdomain_id()
-              << ")" << std::endl;
+      deallog << "(" << cell->id().to_string() << "," << cell->subdomain_id() << ")" << std::endl;
 }
 
 int

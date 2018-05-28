@@ -74,8 +74,7 @@ ConstraintMatrix::condense(const VectorType &vec_ghosted, VectorType &vec) const
   // and in the second one we need to set elements to zero. for
   // parallel vectors, this can only work if we can put a compress()
   // in between, but we don't want to call compress() twice per entry
-  for (std::vector<ConstraintLine>::const_iterator constraint_line =
-         lines.begin();
+  for (std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
        constraint_line != lines.end();
        ++constraint_line)
     {
@@ -86,8 +85,7 @@ ConstraintMatrix::condense(const VectorType &vec_ghosted, VectorType &vec) const
              ExcMessage("Inhomogeneous constraint cannot be condensed "
                         "without any matrix specified."));
 
-      const typename VectorType::value_type old_value =
-        vec_ghosted(constraint_line->index);
+      const typename VectorType::value_type old_value = vec_ghosted(constraint_line->index);
       for (size_type q = 0; q != constraint_line->entries.size(); ++q)
         if (vec.in_local_range(constraint_line->entries[q].first) == true)
           vec(constraint_line->entries[q].first) +=
@@ -97,8 +95,7 @@ ConstraintMatrix::condense(const VectorType &vec_ghosted, VectorType &vec) const
 
   vec.compress(VectorOperation::add);
 
-  for (std::vector<ConstraintLine>::const_iterator constraint_line =
-         lines.begin();
+  for (std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
        constraint_line != lines.end();
        ++constraint_line)
     if (vec.in_local_range(constraint_line->index) == true)
@@ -120,8 +117,7 @@ ConstraintMatrix::condense(VectorType &vec) const
 
 template <typename number, class VectorType>
 void
-ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
-                           VectorType &          vec) const
+ConstraintMatrix::condense(SparseMatrix<number> &uncondensed, VectorType &vec) const
 {
   // check whether we work on real vectors
   // or we just used a dummy when calling
@@ -147,8 +143,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
   // necessary.  otherwise, the number states
   // which line in the constraint matrix
   // handles this index
-  std::vector<size_type> distribute(sparsity.n_rows(),
-                                    numbers::invalid_size_type);
+  std::vector<size_type> distribute(sparsity.n_rows(), numbers::invalid_size_type);
 
   for (size_type c = 0; c < lines.size(); ++c)
     distribute[lines[c].index] = c;
@@ -159,8 +154,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
       if (distribute[row] == numbers::invalid_size_type)
         // regular line. loop over cols
         {
-          for (typename SparseMatrix<number>::iterator entry =
-                 uncondensed.begin(row);
+          for (typename SparseMatrix<number>::iterator entry = uncondensed.begin(row);
                entry != uncondensed.end(row);
                ++entry)
             {
@@ -171,8 +165,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
               // happen, since we only
               // operate on compressed
               // matrices!
-              Assert(column != SparsityPattern::invalid_entry,
-                     ExcMatrixNotClosed());
+              Assert(column != SparsityPattern::invalid_entry, ExcMatrixNotClosed());
 
               if (distribute[column] != numbers::invalid_size_type)
                 // distribute entry at
@@ -182,9 +175,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
                 // set old entry to
                 // zero
                 {
-                  for (size_type q = 0;
-                       q != lines[distribute[column]].entries.size();
-                       ++q)
+                  for (size_type q = 0; q != lines[distribute[column]].entries.size(); ++q)
                     {
                       // need a temporary variable to avoid errors like
                       // no known conversion from 'complex<typename
@@ -192,8 +183,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
                       // complex<float>' for 3rd argument
                       number v = static_cast<number>(entry->value());
                       v *= lines[distribute[column]].entries[q].second;
-                      uncondensed.add(
-                        row, lines[distribute[column]].entries[q].first, v);
+                      uncondensed.add(row, lines[distribute[column]].entries[q].first, v);
                     }
 
                   // need to subtract this element from the
@@ -202,8 +192,8 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
                   // row of the inhomogeneous constraint in
                   // the matrix with Gauss elimination
                   if (use_vectors == true)
-                    vec(row) -= static_cast<number>(entry->value()) *
-                                lines[distribute[column]].inhomogeneity;
+                    vec(row) -=
+                      static_cast<number>(entry->value()) * lines[distribute[column]].inhomogeneity;
 
                   // set old value to zero
                   entry->value() = 0.;
@@ -213,8 +203,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
       else
         // row must be distributed
         {
-          for (typename SparseMatrix<number>::iterator entry =
-                 uncondensed.begin(row);
+          for (typename SparseMatrix<number>::iterator entry = uncondensed.begin(row);
                entry != uncondensed.end(row);
                ++entry)
             {
@@ -225,8 +214,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
               // happen, since we only
               // operate on compressed
               // matrices!
-              Assert(column != SparsityPattern::invalid_entry,
-                     ExcMatrixNotClosed());
+              Assert(column != SparsityPattern::invalid_entry, ExcMatrixNotClosed());
 
               if (distribute[column] == numbers::invalid_size_type)
                 // distribute entry at
@@ -236,9 +224,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
                 // column. set
                 // old entry to zero
                 {
-                  for (size_type q = 0;
-                       q != lines[distribute[row]].entries.size();
-                       ++q)
+                  for (size_type q = 0; q != lines[distribute[row]].entries.size(); ++q)
                     {
                       // need a temporary variable to avoid errors like
                       // no known conversion from 'complex<typename
@@ -246,8 +232,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
                       // complex<float>' for 3rd argument
                       number v = static_cast<number>(entry->value());
                       v *= lines[distribute[row]].entries[q].second;
-                      uncondensed.add(
-                        lines[distribute[row]].entries[q].first, column, v);
+                      uncondensed.add(lines[distribute[row]].entries[q].first, column, v);
                     }
 
                   // set old entry to zero
@@ -261,13 +246,9 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
                 // to one on main
                 // diagonal, zero otherwise
                 {
-                  for (size_type p = 0;
-                       p != lines[distribute[row]].entries.size();
-                       ++p)
+                  for (size_type p = 0; p != lines[distribute[row]].entries.size(); ++p)
                     {
-                      for (size_type q = 0;
-                           q != lines[distribute[column]].entries.size();
-                           ++q)
+                      for (size_type q = 0; q != lines[distribute[column]].entries.size(); ++q)
                         {
                           // need a temporary variable to avoid errors like
                           // no known conversion from 'complex<typename
@@ -276,10 +257,9 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
                           number v = static_cast<number>(entry->value());
                           v *= lines[distribute[row]].entries[p].second *
                                lines[distribute[column]].entries[q].second;
-                          uncondensed.add(
-                            lines[distribute[row]].entries[p].first,
-                            lines[distribute[column]].entries[q].first,
-                            v);
+                          uncondensed.add(lines[distribute[row]].entries[p].first,
+                                          lines[distribute[column]].entries[q].first,
+                                          v);
                         }
 
                       if (use_vectors == true)
@@ -298,8 +278,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
           // take care of vector
           if (use_vectors == true)
             {
-              for (size_type q = 0; q != lines[distribute[row]].entries.size();
-                   ++q)
+              for (size_type q = 0; q != lines[distribute[row]].entries.size(); ++q)
                 vec(lines[distribute[row]].entries[q].first) +=
                   (vec(row) * lines[distribute[row]].entries[q].second);
 
@@ -313,8 +292,7 @@ ConstraintMatrix::condense(SparseMatrix<number> &uncondensed,
 
 template <typename number, class BlockVectorType>
 void
-ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
-                           BlockVectorType &          vec) const
+ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed, BlockVectorType &vec) const
 {
   // check whether we work on real vectors
   // or we just used a dummy when calling
@@ -330,8 +308,7 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
   Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
   Assert(sparsity.n_block_rows() == sparsity.n_block_cols(), ExcNotQuadratic());
   Assert(sparsity.n_block_rows() == sparsity.n_block_cols(), ExcNotQuadratic());
-  Assert(sparsity.get_column_indices() == sparsity.get_row_indices(),
-         ExcNotQuadratic());
+  Assert(sparsity.get_column_indices() == sparsity.get_row_indices(), ExcNotQuadratic());
 
   if (use_vectors == true)
     {
@@ -354,8 +331,7 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
   // otherwise, the number states which line
   // in the constraint matrix handles this
   // index
-  std::vector<size_type> distribute(sparsity.n_rows(),
-                                    numbers::invalid_size_type);
+  std::vector<size_type> distribute(sparsity.n_rows(), numbers::invalid_size_type);
 
   for (size_type c = 0; c < lines.size(); ++c)
     distribute[lines[c].index] = c;
@@ -365,9 +341,8 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
     {
       // get index of this row
       // within the blocks
-      const std::pair<size_type, size_type> block_index =
-        index_mapping.global_to_local(row);
-      const size_type block_row = block_index.first;
+      const std::pair<size_type, size_type> block_index = index_mapping.global_to_local(row);
+      const size_type                       block_row   = block_index.first;
 
       if (distribute[row] == numbers::invalid_size_type)
         // regular line. loop over
@@ -384,10 +359,8 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
           for (size_type block_col = 0; block_col < blocks; ++block_col)
             {
               for (typename SparseMatrix<number>::iterator entry =
-                     uncondensed.block(block_row, block_col)
-                       .begin(block_index.second);
-                   entry != uncondensed.block(block_row, block_col)
-                              .end(block_index.second);
+                     uncondensed.block(block_row, block_col).begin(block_index.second);
+                   entry != uncondensed.block(block_row, block_col).end(block_index.second);
                    ++entry)
                 {
                   const size_type global_col =
@@ -402,14 +375,11 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
                     {
                       const double old_value = entry->value();
 
-                      for (size_type q = 0;
-                           q != lines[distribute[global_col]].entries.size();
-                           ++q)
-                        uncondensed.add(
-                          row,
-                          lines[distribute[global_col]].entries[q].first,
-                          old_value *
-                            lines[distribute[global_col]].entries[q].second);
+                      for (size_type q = 0; q != lines[distribute[global_col]].entries.size(); ++q)
+                        uncondensed.add(row,
+                                        lines[distribute[global_col]].entries[q].first,
+                                        old_value *
+                                          lines[distribute[global_col]].entries[q].second);
 
                       // need to subtract this element from the
                       // vector. this corresponds to an
@@ -417,8 +387,7 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
                       // row of the inhomogeneous constraint in
                       // the matrix with Gauss elimination
                       if (use_vectors == true)
-                        vec(row) -= entry->value() *
-                                    lines[distribute[global_col]].inhomogeneity;
+                        vec(row) -= entry->value() * lines[distribute[global_col]].inhomogeneity;
 
                       entry->value() = 0.;
                     }
@@ -435,10 +404,8 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
           for (size_type block_col = 0; block_col < blocks; ++block_col)
             {
               for (typename SparseMatrix<number>::iterator entry =
-                     uncondensed.block(block_row, block_col)
-                       .begin(block_index.second);
-                   entry != uncondensed.block(block_row, block_col)
-                              .end(block_index.second);
+                     uncondensed.block(block_row, block_col).begin(block_index.second);
+                   entry != uncondensed.block(block_row, block_col).end(block_index.second);
                    ++entry)
                 {
                   const size_type global_col =
@@ -457,13 +424,10 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
                     {
                       const double old_value = entry->value();
 
-                      for (size_type q = 0;
-                           q != lines[distribute[row]].entries.size();
-                           ++q)
-                        uncondensed.add(
-                          lines[distribute[row]].entries[q].first,
-                          global_col,
-                          old_value * lines[distribute[row]].entries[q].second);
+                      for (size_type q = 0; q != lines[distribute[row]].entries.size(); ++q)
+                        uncondensed.add(lines[distribute[row]].entries[q].first,
+                                        global_col,
+                                        old_value * lines[distribute[row]].entries[q].second);
 
                       entry->value() = 0.;
                     }
@@ -478,32 +442,22 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
                     {
                       const double old_value = entry->value();
 
-                      for (size_type p = 0;
-                           p != lines[distribute[row]].entries.size();
-                           ++p)
+                      for (size_type p = 0; p != lines[distribute[row]].entries.size(); ++p)
                         {
-                          for (size_type q = 0;
-                               q !=
-                               lines[distribute[global_col]].entries.size();
+                          for (size_type q = 0; q != lines[distribute[global_col]].entries.size();
                                ++q)
-                            uncondensed.add(
-                              lines[distribute[row]].entries[p].first,
-                              lines[distribute[global_col]].entries[q].first,
-                              old_value *
-                                lines[distribute[row]].entries[p].second *
-                                lines[distribute[global_col]]
-                                  .entries[q]
-                                  .second);
+                            uncondensed.add(lines[distribute[row]].entries[p].first,
+                                            lines[distribute[global_col]].entries[q].first,
+                                            old_value * lines[distribute[row]].entries[p].second *
+                                              lines[distribute[global_col]].entries[q].second);
 
                           if (use_vectors == true)
                             vec(lines[distribute[row]].entries[p].first) -=
-                              old_value *
-                              lines[distribute[row]].entries[p].second *
+                              old_value * lines[distribute[row]].entries[p].second *
                               lines[distribute[global_col]].inhomogeneity;
                         }
 
-                      entry->value() =
-                        (row == global_col ? average_diagonal : 0.);
+                      entry->value() = (row == global_col ? average_diagonal : 0.);
                     }
                 }
             }
@@ -511,8 +465,7 @@ ConstraintMatrix::condense(BlockSparseMatrix<number> &uncondensed,
           // take care of vector
           if (use_vectors == true)
             {
-              for (size_type q = 0; q != lines[distribute[row]].entries.size();
-                   ++q)
+              for (size_type q = 0; q != lines[distribute[row]].entries.size(); ++q)
                 vec(lines[distribute[row]].entries[q].first) +=
                   (vec(row) * lines[distribute[row]].entries[q].second);
 
@@ -539,15 +492,11 @@ namespace internal
 
       template <class VectorType>
       void
-      set_zero_parallel(const std::vector<size_type> &cm,
-                        VectorType &                  vec,
-                        size_type                     shift = 0)
+      set_zero_parallel(const std::vector<size_type> &cm, VectorType &vec, size_type shift = 0)
       {
         Assert(!vec.has_ghost_elements(), ExcInternalError());
         IndexSet locally_owned = vec.locally_owned_elements();
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end();
-             ++it)
+        for (typename std::vector<size_type>::const_iterator it = cm.begin(); it != cm.end(); ++it)
           {
             // If shift>0 then we are working on a part of a BlockVector
             // so vec(i) is actually the global entry i+shift.
@@ -568,9 +517,7 @@ namespace internal
                         LinearAlgebra::distributed::Vector<Number> &vec,
                         size_type                                   shift = 0)
       {
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end();
-             ++it)
+        for (typename std::vector<size_type>::const_iterator it = cm.begin(); it != cm.end(); ++it)
           {
             // If shift>0 then we are working on a part of a BlockVector
             // so vec(i) is actually the global entry i+shift.
@@ -614,9 +561,7 @@ namespace internal
       void
       set_zero_serial(const std::vector<size_type> &cm, VectorType &vec)
       {
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end();
-             ++it)
+        for (typename std::vector<size_type>::const_iterator it = cm.begin(); it != cm.end(); ++it)
           vec(*it) = 0.;
       }
 
@@ -625,9 +570,7 @@ namespace internal
       set_zero_all(const std::vector<size_type> &cm, VectorType &vec)
       {
         set_zero_in_parallel<VectorType>(
-          cm,
-          vec,
-          std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+          cm, vec, std::integral_constant<bool, IsBlockVector<VectorType>::value>());
         vec.compress(VectorOperation::insert);
       }
 
@@ -641,8 +584,7 @@ namespace internal
 
       template <class T>
       void
-      set_zero_all(const std::vector<size_type> &cm,
-                   dealii::BlockVector<T> &      vec)
+      set_zero_all(const std::vector<size_type> &cm, dealii::BlockVector<T> &vec)
       {
         set_zero_serial(cm, vec);
       }
@@ -660,39 +602,32 @@ ConstraintMatrix::set_zero(VectorType &vec) const
   std::vector<size_type> constrained_lines(lines.size());
   for (unsigned int i = 0; i < lines.size(); ++i)
     constrained_lines[i] = lines[i].index;
-  internal::ConstraintMatrixImplementation::set_zero_all(constrained_lines,
-                                                         vec);
+  internal::ConstraintMatrixImplementation::set_zero_all(constrained_lines, vec);
 }
 
 
 
 template <typename VectorType, typename LocalType>
 void
-ConstraintMatrix::distribute_local_to_global(
-  const Vector<LocalType> &     local_vector,
-  const std::vector<size_type> &local_dof_indices,
-  VectorType &                  global_vector,
-  const FullMatrix<LocalType> & local_matrix) const
+ConstraintMatrix::distribute_local_to_global(const Vector<LocalType> &     local_vector,
+                                             const std::vector<size_type> &local_dof_indices,
+                                             VectorType &                  global_vector,
+                                             const FullMatrix<LocalType> & local_matrix) const
 {
-  distribute_local_to_global(local_vector,
-                             local_dof_indices,
-                             local_dof_indices,
-                             global_vector,
-                             local_matrix,
-                             true);
+  distribute_local_to_global(
+    local_vector, local_dof_indices, local_dof_indices, global_vector, local_matrix, true);
 }
 
 
 
 template <typename VectorType, typename LocalType>
 void
-ConstraintMatrix::distribute_local_to_global(
-  const Vector<LocalType> &     local_vector,
-  const std::vector<size_type> &local_dof_indices_row,
-  const std::vector<size_type> &local_dof_indices_col,
-  VectorType &                  global_vector,
-  const FullMatrix<LocalType> & local_matrix,
-  bool                          diagonal) const
+ConstraintMatrix::distribute_local_to_global(const Vector<LocalType> &     local_vector,
+                                             const std::vector<size_type> &local_dof_indices_row,
+                                             const std::vector<size_type> &local_dof_indices_col,
+                                             VectorType &                  global_vector,
+                                             const FullMatrix<LocalType> & local_matrix,
+                                             bool                          diagonal) const
 {
   Assert(sorted == true, ExcMatrixNotClosed());
   AssertDimension(local_vector.size(), local_dof_indices_row.size());
@@ -730,11 +665,9 @@ ConstraintMatrix::distribute_local_to_global(
 
         // find the constraint line to the given
         // global dof index
-        const size_type line_index =
-          calculate_line_index(local_dof_indices_col[i]);
-        const ConstraintLine *position = lines_cache.size() <= line_index ?
-                                           nullptr :
-                                           &lines[lines_cache[line_index]];
+        const size_type       line_index = calculate_line_index(local_dof_indices_col[i]);
+        const ConstraintLine *position =
+          lines_cache.size() <= line_index ? nullptr : &lines[lines_cache[line_index]];
 
         // Gauss elimination of the matrix columns with the inhomogeneity.
         // Go through them one by one and again check whether they are
@@ -745,8 +678,7 @@ ConstraintMatrix::distribute_local_to_global(
             {
               if (is_constrained(local_dof_indices_row[j]) == false)
                 {
-                  global_vector(local_dof_indices_row[j]) -=
-                    val * local_matrix(j, i);
+                  global_vector(local_dof_indices_row[j]) -= val * local_matrix(j, i);
                   continue;
                 }
 
@@ -756,14 +688,12 @@ ConstraintMatrix::distribute_local_to_global(
                 continue;
 
               const ConstraintLine &position_j =
-                lines[lines_cache[calculate_line_index(
-                  local_dof_indices_row[j])]];
+                lines[lines_cache[calculate_line_index(local_dof_indices_row[j])]];
 
               for (size_type q = 0; q < position_j.entries.size(); ++q)
                 {
                   Assert(
-                    !(!local_lines.size() ||
-                      local_lines.is_element(position_j.entries[q].first)) ||
+                    !(!local_lines.size() || local_lines.is_element(position_j.entries[q].first)) ||
                       is_constrained(position_j.entries[q].first) == false,
                     ExcMessage("Tried to distribute to a fixed dof."));
                   global_vector(position_j.entries[q].first) -=
@@ -778,10 +708,10 @@ ConstraintMatrix::distribute_local_to_global(
           {
             for (size_type j = 0; j < position->entries.size(); ++j)
               {
-                Assert(!(!local_lines.size() ||
-                         local_lines.is_element(position->entries[j].first)) ||
-                         is_constrained(position->entries[j].first) == false,
-                       ExcMessage("Tried to distribute to a fixed dof."));
+                Assert(
+                  !(!local_lines.size() || local_lines.is_element(position->entries[j].first)) ||
+                    is_constrained(position->entries[j].first) == false,
+                  ExcMessage("Tried to distribute to a fixed dof."));
                 global_vector(position->entries[j].first) +=
                   local_vector(i) * position->entries[j].second;
               }
@@ -802,12 +732,11 @@ namespace internal
     // need a few overloads
 #ifdef DEAL_II_WITH_TRILINOS
     void
-    import_vector_with_ghost_elements(
-      const TrilinosWrappers::MPI::Vector &vec,
-      const IndexSet & /*locally_owned_elements*/,
-      const IndexSet &               needed_elements,
-      TrilinosWrappers::MPI::Vector &output,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
+    import_vector_with_ghost_elements(const TrilinosWrappers::MPI::Vector &vec,
+                                      const IndexSet & /*locally_owned_elements*/,
+                                      const IndexSet &               needed_elements,
+                                      TrilinosWrappers::MPI::Vector &output,
+                                      const std::integral_constant<bool, false> /*is_block_vector*/)
     {
       Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
 #  ifdef DEAL_II_WITH_MPI
@@ -825,34 +754,29 @@ namespace internal
 
 #ifdef DEAL_II_WITH_PETSC
     void
-    import_vector_with_ghost_elements(
-      const PETScWrappers::MPI::Vector &vec,
-      const IndexSet &                  locally_owned_elements,
-      const IndexSet &                  needed_elements,
-      PETScWrappers::MPI::Vector &      output,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
+    import_vector_with_ghost_elements(const PETScWrappers::MPI::Vector &vec,
+                                      const IndexSet &                  locally_owned_elements,
+                                      const IndexSet &                  needed_elements,
+                                      PETScWrappers::MPI::Vector &      output,
+                                      const std::integral_constant<bool, false> /*is_block_vector*/)
     {
-      output.reinit(
-        locally_owned_elements, needed_elements, vec.get_mpi_communicator());
+      output.reinit(locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
     }
 #endif
 
     template <typename number>
     void
-    import_vector_with_ghost_elements(
-      const LinearAlgebra::distributed::Vector<number> &vec,
-      const IndexSet &                                  locally_owned_elements,
-      const IndexSet &                                  needed_elements,
-      LinearAlgebra::distributed::Vector<number> &      output,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
+    import_vector_with_ghost_elements(const LinearAlgebra::distributed::Vector<number> &vec,
+                                      const IndexSet &locally_owned_elements,
+                                      const IndexSet &needed_elements,
+                                      LinearAlgebra::distributed::Vector<number> &output,
+                                      const std::integral_constant<bool, false> /*is_block_vector*/)
     {
       // TODO: the in vector might already have all elements. need to find a
       // way to efficiently avoid the copy then
-      const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
-        .zero_out_ghosts();
-      output.reinit(
-        locally_owned_elements, needed_elements, vec.get_mpi_communicator());
+      const_cast<LinearAlgebra::distributed::Vector<number> &>(vec).zero_out_ghosts();
+      output.reinit(locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
       output.update_ghost_values();
     }
@@ -862,12 +786,11 @@ namespace internal
     // not have this function called at all -- so throw an exception
     template <typename Vector>
     void
-    import_vector_with_ghost_elements(
-      const Vector & /*vec*/,
-      const IndexSet & /*locally_owned_elements*/,
-      const IndexSet & /*needed_elements*/,
-      Vector & /*output*/,
-      const std::integral_constant<bool, false> /*is_block_vector*/)
+    import_vector_with_ghost_elements(const Vector & /*vec*/,
+                                      const IndexSet & /*locally_owned_elements*/,
+                                      const IndexSet & /*needed_elements*/,
+                                      Vector & /*output*/,
+                                      const std::integral_constant<bool, false> /*is_block_vector*/)
     {
       Assert(false, ExcMessage("We shouldn't even get here!"));
     }
@@ -876,12 +799,11 @@ namespace internal
     // for block vectors, simply dispatch to the individual blocks
     template <class VectorType>
     void
-    import_vector_with_ghost_elements(
-      const VectorType &vec,
-      const IndexSet &  locally_owned_elements,
-      const IndexSet &  needed_elements,
-      VectorType &      output,
-      const std::integral_constant<bool, true> /*is_block_vector*/)
+    import_vector_with_ghost_elements(const VectorType &vec,
+                                      const IndexSet &  locally_owned_elements,
+                                      const IndexSet &  needed_elements,
+                                      VectorType &      output,
+                                      const std::integral_constant<bool, true> /*is_block_vector*/)
     {
       output.reinit(vec.n_blocks());
 
@@ -890,10 +812,8 @@ namespace internal
         {
           import_vector_with_ghost_elements(
             vec.block(b),
-            locally_owned_elements.get_view(block_start,
-                                            block_start + vec.block(b).size()),
-            needed_elements.get_view(block_start,
-                                     block_start + vec.block(b).size()),
+            locally_owned_elements.get_view(block_start, block_start + vec.block(b).size()),
+            needed_elements.get_view(block_start, block_start + vec.block(b).size()),
             output.block(b),
             std::integral_constant<bool, false>());
           block_start += vec.block(b).size();
@@ -961,10 +881,10 @@ ConstraintMatrix::distribute(VectorType &vec) const
           {
             typename VectorType::value_type new_value = it->inhomogeneity;
             for (unsigned int i = 0; i < it->entries.size(); ++i)
-              new_value += (static_cast<typename VectorType::value_type>(
-                              internal::ElementAccess<VectorType>::get(
-                                ghosted_vector, it->entries[i].first)) *
-                            it->entries[i].second);
+              new_value +=
+                (static_cast<typename VectorType::value_type>(
+                   internal::ElementAccess<VectorType>::get(ghosted_vector, it->entries[i].first)) *
+                 it->entries[i].second);
             AssertIsFinite(new_value);
             internal::ElementAccess<VectorType>::set(new_value, it->index, vec);
           }
@@ -981,23 +901,20 @@ ConstraintMatrix::distribute(VectorType &vec) const
     // support anything else or because it's completely stored
     // locally)
     {
-      std::vector<ConstraintLine>::const_iterator next_constraint =
-        lines.begin();
+      std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
       for (; next_constraint != lines.end(); ++next_constraint)
         {
           // fill entry in line
           // next_constraint.index by adding the
           // different contributions
-          typename VectorType::value_type new_value =
-            next_constraint->inhomogeneity;
+          typename VectorType::value_type new_value = next_constraint->inhomogeneity;
           for (unsigned int i = 0; i < next_constraint->entries.size(); ++i)
-            new_value += (static_cast<typename VectorType::value_type>(
-                            internal::ElementAccess<VectorType>::get(
-                              vec, next_constraint->entries[i].first)) *
-                          next_constraint->entries[i].second);
+            new_value +=
+              (static_cast<typename VectorType::value_type>(
+                 internal::ElementAccess<VectorType>::get(vec, next_constraint->entries[i].first)) *
+               next_constraint->entries[i].second);
           AssertIsFinite(new_value);
-          internal::ElementAccess<VectorType>::set(
-            new_value, next_constraint->index, vec);
+          internal::ElementAccess<VectorType>::set(new_value, next_constraint->index, vec);
         }
     }
 }
@@ -1042,8 +959,7 @@ namespace internals
     mutable size_type constraint_position;
   };
 
-  inline Distributing::Distributing(const size_type global_row,
-                                    const size_type local_row) :
+  inline Distributing::Distributing(const size_type global_row, const size_type local_row) :
     global_row(global_row),
     local_row(local_row),
     constraint_position(numbers::invalid_size_type)
@@ -1061,8 +977,7 @@ namespace internals
     global_row = in.global_row;
     local_row  = in.local_row;
     // the constraints pointer should not contain any data here.
-    Assert(constraint_position == numbers::invalid_size_type,
-           ExcInternalError());
+    Assert(constraint_position == numbers::invalid_size_type, ExcInternalError());
 
     if (in.constraint_position != numbers::invalid_size_type)
       {
@@ -1108,8 +1023,7 @@ namespace internals
     }
 
     void
-    append_index(const size_type                     index,
-                 const std::pair<size_type, double> &pair)
+    append_index(const size_type index, const std::pair<size_type, double> &pair)
     {
       AssertIndexRange(index, individual_size.size());
       const size_type my_length = individual_size[index];
@@ -1239,11 +1153,9 @@ namespace internals
     size_type
     size(const size_type counter_index) const
     {
-      return (total_row_indices[counter_index].constraint_position ==
-                  numbers::invalid_size_type ?
+      return (total_row_indices[counter_index].constraint_position == numbers::invalid_size_type ?
                 0 :
-                data_cache.get_size(
-                  total_row_indices[counter_index].constraint_position));
+                data_cache.get_size(total_row_indices[counter_index].constraint_position));
     }
 
     // returns the global row of the counter_index-th entry in the list
@@ -1280,22 +1192,20 @@ namespace internals
     // counter_index-th entry in the list in the index_in_constraint-th
     // position of constraints
     size_type
-    local_row(const size_type counter_index,
-              const size_type index_in_constraint) const
+    local_row(const size_type counter_index, const size_type index_in_constraint) const
     {
-      return (data_cache.get_entry(total_row_indices[counter_index]
-                                     .constraint_position)[index_in_constraint])
+      return (data_cache.get_entry(
+                total_row_indices[counter_index].constraint_position)[index_in_constraint])
         .first;
     }
 
     // returns the value of the constraint in the counter_index-th entry in
     // the list in the index_in_constraint-th position of constraints
     double
-    constraint_value(const size_type counter_index,
-                     const size_type index_in_constraint) const
+    constraint_value(const size_type counter_index, const size_type index_in_constraint) const
     {
-      return (data_cache.get_entry(total_row_indices[counter_index]
-                                     .constraint_position)[index_in_constraint])
+      return (data_cache.get_entry(
+                total_row_indices[counter_index].constraint_position)[index_in_constraint])
         .second;
     }
 
@@ -1384,16 +1294,14 @@ namespace internals
     typedef std::vector<Distributing>::iterator index_iterator;
     index_iterator                              pos, pos1;
     Distributing                                row_value(global_row);
-    std::pair<size_type, double> constraint(local_row, constraint_value);
+    std::pair<size_type, double>                constraint(local_row, constraint_value);
 
     // check whether the list was really sorted before entering here
     for (size_type i = 1; i < n_active_rows; ++i)
-      Assert(total_row_indices[i - 1] < total_row_indices[i],
-             ExcInternalError());
+      Assert(total_row_indices[i - 1] < total_row_indices[i], ExcInternalError());
 
-    pos = Utilities::lower_bound(total_row_indices.begin(),
-                                 total_row_indices.begin() + n_active_rows,
-                                 row_value);
+    pos = Utilities::lower_bound(
+      total_row_indices.begin(), total_row_indices.begin() + n_active_rows, row_value);
     if (pos->global_row == global_row)
       pos1 = pos;
     else
@@ -1426,8 +1334,7 @@ namespace internals
     // make sure that we are in the range of the vector
     AssertIndexRange(length, total_row_indices.size() + 1);
     for (size_type i = 0; i < length; ++i)
-      Assert(total_row_indices[i].constraint_position ==
-               numbers::invalid_size_type,
+      Assert(total_row_indices[i].constraint_position == numbers::invalid_size_type,
              ExcInternalError());
 
     step = length / 2;
@@ -1442,14 +1349,11 @@ namespace internals
             templ = total_row_indices[i].local_row;
             if (total_row_indices[j2].global_row > temp)
               {
-                while ((j >= istep) &&
-                       (total_row_indices[j2].global_row > temp))
+                while ((j >= istep) && (total_row_indices[j2].global_row > temp))
                   {
-                    total_row_indices[j].global_row =
-                      total_row_indices[j2].global_row;
-                    total_row_indices[j].local_row =
-                      total_row_indices[j2].local_row;
-                    j = j2;
+                    total_row_indices[j].global_row = total_row_indices[j2].global_row;
+                    total_row_indices[j].local_row  = total_row_indices[j2].local_row;
+                    j                               = j2;
                     j2 -= istep;
                   }
                 total_row_indices[j].global_row = temp;
@@ -1548,13 +1452,11 @@ namespace internals
        * Constructor. Grabs a scratch data object on the current thread and
        * mark it as used
        */
-      ScratchDataAccessor() :
-        my_scratch_data(&ConstraintMatrixData::scratch_data.get())
+      ScratchDataAccessor() : my_scratch_data(&ConstraintMatrixData::scratch_data.get())
       {
         Assert(my_scratch_data->in_use == false,
-               ExcMessage(
-                 "Access to thread-local scratch data tried, but it is already "
-                 "in use"));
+               ExcMessage("Access to thread-local scratch data tried, but it is already "
+                          "in use"));
         my_scratch_data->in_use = true;
       }
 
@@ -1618,10 +1520,10 @@ namespace internals
     block_starts[0] = 0;
     for (size_type i = 1; i < num_blocks; ++i)
       {
-        row_iterator first_block = Utilities::lower_bound(
-          block_indices,
-          global_rows.total_row_indices.begin() + n_active_rows,
-          Distributing(block_object.get_row_indices().block_start(i)));
+        row_iterator first_block =
+          Utilities::lower_bound(block_indices,
+                                 global_rows.total_row_indices.begin() + n_active_rows,
+                                 Distributing(block_object.get_row_indices().block_start(i)));
         block_starts[i] = first_block - global_rows.total_row_indices.begin();
         block_indices   = first_block;
       }
@@ -1629,9 +1531,8 @@ namespace internals
 
     // transform row indices to block-local index space
     for (size_type i = block_starts[1]; i < n_active_rows; ++i)
-      global_rows.global_row(i) = block_object.get_row_indices()
-                                    .global_to_local(global_rows.global_row(i))
-                                    .second;
+      global_rows.global_row(i) =
+        block_object.get_row_indices().global_to_local(global_rows.global_row(i)).second;
   }
 
 
@@ -1655,10 +1556,8 @@ namespace internals
     block_starts[0] = 0;
     for (size_type i = 1; i < num_blocks; ++i)
       {
-        row_iterator first_block =
-          Utilities::lower_bound(col_indices,
-                                 row_indices.end(),
-                                 block_object.get_row_indices().block_start(i));
+        row_iterator first_block = Utilities::lower_bound(
+          col_indices, row_indices.end(), block_object.get_row_indices().block_start(i));
         block_starts[i] = first_block - row_indices.begin();
         col_indices     = first_block;
       }
@@ -1666,8 +1565,7 @@ namespace internals
 
     // transform row indices to local index space
     for (size_type i = block_starts[1]; i < row_indices.size(); ++i)
-      row_indices[i] =
-        block_object.get_row_indices().global_to_local(row_indices[i]).second;
+      row_indices[i] = block_object.get_row_indices().global_to_local(row_indices[i]).second;
   }
 
 
@@ -1691,9 +1589,7 @@ namespace internals
     // has a direct contribution. if not, set the value to zero.
     if (loc_row != numbers::invalid_size_type)
       {
-        col_val = ((loc_col != numbers::invalid_size_type) ?
-                     local_matrix(loc_row, loc_col) :
-                     0);
+        col_val = ((loc_col != numbers::invalid_size_type) ? local_matrix(loc_row, loc_col) : 0);
 
         // account for indirect contributions by constraints in column
         for (size_type p = 0; p < global_cols.size(j); ++p)
@@ -1709,14 +1605,12 @@ namespace internals
     // the direct and indirect references in the given column.
     for (size_type q = 0; q < global_rows.size(i); ++q)
       {
-        LocalType add_this =
-          (loc_col != numbers::invalid_size_type) ?
-            local_matrix(global_rows.local_row(i, q), loc_col) :
-            0;
+        LocalType add_this = (loc_col != numbers::invalid_size_type) ?
+                               local_matrix(global_rows.local_row(i, q), loc_col) :
+                               0;
 
         for (size_type p = 0; p < global_cols.size(j); ++p)
-          add_this += (local_matrix(global_rows.local_row(i, q),
-                                    global_cols.local_row(j, p)) *
+          add_this += (local_matrix(global_rows.local_row(i, q), global_cols.local_row(j, p)) *
                        global_cols.constraint_value(j, p));
         col_val += add_this * global_rows.constraint_value(i, q);
       }
@@ -1748,8 +1642,7 @@ namespace internals
     // fast function if there are no indirect references to any of the local
     // rows at all on this set of dofs (saves a lot of checks). the only check
     // we actually need to perform is whether the matrix element is zero.
-    if (global_rows.have_indirect_rows() == false &&
-        global_cols.have_indirect_rows() == false)
+    if (global_rows.have_indirect_rows() == false && global_cols.have_indirect_rows() == false)
       {
         AssertIndexRange(loc_row, local_matrix.m());
         const LocalType *matrix_ptr = &local_matrix(loc_row, 0);
@@ -1773,8 +1666,8 @@ namespace internals
       {
         for (size_type j = column_start; j < column_end; ++j)
           {
-            LocalType col_val = resolve_matrix_entry(
-              global_rows, global_cols, i, j, loc_row, local_matrix);
+            LocalType col_val =
+              resolve_matrix_entry(global_rows, global_cols, i, j, loc_row, local_matrix);
 
             // if we got some nontrivial value, append it to the array of
             // values.
@@ -1807,8 +1700,8 @@ namespace internals
             ++matrix_values;
           Assert(
             matrix_values->column() == column,
-            typename SparseMatrix<typename SparseMatrixIterator::MatrixType::
-                                    value_type>::ExcInvalidIndex(row, column));
+            typename SparseMatrix<
+              typename SparseMatrixIterator::MatrixType::value_type>::ExcInvalidIndex(row, column));
           matrix_values->value() += value;
         }
     }
@@ -1839,9 +1732,8 @@ namespace internals
     const size_type row     = global_rows.global_row(i);
     const size_type loc_row = global_rows.local_row(i);
 
-    typename SparseMatrix<number>::iterator matrix_values =
-      sparse_matrix->begin(row);
-    const bool optimize_diagonal = sparsity.n_rows() == sparsity.n_cols();
+    typename SparseMatrix<number>::iterator matrix_values = sparse_matrix->begin(row);
+    const bool optimize_diagonal                          = sparsity.n_rows() == sparsity.n_cols();
 
     // distinguish three cases about what can happen for checking whether the
     // diagonal is the first element of the row. this avoids if statements at
@@ -1866,8 +1758,8 @@ namespace internals
           {
             for (size_type j = column_start; j < column_end; ++j)
               {
-                LocalType col_val = resolve_matrix_entry(
-                  global_rows, global_rows, i, j, loc_row, local_matrix);
+                LocalType col_val =
+                  resolve_matrix_entry(global_rows, global_rows, i, j, loc_row, local_matrix);
                 dealiiSparseMatrix::add_value(
                   col_val, row, global_rows.global_row(j), matrix_values);
               }
@@ -1899,19 +1791,19 @@ namespace internals
           }
         else
           {
-            sparse_matrix->begin(row)->value() += resolve_matrix_entry(
-              global_rows, global_rows, i, i, loc_row, local_matrix);
+            sparse_matrix->begin(row)->value() +=
+              resolve_matrix_entry(global_rows, global_rows, i, i, loc_row, local_matrix);
             for (size_type j = column_start; j < i; ++j)
               {
-                LocalType col_val = resolve_matrix_entry(
-                  global_rows, global_rows, i, j, loc_row, local_matrix);
+                LocalType col_val =
+                  resolve_matrix_entry(global_rows, global_rows, i, j, loc_row, local_matrix);
                 dealiiSparseMatrix::add_value(
                   col_val, row, global_rows.global_row(j), matrix_values);
               }
             for (size_type j = i + 1; j < column_end; ++j)
               {
-                LocalType col_val = resolve_matrix_entry(
-                  global_rows, global_rows, i, j, loc_row, local_matrix);
+                LocalType col_val =
+                  resolve_matrix_entry(global_rows, global_rows, i, j, loc_row, local_matrix);
                 dealiiSparseMatrix::add_value(
                   col_val, row, global_rows.global_row(j), matrix_values);
               }
@@ -1931,8 +1823,7 @@ namespace internals
             if (row == global_rows.global_row(j))
               sparse_matrix->begin(row)->value() += col_val;
             else
-              dealiiSparseMatrix::add_value(
-                col_val, row, global_rows.global_row(j), matrix_values);
+              dealiiSparseMatrix::add_value(col_val, row, global_rows.global_row(j), matrix_values);
           }
       }
     else
@@ -1940,13 +1831,12 @@ namespace internals
         ++matrix_values; // jump over diagonal element
         for (size_type j = column_start; j < column_end; ++j)
           {
-            LocalType col_val = resolve_matrix_entry(
-              global_rows, global_rows, i, j, loc_row, local_matrix);
+            LocalType col_val =
+              resolve_matrix_entry(global_rows, global_rows, i, j, loc_row, local_matrix);
             if (row == global_rows.global_row(j))
               sparse_matrix->begin(row)->value() += col_val;
             else
-              dealiiSparseMatrix::add_value(
-                col_val, row, global_rows.global_row(j), matrix_values);
+              dealiiSparseMatrix::add_value(col_val, row, global_rows.global_row(j), matrix_values);
           }
       }
   }
@@ -2016,8 +1906,7 @@ namespace internals
                   }
 
                 for (size_type p = 0; p < global_rows.size(j); ++p)
-                  if (dof_mask(global_rows.local_row(i, q),
-                               global_rows.local_row(j, p)) == true)
+                  if (dof_mask(global_rows.local_row(i, q), global_rows.local_row(j, p)) == true)
                     goto add_this_index;
               }
 
@@ -2047,27 +1936,25 @@ namespace internals
   // do actually do something with this dof
   template <typename MatrixType, typename VectorType>
   inline void
-  set_matrix_diagonals(
-    const internals::GlobalRowsFromLocal &             global_rows,
-    const std::vector<size_type> &                     local_dof_indices,
-    const FullMatrix<typename MatrixType::value_type> &local_matrix,
-    const ConstraintMatrix &                           constraints,
-    MatrixType &                                       global_matrix,
-    VectorType &                                       global_vector,
-    bool use_inhomogeneities_for_rhs)
+  set_matrix_diagonals(const internals::GlobalRowsFromLocal &             global_rows,
+                       const std::vector<size_type> &                     local_dof_indices,
+                       const FullMatrix<typename MatrixType::value_type> &local_matrix,
+                       const ConstraintMatrix &                           constraints,
+                       MatrixType &                                       global_matrix,
+                       VectorType &                                       global_vector,
+                       bool use_inhomogeneities_for_rhs)
   {
     if (global_rows.n_constraints() > 0)
       {
-        typename MatrixType::value_type average_diagonal =
-          typename MatrixType::value_type();
+        typename MatrixType::value_type average_diagonal = typename MatrixType::value_type();
         for (size_type i = 0; i < local_matrix.m(); ++i)
           average_diagonal += std::abs(local_matrix(i, i));
         average_diagonal /= static_cast<double>(local_matrix.m());
 
         for (size_type i = 0; i < global_rows.n_constraints(); i++)
           {
-            const size_type local_row  = global_rows.constraint_origin(i);
-            const size_type global_row = local_dof_indices[local_row];
+            const size_type                       local_row  = global_rows.constraint_origin(i);
+            const size_type                       global_row = local_dof_indices[local_row];
             const typename MatrixType::value_type new_diagonal =
               (std::abs(local_matrix(local_row, local_row)) != 0 ?
                  std::abs(local_matrix(local_row, local_row)) :
@@ -2079,8 +1966,7 @@ namespace internals
             // of fill in a zero in the ith components with an inhomogeneity,
             // we set those to: inhomogeneity(i)*global_matrix (i,i).
             if (use_inhomogeneities_for_rhs == true)
-              global_vector(global_row) +=
-                new_diagonal * constraints.get_inhomogeneity(global_row);
+              global_vector(global_row) += new_diagonal * constraints.get_inhomogeneity(global_row);
           }
       }
   }
@@ -2095,10 +1981,10 @@ namespace internals
   template <typename SparsityPatternType>
   inline void
   set_sparsity_diagonals(const internals::GlobalRowsFromLocal &global_rows,
-                         const std::vector<size_type> &local_dof_indices,
-                         const Table<2, bool> &        dof_mask,
-                         const bool                    keep_constrained_entries,
-                         SparsityPatternType &         sparsity_pattern)
+                         const std::vector<size_type> &        local_dof_indices,
+                         const Table<2, bool> &                dof_mask,
+                         const bool                            keep_constrained_entries,
+                         SparsityPatternType &                 sparsity_pattern)
   {
     // if we got constraints, need to add the diagonal element and, if the
     // user requested so, also the rest of the entries in rows and columns
@@ -2137,9 +2023,8 @@ namespace internals
 // lines and collect all the local rows that
 // are related to it.
 void
-ConstraintMatrix::make_sorted_row_list(
-  const std::vector<size_type> &  local_dof_indices,
-  internals::GlobalRowsFromLocal &global_rows) const
+ConstraintMatrix::make_sorted_row_list(const std::vector<size_type> &  local_dof_indices,
+                                       internals::GlobalRowsFromLocal &global_rows) const
 {
   const size_type n_local_dofs = local_dof_indices.size();
   AssertDimension(n_local_dofs, global_rows.size());
@@ -2185,13 +2070,11 @@ ConstraintMatrix::make_sorted_row_list(
       AssertIndexRange(local_row, n_local_dofs);
       const size_type global_row = local_dof_indices[local_row];
       Assert(is_constrained(global_row), ExcInternalError());
-      const ConstraintLine &position =
-        lines[lines_cache[calculate_line_index(global_row)]];
+      const ConstraintLine &position = lines[lines_cache[calculate_line_index(global_row)]];
       if (position.inhomogeneity != 0)
         global_rows.set_ith_constraint_inhomogeneous(i);
       for (size_type q = 0; q < position.entries.size(); ++q)
-        global_rows.insert_index(
-          position.entries[q].first, local_row, position.entries[q].second);
+        global_rows.insert_index(position.entries[q].first, local_row, position.entries[q].second);
     }
 }
 
@@ -2201,9 +2084,8 @@ ConstraintMatrix::make_sorted_row_list(
 // come from the local ones without storing their origin. Used for sparsity
 // pattern generation.
 inline void
-ConstraintMatrix::make_sorted_row_list(
-  const std::vector<size_type> &local_dof_indices,
-  std::vector<size_type> &      active_dofs) const
+ConstraintMatrix::make_sorted_row_list(const std::vector<size_type> &local_dof_indices,
+                                       std::vector<size_type> &      active_dofs) const
 {
   const size_type n_local_dofs = local_dof_indices.size();
   size_type       added_rows   = 0;
@@ -2227,8 +2109,7 @@ ConstraintMatrix::make_sorted_row_list(
       // remove constrained entry since we are going to resolve it in place
       active_dofs.pop_back();
       const size_type       global_row = local_dof_indices[local_row];
-      const ConstraintLine &position =
-        lines[lines_cache[calculate_line_index(global_row)]];
+      const ConstraintLine &position   = lines[lines_cache[calculate_line_index(global_row)]];
       for (size_type q = 0; q < position.entries.size(); ++q)
         {
           const size_type new_index = position.entries[q].first;
@@ -2239,8 +2120,8 @@ ConstraintMatrix::make_sorted_row_list(
           // keep the list sorted
           else
             {
-              std::vector<size_type>::iterator it = Utilities::lower_bound(
-                active_dofs.begin(), active_dofs.end() - i + 1, new_index);
+              std::vector<size_type>::iterator it =
+                Utilities::lower_bound(active_dofs.begin(), active_dofs.end() - i + 1, new_index);
               if (*it != new_index)
                 active_dofs.insert(it, new_index);
             }
@@ -2253,15 +2134,14 @@ ConstraintMatrix::make_sorted_row_list(
 // Resolve the constraints from the vector and apply inhomogeneities.
 template <typename MatrixScalar, typename VectorScalar>
 inline typename ProductType<VectorScalar, MatrixScalar>::type
-ConstraintMatrix::resolve_vector_entry(
-  const size_type                       i,
-  const internals::GlobalRowsFromLocal &global_rows,
-  const Vector<VectorScalar> &          local_vector,
-  const std::vector<size_type> &        local_dof_indices,
-  const FullMatrix<MatrixScalar> &      local_matrix) const
+ConstraintMatrix::resolve_vector_entry(const size_type                       i,
+                                       const internals::GlobalRowsFromLocal &global_rows,
+                                       const Vector<VectorScalar> &          local_vector,
+                                       const std::vector<size_type> &        local_dof_indices,
+                                       const FullMatrix<MatrixScalar> &      local_matrix) const
 {
-  const size_type loc_row              = global_rows.local_row(i);
-  const size_type n_inhomogeneous_rows = global_rows.n_inhomogeneities();
+  const size_type loc_row                                    = global_rows.local_row(i);
+  const size_type n_inhomogeneous_rows                       = global_rows.n_inhomogeneities();
   typename ProductType<VectorScalar, MatrixScalar>::type val = 0;
   // has a direct contribution from some local entry. If we have inhomogeneous
   // constraints, compute the contribution of the inhomogeneity in the current
@@ -2279,15 +2159,13 @@ ConstraintMatrix::resolve_vector_entry(
   // go through the indirect contributions
   for (size_type q = 0; q < global_rows.size(i); ++q)
     {
-      const size_type loc_row_q = global_rows.local_row(i, q);
-      typename ProductType<VectorScalar, MatrixScalar>::type add_this =
-        local_vector(loc_row_q);
+      const size_type loc_row_q                                       = global_rows.local_row(i, q);
+      typename ProductType<VectorScalar, MatrixScalar>::type add_this = local_vector(loc_row_q);
       for (size_type k = 0; k < n_inhomogeneous_rows; ++k)
-        add_this -=
-          (local_matrix(loc_row_q, global_rows.constraint_origin(k)) *
-           lines[lines_cache[calculate_line_index(
-                   local_dof_indices[global_rows.constraint_origin(k)])]]
-             .inhomogeneity);
+        add_this -= (local_matrix(loc_row_q, global_rows.constraint_origin(k)) *
+                     lines[lines_cache[calculate_line_index(
+                             local_dof_indices[global_rows.constraint_origin(k)])]]
+                       .inhomogeneity);
       val += add_this * global_rows.constraint_value(i, q);
     }
   return val;
@@ -2304,16 +2182,14 @@ ConstraintMatrix::distribute_local_to_global(
   const std::vector<size_type> &                     local_dof_indices,
   MatrixType &                                       global_matrix,
   VectorType &                                       global_vector,
-  bool use_inhomogeneities_for_rhs,
+  bool                                               use_inhomogeneities_for_rhs,
   std::integral_constant<bool, false>) const
 {
   // check whether we work on real vectors or we just used a dummy when
   // calling the other function above.
-  const bool use_vectors =
-    (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;
+  const bool use_vectors = (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;
   typedef typename MatrixType::value_type number;
-  const bool                              use_dealii_matrix =
-    std::is_same<MatrixType, SparseMatrix<number>>::value;
+  const bool use_dealii_matrix = std::is_same<MatrixType, SparseMatrix<number>>::value;
 
   AssertDimension(local_matrix.n(), local_dof_indices.size());
   AssertDimension(local_matrix.m(), local_dof_indices.size());
@@ -2327,9 +2203,9 @@ ConstraintMatrix::distribute_local_to_global(
 
   const size_type n_local_dofs = local_dof_indices.size();
 
-  typename internals::ConstraintMatrixData<
-    typename MatrixType::value_type,
-    typename VectorType::value_type>::ScratchDataAccessor scratch_data;
+  typename internals::ConstraintMatrixData<typename MatrixType::value_type,
+                                           typename VectorType::value_type>::ScratchDataAccessor
+    scratch_data;
 
   internals::GlobalRowsFromLocal &global_rows = scratch_data->global_rows;
   global_rows.reinit(n_local_dofs);
@@ -2346,13 +2222,11 @@ ConstraintMatrix::distribute_local_to_global(
   std::vector<size_type> &cols = scratch_data->columns;
   std::vector<number> &   vals = scratch_data->values;
   // create arrays for writing into the vector as well
-  std::vector<size_type> &vector_indices = scratch_data->vector_indices;
-  std::vector<typename VectorType::value_type> &vector_values =
-    scratch_data->vector_values;
+  std::vector<size_type> &                      vector_indices = scratch_data->vector_indices;
+  std::vector<typename VectorType::value_type> &vector_values  = scratch_data->vector_values;
   vector_indices.resize(n_actual_dofs);
   vector_values.resize(n_actual_dofs);
-  SparseMatrix<number> *sparse_matrix =
-    dynamic_cast<SparseMatrix<number> *>(&global_matrix);
+  SparseMatrix<number> *sparse_matrix = dynamic_cast<SparseMatrix<number> *>(&global_matrix);
   if (use_dealii_matrix == false)
     {
       cols.resize(n_actual_dofs);
@@ -2375,14 +2249,8 @@ ConstraintMatrix::distribute_local_to_global(
           // cast is uncritical here and only used to avoid compiler
           // warnings. We never access a non-double array
           number *val_ptr = &vals[0];
-          internals::resolve_matrix_row(global_rows,
-                                        global_rows,
-                                        i,
-                                        0,
-                                        n_actual_dofs,
-                                        local_matrix,
-                                        col_ptr,
-                                        val_ptr);
+          internals::resolve_matrix_row(
+            global_rows, global_rows, i, 0, n_actual_dofs, local_matrix, col_ptr, val_ptr);
           const size_type n_values = col_ptr - &cols[0];
           if (n_values > 0)
             global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
@@ -2398,8 +2266,8 @@ ConstraintMatrix::distribute_local_to_global(
       // hand side.
       if (use_vectors == true)
         {
-          const typename VectorType::value_type val = resolve_vector_entry(
-            i, global_rows, local_vector, local_dof_indices, local_matrix);
+          const typename VectorType::value_type val =
+            resolve_vector_entry(i, global_rows, local_vector, local_dof_indices, local_matrix);
           AssertIsFinite(val);
 
           if (val != typename VectorType::value_type())
@@ -2423,9 +2291,7 @@ ConstraintMatrix::distribute_local_to_global(
   // Vector, LinearAlgebra::distributed::vector, etc.
   if (std::is_same<typename VectorType::value_type, number>::value)
     {
-      global_vector.add(
-        vector_indices,
-        *reinterpret_cast<std::vector<number> *>(&vector_values));
+      global_vector.add(vector_indices, *reinterpret_cast<std::vector<number> *>(&vector_values));
     }
   else
     {
@@ -2457,20 +2323,17 @@ ConstraintMatrix::distribute_local_to_global(
   const std::vector<size_type> &                     local_dof_indices,
   MatrixType &                                       global_matrix,
   VectorType &                                       global_vector,
-  bool use_inhomogeneities_for_rhs,
+  bool                                               use_inhomogeneities_for_rhs,
   std::integral_constant<bool, true>) const
 {
-  const bool use_vectors =
-    (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;
+  const bool use_vectors = (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;
   typedef typename MatrixType::value_type number;
-  const bool                              use_dealii_matrix =
-    std::is_same<MatrixType, BlockSparseMatrix<number>>::value;
+  const bool use_dealii_matrix = std::is_same<MatrixType, BlockSparseMatrix<number>>::value;
 
   AssertDimension(local_matrix.n(), local_dof_indices.size());
   AssertDimension(local_matrix.m(), local_dof_indices.size());
   Assert(global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
-  Assert(global_matrix.n_block_rows() == global_matrix.n_block_cols(),
-         ExcNotQuadratic());
+  Assert(global_matrix.n_block_rows() == global_matrix.n_block_cols(), ExcNotQuadratic());
   if (use_vectors == true)
     {
       AssertDimension(local_matrix.m(), local_vector.size());
@@ -2478,9 +2341,9 @@ ConstraintMatrix::distribute_local_to_global(
     }
   Assert(sorted == true, ExcMatrixNotClosed());
 
-  typename internals::ConstraintMatrixData<
-    typename MatrixType::value_type,
-    typename VectorType::value_type>::ScratchDataAccessor scratch_data;
+  typename internals::ConstraintMatrixData<typename MatrixType::value_type,
+                                           typename VectorType::value_type>::ScratchDataAccessor
+    scratch_data;
 
   const size_type                 n_local_dofs = local_dof_indices.size();
   internals::GlobalRowsFromLocal &global_rows  = scratch_data->global_rows;
@@ -2545,22 +2408,17 @@ ConstraintMatrix::distribute_local_to_global(
               else
                 {
                   SparseMatrix<number> *sparse_matrix =
-                    dynamic_cast<SparseMatrix<number> *>(
-                      &global_matrix.block(block, block_col));
+                    dynamic_cast<SparseMatrix<number> *>(&global_matrix.block(block, block_col));
                   Assert(sparse_matrix != nullptr, ExcInternalError());
-                  internals::resolve_matrix_row(global_rows,
-                                                i,
-                                                start_block,
-                                                end_block,
-                                                local_matrix,
-                                                sparse_matrix);
+                  internals::resolve_matrix_row(
+                    global_rows, i, start_block, end_block, local_matrix, sparse_matrix);
                 }
             }
 
           if (use_vectors == true)
             {
-              const number val = resolve_vector_entry(
-                i, global_rows, local_vector, local_dof_indices, local_matrix);
+              const number val =
+                resolve_vector_entry(i, global_rows, local_vector, local_dof_indices, local_matrix);
 
               if (val != number())
                 global_vector(global_indices[i]) +=
@@ -2588,8 +2446,7 @@ ConstraintMatrix::distribute_local_to_global(
   const std::vector<size_type> &                     col_indices,
   MatrixType &                                       global_matrix) const
 {
-  distribute_local_to_global(
-    local_matrix, row_indices, *this, col_indices, global_matrix);
+  distribute_local_to_global(local_matrix, row_indices, *this, col_indices, global_matrix);
 }
 
 
@@ -2611,8 +2468,8 @@ ConstraintMatrix::distribute_local_to_global(
   const size_type n_local_row_dofs = row_indices.size();
   const size_type n_local_col_dofs = col_indices.size();
 
-  typename internals::ConstraintMatrixData<
-    typename MatrixType::value_type>::ScratchDataAccessor scratch_data;
+  typename internals::ConstraintMatrixData<typename MatrixType::value_type>::ScratchDataAccessor
+                                  scratch_data;
   internals::GlobalRowsFromLocal &global_rows = scratch_data->global_rows;
   global_rows.reinit(n_local_row_dofs);
   internals::GlobalRowsFromLocal &global_cols = scratch_data->global_columns;
@@ -2638,14 +2495,8 @@ ConstraintMatrix::distribute_local_to_global(
       // calculate all the data that will be written into the matrix row.
       size_type *col_ptr = &cols[0];
       number *   val_ptr = &vals[0];
-      internals::resolve_matrix_row(global_rows,
-                                    global_cols,
-                                    i,
-                                    0,
-                                    n_actual_col_dofs,
-                                    local_matrix,
-                                    col_ptr,
-                                    val_ptr);
+      internals::resolve_matrix_row(
+        global_rows, global_cols, i, 0, n_actual_col_dofs, local_matrix, col_ptr, val_ptr);
       const size_type n_values = col_ptr - &cols[0];
       if (n_values > 0)
         global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
@@ -2656,15 +2507,13 @@ ConstraintMatrix::distribute_local_to_global(
 
 template <typename SparsityPatternType>
 void
-ConstraintMatrix::add_entries_local_to_global(
-  const std::vector<size_type> &local_dof_indices,
-  SparsityPatternType &         sparsity_pattern,
-  const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask,
-  std::integral_constant<bool, false>) const
+ConstraintMatrix::add_entries_local_to_global(const std::vector<size_type> &local_dof_indices,
+                                              SparsityPatternType &         sparsity_pattern,
+                                              const bool            keep_constrained_entries,
+                                              const Table<2, bool> &dof_mask,
+                                              std::integral_constant<bool, false>) const
 {
-  Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
-         ExcNotQuadratic());
+  Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(), ExcNotQuadratic());
 
   const size_type n_local_dofs       = local_dof_indices.size();
   bool            dof_mask_is_active = false;
@@ -2690,10 +2539,8 @@ ConstraintMatrix::add_entries_local_to_global(
       // now add the indices we collected above to the sparsity pattern. Very
       // easy here - just add the same array to all the rows...
       for (size_type i = 0; i < n_actual_dofs; ++i)
-        sparsity_pattern.add_entries(actual_dof_indices[i],
-                                     actual_dof_indices.begin(),
-                                     actual_dof_indices.end(),
-                                     true);
+        sparsity_pattern.add_entries(
+          actual_dof_indices[i], actual_dof_indices.begin(), actual_dof_indices.end(), true);
 
       // need to add the whole row and column structure in case we keep
       // constrained entries. Unfortunately, we can't use the nice matrix
@@ -2704,10 +2551,8 @@ ConstraintMatrix::add_entries_local_to_global(
             if (keep_constrained_entries == true)
               for (size_type j = 0; j < n_local_dofs; j++)
                 {
-                  sparsity_pattern.add(local_dof_indices[i],
-                                       local_dof_indices[j]);
-                  sparsity_pattern.add(local_dof_indices[j],
-                                       local_dof_indices[i]);
+                  sparsity_pattern.add(local_dof_indices[i], local_dof_indices[j]);
+                  sparsity_pattern.add(local_dof_indices[j], local_dof_indices[i]);
                 }
             else
               sparsity_pattern.add(local_dof_indices[i], local_dof_indices[i]);
@@ -2734,31 +2579,26 @@ ConstraintMatrix::add_entries_local_to_global(
     {
       std::vector<size_type>::iterator col_ptr = cols.begin();
       const size_type                  row     = global_rows.global_row(i);
-      internals::resolve_matrix_row(
-        global_rows, i, 0, n_actual_dofs, dof_mask, col_ptr);
+      internals::resolve_matrix_row(global_rows, i, 0, n_actual_dofs, dof_mask, col_ptr);
 
       // finally, write all the information that accumulated under the given
       // process into the global matrix row and into the vector
       if (col_ptr != cols.begin())
         sparsity_pattern.add_entries(row, cols.begin(), col_ptr, true);
     }
-  internals::set_sparsity_diagonals(global_rows,
-                                    local_dof_indices,
-                                    dof_mask,
-                                    keep_constrained_entries,
-                                    sparsity_pattern);
+  internals::set_sparsity_diagonals(
+    global_rows, local_dof_indices, dof_mask, keep_constrained_entries, sparsity_pattern);
 }
 
 
 
 template <typename SparsityPatternType>
 void
-ConstraintMatrix::add_entries_local_to_global(
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices,
-  SparsityPatternType &         sparsity_pattern,
-  const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask) const
+ConstraintMatrix::add_entries_local_to_global(const std::vector<size_type> &row_indices,
+                                              const std::vector<size_type> &col_indices,
+                                              SparsityPatternType &         sparsity_pattern,
+                                              const bool            keep_constrained_entries,
+                                              const Table<2, bool> &dof_mask) const
 {
   const size_type n_local_rows       = row_indices.size();
   const size_type n_local_cols       = col_indices.size();
@@ -2795,10 +2635,8 @@ ConstraintMatrix::add_entries_local_to_global(
       // now add the indices we collected above to the sparsity pattern. Very
       // easy here - just add the same array to all the rows...
       for (size_type i = 0; i < n_actual_rows; ++i)
-        sparsity_pattern.add_entries(actual_row_indices[i],
-                                     actual_col_indices.begin(),
-                                     actual_col_indices.end(),
-                                     true);
+        sparsity_pattern.add_entries(
+          actual_row_indices[i], actual_col_indices.begin(), actual_col_indices.end(), true);
       return;
     }
 
@@ -2811,19 +2649,16 @@ ConstraintMatrix::add_entries_local_to_global(
 
 template <typename SparsityPatternType>
 void
-ConstraintMatrix::add_entries_local_to_global(
-  const std::vector<size_type> &local_dof_indices,
-  SparsityPatternType &         sparsity_pattern,
-  const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask,
-  std::integral_constant<bool, true>) const
+ConstraintMatrix::add_entries_local_to_global(const std::vector<size_type> &local_dof_indices,
+                                              SparsityPatternType &         sparsity_pattern,
+                                              const bool            keep_constrained_entries,
+                                              const Table<2, bool> &dof_mask,
+                                              std::integral_constant<bool, true>) const
 {
   // just as the other add_entries_local_to_global function, but now
   // specialized for block matrices.
-  Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
-         ExcNotQuadratic());
-  Assert(sparsity_pattern.n_block_rows() == sparsity_pattern.n_block_cols(),
-         ExcNotQuadratic());
+  Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(), ExcNotQuadratic());
+  Assert(sparsity_pattern.n_block_rows() == sparsity_pattern.n_block_cols(), ExcNotQuadratic());
 
   const size_type n_local_dofs = local_dof_indices.size();
   const size_type num_blocks   = sparsity_pattern.n_block_rows();
@@ -2848,8 +2683,7 @@ ConstraintMatrix::add_entries_local_to_global(
       // additional construct that also takes care of block indices.
       std::vector<size_type> &block_starts = scratch_data->block_starts;
       block_starts.resize(num_blocks + 1);
-      internals::make_block_starts(
-        sparsity_pattern, actual_dof_indices, block_starts);
+      internals::make_block_starts(sparsity_pattern, actual_dof_indices, block_starts);
 
       for (size_type block = 0; block < num_blocks; ++block)
         {
@@ -2858,18 +2692,13 @@ ConstraintMatrix::add_entries_local_to_global(
             {
               Assert(i < n_actual_dofs, ExcInternalError());
               const size_type row = actual_dof_indices[i];
-              Assert(row < sparsity_pattern.block(block, 0).n_rows(),
-                     ExcInternalError());
-              std::vector<size_type>::iterator index_it =
-                actual_dof_indices.begin();
+              Assert(row < sparsity_pattern.block(block, 0).n_rows(), ExcInternalError());
+              std::vector<size_type>::iterator index_it = actual_dof_indices.begin();
               for (size_type block_col = 0; block_col < num_blocks; ++block_col)
                 {
                   const size_type next_block_col = block_starts[block_col + 1];
                   sparsity_pattern.block(block, block_col)
-                    .add_entries(row,
-                                 index_it,
-                                 actual_dof_indices.begin() + next_block_col,
-                                 true);
+                    .add_entries(row, index_it, actual_dof_indices.begin() + next_block_col, true);
                   index_it = actual_dof_indices.begin() + next_block_col;
                 }
             }
@@ -2881,10 +2710,8 @@ ConstraintMatrix::add_entries_local_to_global(
             if (keep_constrained_entries == true)
               for (size_type j = 0; j < n_local_dofs; j++)
                 {
-                  sparsity_pattern.add(local_dof_indices[i],
-                                       local_dof_indices[j]);
-                  sparsity_pattern.add(local_dof_indices[j],
-                                       local_dof_indices[i]);
+                  sparsity_pattern.add(local_dof_indices[i], local_dof_indices[j]);
+                  sparsity_pattern.add(local_dof_indices[j], local_dof_indices[i]);
                 }
             else
               sparsity_pattern.add(local_dof_indices[i], local_dof_indices[i]);
@@ -2918,8 +2745,8 @@ ConstraintMatrix::add_entries_local_to_global(
           const size_type row = global_rows.global_row(i);
           for (size_type block_col = 0; block_col < num_blocks; ++block_col)
             {
-              const size_type begin_block = block_starts[block_col],
-                              end_block   = block_starts[block_col + 1];
+              const size_type begin_block              = block_starts[block_col],
+                              end_block                = block_starts[block_col + 1];
               std::vector<size_type>::iterator col_ptr = cols.begin();
               internals::resolve_matrix_row(
                 global_rows, i, begin_block, end_block, dof_mask, col_ptr);
@@ -2930,11 +2757,8 @@ ConstraintMatrix::add_entries_local_to_global(
         }
     }
 
-  internals::set_sparsity_diagonals(global_rows,
-                                    local_dof_indices,
-                                    dof_mask,
-                                    keep_constrained_entries,
-                                    sparsity_pattern);
+  internals::set_sparsity_diagonals(
+    global_rows, local_dof_indices, dof_mask, keep_constrained_entries, sparsity_pattern);
 }
 
 

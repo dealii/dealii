@@ -127,10 +127,8 @@ test_mesh(DoFHandler<dim> &mgdofs)
     dofs.end(),
     dof_info,
     info_box,
-    std::bind(
-      &Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
     std::bind(&Local<dim>::face,
               local,
               std::placeholders::_1,
@@ -159,10 +157,8 @@ test_mesh(DoFHandler<dim> &mgdofs)
     mgdofs.end_mg(),
     mg_dof_info,
     info_box,
-    std::bind(
-      &Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::cell, local, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&Local<dim>::bdry, local, std::placeholders::_1, std::placeholders::_2),
     std::bind(&Local<dim>::face,
               local,
               std::placeholders::_1,

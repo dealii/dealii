@@ -31,17 +31,12 @@ DEAL_II_NAMESPACE_OPEN
 // cleaned up
 
 template <class PolynomialType, int dim, int spacedim>
-FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
-                                                        MappingType map) :
+FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg, MappingType map) :
   FE_PolyTensor<PolynomialType, dim, spacedim>(
     deg,
-    FiniteElementData<dim>(get_dpo_vector(deg),
-                           dim,
-                           deg + 1,
-                           FiniteElementData<dim>::L2),
+    FiniteElementData<dim>(get_dpo_vector(deg), dim, deg + 1, FiniteElementData<dim>::L2),
     std::vector<bool>(PolynomialType::compute_n_pols(deg), true),
-    std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg),
-                               ComponentMask(dim, true)))
+    std::vector<ComponentMask>(PolynomialType::compute_n_pols(deg), ComponentMask(dim, true)))
 {
   this->mapping_type                   = map;
   const unsigned int polynomial_degree = this->tensor_degree();
@@ -59,8 +54,7 @@ template <class PolynomialType, int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGVector<PolynomialType, dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_DGVector<PolynomialType, dim, spacedim>>(
-    *this);
+  return std_cxx14::make_unique<FE_DGVector<PolynomialType, dim, spacedim>>(*this);
 }
 
 
@@ -69,16 +63,15 @@ std::string
 FE_DGVector<PolynomialType, dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_DGVector_" << this->poly_space.name() << "<" << dim << ">("
-          << this->degree - 1 << ")";
+  namebuf << "FE_DGVector_" << this->poly_space.name() << "<" << dim << ">(" << this->degree - 1
+          << ")";
   return namebuf.str();
 }
 
 
 template <class PolynomialType, int dim, int spacedim>
 std::vector<unsigned int>
-FE_DGVector<PolynomialType, dim, spacedim>::get_dpo_vector(
-  const unsigned int deg)
+FE_DGVector<PolynomialType, dim, spacedim>::get_dpo_vector(const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim + 1);
   dpo[dim] = PolynomialType::compute_n_pols(deg);
@@ -89,9 +82,8 @@ FE_DGVector<PolynomialType, dim, spacedim>::get_dpo_vector(
 
 template <class PolynomialType, int dim, int spacedim>
 bool
-FE_DGVector<PolynomialType, dim, spacedim>::has_support_on_face(
-  const unsigned int,
-  const unsigned int) const
+FE_DGVector<PolynomialType, dim, spacedim>::has_support_on_face(const unsigned int,
+                                                                const unsigned int) const
 {
   return true;
 }

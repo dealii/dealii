@@ -43,11 +43,10 @@ main()
   csp.add(1, 2);
   csp.compress();
 
-  deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
-          << std::endl;
+  deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols() << std::endl;
   deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
-  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << "x"
-          << csp.block(1, 0).n_cols() << std::endl;
+  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << "x" << csp.block(1, 0).n_cols()
+          << std::endl;
 
   csp.print(logfile);
 

@@ -42,19 +42,17 @@ check(const FiniteElement<dim> &fe)
 
   MGConstrainedDoFs                 mg_constrained_dofs;
   MGTransferMatrixFree<dim, Number> transfer(mg_constrained_dofs);
-  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim>                tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(6 - dim);
 
   // run a few different sizes...
   for (unsigned int c = 0; c < 4; ++c)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             tr.begin_active();
+      for (typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
            cell != tr.end();
            ++cell)
-        if ((cell->center().norm() < 0.5 &&
-             (cell->level() < 5 || cell->center().norm() > 0.45)) ||
+        if ((cell->center().norm() < 0.5 && (cell->level() < 5 || cell->center().norm() > 0.45)) ||
             (dim == 2 && cell->center().norm() > 1.2))
           cell->set_refine_flag();
       tr.execute_coarsening_and_refinement();
@@ -68,44 +66,38 @@ check(const FiniteElement<dim> &fe)
         exponents_monomial[d] = 1;
       LinearAlgebra::distributed::Vector<double> vref;
       vref.reinit(mgdof.n_dofs());
-      VectorTools::interpolate(
-        mgdof, Functions::Monomial<dim>(exponents_monomial), vref);
+      VectorTools::interpolate(mgdof, Functions::Monomial<dim>(exponents_monomial), vref);
 
       deallog << "no. cells: " << tr.n_global_active_cells() << std::endl;
 
       std::set<types::boundary_id> dirichlet_boundary;
       dirichlet_boundary.insert(0);
       mg_constrained_dofs.initialize(mgdof);
-      mg_constrained_dofs.make_zero_boundary_constraints(mgdof,
-                                                         dirichlet_boundary);
+      mg_constrained_dofs.make_zero_boundary_constraints(mgdof, dirichlet_boundary);
 
       // build matrix-free transfer
       transfer.build(mgdof);
       MGTransferMatrixFree<dim, Number> transfer_ref(mg_constrained_dofs);
       transfer_ref.build(mgdof);
-      MGLevelObject<LinearAlgebra::distributed::Vector<Number>> vectors(
-        0, tr.n_global_levels() - 1);
+      MGLevelObject<LinearAlgebra::distributed::Vector<Number>> vectors(0,
+                                                                        tr.n_global_levels() - 1);
       transfer_ref.copy_to_mg(mgdof, vectors, vref);
       for (unsigned int level = vectors.max_level(); level > 0; --level)
         {
           LinearAlgebra::distributed::Vector<Number> vec2(vectors[level - 1]);
-          transfer_ref.restrict_and_add(
-            level, vectors[level - 1], vectors[level]);
+          transfer_ref.restrict_and_add(level, vectors[level - 1], vectors[level]);
           transfer.restrict_and_add(level, vec2, vectors[level]);
           vec2 -= vectors[level - 1];
-          deallog << "Error in restriction:  " << (double)vec2.linfty_norm()
-                  << std::endl;
+          deallog << "Error in restriction:  " << (double)vec2.linfty_norm() << std::endl;
         }
 
       for (unsigned int level = 1; level < vectors.max_level(); ++level)
         {
           LinearAlgebra::distributed::Vector<Number> vec2(vectors[level + 1]);
-          transfer_ref.prolongate(
-            level + 1, vectors[level + 1], vectors[level]);
+          transfer_ref.prolongate(level + 1, vectors[level + 1], vectors[level]);
           transfer.prolongate(level + 1, vec2, vectors[level]);
           vec2 -= vectors[level + 1];
-          deallog << "Error in prolongation: " << (double)vec2.linfty_norm()
-                  << std::endl;
+          deallog << "Error in prolongation: " << (double)vec2.linfty_norm() << std::endl;
         }
     }
 }

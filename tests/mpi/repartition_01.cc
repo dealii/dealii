@@ -48,8 +48,8 @@ test()
       GridGenerator::hyper_cube(tr);
       tr.refine_global(2);
 
-      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-              << " / " << tr.n_global_active_cells() << std::endl;
+      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells() << " / "
+              << tr.n_global_active_cells() << std::endl;
 
       // tr.write_mesh_vtk("a");
 
@@ -57,8 +57,8 @@ test()
 
       // tr.write_mesh_vtk("b");
 
-      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells()
-              << " / " << tr.n_global_active_cells() << std::endl;
+      deallog << "locally owned cells: " << tr.n_locally_owned_active_cells() << " / "
+              << tr.n_global_active_cells() << std::endl;
 
       const unsigned int checksum = tr.get_checksum();
       if (myid == 0)

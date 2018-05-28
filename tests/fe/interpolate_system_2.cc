@@ -32,10 +32,8 @@ template <int dim, typename T>
 void
 check(T function, const unsigned int degree)
 {
-  FESystem<dim> fe(FE_RaviartThomas<dim>(degree),
-                   2,
-                   FESystem<dim>(FE_RaviartThomas<dim>(degree), 2),
-                   1);
+  FESystem<dim> fe(
+    FE_RaviartThomas<dim>(degree), 2, FESystem<dim>(FE_RaviartThomas<dim>(degree), 2), 1);
   deallog << fe.get_name() << std::endl;
 
   std::vector<double> dofs(fe.dofs_per_cell);
@@ -45,8 +43,7 @@ check(T function, const unsigned int degree)
   function.vector_value_list(fe.get_generalized_support_points(), values);
 
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
-  deallog << " vector " << vector_difference(fe, dofs, function, 0)
-          << std::endl;
+  deallog << " vector " << vector_difference(fe, dofs, function, 0) << std::endl;
 }
 
 int

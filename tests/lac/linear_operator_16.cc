@@ -79,8 +79,8 @@ main(int argc, char *argv[])
     f.compress(VectorOperation::insert);
     u.compress(VectorOperation::insert);
 
-    const auto lo_A    = linear_operator<TrilinosWrappers::MPI::Vector>(A);
-    const auto lo_null = null_operator(lo_A);
+    const auto lo_A           = linear_operator<TrilinosWrappers::MPI::Vector>(A);
+    const auto lo_null        = null_operator(lo_A);
     const auto lo_A_plus_null = lo_A + lo_null;
 
     u = lo_A_plus_null * f;

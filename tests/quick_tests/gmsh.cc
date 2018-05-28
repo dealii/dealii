@@ -49,8 +49,8 @@ main()
 
   geo.close();
 
-  const int ierr = std::system(DEAL_II_GMSH_EXECUTABLE_PATH
-                               " -2 file.geo 1>file.log 2>file_warn.log");
+  const int ierr =
+    std::system(DEAL_II_GMSH_EXECUTABLE_PATH " -2 file.geo 1>file.log 2>file_warn.log");
   Assert(ierr == 0, dealii::ExcInternalError());
 
   std::remove("file.geo");

@@ -44,10 +44,8 @@ namespace CUDAWrappers
     // These variables are stored in the device constant memory.
     // TODO: use a template parameter
     constexpr unsigned int max_elem_degree = 10;
-    __constant__ double
-      global_shape_values[(max_elem_degree + 1) * (max_elem_degree + 1)];
-    __constant__ double
-      global_shape_gradients[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    __constant__ double    global_shape_values[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    __constant__ double    global_shape_gradients[(max_elem_degree + 1) * (max_elem_degree + 1)];
 
     template <typename Number>
     using CUDAVector = ::dealii::LinearAlgebra::CUDAWrappers::Vector<Number>;
@@ -58,10 +56,7 @@ namespace CUDAWrappers
      */
     template <typename Number>
     void
-    transpose(const unsigned int N,
-              const unsigned     M,
-              const Number *     src,
-              Number *           dst)
+    transpose(const unsigned int N, const unsigned M, const Number *src, Number *dst)
     {
       // src is N X M
       // dst is M X N
@@ -77,9 +72,7 @@ namespace CUDAWrappers
      */
     template <typename Number>
     void
-    transpose_in_place(std::vector<Number> &array_host,
-                       const unsigned int   n,
-                       const unsigned int   m)
+    transpose_in_place(std::vector<Number> &array_host, const unsigned int n, const unsigned int m)
     {
       // convert to structure-of-array
       std::vector<Number> old(array_host.size());
@@ -95,17 +88,13 @@ namespace CUDAWrappers
      */
     template <typename Number1, typename Number2>
     void
-    alloc_and_copy(Number1 **            array_device,
-                   std::vector<Number2> &array_host,
-                   const unsigned int    n)
+    alloc_and_copy(Number1 **array_device, std::vector<Number2> &array_host, const unsigned int n)
     {
       cudaError_t error_code = cudaMalloc(array_device, n * sizeof(Number1));
       AssertCuda(error_code);
 
-      error_code = cudaMemcpy(*array_device,
-                              array_host.data(),
-                              n * sizeof(Number1),
-                              cudaMemcpyHostToDevice);
+      error_code =
+        cudaMemcpy(*array_device, array_host.data(), n * sizeof(Number1), cudaMemcpyHostToDevice);
       AssertCuda(error_code);
     }
 
@@ -119,14 +108,12 @@ namespace CUDAWrappers
     class ReinitHelper
     {
     public:
-      ReinitHelper(
-        MatrixFree<dim, Number> *      data,
-        const Mapping<dim> &           mapping,
-        const FiniteElement<dim, dim> &fe,
-        const Quadrature<1> &          quad,
-        const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-          &                shape_info,
-        const UpdateFlags &update_flags);
+      ReinitHelper(MatrixFree<dim, Number> *                                         data,
+                   const Mapping<dim> &                                              mapping,
+                   const FiniteElement<dim, dim> &                                   fe,
+                   const Quadrature<1> &                                             quad,
+                   const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+                   const UpdateFlags &                                               update_flags);
 
       void
       setup_color_arrays(const unsigned int n_colors);
@@ -166,13 +153,12 @@ namespace CUDAWrappers
 
     template <int dim, typename Number>
     ReinitHelper<dim, Number>::ReinitHelper(
-      MatrixFree<dim, Number> * data,
-      const Mapping<dim> &      mapping,
-      const FiniteElement<dim> &fe,
-      const Quadrature<1> &     quad,
-      const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-        &                shape_info,
-      const UpdateFlags &update_flags) :
+      MatrixFree<dim, Number> *                                         data,
+      const Mapping<dim> &                                              mapping,
+      const FiniteElement<dim> &                                        fe,
+      const Quadrature<1> &                                             quad,
+      const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const UpdateFlags &                                               update_flags) :
       data(data),
       fe_degree(data->fe_degree),
       dofs_per_cell(data->dofs_per_cell),
@@ -180,8 +166,8 @@ namespace CUDAWrappers
       fe_values(mapping,
                 fe,
                 Quadrature<dim>(quad),
-                update_inverse_jacobians | update_quadrature_points |
-                  update_values | update_gradients | update_JxW_values),
+                update_inverse_jacobians | update_quadrature_points | update_values |
+                  update_gradients | update_JxW_values),
       lexicographic_inv(shape_info.lexicographic_numbering),
       update_flags(update_flags),
       padding_length(data->get_padding_length())
@@ -224,10 +210,9 @@ namespace CUDAWrappers
       const unsigned int cells_per_block = data->cells_per_block;
 
       // Setup kernel parameters
-      const double apply_n_blocks = std::ceil(
-        static_cast<double>(n_cells) / static_cast<double>(cells_per_block));
-      const unsigned int apply_x_n_blocks =
-        std::round(std::sqrt(apply_n_blocks));
+      const double apply_n_blocks =
+        std::ceil(static_cast<double>(n_cells) / static_cast<double>(cells_per_block));
+      const unsigned int apply_x_n_blocks = std::round(std::sqrt(apply_n_blocks));
       const unsigned int apply_y_n_blocks =
         std::ceil(apply_n_blocks / static_cast<double>(apply_x_n_blocks));
 
@@ -236,17 +221,14 @@ namespace CUDAWrappers
       // TODO this should be a templated parameter.
       const unsigned int n_dofs_1d = fe_degree + 1;
 
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_in_elem)
+      if (data->parallelization_scheme == MatrixFree<dim, Number>::parallel_in_elem)
         {
           if (dim == 1)
             data->block_dim[color] = dim3(n_dofs_1d * cells_per_block);
           else if (dim == 2)
-            data->block_dim[color] =
-              dim3(n_dofs_1d * cells_per_block, n_dofs_1d);
+            data->block_dim[color] = dim3(n_dofs_1d * cells_per_block, n_dofs_1d);
           else
-            data->block_dim[color] =
-              dim3(n_dofs_1d * cells_per_block, n_dofs_1d, n_dofs_1d);
+            data->block_dim[color] = dim3(n_dofs_1d * cells_per_block, n_dofs_1d, n_dofs_1d);
         }
       else
         data->block_dim[color] = dim3(cells_per_block);
@@ -270,8 +252,7 @@ namespace CUDAWrappers
     template <int dim, typename Number>
     template <typename CellFilter>
     void
-    ReinitHelper<dim, Number>::get_cell_data(const CellFilter & cell,
-                                             const unsigned int cell_id)
+    ReinitHelper<dim, Number>::get_cell_data(const CellFilter &cell, const unsigned int cell_id)
     {
       cell->get_dof_indices(local_dof_indices);
 
@@ -287,8 +268,7 @@ namespace CUDAWrappers
       // Quadrature points
       if (update_flags & update_quadrature_points)
         {
-          const std::vector<Point<dim>> &q_points =
-            fe_values.get_quadrature_points();
+          const std::vector<Point<dim>> &q_points = fe_values.get_quadrature_points();
           memcpy(&q_points_host[cell_id * padding_length],
                  q_points.data(),
                  q_points_per_cell * sizeof(Point<dim>));
@@ -321,32 +301,24 @@ namespace CUDAWrappers
       const unsigned int n_cells = data->n_cells[color];
 
       // Local-to-global mapping
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_over_elem)
-        internal::transpose_in_place(
-          local_to_global_host, n_cells, padding_length);
+      if (data->parallelization_scheme == MatrixFree<dim, Number>::parallel_over_elem)
+        internal::transpose_in_place(local_to_global_host, n_cells, padding_length);
 
-      alloc_and_copy(&data->local_to_global[color],
-                     local_to_global_host,
-                     n_cells * padding_length);
+      alloc_and_copy(&data->local_to_global[color], local_to_global_host, n_cells * padding_length);
 
       // Quadrature points
       if (update_flags & update_quadrature_points)
         {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            internal::transpose_in_place(
-              q_points_host, n_cells, padding_length);
+          if (data->parallelization_scheme == MatrixFree<dim, Number>::parallel_over_elem)
+            internal::transpose_in_place(q_points_host, n_cells, padding_length);
 
-          alloc_and_copy(
-            &data->q_points[color], q_points_host, n_cells * padding_length);
+          alloc_and_copy(&data->q_points[color], q_points_host, n_cells * padding_length);
         }
 
       // Jacobian determinants/quadrature weights
       if (update_flags & update_JxW_values)
         {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
+          if (data->parallelization_scheme == MatrixFree<dim, Number>::parallel_over_elem)
             internal::transpose_in_place(JxW_host, n_cells, padding_length);
 
           alloc_and_copy(&data->JxW[color], JxW_host, n_cells * padding_length);
@@ -359,24 +331,19 @@ namespace CUDAWrappers
           // are together, etc., i.e., reorder indices from
           // cell_id*q_points_per_cell*dim*dim + q*dim*dim +i to
           // i*q_points_per_cell*n_cells + cell_id*q_points_per_cell+q
-          internal::transpose_in_place(
-            inv_jacobian_host, padding_length * n_cells, dim * dim);
+          internal::transpose_in_place(inv_jacobian_host, padding_length * n_cells, dim * dim);
 
           // Transpose second time means we get the following index order:
           // q*n_cells*dim*dim + i*n_cells + cell_id which is good for an
           // element-level parallelization
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            internal::transpose_in_place(
-              inv_jacobian_host, n_cells * dim * dim, padding_length);
+          if (data->parallelization_scheme == MatrixFree<dim, Number>::parallel_over_elem)
+            internal::transpose_in_place(inv_jacobian_host, n_cells * dim * dim, padding_length);
 
-          alloc_and_copy(&data->inv_jacobian[color],
-                         inv_jacobian_host,
-                         n_cells * dim * dim * padding_length);
+          alloc_and_copy(
+            &data->inv_jacobian[color], inv_jacobian_host, n_cells * dim * dim * padding_length);
         }
 
-      alloc_and_copy(
-        &data->constraint_mask[color], constraint_mask_host, n_cells);
+      alloc_and_copy(&data->constraint_mask[color], constraint_mask_host, n_cells);
     }
 
 
@@ -384,12 +351,10 @@ namespace CUDAWrappers
     template <int dim>
     std::vector<types::global_dof_index>
     get_conflict_indices(
-      const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-        &                     cell,
-      const ConstraintMatrix &constraints)
+      const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> &cell,
+      const ConstraintMatrix &                                                constraints)
     {
-      std::vector<types::global_dof_index> local_dof_indices(
-        cell->get_fe().dofs_per_cell);
+      std::vector<types::global_dof_index> local_dof_indices(cell->get_fe().dofs_per_cell);
       cell->get_dof_indices(local_dof_indices);
       constraints.resolve_indices(local_dof_indices);
 
@@ -400,14 +365,12 @@ namespace CUDAWrappers
 
     template <typename Number>
     __global__ void
-    copy_constrained_dofs(
-      const dealii::types::global_dof_index *constrained_dofs,
-      const unsigned int                     n_constrained_dofs,
-      const Number *                         src,
-      Number *                               dst)
+    copy_constrained_dofs(const dealii::types::global_dof_index *constrained_dofs,
+                          const unsigned int                     n_constrained_dofs,
+                          const Number *                         src,
+                          Number *                               dst)
     {
-      const unsigned int dof =
-        threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
+      const unsigned int dof = threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
       if (dof < n_constrained_dofs)
         dst[constrained_dofs[dof]] = src[constrained_dofs[dof]];
     }
@@ -416,14 +379,12 @@ namespace CUDAWrappers
 
     template <typename Number>
     __global__ void
-    set_constrained_dofs(
-      const dealii::types::global_dof_index *constrained_dofs,
-      const unsigned int                     n_constrained_dofs,
-      Number                                 val,
-      Number *                               dst)
+    set_constrained_dofs(const dealii::types::global_dof_index *constrained_dofs,
+                         const unsigned int                     n_constrained_dofs,
+                         Number                                 val,
+                         Number *                               dst)
     {
-      const unsigned int dof =
-        threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
+      const unsigned int dof = threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
       if (dof < n_constrained_dofs)
         dst[constrained_dofs[dof]] = val;
     }
@@ -437,8 +398,7 @@ namespace CUDAWrappers
                        const Number *                               src,
                        Number *                                     dst)
     {
-      const unsigned int cells_per_block =
-        cells_per_block_shmem(dim, functor::n_dofs_1d - 1);
+      const unsigned int cells_per_block = cells_per_block_shmem(dim, functor::n_dofs_1d - 1);
 
       // TODO make use of dynamically allocated shared memory
       __shared__ Number values[cells_per_block * functor::n_local_dofs];
@@ -452,8 +412,7 @@ namespace CUDAWrappers
       for (int d = 0; d < dim; ++d)
         gq[d] = &gradients[d][local_cell * functor::n_q_points];
 
-      SharedData<dim, Number> shared_data(
-        &values[local_cell * functor::n_local_dofs], gq);
+      SharedData<dim, Number> shared_data(&values[local_cell * functor::n_local_dofs], gq);
 
       if (cell < gpu_data.n_cells)
         func(cell, &gpu_data, &shared_data, src, dst);
@@ -463,9 +422,7 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  MatrixFree<dim, Number>::MatrixFree() :
-    constrained_dofs(nullptr),
-    padding_length(0)
+  MatrixFree<dim, Number>::MatrixFree() : constrained_dofs(nullptr), padding_length(0)
   {}
 
 
@@ -499,19 +456,16 @@ namespace CUDAWrappers
     const unsigned int n_dofs_1d     = fe_degree + 1;
     const unsigned int n_q_points_1d = quad.size();
 
-    Assert(n_dofs_1d == n_q_points_1d,
-           ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
+    Assert(n_dofs_1d == n_q_points_1d, ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
 
     // Set padding length to the closest power of two larger than or equal to
     // the number of threads.
-    padding_length = 1 << static_cast<unsigned int>(
-                       std::ceil(dim * std::log2(fe_degree + 1.)));
+    padding_length = 1 << static_cast<unsigned int>(std::ceil(dim * std::log2(fe_degree + 1.)));
 
     dofs_per_cell     = fe.dofs_per_cell;
     q_points_per_cell = std::pow(n_q_points_1d, dim);
 
-    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
-      quad, fe);
+    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quad, fe);
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d * sizeof(Number);
 
@@ -535,22 +489,15 @@ namespace CUDAWrappers
     // Setup the number of cells per CUDA thread block
     cells_per_block = cells_per_block_shmem(dim, fe_degree);
 
-    internal::ReinitHelper<dim, Number> helper(
-      this, mapping, fe, quad, shape_info, update_flags);
+    internal::ReinitHelper<dim, Number> helper(this, mapping, fe, quad, shape_info, update_flags);
 
     // Create a graph coloring
-    typedef FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-               CellFilter;
-    CellFilter begin(IteratorFilters::LocallyOwnedCell(),
-                     dof_handler.begin_active());
+    typedef FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> CellFilter;
+    CellFilter begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
     CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    typedef std::function<std::vector<types::global_dof_index>(
-      CellFilter const &)>
-                    fun_type;
-    const fun_type &fun =
-      static_cast<fun_type>(std::bind(&internal::get_conflict_indices<dim>,
-                                      std::placeholders::_1,
-                                      constraints));
+    typedef std::function<std::vector<types::global_dof_index>(CellFilter const &)> fun_type;
+    const fun_type &fun = static_cast<fun_type>(
+      std::bind(&internal::get_conflict_indices<dim>, std::placeholders::_1, constraints));
 
     std::vector<std::vector<CellFilter>> graph =
       GraphColoring::make_graph_coloring(begin, end, fun);
@@ -580,20 +527,15 @@ namespace CUDAWrappers
     if (n_constrained_dofs != 0)
       {
         const unsigned int constraint_n_blocks =
-          std::ceil(static_cast<double>(n_constrained_dofs) /
-                    static_cast<double>(block_size));
-        const unsigned int constraint_x_n_blocks =
-          std::round(std::sqrt(constraint_n_blocks));
-        const unsigned int constraint_y_n_blocks =
-          std::ceil(static_cast<double>(constraint_n_blocks) /
-                    static_cast<double>(constraint_x_n_blocks));
+          std::ceil(static_cast<double>(n_constrained_dofs) / static_cast<double>(block_size));
+        const unsigned int constraint_x_n_blocks = std::round(std::sqrt(constraint_n_blocks));
+        const unsigned int constraint_y_n_blocks = std::ceil(
+          static_cast<double>(constraint_n_blocks) / static_cast<double>(constraint_x_n_blocks));
 
-        constraint_grid_dim =
-          dim3(constraint_x_n_blocks, constraint_y_n_blocks);
+        constraint_grid_dim  = dim3(constraint_x_n_blocks, constraint_y_n_blocks);
         constraint_block_dim = dim3(block_size);
 
-        std::vector<dealii::types::global_dof_index> constrained_dofs_host(
-          n_constrained_dofs);
+        std::vector<dealii::types::global_dof_index> constrained_dofs_host(n_constrained_dofs);
 
         unsigned int       i_constraint = 0;
         const unsigned int n_dofs       = dof_handler.n_dofs();
@@ -607,14 +549,12 @@ namespace CUDAWrappers
           }
 
         cuda_error = cudaMalloc(&constrained_dofs,
-                                n_constrained_dofs *
-                                  sizeof(dealii::types::global_dof_index));
+                                n_constrained_dofs * sizeof(dealii::types::global_dof_index));
         AssertCuda(cuda_error);
 
         cuda_error = cudaMemcpy(constrained_dofs,
                                 constrained_dofs_host.data(),
-                                n_constrained_dofs *
-                                  sizeof(dealii::types::global_dof_index),
+                                n_constrained_dofs * sizeof(dealii::types::global_dof_index),
                                 cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
       }
@@ -714,27 +654,21 @@ namespace CUDAWrappers
 
   template <int dim, typename Number>
   void
-  MatrixFree<dim, Number>::copy_constrained_values(
-    const CUDAVector<Number> &src,
-    CUDAVector<Number> &      dst) const
+  MatrixFree<dim, Number>::copy_constrained_values(const CUDAVector<Number> &src,
+                                                   CUDAVector<Number> &      dst) const
   {
-    internal::copy_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      src.get_values(),
-                                                      dst.get_values());
+    internal::copy_constrained_dofs<Number><<<constraint_grid_dim, constraint_block_dim>>>(
+      constrained_dofs, n_constrained_dofs, src.get_values(), dst.get_values());
   }
 
 
 
   template <int dim, typename Number>
   void
-  MatrixFree<dim, Number>::set_constrained_values(Number              val,
-                                                  CUDAVector<Number> &dst) const
+  MatrixFree<dim, Number>::set_constrained_values(Number val, CUDAVector<Number> &dst) const
   {
-    internal::set_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(
-        constrained_dofs, n_constrained_dofs, val, dst.get_values());
+    internal::set_constrained_dofs<Number><<<constraint_grid_dim, constraint_block_dim>>>(
+      constrained_dofs, n_constrained_dofs, val, dst.get_values());
   }
 
 
@@ -757,8 +691,7 @@ namespace CUDAWrappers
   {
     for (unsigned int i = 0; i < n_colors; ++i)
       internal::apply_kernel_shmem<dim, Number, functor>
-        <<<grid_dim[i], block_dim[i]>>>(
-          func, get_data(i), src.get_values(), dst.get_values());
+        <<<grid_dim[i], block_dim[i]>>>(func, get_data(i), src.get_values(), dst.get_values());
   }
 
 
@@ -769,8 +702,7 @@ namespace CUDAWrappers
   {
     // First compute the size of n_cells, row_starts, kernel launch parameters,
     // and constrained_dofs
-    std::size_t bytes = n_cells.size() * sizeof(unsigned int) * 2 +
-                        2 * n_colors * sizeof(dim3) +
+    std::size_t bytes = n_cells.size() * sizeof(unsigned int) * 2 + 2 * n_colors * sizeof(dim3) +
                         n_constrained_dofs * sizeof(unsigned int);
 
     // For each color, add local_to_global, inv_jacobian, JxW, and q_points.

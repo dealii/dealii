@@ -56,11 +56,7 @@ test()
     }
 
   // apply function for tensor product
-  internal::EvaluatorTensorProduct<internal::evaluate_symmetric_hierarchical,
-                                   1,
-                                   M,
-                                   N,
-                                   double>
+  internal::EvaluatorTensorProduct<internal::evaluate_symmetric_hierarchical, 1, M, N, double>
     evaluator(shape, shape, shape);
   if (type == 0)
     evaluator.template values<0, false, false>(x, x);

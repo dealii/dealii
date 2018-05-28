@@ -121,7 +121,7 @@ namespace PETScWrappers
        * initialized with the given IndexSet.
        */
       explicit BlockVector(const std::vector<IndexSet> &parallel_partitioning,
-                           const MPI_Comm &communicator = MPI_COMM_WORLD);
+                           const MPI_Comm &             communicator = MPI_COMM_WORLD);
 
       /**
        * Same as above, but include ghost elements
@@ -214,8 +214,7 @@ namespace PETScWrappers
        * with the same arguments for details.
        */
       void
-      reinit(const std::vector<IndexSet> &parallel_partitioning,
-             const MPI_Comm &             communicator);
+      reinit(const std::vector<IndexSet> &parallel_partitioning, const MPI_Comm &communicator);
 
       /**
        * Same as above but include ghost entries.
@@ -300,17 +299,15 @@ namespace PETScWrappers
 
 
 
-    inline BlockVector::BlockVector(
-      const std::vector<size_type> &block_sizes,
-      const MPI_Comm &              communicator,
-      const std::vector<size_type> &local_elements)
+    inline BlockVector::BlockVector(const std::vector<size_type> &block_sizes,
+                                    const MPI_Comm &              communicator,
+                                    const std::vector<size_type> &local_elements)
     {
       reinit(block_sizes, communicator, local_elements, false);
     }
 
 
-    inline BlockVector::BlockVector(const BlockVector &v) :
-      BlockVectorBase<Vector>()
+    inline BlockVector::BlockVector(const BlockVector &v) : BlockVectorBase<Vector>()
     {
       this->components.resize(v.n_blocks());
       this->block_indices = v.block_indices;
@@ -319,17 +316,15 @@ namespace PETScWrappers
         this->components[i] = v.components[i];
     }
 
-    inline BlockVector::BlockVector(
-      const std::vector<IndexSet> &parallel_partitioning,
-      const MPI_Comm &             communicator)
+    inline BlockVector::BlockVector(const std::vector<IndexSet> &parallel_partitioning,
+                                    const MPI_Comm &             communicator)
     {
       reinit(parallel_partitioning, communicator);
     }
 
-    inline BlockVector::BlockVector(
-      const std::vector<IndexSet> &parallel_partitioning,
-      const std::vector<IndexSet> &ghost_indices,
-      const MPI_Comm &             communicator)
+    inline BlockVector::BlockVector(const std::vector<IndexSet> &parallel_partitioning,
+                                    const std::vector<IndexSet> &ghost_indices,
+                                    const MPI_Comm &             communicator)
     {
       reinit(parallel_partitioning, ghost_indices, communicator);
     }
@@ -434,8 +429,7 @@ namespace PETScWrappers
         this->components.resize(this->n_blocks());
 
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        block(i).reinit(
-          parallel_partitioning[i], ghost_entries[i], communicator);
+        block(i).reinit(parallel_partitioning[i], ghost_entries[i], communicator);
     }
 
 
@@ -525,8 +519,7 @@ namespace internal
                           PETScWrappers::MPI::BlockVector &v,
                           bool /*omit_zeroing_entries*/)
       {
-        v.reinit(matrix.locally_owned_range_indices(),
-                 matrix.get_mpi_communicator());
+        v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator());
       }
 
       template <typename Matrix>
@@ -535,8 +528,7 @@ namespace internal
                            PETScWrappers::MPI::BlockVector &v,
                            bool /*omit_zeroing_entries*/)
       {
-        v.reinit(matrix.locally_owned_domain_indices(),
-                 matrix.get_mpi_communicator());
+        v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator());
       }
     };
 

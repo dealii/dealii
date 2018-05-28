@@ -317,8 +317,7 @@ protected:
 
 template <class DerivedIterator, class AccessorType>
 inline DerivedIterator &
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator=(const DerivedIterator &it)
+LinearIndexIterator<DerivedIterator, AccessorType>::operator=(const DerivedIterator &it)
 {
   accessor.container    = it.container;
   accessor.linear_index = it.linear_index;
@@ -369,8 +368,7 @@ LinearIndexIterator<DerivedIterator, AccessorType>::operator--(int)
 
 template <class DerivedIterator, class AccessorType>
 inline DerivedIterator
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator+(const difference_type n) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator+(const difference_type n) const
 {
   DerivedIterator copy(this->accessor);
   copy += n;
@@ -381,8 +379,7 @@ operator+(const difference_type n) const
 
 template <class DerivedIterator, class AccessorType>
 inline DerivedIterator
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator-(const difference_type n) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator-(const difference_type n) const
 {
   DerivedIterator copy(this->accessor);
   copy += -n;
@@ -393,8 +390,7 @@ operator-(const difference_type n) const
 
 template <class DerivedIterator, class AccessorType>
 inline DerivedIterator &
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator+=(const difference_type n)
+LinearIndexIterator<DerivedIterator, AccessorType>::operator+=(const difference_type n)
 {
   accessor.linear_index += n;
   return static_cast<DerivedIterator &>(*this);
@@ -404,8 +400,7 @@ operator+=(const difference_type n)
 
 template <class DerivedIterator, class AccessorType>
 inline DerivedIterator &
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator-=(const difference_type n)
+LinearIndexIterator<DerivedIterator, AccessorType>::operator-=(const difference_type n)
 {
   return operator+=(-n);
 }
@@ -413,14 +408,11 @@ operator-=(const difference_type n)
 
 
 template <class DerivedIterator, class AccessorType>
-inline
-  typename LinearIndexIterator<DerivedIterator, AccessorType>::difference_type
-  LinearIndexIterator<DerivedIterator, AccessorType>::
-  operator-(const DerivedIterator &other) const
+inline typename LinearIndexIterator<DerivedIterator, AccessorType>::difference_type
+LinearIndexIterator<DerivedIterator, AccessorType>::operator-(const DerivedIterator &other) const
 {
   Assert(this->accessor.container == other.accessor.container,
-         ExcMessage(
-           "Only iterators pointing to the same container can be compared."));
+         ExcMessage("Only iterators pointing to the same container can be compared."));
   return this->accessor.linear_index - other.accessor.linear_index;
 }
 
@@ -446,8 +438,7 @@ inline typename LinearIndexIterator<DerivedIterator, AccessorType>::pointer
 
 template <class DerivedIterator, class AccessorType>
 inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator==(const DerivedIterator &other) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator==(const DerivedIterator &other) const
 {
   const auto &other_2 = static_cast<decltype(*this) &>(other);
   return accessor.container == other_2.accessor.container &&
@@ -458,8 +449,7 @@ operator==(const DerivedIterator &other) const
 
 template <class DerivedIterator, class AccessorType>
 inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator!=(const DerivedIterator &other) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator!=(const DerivedIterator &other) const
 {
   return !(*this == other);
 }
@@ -468,8 +458,7 @@ operator!=(const DerivedIterator &other) const
 
 template <class DerivedIterator, class AccessorType>
 inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator<=(const DerivedIterator &other) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator<=(const DerivedIterator &other) const
 {
   return (*this == other) || (*this < other);
 }
@@ -478,8 +467,7 @@ operator<=(const DerivedIterator &other) const
 
 template <class DerivedIterator, class AccessorType>
 inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator>=(const DerivedIterator &other) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator>=(const DerivedIterator &other) const
 {
   return !(*this < other);
 }
@@ -488,12 +476,10 @@ operator>=(const DerivedIterator &other) const
 
 template <class DerivedIterator, class AccessorType>
 inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator<(const DerivedIterator &other) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator<(const DerivedIterator &other) const
 {
   Assert(this->accessor.container == other.accessor.container,
-         ExcMessage(
-           "Only iterators pointing to the same container can be compared."));
+         ExcMessage("Only iterators pointing to the same container can be compared."));
   return this->accessor.linear_index < other.accessor.linear_index;
 }
 
@@ -501,8 +487,7 @@ operator<(const DerivedIterator &other) const
 
 template <class DerivedIterator, class AccessorType>
 inline bool
-LinearIndexIterator<DerivedIterator, AccessorType>::
-operator>(const DerivedIterator &other) const
+LinearIndexIterator<DerivedIterator, AccessorType>::operator>(const DerivedIterator &other) const
 {
   return other < *this;
 }

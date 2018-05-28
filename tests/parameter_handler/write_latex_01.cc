@@ -43,11 +43,10 @@ main()
   {
     prm.enter_subsection("section_2&3");
     {
-      prm.declare_entry(
-        "list",
-        "default_1",
-        Patterns::List(Patterns::Selection("default_1|b|c|d|e|f|g|h")),
-        "docs 1");
+      prm.declare_entry("list",
+                        "default_1",
+                        Patterns::List(Patterns::Selection("default_1|b|c|d|e|f|g|h")),
+                        "docs 1");
       prm.declare_entry("int_hello", "1", Patterns::Integer());
       prm.declare_entry("text",
                         "default text with _ ~ \\ # & { }",
@@ -55,10 +54,8 @@ main()
                         "documentation with formulas: $x_3$");
     }
     prm.leave_subsection();
-    prm.declare_entry("some other entry with {%}",
-                      "3.1415926",
-                      Patterns::Double(),
-                      "documentation");
+    prm.declare_entry(
+      "some other entry with {%}", "3.1415926", Patterns::Double(), "documentation");
   }
   prm.leave_subsection();
 

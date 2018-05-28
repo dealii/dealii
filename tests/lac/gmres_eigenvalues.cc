@@ -25,8 +25,7 @@
 
 template <class NUMBER>
 void
-output_eigenvalues(const std::vector<NUMBER> &eigenvalues,
-                   const std::string &        text)
+output_eigenvalues(const std::vector<NUMBER> &eigenvalues, const std::string &text)
 {
   deallog << text;
   for (unsigned int j = 0; j < eigenvalues.size(); ++j)
@@ -78,19 +77,16 @@ test(unsigned int variant)
   IterationNumberControl control(variant == 1 ? 5 : 20, 1e-40);
 
   SolverGMRES<Vector<number>> solver(control);
-  solver.connect_eigenvalues_slot(
-    std::bind(output_eigenvalues<std::complex<double>>,
-              std::placeholders::_1,
-              "Eigenvalue estimate: "));
+  solver.connect_eigenvalues_slot(std::bind(
+    output_eigenvalues<std::complex<double>>, std::placeholders::_1, "Eigenvalue estimate: "));
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
 
   if (variant < 2)
     {
       IterationNumberControl   cg_control(variant == 1 ? 6 : 21, 1e-40);
       SolverCG<Vector<number>> solver_cg(cg_control);
-      solver_cg.connect_eigenvalues_slot(std::bind(output_eigenvalues<double>,
-                                                   std::placeholders::_1,
-                                                   "Eigenvalue estimate: "));
+      solver_cg.connect_eigenvalues_slot(
+        std::bind(output_eigenvalues<double>, std::placeholders::_1, "Eigenvalue estimate: "));
       sol = 0;
       solver_cg.solve(matrix, sol, rhs, PreconditionIdentity());
     }

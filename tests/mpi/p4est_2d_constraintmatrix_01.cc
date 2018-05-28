@@ -70,8 +70,7 @@ test()
   DoFTools::make_hanging_node_constraints(dofh, cm2);
 
   {
-    std::ofstream file(
-      (std::string("dat.") + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
     file << "**** proc " << myid << std::endl;
     cm.print(file);
     file << "****" << std::endl;

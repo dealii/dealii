@@ -44,8 +44,7 @@ template <int N>
 class TableIndices
 {
 public:
-  static_assert(N > 0,
-                "TableIndices objects need to represent at least one index.");
+  static_assert(N > 0, "TableIndices objects need to represent at least one index.");
 
 
   /**
@@ -81,9 +80,7 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from three.
    */
-  TableIndices(const std::size_t index0,
-               const std::size_t index1,
-               const std::size_t index2);
+  TableIndices(const std::size_t index0, const std::size_t index1, const std::size_t index2);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -198,19 +195,16 @@ TableIndices<N>::TableIndices()
 template <int N>
 TableIndices<N>::TableIndices(const std::size_t index0)
 {
-  static_assert(
-    N == 1, "This constructor is only available for TableIndices<1> objects.");
+  static_assert(N == 1, "This constructor is only available for TableIndices<1> objects.");
   indices[0] = index0;
 }
 
 
 
 template <int N>
-TableIndices<N>::TableIndices(const std::size_t index0,
-                              const std::size_t index1)
+TableIndices<N>::TableIndices(const std::size_t index0, const std::size_t index1)
 {
-  static_assert(
-    N == 2, "This constructor is only available for TableIndices<2> objects.");
+  static_assert(N == 2, "This constructor is only available for TableIndices<2> objects.");
   indices[0] = index0;
   indices[1] = index1;
 }
@@ -222,8 +216,7 @@ TableIndices<N>::TableIndices(const std::size_t index0,
                               const std::size_t index1,
                               const std::size_t index2)
 {
-  static_assert(
-    N == 3, "This constructor is only available for TableIndices<3> objects.");
+  static_assert(N == 3, "This constructor is only available for TableIndices<3> objects.");
   indices[0] = index0;
   indices[1] = index1;
   indices[2] = index2;
@@ -237,8 +230,7 @@ TableIndices<N>::TableIndices(const std::size_t index0,
                               const std::size_t index2,
                               const std::size_t index3)
 {
-  static_assert(
-    N == 4, "This constructor is only available for TableIndices<4> objects.");
+  static_assert(N == 4, "This constructor is only available for TableIndices<4> objects.");
   indices[0] = index0;
   indices[1] = index1;
   indices[2] = index2;
@@ -254,8 +246,7 @@ TableIndices<N>::TableIndices(const std::size_t index0,
                               const std::size_t index3,
                               const std::size_t index4)
 {
-  static_assert(
-    N == 5, "This constructor is only available for TableIndices<5> objects.");
+  static_assert(N == 5, "This constructor is only available for TableIndices<5> objects.");
   indices[0] = index0;
   indices[1] = index1;
   indices[2] = index2;

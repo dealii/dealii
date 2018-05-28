@@ -124,8 +124,7 @@ public:
    * always @p true.
    */
   virtual bool
-  has_support_on_face(const unsigned int shape_index,
-                      const unsigned int face_index) const override;
+  has_support_on_face(const unsigned int shape_index, const unsigned int face_index) const override;
 
   // documentation inherited from the base class
   virtual void

@@ -116,35 +116,19 @@ main()
   // Create to distinct linear operators:
 
   typedef dealii::internal::LinearOperatorImplementation::EmptyPayload Payload;
-  LinearOperator<LeftVector, RightVector, Payload> multiply2;
-  multiply2.vmult = [](LeftVector &v, const RightVector &u) {
-    v.value = 2 * u.value;
-  };
-  multiply2.vmult_add = [](LeftVector &v, const RightVector &u) {
-    v.value += 2 * u.value;
-  };
-  multiply2.Tvmult = [](RightVector &v, const LeftVector &u) {
-    v.value = 2 * u.value;
-  };
-  multiply2.Tvmult_add = [](RightVector &v, const LeftVector &u) {
-    v.value += 2 * u.value;
-  };
+  LinearOperator<LeftVector, RightVector, Payload>                     multiply2;
+  multiply2.vmult      = [](LeftVector &v, const RightVector &u) { v.value = 2 * u.value; };
+  multiply2.vmult_add  = [](LeftVector &v, const RightVector &u) { v.value += 2 * u.value; };
+  multiply2.Tvmult     = [](RightVector &v, const LeftVector &u) { v.value = 2 * u.value; };
+  multiply2.Tvmult_add = [](RightVector &v, const LeftVector &u) { v.value += 2 * u.value; };
   multiply2.reinit_range_vector  = [](LeftVector &, bool) {};
   multiply2.reinit_domain_vector = [](RightVector &, bool) {};
 
-  auto multiply4  = multiply2;
-  multiply4.vmult = [](LeftVector &v, const RightVector &u) {
-    v.value = 4 * u.value;
-  };
-  multiply4.vmult_add = [](LeftVector &v, const RightVector &u) {
-    v.value += 4 * u.value;
-  };
-  multiply4.Tvmult = [](RightVector &v, const LeftVector &u) {
-    v.value = 4 * u.value;
-  };
-  multiply4.Tvmult_add = [](RightVector &v, const LeftVector &u) {
-    v.value += 4 * u.value;
-  };
+  auto multiply4       = multiply2;
+  multiply4.vmult      = [](LeftVector &v, const RightVector &u) { v.value = 4 * u.value; };
+  multiply4.vmult_add  = [](LeftVector &v, const RightVector &u) { v.value += 4 * u.value; };
+  multiply4.Tvmult     = [](RightVector &v, const LeftVector &u) { v.value = 4 * u.value; };
+  multiply4.Tvmult_add = [](RightVector &v, const LeftVector &u) { v.value += 4 * u.value; };
 
 
   // Small unit tests for all functions:

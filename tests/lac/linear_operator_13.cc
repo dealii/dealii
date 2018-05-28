@@ -95,15 +95,13 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   vector.reinit(partitioning);
 
   // Assemble system: Mass matrix and constrant RHS vector
-  FEValues<dim> fe_values(
-    fe, quadrature_formula, update_values | update_JxW_values);
+  FEValues<dim>      fe_values(fe, quadrature_formula, update_values | update_JxW_values);
   const unsigned int n_q_points = quadrature_formula.size();
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
@@ -119,13 +117,11 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
               // blocks are non-square
               // This is useful for checking implementation of transpose
               // operator
-              cell_matrix(i, j) +=
-                (fe_values.shape_value(i, q_point) *
-                 fe_values.shape_value(j, q_point) * fe_values.JxW(q_point));
+              cell_matrix(i, j) += (fe_values.shape_value(i, q_point) *
+                                    fe_values.shape_value(j, q_point) * fe_values.JxW(q_point));
 
             // Non-trivial vector contribution
-            cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 *
-                            fe_values.JxW(q_point));
+            cell_rhs(i) += (fe_values.shape_value(i, q_point) * 1.0 * fe_values.JxW(q_point));
           }
 
       cell->get_dof_indices(local_dof_indices);
@@ -145,22 +141,18 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
   const double                                   tol = 1e-12;
   typedef dealii::TrilinosWrappers::SparseMatrix MatrixType;
   typedef dealii::TrilinosWrappers::MPI::Vector  VectorType;
-  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::
-    TrilinosPayload                        PayloadType;
+  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload
+                                           PayloadType;
   typedef typename PayloadType::VectorType PayloadVectorType;
   typedef dealii::types::global_dof_index  size_type;
 
   deallog.push("System info");
   {
     deallog << "Matrix frobenius norm" << std::endl
-            << "block(0,0): " << matrix.block(0, 0).frobenius_norm()
-            << std::endl
-            << "block(0,1): " << matrix.block(0, 1).frobenius_norm()
-            << std::endl
-            << "block(1,0): " << matrix.block(1, 0).frobenius_norm()
-            << std::endl
-            << "block(1,1): " << matrix.block(1, 1).frobenius_norm()
-            << std::endl
+            << "block(0,0): " << matrix.block(0, 0).frobenius_norm() << std::endl
+            << "block(0,1): " << matrix.block(0, 1).frobenius_norm() << std::endl
+            << "block(1,0): " << matrix.block(1, 0).frobenius_norm() << std::endl
+            << "block(1,1): " << matrix.block(1, 1).frobenius_norm() << std::endl
             << "Vector L1 norm" << std::endl
             << "block(0): " << vector.block(0).l1_norm() << std::endl
             << "block(1): " << vector.block(1).l1_norm() << std::endl
@@ -185,9 +177,8 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       Assert(A.frobenius_norm() > 0.0, ExcInternalError());
       Assert(b.l2_norm() > 0.0, ExcInternalError());
       deallog << "System size: "
-              << "  A.m(): " << A.m() << "  A.n(): " << A.n()
-              << "  b.size(): " << b.size() << "  r.size(): " << r.size()
-              << std::endl;
+              << "  A.m(): " << A.m() << "  A.n(): " << A.n() << "  b.size(): " << b.size()
+              << "  r.size(): " << r.size() << std::endl;
 
       VectorType out_ref(r);
       VectorType out_lo(r);
@@ -197,18 +188,14 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
 
       // First test the standard operation to get a reference result
       A.vmult(out_ref, b);
-      deallog << "Reference result norm squared: " << out_ref.norm_sqr()
-              << std::endl;
+      deallog << "Reference result norm squared: " << out_ref.norm_sqr() << std::endl;
 
       // Next we check the native operation of the LinearOperator
       out_lo = lo_A * b; // lo_A.vmult(out_lo,b);
-      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr()
-              << std::endl;
+      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr() << std::endl;
       const VectorType diff1 = out_lo - out_ref;
-      Assert(
-        std::sqrt(diff1.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator vmult operation does not match reference result"));
+      Assert(std::sqrt(diff1.norm_sqr()) < tol,
+             ExcMessage("LinearOperator vmult operation does not match reference result"));
 
       // Lastly we test functionality added by the Payload
       // These Trilinos vectors are composed of a set of pointers to elements
@@ -219,35 +206,25 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       // TrilinosWrappers::SparseMatrix::vmult
       out_lo_pyld                  = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
-      AssertDimension(
-        b_local_size,
-        static_cast<size_type>(lo_A.OperatorDomainMap().NumMyPoints()));
-      PayloadVectorType tril_b_pyld(View,
-                                    lo_A.OperatorDomainMap(),
-                                    const_cast<TrilinosScalar *>(b.begin()),
-                                    b_local_size,
-                                    1);
+      AssertDimension(o_local_size, static_cast<size_type>(lo_A.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
+      AssertDimension(b_local_size, static_cast<size_type>(lo_A.OperatorDomainMap().NumMyPoints()));
+      PayloadVectorType tril_b_pyld(
+        View, lo_A.OperatorDomainMap(), const_cast<TrilinosScalar *>(b.begin()), b_local_size, 1);
 
       deallog << "LinearOperator status:"
               << "  UseTranspose: " << lo_A.UseTranspose() << std::endl;
       lo_A.Apply(tril_b_pyld, tril_out_lo_pyld);
-      deallog << "LinearOperator payload result norm squared: "
-              << out_lo_pyld.norm_sqr() << std::endl;
+      deallog << "LinearOperator payload result norm squared: " << out_lo_pyld.norm_sqr()
+              << std::endl;
       const VectorType diff2 = out_lo_pyld - out_ref;
-      Assert(
-        std::sqrt(diff2.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator payload vmult operation does not match reference result"));
+      Assert(std::sqrt(diff2.norm_sqr()) < tol,
+             ExcMessage("LinearOperator payload vmult operation does not match reference result"));
 
       deallog.pop();
     }
@@ -261,9 +238,8 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       Assert(A.frobenius_norm() > 0.0, ExcInternalError());
       Assert(b.l2_norm() > 0.0, ExcInternalError());
       deallog << "System size: "
-              << "  A.m(): " << A.m() << "  A.n(): " << A.n()
-              << "  b.size(): " << b.size() << "  r.size(): " << r.size()
-              << std::endl;
+              << "  A.m(): " << A.m() << "  A.n(): " << A.n() << "  b.size(): " << b.size()
+              << "  r.size(): " << r.size() << std::endl;
 
       VectorType out_ref(r);
       VectorType out_lo(r);
@@ -271,53 +247,40 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
 
       // First test the standard operation to get a reference result
       A.Tvmult(out_ref, b);
-      deallog << "Reference result norm squared: " << out_ref.norm_sqr()
-              << std::endl;
+      deallog << "Reference result norm squared: " << out_ref.norm_sqr() << std::endl;
 
       // Next we check the native operation of the LinearOperator
-      const auto lo_A_T =
-        transpose_operator<VectorType, VectorType, PayloadType>(A);
-      out_lo = lo_A_T * b; // lo_A.Tvmult(out_lo,b);
-      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr()
-              << std::endl;
+      const auto lo_A_T = transpose_operator<VectorType, VectorType, PayloadType>(A);
+      out_lo            = lo_A_T * b; // lo_A.Tvmult(out_lo,b);
+      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr() << std::endl;
       const VectorType diff1 = out_lo - out_ref;
-      Assert(
-        std::sqrt(diff1.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator Tvmult operation does not match reference result"));
+      Assert(std::sqrt(diff1.norm_sqr()) < tol,
+             ExcMessage("LinearOperator Tvmult operation does not match reference result"));
 
       // Lastly we test functionality added by the Payload
       out_lo_pyld                  = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A_T.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A_T.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
-      AssertDimension(
-        b_local_size,
-        static_cast<size_type>(lo_A_T.OperatorDomainMap().NumMyPoints()));
-      PayloadVectorType tril_b_pyld(View,
-                                    lo_A_T.OperatorDomainMap(),
-                                    const_cast<TrilinosScalar *>(b.begin()),
-                                    b_local_size,
-                                    1);
+      AssertDimension(o_local_size,
+                      static_cast<size_type>(lo_A_T.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A_T.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
+      AssertDimension(b_local_size,
+                      static_cast<size_type>(lo_A_T.OperatorDomainMap().NumMyPoints()));
+      PayloadVectorType tril_b_pyld(
+        View, lo_A_T.OperatorDomainMap(), const_cast<TrilinosScalar *>(b.begin()), b_local_size, 1);
 
       deallog << "LinearOperator status:"
               << "  UseTranspose: " << lo_A_T.UseTranspose() << std::endl;
       lo_A_T.Apply(tril_b_pyld, tril_out_lo_pyld);
-      deallog << "LinearOperator payload result norm squared: "
-              << out_lo_pyld.norm_sqr() << std::endl;
+      deallog << "LinearOperator payload result norm squared: " << out_lo_pyld.norm_sqr()
+              << std::endl;
       const VectorType diff2 = out_lo_pyld - out_ref;
-      Assert(
-        std::sqrt(diff2.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator payload Tvmult operation does not match reference result"));
+      Assert(std::sqrt(diff2.norm_sqr()) < tol,
+             ExcMessage("LinearOperator payload Tvmult operation does not match reference result"));
 
       deallog.pop();
     }
@@ -332,9 +295,8 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       Assert(A.frobenius_norm() > 0.0, ExcInternalError());
       Assert(b.l2_norm() > 0.0, ExcInternalError());
       deallog << "System size: "
-              << "  A.m(): " << A.m() << "  A.n(): " << A.n()
-              << "  b.size(): " << b.size() << "  r.size(): " << r.size()
-              << std::endl;
+              << "  A.m(): " << A.m() << "  A.n(): " << A.n() << "  b.size(): " << b.size()
+              << "  r.size(): " << r.size() << std::endl;
 
       VectorType out_ref(r);
       VectorType out_lo(r);
@@ -346,39 +308,32 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
         A.vmult(int_lo_pyld, b);
         A.Tvmult(out_ref, int_lo_pyld);
       }
-      deallog << "Reference result norm squared: " << out_ref.norm_sqr()
-              << std::endl;
+      deallog << "Reference result norm squared: " << out_ref.norm_sqr() << std::endl;
 
       // Next we check the native operation of the LinearOperator
-      const auto lo_A = linear_operator<VectorType, VectorType, PayloadType>(A);
-      const auto lo_A_T =
-        transpose_operator<VectorType, VectorType, PayloadType>(A);
-      out_lo = (lo_A_T * lo_A) * b;
-      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr()
-              << std::endl;
+      const auto lo_A   = linear_operator<VectorType, VectorType, PayloadType>(A);
+      const auto lo_A_T = transpose_operator<VectorType, VectorType, PayloadType>(A);
+      out_lo            = (lo_A_T * lo_A) * b;
+      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr() << std::endl;
       const VectorType diff1 = out_lo - out_ref;
       Assert(
         std::sqrt(diff1.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator composite vmult operation does not match reference result"));
+        ExcMessage("LinearOperator composite vmult operation does not match reference result"));
 
       // Lastly we test functionality added by the Payload
-      const auto lo_A_T_x_lo_A = lo_A_T * lo_A; // Construct composite operator
-      out_lo_pyld              = 0.0;
+      const auto lo_A_T_x_lo_A     = lo_A_T * lo_A; // Construct composite operator
+      out_lo_pyld                  = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A_T_x_lo_A.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A_T_x_lo_A.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
+      AssertDimension(o_local_size,
+                      static_cast<size_type>(lo_A_T_x_lo_A.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A_T_x_lo_A.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
       AssertDimension(b_local_size,
-                      static_cast<size_type>(
-                        lo_A_T_x_lo_A.OperatorDomainMap().NumMyPoints()));
+                      static_cast<size_type>(lo_A_T_x_lo_A.OperatorDomainMap().NumMyPoints()));
       PayloadVectorType tril_b_pyld(View,
                                     lo_A_T_x_lo_A.OperatorDomainMap(),
                                     const_cast<TrilinosScalar *>(b.begin()),
@@ -386,16 +341,14 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
                                     1);
 
       deallog << "LinearOperator status:"
-              << "  UseTranspose: " << lo_A_T_x_lo_A.UseTranspose()
-              << std::endl;
+              << "  UseTranspose: " << lo_A_T_x_lo_A.UseTranspose() << std::endl;
       lo_A_T_x_lo_A.Apply(tril_b_pyld, tril_out_lo_pyld);
-      deallog << "LinearOperator payload result norm squared: "
-              << out_lo_pyld.norm_sqr() << std::endl;
+      deallog << "LinearOperator payload result norm squared: " << out_lo_pyld.norm_sqr()
+              << std::endl;
       const VectorType diff2 = out_lo_pyld - out_ref;
-      Assert(
-        std::sqrt(diff2.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator payload composite vmult operation does not match reference result"));
+      Assert(std::sqrt(diff2.norm_sqr()) < tol,
+             ExcMessage(
+               "LinearOperator payload composite vmult operation does not match reference result"));
 
       deallog.pop();
     }
@@ -410,9 +363,8 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
       Assert(A.frobenius_norm() > 0.0, ExcInternalError());
       Assert(b.l2_norm() > 0.0, ExcInternalError());
       deallog << "System size: "
-              << "  A.m(): " << A.m() << "  A.n(): " << A.n()
-              << "  b.size(): " << b.size() << "  r.size(): " << r.size()
-              << std::endl;
+              << "  A.m(): " << A.m() << "  A.n(): " << A.n() << "  b.size(): " << b.size()
+              << "  r.size(): " << r.size() << std::endl;
 
       VectorType out_ref(r);
       VectorType out_lo(r);
@@ -424,40 +376,32 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
         A.Tvmult(int_lo_pyld, b);
         A.vmult(out_ref, int_lo_pyld);
       }
-      deallog << "Reference result norm squared: " << out_ref.norm_sqr()
-              << std::endl;
+      deallog << "Reference result norm squared: " << out_ref.norm_sqr() << std::endl;
 
       // Next we check the native operation of the LinearOperator
-      const auto lo_A = linear_operator<VectorType, VectorType, PayloadType>(A);
-      const auto lo_A_T =
-        transpose_operator<VectorType, VectorType, PayloadType>(A);
-      out_lo = (lo_A * lo_A_T) * b;
-      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr()
-              << std::endl;
+      const auto lo_A   = linear_operator<VectorType, VectorType, PayloadType>(A);
+      const auto lo_A_T = transpose_operator<VectorType, VectorType, PayloadType>(A);
+      out_lo            = (lo_A * lo_A_T) * b;
+      deallog << "LinearOperator result norm squared: " << out_lo.norm_sqr() << std::endl;
       const VectorType diff = out_lo - out_ref;
       Assert(
         std::sqrt(diff.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator composite Tvmult operation does not match reference result"));
+        ExcMessage("LinearOperator composite Tvmult operation does not match reference result"));
 
       // Lastly we test functionality added by the Payload
-      const auto lo_A_x_lo_A_T =
-        transpose_operator(lo_A * lo_A_T); // Construct composite operator
-      out_lo_pyld                  = 0.0;
+      const auto lo_A_x_lo_A_T = transpose_operator(lo_A * lo_A_T); // Construct composite operator
+      out_lo_pyld              = 0.0;
       const size_type o_local_size = out_lo_pyld.end() - out_lo_pyld.begin();
-      AssertDimension(
-        o_local_size,
-        static_cast<size_type>(lo_A_x_lo_A_T.OperatorRangeMap().NumMyPoints()));
-      PayloadVectorType tril_out_lo_pyld(
-        View,
-        lo_A_x_lo_A_T.OperatorRangeMap(),
-        const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
-        o_local_size,
-        1);
-      const size_type b_local_size = b.end() - b.begin();
+      AssertDimension(o_local_size,
+                      static_cast<size_type>(lo_A_x_lo_A_T.OperatorRangeMap().NumMyPoints()));
+      PayloadVectorType tril_out_lo_pyld(View,
+                                         lo_A_x_lo_A_T.OperatorRangeMap(),
+                                         const_cast<TrilinosScalar *>(out_lo_pyld.begin()),
+                                         o_local_size,
+                                         1);
+      const size_type   b_local_size = b.end() - b.begin();
       AssertDimension(b_local_size,
-                      static_cast<size_type>(
-                        lo_A_x_lo_A_T.OperatorDomainMap().NumMyPoints()));
+                      static_cast<size_type>(lo_A_x_lo_A_T.OperatorDomainMap().NumMyPoints()));
       PayloadVectorType tril_b_pyld(View,
                                     lo_A_x_lo_A_T.OperatorDomainMap(),
                                     const_cast<TrilinosScalar *>(b.begin()),
@@ -465,16 +409,14 @@ evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
                                     1);
 
       deallog << "LinearOperator status:"
-              << "  UseTranspose: " << lo_A_x_lo_A_T.UseTranspose()
-              << std::endl;
+              << "  UseTranspose: " << lo_A_x_lo_A_T.UseTranspose() << std::endl;
       lo_A_x_lo_A_T.Apply(tril_b_pyld, tril_out_lo_pyld);
-      deallog << "LinearOperator payload result norm squared: "
-              << out_lo_pyld.norm_sqr() << std::endl;
+      deallog << "LinearOperator payload result norm squared: " << out_lo_pyld.norm_sqr()
+              << std::endl;
       const VectorType diff2 = out_lo_pyld - out_ref;
-      Assert(
-        std::sqrt(diff2.norm_sqr()) < tol,
-        ExcMessage(
-          "LinearOperator payload composite vmult operation does not match reference result"));
+      Assert(std::sqrt(diff2.norm_sqr()) < tol,
+             ExcMessage(
+               "LinearOperator payload composite vmult operation does not match reference result"));
 
       deallog.pop();
     }

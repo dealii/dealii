@@ -71,11 +71,8 @@ check(const unsigned int        level,
 
   dof.distribute_dofs(element);
 
-  FEValues<dim> fe(mapping,
-                   element,
-                   quadrature,
-                   update_values | update_quadrature_points |
-                     update_JxW_values);
+  FEValues<dim> fe(
+    mapping, element, quadrature, update_values | update_quadrature_points | update_JxW_values);
 
   std::vector<types::global_dof_index> global_dofs(element.dofs_per_cell);
   std::vector<double>                  function(quadrature.size());
@@ -83,8 +80,7 @@ check(const unsigned int        level,
   Vector<double> u(dof.n_dofs());
   Vector<double> f(dof.n_dofs());
 
-  SparsityPattern A_pattern(
-    dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
+  SparsityPattern A_pattern(dof.n_dofs(), dof.n_dofs(), dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, A_pattern);
   A_pattern.compress();
 
@@ -129,8 +125,8 @@ check(const unsigned int        level,
   FEValues<dim> fe2(mapping,
                     element,
                     quadrature,
-                    update_values | update_gradients | update_hessians |
-                      update_quadrature_points | update_JxW_values);
+                    update_values | update_gradients | update_hessians | update_quadrature_points |
+                      update_JxW_values);
 
   double l2 = 0.;
   double h1 = 0.;

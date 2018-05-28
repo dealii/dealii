@@ -75,16 +75,13 @@ test()
         if (cell->face(f)->at_boundary() && rc > 0.1)
           {
             fe_v.reinit(cell, f);
-            const std::vector<Point<spacedim>> &qps =
-              fe_v.get_quadrature_points();
-            const std::vector<Tensor<1, spacedim>> &nps =
-              fe_v.get_normal_vectors();
+            const std::vector<Point<spacedim>> &    qps = fe_v.get_quadrature_points();
+            const std::vector<Tensor<1, spacedim>> &nps = fe_v.get_normal_vectors();
             for (unsigned int i = 0; i < qps.size(); ++i)
               {
                 out << qps[i] << std::endl;
                 if (std::abs(qps[i].distance(center) - radius) > 1e-10)
-                  out << "# Error! This should be on the sphere, but it's not!"
-                      << std::endl;
+                  out << "# Error! This should be on the sphere, but it's not!" << std::endl;
               }
             out << std::endl;
           }
@@ -109,18 +106,14 @@ test()
         if (cell->face(f)->at_boundary() && rc > 0.1)
           {
             fe_v.reinit(cell, f);
-            const std::vector<Point<spacedim>> &qps =
-              fe_v.get_quadrature_points();
-            const std::vector<Tensor<1, spacedim>> &nps =
-              fe_v.get_normal_vectors();
+            const std::vector<Point<spacedim>> &    qps = fe_v.get_quadrature_points();
+            const std::vector<Tensor<1, spacedim>> &nps = fe_v.get_normal_vectors();
             for (unsigned int i = 0; i < qps.size(); ++i)
               {
                 out << qps[i] << " " << nps[i] << std::endl;
                 if (std::abs((center + nps[i] - qps[i]).norm()) > 1e-10)
-                  out << "# Error! The normal vector should be radial! "
-                      << std::endl
-                      << "# Got " << center + nps[i] << " instead of " << qps[i]
-                      << std::endl;
+                  out << "# Error! The normal vector should be radial! " << std::endl
+                      << "# Got " << center + nps[i] << " instead of " << qps[i] << std::endl;
               }
             out << std::endl;
           }

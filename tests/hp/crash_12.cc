@@ -70,10 +70,7 @@ test()
   std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(
-    triangulation,
-    subdivisions,
-    Point<dim>(),
-    (dim == 3 ? Point<dim>(2, 1, 1) : Point<dim>(2, 1)));
+    triangulation, subdivisions, Point<dim>(), (dim == 3 ? Point<dim>(2, 1, 1) : Point<dim>(2, 1)));
   (++triangulation.begin_active())->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
@@ -89,13 +86,11 @@ test()
   for (unsigned int i = 0; i < fe.size(); ++i)
     for (unsigned int j = 0; j < fe.size(); ++j)
       {
-        deallog << "Testing " << fe[i].get_name() << " vs. " << fe[j].get_name()
-                << std::endl;
+        deallog << "Testing " << fe[i].get_name() << " vs. " << fe[j].get_name() << std::endl;
 
         // set fe on coarse cell to 'i', on
         // all fine cells to 'j'
-        typename hp::DoFHandler<dim>::active_cell_iterator cell =
-          dof_handler.begin_active();
+        typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
         cell->set_active_fe_index(i);
         ++cell;
 

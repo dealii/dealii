@@ -51,9 +51,7 @@ check(double r1, double r2, unsigned int n)
   tria.set_all_manifold_ids(numbers::flat_manifold_id);
   GridTools::copy_boundary_to_manifold_id(tria);
   if (dim == 3)
-    for (typename Triangulation<dim>::active_cell_iterator c =
-           tria.begin_active();
-         c != tria.end();
+    for (typename Triangulation<dim>::active_cell_iterator c = tria.begin_active(); c != tria.end();
          ++c)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (c->face(f)->at_boundary())
@@ -71,13 +69,11 @@ check(double r1, double r2, unsigned int n)
         }
       catch (typename Triangulation<dim>::DistortedCellList &dcv)
         {
-          deallog << "Found " << dcv.distorted_cells.size()
-                  << " distorted cells" << std::endl;
+          deallog << "Found " << dcv.distorted_cells.size() << " distorted cells" << std::endl;
 
           typename Triangulation<dim>::DistortedCellList subset =
             GridTools::fix_up_distorted_child_cells(dcv, tria);
-          deallog << subset.distorted_cells.size()
-                  << " distorted cells remaining" << std::endl;
+          deallog << subset.distorted_cells.size() << " distorted cells remaining" << std::endl;
         }
     }
 

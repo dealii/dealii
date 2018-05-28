@@ -25,11 +25,9 @@ void
 check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry(
-    "test_13",
-    "-1:a, 0:b, 1:c",
-    Patterns::Map(
-      Patterns::Integer(-1, 1), Patterns::Selection("a|b|c"), 2, 3));
+  prm.declare_entry("test_13",
+                    "-1:a, 0:b, 1:c",
+                    Patterns::Map(Patterns::Integer(-1, 1), Patterns::Selection("a|b|c"), 2, 3));
 
   std::ifstream in(p);
   prm.parse_input(in);
@@ -40,12 +38,10 @@ check(const char *p)
     Utilities::split_string_list(prm.get("test_13"), ',');
   for (const std::string &entry : split_entries)
     {
-      const std::vector<std::string> parts =
-        Utilities::split_string_list(entry, ':');
-      const std::string key   = parts[0];
-      const std::string value = parts[1];
-      deallog << " found key = '" << key << "' value = '" << value << "'"
-              << std::endl;
+      const std::vector<std::string> parts = Utilities::split_string_list(entry, ':');
+      const std::string              key   = parts[0];
+      const std::string              value = parts[1];
+      deallog << " found key = '" << key << "' value = '" << value << "'" << std::endl;
     }
 }
 

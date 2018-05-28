@@ -49,8 +49,7 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_owned, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
 
   // set local values
   if (myid < 8)
@@ -104,8 +103,7 @@ test()
     if (myid == 0)
       deallog << "Mean value: " << mean << std::endl;
 
-    Assert(std::fabs(mean * v.size() - v.l1_norm()) < 1e-15,
-           ExcInternalError());
+    Assert(std::fabs(mean * v.size() - v.l1_norm()) < 1e-15, ExcInternalError());
   }
   // check inner product
   {
@@ -150,8 +148,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

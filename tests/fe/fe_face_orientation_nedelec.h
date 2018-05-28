@@ -194,20 +194,17 @@ evaluate(const FE_Nedelec<3> & fe,
   const QGauss<3>                  quadrature(2);
   const unsigned int               n_q_points = quadrature.size();
   Functions::FEFieldFunction<3>    fe_field_function(dof_handler, u);
-  FEValues<3>                      fe_values(
-    fe, quadrature, update_quadrature_points | update_values);
+  FEValues<3>                 fe_values(fe, quadrature, update_quadrature_points | update_values);
   std::vector<Vector<double>> values(n_q_points, Vector<double>(3));
   std::vector<Tensor<1, 3>>   values_ref(n_q_points);
 
-  for (DoFHandler<3>::active_cell_iterator cell =
-         dof_handler_ref.begin_active();
+  for (DoFHandler<3>::active_cell_iterator cell = dof_handler_ref.begin_active();
        cell != dof_handler_ref.end();
        ++cell)
     {
       fe_values.reinit(cell);
       fe_values[component].get_function_values(u_ref, values_ref);
-      fe_field_function.vector_value_list(fe_values.get_quadrature_points(),
-                                          values);
+      fe_field_function.vector_value_list(fe_values.get_quadrature_points(), values);
 
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         {
@@ -238,8 +235,7 @@ set_solution(Vector<double> &      vector,
 
   Functions::FEFieldFunction<3> fe_field_function(dof_handler_ref, u_ref);
 
-  VectorTools::project(
-    dof_handler, constraints, QGauss<3>(2), fe_field_function, vector);
+  VectorTools::project(dof_handler, constraints, QGauss<3>(2), fe_field_function, vector);
 }
 
 void

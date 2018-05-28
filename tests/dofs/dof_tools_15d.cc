@@ -39,9 +39,9 @@ check_this(const DoFHandler<dim> &dof_handler)
   std::vector<types::global_dof_index> map(dof_handler.n_dofs());
   DoFTools::map_dof_to_boundary_indices(dof_handler, map);
 
-  const unsigned int n_blocks = std::min(
-    static_cast<types::global_dof_index>(dof_handler.get_fe().n_components()),
-    dof_handler.n_boundary_dofs());
+  const unsigned int n_blocks =
+    std::min(static_cast<types::global_dof_index>(dof_handler.get_fe().n_components()),
+             dof_handler.n_boundary_dofs());
   BlockDynamicSparsityPattern sp(n_blocks, n_blocks);
   // split dofs almost arbitrarily to
   // blocks
@@ -49,8 +49,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   for (unsigned int i = 0; i < n_blocks - 1; ++i)
     dofs_per_block[i] = dof_handler.n_boundary_dofs() / n_blocks;
   dofs_per_block.back() =
-    (dof_handler.n_boundary_dofs() -
-     (dof_handler.n_boundary_dofs() / n_blocks) * (n_blocks - 1));
+    (dof_handler.n_boundary_dofs() - (dof_handler.n_boundary_dofs() / n_blocks) * (n_blocks - 1));
 
   for (unsigned int i = 0; i < n_blocks; ++i)
     for (unsigned int j = 0; j < n_blocks; ++j)
@@ -66,17 +65,13 @@ check_this(const DoFHandler<dim> &dof_handler)
   // would be in the range of 40 MB)
   for (unsigned int l = 0; l < 20; ++l)
     {
-      const unsigned int                    line = l * (sp.n_rows() / 20);
-      std::pair<unsigned int, unsigned int> block_row =
-        sp.get_row_indices().global_to_local(line);
+      const unsigned int                    line      = l * (sp.n_rows() / 20);
+      std::pair<unsigned int, unsigned int> block_row = sp.get_row_indices().global_to_local(line);
       for (unsigned int col = 0; col < n_blocks; ++col)
         {
-          for (unsigned int c = 0;
-               c < sp.block(block_row.first, col).row_length(block_row.second);
+          for (unsigned int c = 0; c < sp.block(block_row.first, col).row_length(block_row.second);
                ++c)
-            deallog << sp.block(block_row.first, col)
-                         .column_number(block_row.second, c)
-                    << " ";
+            deallog << sp.block(block_row.first, col).column_number(block_row.second, c) << " ";
           deallog << std::endl;
         }
     }

@@ -34,8 +34,7 @@ check_norms()
       LinearAlgebra::Vector<number> vec(size);
       for (unsigned int i = 0; i < size; ++i)
         vec(i) = random_value<number>();
-      const typename LinearAlgebra::ReadWriteVector<number>::real_type norm =
-        vec.l2_norm();
+      const typename LinearAlgebra::ReadWriteVector<number>::real_type norm = vec.l2_norm();
       for (unsigned int i = 0; i < 30; ++i)
         AssertThrow(vec.l2_norm() == norm, ExcInternalError());
 

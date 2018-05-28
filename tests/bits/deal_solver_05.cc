@@ -33,10 +33,7 @@
 #include "../testmatrix.h"
 #include "../tests.h"
 
-template <typename SolverType,
-          typename MatrixType,
-          typename VectorType,
-          class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType &         solver,
             const SolverControl &solver_control,
@@ -59,8 +56,7 @@ check_solve(SolverType &         solver,
       abort();
     }
 
-  deallog << "Solver stopped after " << solver_control.last_step()
-          << " iterations" << std::endl;
+  deallog << "Solver stopped after " << solver_control.last_step() << " iterations" << std::endl;
 }
 
 

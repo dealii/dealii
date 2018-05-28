@@ -27,22 +27,19 @@ for (deal_II_dimension : DIMENSIONS)
         template void
         init_quadrant_children<deal_II_dimension>(
           const types<deal_II_dimension>::quadrant &p4est_cell,
-          types<deal_II_dimension>::quadrant (&p4est_children)
-            [GeometryInfo<deal_II_dimension>::max_children_per_cell]);
+          types<deal_II_dimension>::quadrant (
+            &p4est_children)[GeometryInfo<deal_II_dimension>::max_children_per_cell]);
 
         template void
-        init_coarse_quadrant<deal_II_dimension>(
-          types<deal_II_dimension>::quadrant &quad);
+        init_coarse_quadrant<deal_II_dimension>(types<deal_II_dimension>::quadrant &quad);
 
         template bool
-        quadrant_is_equal<deal_II_dimension>(
-          const types<deal_II_dimension>::quadrant &q1,
-          const types<deal_II_dimension>::quadrant &q2);
+        quadrant_is_equal<deal_II_dimension>(const types<deal_II_dimension>::quadrant &q1,
+                                             const types<deal_II_dimension>::quadrant &q2);
 
         template bool
-        quadrant_is_ancestor<deal_II_dimension>(
-          const types<deal_II_dimension>::quadrant &q1,
-          const types<deal_II_dimension>::quadrant &q2);
+        quadrant_is_ancestor<deal_II_dimension>(const types<deal_II_dimension>::quadrant &q1,
+                                                const types<deal_II_dimension>::quadrant &q2);
 
         template bool
         tree_exists_locally<deal_II_dimension>(
@@ -68,12 +65,10 @@ for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
 #    if deal_II_space_dimension >= deal_II_dimension
         template std::map<unsigned int, std::set<dealii::types::subdomain_id>>
         compute_vertices_with_ghost_neighbors(
-          const dealii::parallel::distributed::
-            Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
-          typename dealii::internal::p4est::types<deal_II_dimension>::forest
-            *parallel_forest,
-          typename dealii::internal::p4est::types<deal_II_dimension>::ghost
-            *parallel_ghost);
+          const dealii::parallel::distributed::Triangulation<deal_II_dimension,
+                                                             deal_II_space_dimension> &tria,
+          typename dealii::internal::p4est::types<deal_II_dimension>::forest *parallel_forest,
+          typename dealii::internal::p4est::types<deal_II_dimension>::ghost * parallel_ghost);
 
 #    endif
 #  endif

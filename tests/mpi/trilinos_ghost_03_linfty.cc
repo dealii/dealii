@@ -72,8 +72,7 @@ test()
     }
 
   Assert(exc == false, ExcInternalError());
-  Assert(norm == 2. * Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) - 1,
-         ExcInternalError());
+  Assert(norm == 2. * Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) - 1, ExcInternalError());
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       deallog << norm << std::endl;
@@ -88,8 +87,7 @@ main(int argc, char **argv)
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

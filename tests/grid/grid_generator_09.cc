@@ -40,8 +40,7 @@ check_rect1(unsigned int n, bool color, bool log)
       subdivisions[d] = n * (d + 3);
     }
   Triangulation<dim> tria;
-  GridGenerator::subdivided_hyper_rectangle(
-    tria, subdivisions, left, right, color);
+  GridGenerator::subdivided_hyper_rectangle(tria, subdivisions, left, right, color);
 
   GridOut grid_out;
   if (dim == 2)

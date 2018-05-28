@@ -71,8 +71,7 @@ main()
 {
   initlog();
 
-  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> he(
-    TimeStepping::HEUN_EULER);
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> he(TimeStepping::HEUN_EULER);
   test(he, f, my);
 
   return 0;

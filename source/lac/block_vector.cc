@@ -25,9 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 template BlockVector<double>::BlockVector(const BlockVector<float> &);
 template BlockVector<float>::BlockVector(const BlockVector<double> &);
 
-template BlockVector<std::complex<double>>::BlockVector(
-  const BlockVector<std::complex<float>> &);
-template BlockVector<std::complex<float>>::BlockVector(
-  const BlockVector<std::complex<double>> &);
+template BlockVector<std::complex<double>>::BlockVector(const BlockVector<std::complex<float>> &);
+template BlockVector<std::complex<float>>::BlockVector(const BlockVector<std::complex<double>> &);
 
 DEAL_II_NAMESPACE_CLOSE

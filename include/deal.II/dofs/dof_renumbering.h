@@ -506,11 +506,10 @@ namespace DoFRenumbering
      */
     template <typename DoFHandlerType>
     void
-    compute_minimum_degree(
-      std::vector<types::global_dof_index> &new_dof_indices,
-      const DoFHandlerType &,
-      const bool reversed_numbering = false,
-      const bool use_constraints    = false);
+    compute_minimum_degree(std::vector<types::global_dof_index> &new_dof_indices,
+                           const DoFHandlerType &,
+                           const bool reversed_numbering = false,
+                           const bool use_constraints    = false);
   } // namespace boost
 
   /**
@@ -579,9 +578,9 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  Cuthill_McKee(DoFHandlerType &dof_handler,
-                const bool      reversed_numbering = false,
-                const bool      use_constraints    = false,
+  Cuthill_McKee(DoFHandlerType &                            dof_handler,
+                const bool                                  reversed_numbering = false,
+                const bool                                  use_constraints    = false,
                 const std::vector<types::global_dof_index> &starting_indices =
                   std::vector<types::global_dof_index>());
 
@@ -594,13 +593,12 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_Cuthill_McKee(
-    std::vector<types::global_dof_index> &new_dof_indices,
-    const DoFHandlerType &,
-    const bool                                  reversed_numbering = false,
-    const bool                                  use_constraints    = false,
-    const std::vector<types::global_dof_index> &starting_indices =
-      std::vector<types::global_dof_index>());
+  compute_Cuthill_McKee(std::vector<types::global_dof_index> &new_dof_indices,
+                        const DoFHandlerType &,
+                        const bool                                  reversed_numbering = false,
+                        const bool                                  use_constraints    = false,
+                        const std::vector<types::global_dof_index> &starting_indices =
+                          std::vector<types::global_dof_index>());
 
   /**
    * Renumber the degrees of freedom according to the Cuthill-McKee method,
@@ -617,9 +615,9 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  Cuthill_McKee(DoFHandlerType &   dof_handler,
-                const unsigned int level,
-                const bool         reversed_numbering = false,
+  Cuthill_McKee(DoFHandlerType &                            dof_handler,
+                const unsigned int                          level,
+                const bool                                  reversed_numbering = false,
                 const std::vector<types::global_dof_index> &starting_indices =
                   std::vector<types::global_dof_index>());
 
@@ -657,8 +655,7 @@ namespace DoFRenumbering
   template <typename DoFHandlerType>
   void
   component_wise(DoFHandlerType &                 dof_handler,
-                 const std::vector<unsigned int> &target_component =
-                   std::vector<unsigned int>());
+                 const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
 
 
   /**
@@ -671,8 +668,7 @@ namespace DoFRenumbering
   void
   component_wise(DoFHandlerType &                 dof_handler,
                  const unsigned int               level,
-                 const std::vector<unsigned int> &target_component =
-                   std::vector<unsigned int>());
+                 const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
 
   /**
    * Compute the renumbering vector needed by the component_wise() functions.
@@ -681,11 +677,11 @@ namespace DoFRenumbering
    */
   template <int dim, int spacedim, typename CellIterator>
   types::global_dof_index
-  compute_component_wise(std::vector<types::global_dof_index> &new_dof_indices,
-                         const CellIterator &                  start,
+  compute_component_wise(std::vector<types::global_dof_index> &       new_dof_indices,
+                         const CellIterator &                         start,
                          const typename identity<CellIterator>::type &end,
-                         const std::vector<unsigned int> &target_component,
-                         const bool                       is_level_operation);
+                         const std::vector<unsigned int> &            target_component,
+                         const bool                                   is_level_operation);
 
   /**
    * @}
@@ -857,9 +853,8 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  cell_wise(DoFHandlerType &dof_handler,
-            const std::vector<typename DoFHandlerType::active_cell_iterator>
-              &cell_order);
+  cell_wise(DoFHandlerType &                                                  dof_handler,
+            const std::vector<typename DoFHandlerType::active_cell_iterator> &cell_order);
 
   /**
    * Compute a renumbering of degrees of freedom by cell. The function takes a
@@ -894,12 +889,10 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_cell_wise(
-    std::vector<types::global_dof_index> &renumbering,
-    std::vector<types::global_dof_index> &inverse_renumbering,
-    const DoFHandlerType &                dof_handler,
-    const std::vector<typename DoFHandlerType::active_cell_iterator>
-      &cell_order);
+  compute_cell_wise(std::vector<types::global_dof_index> &renumbering,
+                    std::vector<types::global_dof_index> &inverse_renumbering,
+                    const DoFHandlerType &                dof_handler,
+                    const std::vector<typename DoFHandlerType::active_cell_iterator> &cell_order);
 
   /**
    * Like the other cell_wise() function, but for one level of a multilevel
@@ -907,10 +900,9 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  cell_wise(DoFHandlerType &   dof_handler,
-            const unsigned int level,
-            const std::vector<typename DoFHandlerType::level_cell_iterator>
-              &cell_order);
+  cell_wise(DoFHandlerType &                                                 dof_handler,
+            const unsigned int                                               level,
+            const std::vector<typename DoFHandlerType::level_cell_iterator> &cell_order);
 
   /**
    * Like the other compute_cell_wise() function, but for one level of a
@@ -918,13 +910,11 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_cell_wise(
-    std::vector<types::global_dof_index> &renumbering,
-    std::vector<types::global_dof_index> &inverse_renumbering,
-    const DoFHandlerType &                dof_handler,
-    const unsigned int                    level,
-    const std::vector<typename DoFHandlerType::level_cell_iterator>
-      &cell_order);
+  compute_cell_wise(std::vector<types::global_dof_index> &renumbering,
+                    std::vector<types::global_dof_index> &inverse_renumbering,
+                    const DoFHandlerType &                dof_handler,
+                    const unsigned int                    level,
+                    const std::vector<typename DoFHandlerType::level_cell_iterator> &cell_order);
 
   /**
    * @}
@@ -965,7 +955,7 @@ namespace DoFRenumbering
   void
   downstream(DoFHandlerType &                                  dof_handler,
              const Tensor<1, DoFHandlerType::space_dimension> &direction,
-             const bool dof_wise_renumbering = false);
+             const bool                                        dof_wise_renumbering = false);
 
 
   /**
@@ -978,7 +968,7 @@ namespace DoFRenumbering
   downstream(DoFHandlerType &                                  dof_handler,
              const unsigned int                                level,
              const Tensor<1, DoFHandlerType::space_dimension> &direction,
-             const bool dof_wise_renumbering = false);
+             const bool                                        dof_wise_renumbering = false);
 
   /**
    * Compute the set of renumbering indices needed by the downstream() function.
@@ -987,12 +977,11 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_downstream(
-    std::vector<types::global_dof_index> &            new_dof_indices,
-    std::vector<types::global_dof_index> &            reverse,
-    const DoFHandlerType &                            dof_handler,
-    const Tensor<1, DoFHandlerType::space_dimension> &direction,
-    const bool                                        dof_wise_renumbering);
+  compute_downstream(std::vector<types::global_dof_index> &            new_dof_indices,
+                     std::vector<types::global_dof_index> &            reverse,
+                     const DoFHandlerType &                            dof_handler,
+                     const Tensor<1, DoFHandlerType::space_dimension> &direction,
+                     const bool                                        dof_wise_renumbering);
 
   /**
    * Compute the set of renumbering indices needed by the downstream() function.
@@ -1001,13 +990,12 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_downstream(
-    std::vector<types::global_dof_index> &            new_dof_indices,
-    std::vector<types::global_dof_index> &            reverse,
-    const DoFHandlerType &                            dof_handler,
-    const unsigned int                                level,
-    const Tensor<1, DoFHandlerType::space_dimension> &direction,
-    const bool                                        dof_wise_renumbering);
+  compute_downstream(std::vector<types::global_dof_index> &            new_dof_indices,
+                     std::vector<types::global_dof_index> &            reverse,
+                     const DoFHandlerType &                            dof_handler,
+                     const unsigned int                                level,
+                     const Tensor<1, DoFHandlerType::space_dimension> &direction,
+                     const bool                                        dof_wise_renumbering);
 
   /**
    * Cell-wise clockwise numbering.
@@ -1041,8 +1029,8 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_clockwise_dg(std::vector<types::global_dof_index> &new_dof_indices,
-                       const DoFHandlerType &                dof_handler,
+  compute_clockwise_dg(std::vector<types::global_dof_index> &        new_dof_indices,
+                       const DoFHandlerType &                        dof_handler,
                        const Point<DoFHandlerType::space_dimension> &center,
                        const bool                                    counter);
 
@@ -1066,8 +1054,7 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  sort_selected_dofs_back(DoFHandlerType &         dof_handler,
-                          const std::vector<bool> &selected_dofs);
+  sort_selected_dofs_back(DoFHandlerType &dof_handler, const std::vector<bool> &selected_dofs);
 
   /**
    * Sort those degrees of freedom which are tagged with @p true in the @p
@@ -1095,10 +1082,9 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_sort_selected_dofs_back(
-    std::vector<types::global_dof_index> &new_dof_indices,
-    const DoFHandlerType &                dof_handler,
-    const std::vector<bool> &             selected_dofs);
+  compute_sort_selected_dofs_back(std::vector<types::global_dof_index> &new_dof_indices,
+                                  const DoFHandlerType &                dof_handler,
+                                  const std::vector<bool> &             selected_dofs);
 
   /**
    * This function computes the renumbering vector on each level needed by the
@@ -1111,11 +1097,10 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  compute_sort_selected_dofs_back(
-    std::vector<types::global_dof_index> &new_dof_indices,
-    const DoFHandlerType &                dof_handler,
-    const std::vector<bool> &             selected_dofs,
-    const unsigned int                    level);
+  compute_sort_selected_dofs_back(std::vector<types::global_dof_index> &new_dof_indices,
+                                  const DoFHandlerType &                dof_handler,
+                                  const std::vector<bool> &             selected_dofs,
+                                  const unsigned int                    level);
 
   /**
    * Renumber the degrees of freedom in a random way. The result of this

@@ -38,14 +38,12 @@ test()
   const unsigned int dim = 2;
 
   Triangulation<dim - 1, dim> boundary_mesh;
-  map<Triangulation<dim - 1, dim>::cell_iterator,
-      Triangulation<dim, dim>::face_iterator>
+  map<Triangulation<dim - 1, dim>::cell_iterator, Triangulation<dim, dim>::face_iterator>
                      surface_to_volume_mapping;
   Triangulation<dim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
 
-  surface_to_volume_mapping =
-    GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
+  surface_to_volume_mapping = GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
 
   FE_Q<dim - 1, dim>       boundary_fe(1);
   DoFHandler<dim - 1, dim> boundary_dh(boundary_mesh);
@@ -53,19 +51,17 @@ test()
 
   deallog << "n_dofs=" << boundary_dh.n_dofs() << std::endl;
 
-  for (DoFHandler<dim - 1, dim>::active_cell_iterator
-         cell = boundary_dh.begin_active(),
-         endc = boundary_dh.end();
+  for (DoFHandler<dim - 1, dim>::active_cell_iterator cell = boundary_dh.begin_active(),
+                                                      endc = boundary_dh.end();
        cell != endc;
        ++cell)
     {
       deallog << "Cell: " << cell << std::endl;
-      for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell;
-           ++v)
+      for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell; ++v)
         {
           unsigned int index = cell->vertex_dof_index(v, 0);
-          deallog << "vertex: " << v << ", global: " << cell->vertex_index(v)
-                  << " index: " << index << std::endl;
+          deallog << "vertex: " << v << ", global: " << cell->vertex_index(v) << " index: " << index
+                  << std::endl;
         }
 
       deallog << std::endl;

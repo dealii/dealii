@@ -47,8 +47,7 @@ test()
 {
   using namespace dealii;
 
-  Triangulation<dim> triangulation(
-    Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> triangulation(Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(triangulation, 0, 1);
 
@@ -92,8 +91,7 @@ test()
       Assert(false, ExcNotImplemented());
 
     unsigned int index = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end();
          ++cell, ++index)
 
@@ -149,15 +147,13 @@ test()
       if (i % (dim == 1 ? 1 : (dim == 2 ? 5 : 25)) == 0)
         {
           deallog << "Patch around dof " << i << ": ";
-          typename std::vector<
-            typename dealii::DoFHandler<dim>::active_cell_iterator>::iterator
+          typename std::vector<typename dealii::DoFHandler<dim>::active_cell_iterator>::iterator
             patch_iter     = dof_to_cell_map[i].begin(),
             patch_iter_end = dof_to_cell_map[i].end();
           for (; patch_iter != patch_iter_end; ++patch_iter)
             {
-              typename dealii::DoFHandler<dim>::active_cell_iterator
-                         patch_cell = *(patch_iter);
-              Point<dim> cell_bary  = patch_cell->barycenter();
+              typename dealii::DoFHandler<dim>::active_cell_iterator patch_cell = *(patch_iter);
+              Point<dim> cell_bary = patch_cell->barycenter();
               deallog << "(";
               for (unsigned int d = 0; d < dim - 1; ++d)
                 deallog << cell_bary[d] << ", ";

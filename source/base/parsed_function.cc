@@ -23,8 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
   template <int dim>
-  ParsedFunction<dim>::ParsedFunction(const unsigned int n_components,
-                                      const double       h) :
+  ParsedFunction<dim>::ParsedFunction(const unsigned int n_components, const double h) :
     AutoDerivativeFunction<dim>(h, n_components),
     function_object(n_components)
   {}
@@ -33,8 +32,7 @@ namespace Functions
 
   template <int dim>
   void
-  ParsedFunction<dim>::declare_parameters(ParameterHandler & prm,
-                                          const unsigned int n_components)
+  ParsedFunction<dim>::declare_parameters(ParameterHandler &prm, const unsigned int n_components)
   {
     Assert(n_components > 0, ExcZero());
 
@@ -54,21 +52,20 @@ namespace Functions
           AssertThrow(false, ExcNotImplemented());
           break;
       }
-    prm.declare_entry(
-      "Variable names",
-      vnames,
-      Patterns::Anything(),
-      "The names of the variables as they will be used in the "
-      "function, separated by commas. By default, the names of variables "
-      "at which the function will be evaluated are `x' (in 1d), `x,y' (in 2d) or "
-      "`x,y,z' (in 3d) for spatial coordinates and `t' for time. You can then "
-      "use these variable names in your function expression and they will be "
-      "replaced by the values of these variables at which the function is "
-      "currently evaluated. However, you can also choose a different set "
-      "of names for the independent variables at which to evaluate your function "
-      "expression. For example, if you work in spherical coordinates, you may "
-      "wish to set this input parameter to `r,phi,theta,t' and then use these "
-      "variable names in your function expression.");
+    prm.declare_entry("Variable names",
+                      vnames,
+                      Patterns::Anything(),
+                      "The names of the variables as they will be used in the "
+                      "function, separated by commas. By default, the names of variables "
+                      "at which the function will be evaluated are `x' (in 1d), `x,y' (in 2d) or "
+                      "`x,y,z' (in 3d) for spatial coordinates and `t' for time. You can then "
+                      "use these variable names in your function expression and they will be "
+                      "replaced by the values of these variables at which the function is "
+                      "currently evaluated. However, you can also choose a different set "
+                      "of names for the independent variables at which to evaluate your function "
+                      "expression. For example, if you work in spherical coordinates, you may "
+                      "wish to set this input parameter to `r,phi,theta,t' and then use these "
+                      "variable names in your function expression.");
 
     // The expression of the function
     std::string expr = "0";
@@ -92,20 +89,19 @@ namespace Functions
       "If the function you are describing represents a vector-valued "
       "function with multiple components, then separate the expressions "
       "for individual components by a semicolon.");
-    prm.declare_entry(
-      "Function constants",
-      "",
-      Patterns::Anything(),
-      "Sometimes it is convenient to use symbolic constants in the "
-      "expression that describes the function, rather than having to "
-      "use its numeric value everywhere the constant appears. These "
-      "values can be defined using this parameter, in the form "
-      "`var1=value1, var2=value2, ...'."
-      "\n\n"
-      "A typical example would be to set this runtime parameter to "
-      "`pi=3.1415926536' and then use `pi' in the expression of the "
-      "actual formula. (That said, for convenience this class actually "
-      "defines both `pi' and `Pi' by default, but you get the idea.)");
+    prm.declare_entry("Function constants",
+                      "",
+                      Patterns::Anything(),
+                      "Sometimes it is convenient to use symbolic constants in the "
+                      "expression that describes the function, rather than having to "
+                      "use its numeric value everywhere the constant appears. These "
+                      "values can be defined using this parameter, in the form "
+                      "`var1=value1, var2=value2, ...'."
+                      "\n\n"
+                      "A typical example would be to set this runtime parameter to "
+                      "`pi=3.1415926536' and then use `pi' in the expression of the "
+                      "actual formula. (That said, for convenience this class actually "
+                      "defines both `pi' and `Pi' by default, but you get the idea.)");
   }
 
 
@@ -118,17 +114,14 @@ namespace Functions
     std::string expression     = prm.get("Function expression");
     std::string constants_list = prm.get("Function constants");
 
-    std::vector<std::string> const_list =
-      Utilities::split_string_list(constants_list, ',');
+    std::vector<std::string>      const_list = Utilities::split_string_list(constants_list, ',');
     std::map<std::string, double> constants;
     for (unsigned int i = 0; i < const_list.size(); ++i)
       {
-        std::vector<std::string> this_c =
-          Utilities::split_string_list(const_list[i], '=');
+        std::vector<std::string> this_c = Utilities::split_string_list(const_list[i], '=');
         AssertThrow(this_c.size() == 2, ExcMessage("Invalid format"));
         double tmp;
-        AssertThrow(std::sscanf(this_c[1].c_str(), "%lf", &tmp),
-                    ExcMessage("Double number?"));
+        AssertThrow(std::sscanf(this_c[1].c_str(), "%lf", &tmp), ExcMessage("Double number?"));
         constants[this_c[0]] = tmp;
       }
 
@@ -149,14 +142,12 @@ namespace Functions
           function_object.initialize(vnames, expression, constants, true);
           break;
         default:
-          AssertThrow(
-            false,
-            ExcMessage("The list of variables specified is <" + vnames +
-                       "> which is a list of length " +
-                       Utilities::int_to_string(nn) +
-                       " but it has to be a list of length equal to" +
-                       " either dim (for a time-independent function)" +
-                       " or dim+1 (for a time-dependent function)."));
+          AssertThrow(false,
+                      ExcMessage("The list of variables specified is <" + vnames +
+                                 "> which is a list of length " + Utilities::int_to_string(nn) +
+                                 " but it has to be a list of length equal to" +
+                                 " either dim (for a time-independent function)" +
+                                 " or dim+1 (for a time-dependent function)."));
       }
   }
 
@@ -164,8 +155,7 @@ namespace Functions
 
   template <int dim>
   void
-  ParsedFunction<dim>::vector_value(const Point<dim> &p,
-                                    Vector<double> &  values) const
+  ParsedFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
   {
     function_object.vector_value(p, values);
   }

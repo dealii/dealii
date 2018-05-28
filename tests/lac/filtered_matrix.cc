@@ -32,9 +32,7 @@ test(const FilteredMatrix<VectorType> &M)
   deallog << "Iterator";
 
   unsigned int max = 0;
-  for (typename FilteredMatrix<VectorType>::const_iterator i = M.begin();
-       i != M.end();
-       ++i)
+  for (typename FilteredMatrix<VectorType>::const_iterator i = M.begin(); i != M.end(); ++i)
     {
       Assert(i->row() == i->column(), ExcInternalError());
       deallog << ' ' << i->row() << ':' << i->value();

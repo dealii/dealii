@@ -70,14 +70,12 @@ GridRefinement::refine(Triangulation<dim, spacedim> &tria,
     }
 
   unsigned int marked = 0;
-  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     if (std::fabs(criteria(cell->active_cell_index())) >= new_threshold)
       {
-        if (max_to_mark != numbers::invalid_unsigned_int &&
-            marked >= max_to_mark)
+        if (max_to_mark != numbers::invalid_unsigned_int && marked >= max_to_mark)
           break;
         ++marked;
         cell->set_refine_flag();
@@ -96,8 +94,7 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
          ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
-  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
-         tria.begin_active();
+  for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = tria.begin_active();
        cell != tria.end();
        ++cell)
     if (std::fabs(criteria(cell->active_cell_index())) <= threshold)
@@ -107,11 +104,10 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
 
 template <int dim>
 std::pair<double, double>
-GridRefinement::adjust_refine_and_coarsen_number_fraction(
-  const unsigned int current_n_cells,
-  const unsigned int max_n_cells,
-  const double       top_fraction,
-  const double       bottom_fraction)
+GridRefinement::adjust_refine_and_coarsen_number_fraction(const unsigned int current_n_cells,
+                                                          const unsigned int max_n_cells,
+                                                          const double       top_fraction,
+                                                          const double       bottom_fraction)
 {
   Assert(top_fraction >= 0, ExcInvalidParameterValue());
   Assert(top_fraction <= 1, ExcInvalidParameterValue());
@@ -122,10 +118,8 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
   double refine_cells  = current_n_cells * top_fraction;
   double coarsen_cells = current_n_cells * bottom_fraction;
 
-  const double cell_increase_on_refine =
-    GeometryInfo<dim>::max_children_per_cell - 1.0;
-  const double cell_decrease_on_coarsen =
-    1.0 - 1.0 / GeometryInfo<dim>::max_children_per_cell;
+  const double cell_increase_on_refine  = GeometryInfo<dim>::max_children_per_cell - 1.0;
+  const double cell_decrease_on_coarsen = 1.0 - 1.0 / GeometryInfo<dim>::max_children_per_cell;
 
   std::pair<double, double> adjusted_fractions(top_fraction, bottom_fraction);
   // first we have to see whether we
@@ -143,11 +137,9 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
       // anisotropically, assume isotropic
       // refinement here, though that may
       // result in a worse approximation
-      adjusted_fractions.first = 0;
-      coarsen_cells =
-        (current_n_cells - max_n_cells) / cell_decrease_on_coarsen;
-      adjusted_fractions.second =
-        std::min(coarsen_cells / current_n_cells, 1.0);
+      adjusted_fractions.first  = 0;
+      coarsen_cells             = (current_n_cells - max_n_cells) / cell_decrease_on_coarsen;
+      adjusted_fractions.second = std::min(coarsen_cells / current_n_cells, 1.0);
     }
   // otherwise, see if we would exceed the
   // maximum desired number of cells with the
@@ -162,9 +154,8 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
   // again, this is true for isotropically
   // refined cells. we take this as an
   // approximation of a mixed refinement.
-  else if (static_cast<unsigned int>(
-             current_n_cells + refine_cells * cell_increase_on_refine -
-             coarsen_cells * cell_decrease_on_coarsen) > max_n_cells)
+  else if (static_cast<unsigned int>(current_n_cells + refine_cells * cell_increase_on_refine -
+                                     coarsen_cells * cell_decrease_on_coarsen) > max_n_cells)
     {
       // we have to adjust the
       // fractions. assume we want
@@ -174,9 +165,9 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
       // of cells to be equal to
       // max_n_cells. this leads to the
       // following equation for alpha
-      const double alpha = 1. * (max_n_cells - current_n_cells) /
-                           (refine_cells * cell_increase_on_refine -
-                            coarsen_cells * cell_decrease_on_coarsen);
+      const double alpha =
+        1. * (max_n_cells - current_n_cells) /
+        (refine_cells * cell_increase_on_refine - coarsen_cells * cell_decrease_on_coarsen);
 
       adjusted_fractions.first  = alpha * top_fraction;
       adjusted_fractions.second = alpha * bottom_fraction;
@@ -186,19 +177,16 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
 
 template <int dim, typename Number, int spacedim>
 void
-GridRefinement::refine_and_coarsen_fixed_number(
-  Triangulation<dim, spacedim> &tria,
-  const Vector<Number> &        criteria,
-  const double                  top_fraction,
-  const double                  bottom_fraction,
-  const unsigned int            max_n_cells)
+GridRefinement::refine_and_coarsen_fixed_number(Triangulation<dim, spacedim> &tria,
+                                                const Vector<Number> &        criteria,
+                                                const double                  top_fraction,
+                                                const double                  bottom_fraction,
+                                                const unsigned int            max_n_cells)
 {
   // correct number of cells is
   // checked in @p{refine}
-  Assert((top_fraction >= 0) && (top_fraction <= 1),
-         ExcInvalidParameterValue());
-  Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
-         ExcInvalidParameterValue());
+  Assert((top_fraction >= 0) && (top_fraction <= 1), ExcInvalidParameterValue());
+  Assert((bottom_fraction >= 0) && (bottom_fraction <= 1), ExcInvalidParameterValue());
   Assert(top_fraction + bottom_fraction <= 1, ExcInvalidParameterValue());
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
@@ -206,10 +194,8 @@ GridRefinement::refine_and_coarsen_fixed_number(
     adjust_refine_and_coarsen_number_fraction<dim>(
       criteria.size(), max_n_cells, top_fraction, bottom_fraction);
 
-  const int refine_cells =
-    static_cast<int>(adjusted_fractions.first * criteria.size());
-  const int coarsen_cells =
-    static_cast<int>(adjusted_fractions.second * criteria.size());
+  const int refine_cells  = static_cast<int>(adjusted_fractions.first * criteria.size());
+  const int coarsen_cells = static_cast<int>(adjusted_fractions.second * criteria.size());
 
   if (refine_cells || coarsen_cells)
     {
@@ -220,10 +206,8 @@ GridRefinement::refine_and_coarsen_fixed_number(
             refine(tria, criteria, -std::numeric_limits<double>::max());
           else
             {
-              std::nth_element(tmp.begin(),
-                               tmp.begin() + refine_cells,
-                               tmp.end(),
-                               std::greater<double>());
+              std::nth_element(
+                tmp.begin(), tmp.begin() + refine_cells, tmp.end(), std::greater<double>());
               refine(tria, criteria, *(tmp.begin() + refine_cells));
             }
         }
@@ -238,8 +222,7 @@ GridRefinement::refine_and_coarsen_fixed_number(
                                tmp.begin() + tmp.size() - coarsen_cells,
                                tmp.end(),
                                std::greater<double>());
-              coarsen(
-                tria, criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
+              coarsen(tria, criteria, *(tmp.begin() + tmp.size() - coarsen_cells));
             }
         }
     }
@@ -249,19 +232,16 @@ GridRefinement::refine_and_coarsen_fixed_number(
 
 template <int dim, typename Number, int spacedim>
 void
-GridRefinement::refine_and_coarsen_fixed_fraction(
-  Triangulation<dim, spacedim> &tria,
-  const Vector<Number> &        criteria,
-  const double                  top_fraction,
-  const double                  bottom_fraction,
-  const unsigned int            max_n_cells)
+GridRefinement::refine_and_coarsen_fixed_fraction(Triangulation<dim, spacedim> &tria,
+                                                  const Vector<Number> &        criteria,
+                                                  const double                  top_fraction,
+                                                  const double                  bottom_fraction,
+                                                  const unsigned int            max_n_cells)
 {
   // correct number of cells is
   // checked in @p{refine}
-  Assert((top_fraction >= 0) && (top_fraction <= 1),
-         ExcInvalidParameterValue());
-  Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
-         ExcInvalidParameterValue());
+  Assert((top_fraction >= 0) && (top_fraction <= 1), ExcInvalidParameterValue());
+  Assert((bottom_fraction >= 0) && (bottom_fraction <= 1), ExcInvalidParameterValue());
   Assert(top_fraction + bottom_fraction <= 1, ExcInvalidParameterValue());
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
@@ -279,15 +259,11 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
 
   // compute thresholds
   typename Vector<Number>::const_iterator pp = tmp.begin();
-  for (double sum = 0;
-       (sum < top_fraction * total_error) && (pp != (tmp.end() - 1));
-       ++pp)
+  for (double sum = 0; (sum < top_fraction * total_error) && (pp != (tmp.end() - 1)); ++pp)
     sum += *pp;
-  double top_threshold = (pp != tmp.begin() ? (*pp + *(pp - 1)) / 2 : *pp);
+  double top_threshold                       = (pp != tmp.begin() ? (*pp + *(pp - 1)) / 2 : *pp);
   typename Vector<Number>::const_iterator qq = (tmp.end() - 1);
-  for (double sum = 0;
-       (sum < bottom_fraction * total_error) && (qq != tmp.begin());
-       --qq)
+  for (double sum = 0; (sum < bottom_fraction * total_error) && (qq != tmp.begin()); --qq)
     sum += *qq;
   double bottom_threshold = (qq != (tmp.end() - 1) ? (*qq + *(qq + 1)) / 2 : 0);
 
@@ -304,14 +280,12 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
   // isotropic refinement as guess for a mixed
   // refinemnt as well.
   {
-    const unsigned int refine_cells  = pp - tmp.begin(),
-                       coarsen_cells = tmp.end() - qq;
+    const unsigned int refine_cells = pp - tmp.begin(), coarsen_cells = tmp.end() - qq;
 
-    if (static_cast<unsigned int>(
-          tria.n_active_cells() +
-          refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1) -
-          (coarsen_cells * (GeometryInfo<dim>::max_children_per_cell - 1) /
-           GeometryInfo<dim>::max_children_per_cell)) > max_n_cells)
+    if (static_cast<unsigned int>(tria.n_active_cells() +
+                                  refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1) -
+                                  (coarsen_cells * (GeometryInfo<dim>::max_children_per_cell - 1) /
+                                   GeometryInfo<dim>::max_children_per_cell)) > max_n_cells)
       {
         refine_and_coarsen_fixed_number(tria,
                                         criteria,
@@ -354,8 +328,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
   // threshold if it equals the
   // largest indicator and the
   // top_fraction!=1
-  const auto minmax_element =
-    std::minmax_element(criteria.begin(), criteria.end());
+  const auto minmax_element = std::minmax_element(criteria.begin(), criteria.end());
   if ((top_threshold == *minmax_element.second) && (top_fraction != 1))
     top_threshold *= 0.999;
 
@@ -375,8 +348,8 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
 template <int dim, typename Number, int spacedim>
 void
 GridRefinement::refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
-                                            const Vector<Number> &criteria,
-                                            const unsigned int    order)
+                                            const Vector<Number> &        criteria,
+                                            const unsigned int            order)
 {
   Assert(criteria.size() == tria.n_active_cells(),
          ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -403,12 +376,10 @@ GridRefinement::refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
 
   for (std::size_t M = 0; M < criteria.size(); ++M)
     {
-      expected_error_reduction +=
-        (1 - std::pow(2., -1. * order)) * criteria(cell_indices[M]);
+      expected_error_reduction += (1 - std::pow(2., -1. * order)) * criteria(cell_indices[M]);
 
-      const double cost =
-        std::pow(((std::pow(2., dim) - 1) * (1 + M) + N), (double)order / dim) *
-        (original_error - expected_error_reduction);
+      const double cost = std::pow(((std::pow(2., dim) - 1) * (1 + M) + N), (double)order / dim) *
+                          (original_error - expected_error_reduction);
       if (cost <= min_cost)
         {
           min_cost = cost;

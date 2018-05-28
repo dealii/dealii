@@ -243,8 +243,7 @@ public:
    * an empty function.
    */
   void
-  compress(::dealii::VectorOperation::values operation =
-             ::dealii::VectorOperation::unknown) const;
+  compress(::dealii::VectorOperation::values operation = ::dealii::VectorOperation::unknown) const;
 
   /**
    * Change the dimension of the vector to @p N. The reserved memory for this
@@ -673,8 +672,7 @@ public:
    */
   template <typename OtherNumber>
   void
-  add(const std::vector<size_type> &  indices,
-      const std::vector<OtherNumber> &values);
+  add(const std::vector<size_type> &indices, const std::vector<OtherNumber> &values);
 
   /**
    * This is a second collective add operation. As a difference, this function
@@ -691,9 +689,7 @@ public:
    */
   template <typename OtherNumber>
   void
-  add(const size_type    n_elements,
-      const size_type *  indices,
-      const OtherNumber *values);
+  add(const size_type n_elements, const size_type *indices, const OtherNumber *values);
 
   /**
    * Addition of @p s to all components. Note that @p s is a scalar and not a
@@ -710,10 +706,7 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   void
-  add(const Number          a,
-      const Vector<Number> &V,
-      const Number          b,
-      const Vector<Number> &W);
+  add(const Number a, const Vector<Number> &V, const Number b, const Vector<Number> &W);
 
   /**
    * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
@@ -850,9 +843,7 @@ public:
    */
   DEAL_II_DEPRECATED
   void
-  print(LogStream &        out,
-        const unsigned int width  = 6,
-        const bool         across = true) const;
+  print(LogStream &out, const unsigned int width = 6, const bool across = true) const;
 
   /**
    * Write the vector en bloc to a file. This is done in a binary mode, so the
@@ -991,8 +982,7 @@ protected:
    * For parallel loops with TBB, this member variable stores the affinity
    * information of loops.
    */
-  mutable std::shared_ptr<parallel::internal::TBBPartitioner>
-    thread_loop_partitioner;
+  mutable std::shared_ptr<parallel::internal::TBBPartitioner> thread_loop_partitioner;
 
   /**
    * Make all other vector types friends.
@@ -1037,10 +1027,7 @@ Vector<int>::lp_norm(const real_type) const;
 //------------------------ inline functions
 
 template <typename Number>
-inline Vector<Number>::Vector() :
-  vec_size(0),
-  max_vec_size(0),
-  values(nullptr, &free)
+inline Vector<Number>::Vector() : vec_size(0), max_vec_size(0), values(nullptr, &free)
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class
@@ -1213,11 +1200,9 @@ Vector<Number>::operator/=(const Number factor)
 template <typename Number>
 template <typename OtherNumber>
 inline void
-Vector<Number>::add(const std::vector<size_type> &  indices,
-                    const std::vector<OtherNumber> &values)
+Vector<Number>::add(const std::vector<size_type> &indices, const std::vector<OtherNumber> &values)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
+  Assert(indices.size() == values.size(), ExcDimensionMismatch(indices.size(), values.size()));
   add(indices.size(), indices.data(), values.data());
 }
 
@@ -1226,11 +1211,9 @@ Vector<Number>::add(const std::vector<size_type> &  indices,
 template <typename Number>
 template <typename OtherNumber>
 inline void
-Vector<Number>::add(const std::vector<size_type> &indices,
-                    const Vector<OtherNumber> &   values)
+Vector<Number>::add(const std::vector<size_type> &indices, const Vector<OtherNumber> &values)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
+  Assert(indices.size() == values.size(), ExcDimensionMismatch(indices.size(), values.size()));
   add(indices.size(), indices.data(), values.values.get());
 }
 
@@ -1239,17 +1222,13 @@ Vector<Number>::add(const std::vector<size_type> &indices,
 template <typename Number>
 template <typename OtherNumber>
 inline void
-Vector<Number>::add(const size_type    n_indices,
-                    const size_type *  indices,
-                    const OtherNumber *values)
+Vector<Number>::add(const size_type n_indices, const size_type *indices, const OtherNumber *values)
 {
   for (size_type i = 0; i < n_indices; ++i)
     {
       Assert(indices[i] < vec_size, ExcIndexRange(indices[i], 0, vec_size));
-      Assert(
-        numbers::is_finite(values[i]),
-        ExcMessage(
-          "The given value is not finite but either infinite or Not A Number (NaN)"));
+      Assert(numbers::is_finite(values[i]),
+             ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
       this->values[indices[i]] += values[i];
     }

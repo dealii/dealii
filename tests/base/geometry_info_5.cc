@@ -33,9 +33,8 @@ test()
   for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-        const Tensor<1, dim> phi_i_grad =
-          GeometryInfo<dim>::d_linear_shape_function_gradient(
-            GeometryInfo<dim>::unit_cell_vertex(v), i);
+        const Tensor<1, dim> phi_i_grad = GeometryInfo<dim>::d_linear_shape_function_gradient(
+          GeometryInfo<dim>::unit_cell_vertex(v), i);
 
         deallog << phi_i_grad << std::endl;
       }

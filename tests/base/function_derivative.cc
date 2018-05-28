@@ -56,11 +56,10 @@ check_derivative_order(const std::vector<Tensor<1, dim>> &gradients,
   for (unsigned int i = 0; i < gradients.size(); ++i)
     {
       const double reduction =
-        std::fabs(gradients[i][direction] - derivatives[i]) /
-        std::fabs(differences[i]);
+        std::fabs(gradients[i][direction] - derivatives[i]) / std::fabs(differences[i]);
       if (reduction > 1.2 * expected || reduction < .8 * expected)
-        deallog << "Derivative error " << direction << ' ' << order << ' ' << i
-                << "   " << reduction << std::endl;
+        deallog << "Derivative error " << direction << ' ' << order << ' ' << i << "   "
+                << reduction << std::endl;
     }
 }
 
@@ -97,13 +96,11 @@ check_hessian_order(const std::vector<double> &values,
   for (unsigned int i = 0; i < values.size(); ++i)
     for (unsigned int d = 0; d < dim; ++d)
       {
-        const double reduction =
-          std::fabs(-values[i] * k[direction] * k[d] - derivatives[i][d]) /
-          std::fabs(differences[i][d]);
+        const double reduction = std::fabs(-values[i] * k[direction] * k[d] - derivatives[i][d]) /
+                                 std::fabs(differences[i][d]);
         if (reduction > 1.2 * expected || reduction < .8 * expected)
-          deallog << "Hessian error " << direction << ' ' << d << ' ' << order
-                  << ' ' << i << "   " << reduction << "   " << expected
-                  << "   " << differences[i][d] << std::endl;
+          deallog << "Hessian error " << direction << ' ' << d << ' ' << order << ' ' << i << "   "
+                  << reduction << "   " << expected << "   " << differences[i][d] << std::endl;
       }
 }
 

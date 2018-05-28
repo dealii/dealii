@@ -46,8 +46,7 @@ void
 execute_ref(const X &x)
 {
   Assert(x.i == 0, ExcInternalError());
-  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << x.i
-          << std::endl;
+  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << x.i << std::endl;
   deallog << "OK" << std::endl;
 }
 
@@ -55,8 +54,8 @@ void
 execute_value(X x)
 {
   Assert(x.i > 0, ExcInternalError());
-  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' '
-          << (x.i > 0 ? "OK" : "not OK") << std::endl;
+  deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << (x.i > 0 ? "OK" : "not OK")
+          << std::endl;
   deallog << "OK" << std::endl;
 }
 

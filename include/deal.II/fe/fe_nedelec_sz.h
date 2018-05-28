@@ -154,12 +154,11 @@ protected:
   MappingType mapping_type;
 
   virtual std::unique_ptr<typename FiniteElement<dim, dim>::InternalDataBase>
-  get_data(
-    const UpdateFlags        update_flags,
-    const Mapping<dim, dim> &mapping,
-    const Quadrature<dim> &  quadrature,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
-      &output_data) const override;
+  get_data(const UpdateFlags        update_flags,
+           const Mapping<dim, dim> &mapping,
+           const Quadrature<dim> &  quadrature,
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
+             &output_data) const override;
 
   /**
    * Compute information about the shape functions on the cell denoted by the
@@ -168,16 +167,15 @@ protected:
    */
   virtual void
   fill_fe_values(
-    const typename Triangulation<dim, dim>::cell_iterator &cell,
-    const CellSimilarity::Similarity                       cell_similarity,
-    const Quadrature<dim> &                                quadrature,
-    const Mapping<dim, dim> &                              mapping,
-    const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
-      &                                                       mapping_data,
-    const typename FiniteElement<dim, dim>::InternalDataBase &fedata,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
-      &data) const override;
+    const typename Triangulation<dim, dim>::cell_iterator &                       cell,
+    const CellSimilarity::Similarity                                              cell_similarity,
+    const Quadrature<dim> &                                                       quadrature,
+    const Mapping<dim, dim> &                                                     mapping,
+    const typename Mapping<dim, dim>::InternalDataBase &                          mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
+    const typename FiniteElement<dim, dim>::InternalDataBase &                    fedata,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data)
+    const override;
 
   /**
    * Compute information about the shape functions on the cell and face denoted
@@ -186,33 +184,31 @@ protected:
    */
   virtual void
   fill_fe_face_values(
-    const typename Triangulation<dim, dim>::cell_iterator &cell,
-    const unsigned int                                     face_no,
-    const Quadrature<dim - 1> &                            quadrature,
-    const Mapping<dim, dim> &                              mapping,
-    const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
-      &                                                       mapping_data,
-    const typename FiniteElement<dim, dim>::InternalDataBase &fedata,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
-      &data) const override;
+    const typename Triangulation<dim, dim>::cell_iterator &                       cell,
+    const unsigned int                                                            face_no,
+    const Quadrature<dim - 1> &                                                   quadrature,
+    const Mapping<dim, dim> &                                                     mapping,
+    const typename Mapping<dim, dim>::InternalDataBase &                          mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
+    const typename FiniteElement<dim, dim>::InternalDataBase &                    fedata,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data)
+    const override;
 
   /**
    * Not implemented.
    */
   virtual void
   fill_fe_subface_values(
-    const typename Triangulation<dim, dim>::cell_iterator &cell,
-    const unsigned int                                     face_no,
-    const unsigned int                                     sub_no,
-    const Quadrature<dim - 1> &                            quadrature,
-    const Mapping<dim, dim> &                              mapping,
-    const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
-      &                                                       mapping_data,
-    const typename FiniteElement<dim, dim>::InternalDataBase &fedata,
-    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
-      &data) const override;
+    const typename Triangulation<dim, dim>::cell_iterator &                       cell,
+    const unsigned int                                                            face_no,
+    const unsigned int                                                            sub_no,
+    const Quadrature<dim - 1> &                                                   quadrature,
+    const Mapping<dim, dim> &                                                     mapping,
+    const typename Mapping<dim, dim>::InternalDataBase &                          mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
+    const typename FiniteElement<dim, dim>::InternalDataBase &                    fedata,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data)
+    const override;
 
   /**
    * Derived Internal data which is used to store cell-independent data.
@@ -431,8 +427,8 @@ private:
    */
   void
   fill_edge_values(const typename Triangulation<dim, dim>::cell_iterator &cell,
-                   const Quadrature<dim> &quadrature,
-                   const InternalData &   fedata) const;
+                   const Quadrature<dim> &                                quadrature,
+                   const InternalData &                                   fedata) const;
 
   /**
    * Populates the cell-dependent face-based shape functions on the given
@@ -440,8 +436,8 @@ private:
    */
   void
   fill_face_values(const typename Triangulation<dim, dim>::cell_iterator &cell,
-                   const Quadrature<dim> &quadrature,
-                   const InternalData &   fedata) const;
+                   const Quadrature<dim> &                                quadrature,
+                   const InternalData &                                   fedata) const;
 };
 
 

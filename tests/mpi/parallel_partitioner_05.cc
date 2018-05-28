@@ -52,21 +52,12 @@ test()
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
   local_relevant                            = local_owned;
-  types::global_dof_index ghost_indices[10] = {1,
-                                               2,
-                                               13,
-                                               set - 2,
-                                               set - 1,
-                                               set,
-                                               set + 1,
-                                               2 * set,
-                                               2 * set + 1,
-                                               2 * set + 3};
+  types::global_dof_index ghost_indices[10] = {
+    1, 2, 13, set - 2, set - 1, set, set + 1, 2 * set, 2 * set + 1, 2 * set + 3};
   local_relevant.add_indices(&ghost_indices[0], &ghost_indices[0] + 10);
   types::global_dof_index before_start = myid > 0 ? my_start - set / 4 : 0;
-  types::global_dof_index after_end    = myid < numproc - 1 ?
-                                        my_start + local_size + set / 3 :
-                                        my_start + local_size;
+  types::global_dof_index after_end =
+    myid < numproc - 1 ? my_start + local_size + set / 3 : my_start + local_size;
   if (before_start < my_start)
     local_relevant.add_range(before_start, my_start);
   if (after_end > my_start + local_size)
@@ -85,8 +76,7 @@ test()
   restricted_indices.push_back(2 * set);
   restricted_indices.push_back(2 * set + 1);
   IndexSet restricted_set(global_size);
-  restricted_set.add_indices(restricted_indices.begin(),
-                             restricted_indices.end());
+  restricted_set.add_indices(restricted_indices.begin(), restricted_indices.end());
   Utilities::MPI::Partitioner w(local_owned, MPI_COMM_WORLD);
   w.set_ghost_indices(restricted_set, v.ghost_indices());
 
@@ -99,22 +89,19 @@ test()
 
   // print the additional ghost index number to the log stream
   deallog << "Ghost subset in " << v.n_ghost_indices() << " indices: ";
-  for (unsigned int i = 0; i < v.ghost_indices_within_larger_ghost_set().size();
-       ++i)
+  for (unsigned int i = 0; i < v.ghost_indices_within_larger_ghost_set().size(); ++i)
     deallog << "[" << v.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << v.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 
   deallog << "Ghost subset in " << w.n_ghost_indices() << " indices: ";
-  for (unsigned int i = 0; i < w.ghost_indices_within_larger_ghost_set().size();
-       ++i)
+  for (unsigned int i = 0; i < w.ghost_indices_within_larger_ghost_set().size(); ++i)
     deallog << "[" << w.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << w.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 
   deallog << "Ghost subset in " << x.n_ghost_indices() << " indices: ";
-  for (unsigned int i = 0; i < x.ghost_indices_within_larger_ghost_set().size();
-       ++i)
+  for (unsigned int i = 0; i < x.ghost_indices_within_larger_ghost_set().size(); ++i)
     deallog << "[" << x.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << x.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;

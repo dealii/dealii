@@ -39,8 +39,7 @@ std::ofstream logfile("output");
 DeclException2(ExcNumberMismatch,
                int,
                int,
-               << "The numbers " << arg1 << " and " << arg2
-               << " should be equal, but are not.");
+               << "The numbers " << arg1 << " and " << arg2 << " should be equal, but are not.");
 
 
 template <int dim>
@@ -56,8 +55,7 @@ test()
   // ids based on their position, in
   // particular we take the quadrant
   // (octant)
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
   for (; cell != endc; ++cell)
     {
       unsigned int subdomain = 0;
@@ -85,8 +83,7 @@ test()
         };
       for (unsigned int i = 0; i < (1 << dim); ++i)
         AssertThrow(subdomain_cells[i] == tria.n_active_cells() / (1 << dim),
-                    ExcNumberMismatch(subdomain_cells[i],
-                                      tria.n_active_cells() / (1 << dim)));
+                    ExcNumberMismatch(subdomain_cells[i], tria.n_active_cells() / (1 << dim)));
       deallog << "Check 1 (dim=" << dim << ") ok" << std::endl;
     };
 
@@ -109,8 +106,7 @@ test()
         };
       for (unsigned int i = 0; i < (1 << dim); ++i)
         AssertThrow(subdomain_cells[i] == tria.n_active_cells() / (1 << dim),
-                    ExcNumberMismatch(subdomain_cells[i],
-                                      tria.n_active_cells() / (1 << dim)));
+                    ExcNumberMismatch(subdomain_cells[i], tria.n_active_cells() / (1 << dim)));
       deallog << "Check 2 (dim=" << dim << ") ok" << std::endl;
     };
 
@@ -126,15 +122,13 @@ test()
       std::vector<bool> selected_dofs(dof_handler.n_dofs());
       for (unsigned int subdomain = 0; subdomain < (1 << dim); ++subdomain)
         {
-          DoFTools::extract_subdomain_dofs(
-            dof_handler, subdomain, selected_dofs);
+          DoFTools::extract_subdomain_dofs(dof_handler, subdomain, selected_dofs);
           AssertThrow(
             static_cast<unsigned int>(
               std::count(selected_dofs.begin(), selected_dofs.end(), true)) ==
               dof_handler.n_dofs() / (1 << dim),
-            ExcNumberMismatch(
-              std::count(selected_dofs.begin(), selected_dofs.end(), true),
-              dof_handler.n_dofs() / (1 << dim)));
+            ExcNumberMismatch(std::count(selected_dofs.begin(), selected_dofs.end(), true),
+                              dof_handler.n_dofs() / (1 << dim)));
         }
       deallog << "Check 3 (dim=" << dim << ") ok" << std::endl;
     };
@@ -151,22 +145,20 @@ test()
       DoFHandler<dim> dof_handler(tria);
       dof_handler.distribute_dofs(fe);
 
-      const unsigned int cells_per_direction = static_cast<unsigned int>(
-        rint(std::pow(tria.n_active_cells(), 1. / dim)));
+      const unsigned int cells_per_direction =
+        static_cast<unsigned int>(rint(std::pow(tria.n_active_cells(), 1. / dim)));
 
       std::vector<bool> selected_dofs(dof_handler.n_dofs());
       for (unsigned int subdomain = 0; subdomain < (1 << dim); ++subdomain)
         {
-          DoFTools::extract_subdomain_dofs(
-            dof_handler, subdomain, selected_dofs);
+          DoFTools::extract_subdomain_dofs(dof_handler, subdomain, selected_dofs);
           AssertThrow(
             static_cast<unsigned int>(
               std::count(selected_dofs.begin(), selected_dofs.end(), true)) ==
               std::pow(static_cast<double>(cells_per_direction / 2 + 1), dim),
-            ExcNumberMismatch(
-              std::count(selected_dofs.begin(), selected_dofs.end(), true),
-              static_cast<unsigned int>(std::pow(
-                static_cast<double>(cells_per_direction / 2 + 1), dim))));
+            ExcNumberMismatch(std::count(selected_dofs.begin(), selected_dofs.end(), true),
+                              static_cast<unsigned int>(
+                                std::pow(static_cast<double>(cells_per_direction / 2 + 1), dim))));
         }
       deallog << "Check 4 (dim=" << dim << ") ok" << std::endl;
     };

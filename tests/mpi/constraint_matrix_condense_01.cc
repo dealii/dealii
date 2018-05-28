@@ -60,8 +60,7 @@ test()
   constraints.clear();
   {
     IndexSet boundary_dofs(dof_handler.n_dofs());
-    DoFTools::extract_boundary_dofs(
-      dof_handler, std::vector<bool>(1, true), boundary_dofs);
+    DoFTools::extract_boundary_dofs(dof_handler, std::vector<bool>(1, true), boundary_dofs);
 
     unsigned int first_nboundary_dof = 0;
     while (boundary_dofs.is_element(first_nboundary_dof))

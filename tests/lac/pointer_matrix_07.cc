@@ -23,16 +23,13 @@
 
 template <typename number>
 void
-checkTvmult_add(FullMatrix<number> &A,
-                Vector<number> &    V,
-                char *              name = "Test Matrix")
+checkTvmult_add(FullMatrix<number> &A, Vector<number> &V, char *name = "Test Matrix")
 {
   deallog << "Tvmult_add" << std::endl;
 
   PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name);
 
-  deallog << "Result vector set to all ones and to be added with result"
-          << std::endl;
+  deallog << "Result vector set to all ones and to be added with result" << std::endl;
   Vector<number> O(V.size());
   for (unsigned int i = 0; i < O.size(); ++i)
     O(i) = 1;

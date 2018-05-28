@@ -161,8 +161,7 @@ public:
    * (which defaults to one, i.e. a scalar function), and the time variable,
    * which defaults to zero.
    */
-  Function(const unsigned int    n_components = 1,
-           const RangeNumberType initial_time = 0.0);
+  Function(const unsigned int n_components = 1, const RangeNumberType initial_time = 0.0);
 
   /**
    * Virtual destructor; absolutely necessary in this case.
@@ -266,9 +265,8 @@ public:
    * Return the gradient of all components of the function at the given point.
    */
   virtual void
-  vector_gradient(
-    const Point<dim> &                            p,
-    std::vector<Tensor<1, dim, RangeNumberType>> &gradients) const;
+  vector_gradient(const Point<dim> &                            p,
+                  std::vector<Tensor<1, dim, RangeNumberType>> &gradients) const;
 
   /**
    * Set <tt>gradients</tt> to the gradients of the specified component of the
@@ -279,7 +277,7 @@ public:
   virtual void
   gradient_list(const std::vector<Point<dim>> &               points,
                 std::vector<Tensor<1, dim, RangeNumberType>> &gradients,
-                const unsigned int component = 0) const;
+                const unsigned int                            component = 0) const;
 
   /**
    * For each component of the function, fill a vector of gradient values, one
@@ -290,9 +288,8 @@ public:
    * can be reimplemented in derived classes to speed up performance.
    */
   virtual void
-  vector_gradients(
-    const std::vector<Point<dim>> &                            points,
-    std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const;
+  vector_gradients(const std::vector<Point<dim>> &                            points,
+                   std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const;
 
   /**
    * Set <tt>gradients</tt> to the gradients of the function at the
@@ -304,9 +301,8 @@ public:
    * the inner loop over the different components of the function.
    */
   virtual void
-  vector_gradient_list(
-    const std::vector<Point<dim>> &                            points,
-    std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const;
+  vector_gradient_list(const std::vector<Point<dim>> &                            points,
+                       std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const;
 
   /**
    * Compute the Laplacian of a given component at point <tt>p</tt>.
@@ -348,9 +344,8 @@ public:
    * in <tt>values</tt>.
    */
   virtual void
-  vector_hessian(
-    const Point<dim> &                                     p,
-    std::vector<SymmetricTensor<2, dim, RangeNumberType>> &values) const;
+  vector_hessian(const Point<dim> &                                     p,
+                 std::vector<SymmetricTensor<2, dim, RangeNumberType>> &values) const;
 
   /**
    * Compute the Hessian of one component at a set of points.
@@ -358,7 +353,7 @@ public:
   virtual void
   hessian_list(const std::vector<Point<dim>> &                        points,
                std::vector<SymmetricTensor<2, dim, RangeNumberType>> &values,
-               const unsigned int component = 0) const;
+               const unsigned int                                     component = 0) const;
 
   /**
    * Compute the Hessians of all components at a set of points.
@@ -366,8 +361,7 @@ public:
   virtual void
   vector_hessian_list(
     const std::vector<Point<dim>> &                                     points,
-    std::vector<std::vector<SymmetricTensor<2, dim, RangeNumberType>>> &values)
-    const;
+    std::vector<std::vector<SymmetricTensor<2, dim, RangeNumberType>>> &values) const;
 
 
   /**
@@ -397,8 +391,7 @@ namespace Functions
      * Constructor; set values of all components to the provided one. The
      * default number of components is one.
      */
-    ConstantFunction(const RangeNumberType value,
-                     const unsigned int    n_components = 1);
+    ConstantFunction(const RangeNumberType value, const unsigned int n_components = 1);
 
     /**
      * Constructor; takes an <tt>std::vector<RangeNumberType></tt> object as an
@@ -418,15 +411,13 @@ namespace Functions
      * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
      * to initialize a new object.
      */
-    ConstantFunction(const RangeNumberType *begin_ptr,
-                     const unsigned int     n_components);
+    ConstantFunction(const RangeNumberType *begin_ptr, const unsigned int n_components);
 
     virtual RangeNumberType
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     virtual void
-    vector_value(const Point<dim> &       p,
-                 Vector<RangeNumberType> &return_value) const override;
+    vector_value(const Point<dim> &p, Vector<RangeNumberType> &return_value) const override;
 
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -434,29 +425,25 @@ namespace Functions
                const unsigned int             component = 0) const override;
 
     virtual void
-    vector_value_list(
-      const std::vector<Point<dim>> &       points,
-      std::vector<Vector<RangeNumberType>> &return_values) const override;
+    vector_value_list(const std::vector<Point<dim>> &       points,
+                      std::vector<Vector<RangeNumberType>> &return_values) const override;
 
     virtual Tensor<1, dim, RangeNumberType>
-    gradient(const Point<dim> & p,
-             const unsigned int component = 0) const override;
+    gradient(const Point<dim> &p, const unsigned int component = 0) const override;
 
     virtual void
-    vector_gradient(
-      const Point<dim> &                            p,
-      std::vector<Tensor<1, dim, RangeNumberType>> &gradients) const override;
+    vector_gradient(const Point<dim> &                            p,
+                    std::vector<Tensor<1, dim, RangeNumberType>> &gradients) const override;
 
     virtual void
     gradient_list(const std::vector<Point<dim>> &               points,
                   std::vector<Tensor<1, dim, RangeNumberType>> &gradients,
-                  const unsigned int component = 0) const override;
+                  const unsigned int                            component = 0) const override;
 
     virtual void
     vector_gradient_list(
       const std::vector<Point<dim>> &                            points,
-      std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients)
-      const override;
+      std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const override;
 
     std::size_t
     memory_consumption() const;
@@ -501,8 +488,7 @@ namespace Functions
  * @deprecated use Functions::ConstantFunction instead.
  */
 template <int dim, typename RangeNumberType = double>
-using ConstantFunction DEAL_II_DEPRECATED =
-  Functions::ConstantFunction<dim, RangeNumberType>;
+using ConstantFunction DEAL_II_DEPRECATED = Functions::ConstantFunction<dim, RangeNumberType>;
 
 /**
  * Provide a function which always returns zero.
@@ -510,8 +496,7 @@ using ConstantFunction DEAL_II_DEPRECATED =
  * @deprecated use Functions::ZeroFunction instead.
  */
 template <int dim, typename RangeNumberType = double>
-using ZeroFunction DEAL_II_DEPRECATED =
-  Functions::ZeroFunction<dim, RangeNumberType>;
+using ZeroFunction DEAL_II_DEPRECATED = Functions::ZeroFunction<dim, RangeNumberType>;
 
 
 
@@ -546,8 +531,7 @@ public:
    * Constructor. As before, but the value for the selected component is
    * assumed to be one. In essence, this function then works as a mask.
    */
-  ComponentSelectFunction(const unsigned int selected,
-                          const unsigned int n_components);
+  ComponentSelectFunction(const unsigned int selected, const unsigned int n_components);
 
   /**
    * Constructor if multiple components shall have non-zero, unit values (i.e.
@@ -557,7 +541,7 @@ public:
    * number of vector components.
    */
   ComponentSelectFunction(const std::pair<unsigned int, unsigned int> &selected,
-                          const unsigned int n_components);
+                          const unsigned int                           n_components);
 
 
   /**
@@ -574,15 +558,13 @@ public:
    * calling object.
    */
   virtual void
-  substitute_function_value_with(
-    const Functions::ConstantFunction<dim, RangeNumberType> &f);
+  substitute_function_value_with(const Functions::ConstantFunction<dim, RangeNumberType> &f);
 
   /**
    * Return the value of the function at the given point for all components.
    */
   virtual void
-  vector_value(const Point<dim> &       p,
-               Vector<RangeNumberType> &return_value) const override;
+  vector_value(const Point<dim> &p, Vector<RangeNumberType> &return_value) const override;
 
   /**
    * Set <tt>values</tt> to the point values of the function at the
@@ -591,9 +573,8 @@ public:
    * array.
    */
   virtual void
-  vector_value_list(
-    const std::vector<Point<dim>> &       points,
-    std::vector<Vector<RangeNumberType>> &values) const override;
+  vector_value_list(const std::vector<Point<dim>> &       points,
+                    std::vector<Vector<RangeNumberType>> &values) const override;
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
@@ -755,8 +736,7 @@ private:
  * @author Wolfgang Bangerth, 2011
  */
 template <int dim, typename RangeNumberType = double>
-class VectorFunctionFromScalarFunctionObject
-  : public Function<dim, RangeNumberType>
+class VectorFunctionFromScalarFunctionObject : public Function<dim, RangeNumberType>
 {
 public:
   /**
@@ -773,8 +753,8 @@ public:
    */
   VectorFunctionFromScalarFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object,
-    const unsigned int selected_component,
-    const unsigned int n_components);
+    const unsigned int                                        selected_component,
+    const unsigned int                                        n_components);
 
   /**
    * Return the value of the function at the given point. Returns the value
@@ -789,8 +769,7 @@ public:
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
   virtual void
-  vector_value(const Point<dim> &       p,
-               Vector<RangeNumberType> &values) const override;
+  vector_value(const Point<dim> &p, Vector<RangeNumberType> &values) const override;
 
 private:
   /**
@@ -862,10 +841,9 @@ public:
    * the first argument.  This should be such that the entire tensor_function
    * fits inside the <tt>n_component</tt> length return vector.
    */
-  VectorFunctionFromTensorFunction(
-    const TensorFunction<1, dim, RangeNumberType> &tensor_function,
-    const unsigned int                             selected_component = 0,
-    const unsigned int                             n_components       = dim);
+  VectorFunctionFromTensorFunction(const TensorFunction<1, dim, RangeNumberType> &tensor_function,
+                                   const unsigned int selected_component = 0,
+                                   const unsigned int n_components       = dim);
 
   /**
    * This destructor is defined as virtual so as to coincide with all other
@@ -885,8 +863,7 @@ public:
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
   virtual void
-  vector_value(const Point<dim> &       p,
-               Vector<RangeNumberType> &values) const override;
+  vector_value(const Point<dim> &p, Vector<RangeNumberType> &values) const override;
 
   /**
    * Return all components of a vector-valued function at a list of points.
@@ -896,9 +873,8 @@ public:
    * function
    */
   virtual void
-  vector_value_list(
-    const std::vector<Point<dim>> &       points,
-    std::vector<Vector<RangeNumberType>> &value_list) const override;
+  vector_value_list(const std::vector<Point<dim>> &       points,
+                    std::vector<Vector<RangeNumberType>> &value_list) const override;
 
 private:
   /**

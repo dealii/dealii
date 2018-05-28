@@ -70,16 +70,14 @@ void make_grid(Triangulation<2> &triangulation)
 {
   const Point<2> center(1, 0);
   const double   inner_radius = 0.5, outer_radius = 1.0;
-  GridGenerator::hyper_shell(
-    triangulation, center, inner_radius, outer_radius, 5);
+  GridGenerator::hyper_shell(triangulation, center, inner_radius, outer_radius, 5);
 
   for (unsigned int step = 0; step < 3; ++step)
     {
       for (auto cell : triangulation.active_cell_iterators())
         for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
           {
-            const double distance_from_center =
-              center.distance(cell->vertex(v));
+            const double distance_from_center = center.distance(cell->vertex(v));
 
             if (std::fabs(distance_from_center - inner_radius) < 1e-10)
               {
@@ -169,8 +167,7 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   // to initialize this intermediate data structure, we have to give it the
   // size of the matrix, which in our case will be square with as many rows
   // and columns as there are degrees of freedom on the grid:
-  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
-                                                  dof_handler.n_dofs());
+  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(), dof_handler.n_dofs());
 
   // We then fill this object with the places where nonzero elements will be
   // located given the present numbering of degrees of freedom:
@@ -232,8 +229,7 @@ void renumber_dofs(DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee(dof_handler);
 
-  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
-                                                  dof_handler.n_dofs());
+  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(), dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, dynamic_sparsity_pattern);
 
   SparsityPattern sparsity_pattern;

@@ -342,8 +342,7 @@ namespace MeshWorker
      */
     template <typename MatrixType>
     void
-    initialize_matrices(const MatrixBlockVector<MatrixType> &matrices,
-                        bool                                 both);
+    initialize_matrices(const MatrixBlockVector<MatrixType> &matrices, bool both);
 
     /**
      * Allocate a local matrix for each of the global level objects in @p
@@ -354,8 +353,7 @@ namespace MeshWorker
      */
     template <typename MatrixType>
     void
-    initialize_matrices(const MGMatrixBlockVector<MatrixType> &matrices,
-                        bool                                   both);
+    initialize_matrices(const MGMatrixBlockVector<MatrixType> &matrices, bool both);
 
     /**
      * Initialize quadrature values to <tt>nv</tt> values in <tt>np</tt>
@@ -435,9 +433,8 @@ namespace MeshWorker
   template <typename number>
   template <typename MatrixType>
   inline void
-  LocalResults<number>::initialize_matrices(
-    const MatrixBlockVector<MatrixType> &matrices,
-    bool                                 both)
+  LocalResults<number>::initialize_matrices(const MatrixBlockVector<MatrixType> &matrices,
+                                            bool                                 both)
   {
     M1.resize(matrices.size());
     if (both)
@@ -461,18 +458,17 @@ namespace MeshWorker
   template <typename number>
   template <typename MatrixType>
   inline void
-  LocalResults<number>::initialize_matrices(
-    const MGMatrixBlockVector<MatrixType> &matrices,
-    bool                                   both)
+  LocalResults<number>::initialize_matrices(const MGMatrixBlockVector<MatrixType> &matrices,
+                                            bool                                   both)
   {
     M1.resize(matrices.size());
     if (both)
       M2.resize(matrices.size());
     for (unsigned int i = 0; i < matrices.size(); ++i)
       {
-        const MGLevelObject<MatrixBlock<MatrixType>> &o = matrices.block(i);
-        const unsigned int row                          = o[o.min_level()].row;
-        const unsigned int col = o[o.min_level()].column;
+        const MGLevelObject<MatrixBlock<MatrixType>> &o   = matrices.block(i);
+        const unsigned int                            row = o[o.min_level()].row;
+        const unsigned int                            col = o[o.min_level()].column;
 
         M1[i].row    = row;
         M1[i].column = col;
@@ -487,8 +483,7 @@ namespace MeshWorker
 
   template <typename number>
   inline void
-  LocalResults<number>::initialize_matrices(const unsigned int n,
-                                            const bool         both)
+  LocalResults<number>::initialize_matrices(const unsigned int n, const bool both)
   {
     M1.resize(n);
     if (both)
@@ -659,11 +654,11 @@ namespace MeshWorker
     os << "M: " << M1.size() << " face " << M2.size() << std::endl;
     for (unsigned int i = 0; i < M1.size(); ++i)
       {
-        os << "  " << M1[i].row << "," << M1[i].column << " "
-           << M1[i].matrix.m() << 'x' << M1[i].matrix.n();
+        os << "  " << M1[i].row << "," << M1[i].column << " " << M1[i].matrix.m() << 'x'
+           << M1[i].matrix.n();
         if (i < M2.size())
-          os << " face " << M2[i].row << "," << M2[i].column << " "
-             << M2[i].matrix.m() << 'x' << M2[i].matrix.n();
+          os << " face " << M2[i].row << "," << M2[i].column << " " << M2[i].matrix.m() << 'x'
+             << M2[i].matrix.n();
         os << std::endl;
       }
   }

@@ -33,7 +33,7 @@ main()
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  TopoDS_Shape sh = read_STEP(SOURCE_DIR "/step_files/goteborg.step");
+  TopoDS_Shape               sh = read_STEP(SOURCE_DIR "/step_files/goteborg.step");
   std::vector<TopoDS_Face>   faces;
   std::vector<TopoDS_Edge>   edges;
   std::vector<TopoDS_Vertex> vertices;
@@ -45,8 +45,8 @@ main()
   unsigned int                                         ne = std::get<1>(n);
   unsigned int                                         nv = std::get<2>(n);
 
-  deallog << "Shape contains " << std::get<0>(n) << " faces, " << std::get<1>(n)
-          << " edges, and " << std::get<2>(n) << " vertices." << std::endl;
+  deallog << "Shape contains " << std::get<0>(n) << " faces, " << std::get<1>(n) << " edges, and "
+          << std::get<2>(n) << " vertices." << std::endl;
 
   if (nf != faces.size())
     deallog << "Error!" << std::endl;

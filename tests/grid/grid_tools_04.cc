@@ -44,8 +44,8 @@ test1()
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "hypercube volume, " << i * 2
-                  << " refinements: " << GridTools::volume(tria) << std::endl;
+                  << "hypercube volume, " << i * 2 << " refinements: " << GridTools::volume(tria)
+                  << std::endl;
         };
     };
 }

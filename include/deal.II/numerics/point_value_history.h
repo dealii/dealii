@@ -59,10 +59,9 @@ namespace internal
     class PointGeometryData
     {
     public:
-      PointGeometryData(
-        const Point<dim> &                          new_requested_location,
-        const std::vector<Point<dim>> &             new_locations,
-        const std::vector<types::global_dof_index> &new_sol_indices);
+      PointGeometryData(const Point<dim> &                          new_requested_location,
+                        const std::vector<Point<dim>> &             new_locations,
+                        const std::vector<types::global_dof_index> &new_sol_indices);
       Point<dim>                           requested_location;
       std::vector<Point<dim>>              support_point_locations;
       std::vector<types::global_dof_index> solution_indices;
@@ -301,8 +300,7 @@ public:
    * function.
    */
   void
-  add_field_name(const std::string &vector_name,
-                 const unsigned int n_components);
+  add_field_name(const std::string &vector_name, const unsigned int n_components);
 
   /**
    * Provide optional names for each component of a field. These names will be
@@ -385,8 +383,7 @@ public:
    */
   template <class VectorType>
   void
-  evaluate_field_at_requested_location(const std::string &name,
-                                       const VectorType & solution);
+  evaluate_field_at_requested_location(const std::string &name, const VectorType &solution);
 
 
   /**
@@ -430,8 +427,7 @@ public:
    */
   void
   write_gnuplot(const std::string &            base_name,
-                const std::vector<Point<dim>> &postprocessor_locations =
-                  std::vector<Point<dim>>());
+                const std::vector<Point<dim>> &postprocessor_locations = std::vector<Point<dim>>());
 
 
   /**
@@ -550,35 +546,32 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcDataLostSync,
-    "This error is thrown to indicate that the data sets appear to be out of "
-    "sync. The class requires that the number of dataset keys is the same as "
-    "the number of independent values sets and mesh linked value sets. The "
-    "number of each of these is allowed to differ by one to allow new values "
-    "to be added with out restricting the order the user choses to do so. "
-    "Special cases of no FHandler and no independent values should not "
-    "trigger this error.");
+  DeclExceptionMsg(ExcDataLostSync,
+                   "This error is thrown to indicate that the data sets appear to be out of "
+                   "sync. The class requires that the number of dataset keys is the same as "
+                   "the number of independent values sets and mesh linked value sets. The "
+                   "number of each of these is allowed to differ by one to allow new values "
+                   "to be added with out restricting the order the user choses to do so. "
+                   "Special cases of no FHandler and no independent values should not "
+                   "trigger this error.");
 
 
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcDoFHandlerRequired,
-    "A method which requires access to a @p DoFHandler to be meaningful has "
-    "been called when have_dof_handler is false (most likely due to default "
-    "constructor being called). Only independent variables may be logged with "
-    "no DoFHandler.");
+  DeclExceptionMsg(ExcDoFHandlerRequired,
+                   "A method which requires access to a @p DoFHandler to be meaningful has "
+                   "been called when have_dof_handler is false (most likely due to default "
+                   "constructor being called). Only independent variables may be logged with "
+                   "no DoFHandler.");
 
   /**
    * Exception
    */
-  DeclExceptionMsg(
-    ExcDoFHandlerChanged,
-    "The triangulation has been refined or coarsened in some way. This "
-    "suggests that the internal DoF indices stored by the current "
-    "object are no longer meaningful.");
+  DeclExceptionMsg(ExcDoFHandlerChanged,
+                   "The triangulation has been refined or coarsened in some way. This "
+                   "suggests that the internal DoF indices stored by the current "
+                   "object are no longer meaningful.");
 
 private:
   /**

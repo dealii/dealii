@@ -62,8 +62,7 @@ dofs(const DoFHandler<dim> &dof)
           typename DoFHandler<dim>::face_iterator face = cell->face(f);
           face->get_mg_dof_indices(cell->level(), indices);
 
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;
-               ++i)
+          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
             deallog << " v" << face->vertex(i);
           deallog << " dofs ";
           for (unsigned int i = 0; i < indices.size(); ++i)

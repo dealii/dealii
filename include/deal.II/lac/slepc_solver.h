@@ -285,8 +285,8 @@ namespace SLEPcWrappers
     DeclException2(ExcSLEPcEigenvectorConvergenceMismatchError,
                    int,
                    int,
-                   << "    The number of converged eigenvectors is " << arg1
-                   << " but " << arg2 << " were requested. ");
+                   << "    The number of converged eigenvectors is " << arg1 << " but " << arg2
+                   << " were requested. ");
 
     /**
      * Access to the object that controls convergence.
@@ -349,8 +349,7 @@ namespace SLEPcWrappers
      * x=\lambda B x$.
      */
     void
-    set_matrices(const PETScWrappers::MatrixBase &A,
-                 const PETScWrappers::MatrixBase &B);
+    set_matrices(const PETScWrappers::MatrixBase &A, const PETScWrappers::MatrixBase &B);
 
   protected:
     /**
@@ -405,7 +404,7 @@ namespace SLEPcWrappers
      */
     SolverKrylovSchur(SolverControl &       cn,
                       const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
-                      const AdditionalData &data = AdditionalData());
+                      const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -485,8 +484,7 @@ namespace SLEPcWrappers
        * Constructor. By default sets the type of reorthogonalization used
        * during the Lanczos iteration to full.
        */
-      AdditionalData(
-        const EPSLanczosReorthogType r = EPS_LANCZOS_REORTHOG_FULL);
+      AdditionalData(const EPSLanczosReorthogType r = EPS_LANCZOS_REORTHOG_FULL);
     };
 
     /**
@@ -572,10 +570,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behaviour as the PETScWrappers, but you can change that.
      */
-    SolverGeneralizedDavidson(
-      SolverControl &       cn,
-      const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
-      const AdditionalData &data             = AdditionalData());
+    SolverGeneralizedDavidson(SolverControl &       cn,
+                              const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                              const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -607,9 +604,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behaviour as the PETScWrappers, but you can change that.
      */
-    SolverJacobiDavidson(SolverControl & cn,
-                         const MPI_Comm &mpi_communicator = PETSC_COMM_SELF,
-                         const AdditionalData &data       = AdditionalData());
+    SolverJacobiDavidson(SolverControl &       cn,
+                         const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                         const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -669,8 +666,7 @@ namespace SLEPcWrappers
                     const unsigned int               n_eigenpairs)
   {
     // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
-                ExcSLEPcWrappersUsageError());
+    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()), ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices(A);
@@ -681,9 +677,8 @@ namespace SLEPcWrappers
 
     if (n_converged > n_eigenpairs)
       n_converged = n_eigenpairs;
-    AssertThrow(
-      n_converged == n_eigenpairs,
-      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    AssertThrow(n_converged == n_eigenpairs,
+                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
 
     AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
     eigenvectors.resize(n_converged, eigenvectors.front());
@@ -706,8 +701,7 @@ namespace SLEPcWrappers
     AssertThrow(A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
 
     // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
-                ExcSLEPcWrappersUsageError());
+    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()), ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices(A, B);
@@ -719,9 +713,8 @@ namespace SLEPcWrappers
     if (n_converged >= n_eigenpairs)
       n_converged = n_eigenpairs;
 
-    AssertThrow(
-      n_converged == n_eigenpairs,
-      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    AssertThrow(n_converged == n_eigenpairs,
+                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
     AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
 
     eigenvectors.resize(n_converged, eigenvectors.front());
@@ -746,16 +739,13 @@ namespace SLEPcWrappers
     AssertThrow(A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
 
     // and incompatible eigenvalue/eigenvector sizes
-    AssertThrow(
-      real_eigenvalues.size() == imag_eigenvalues.size(),
-      ExcDimensionMismatch(real_eigenvalues.size(), imag_eigenvalues.size()));
-    AssertThrow(
-      real_eigenvectors.size() == imag_eigenvectors.size(),
-      ExcDimensionMismatch(real_eigenvectors.size(), imag_eigenvectors.size()));
+    AssertThrow(real_eigenvalues.size() == imag_eigenvalues.size(),
+                ExcDimensionMismatch(real_eigenvalues.size(), imag_eigenvalues.size()));
+    AssertThrow(real_eigenvectors.size() == imag_eigenvectors.size(),
+                ExcDimensionMismatch(real_eigenvectors.size(), imag_eigenvectors.size()));
 
     // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
-                ExcSLEPcWrappersUsageError());
+    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()), ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices(A, B);
@@ -767,11 +757,9 @@ namespace SLEPcWrappers
     if (n_converged >= n_eigenpairs)
       n_converged = n_eigenpairs;
 
-    AssertThrow(
-      n_converged == n_eigenpairs,
-      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
-    AssertThrow((real_eigenvectors.size() != 0) &&
-                  (imag_eigenvectors.size() != 0),
+    AssertThrow(n_converged == n_eigenpairs,
+                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    AssertThrow((real_eigenvectors.size() != 0) && (imag_eigenvectors.size() != 0),
                 ExcSLEPcWrappersUsageError());
 
     real_eigenvectors.resize(n_converged, real_eigenvectors.front());
@@ -806,8 +794,7 @@ namespace SLEPcWrappers
     // guesses, by taking a linear combination of them. (TODO: make function
     // virtual?)
 
-    const PetscErrorCode ierr =
-      EPSSetInitialSpace(eps, vecs.size(), vecs.data());
+    const PetscErrorCode ierr = EPSSetInitialSpace(eps, vecs.size(), vecs.data());
     AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 

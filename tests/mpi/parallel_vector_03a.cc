@@ -29,8 +29,7 @@
 #include "../tests.h"
 
 void
-check(const unsigned int                                myid,
-      const LinearAlgebra::distributed::Vector<double> &v)
+check(const unsigned int myid, const LinearAlgebra::distributed::Vector<double> &v)
 {
   if (myid == 0)
     {
@@ -79,8 +78,7 @@ test()
       local_relevant.add_range(4, 7);
     }
 
-  LinearAlgebra::distributed::Vector<double> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
   v = 0.;
 
   // set local values
@@ -111,8 +109,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, testing_max_num_threads());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
