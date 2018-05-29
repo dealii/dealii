@@ -403,7 +403,143 @@ namespace GridTools
               }
         }
     }
+
+
+
+    template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+    std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+              Point<dim>>
+#else
+    std::pair<
+      typename dealii::internal::
+        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
+      Point<dim>>
+#endif
+    find_active_cell_around_point_tolerance(
+      const Mapping<dim, spacedim> & mapping,
+      const MeshType<dim, spacedim> &mesh,
+      const Point<spacedim> &        p,
+      const std::vector<bool> &      marked_vertices,
+      const double                   tolerance)
+    {
+      typedef typename dealii::internal::
+        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
+          active_cell_iterator;
+
+      // The best distance is set to the
+      // maximum allowable distance from
+      // the unit cell; we assume a
+      // max. deviation of the given tolerance
+      double                                      best_distance = tolerance;
+      int                                         best_level    = -1;
+      std::pair<active_cell_iterator, Point<dim>> best_cell;
+
+      // Find closest vertex and determine
+      // all adjacent cells
+      std::vector<active_cell_iterator> adjacent_cells_tmp =
+        find_cells_adjacent_to_vertex(
+          mesh, find_closest_vertex(mapping, mesh, p, marked_vertices));
+
+      // Make sure that we have found
+      // at least one cell adjacent to vertex.
+      Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
+
+      // Copy all the cells into a std::set
+      std::set<active_cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
+                                                    adjacent_cells_tmp.end());
+      std::set<active_cell_iterator> searched_cells;
+
+      // Determine the maximal number of cells
+      // in the grid.
+      // As long as we have not found
+      // the cell and have not searched
+      // every cell in the triangulation,
+      // we keep on looking.
+      const unsigned int n_active_cells =
+        mesh.get_triangulation().n_active_cells();
+      bool         found          = false;
+      unsigned int cells_searched = 0;
+      while (!found && cells_searched < n_active_cells)
+        {
+          typename std::set<active_cell_iterator>::const_iterator
+            cell = adjacent_cells.begin(),
+            endc = adjacent_cells.end();
+          for (; cell != endc; ++cell)
+            {
+              try
+                {
+                  const Point<dim> p_cell =
+                    mapping.transform_real_to_unit_cell(*cell, p);
+
+                  // calculate the infinity norm of
+                  // the distance vector to the unit cell.
+                  const double dist =
+                    GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+                  // We compare if the point is inside the
+                  // unit cell (or at least not too far
+                  // outside). If it is, it is also checked
+                  // that the cell has a more refined state
+                  if ((dist < best_distance) ||
+                      ((dist == best_distance) &&
+                       ((*cell)->level() > best_level)))
+                    {
+                      found         = true;
+                      best_distance = dist;
+                      best_level    = (*cell)->level();
+                      best_cell     = std::make_pair(*cell, p_cell);
+                    }
+                }
+              catch (
+                typename MappingQGeneric<dim, spacedim>::ExcTransformationFailed
+                  &)
+                {
+                  // ok, the transformation
+                  // failed presumably
+                  // because the point we
+                  // are looking for lies
+                  // outside the current
+                  // cell. this means that
+                  // the current cell can't
+                  // be the cell around the
+                  // point, so just ignore
+                  // this cell and move on
+                  // to the next
+                }
+            }
+
+          // update the number of cells searched
+          cells_searched += adjacent_cells.size();
+
+          // if the user provided a custom mask for vertices,
+          // terminate the search without trying to expand the search
+          // to all cells of the triangulation, as done below.
+          if (marked_vertices.size() > 0)
+            cells_searched = n_active_cells;
+
+          // if we have not found the cell in
+          // question and have not yet searched every
+          // cell, we expand our search to
+          // all the not already searched neighbors of
+          // the cells in adjacent_cells. This is
+          // what find_active_cell_around_point_internal
+          // is for.
+          if (!found && cells_searched < n_active_cells)
+            {
+              find_active_cell_around_point_internal<dim, MeshType, spacedim>(
+                mesh, searched_cells, adjacent_cells);
+            }
+        }
+
+      AssertThrow(best_cell.first.state() == IteratorState::valid,
+                  ExcPointNotFound<spacedim>(p));
+
+      return best_cell;
+    }
   } // namespace
+
+
 
   template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
@@ -422,6 +558,7 @@ namespace GridTools
   }
 
 
+
   template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
   std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim>>
@@ -435,118 +572,164 @@ namespace GridTools
                                 const Point<spacedim> &        p,
                                 const std::vector<bool> &      marked_vertices)
   {
-    typedef typename dealii::internal::
-      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
-        active_cell_iterator;
+    return find_active_cell_around_point_tolerance(
+      mapping, mesh, p, marked_vertices, 1e-10);
+  }
 
-    // The best distance is set to the
-    // maximum allowable distance from
-    // the unit cell; we assume a
-    // max. deviation of 1e-10
-    double                                      best_distance = 1e-10;
-    int                                         best_level    = -1;
-    std::pair<active_cell_iterator, Point<dim>> best_cell;
 
-    // Find closest vertex and determine
-    // all adjacent cells
-    std::vector<active_cell_iterator> adjacent_cells_tmp =
-      find_cells_adjacent_to_vertex(
-        mesh, find_closest_vertex(mapping, mesh, p, marked_vertices));
 
-    // Make sure that we have found
-    // at least one cell adjacent to vertex.
-    Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
-
-    // Copy all the cells into a std::set
-    std::set<active_cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
-                                                  adjacent_cells_tmp.end());
-    std::set<active_cell_iterator> searched_cells;
-
-    // Determine the maximal number of cells
-    // in the grid.
-    // As long as we have not found
-    // the cell and have not searched
-    // every cell in the triangulation,
-    // we keep on looking.
-    const unsigned int n_active_cells =
-      mesh.get_triangulation().n_active_cells();
-    bool         found          = false;
-    unsigned int cells_searched = 0;
-    while (!found && cells_searched < n_active_cells)
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+  std::vector<std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                        Point<dim>>>
+#else
+  std::vector<std::pair<
+    typename dealii::internal::
+      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
+    Point<dim>>>
+#endif
+  find_all_active_cells_around_point(const Mapping<dim, spacedim> & mapping,
+                                     const MeshType<dim, spacedim> &mesh,
+                                     const Point<spacedim> &        p,
+                                     const double                   tolerance,
+                                     const std::vector<bool> &marked_vertices)
+  {
+    // first use the result of the single point function as a guess. In order
+    // not to make the other find_all_active_cells_around_point more expensive
+    // and avoid some additional logic there, we first start with one cell as
+    // given by that other function (that possibly goes through a larger set
+    // of cells) and later add a list of more cells as appropriate.
+    std::vector<
+      std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                Point<dim>>>
+      cells_and_points;
+    try
       {
-        typename std::set<active_cell_iterator>::const_iterator
-          cell = adjacent_cells.begin(),
-          endc = adjacent_cells.end();
-        for (; cell != endc; ++cell)
+        cells_and_points.push_back(find_active_cell_around_point_tolerance(
+          mapping, mesh, p, marked_vertices, tolerance));
+      }
+    catch (ExcPointNotFound<spacedim> &)
+      {}
+
+    if (!cells_and_points.empty())
+      {
+        // check if the given point is on the surface of the unit cell. if yes,
+        // need to find all neighbors
+        const Point<dim> unit_point = cells_and_points.front().second;
+        const auto       my_cell    = cells_and_points.front().first;
+        Tensor<1, dim>   distance_to_center;
+        unsigned int     n_dirs_at_threshold = 0;
+        unsigned int last_point_at_threshold = numbers::invalid_unsigned_int;
+        for (unsigned int d = 0; d < dim; ++d)
           {
-            try
+            distance_to_center[d] = std::abs(unit_point[d] - 0.5);
+            if (distance_to_center[d] > 0.5 - tolerance)
               {
-                const Point<dim> p_cell =
-                  mapping.transform_real_to_unit_cell(*cell, p);
+                ++n_dirs_at_threshold;
+                last_point_at_threshold = d;
+              }
+          }
 
-                // calculate the infinity norm of
-                // the distance vector to the unit cell.
-                const double dist =
-                  GeometryInfo<dim>::distance_to_unit_cell(p_cell);
-
-                // We compare if the point is inside the
-                // unit cell (or at least not too far
-                // outside). If it is, it is also checked
-                // that the cell has a more refined state
-                if ((dist < best_distance) || ((dist == best_distance) &&
-                                               ((*cell)->level() > best_level)))
+        std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
+          cells_to_add;
+        // point is within face -> only need neighbor
+        if (n_dirs_at_threshold == 1)
+          {
+            unsigned int neighbor_index =
+              2 * last_point_at_threshold +
+              (unit_point[last_point_at_threshold] > 0.5 ? 1 : 0);
+            if (!my_cell->at_boundary(neighbor_index))
+              cells_to_add.push_back(my_cell->neighbor(neighbor_index));
+          }
+        // corner point -> use all neighbors
+        else if (n_dirs_at_threshold == dim)
+          {
+            unsigned int local_vertex_index = 0;
+            for (unsigned int d = 0; d < dim; ++d)
+              local_vertex_index += (unit_point[d] > 0.5 ? 1 : 0) << d;
+            std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
+              cells = find_cells_adjacent_to_vertex(
+                mesh, my_cell->vertex_index(local_vertex_index));
+            for (auto cell : cells)
+              if (cell != my_cell)
+                cells_to_add.push_back(cell);
+          }
+        // point on line in 3D: We cannot simply take the intersection between
+        // the two vertices of cels because of hanging nodes. So instead we
+        // list the vertices around both points and then select the
+        // appropriate cells according to the result of read_to_unit_cell
+        // below.
+        else if (n_dirs_at_threshold == 2)
+          {
+            std::pair<unsigned int, unsigned int> vertex_indices[3];
+            unsigned int                          count_vertex_indices = 0;
+            unsigned int free_direction = numbers::invalid_unsigned_int;
+            for (unsigned int d = 0; d < dim; ++d)
+              {
+                if (distance_to_center[d] > 0.5 - tolerance)
                   {
-                    found         = true;
-                    best_distance = dist;
-                    best_level    = (*cell)->level();
-                    best_cell     = std::make_pair(*cell, p_cell);
+                    vertex_indices[count_vertex_indices].first = d;
+                    vertex_indices[count_vertex_indices].second =
+                      unit_point[d] > 0.5 ? 1 : 0;
+                    count_vertex_indices++;
+                  }
+                else
+                  free_direction = d;
+              }
+
+            AssertDimension(count_vertex_indices, 2);
+            Assert(free_direction != numbers::invalid_unsigned_int,
+                   ExcInternalError());
+
+            const unsigned int first_vertex =
+              (vertex_indices[0].second << vertex_indices[0].first) +
+              (vertex_indices[1].second << vertex_indices[1].first);
+            for (unsigned int d = 0; d < 2; ++d)
+              {
+                auto tentative_cells = find_cells_adjacent_to_vertex(
+                  mesh,
+                  my_cell->vertex_index(first_vertex + (d << free_direction)));
+                for (auto cell : tentative_cells)
+                  {
+                    bool cell_not_yet_present = true;
+                    for (auto other_cell : cells_to_add)
+                      if (cell == other_cell)
+                        {
+                          cell_not_yet_present = false;
+                          break;
+                        }
+                    if (cell_not_yet_present)
+                      cells_to_add.push_back(cell);
                   }
               }
-            catch (
-              typename MappingQGeneric<dim, spacedim>::ExcTransformationFailed
-                &)
-              {
-                // ok, the transformation
-                // failed presumably
-                // because the point we
-                // are looking for lies
-                // outside the current
-                // cell. this means that
-                // the current cell can't
-                // be the cell around the
-                // point, so just ignore
-                // this cell and move on
-                // to the next
-              }
           }
 
-        // update the number of cells searched
-        cells_searched += adjacent_cells.size();
-
-        // if the user provided a custom mask for vertices,
-        // terminate the search without trying to expand the search
-        // to all cells of the triangulation, as done below.
-        if (marked_vertices.size() > 0)
-          cells_searched = n_active_cells;
-
-        // if we have not found the cell in
-        // question and have not yet searched every
-        // cell, we expand our search to
-        // all the not already searched neighbors of
-        // the cells in adjacent_cells. This is
-        // what find_active_cell_around_point_internal
-        // is for.
-        if (!found && cells_searched < n_active_cells)
+        const double original_distance_to_unit_cell =
+          GeometryInfo<dim>::distance_to_unit_cell(unit_point);
+        for (auto cell : cells_to_add)
           {
-            find_active_cell_around_point_internal<dim, MeshType, spacedim>(
-              mesh, searched_cells, adjacent_cells);
+            if (cell != my_cell)
+              try
+                {
+                  const Point<dim> p_unit =
+                    mapping.transform_real_to_unit_cell(cell, p);
+                  if (GeometryInfo<dim>::distance_to_unit_cell(p_unit) <
+                      original_distance_to_unit_cell + tolerance)
+                    cells_and_points.emplace_back(cell, p_unit);
+                }
+              catch (typename Mapping<dim>::ExcTransformationFailed &)
+                {}
           }
       }
+    std::sort(
+      cells_and_points.begin(),
+      cells_and_points.end(),
+      [](const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                         Point<dim>> &a,
+         const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                         Point<dim>> &b) { return a.first < b.first; });
 
-    AssertThrow(best_cell.first.state() == IteratorState::valid,
-                ExcPointNotFound<spacedim>(p));
-
-    return best_cell;
+    return cells_and_points;
   }
 
 
