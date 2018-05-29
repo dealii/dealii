@@ -558,15 +558,187 @@ TimerOutput::print_summary() const
   const std::string extra_dash  = std::string(max_width - 32, '-');
   const std::string extra_space = std::string(max_width - 32, ' ');
 
-  // in case we want to write CPU times
-  if (output_type != wall_times)
+  if (output_type != cpu_and_wall_times_grouped)
     {
-      double total_cpu_time =
+      // in case we want to write CPU times
+      if (output_type != wall_times)
+        {
+          double total_cpu_time =
+            Utilities::MPI::sum(timer_all(), mpi_communicator);
+
+          // check that the sum of all times is less or equal than the total
+          // time. otherwise, we might have generated a lot of overhead in this
+          // function.
+          double check_time = 0.;
+          for (std::map<std::string, Section>::const_iterator i =
+                 sections.begin();
+               i != sections.end();
+               ++i)
+            check_time += i->second.total_cpu_time;
+
+          const double time_gap = check_time - total_cpu_time;
+          if (time_gap > 0.0)
+            total_cpu_time = check_time;
+
+          // generate a nice table
+          out_stream << "\n\n"
+                     << "+---------------------------------------------"
+                     << extra_dash << "+------------"
+                     << "+------------+\n"
+                     << "| Total CPU time elapsed since start          "
+                     << extra_space << "|";
+          out_stream << std::setw(10) << std::setprecision(3) << std::right;
+          out_stream << total_cpu_time << "s |            |\n";
+          out_stream << "|                                             "
+                     << extra_space << "|            "
+                     << "|            |\n";
+          out_stream << "| Section                         " << extra_space
+                     << "| no. calls |";
+          out_stream << std::setw(10);
+          out_stream << std::setprecision(3);
+          out_stream << "  CPU time "
+                     << " | % of total |\n";
+          out_stream << "+---------------------------------" << extra_dash
+                     << "+-----------+------------"
+                     << "+------------+";
+          for (std::map<std::string, Section>::const_iterator i =
+                 sections.begin();
+               i != sections.end();
+               ++i)
+            {
+              std::string name_out = i->first;
+
+              // resize the array so that it is always of the same size
+              unsigned int pos_non_space = name_out.find_first_not_of(' ');
+              name_out.erase(0, pos_non_space);
+              name_out.resize(max_width, ' ');
+              out_stream << std::endl;
+              out_stream << "| " << name_out;
+              out_stream << "| ";
+              out_stream << std::setw(9);
+              out_stream << i->second.n_calls << " |";
+              out_stream << std::setw(10);
+              out_stream << std::setprecision(3);
+              out_stream << i->second.total_cpu_time << "s |";
+              out_stream << std::setw(10);
+              if (total_cpu_time != 0)
+                {
+                  // if run time was less than 0.1%, just print a zero to avoid
+                  // printing silly things such as "2.45e-6%". otherwise print
+                  // the actual percentage
+                  const double fraction =
+                    i->second.total_cpu_time / total_cpu_time;
+                  if (fraction > 0.001)
+                    {
+                      out_stream << std::setprecision(2);
+                      out_stream << fraction * 100;
+                    }
+                  else
+                    out_stream << 0.0;
+
+                  out_stream << "% |";
+                }
+              else
+                out_stream << 0.0 << "% |";
+            }
+          out_stream << std::endl
+                     << "+---------------------------------" << extra_dash
+                     << "+-----------+"
+                     << "------------+------------+\n"
+                     << std::endl;
+
+          if (time_gap > 0.0)
+            out_stream
+              << std::endl
+              << "Note: The sum of counted times is " << time_gap
+              << " seconds larger than the total time.\n"
+              << "(Timer function may have introduced too much overhead, or different\n"
+              << "section timers may have run at the same time.)" << std::endl;
+        }
+
+      // in case we want to write out wallclock times
+      if (output_type != cpu_times)
+        {
+          double total_wall_time = timer_all.wall_time();
+
+          // now generate a nice table
+          out_stream << "\n\n"
+                     << "+---------------------------------------------"
+                     << extra_dash << "+------------"
+                     << "+------------+\n"
+                     << "| Total wallclock time elapsed since start    "
+                     << extra_space << "|";
+          out_stream << std::setw(10) << std::setprecision(3) << std::right;
+          out_stream << total_wall_time << "s |            |\n";
+          out_stream << "|                                             "
+                     << extra_space << "|            "
+                     << "|            |\n";
+          out_stream << "| Section                         " << extra_space
+                     << "| no. calls |";
+          out_stream << std::setw(10);
+          out_stream << std::setprecision(3);
+          out_stream << "  wall time | % of total |\n";
+          out_stream << "+---------------------------------" << extra_dash
+                     << "+-----------+------------"
+                     << "+------------+";
+          for (std::map<std::string, Section>::const_iterator i =
+                 sections.begin();
+               i != sections.end();
+               ++i)
+            {
+              std::string name_out = i->first;
+
+              // resize the array so that it is always of the same size
+              unsigned int pos_non_space = name_out.find_first_not_of(' ');
+              name_out.erase(0, pos_non_space);
+              name_out.resize(max_width, ' ');
+              out_stream << std::endl;
+              out_stream << "| " << name_out;
+              out_stream << "| ";
+              out_stream << std::setw(9);
+              out_stream << i->second.n_calls << " |";
+              out_stream << std::setw(10);
+              out_stream << std::setprecision(3);
+              out_stream << i->second.total_wall_time << "s |";
+              out_stream << std::setw(10);
+
+              if (total_wall_time != 0)
+                {
+                  // if run time was less than 0.1%, just print a zero to avoid
+                  // printing silly things such as "2.45e-6%". otherwise print
+                  // the actual percentage
+                  const double fraction =
+                    i->second.total_wall_time / total_wall_time;
+                  if (fraction > 0.001)
+                    {
+                      out_stream << std::setprecision(2);
+                      out_stream << fraction * 100;
+                    }
+                  else
+                    out_stream << 0.0;
+
+                  out_stream << "% |";
+                }
+              else
+                out_stream << 0.0 << "% |";
+            }
+          out_stream << std::endl
+                     << "+---------------------------------" << extra_dash
+                     << "+-----------+"
+                     << "------------+------------+\n"
+                     << std::endl;
+        }
+    }
+  else
+    {
+      const double total_wall_time = timer_all.wall_time();
+      double       total_cpu_time =
         Utilities::MPI::sum(timer_all(), mpi_communicator);
 
       // check that the sum of all times is less or equal than the total time.
       // otherwise, we might have generated a lot of overhead in this function.
       double check_time = 0.;
+
       for (std::map<std::string, Section>::const_iterator i = sections.begin();
            i != sections.end();
            ++i)
@@ -577,26 +749,66 @@ TimerOutput::print_summary() const
         total_cpu_time = check_time;
 
       // generate a nice table
-      out_stream << "\n\n"
-                 << "+---------------------------------------------"
-                 << extra_dash << "+------------"
-                 << "+------------+\n"
-                 << "| Total CPU time elapsed since start          "
+      out_stream << "\n\n+---------------------------------------------"
+                 << extra_dash << "+";
+
+      if (output_type != wall_times)
+        out_stream << "------------+------------+";
+
+      if (output_type != cpu_times)
+        out_stream << "------------+------------+";
+
+      out_stream << "\n";
+
+      if (output_type == cpu_times)
+        out_stream << "| Total CPU time elapsed since start          ";
+      else if (output_type == wall_times)
+        out_stream << "| Total wallclock time elapsed since start    ";
+      else
+        out_stream << "| Total CPU/wall time elapsed since start     ";
+
+      out_stream << extra_space << "|";
+
+      if (output_type != wall_times)
+        out_stream << std::setw(10) << std::setprecision(3) << std::right
+                   << total_cpu_time << "s |            |";
+
+      if (output_type != cpu_times)
+        out_stream << std::setw(10) << std::setprecision(3) << std::right
+                   << total_wall_time << "s |            |";
+
+      out_stream << "\n|                                             "
                  << extra_space << "|";
-      out_stream << std::setw(10) << std::setprecision(3) << std::right;
-      out_stream << total_cpu_time << "s |            |\n";
-      out_stream << "|                                             "
-                 << extra_space << "|            "
-                 << "|            |\n";
-      out_stream << "| Section                         " << extra_space
+
+      if (output_type != wall_times)
+        out_stream << "            |            |";
+
+      if (output_type != cpu_times)
+        out_stream << "            |            |";
+
+      out_stream << "\n| Section                         " << extra_space
                  << "| no. calls |";
-      out_stream << std::setw(10);
-      out_stream << std::setprecision(3);
-      out_stream << "  CPU time "
-                 << " | % of total |\n";
-      out_stream << "+---------------------------------" << extra_dash
-                 << "+-----------+------------"
-                 << "+------------+";
+
+      // FIXME: do we need this?
+      out_stream << std::setw(10) << std::setprecision(3);
+
+      if (output_type != wall_times)
+        out_stream << "  CPU time  | % of total |";
+
+      if (output_type != cpu_times)
+        out_stream << "  wall time | % of total |";
+
+      out_stream << "\n+---------------------------------" << extra_dash
+                 << "+-----------+";
+
+      if (output_type != wall_times)
+        out_stream << "------------+------------+";
+
+      if (output_type != cpu_times)
+        out_stream << "------------+------------+";
+
+      out_stream << std::endl;
+
       for (std::map<std::string, Section>::const_iterator i = sections.begin();
            i != sections.end();
            ++i)
@@ -607,119 +819,86 @@ TimerOutput::print_summary() const
           unsigned int pos_non_space = name_out.find_first_not_of(' ');
           name_out.erase(0, pos_non_space);
           name_out.resize(max_width, ' ');
-          out_stream << std::endl;
-          out_stream << "| " << name_out;
-          out_stream << "| ";
+          out_stream << "| " << name_out << "| ";
+
           out_stream << std::setw(9);
           out_stream << i->second.n_calls << " |";
-          out_stream << std::setw(10);
-          out_stream << std::setprecision(3);
-          out_stream << i->second.total_cpu_time << "s |";
-          out_stream << std::setw(10);
-          if (total_cpu_time != 0)
+
+          if (output_type != wall_times)
             {
-              // if run time was less than 0.1%, just print a zero to avoid
-              // printing silly things such as "2.45e-6%". otherwise print the
-              // actual percentage
-              const double fraction = i->second.total_cpu_time / total_cpu_time;
-              if (fraction > 0.001)
+              out_stream << std::setw(10);
+              out_stream << std::setprecision(3);
+              out_stream << i->second.total_cpu_time << "s |";
+              out_stream << std::setw(10);
+              if (total_cpu_time != 0)
                 {
-                  out_stream << std::setprecision(2);
-                  out_stream << fraction * 100;
+                  // if run time was less than 0.1%, just print a zero to avoid
+                  // printing silly things such as "2.45e-6%". otherwise print
+                  // the actual percentage
+                  const double fraction =
+                    i->second.total_cpu_time / total_cpu_time;
+                  if (fraction > 0.001)
+                    {
+                      out_stream << std::setprecision(2);
+                      out_stream << fraction * 100;
+                    }
+                  else
+                    out_stream << 0.0;
+
+                  out_stream << "% |";
                 }
               else
-                out_stream << 0.0;
-
-              out_stream << "% |";
+                out_stream << 0.0 << "% |";
             }
-          else
-            out_stream << 0.0 << "% |";
-        }
-      out_stream << std::endl
-                 << "+---------------------------------" << extra_dash
-                 << "+-----------+"
-                 << "------------+------------+\n"
-                 << std::endl;
 
-      if (time_gap > 0.0)
+          if (output_type != cpu_times)
+            {
+              out_stream << std::setw(10);
+              out_stream << std::setprecision(3);
+              out_stream << i->second.total_wall_time << "s |";
+              out_stream << std::setw(10);
+
+              if (total_wall_time != 0)
+                {
+                  // if run time was less than 0.1%, just print a zero to avoid
+                  // printing silly things such as "2.45e-6%". otherwise print
+                  // the actual percentage
+                  const double fraction =
+                    i->second.total_wall_time / total_wall_time;
+                  if (fraction > 0.001)
+                    {
+                      out_stream << std::setprecision(2);
+                      out_stream << fraction * 100;
+                    }
+                  else
+                    out_stream << 0.0;
+
+                  out_stream << "% |";
+                }
+              else
+                out_stream << 0.0 << "% |";
+            }
+          out_stream << std::endl;
+        }
+
+      out_stream << "+---------------------------------" << extra_dash
+                 << "+-----------+";
+
+      if (output_type != wall_times)
+        out_stream << "------------+------------+";
+
+      if (output_type != cpu_times)
+        out_stream << "------------+------------+";
+
+      out_stream << std::endl << std::endl;
+
+      if (output_type != wall_times && time_gap > 0.0)
         out_stream
           << std::endl
           << "Note: The sum of counted times is " << time_gap
           << " seconds larger than the total time.\n"
           << "(Timer function may have introduced too much overhead, or different\n"
           << "section timers may have run at the same time.)" << std::endl;
-    }
-
-  // in case we want to write out wallclock times
-  if (output_type != cpu_times)
-    {
-      double total_wall_time = timer_all.wall_time();
-
-      // now generate a nice table
-      out_stream << "\n\n"
-                 << "+---------------------------------------------"
-                 << extra_dash << "+------------"
-                 << "+------------+\n"
-                 << "| Total wallclock time elapsed since start    "
-                 << extra_space << "|";
-      out_stream << std::setw(10) << std::setprecision(3) << std::right;
-      out_stream << total_wall_time << "s |            |\n";
-      out_stream << "|                                             "
-                 << extra_space << "|            "
-                 << "|            |\n";
-      out_stream << "| Section                         " << extra_space
-                 << "| no. calls |";
-      out_stream << std::setw(10);
-      out_stream << std::setprecision(3);
-      out_stream << "  wall time | % of total |\n";
-      out_stream << "+---------------------------------" << extra_dash
-                 << "+-----------+------------"
-                 << "+------------+";
-      for (std::map<std::string, Section>::const_iterator i = sections.begin();
-           i != sections.end();
-           ++i)
-        {
-          std::string name_out = i->first;
-
-          // resize the array so that it is always of the same size
-          unsigned int pos_non_space = name_out.find_first_not_of(' ');
-          name_out.erase(0, pos_non_space);
-          name_out.resize(max_width, ' ');
-          out_stream << std::endl;
-          out_stream << "| " << name_out;
-          out_stream << "| ";
-          out_stream << std::setw(9);
-          out_stream << i->second.n_calls << " |";
-          out_stream << std::setw(10);
-          out_stream << std::setprecision(3);
-          out_stream << i->second.total_wall_time << "s |";
-          out_stream << std::setw(10);
-
-          if (total_wall_time != 0)
-            {
-              // if run time was less than 0.1%, just print a zero to avoid
-              // printing silly things such as "2.45e-6%". otherwise print the
-              // actual percentage
-              const double fraction =
-                i->second.total_wall_time / total_wall_time;
-              if (fraction > 0.001)
-                {
-                  out_stream << std::setprecision(2);
-                  out_stream << fraction * 100;
-                }
-              else
-                out_stream << 0.0;
-
-              out_stream << "% |";
-            }
-          else
-            out_stream << 0.0 << "% |";
-        }
-      out_stream << std::endl
-                 << "+---------------------------------" << extra_dash
-                 << "+-----------+"
-                 << "------------+------------+\n"
-                 << std::endl;
     }
 
   // restore previous precision and width
