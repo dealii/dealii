@@ -19,58 +19,73 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     template class FE_Enriched<deal_II_dimension, deal_II_space_dimension>;
 
-    namespace ColorEnriched \{
-        namespace internal \{
-            template
-            bool find_connection_between_subdomains
-            (const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>  &dof_handler,
-             const predicate_function<deal_II_dimension, deal_II_space_dimension> &predicate_1,
-             const predicate_function<deal_II_dimension, deal_II_space_dimension> &predicate_2);
+    namespace ColorEnriched
+    \{
+      namespace internal
+      \{
+        template bool
+        find_connection_between_subdomains(
+          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &dof_handler,
+          const predicate_function<deal_II_dimension, deal_II_space_dimension>
+            &predicate_1,
+          const predicate_function<deal_II_dimension, deal_II_space_dimension>
+            &predicate_2);
 
 
-            template
-            unsigned int color_predicates
-            (const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
-             const std::vector<predicate_function<deal_II_dimension, deal_II_space_dimension>> &,
-             std::vector<unsigned int> &);
+        template unsigned int
+        color_predicates(
+          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &dof_handler,
+          const std::vector<
+            predicate_function<deal_II_dimension, deal_II_space_dimension>> &,
+          std::vector<unsigned int> &);
 
 
-            template
-            void set_cellwise_color_set_and_fe_index
-            (hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
-             const std::vector<predicate_function <deal_II_dimension, deal_II_space_dimension>>
-             &predicates,
-             const std::vector<unsigned int> &predicate_colors,
-             std::map<unsigned int,std::map<unsigned int, unsigned int> >
-             &cellwise_color_predicate_map,
-             std::vector <std::set<unsigned int>> &fe_sets);
+        template void
+        set_cellwise_color_set_and_fe_index(
+          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &dof_handler,
+          const std::vector<
+            predicate_function<deal_II_dimension, deal_II_space_dimension>>
+            &                              predicates,
+          const std::vector<unsigned int> &predicate_colors,
+          std::map<unsigned int, std::map<unsigned int, unsigned int>>
+            &                                  cellwise_color_predicate_map,
+          std::vector<std::set<unsigned int>> &fe_sets);
 
 
-            template
-            void make_colorwise_enrichment_functions<deal_II_dimension, deal_II_space_dimension>
-            (const unsigned int &num_colors,
-             const std::vector< std::shared_ptr <Function<deal_II_space_dimension>> >
-             &enrichments,
-             const std::map<unsigned int,std::map<unsigned int, unsigned int> >
-             &cellwise_color_predicate_map,
-             std::vector<std::function<const Function<deal_II_space_dimension>*
-             (const typename Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator &)>>
-             &color_enrichments);
+        template void
+        make_colorwise_enrichment_functions<deal_II_dimension,
+                                            deal_II_space_dimension>(
+          const unsigned int &num_colors,
+          const std::vector<std::shared_ptr<Function<deal_II_space_dimension>>>
+            &enrichments,
+          const std::map<unsigned int, std::map<unsigned int, unsigned int>>
+            &       cellwise_color_predicate_map,
+          std::vector<std::function<const Function<deal_II_space_dimension> *(
+            const typename Triangulation<deal_II_dimension,
+                                         deal_II_space_dimension>::cell_iterator
+              &)>> &color_enrichments);
 
 
-            template
-            void make_fe_collection_from_colored_enrichments
-            (const unsigned int &num_colors,
-             const std::vector <std::set<unsigned int>> &fe_sets,
-             const std::vector<std::function<const Function<deal_II_space_dimension>*
-             (const typename Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator &)>>
-             &color_enrichments,
-             const FE_Q<deal_II_dimension, deal_II_space_dimension> &fe_base,
-             const FE_Q<deal_II_dimension, deal_II_space_dimension> &fe_enriched,
-             const FE_Nothing<deal_II_dimension, deal_II_space_dimension> &fe_nothing,
-             hp::FECollection<deal_II_dimension, deal_II_space_dimension> &fe_collection);
-        \}
-        template struct Helper<deal_II_dimension, deal_II_space_dimension>;
+        template void
+        make_fe_collection_from_colored_enrichments(
+          const unsigned int &                       num_colors,
+          const std::vector<std::set<unsigned int>> &fe_sets,
+          const std::vector<
+            std::function<const Function<deal_II_space_dimension> *(
+              const typename Triangulation<
+                deal_II_dimension,
+                deal_II_space_dimension>::cell_iterator &)>> &color_enrichments,
+          const FE_Q<deal_II_dimension, deal_II_space_dimension> &fe_base,
+          const FE_Q<deal_II_dimension, deal_II_space_dimension> &fe_enriched,
+          const FE_Nothing<deal_II_dimension, deal_II_space_dimension>
+            &fe_nothing,
+          hp::FECollection<deal_II_dimension, deal_II_space_dimension>
+            &fe_collection);
+      \}
+      template struct Helper<deal_II_dimension, deal_II_space_dimension>;
     \}
 
 #endif
