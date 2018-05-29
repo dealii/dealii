@@ -75,7 +75,7 @@ fi
 # - -n 50 calls the following script with up to 50 file names at a time
 # - -P 10 calls the following script up to 10 times in parallel
 #
-find tests include source examples \
+find tests include source \
   \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 |
   xargs -0 -n 50 -P 10 clang-format -i
 
