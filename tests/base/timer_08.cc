@@ -64,8 +64,7 @@ test(TimerOutput::OutputType output_type)
 int
 main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   deallog << "cpu_times:" << std::endl;
   test(TimerOutput::cpu_times);
