@@ -153,14 +153,8 @@ discrete finite element space is a proper subset of the $H^1$ function
 space in which we seek the solution of the Laplace equation.
 To guarantee that the global solution is continuous at these nodes as well, we
 have to state some additional constraints on the values of the solution at
-these nodes. How these constraints have to look is relatively easy to
-understand conceptually, but the implementation in software is
-complicated and takes several thousand lines of code. On the other
-hand, in user code, it is only about half a dozen lines you have to
-add when dealing with hanging nodes.
-
-In the program below, we will show how we can get these
-constraints from deal.II, and how to use them in the solution of the
+these nodes. In the program below, we will show how we can get these
+constraints from the library, and how to use them in the solution of the
 linear system of equations. Before going over the details of the program
 below, you may want to take a look at the @ref constraints documentation
 module that explains how these constraints can be computed and what classes in

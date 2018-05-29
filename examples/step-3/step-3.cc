@@ -94,9 +94,9 @@ using namespace dealii;
 class Step3
 {
 public:
-  Step3();
+  Step3 ();
 
-  void run();
+  void run ();
 
   // Then there are the member functions that mostly do what their names
   // suggest and whose have been discussed in the introduction already. Since
@@ -104,19 +104,19 @@ public:
   // class.
 
 private:
-  void make_grid();
-  void setup_system();
-  void assemble_system();
-  void solve();
-  void output_results() const;
+  void make_grid ();
+  void setup_system ();
+  void assemble_system ();
+  void solve ();
+  void output_results () const;
 
   // And finally we have some member variables. There are variables describing
   // the triangulation and the global numbering of the degrees of freedom (we
   // will specify the exact polynomial degree of the finite element in the
   // constructor of this class)...
-  Triangulation<2> triangulation;
-  FE_Q<2>          fe;
-  DoFHandler<2>    dof_handler;
+  Triangulation<2>     triangulation;
+  FE_Q<2>              fe;
+  DoFHandler<2>        dof_handler;
 
   // ...variables for the sparsity pattern and values of the system matrix
   // resulting from the discretization of the Laplace equation...
@@ -125,8 +125,8 @@ private:
 
   // ...and variables which will hold the right hand side and solution
   // vectors.
-  Vector<double> solution;
-  Vector<double> system_rhs;
+  Vector<double>       solution;
+  Vector<double>       system_rhs;
 };
 
 // @sect4{Step3::Step3}
@@ -141,7 +141,10 @@ private:
 // you try to distribute degree of freedom on the mesh using the
 // distribute_dofs() function.) All the other member variables of the Step3
 // class have a default constructor which does all we want.
-Step3::Step3() : fe(1), dof_handler(triangulation)
+Step3::Step3 ()
+  :
+  fe (1),
+  dof_handler (triangulation)
 {}
 
 
@@ -160,12 +163,13 @@ Step3::Step3() : fe(1), dof_handler(triangulation)
 // Unsure that 1024 is the correct number? We can check that by outputting the
 // number of cells using the <code>n_active_cells()</code> function on the
 // triangulation.
-void Step3::make_grid()
+void Step3::make_grid ()
 {
-  GridGenerator::hyper_cube(triangulation, -1, 1);
-  triangulation.refine_global(5);
+  GridGenerator::hyper_cube (triangulation, -1, 1);
+  triangulation.refine_global (5);
 
-  std::cout << "Number of active cells: " << triangulation.n_active_cells()
+  std::cout << "Number of active cells: "
+            << triangulation.n_active_cells()
             << std::endl;
 }
 
@@ -191,10 +195,11 @@ void Step3::make_grid()
 // constructor, i.e. bilinear elements, this associates one degree of freedom
 // with each vertex. While we're at generating output, let us also take a look
 // at how many degrees of freedom are generated:
-void Step3::setup_system()
+void Step3::setup_system ()
 {
-  dof_handler.distribute_dofs(fe);
-  std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
+  dof_handler.distribute_dofs (fe);
+  std::cout << "Number of degrees of freedom: "
+            << dof_handler.n_dofs()
             << std::endl;
   // There should be one DoF for each vertex. Since we have a 32 times 32
   // grid, the number of DoFs should be 33 times 33, or 1089.
@@ -204,7 +209,7 @@ void Step3::setup_system()
   // nonzero, and then copying the data over to the SparsityPattern object
   // that can then be used by the system matrix.
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern(dof_handler, dsp);
+  DoFTools::make_sparsity_pattern (dof_handler, dsp);
   sparsity_pattern.copy_from(dsp);
 
   // Note that the SparsityPattern object does not hold the values of the
@@ -218,12 +223,12 @@ void Step3::setup_system()
   // and that it may take some time to build the sparsity pattern, this
   // becomes important in large-scale problems if you have to store several
   // matrices in your program.
-  system_matrix.reinit(sparsity_pattern);
+  system_matrix.reinit (sparsity_pattern);
 
   // The last thing to do in this function is to set the sizes of the right
   // hand side vector and the solution vector to the right values:
-  solution.reinit(dof_handler.n_dofs());
-  system_rhs.reinit(dof_handler.n_dofs());
+  solution.reinit (dof_handler.n_dofs());
+  system_rhs.reinit (dof_handler.n_dofs());
 }
 
 // @sect4{Step3::assemble_system}
@@ -262,7 +267,7 @@ void Step3::setup_system()
 //
 // Using all this, we will assemble the linear system for this problem in the
 // following function:
-void Step3::assemble_system()
+void Step3::assemble_system ()
 {
   // Ok, let's start: we need a quadrature formula for the evaluation of the
   // integrals on each cell. Let's take a Gauss formula with two quadrature
@@ -270,7 +275,7 @@ void Step3::assemble_system()
   // 2D. This quadrature formula integrates polynomials of degrees up to three
   // exactly (in 1D). It is easy to check that this is sufficient for the
   // present problem:
-  QGauss<2> quadrature_formula(2);
+  QGauss<2>  quadrature_formula(2);
   // And we initialize the object which we have briefly talked about above. It
   // needs to be told which finite element we want to use, and the quadrature
   // points and their weights (jointly described by a Quadrature object). As
@@ -294,9 +299,8 @@ void Step3::assemble_system()
   // weights are always used together, so only the products (Jacobians times
   // weights, or short <code>JxW</code>) are computed; since we need them, we
   // have to list #update_JxW_values as well:
-  FEValues<2> fe_values(fe,
-                        quadrature_formula,
-                        update_values | update_gradients | update_JxW_values);
+  FEValues<2> fe_values (fe, quadrature_formula,
+                         update_values | update_gradients | update_JxW_values);
   // The advantage of this approach is that we can specify what kind of
   // information we actually need on each cell. It is easily understandable
   // that this approach can significantly speed up finite element computations,
@@ -357,8 +361,8 @@ void Step3::assemble_system()
   // bit more readable. You will see them in many places in larger programs,
   // and `dofs_per_cell` and `n_q_points` are more or less by convention the
   // standard names for these purposes:
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.size();
 
   // Now, we said that we wanted to assemble the global matrix and vector
   // cell-by-cell. We could write the results directly into the global matrix,
@@ -371,8 +375,8 @@ void Step3::assemble_system()
   // are coupling with all others, and we should use a full matrix object
   // rather than a sparse one for the local operations; everything will be
   // transferred to a global sparse matrix later on):
-  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_rhs(dofs_per_cell);
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
 
   // When assembling the contributions of each cell, we do this with the local
   // numbering of the degrees of freedom (i.e. the number running from zero
@@ -381,7 +385,7 @@ void Step3::assemble_system()
   // freedom. When we query them, we need a scratch (temporary) array for
   // these numbers (see the discussion at the end of the introduction for
   // the type, types::global_dof_index, used here):
-  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   // Now for the loop over all cells. We have seen before how this works for a
   // triangulation. A DoFHandler has cell iterators that are exactly analogous
@@ -394,7 +398,7 @@ void Step3::assemble_system()
   // triangulation by flagging them with refinement indicators. Here we're only
   // examining the cells without modifying them, so it's good practice to
   // declare `cell` as `const` in order to enforce this invariant.
-  for (const auto &cell : dof_handler.active_cell_iterators())
+  for (const auto &cell: dof_handler.active_cell_iterators())
     {
       // We are now sitting on one cell, and we would like the values and
       // gradients of the shape functions be computed, as well as the
@@ -402,17 +406,17 @@ void Step3::assemble_system()
       // reference cell and true cell, at the quadrature points. Since all
       // these values depend on the geometry of the cell, we have to have the
       // FEValues object re-compute them on each cell:
-      fe_values.reinit(cell);
+      fe_values.reinit (cell);
 
       // Next, reset the local cell's contributions to global matrix and
       // global right hand side to zero, before we fill them:
       cell_matrix = 0;
-      cell_rhs    = 0;
+      cell_rhs = 0;
 
       // Now it is time to start integration over the cell, which we
       // do by looping over all quadrature points, which we will
       // number by q_index.
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
         {
           // First assemble the matrix: For the Laplace problem, the
           // matrix on each cell is the integral over the gradients of
@@ -431,37 +435,39 @@ void Step3::assemble_system()
           // determinant and the quadrature point weight (that one
           // gets together by the call to FEValues::JxW() ). Finally,
           // this is repeated for all shape functions $i$ and $j$:
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i, j) +=
-                (fe_values.shape_grad(i, q_index) *
-                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              cell_matrix(i,j) += (fe_values.shape_grad (i, q_index) *
+                                   fe_values.shape_grad (j, q_index) *
+                                   fe_values.JxW (q_index));
 
           // We then do the same thing for the right hand side. Here,
           // the integral is over the shape function i times the right
           // hand side function, which we choose to be the function
           // with constant value one (more interesting examples will
           // be considered in the following programs).
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            cell_rhs(i) +=
-              (fe_values.shape_value(i, q_index) * 1 * fe_values.JxW(q_index));
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            cell_rhs(i) += (fe_values.shape_value (i, q_index) *
+                            1 *
+                            fe_values.JxW (q_index));
         }
       // Now that we have the contribution of this cell, we have to transfer
       // it to the global matrix and right hand side. To this end, we first
       // have to find out which global numbers the degrees of freedom on this
       // cell have. Let's simply ask the cell for that information:
-      cell->get_dof_indices(local_dof_indices);
+      cell->get_dof_indices (local_dof_indices);
 
       // Then again loop over all shape functions i and j and transfer the
       // local elements to the global matrix. The global numbers can be
       // obtained using local_dof_indices[i]:
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(
-            local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int j=0; j<dofs_per_cell; ++j)
+          system_matrix.add (local_dof_indices[i],
+                             local_dof_indices[j],
+                             cell_matrix(i,j));
 
       // And again, we do the same thing for the right hand side vector.
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
     }
 
@@ -499,24 +505,28 @@ void Step3::assemble_system()
   // the boundary.
   //
   // The function describing the boundary values is an object of type Function
-  // or of a derived class. One of the derived classes is
-  // Functions::ZeroFunction, which describes (not unexpectedly) a function
-  // which is zero everywhere. We create such an object in-place and pass it to
-  // the VectorTools::interpolate_boundary_values() function.
+  // or of a derived class. One of the derived classes is Functions::ZeroFunction, which
+  // describes (not unexpectedly) a function which is zero everywhere. We
+  // create such an object in-place and pass it to the
+  // VectorTools::interpolate_boundary_values() function.
   //
   // Finally, the output object is a list of pairs of global degree of freedom
   // numbers (i.e. the number of the degrees of freedom on the boundary) and
   // their boundary values (which are zero here for all entries). This mapping
   // of DoF numbers to boundary values is done by the <code>std::map</code>
   // class.
-  std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(
-    dof_handler, 0, Functions::ZeroFunction<2>(), boundary_values);
+  std::map<types::global_dof_index,double> boundary_values;
+  VectorTools::interpolate_boundary_values (dof_handler,
+                                            0,
+                                            Functions::ZeroFunction<2>(),
+                                            boundary_values);
   // Now that we got the list of boundary DoFs and their respective boundary
   // values, let's use them to modify the system of equations
   // accordingly. This is done by the following function call:
-  MatrixTools::apply_boundary_values(
-    boundary_values, system_matrix, solution, system_rhs);
+  MatrixTools::apply_boundary_values (boundary_values,
+                                      system_matrix,
+                                      solution,
+                                      system_rhs);
 }
 
 
@@ -529,7 +539,7 @@ void Step3::assemble_system()
 // number for finite element computations, where 100.000 is a more usual
 // number.  For this number of variables, direct methods are no longer usable
 // and you are forced to use methods like CG.
-void Step3::solve()
+void Step3::solve ()
 {
   // First, we need to have an object that knows how to tell the CG algorithm
   // when to stop. This is done by using a SolverControl object, and as
@@ -538,17 +548,18 @@ void Step3::solve()
   // find out how many were really used), and stop if the norm of the residual
   // is below $10^{-12}$. In practice, the latter criterion will be the one
   // which stops the iteration:
-  SolverControl solver_control(1000, 1e-12);
+  SolverControl           solver_control (1000, 1e-12);
   // Then we need the solver itself. The template parameter to the SolverCG
   // class is the type of the vectors, but the empty angle brackets indicate
   // that we simply take the default argument (which is
   // <code>Vector@<double@></code>):
-  SolverCG<> solver(solver_control);
+  SolverCG<>              solver (solver_control);
 
   // Now solve the system of equations. The CG solver takes a preconditioner
   // as its fourth argument. We don't feel ready to delve into this yet, so we
   // tell it to use the identity operation as preconditioner:
-  solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+  solver.solve (system_matrix, solution, system_rhs,
+                PreconditionIdentity());
   // Now that the solver has done its job, the solution variable contains the
   // nodal values of the solution function.
 }
@@ -561,7 +572,7 @@ void Step3::solve()
 // values at the boundary, or the average flux across the outflow, etc). We
 // have no such postprocessing here, but we would like to write the solution
 // to a file.
-void Step3::output_results() const
+void Step3::output_results () const
 {
   // To write the output to a file, we need an object which knows about output
   // formats and the like. This is the DataOut class, and we need an object of
@@ -573,8 +584,8 @@ void Step3::output_results() const
   // file). If we had more than one vector which we would like to look at in
   // the output (for example right hand sides, errors per cell, etc) we would
   // add them as well:
-  data_out.attach_dof_handler(dof_handler);
-  data_out.add_data_vector(solution, "solution");
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (solution, "solution");
   // After the DataOut object knows which data it is to work on, we have to
   // tell it to process them into something the back ends can handle. The
   // reason is that we have separated the frontend (which knows about how to
@@ -582,14 +593,14 @@ void Step3::output_results() const
   // many different output formats) and use an intermediate data format to
   // transfer data from the front- to the backend. The data is transformed
   // into this intermediate format by the following function:
-  data_out.build_patches();
+  data_out.build_patches ();
 
   // Now we have everything in place for the actual output. Just open a file
   // and write the data into it, using GNUPLOT format (there are other
   // functions which write their data in postscript, AVS, GMV, or some other
   // format):
-  std::ofstream output("solution.gpl");
-  data_out.write_gnuplot(output);
+  std::ofstream output ("solution.gpl");
+  data_out.write_gnuplot (output);
 }
 
 
@@ -600,13 +611,13 @@ void Step3::output_results() const
 // this is done resembles the order in which most finite element programs
 // work. Since the names are mostly self-explanatory, there is not much to
 // comment about:
-void Step3::run()
+void Step3::run ()
 {
-  make_grid();
-  setup_system();
-  assemble_system();
-  solve();
-  output_results();
+  make_grid ();
+  setup_system ();
+  assemble_system ();
+  solve ();
+  output_results ();
 }
 
 
@@ -662,12 +673,12 @@ void Step3::run()
 // examples later on (e.g., in step-22) where solvers are nested more
 // deeply and where you may get useful information by setting the
 // depth even higher.
-int main()
+int main ()
 {
-  deallog.depth_console(2);
+  deallog.depth_console (2);
 
   Step3 laplace_problem;
-  laplace_problem.run();
+  laplace_problem.run ();
 
   return 0;
 }

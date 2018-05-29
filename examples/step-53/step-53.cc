@@ -47,9 +47,9 @@
 #include <boost/iostreams/device/file.hpp>
 
 // The last include file is required because we will be using a feature that is
-// not part of the C++11 standard. As some of the C++14 features are very
-// useful, we provide their implementation in an internal namespace, if the
-// compiler does not support them:
+// not part of the C++11 standard. As some of the C++14 features are very useful,
+// we provide their implementation in an internal namespace, if the compiler
+// does not support them:
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <iostream>
@@ -81,16 +81,17 @@ namespace Step53
   class AfricaTopography
   {
   public:
-    AfricaTopography();
+    AfricaTopography ();
 
-    double value(const double lon, const double lat) const;
+    double value (const double lon,
+                  const double lat) const;
 
   private:
     const Functions::InterpolatedUniformGridData<2> topography_data;
 
-    static std::array<std::pair<double, double>, 2> get_endpoints();
-    static std::array<unsigned int, 2>              n_intervals();
-    static std::vector<double>                      get_data();
+    static std::array<std::pair<double,double>,2> get_endpoints ();
+    static std::array<unsigned int,2>             n_intervals ();
+    static std::vector<double>                           get_data ();
   };
 
 
@@ -111,32 +112,38 @@ namespace Step53
   // member functions we call here are static because (i) they do not
   // access any member variables of the class, and (ii) because they are
   // called at a time when the object is not initialized fully anyway.
-  AfricaTopography::AfricaTopography() :
-    topography_data(get_endpoints(),
-                    n_intervals(),
-                    Table<2, double>(380, 220, get_data().begin()))
+  AfricaTopography::AfricaTopography ()
+    :
+    topography_data (get_endpoints(),
+                     n_intervals(),
+                     Table<2,double> (380, 220,
+                                      get_data().begin()))
   {}
 
 
-  double AfricaTopography::value(const double lon, const double lat) const
+  double
+  AfricaTopography::value (const double lon,
+                           const double lat) const
   {
-    return topography_data.value(
-      Point<2>(-lat * 180 / numbers::PI, lon * 180 / numbers::PI));
+    return topography_data.value (Point<2>(-lat * 180/numbers::PI,
+                                           lon * 180/numbers::PI));
   }
 
 
-  std::array<std::pair<double, double>, 2> AfricaTopography::get_endpoints()
+  std::array<std::pair<double,double>,2>
+  AfricaTopography::get_endpoints ()
   {
-    std::array<std::pair<double, double>, 2> endpoints;
-    endpoints[0] = std::make_pair(-6.983333, 11.966667);
-    endpoints[1] = std::make_pair(25, 35.95);
+    std::array<std::pair<double,double>,2> endpoints;
+    endpoints[0] = std::make_pair (-6.983333, 11.966667);
+    endpoints[1] = std::make_pair (25, 35.95);
     return endpoints;
   }
 
 
-  std::array<unsigned int, 2> AfricaTopography::n_intervals()
+  std::array<unsigned int,2>
+  AfricaTopography::n_intervals ()
   {
-    std::array<unsigned int, 2> endpoints;
+    std::array<unsigned int,2> endpoints;
     endpoints[0] = 379;
     endpoints[1] = 219;
     return endpoints;
@@ -168,7 +175,8 @@ namespace Step53
   // <code>throw ExcMessage("...")</code> but it also fills certain fields
   // in the exception object that will later be printed on the screen
   // identifying the function, file and line where the exception happened.
-  std::vector<double> AfricaTopography::get_data()
+  std::vector<double>
+  AfricaTopography::get_data ()
   {
     std::vector<double> data;
 
@@ -177,20 +185,20 @@ namespace Step53
     in.push(boost::iostreams::basic_gzip_decompressor<>());
     in.push(boost::iostreams::file_source("topography.txt.gz"));
 
-    for (unsigned int line = 0; line < 83600; ++line)
+    for (unsigned int line=0; line<83600; ++line)
       {
         try
           {
             double lat, lon, elevation;
             in >> lat >> lon >> elevation;
 
-            data.push_back(elevation);
+            data.push_back (elevation);
           }
         catch (...)
           {
-            AssertThrow(false,
-                        ExcMessage("Could not read all 83,600 data points "
-                                   "from the file <topography.txt.gz>!"));
+            AssertThrow (false,
+                         ExcMessage ("Could not read all 83,600 data points "
+                                     "from the file <topography.txt.gz>!"));
           }
       }
 
@@ -203,26 +211,30 @@ namespace Step53
   // The following class is then the main one of this program. Its structure
   // has been described in much detail in the introduction and does not need
   // much introduction any more.
-  class AfricaGeometry : public ChartManifold<3, 3>
+  class AfricaGeometry : public ChartManifold<3,3>
   {
   public:
-    virtual Point<3> pull_back(const Point<3> &space_point) const override;
+    virtual
+    Point<3>
+    pull_back(const Point<3> &space_point) const override;
 
-    virtual Point<3> push_forward(const Point<3> &chart_point) const override;
+    virtual
+    Point<3>
+    push_forward(const Point<3> &chart_point) const override;
 
-    virtual std::unique_ptr<Manifold<3, 3>> clone() const override;
+    virtual std::unique_ptr<Manifold<3,3> > clone() const override;
 
   private:
-    static const double R;
-    static const double ellipticity;
+    static const double    R;
+    static const double    ellipticity;
 
     const AfricaTopography topography;
 
-    Point<3> push_forward_wgs84(const Point<3> &phi_theta_d) const;
-    Point<3> pull_back_wgs84(const Point<3> &x) const;
+    Point<3> push_forward_wgs84 (const Point<3> &phi_theta_d) const;
+    Point<3> pull_back_wgs84 (const Point<3> &x) const;
 
-    Point<3> push_forward_topo(const Point<3> &phi_theta_d_hat) const;
-    Point<3> pull_back_topo(const Point<3> &phi_theta_d) const;
+    Point<3> push_forward_topo (const Point<3> &phi_theta_d_hat) const;
+    Point<3> pull_back_topo (const Point<3> &phi_theta_d) const;
   };
 
 
@@ -234,14 +246,16 @@ namespace Step53
   // read the introduction. In particular, both of the pull back and
   // push forward functions are just concatenations of the respective
   // functions of the WGS 84 and topography mappings:
-  Point<3> AfricaGeometry::pull_back(const Point<3> &space_point) const
+  Point<3>
+  AfricaGeometry::pull_back(const Point<3> &space_point) const
   {
-    return pull_back_topo(pull_back_wgs84(space_point));
+    return pull_back_topo (pull_back_wgs84 (space_point));
   }
 
-  Point<3> AfricaGeometry::push_forward(const Point<3> &chart_point) const
+  Point<3>
+  AfricaGeometry::push_forward(const Point<3> &chart_point) const
   {
-    return push_forward_wgs84(push_forward_topo(chart_point));
+    return push_forward_wgs84 (push_forward_topo (chart_point));
   }
 
 
@@ -254,7 +268,8 @@ namespace Step53
   // unique_ptr<AfricaGeometry>. C++11 knows how to handle these cases,
   // and is able to transform a unique pointer to a derived class to a
   // unique pointer to its base class automatically:
-  std::unique_ptr<Manifold<3, 3>> AfricaGeometry::clone() const
+  std::unique_ptr<Manifold<3,3> >
+  AfricaGeometry::clone() const
   {
     return std_cxx14::make_unique<AfricaGeometry>();
   }
@@ -268,7 +283,8 @@ namespace Step53
   // fact that it returns an angle that at the end of the function we
   // need to clip back into the interval $[0,2\pi]$ if it should have
   // escaped from there.
-  Point<3> AfricaGeometry::push_forward_wgs84(const Point<3> &phi_theta_d) const
+  Point<3>
+  AfricaGeometry::push_forward_wgs84(const Point<3> &phi_theta_d) const
   {
     const double phi   = phi_theta_d[0];
     const double theta = phi_theta_d[1];
@@ -277,32 +293,29 @@ namespace Step53
     const double R_bar = R / std::sqrt(1 - (ellipticity * ellipticity *
                                             std::sin(theta) * std::sin(theta)));
 
-    return Point<3>((R_bar + d) * std::cos(phi) * std::cos(theta),
-                    (R_bar + d) * std::sin(phi) * std::cos(theta),
-                    ((1 - ellipticity * ellipticity) * R_bar + d) *
-                      std::sin(theta));
+    return Point<3> ((R_bar + d) * std::cos(phi) * std::cos(theta),
+                     (R_bar + d) * std::sin(phi) * std::cos(theta),
+                     ((1 - ellipticity * ellipticity) * R_bar + d) * std::sin(theta));
   }
 
-  Point<3> AfricaGeometry::pull_back_wgs84(const Point<3> &x) const
+  Point<3>
+  AfricaGeometry::pull_back_wgs84(const Point<3> &x) const
   {
     const double b     = std::sqrt(R * R * (1 - ellipticity * ellipticity));
     const double ep    = std::sqrt((R * R - b * b) / (b * b));
     const double p     = std::sqrt(x(0) * x(0) + x(1) * x(1));
     const double th    = std::atan2(R * x(2), b * p);
     const double phi   = std::atan2(x(1), x(0));
-    const double theta = std::atan2(
-      x(2) + ep * ep * b * std::pow(std::sin(th), 3),
-      (p - (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
-    const double R_bar =
-      R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) *
-                           std::sin(theta)));
+    const double theta = std::atan2(x(2) + ep * ep * b * std::pow(std::sin(th),3),
+                                    (p - (ellipticity * ellipticity * R  * std::pow(std::cos(th),3))));
+    const double R_bar = R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) * std::sin(theta)));
     const double R_plus_d = p / std::cos(theta);
 
     Point<3> phi_theta_d;
     if (phi < 0)
-      phi_theta_d[0] = phi + 2 * numbers::PI;
-    else if (phi > 2 * numbers::PI)
-      phi_theta_d[0] = phi - 2 * numbers::PI;
+      phi_theta_d[0] = phi + 2*numbers::PI;
+    else if (phi > 2*numbers::PI)
+      phi_theta_d[0] = phi - 2*numbers::PI;
     else
       phi_theta_d[0] = phi;
     phi_theta_d[1] = theta;
@@ -317,19 +330,26 @@ namespace Step53
   Point<3>
   AfricaGeometry::push_forward_topo(const Point<3> &phi_theta_d_hat) const
   {
-    const double   d_hat = phi_theta_d_hat[2];
-    const double   h = topography.value(phi_theta_d_hat[0], phi_theta_d_hat[1]);
-    const double   d = d_hat + (d_hat + 500000) / 500000 * h;
-    const Point<3> phi_theta_d(phi_theta_d_hat[0], phi_theta_d_hat[1], d);
+    const double d_hat = phi_theta_d_hat[2];
+    const double h     = topography.value(phi_theta_d_hat[0],
+                                          phi_theta_d_hat[1]);
+    const double d = d_hat + (d_hat + 500000)/500000*h;
+    const Point<3> phi_theta_d (phi_theta_d_hat[0],
+                                phi_theta_d_hat[1],
+                                d);
     return phi_theta_d;
   }
 
-  Point<3> AfricaGeometry::pull_back_topo(const Point<3> &phi_theta_d) const
+  Point<3>
+  AfricaGeometry::pull_back_topo(const Point<3> &phi_theta_d) const
   {
-    const double   d     = phi_theta_d[2];
-    const double   h     = topography.value(phi_theta_d[0], phi_theta_d[1]);
-    const double   d_hat = 500000 * (d - h) / (500000 + h);
-    const Point<3> phi_theta_d_hat(phi_theta_d[0], phi_theta_d[1], d_hat);
+    const double d = phi_theta_d[2];
+    const double h = topography.value(phi_theta_d[0],
+                                      phi_theta_d[1]);
+    const double d_hat = 500000 * (d-h)/(500000+h);
+    const Point<3> phi_theta_d_hat (phi_theta_d[0],
+                                    phi_theta_d[1],
+                                    d_hat);
     return phi_theta_d_hat;
   }
 
@@ -361,26 +381,31 @@ namespace Step53
   // to the geometry object we have created at the top of the function
   // and leave the second one open, obtaining the desired object to
   // do the transformation.
-  void run()
+  void run ()
   {
     AfricaGeometry   geometry;
     Triangulation<3> triangulation;
 
     {
-      const Point<3> corner_points[2] = {
-        Point<3>(26 * numbers::PI / 180, -10 * numbers::PI / 180, -500000),
-        Point<3>(35 * numbers::PI / 180, 5 * numbers::PI / 180, 0)};
+      const Point<3> corner_points[2] = { Point<3>(26*numbers::PI/180,
+                                                   -10*numbers::PI/180,
+                                                   -500000),
+                                          Point<3>(35*numbers::PI/180,
+                                                   5*numbers::PI/180,
+                                                   0)
+                                        };
       std::vector<unsigned int> subdivisions(3);
       subdivisions[0] = 1;
       subdivisions[1] = 2;
       subdivisions[2] = 1;
-      GridGenerator::subdivided_hyper_rectangle(
-        triangulation, subdivisions, corner_points[0], corner_points[1], true);
+      GridGenerator::subdivided_hyper_rectangle (triangulation, subdivisions,
+                                                 corner_points[0], corner_points[1],
+                                                 true);
 
-      GridTools::transform(std::bind(&AfricaGeometry::push_forward,
-                                     std::cref(geometry),
-                                     std::placeholders::_1),
-                           triangulation);
+      GridTools::transform (std::bind(&AfricaGeometry::push_forward,
+                                      std::cref(geometry),
+                                      std::placeholders::_1),
+                            triangulation);
     }
 
     // The next step is to explain to the triangulation to use our geometry
@@ -393,50 +418,46 @@ namespace Step53
     // mother to children, this also happens after several recursive
     // refinement steps.
     triangulation.set_manifold(0, geometry);
-    for (Triangulation<3>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
+         cell!=triangulation.end(); ++cell)
       cell->set_all_manifold_ids(0);
 
-    // The last step is to refine the mesh beyond its initial $1\times 2\times
-    // 1$ coarse mesh. We could just refine globally a number of times, but
-    // since for the purpose of this tutorial program we're really only
-    // interested in what is happening close to the surface, we just refine 6
-    // times all of the cells that have a face at a boundary with indicator 5.
-    // Looking this up in the documentation of the
-    // GridGenerator::subdivided_hyper_rectangle() function we have used above
-    // reveals that boundary indicator 5 corresponds to the top surface of the
-    // domain (and this is what the last <code>true</code> argument in the call
-    // to GridGenerator::subdivided_hyper_rectangle() above meant: to "color"
-    // the boundaries by assigning each boundary a unique boundary indicator).
-    for (unsigned int i = 0; i < 6; ++i)
+    // The last step is to refine the mesh beyond its initial $1\times 2\times 1$
+    // coarse mesh. We could just refine globally a number of times, but since for
+    // the purpose of this tutorial program we're really only interested in what
+    // is happening close to the surface, we just refine 6 times all of the cells
+    // that have a face at a boundary with indicator 5. Looking this up in the
+    // documentation of the GridGenerator::subdivided_hyper_rectangle() function
+    // we have used above reveals that boundary indicator 5 corresponds to the top
+    // surface of the domain (and this is what the last <code>true</code> argument
+    // in the call to GridGenerator::subdivided_hyper_rectangle() above meant: to
+    // "color" the boundaries by assigning each boundary a unique boundary indicator).
+    for (unsigned int i=0; i<6; ++i)
       {
-        for (Triangulation<3>::active_cell_iterator cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
-          for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+        for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
+             cell!=triangulation.end(); ++cell)
+          for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
             if (cell->face(f)->boundary_id() == 5)
               {
-                cell->set_refine_flag();
+                cell->set_refine_flag ();
                 break;
               }
         triangulation.execute_coarsening_and_refinement();
 
-        std::cout << "Refinement step " << i + 1 << ": "
+        std::cout << "Refinement step " << i+1 << ": "
                   << triangulation.n_active_cells() << " cells, "
-                  << GridTools::minimal_cell_diameter(triangulation) / 1000
-                  << "km minimal cell diameter" << std::endl;
+                  << GridTools::minimal_cell_diameter (triangulation)/1000
+                  << "km minimal cell diameter"
+                  << std::endl;
       }
 
     // Having done this all, we can now output the mesh into a file of its own:
     const std::string filename = "mesh.vtu";
-    std::ofstream     out(filename);
-    GridOut           grid_out;
-    grid_out.write_vtu(triangulation, out);
+    std::ofstream out (filename);
+    GridOut grid_out;
+    grid_out.write_vtu (triangulation, out);
   }
-} // namespace Step53
+}
 
 
 
@@ -445,16 +466,15 @@ namespace Step53
 // Finally, the main function, which follows the same scheme used in all
 // tutorial programs starting with step-6. There isn't much to do here, only
 // to call the single <code>run()</code> function.
-int main()
+int main ()
 {
   try
     {
-      Step53::run();
+      Step53::run ();
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl
-                << std::endl
+      std::cerr << std::endl << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -467,8 +487,7 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl
-                << std::endl
+      std::cerr << std::endl << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -478,3 +497,4 @@ int main()
       return 1;
     }
 }
+
