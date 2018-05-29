@@ -78,7 +78,8 @@ test()
   Assert(get_real_assert_zero_imag(v(myid * 2 + 1)) == myid * 4.0 + 2.0,
          ExcInternalError());
 
-  ConstraintMatrix cm;
+  using scalar_type = typename LA::MPI::BlockVector::value_type;
+  AffineConstraints<scalar_type> cm;
   cm.add_line(1);
   cm.add_entry(1, 2, 3.0);
   cm.close();
