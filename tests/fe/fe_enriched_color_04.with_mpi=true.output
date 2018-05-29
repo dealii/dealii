@@ -1,0 +1,18 @@
+
+DEAL:0::color wise enrichment functions:
+DEAL:0::0:predicates=0:0:0:
+DEAL:0::1:predicates=0:0:0:
+DEAL:0::2:predicates=0:0:0:
+DEAL:0::3:predicates=0:0:0:
+DEAL:0::4:predicates=0:0:0:
+DEAL:0::5:predicates=0:0:1::color:1:func_value:2.00000
+DEAL:0::6:predicates=0:0:0:
+DEAL:0::7:predicates=0:0:0:
+DEAL:0::8:predicates=0:1:0::color:2:func_value:1.00000
+DEAL:0::9:predicates=1:1:0::color:1:func_value:0.00000:color:2:func_value:1.00000
+DEAL:0::10:predicates=0:1:0::color:2:func_value:1.00000
+DEAL:0::11:predicates=1:1:0::color:1:func_value:0.00000:color:2:func_value:1.00000
+DEAL:0::12:predicates=1:0:0::color:1:func_value:0.00000
+DEAL:0::13:predicates=0:0:0:
+DEAL:0::14:predicates=1:0:0::color:1:func_value:0.00000
+DEAL:0::15:predicates=0:0:0:

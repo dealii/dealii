@@ -17,8 +17,10 @@
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_enriched.h>
+#include <deal.II/fe/fe_enriched.templates.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <deal.II/lac/sparsity_tools.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1046,6 +1048,374 @@ FE_Enriched<dim, spacedim>::InternalData::get_fe_output_object(
 {
   return fesystem_data->get_fe_output_object(base_no);
 }
+
+
+namespace ColorEnriched
+{
+  namespace internal
+  {
+    template <int dim, int spacedim>
+    bool
+    find_connection_between_subdomains(
+      const hp::DoFHandler<dim, spacedim> &    dof_handler,
+      const predicate_function<dim, spacedim> &predicate_1,
+      const predicate_function<dim, spacedim> &predicate_2)
+    {
+      // Use a vector to mark vertices
+      std::vector<bool> vertices_subdomain_1(
+        dof_handler.get_triangulation().n_vertices(), false);
+
+      // Mark vertices that belong to cells in subdomain 1
+      for (auto cell : dof_handler.active_cell_iterators())
+        if (predicate_1(cell)) // True ==> part of subdomain 1
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
+               ++v)
+            vertices_subdomain_1[cell->vertex_index(v)] = true;
+
+      // Find if cells in subdomain 2 and subdomain 1 share vertices.
+      for (auto cell : dof_handler.active_cell_iterators())
+        if (predicate_2(cell)) // True ==> part of subdomain 2
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
+               ++v)
+            if (vertices_subdomain_1[cell->vertex_index(v)] == true)
+              {
+                return true;
+              }
+      return false;
+    }
+
+
+
+    template <int dim, int spacedim>
+    unsigned int
+    color_predicates(
+      const hp::DoFHandler<dim, spacedim> &                 mesh,
+      const std::vector<predicate_function<dim, spacedim>> &predicates,
+      std::vector<unsigned int> &                           predicate_colors)
+    {
+      const unsigned int num_indices = predicates.size();
+
+      // Use sparsity pattern to represent connections between subdomains.
+      // Each predicate (i.e a subdomain) is a node in the graph.
+      DynamicSparsityPattern dsp;
+      dsp.reinit(num_indices, num_indices);
+
+      /*
+       * Find connections between subdomains taken two at a time.
+       * If the connection exists, add it to a graph object represented
+       * by dynamic sparsity pattern.
+       */
+      for (unsigned int i = 0; i < num_indices; ++i)
+        for (unsigned int j = i + 1; j < num_indices; ++j)
+          if (internal::find_connection_between_subdomains(
+                mesh, predicates[i], predicates[j]))
+            dsp.add(i, j);
+
+      dsp.symmetrize();
+
+      // Copy dynamic sparsity pattern to sparsity pattern needed by
+      // coloring function
+      SparsityPattern sp_graph;
+      sp_graph.copy_from(dsp);
+      predicate_colors.resize(num_indices);
+
+      // Assign each predicate with a color and return number of colors
+      return SparsityTools::color_sparsity_pattern(sp_graph, predicate_colors);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    set_cellwise_color_set_and_fe_index(
+      hp::DoFHandler<dim, spacedim> &                       dof_handler,
+      const std::vector<predicate_function<dim, spacedim>> &predicates,
+      const std::vector<unsigned int> &                     predicate_colors,
+      std::map<unsigned int, std::map<unsigned int, unsigned int>>
+        &                                  cellwise_color_predicate_map,
+      std::vector<std::set<unsigned int>> &fe_sets)
+    {
+      // clear output variables first
+      fe_sets.clear();
+      cellwise_color_predicate_map.clear();
+
+      /*
+       * Add first element of fe_sets which is empty by default. This means that
+       * the default, FE index = 0 is associated with an empty set, since no
+       * predicate is active in these regions.
+       */
+      fe_sets.resize(1);
+
+      /*
+       * Loop through cells and find set of predicate colors associated
+       * with the cell. As an example, a cell with an FE index associated
+       * with colors {a,b} means that predicates active in the cell have
+       * colors a or b.
+       *
+       * Create new active FE index in case of the color
+       * set is not already listed in fe_sets. If the set already exists,
+       * find index of the set in fe_sets. In either case, use the id in
+       * fe_sets to modify cell->active_fe_index.
+       *
+       * Associate each cell_id with a set of pairs. The pair represents
+       * predicate color and the active predicate with that color.
+       * Each color can only correspond to a single predicate since
+       * predicates with the same color correspond to disjoint domains.
+       * This is what the graph coloring in color_predicates
+       * function ensures. The number of pairs is equal to the number
+       * of predicates active in the given cell.
+       */
+      unsigned int map_index(0);
+      auto         cell = dof_handler.begin_active();
+      auto         endc = dof_handler.end();
+      for (; cell != endc; ++cell)
+        {
+          // set default FE index ==> no enrichment and no active predicates
+          cell->set_active_fe_index(0);
+
+          // Give each cell a unique id, which the cellwise_color_predicate_map
+          // can later use to associate a colors of active predicates with
+          // the actual predicate id.
+          //
+          // When the grid is refined, material id is inherited to
+          // children cells. So, the cellwise_color_predicate_map stays
+          // relevant.
+          cell->set_material_id(map_index);
+          std::set<unsigned int> color_list;
+
+          // loop through active predicates for the cell and insert map.
+          // Eg: if the cell with material id 100 has active
+          // predicates 4 (color = 1) and 5 (color = 2), the map will insert
+          // pairs (1, 4) and (2, 5) at key 100 (i.e unique id of cell is
+          // mapped with a map which associates color with predicate id)
+          // Note that color list for the cell would be {1,2}.
+          for (unsigned int i = 0; i < predicates.size(); ++i)
+            {
+              if (predicates[i](cell))
+                {
+                  /*
+                   * create a pair predicate color and predicate id and add it
+                   * to a map associated with each enriched cell
+                   */
+                  auto ret = cellwise_color_predicate_map[map_index].insert(
+                    std::pair<unsigned int, unsigned int>(predicate_colors[i],
+                                                          i));
+
+                  AssertThrow(
+                    ret.second == 1,
+                    ExcMessage("Only one enrichment function per color"));
+
+                  color_list.insert(predicate_colors[i]);
+                }
+            }
+
+
+          /*
+           * check if color combination is already added.
+           * If already added, set the active FE index based on
+           * its index in the fe_sets. If the combination doesn't
+           * exist, add the set to fe_sets and once again set the
+           * active FE index as last index in fe_sets.
+           *
+           * Eg: if cell has color list {1,2} associated and
+           * fe_sets = { {}, {1}, {2} } for now, we need to add a new set {1,2}
+           * to fe_sets and a new active FE index 3 because 0 to 2 FE indices
+           * are already taken by existing sets in fe_sets.
+           */
+          bool found = false;
+          if (!color_list.empty())
+            {
+              for (unsigned int j = 0; j < fe_sets.size(); ++j)
+                {
+                  if (fe_sets[j] == color_list)
+                    {
+                      found = true;
+                      cell->set_active_fe_index(j);
+                      break;
+                    }
+                }
+
+              if (!found)
+                {
+                  fe_sets.push_back(color_list);
+                  cell->set_active_fe_index(fe_sets.size() - 1);
+                }
+            }
+          ++map_index; // map_index should be unique to cells
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    make_colorwise_enrichment_functions(
+      const unsigned int &                                    num_colors,
+      const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments,
+      const std::map<unsigned int, std::map<unsigned int, unsigned int>>
+        &cellwise_color_predicate_map,
+      std::vector<std::function<const Function<spacedim> *(
+        const typename Triangulation<dim, spacedim>::cell_iterator &)>>
+        &color_enrichments)
+    {
+      color_enrichments.clear();
+
+      // Each color should be associated with a single enrichment function
+      // called color enrichment function which calls the correct enrichment
+      // function for a given cell.
+      //
+      // Assume that a cell has a active predicates with ids 4 (color = 1) and
+      // 5 (color = 2). cellwise_color_predicate_map has this information
+      // provided we know the material id.
+      //
+      // Now a call to color_enrichment[1](cell) should in turn call
+      // enrichments[4](cell). That is just what this lambda is doing.
+      color_enrichments.resize(num_colors);
+      for (unsigned int i = 0; i < num_colors; ++i)
+        {
+          color_enrichments[i] =
+            [&, i](const typename Triangulation<dim, spacedim>::cell_iterator
+                     &cell) {
+              unsigned int id = cell->material_id();
+
+              /*
+               * i'th color_enrichment function corresponds to (i+1)'th color.
+               * Since FE_Enriched takes function pointers, we return a
+               * function pointer.
+               */
+              return enrichments[cellwise_color_predicate_map.at(id).at(i + 1)]
+                .get();
+            };
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    make_fe_collection_from_colored_enrichments(
+      const unsigned int &                       num_colors,
+      const std::vector<std::set<unsigned int>> &fe_sets,
+      const std::vector<std::function<const Function<spacedim> *(
+        const typename Triangulation<dim, spacedim>::cell_iterator &)>>
+        &                              color_enrichments,
+      const FE_Q<dim, spacedim> &      fe_base,
+      const FE_Q<dim, spacedim> &      fe_enriched,
+      const FE_Nothing<dim, spacedim> &fe_nothing,
+      hp::FECollection<dim, spacedim> &fe_collection)
+    {
+      // define dummy function which is associated with FE_Nothing
+      using cell_function = std::function<const Function<spacedim> *(
+        const typename Triangulation<dim, spacedim>::cell_iterator &)>;
+      cell_function dummy_function;
+      dummy_function =
+        [=](const typename Triangulation<dim, spacedim>::cell_iterator &)
+        -> const Function<spacedim> * {
+        AssertThrow(false,
+                    ExcMessage("Called enrichment function for FE_Nothing"));
+        return nullptr;
+      };
+
+      using EnrichmentFunctions_2DVector =
+        std::vector<std::vector<std::function<const Function<spacedim> *(
+          const typename Triangulation<dim, spacedim>::cell_iterator &)>>>;
+
+      // loop through color sets and create FE_enriched element for each
+      // of them provided before calling this function, we have color
+      // enrichment function associated with each color.
+      for (unsigned int color_set_id = 0; color_set_id != fe_sets.size();
+           ++color_set_id)
+        {
+          std::vector<const FiniteElement<dim, spacedim> *> vec_fe_enriched(
+            num_colors, &fe_nothing);
+          EnrichmentFunctions_2DVector functions(num_colors, {dummy_function});
+
+          for (auto it = fe_sets[color_set_id].begin();
+               it != fe_sets[color_set_id].end();
+               ++it)
+            {
+              // Given a color id ( = *it), corresponding color enrichment
+              // function is at index id-1 because color_enrichments is
+              // is indexed from zero.
+              const unsigned int ind = *it - 1;
+
+              AssertIndexRange(ind, vec_fe_enriched.size());
+              AssertIndexRange(ind, functions.size());
+              AssertIndexRange(ind, color_enrichments.size());
+
+              // Assume a active predicate colors {1,2} for a cell.
+              // We then need to create a vector of FE enriched elements
+              // with vec_fe_enriched[0] = vec_fe_enriched[1] = &fe_enriched
+              // which can later be associated with enrichment functions.
+              vec_fe_enriched[ind] = &fe_enriched;
+
+              // color_set_id'th color function is (color_set_id-1)
+              // element of color wise enrichments
+              functions[ind].assign(1, color_enrichments[ind]);
+            }
+
+          AssertDimension(vec_fe_enriched.size(), functions.size());
+
+          FE_Enriched<dim, spacedim> fe_component(
+            &fe_base, vec_fe_enriched, functions);
+          fe_collection.push_back(fe_component);
+        }
+    }
+  } // namespace internal
+
+
+
+  template <int dim, int spacedim>
+  Helper<dim, spacedim>::Helper(
+    const FE_Q<dim, spacedim> &                             fe_base,
+    const FE_Q<dim, spacedim> &                             fe_enriched,
+    const std::vector<predicate_function<dim, spacedim>> &  predicates,
+    const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments) :
+    fe_base(fe_base),
+    fe_enriched(fe_enriched),
+    fe_nothing(1, true),
+    predicates(predicates),
+    enrichments(enrichments)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  const hp::FECollection<dim, spacedim> &
+  Helper<dim, spacedim>::build_fe_collection(
+    hp::DoFHandler<dim, spacedim> &dof_handler)
+  {
+    // color the predicates based on connections between corresponding
+    // subdomains
+    if (predicates.size() != 0)
+      num_colors =
+        internal::color_predicates(dof_handler, predicates, predicate_colors);
+    else
+      num_colors = 0;
+
+    // create color maps and color list for each cell
+    internal::set_cellwise_color_set_and_fe_index(dof_handler,
+                                                  predicates,
+                                                  predicate_colors,
+                                                  cellwise_color_predicate_map,
+                                                  fe_sets);
+    // setup color wise enrichment functions
+    // i'th function corresponds to (i+1) color!
+    internal::make_colorwise_enrichment_functions<dim, spacedim>(
+      num_colors, enrichments, cellwise_color_predicate_map, color_enrichments);
+
+    // make FE_Collection
+    internal::make_fe_collection_from_colored_enrichments(num_colors,
+                                                          fe_sets,
+                                                          color_enrichments,
+                                                          fe_base,
+                                                          fe_enriched,
+                                                          fe_nothing,
+                                                          fe_collection);
+
+    return fe_collection;
+  }
+} // namespace ColorEnriched
 
 
 // explicit instantiations
