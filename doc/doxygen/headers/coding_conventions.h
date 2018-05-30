@@ -54,7 +54,10 @@ style guidelines outlined in this page. Alternatively, you can run
 </pre>
 </code>
 in whatever directory you set up the library to be compiled in to indent all
-source files.
+source files. If you want to make sure that the indenting is correct for all
+your commits, you might want to set up a pre-commit hook. One way to do so,
+is to copy ${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format to
+${SOURCE_DIR}/.git/hooks/pre-commit and make sure it is executable.
 </p>
 
 <h3>Style issues</h3>
@@ -75,7 +78,8 @@ source files.
 <li> In the implementation files, after each function, three empty lines are
   expected to enable better readability. One empty line occurs in functions to
   group blocks of code, since two empty lines are not enough to visibly
-  distinguish sufficiently that the code belongs to two different functions.</li>
+  distinguish sufficiently that the code belongs to two different
+  functions.</li>
 
 <li> Whenever an integer variable can only assume nonnegative values,
   it is marked as unsigned. The same applies to functions that can only
@@ -188,33 +192,35 @@ deal.II we adopt the following convention:</p>
 <ol>
 
 <li> If we can enumerate all possible template arguments (e.g., the dimension
-can only be 1, 2, or 3), then a function template goes into the <code>.cc</code> file and
-we explicitly instantiate all possibilities. Users will not have any need to
-ever see these function templates because they will not want to instantiate
-these functions for any other template arguments anyway. </li>
+can only be 1, 2, or 3), then a function template goes into the <code>.cc</code>
+file and we explicitly instantiate all possibilities. Users will not have any
+need to ever see these function templates because they will not want to
+instantiate these functions for any other template arguments anyway. </li>
 
 <li> If we can not enumerate all possible template arguments (e.g., vector
 types -- because users might want to define their own vector kinds) but at
 least know a few common usage cases, then the function is put into a
-<code>.templates.h</code> file. We #include it into the <code>.cc</code> file and instantiate the
-functions for all of the common arguments. For almost all users, this will be
-just fine -- they only use the (vector, matrix, ...) types we already
-instantiate, and for them the <code>.templates.h</code> file will not be of any interest.
-It will also not slow down their compilations because nothing they see will
-#include the <code>.templates.h</code> file. But users who define their own
-(vector, matrix, ...) types can instantiate the template functions with their
-own user-defined types by including the <code>.templates.h</code> files.
+<code>.templates.h</code> file. We #include it into the <code>.cc</code> file
+and instantiate the functions for all of the common arguments. For almost all
+users, this will be just fine -- they only use the (vector, matrix, ...) types
+we already instantiate, and for them the <code>.templates.h</code> file will not
+be of any interest. It will also not slow down their compilations because
+nothing they see will #include the <code>.templates.h</code> file. But users who
+define their own (vector, matrix, ...) types can instantiate the template
+functions with their own user-defined types by including the
+<code>.templates.h</code> files.
 
 <li> Finally, if we can not assume in advance which values template arguments
 will take (e.g., any class derived from Subscriptor can be used as an argument),
 the definitions of functions are provided at the bottom of the header
-file with declarations. The definitions should be guarded with <code>#ifndef DOXYGEN ...
-#endif</code> to prevent Doxygen from picking them up.</li>
+file with declarations. The definitions should be guarded with <code>#ifndef
+DOXYGEN ... #endif</code> to prevent Doxygen from picking them up.</li>
 
 </ol>
 
-<p> For the first two cases, instantiation instructions are defined in <code>.inst.in</code>
-files. They are processed by a binary called expand_instantiations (built from
+<p> For the first two cases, instantiation instructions are defined in
+<code>.inst.in</code> files. They are processed by a binary called
+expand_instantiations (built from
 <code>cmake/scripts/expand_instantiations.cc</code>) and the parameters are
 defined dynamically through cmake depending on your configuration (see
 <code>share/deal.II/template-arguments</code> in your build directory).
@@ -438,7 +444,8 @@ we list here:
       ... // something lengthy and complicated
       for (cell = dof_handler.begin_active(); ...)
         {
-          <b>const</b> Point<dim> cell_center = (cell->vertex(0) + cell->vertex(1)) / 2;
+          <b>const</b> Point<dim> cell_center = (cell->vertex(0) +
+                                                 cell->vertex(1)) / 2;
           ...
         }
   </pre>
