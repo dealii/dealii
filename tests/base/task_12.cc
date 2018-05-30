@@ -19,8 +19,6 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include "../tests.h"
 
 
@@ -30,7 +28,7 @@ double
 test(int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
-  sleep(1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   deallog << "Task " << i << " finished!" << std::endl;
 
   return 3.141;

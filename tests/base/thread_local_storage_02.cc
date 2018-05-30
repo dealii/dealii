@@ -66,7 +66,7 @@ execute(int i)
 
   // wait in order to make sure that the
   // thread lives longer than the TLS object
-  sleep(5);
+  std::this_thread::sleep_for(std::chrono::seconds(5));
 }
 
 

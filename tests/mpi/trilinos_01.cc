@@ -71,7 +71,7 @@ test()
           MPI_Iprobe(0, 12345, MPI_COMM_WORLD, &flag, &status);
           std::cout << flag << std::endl;
 
-          sleep(1);
+          std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
       Assert(flag != 0, ExcMessage("hang in has_ghost_elements()"));

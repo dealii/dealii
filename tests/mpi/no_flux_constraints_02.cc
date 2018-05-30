@@ -135,7 +135,7 @@ test()
     constraints.print(file);
   }
   MPI_Barrier(MPI_COMM_WORLD);
-  sleep(1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   if (myid == 0)
     {
       // sort and merge the constraint matrices on proc 0, generate a checksum

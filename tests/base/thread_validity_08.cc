@@ -18,8 +18,6 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include <atomic>
 
 #include "../tests.h"
@@ -65,7 +63,7 @@ main()
   {
     Threads::new_thread(worker);
   }
-  sleep(1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // let abandoned thread continue
   mutex.release();

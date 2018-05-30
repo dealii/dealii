@@ -19,8 +19,6 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include "../tests.h"
 
 
@@ -28,7 +26,7 @@ void
 worker()
 {
   deallog << "Worker thread is starting." << std::endl;
-  sleep(3);
+  std::this_thread::sleep_for(std::chrono::seconds(3));
   deallog << "Worker thread is finished." << std::endl;
 }
 

@@ -39,7 +39,6 @@ test_mpi()
   for (unsigned int i = 1; i < numprocs; ++i)
     {
       MPI_Barrier(MPI_COMM_WORLD);
-      //      system("sleep 1");
 
       if (myid == 0)
         {
