@@ -18,8 +18,6 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include "../tests.h"
 
 Threads::Mutex mutex;
@@ -36,7 +34,7 @@ a_task()
 
   // Sleep some time to make sure all other concurrently running tasks enter
   // here.
-  sleep(1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 
   mutex.acquire();
   n_running--;

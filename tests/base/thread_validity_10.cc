@@ -19,8 +19,6 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include "../tests.h"
 
 
@@ -31,7 +29,7 @@ int            spin_lock = 0;
 int
 worker()
 {
-  sleep(1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   return 42;
 }
 

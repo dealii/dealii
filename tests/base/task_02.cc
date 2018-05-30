@@ -18,15 +18,13 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include "../tests.h"
 
 
 int
 test()
 {
-  sleep(3);
+  std::this_thread::sleep_for(std::chrono::seconds(3));
   return 42;
 }
 

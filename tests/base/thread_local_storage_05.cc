@@ -19,8 +19,6 @@
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include "../tests.h"
 
 
@@ -78,7 +76,7 @@ test()
     }
 
   // let threads work through their first part
-  sleep(3);
+  std::this_thread::sleep_for(std::chrono::seconds(3));
 
   // then reset the thread local object and release the mutices so the
   // threads can actually run to an end

@@ -18,8 +18,6 @@
 
 #include <deal.II/base/thread_management.h>
 
-#include <unistd.h>
-
 #include "../tests.h"
 
 
@@ -48,7 +46,7 @@ main()
 
   Threads::Thread<> t = Threads::new_thread(&test);
 
-  sleep(2);
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   deallog << "1" << std::endl;
 
   mutex.release();
