@@ -26,8 +26,8 @@
 void
 test()
 {
-  unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  const int    numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   {
     Vector<int> values(2);
@@ -35,8 +35,8 @@ test()
     values[1] = 2;
     Vector<int> sums(2);
     Utilities::MPI::sum(values, MPI_COMM_WORLD, sums);
-    Assert(sums[0] == numprocs, ExcInternalError());
-    Assert(sums[1] == 2 * numprocs, ExcInternalError());
+    Assert((unsigned int)sums[0] == numprocs, ExcInternalError());
+    Assert((unsigned int)sums[1] == 2 * numprocs, ExcInternalError());
 
     if (myid == 0)
       deallog << sums[0] << ' ' << sums[1] << std::endl;
