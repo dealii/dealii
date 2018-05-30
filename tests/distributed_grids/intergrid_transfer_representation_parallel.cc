@@ -67,7 +67,7 @@ test(unsigned n_refinements)
   // do some local refinement
   Point<dim> p0;
   p0 *= 0.;
-  for (int i = 0; i < n_refinements; ++i)
+  for (unsigned int i = 0; i < n_refinements; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator cell;
       for (cell = tria2.begin_active(); cell != tria2.end(); ++cell)

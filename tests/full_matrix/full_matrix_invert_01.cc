@@ -100,8 +100,8 @@ template <typename number>
 void
 check()
 {
-  int nFails = 0;
-  int maxDim = 10;
+  unsigned int nFails = 0;
+  unsigned int maxDim = 10;
   for (unsigned int i = 1; i <= maxDim; ++i)
     {
       for (unsigned int j = 1; j <= maxDim; ++j)

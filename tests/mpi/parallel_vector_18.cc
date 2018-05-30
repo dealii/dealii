@@ -54,8 +54,8 @@ test()
   // set local values
   if (myid < 8)
     {
-      types::global_dof_index n_elements = 2;
-      types::global_dof_index indices[n_elements];
+      constexpr types::global_dof_index n_elements = 2;
+      types::global_dof_index           indices[n_elements];
       indices[0] = myid * 2;
       indices[1] = myid * 2 + 1;
       float values[2];

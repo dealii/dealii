@@ -64,9 +64,9 @@ check_this(const DoFHandler<dim> &dof_handler)
     if (is_hanging_node_constrained[dof])
       AssertThrow(constraints.is_constrained(dof), ExcInternalError());
 
-  AssertThrow(std::count(is_hanging_node_constrained.begin(),
-                         is_hanging_node_constrained.end(),
-                         true) == constraints.n_constraints(),
+  AssertThrow((unsigned int)(std::count(is_hanging_node_constrained.begin(),
+                                        is_hanging_node_constrained.end(),
+                                        true)) == constraints.n_constraints(),
               ExcInternalError());
 
   deallog << "OK" << std::endl;

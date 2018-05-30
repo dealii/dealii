@@ -49,7 +49,7 @@ test_real_to_unit_cell()
     {
       mapping.transform_real_to_unit_cell(cell, point);
     }
-  catch (typename Mapping<dim>::ExcTransformationFailed)
+  catch (const typename Mapping<dim>::ExcTransformationFailed &)
     {
       deallog << "Transformation for point " << point << " on cell with "
               << "center " << cell->center() << " is not invertible"

@@ -67,19 +67,19 @@ test()
   if (my_id == 0)
     {
       deallog << "Distributed:" << std::endl;
-      for (unsigned int i = begin_index; i < end_index; ++i)
+      for (int i = begin_index; i < end_index; ++i)
         deallog << i << ": " << distributed(i) << std::endl;
 
       deallog << "Ghosted:" << std::endl;
-      for (unsigned int i = local_begin; i < local_end; ++i)
+      for (int i = local_begin; i < local_end; ++i)
         deallog << i << ": " << ghosted(i) << std::endl;
     }
 
   // verify correct value
-  for (unsigned int i = begin_index; i < end_index; ++i)
+  for (int i = begin_index; i < end_index; ++i)
     Assert(distributed(i) == 3, ExcInternalError());
 
-  for (unsigned int i = local_begin; i < local_end; ++i)
+  for (int i = local_begin; i < local_end; ++i)
     Assert(ghosted(i) == 3, ExcInternalError());
 }
 

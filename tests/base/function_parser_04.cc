@@ -82,7 +82,7 @@ test2()
                   copy_data());
   std::cout << "result: " << result << std::endl;
 
-  Assert(result == v.size(), ExcMessage("uhuh!"));
+  Assert((unsigned int)result == v.size(), ExcMessage("uhuh!"));
 }
 
 

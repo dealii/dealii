@@ -37,7 +37,7 @@ main(int argc, const char *argv[])
   tria.refine_global(4);
 
   Vector<float> indicator(tria.n_active_cells());
-  for (int i = 0; i != indicator.size(); ++i)
+  for (unsigned int i = 0; i != indicator.size(); ++i)
     {
       indicator[i] = i;
     }
@@ -50,7 +50,7 @@ main(int argc, const char *argv[])
   deallog << "n_active_cells: " << tria.n_active_cells() << std::endl;
 
   indicator.reinit(tria.n_active_cells());
-  for (int i = 0; i != indicator.size(); ++i)
+  for (unsigned int i = 0; i != indicator.size(); ++i)
     {
       indicator[i] = i;
     }

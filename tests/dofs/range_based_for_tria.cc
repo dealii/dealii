@@ -61,7 +61,7 @@ check()
 
       for (auto cell : tr.cell_iterators())
         AssertThrow((cell->user_flag_set() == !cell->has_children()) ||
-                      (l != cell->level()),
+                      (l != (unsigned int)cell->level()),
                     ExcInternalError());
     }
 
