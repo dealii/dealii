@@ -1,0 +1,6 @@
+New: The introduction to step-6 has been completely rewritten. It
+previously mentioned only the bare minimum about what this important
+tutorial program actually does. It now gives a much broader overview
+of why we use adaptive meshes and how this is achieved in practice.
+<br>
+(Wolfgang Bangerth, 2018/05/25)
