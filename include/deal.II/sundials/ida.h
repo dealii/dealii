@@ -178,14 +178,14 @@ namespace SUNDIALS
    * VectorType y(2);
    * VectorType y_dot(2);
    *
+   * double kappa = 1.0;
+   *
    * FullMatrix<double> A(2,2);
    * A(0,1) = -1.0;
    * A(1,0) = kappa*kappa;
    *
    * FullMatrix<double> J(2,2);
    * FullMatrix<double> Jinv(2,2);
-   *
-   * double kappa = 1.0;
    *
    * IDA time_stepper;
    *
