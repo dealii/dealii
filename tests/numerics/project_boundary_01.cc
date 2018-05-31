@@ -148,8 +148,8 @@ check()
   fe_list.push_back(new FE_Q<dim>(1));
   function_list.push_back(new MySquareFunction<dim>(1));
 
-  // test four different cases for the parameter: 1, 1e-20, 1e-170, 1e-800 (= 0)
-  double factors[] = {1., 1e-40, 1e-170, 1e-800};
+  // test four different cases for the parameter: 1, 1e-20, 1e-170, 0.
+  double factors[] = {1., 1e-40, 1e-170, 0.};
   for (unsigned int it = 0; it < 4; ++it)
     {
       deallog.push(Utilities::int_to_string(it, 1));

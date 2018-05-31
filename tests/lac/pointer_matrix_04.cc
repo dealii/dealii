@@ -43,7 +43,7 @@ main()
   FullMatrix<double> A(2, 2);
   A.fill(Adata);
 
-  char *name = "Matrix A";
+  char name[] = "Matrix A";
 
   checkConstructor4<double>(A, name);
 }

@@ -31,14 +31,14 @@
 class FunctionBase
 {
 public:
-  ~FunctionBase()
+  virtual ~FunctionBase()
   {}
 
   virtual void
   do_test() = 0;
 };
 
-class Function
+class Function : public FunctionBase
 {
 public:
   Function() : size_(2)
@@ -51,13 +51,13 @@ public:
     deallog << "Copy construct object" << std::endl;
   }
 
-  ~Function()
+  virtual ~Function() override
   {
     deallog << "Destruct with size " << vec.size() << std::endl;
   }
 
   virtual void
-  do_test()
+  do_test() override
   {
     vec.resize(size_++);
     deallog << "Resize vector to " << vec.size() << std::endl;

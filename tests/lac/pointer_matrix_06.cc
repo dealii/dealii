@@ -25,11 +25,11 @@ template <typename number>
 void
 checkTvmult(FullMatrix<number> &A,
             Vector<number> &    V,
-            char *              name = "Test Matrix")
+            const std::string & name = "Test Matrix")
 {
   deallog << "Tvmult" << std::endl;
 
-  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name);
+  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name.c_str());
   Vector<number>                                    O(A.m());
   P.Tvmult(O, V);
 

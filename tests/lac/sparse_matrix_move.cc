@@ -48,15 +48,6 @@ graph_laplacian(const SparsityPattern &sparsity)
 }
 
 
-SparseMatrix<double>
-graph_laplacian_move_return(const SparsityPattern &sparsity)
-{
-  SparseMatrix<double> A(sparsity);
-  graph_laplacian(sparsity, A);
-
-  return std::move(A);
-}
-
 
 int
 main()
@@ -88,16 +79,17 @@ main()
   }
 
   {
-    // Return a sparse matrix using the move constructor
-    SparseMatrix<double> A = graph_laplacian_move_return(sparsity);
+    // Return a sparse matrix using the move constructoir
+    SparseMatrix<double> B = graph_laplacian(sparsity);
+    SparseMatrix<double> A = std::move(B);
     deallog << A.n_nonzero_elements() << std::endl;
+    deallog << B.empty() << std::endl;
     y = 1.0;
     A.vmult(y, x);
 
     deallog << y.l2_norm() << std::endl;
 
     // Explicitly move a sparse matrix
-    SparseMatrix<double> B;
     B = std::move(A);
     deallog << B.m() << std::endl;
     deallog << A.empty() << std::endl;

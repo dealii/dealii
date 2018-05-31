@@ -49,7 +49,7 @@ class MyManifold : public Manifold<dim>
 
   virtual Point<dim>
   get_new_point_on_line(
-    const typename Triangulation<dim>::line_iterator &line) const
+    const typename Triangulation<dim>::line_iterator &line) const override
   {
     deallog << "Finding point between " << line->vertex(0) << " and "
             << line->vertex(1) << std::endl;
@@ -59,7 +59,7 @@ class MyManifold : public Manifold<dim>
 
   virtual Point<dim>
   get_new_point_on_quad(
-    const typename Triangulation<dim>::quad_iterator &) const
+    const typename Triangulation<dim>::quad_iterator &) const override
   {
     Assert(false, ExcInternalError());
     return Point<dim>(0, 0, 1.25);
