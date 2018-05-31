@@ -277,7 +277,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     #
     # https://llvm.org/bugs/show_bug.cgi?id=16876
     #
-    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS_DEBUG}")
+    PUSH_CMAKE_REQUIRED("-g")
     CHECK_CXX_SOURCE_COMPILES(
       "
       struct foo
