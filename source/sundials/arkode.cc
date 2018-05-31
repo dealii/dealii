@@ -300,7 +300,8 @@ namespace SUNDIALS
 
     double next_time = data.initial_time;
 
-    output_step(0, solution, 0);
+    if (output_step)
+      output_step(0, solution, 0);
 
     while (t < data.final_time)
       {
