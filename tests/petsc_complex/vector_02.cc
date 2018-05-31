@@ -37,7 +37,7 @@ test()
   v.compress(VectorOperation::insert);
 
   PETScWrappers::MPI::Vector v2(MPI_COMM_WORLD, s, s);
-  for (int k = 0; k < v2.size(); ++k)
+  for (int k = 0; (unsigned int)k < v2.size(); ++k)
     v2(k) = PetscScalar(k, -k);
 
   v2.compress(VectorOperation::insert);

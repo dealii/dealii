@@ -25,11 +25,11 @@ template <typename number>
 void
 checkVmult_add(FullMatrix<number> &A,
                Vector<number> &    V,
-               char *              name = "Test Matrix")
+               const std::string & name = "Test Matrix")
 {
   deallog << "vmult_add" << std::endl;
 
-  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name);
+  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name.c_str());
 
   deallog << "Result vector set to all ones and to be added with result"
           << std::endl;

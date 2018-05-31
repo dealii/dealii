@@ -42,7 +42,7 @@ Point<3> distort_planar(Point<3> p)
 // a saddle surface
 Point<3> distort_twisted(Point<3> p)
 {
-  if (p(2) > 0.5 && (p(0) > 0.5 ^ p(1) > 0.5))
+  if (p(2) > 0.5 && ((p(0) > 0.5) ^ (p(1) > 0.5)))
     {
       p(2) += 1;
     }

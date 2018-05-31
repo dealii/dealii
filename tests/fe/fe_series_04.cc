@@ -165,8 +165,8 @@ test_legendre_orthonormal(const unsigned int N)
 
   QGauss<dim> quadrature(8);
   deallog << "orthogonality: " << std::endl;
-  for (int k1 = 0; k1 < N; k1++)
-    for (int k2 = 0; k2 < N; k2++)
+  for (unsigned int k1 = 0; k1 < N; k1++)
+    for (unsigned int k2 = 0; k2 < N; k2++)
       {
         double ortho = 0;
         for (unsigned int q = 0; q < quadrature.size(); ++q)

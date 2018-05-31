@@ -54,14 +54,16 @@ main()
     TopoDS_Edge edge           = BRepBuilderAPI_MakeEdge(circle);
 
     NormalProjectionBoundary<2, 3>  manifold_b(edge);
-    std::unique_ptr<Manifold<2, 3>> clone_b = manifold_b.clone();
+    std::unique_ptr<Manifold<2, 3>> clone_b       = manifold_b.clone();
+    const auto &                    deref_clone_b = *clone_b;
     deallog << "typeid of NormalProjectionBoundary<2, 3> is "
-            << boost::core::demangle(typeid(*clone_b).name()) << std::endl;
+            << boost::core::demangle(typeid(deref_clone_b).name()) << std::endl;
 
     NormalProjectionManifold<2, 3>  manifold_m(edge);
-    std::unique_ptr<Manifold<2, 3>> clone_m = manifold_m.clone();
+    std::unique_ptr<Manifold<2, 3>> clone_m       = manifold_m.clone();
+    const auto &                    deref_clone_m = *clone_m;
     deallog << "typeid of NormalProjectionManifold<2, 3> is "
-            << boost::core::demangle(typeid(*clone_m).name()) << std::endl;
+            << boost::core::demangle(typeid(deref_clone_m).name()) << std::endl;
   }
 
   {
@@ -81,15 +83,17 @@ main()
 
     DirectionalProjectionBoundary<2, 3> manifold_b(face, Point<3>(0, 0, 1));
 
-    std::unique_ptr<Manifold<2, 3>> clone_b = manifold_b.clone();
+    std::unique_ptr<Manifold<2, 3>> clone_b       = manifold_b.clone();
+    const auto &                    deref_clone_b = *clone_b;
     deallog << "typeid of DirectionalProjectionBoundary<2, 3> is "
-            << boost::core::demangle(typeid(*clone_b).name()) << std::endl;
+            << boost::core::demangle(typeid(deref_clone_b).name()) << std::endl;
 
     DirectionalProjectionManifold<2, 3> manifold_m(face, Point<3>(0, 0, 1));
 
-    std::unique_ptr<Manifold<2, 3>> clone_m = manifold_m.clone();
+    std::unique_ptr<Manifold<2, 3>> clone_m       = manifold_m.clone();
+    const auto &                    deref_clone_m = *clone_m;
     deallog << "typeid of DirectionalProjectionManifold<2, 3> is "
-            << boost::core::demangle(typeid(*clone_m).name()) << std::endl;
+            << boost::core::demangle(typeid(deref_clone_m).name()) << std::endl;
   }
 
   // Create a bspline passing through the points
@@ -109,14 +113,16 @@ main()
 
     NormalToMeshProjectionBoundary<1, 3> manifold_b(face);
 
-    std::unique_ptr<Manifold<1, 3>> clone_b = manifold_b.clone();
+    std::unique_ptr<Manifold<1, 3>> clone_b       = manifold_b.clone();
+    const auto &                    deref_clone_b = *clone_b;
     deallog << "typeid of NormalProjectionBoundary<2, 3> is "
-            << boost::core::demangle(typeid(*clone_b).name()) << std::endl;
+            << boost::core::demangle(typeid(deref_clone_b).name()) << std::endl;
 
     NormalToMeshProjectionManifold<1, 3> manifold_m(face);
-    std::unique_ptr<Manifold<1, 3>>      clone_m = manifold_m.clone();
+    std::unique_ptr<Manifold<1, 3>>      clone_m       = manifold_m.clone();
+    const auto &                         deref_clone_m = *clone_m;
     deallog << "typeid of NormalProjectionManifold<2, 3> is "
-            << boost::core::demangle(typeid(*clone_m).name()) << std::endl;
+            << boost::core::demangle(typeid(deref_clone_m).name()) << std::endl;
   }
 
   deallog << "OK" << std::endl;

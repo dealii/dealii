@@ -83,7 +83,7 @@ test()
 
   IndexSet local_relevant_3(global_size);
   local_relevant_3.add_index(2);
-  if (myid > 0 < my_start)
+  if (myid > 0 && my_start > 0)
     local_relevant_3.add_range(my_start - 10, my_start);
   Utilities::MPI::Partitioner x(local_owned, MPI_COMM_WORLD);
   x.set_ghost_indices(local_relevant_3, v.ghost_indices());

@@ -30,6 +30,30 @@
 #include "../tests.h"
 
 
+template <int dim>
+typename Triangulation<dim>::quad_iterator
+get_quad_iterator(const typename Triangulation<dim>::active_cell_iterator &cell,
+                  const unsigned int quad);
+
+template <>
+typename Triangulation<2>::quad_iterator
+get_quad_iterator<2>(
+  const typename Triangulation<2>::active_cell_iterator &cell,
+  const unsigned int /*quad*/)
+{
+  return *reinterpret_cast<const typename Triangulation<2>::quad_iterator *>(
+    &cell);
+}
+
+template <>
+typename Triangulation<3>::quad_iterator
+get_quad_iterator<3>(
+  const typename Triangulation<3>::active_cell_iterator &cell,
+  const unsigned int                                     quad)
+{
+  return cell->quad(quad);
+}
+
 
 template <int dim>
 void
@@ -67,10 +91,7 @@ test()
       for (unsigned int e = 0; e < GeometryInfo<dim>::quads_per_cell; ++e)
         {
           const typename Triangulation<dim>::quad_iterator quad =
-            (dim > 2 ?
-               cell->quad(e) :
-               *reinterpret_cast<
-                 const typename Triangulation<dim>::quad_iterator *>(&cell));
+            get_quad_iterator<dim>(cell, e);
 
           deallog << "    Quad " << e << ", projected point=";
 

@@ -38,7 +38,7 @@ main()
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  char *name = "Matrix A";
+  char name[] = "Matrix A";
 
   checkConstructor3<double>(name);
 }

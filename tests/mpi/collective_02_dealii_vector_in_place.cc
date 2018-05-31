@@ -34,8 +34,8 @@ test()
     sums[0] = 1;
     sums[1] = 2;
     Utilities::MPI::sum(sums, MPI_COMM_WORLD, sums);
-    Assert(sums[0] == numprocs, ExcInternalError());
-    Assert(sums[1] == 2 * numprocs, ExcInternalError());
+    Assert((unsigned int)sums[0] == numprocs, ExcInternalError());
+    Assert((unsigned int)sums[1] == 2 * numprocs, ExcInternalError());
 
     if (myid == 0)
       deallog << sums[0] << ' ' << sums[1] << std::endl;

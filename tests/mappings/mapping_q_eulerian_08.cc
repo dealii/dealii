@@ -139,8 +139,8 @@ test(const unsigned int n_ref = 0)
            cell != triangulation.end();
            ++cell)
         if (cell->is_locally_owned() &&
-            (cell->center().norm() < 0.5 &&
-               (cell->level() < 5 || cell->center().norm() > 0.45) ||
+            ((cell->center().norm() < 0.5 &&
+              (cell->level() < 5 || cell->center().norm() > 0.45)) ||
              (dim == 2 && cell->center().norm() > 1.2)))
           cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();

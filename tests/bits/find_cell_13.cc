@@ -64,7 +64,7 @@ void check(Triangulation<2> &tria)
               << " Point: " << p;
       deallog << std::endl; // Flush deallog buffer
     }
-  catch (GridTools::ExcPointNotFound<2>)
+  catch (const GridTools::ExcPointNotFound<2> &)
     {
       deallog
         << "The first call to the function find_closest_vertex() has thrown "

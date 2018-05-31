@@ -120,14 +120,15 @@ factorial(unsigned int a)
 double
 newton_binomial(unsigned int a, unsigned int b)
 {
-  double c;
+  double c = 0.;
   if (a >= b)
-    c = factorial(a) / factorial(b) / factorial(a - b);
-  else
-    deallog
-      << "Error: in Newton binomial the first integer must be greater or equal to the second.";
+    return factorial(a) / factorial(b) / factorial(a - b);
 
-  return c;
+  // we should not get here
+  deallog << "Error: in Newton binomial the first integer "
+             "must be greater or equal to the second.";
+
+  return 0.;
 }
 
 int

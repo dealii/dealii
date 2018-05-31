@@ -193,7 +193,7 @@ test()
 
       // Check that all the vertices are within the sphere
       // (sphere with thickness 100. *std::numeric_limits<double>::epsilon())
-      for (int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         AssertThrow(std::fabs(center.distance(tria.begin_active()->vertex(v))) <
                       radius + 100. * std::numeric_limits<double>::epsilon(),
                     ExcInternalError());

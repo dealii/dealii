@@ -92,7 +92,9 @@ test()
     dof_handler2.distribute_dofs(fe);
     try
       {
-        (dof_handler.begin_active() != dof_handler2.begin_active());
+        bool is_same =
+          (dof_handler.begin_active() != dof_handler2.begin_active());
+        (void)is_same;
       }
     catch (ExceptionBase &e)
       {

@@ -23,11 +23,13 @@
 
 template <typename number>
 void
-checkVmult(FullMatrix<number> &A, Vector<number> &V, char *name = "Test Matrix")
+checkVmult(FullMatrix<number> &A,
+           Vector<number> &    V,
+           const std::string & name = "Test Matrix")
 {
   deallog << "vmult" << std::endl;
 
-  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name);
+  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A, name.c_str());
   Vector<number>                                    O(A.m());
   P.vmult(O, V);
 

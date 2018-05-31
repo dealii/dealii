@@ -523,7 +523,7 @@ run()
   for (unsigned int i = 0; i < n; ++i)
     sp.add(mati[i], matj[i]);
 
-  for (unsigned int i = 0; i < dim; ++i)
+  for (int i = 0; i < dim; ++i)
     sp.add(i, i);
 
   sp.compress();
@@ -533,7 +533,7 @@ run()
   TrilinosWrappers::MPI::Vector  x2(owned, MPI_COMM_WORLD);
   TrilinosWrappers::MPI::Vector  b(owned, MPI_COMM_WORLD);
 
-  for (unsigned int i = 0; i < dim; ++i)
+  for (int i = 0; i < dim; ++i)
     mat.set(i, i, 1.0);
 
 

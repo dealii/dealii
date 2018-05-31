@@ -76,14 +76,14 @@ test_one_object(const TESTEE<dim> &f,
     deallog << std::endl;
     std::vector<Number> return_values(n_points);
     f.value_list(points, return_values /*, component = 0*/);
-    for (int i = 0; i < n_points; ++i)
+    for (unsigned int i = 0; i < n_points; ++i)
       {
         deallog << return_values[i] << ' ';
       }
     deallog << std::endl;
 
     f.value_list(points, return_values, std::min(n_component - 1, 3u));
-    for (int i = 0; i < n_points; ++i)
+    for (unsigned int i = 0; i < n_points; ++i)
       {
         deallog << return_values[i] << ' ';
       }
@@ -96,7 +96,7 @@ test_one_object(const TESTEE<dim> &f,
     std::vector<Vector<Number>> return_values(n_points,
                                               Vector<Number>(n_component));
     f.vector_value_list(points, return_values);
-    for (int p = 0; p < n_points; ++p)
+    for (unsigned int p = 0; p < n_points; ++p)
       {
         for (unsigned int c = 0; c < n_component; ++c)
           deallog << return_values[p][c] << ' ';
