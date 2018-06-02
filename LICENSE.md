@@ -44,15 +44,16 @@ scientific result. In addition, it helps us justify our effort in
 developing deal.II as an academic undertaking.
 
 We keep a list of publications using deal.II. Feel free to let us know
-about your publications.
+about your publications so that we can add them to the aforementioned list.
 
 
-Parts of the deal.II distribution under a separate license
-----------------------------------------------------------
+Bundled third party software in the deal.II repository
+------------------------------------------------------
 
 The subdirectory `bundled/` contains third party software. <b>Please note
-that the software there is copyrighted by others than the deal.II
-authors</b> and are covered by different licenses.
+that the software located there is copyrighted by their respective
+authors</b> (independent of the deal.II authors) and are covered by
+different licenses.
 
 The libraries listed above are all open source and as such place few
 restrictions on their use. However, if you want to distribute software
