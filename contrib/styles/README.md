@@ -1,12 +1,6 @@
 This folder contains style files for IDEs for deal.II
 ==============================================================
 
-Astyle
-------
-
-    astyle.rc - C++ style for astyle, see contrib/utilities/indent
-
-
 Atom
 ----
 
