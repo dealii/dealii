@@ -157,8 +157,11 @@ namespace TrilinosWrappers
     {
       nonlocal_vector.reset();
 
+      const bool overlapping =
+        !parallel_partitioner.is_ascending_and_one_to_one(communicator);
+
       Epetra_Map map =
-        parallel_partitioner.make_trilinos_map(communicator, true);
+        parallel_partitioner.make_trilinos_map(communicator, overlapping);
 
       vector = std_cxx14::make_unique<Epetra_FEVector>(map);
 
