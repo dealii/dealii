@@ -24,8 +24,8 @@ The deal.II project does not require copyright assignments for
 contributions. This means that the copyright for code contributions in the
 deal.II project is held by its respective contributors who have each agreed
 to release their contributed code under a compatible open source license
-(LGPL v2.1 for library code). The full
-text of the Developer Certificate of Origin version 1.1 is quoted below.
+(LGPL v2.1 for library code). The full text of the Developer Certificate of
+Origin version 1.1 is quoted below.
 
 
 Referencing the library
@@ -45,6 +45,8 @@ developing deal.II as an academic undertaking.
 
 We keep a list of publications using deal.II. Feel free to let us know
 about your publications so that we can add them to the aforementioned list.
+You can do this by emailing the reference information to one of the
+[Principal Developers of deal.II](https://www.dealii.org/authors.html).
 
 
 Bundled third party software in the deal.II repository
