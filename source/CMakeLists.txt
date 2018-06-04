@@ -22,9 +22,10 @@ IF("${DEAL_II_PACKAGE_NAME}" STREQUAL  "")
   MESSAGE(FATAL_ERROR
     "\nWrong source directory specified.\n"
     "You pointed cmake to the subdirectory \"source\" instead of the base "
-    "directory. Make sure that the path in the cmake invocation does not "
-    "end in source. If you have created a \"build\" subdirectory, the "
-    "cmake invocation should simply be of the form:\n"
+    "directory (the one containing the file \"README.md\"). Make sure that "
+    "the path in the cmake invocation does not end in \".../source\". If you "
+    "have created a \"build\" subdirectory, the cmake invocation should simply "
+    "be of the form:\n"
     "  $ cmake  [...options...]  /..\n"
     "(path not ending in \".../source\")"
     )
