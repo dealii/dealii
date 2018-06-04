@@ -43,7 +43,7 @@ Since deal.II is a fairly large project with lots of contributors we use a
 set of
 [coding conventions](https://www.dealii.org/developer/doxygen/deal.II/CodingConventions.html)
 to keep the style of the source code in the library consistent. This
-convention essentially consists of using `astyle` for indentation, camel
+convention essentially consists of using `clang-format` for indentation, camel
 case for classes, and lower case letters with underscores for everything
 else. If you are new to the project then we will work with you to ensure
 your contributions are formatted with this style, so please do not think of
