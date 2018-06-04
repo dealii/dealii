@@ -277,7 +277,9 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     #
     # https://llvm.org/bugs/show_bug.cgi?id=16876
     #
-    PUSH_CMAKE_REQUIRED("-g")
+    SET(_flags "${DEAL_II_CXX_FLAGS_DEBUG}")
+    STRIP_FLAG(_flags "-Wa,--compress-debug-sections")
+    PUSH_CMAKE_REQUIRED("${_flags}")
     CHECK_CXX_SOURCE_COMPILES(
       "
       struct foo
