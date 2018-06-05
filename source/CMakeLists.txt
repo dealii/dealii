@@ -26,7 +26,7 @@ IF("${DEAL_II_PACKAGE_NAME}" STREQUAL  "")
     "the path in the cmake invocation does not end in \".../source\". If you "
     "have created a \"build\" subdirectory, the cmake invocation should simply "
     "be of the form:\n"
-    "  $ cmake  [...options...]  /..\n"
+    "  $ cmake  [...options...]  ../\n"
     "(path not ending in \".../source\")"
     )
 ENDIF()
