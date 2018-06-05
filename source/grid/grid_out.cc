@@ -168,12 +168,6 @@ namespace GridOutFlags
 
 
 
-  Gnuplot::Gnuplot(Gnuplot &&flags) :
-    Gnuplot(static_cast<const Gnuplot &>(flags))
-  {}
-
-
-
   Gnuplot &
   Gnuplot::operator=(const Gnuplot &flags)
   {
@@ -183,14 +177,6 @@ namespace GridOutFlags
     write_additional_boundary_lines = flags.write_additional_boundary_lines;
 
     return *this;
-  }
-
-
-
-  Gnuplot &
-  Gnuplot::operator=(Gnuplot &&flags)
-  {
-    return operator=(static_cast<const Gnuplot &>(flags));
   }
 
 

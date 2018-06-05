@@ -295,24 +295,11 @@ namespace GridOutFlags
     Gnuplot(const Gnuplot &flags);
 
     /**
-     * Move constructor. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot(Gnuplot &&flags);
-
-    /**
      * Copy operator. Needed since this class (for backwards compatibility)
      * has a reference member variable.
      */
     Gnuplot &
     operator=(const Gnuplot &flags);
-
-    /**
-     * Move assignment operator. Needed since this class (for backwards
-     * compatibility) has a reference member variable.
-     */
-    Gnuplot &
-    operator=(Gnuplot &&flags);
 
     /**
      * Declare parameters in ParameterHandler.
