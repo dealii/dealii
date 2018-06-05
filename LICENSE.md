@@ -1,25 +1,130 @@
+deal.II Copyright and License
+=============================
 
 This directory contains the deal.II library.
 
 The deal.II library is copyrighted by the deal.II authors. This term
-refers to the people listed in the file AUTHORS and on the webpage 
-http://www.dealii.org/authors.html.
+refers to the people listed in the file `AUTHORS` and in the
+[authors list](https://www.dealii.org/authors.html) on the webpage.
 
 The deal.II library is free software; you can use it, redistribute it,
-and/or modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either version
-2.1 of the License, or (at your option) any later version.
+and/or modify it under the terms of the <b>GNU Lesser General Public
+License</b> as published by the Free Software Foundation; either <b>version
+2.1</b> of the License, or (at your option) any later version. The full
+text of the GNU Lesser General Public version 2.1 is quoted below.
 
-The full text of the GNU Lesser General Public version 2.1 is quoted
-below.
 
-The subdirectory "bundled/" contains third party software.
-PLEASE NOTE THAT THE SOFTWARE THERE IS COPYRIGHTED BY OTHERS THAN THE
-deal.II AUTHORS, but is included by permission. For details, consult the
-stated licenses there.
 
-----------------------------------------------------------------------
+Contributions
+-------------
 
+As a contributor to this project, you agree that all of your contributions
+be governed by the <b>Developer Certificate of Origin version 1.1</b>.
+The deal.II project does not require copyright assignments for
+contributions. This means that the copyright for code contributions in the
+deal.II project is held by its respective contributors who have each agreed
+to release their contributed code under a compatible open source license
+(LGPL v2.1 for library code). The full text of the Developer Certificate of
+Origin version 1.1 is quoted below.
+
+
+Referencing the library
+-----------------------
+
+In addition to the terms imposed by the LGPL v2.1 or later, we ask for the
+following courtesy:
+
+ -  Every publication presenting numerical results obtained with the help
+    of deal.II should state the name of the library and cite appropriate
+    deal.II references listed at the top of the [publications
+    page](https://www.dealii.org/publications.html).
+
+This is the usual, fair way of giving credit to contributors to a
+scientific result. In addition, it helps us justify our effort in
+developing deal.II as an academic undertaking.
+
+We keep a list of publications using deal.II. Let us know about your
+publications so that we can add them to the aforementioned list. You can do
+this by emailing the reference information to one of the [Principal
+Developers of deal.II](https://www.dealii.org/authors.html).
+
+
+Bundled third party software in the deal.II repository
+------------------------------------------------------
+
+The subdirectory `bundled/` contains third party software. <b>Please note
+that the software located there is copyrighted by their respective
+authors</b> (independent of the deal.II authors) and are covered by
+different licenses.
+
+The libraries listed above are all open source and as such place few
+restrictions on their use. However, if you want to distribute software
+developed with deal.II (in source or binary form) and you are using the
+packages above (with source code in `bundled/`), then they may impose
+different terms. Please consult the licenses of these packages for more
+information.
+
+Alternatively, the configuration process of deal.II allows you to
+<i>remove</i> the `bundled/` directory entirely, or disable any or all of
+these bundled libraries. In that case, you can not use their functionality
+but you also are not restricted by their license.
+
+
+Contact
+-------
+
+For further questions regarding licensing and commercial use please contact the
+[deal.II principal developers, or project
+administrators](https://www.dealii.org/authors.html) directly.
+
+
+Full text of the [Developer Certificate of Origin version 1.1](https://developercertificate.org/)
+-------------------------------------------------------------------------------------------------
+```
+Developer Certificate of Origin
+Version 1.1
+
+Copyright (C) 2004, 2006 The Linux Foundation and its contributors.
+1 Letterman Drive
+Suite D4700
+San Francisco, CA, 94129
+
+Everyone is permitted to copy and distribute verbatim copies of this
+license document, but changing it is not allowed.
+
+
+Developer's Certificate of Origin 1.1
+
+By making a contribution to this project, I certify that:
+
+(a) The contribution was created in whole or in part by me and I
+    have the right to submit it under the open source license
+    indicated in the file; or
+
+(b) The contribution is based upon previous work that, to the best
+    of my knowledge, is covered under an appropriate open source
+    license and I have the right under that license to submit that
+    work with modifications, whether created in whole or in part
+    by me, under the same open source license (unless I am
+    permitted to submit under a different license), as indicated
+    in the file; or
+
+(c) The contribution was provided directly to me by some other
+    person who certified (a), (b) or (c) and I have not modified
+    it.
+
+(d) I understand and agree that this project and the contribution
+    are public and that a record of the contribution (including all
+    personal information I submit with it, including my sign-off) is
+    maintained indefinitely and may be redistributed consistent with
+    this project or the open source license(s) involved.
+```
+
+
+Full license text of the [GNU Lesser Genreal Public License version 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html)
+-------------------------------------------------------------------------------------------------------------------
+----
+```
                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
 
@@ -522,3 +627,4 @@ necessary.  Here is a sample; alter the names:
   Ty Coon, President of Vice
 
 That's all there is to it!
+```
