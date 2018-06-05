@@ -43,10 +43,10 @@ This is the usual, fair way of giving credit to contributors to a
 scientific result. In addition, it helps us justify our effort in
 developing deal.II as an academic undertaking.
 
-We keep a list of publications using deal.II. Feel free to let us know
-about your publications so that we can add them to the aforementioned list.
-You can do this by emailing the reference information to one of the
-[Principal Developers of deal.II](https://www.dealii.org/authors.html).
+We keep a list of publications using deal.II. Let us know about your
+publications so that we can add them to the aforementioned list. You can do
+this by emailing the reference information to one of the [Principal
+Developers of deal.II](https://www.dealii.org/authors.html).
 
 
 Bundled third party software in the deal.II repository
