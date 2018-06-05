@@ -437,12 +437,16 @@ namespace CUDAWrappers
                        const Number *                               src,
                        Number *                                     dst)
     {
-      const unsigned int cells_per_block =
+      constexpr unsigned int cells_per_block =
         cells_per_block_shmem(dim, functor::n_dofs_1d - 1);
 
+      constexpr unsigned int n_dofs_per_block =
+        cells_per_block * functor::n_local_dofs;
+      constexpr unsigned int n_q_points_per_block =
+        cells_per_block * functor::n_q_points;
       // TODO make use of dynamically allocated shared memory
-      __shared__ Number values[cells_per_block * functor::n_local_dofs];
-      __shared__ Number gradients[dim][cells_per_block * functor::n_q_points];
+      __shared__ Number values[n_dofs_per_block];
+      __shared__ Number gradients[dim][n_q_points_per_block];
 
       const unsigned int local_cell = threadIdx.x / functor::n_dofs_1d;
       const unsigned int cell =
