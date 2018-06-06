@@ -85,8 +85,7 @@ namespace Step52
 
     void assemble_system();
 
-    double get_source(const double time,
-                      const Point<2> &point) const;
+    double get_source(const double time, const Point<2> &point) const;
 
     Vector<double> evaluate_diffusion(const double          time,
                                       const Vector<double> &y) const;
@@ -114,10 +113,11 @@ namespace Step52
                          const double                           initial_time,
                          const double                           final_time);
 
-    unsigned int embedded_explicit_method(const TimeStepping::runge_kutta_method method,
-                                          const unsigned int n_time_steps,
-                                          const double       initial_time,
-                                          const double       final_time);
+    unsigned int
+    embedded_explicit_method(const TimeStepping::runge_kutta_method method,
+                             const unsigned int n_time_steps,
+                             const double       initial_time,
+                             const double       final_time);
 
 
     unsigned int fe_degree;
@@ -147,8 +147,7 @@ namespace Step52
 
 
   // We choose quadratic finite elements and we initialize the parameters.
-  Diffusion::Diffusion()
-    :
+  Diffusion::Diffusion() :
     fe_degree(2),
     diffusion_coefficient(1. / 30.),
     absorption_cross_section(1.),
@@ -165,7 +164,8 @@ namespace Step52
   {
     dof_handler.distribute_dofs(fe);
 
-    VectorTools::interpolate_boundary_values(dof_handler,1,Functions::ZeroFunction<2>(),constraint_matrix);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 1, Functions::ZeroFunction<2>(), constraint_matrix);
     constraint_matrix.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -199,7 +199,8 @@ namespace Step52
 
     const QGauss<2> quadrature_formula(fe_degree + 1);
 
-    FEValues<2> fe_values(fe, quadrature_formula,
+    FEValues<2> fe_values(fe,
+                          quadrature_formula,
                           update_values | update_gradients | update_JxW_values);
 
 
@@ -211,8 +212,7 @@ namespace Step52
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    DoFHandler<2>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
                                         endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
@@ -226,10 +226,10 @@ namespace Step52
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
-                cell_matrix(i,j) += ((-diffusion_coefficient *
-                                      fe_values.shape_grad(i,q_point) *
-                                      fe_values.shape_grad(j,q_point)
-                                      - absorption_cross_section *
+                cell_matrix(i, j) +=
+                  ((-diffusion_coefficient * fe_values.shape_grad(i, q_point) *
+                      fe_values.shape_grad(j, q_point) -
+                    absorption_cross_section *
                       fe_values.shape_value(i, q_point) *
                       fe_values.shape_value(j, q_point)) *
                    fe_values.JxW(q_point));
@@ -240,8 +240,10 @@ namespace Step52
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraint_matrix.distribute_local_to_global(cell_matrix,local_dof_indices,system_matrix);
-        constraint_matrix.distribute_local_to_global(cell_mass_matrix,local_dof_indices,mass_matrix);
+        constraint_matrix.distribute_local_to_global(
+          cell_matrix, local_dof_indices, system_matrix);
+        constraint_matrix.distribute_local_to_global(
+          cell_mass_matrix, local_dof_indices, mass_matrix);
       }
 
     inverse_mass_matrix.initialize(mass_matrix);
@@ -253,18 +255,17 @@ namespace Step52
   //
   // In this function, the source term of the equation for a given time and a
   // given point is computed.
-  double Diffusion::get_source(const double time,
-                               const Point<2> &point) const
+  double Diffusion::get_source(const double time, const Point<2> &point) const
   {
     const double intensity = 10.;
     const double frequency = numbers::PI / 10.;
     const double b         = 5.;
     const double x         = point(0);
 
-    return intensity* (frequency*std::cos(frequency*time)*(b*x-x*x)
-                       +
-                       std::sin(frequency*time) * (absorption_cross_section*(b*x-x*x)
-                                                   +
+    return intensity *
+           (frequency * std::cos(frequency * time) * (b * x - x * x) +
+            std::sin(frequency * time) *
+              (absorption_cross_section * (b * x - x * x) +
                2. * diffusion_coefficient));
   }
 
@@ -293,7 +294,8 @@ namespace Step52
 
     FEValues<2> fe_values(fe,
                           quadrature_formula,
-                          update_values | update_quadrature_points | update_JxW_values);
+                          update_values | update_quadrature_points |
+                            update_JxW_values);
 
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
@@ -303,8 +305,7 @@ namespace Step52
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    DoFHandler<2>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
                                         endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
@@ -315,19 +316,17 @@ namespace Step52
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
-            const double source = get_source(time,
-                                             fe_values.quadrature_point(q_point));
+            const double source =
+              get_source(time, fe_values.quadrature_point(q_point));
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_source(i) += source *
-                                fe_values.shape_value(i,q_point) *
+              cell_source(i) += source * fe_values.shape_value(i, q_point) *
                                 fe_values.JxW(q_point);
           }
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraint_matrix.distribute_local_to_global(cell_source,
-                                                     local_dof_indices,
-                                                     tmp);
+        constraint_matrix.distribute_local_to_global(
+          cell_source, local_dof_indices, tmp);
       }
 
     Vector<double> value(dof_handler.n_dofs());
@@ -342,9 +341,11 @@ namespace Step52
   // We compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M$. This
   // is done in several steps:
   //   - compute $M-\tau \frac{\partial f}{\partial y}$
-  //   - invert the matrix to get $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1}$
+  //   - invert the matrix to get $\left(M-\tau \frac{\partial f}{\partial
+  //   y}\right)^{-1}$
   //   - compute $tmp=My$
-  //   - compute $z=\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp = \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} My$
+  //   - compute $z=\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp =
+  //   \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} My$
   //   - return z.
   Vector<double> Diffusion::id_minus_tau_J_inverse(const double          time,
                                                    const double          tau,
@@ -467,15 +468,17 @@ namespace Step52
   // <code>evaluate_diffusion</code> is a member function, it needs to be bound
   // to <code>this</code>. Finally, the solution is output every 10 time steps.
   void Diffusion::explicit_method(const TimeStepping::runge_kutta_method method,
-                                  const unsigned int                     n_time_steps,
-                                  const double                           initial_time,
-                                  const double                           final_time)
+                                  const unsigned int n_time_steps,
+                                  const double       initial_time,
+                                  const double       final_time)
   {
-    const double time_step = (final_time-initial_time)/static_cast<double> (n_time_steps);
+    const double time_step =
+      (final_time - initial_time) / static_cast<double>(n_time_steps);
     double time = initial_time;
     solution    = 0.;
 
-    TimeStepping::ExplicitRungeKutta<Vector<double>> explicit_runge_kutta(method);
+    TimeStepping::ExplicitRungeKutta<Vector<double>> explicit_runge_kutta(
+      method);
     output_results(0, method);
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
@@ -484,7 +487,9 @@ namespace Step52
                     this,
                     std::placeholders::_1,
                     std::placeholders::_2),
-                 time,time_step,solution);
+          time,
+          time_step,
+          solution);
 
         if ((i + 1) % 10 == 0)
           output_results(i + 1, method);
@@ -494,20 +499,23 @@ namespace Step52
 
 
   // @sect4{<code>Diffusion::implicit_method</code>}
-  // This function is equivalent to <code>explicit_method</code> but for implicit
-  // methods. When using implicit methods, we need to evaluate $M^{-1}(f(t,y))$
-  // and $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$
-  // for which we use the two member functions previously introduced.
+  // This function is equivalent to <code>explicit_method</code> but for
+  // implicit methods. When using implicit methods, we need to evaluate
+  // $M^{-1}(f(t,y))$ and $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial
+  // y}\right)^{-1}$ for which we use the two member functions previously
+  // introduced.
   void Diffusion::implicit_method(const TimeStepping::runge_kutta_method method,
-                                  const unsigned int                     n_time_steps,
-                                  const double                           initial_time,
-                                  const double                           final_time)
+                                  const unsigned int n_time_steps,
+                                  const double       initial_time,
+                                  const double       final_time)
   {
-    const double time_step = (final_time-initial_time)/static_cast<double> (n_time_steps);
+    const double time_step =
+      (final_time - initial_time) / static_cast<double>(n_time_steps);
     double time = initial_time;
     solution    = 0.;
 
-    TimeStepping::ImplicitRungeKutta<Vector<double>> implicit_runge_kutta(method);
+    TimeStepping::ImplicitRungeKutta<Vector<double>> implicit_runge_kutta(
+      method);
     output_results(0, method);
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
@@ -521,7 +529,9 @@ namespace Step52
                     std::placeholders::_1,
                     std::placeholders::_2,
                     std::placeholders::_3),
-                 time,time_step,solution);
+          time,
+          time_step,
+          solution);
 
         if ((i + 1) % 10 == 0)
           output_results(i + 1, method);
@@ -544,14 +554,17 @@ namespace Step52
   // Embedded methods use a guessed time step. If the error using this time step
   // is too large, the time step will be reduced. If the error is below the
   // threshold, a larger time step will be tried for the next time step.
-  // <code>delta_t_guess</code> is the guessed time step produced by the embedded method.
-  unsigned int Diffusion::embedded_explicit_method(const TimeStepping::runge_kutta_method method,
-                                      const unsigned int                     n_time_steps,
-                                      const double                           initial_time,
-                                      const double                           final_time)
+  // <code>delta_t_guess</code> is the guessed time step produced by the
+  // embedded method.
+  unsigned int Diffusion::embedded_explicit_method(
+    const TimeStepping::runge_kutta_method method,
+    const unsigned int                     n_time_steps,
+    const double                           initial_time,
+    const double                           final_time)
   {
-    double time_step = (final_time - initial_time) / static_cast<double>(n_time_steps);
-    double time      = initial_time;
+    double time_step =
+      (final_time - initial_time) / static_cast<double>(n_time_steps);
+    double       time          = initial_time;
     const double coarsen_param = 1.2;
     const double refine_param  = 0.8;
     const double min_delta     = 1e-8;
@@ -579,8 +592,13 @@ namespace Step52
           time_step = final_time - time;
 
         time = embedded_explicit_runge_kutta.evolve_one_time_step(
-                 std::bind(&Diffusion::evaluate_diffusion,this,std::placeholders::_1,std::placeholders::_2),
-                 time,time_step,solution);
+          std::bind(&Diffusion::evaluate_diffusion,
+                    this,
+                    std::placeholders::_1,
+                    std::placeholders::_2),
+          time,
+          time_step,
+          solution);
 
         if ((n_steps + 1) % 10 == 0)
           output_results(n_steps + 1, method);
@@ -605,15 +623,15 @@ namespace Step52
     GridGenerator::hyper_cube(triangulation, 0., 5.);
     triangulation.refine_global(4);
 
-    Triangulation<2>::active_cell_iterator
-    cell = triangulation.begin_active(),
+    Triangulation<2>::active_cell_iterator cell = triangulation.begin_active(),
                                            endc = triangulation.end();
 
     for (; cell != endc; ++cell)
       for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
-            if ((cell->face(f)->center()[0] == 0.) || (cell->face(f)->center()[0] == 5.))
+            if ((cell->face(f)->center()[0] == 0.) ||
+                (cell->face(f)->center()[0] == 5.))
               cell->face(f)->set_boundary_id(1);
             else
               cell->face(f)->set_boundary_id(0);
@@ -637,87 +655,77 @@ namespace Step52
     const double       final_time   = 10.;
 
     std::cout << "Explicit methods:" << std::endl;
-    explicit_method(TimeStepping::FORWARD_EULER,
-                    n_time_steps,
-                    initial_time,
-                    final_time);
-    std::cout << "Forward Euler:            error=" << solution.l2_norm() << std::endl;
+    explicit_method(
+      TimeStepping::FORWARD_EULER, n_time_steps, initial_time, final_time);
+    std::cout << "Forward Euler:            error=" << solution.l2_norm()
+              << std::endl;
 
-    explicit_method(TimeStepping::RK_THIRD_ORDER,
-                    n_time_steps,
-                    initial_time,
-                    final_time);
-    std::cout << "Third order Runge-Kutta:  error=" << solution.l2_norm() << std::endl;
+    explicit_method(
+      TimeStepping::RK_THIRD_ORDER, n_time_steps, initial_time, final_time);
+    std::cout << "Third order Runge-Kutta:  error=" << solution.l2_norm()
+              << std::endl;
 
     explicit_method(TimeStepping::RK_CLASSIC_FOURTH_ORDER,
                     n_time_steps,
                     initial_time,
                     final_time);
-    std::cout << "Fourth order Runge-Kutta: error=" << solution.l2_norm() << std::endl;
+    std::cout << "Fourth order Runge-Kutta: error=" << solution.l2_norm()
+              << std::endl;
     std::cout << std::endl;
 
 
     std::cout << "Implicit methods:" << std::endl;
-    implicit_method(TimeStepping::BACKWARD_EULER,
-                    n_time_steps,
-                    initial_time,
-                    final_time);
-    std::cout << "Backward Euler:           error=" << solution.l2_norm() << std::endl;
+    implicit_method(
+      TimeStepping::BACKWARD_EULER, n_time_steps, initial_time, final_time);
+    std::cout << "Backward Euler:           error=" << solution.l2_norm()
+              << std::endl;
 
-    implicit_method(TimeStepping::IMPLICIT_MIDPOINT,
-                    n_time_steps,
-                    initial_time,
-                    final_time);
-    std::cout << "Implicit Midpoint:        error=" << solution.l2_norm() << std::endl;
+    implicit_method(
+      TimeStepping::IMPLICIT_MIDPOINT, n_time_steps, initial_time, final_time);
+    std::cout << "Implicit Midpoint:        error=" << solution.l2_norm()
+              << std::endl;
 
-    implicit_method(TimeStepping::CRANK_NICOLSON,
-                    n_time_steps,
-                    initial_time,
-                    final_time);
-    std::cout << "Crank-Nicolson:           error=" << solution.l2_norm() << std::endl;
+    implicit_method(
+      TimeStepping::CRANK_NICOLSON, n_time_steps, initial_time, final_time);
+    std::cout << "Crank-Nicolson:           error=" << solution.l2_norm()
+              << std::endl;
 
-    implicit_method(TimeStepping::SDIRK_TWO_STAGES,
-                    n_time_steps,
-                    initial_time,
-                    final_time);
-    std::cout << "SDIRK:                    error=" << solution.l2_norm() << std::endl;
+    implicit_method(
+      TimeStepping::SDIRK_TWO_STAGES, n_time_steps, initial_time, final_time);
+    std::cout << "SDIRK:                    error=" << solution.l2_norm()
+              << std::endl;
     std::cout << std::endl;
 
 
     std::cout << "Embedded explicit methods:" << std::endl;
-    n_steps = embedded_explicit_method(TimeStepping::HEUN_EULER,
-                                       n_time_steps,
-                                       initial_time,
-                                       final_time);
-    std::cout << "Heun-Euler:               error=" << solution.l2_norm() << std::endl;
+    n_steps = embedded_explicit_method(
+      TimeStepping::HEUN_EULER, n_time_steps, initial_time, final_time);
+    std::cout << "Heun-Euler:               error=" << solution.l2_norm()
+              << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(TimeStepping::BOGACKI_SHAMPINE,
-                                       n_time_steps,
-                                       initial_time,
-                                       final_time);
-    std::cout << "Bogacki-Shampine:         error=" << solution.l2_norm() << std::endl;
+    n_steps = embedded_explicit_method(
+      TimeStepping::BOGACKI_SHAMPINE, n_time_steps, initial_time, final_time);
+    std::cout << "Bogacki-Shampine:         error=" << solution.l2_norm()
+              << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(TimeStepping::DOPRI,
-                                       n_time_steps,
-                                       initial_time,
-                                       final_time);
-    std::cout << "Dopri:                    error=" << solution.l2_norm() << std::endl;
+    n_steps = embedded_explicit_method(
+      TimeStepping::DOPRI, n_time_steps, initial_time, final_time);
+    std::cout << "Dopri:                    error=" << solution.l2_norm()
+              << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(TimeStepping::FEHLBERG,
-                                       n_time_steps,
-                                       initial_time,
-                                       final_time);
-    std::cout << "Fehlberg:                 error=" << solution.l2_norm() << std::endl;
+    n_steps = embedded_explicit_method(
+      TimeStepping::FEHLBERG, n_time_steps, initial_time, final_time);
+    std::cout << "Fehlberg:                 error=" << solution.l2_norm()
+              << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
 
-    n_steps = embedded_explicit_method(TimeStepping::CASH_KARP,
-                                       n_time_steps,
-                                       initial_time,
-                                       final_time);
-    std::cout << "Cash-Karp:                error=" << solution.l2_norm() << std::endl;
+    n_steps = embedded_explicit_method(
+      TimeStepping::CASH_KARP, n_time_steps, initial_time, final_time);
+    std::cout << "Cash-Karp:                error=" << solution.l2_norm()
+              << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
   }
 } // namespace Step52
@@ -737,7 +745,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -749,7 +758,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

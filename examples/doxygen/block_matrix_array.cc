@@ -30,33 +30,16 @@
 
 using namespace dealii;
 
-double Adata[4][4] =
-{
-  {4., .5, .1, 0.},
+double Adata[4][4] = {{4., .5, .1, 0.},
                       {.5, 4., .5, .1},
                       {.1, .5, 4., .5},
-  {0., .1, .5, 4.}
-};
+                      {0., .1, .5, 4.}};
 
-double B1data[4][2] =
-{
-  {.5, .1},
-  {.4, .2},
-  {.3, .3},
-  {.2, .4}
-};
+double B1data[4][2] = {{.5, .1}, {.4, .2}, {.3, .3}, {.2, .4}};
 
-double B2data[2][4] =
-{
-  {.3, 0., -.3, 0.},
-  {-.3, 0., .3, 0.}
-};
+double B2data[2][4] = {{.3, 0., -.3, 0.}, {-.3, 0., .3, 0.}};
 
-double Cdata[2][2] =
-{
-  {8., 1.},
-  {1., 8.}
-};
+double Cdata[2][2] = {{8., 1.}, {1., 8.}};
 
 int main()
 {
@@ -100,8 +83,7 @@ int main()
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
 
-  deallog << "Error A-norm "
-          << std::sqrt(matrix.matrix_norm_square(x))
+  deallog << "Error A-norm " << std::sqrt(matrix.matrix_norm_square(x))
           << std::endl;
 
   FullMatrix<float> Ainv(4, 4);
@@ -109,8 +91,7 @@ int main()
   FullMatrix<float> Cinv(2, 2);
   Cinv.invert(C);
 
-  BlockTrianglePrecondition<double>
-  precondition(2);
+  BlockTrianglePrecondition<double> precondition(2);
   precondition.enter(Ainv, 0, 0, .5);
   precondition.enter(Cinv, 1, 1);
 

@@ -134,7 +134,6 @@ namespace Step34
     void run();
 
   private:
-
     void read_parameters(const std::string &filename);
 
     void read_domain();
@@ -218,7 +217,7 @@ namespace Step34
     // integrate the singular kernels in the interior of the cells.
     const Quadrature<dim - 1> &get_singular_quadrature(
       const typename DoFHandler<dim - 1, dim>::active_cell_iterator &cell,
-      const unsigned int                                             index) const;
+      const unsigned int index) const;
 
 
     // The usual deal.II classes can be used for boundary element methods by
@@ -316,8 +315,7 @@ namespace Step34
   // knowledge of the number of components.
   template <int dim>
   BEMProblem<dim>::BEMProblem(const unsigned int fe_degree,
-                              const unsigned int mapping_degree)
-    :
+                              const unsigned int mapping_degree) :
     fe(fe_degree),
     dh(tria),
     mapping(mapping_degree, true),
@@ -333,26 +331,26 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::read_parameters(const std::string &filename)
   {
-    deallog << std::endl << "Parsing parameter file " << filename << std::endl
+    deallog << std::endl
+            << "Parsing parameter file " << filename << std::endl
             << "for a " << dim << " dimensional simulation. " << std::endl;
 
     ParameterHandler prm;
 
-    prm.declare_entry("Number of cycles", "4",
-                      Patterns::Integer());
-    prm.declare_entry("External refinement", "5",
-                      Patterns::Integer());
-    prm.declare_entry("Extend solution on the -2,2 box", "true",
-                      Patterns::Bool());
-    prm.declare_entry("Run 2d simulation", "true",
-                      Patterns::Bool());
-    prm.declare_entry("Run 3d simulation", "true",
-                      Patterns::Bool());
+    prm.declare_entry("Number of cycles", "4", Patterns::Integer());
+    prm.declare_entry("External refinement", "5", Patterns::Integer());
+    prm.declare_entry(
+      "Extend solution on the -2,2 box", "true", Patterns::Bool());
+    prm.declare_entry("Run 2d simulation", "true", Patterns::Bool());
+    prm.declare_entry("Run 3d simulation", "true", Patterns::Bool());
 
     prm.enter_subsection("Quadrature rules");
     {
-      prm.declare_entry("Quadrature type", "gauss",
-        Patterns::Selection(QuadratureSelector<(dim - 1)>::get_quadrature_names()));
+      prm.declare_entry(
+        "Quadrature type",
+        "gauss",
+        Patterns::Selection(
+          QuadratureSelector<(dim - 1)>::get_quadrature_names()));
       prm.declare_entry("Quadrature order", "4", Patterns::Integer());
       prm.declare_entry("Singular quadrature order", "5", Patterns::Integer());
     }
@@ -431,9 +429,8 @@ namespace Step34
     prm.enter_subsection("Quadrature rules");
     {
       quadrature =
-        std::shared_ptr<Quadrature<dim-1> >
-        (new QuadratureSelector<dim-1> (prm.get("Quadrature type"),
-                                        prm.get_integer("Quadrature order")));
+        std::shared_ptr<Quadrature<dim - 1>>(new QuadratureSelector<dim - 1>(
+          prm.get("Quadrature type"), prm.get_integer("Quadrature order")));
       singular_quadrature_order = prm.get_integer("Singular quadrature order");
     }
     prm.leave_subsection();
@@ -461,9 +458,8 @@ namespace Step34
     // dimension independent programming.  If we wanted to switch off one of
     // the two simulations, we could do this by setting the corresponding "Run
     // 2d simulation" or "Run 3d simulation" flag to false:
-    run_in_this_dimension = prm.get_bool("Run " +
-                                         Utilities::int_to_string(dim) +
-                                         "d simulation");
+    run_in_this_dimension =
+      prm.get_bool("Run " + Utilities::int_to_string(dim) + "d simulation");
   }
 
 
@@ -556,16 +552,15 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::assemble_system()
   {
-
     // First we initialize an FEValues object with the quadrature formula for
     // the integration of the kernel in non singular cells. This quadrature is
     // selected with the parameter file, and needs to be quite precise, since
     // the functions we are integrating are not polynomial functions.
-    FEValues<dim-1,dim> fe_v(mapping, fe, *quadrature,
-                             update_values |
-                             update_cell_normal_vectors |
-                             update_quadrature_points |
-                             update_JxW_values);
+    FEValues<dim - 1, dim> fe_v(mapping,
+                                fe,
+                                *quadrature,
+                                update_values | update_cell_normal_vectors |
+                                  update_quadrature_points | update_JxW_values);
 
     const unsigned int n_q_points = fe_v.n_quadrature_points;
 
@@ -590,15 +585,16 @@ namespace Step34
     // We construct a vector of support points which will be used in the local
     // integrations:
     std::vector<Point<dim>> support_points(dh.n_dofs());
-    DoFTools::map_dofs_to_support_points<dim - 1, dim>(mapping, dh, support_points);
+    DoFTools::map_dofs_to_support_points<dim - 1, dim>(
+      mapping, dh, support_points);
 
 
     // After doing so, we can start the integration loop over all cells, where
     // we first initialize the FEValues object and get the values of
     // $\mathbf{\tilde v}$ at the quadrature points (this vector field should
     // be constant, but it doesn't hurt to be more general):
-    typename DoFHandler<dim-1,dim>::active_cell_iterator
-    cell = dh.begin_active(),
+    typename DoFHandler<dim - 1, dim>::active_cell_iterator cell =
+                                                              dh.begin_active(),
                                                             endc = dh.end();
 
     for (cell = dh.begin_active(); cell != endc; ++cell)
@@ -606,8 +602,8 @@ namespace Step34
         fe_v.reinit(cell);
         cell->get_dof_indices(local_dof_indices);
 
-        const std::vector<Point<dim>> &    q_points = fe_v.get_quadrature_points();
-        const std::vector<Tensor<1, dim>> &normals  = fe_v.get_normal_vectors();
+        const std::vector<Point<dim>> &q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
         wind.vector_value_list(q_points, cell_wind);
 
         // We then form the integral over the current cell for all degrees of
@@ -619,7 +615,6 @@ namespace Step34
         // the case, and we store which one is the singular index:
         for (unsigned int i = 0; i < dh.n_dofs(); ++i)
           {
-
             local_matrix_row_i = 0;
 
             bool         is_singular    = false;
@@ -648,15 +643,13 @@ namespace Step34
                     const Tensor<1, dim> R = q_points[q] - support_points[i];
 
                     system_rhs(i) += (LaplaceKernel::single_layer(R) *
-                                       normal_wind                      *
-                                       fe_v.JxW(q) );
+                                      normal_wind * fe_v.JxW(q));
 
                     for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
 
-                      local_matrix_row_i(j) -= ( ( LaplaceKernel::double_layer(R)     *
-                                                   normals[q] )            *
-                                                 fe_v.shape_value(j,q)     *
-                                                 fe_v.JxW(q)       );
+                      local_matrix_row_i(j) -=
+                        ((LaplaceKernel::double_layer(R) * normals[q]) *
+                         fe_v.shape_value(j, q) * fe_v.JxW(q));
                   }
               }
             else
@@ -681,37 +674,41 @@ namespace Step34
                 const Quadrature<dim - 1> &singular_quadrature =
                   get_singular_quadrature(cell, singular_index);
 
-                FEValues<dim-1,dim> fe_v_singular(mapping, fe, singular_quadrature,
-                                                  update_jacobians |
-                                                  update_values |
-                                                       update_cell_normal_vectors |
-                                                       update_quadrature_points);
+                FEValues<dim - 1, dim> fe_v_singular(
+                  mapping,
+                  fe,
+                  singular_quadrature,
+                  update_jacobians | update_values |
+                    update_cell_normal_vectors | update_quadrature_points);
 
                 fe_v_singular.reinit(cell);
 
-                std::vector<Vector<double>> singular_cell_wind(singular_quadrature.size(),
-                                                               Vector<double>(dim));
+                std::vector<Vector<double>> singular_cell_wind(
+                  singular_quadrature.size(), Vector<double>(dim));
 
-                const std::vector<Tensor<1,dim> > &singular_normals  = fe_v_singular.get_normal_vectors();
-                const std::vector<Point<dim> >    &singular_q_points = fe_v_singular.get_quadrature_points();
+                const std::vector<Tensor<1, dim>> &singular_normals =
+                  fe_v_singular.get_normal_vectors();
+                const std::vector<Point<dim>> &singular_q_points =
+                  fe_v_singular.get_quadrature_points();
 
                 wind.vector_value_list(singular_q_points, singular_cell_wind);
 
                 for (unsigned int q = 0; q < singular_quadrature.size(); ++q)
                   {
-                    const Tensor<1, dim> R = singular_q_points[q] - support_points[i];
-                    double               normal_wind = 0;
+                    const Tensor<1, dim> R =
+                      singular_q_points[q] - support_points[i];
+                    double normal_wind = 0;
                     for (unsigned int d = 0; d < dim; ++d)
-                      normal_wind += (singular_cell_wind[q](d)*
-                                      singular_normals[q][d]);
+                      normal_wind +=
+                        (singular_cell_wind[q](d) * singular_normals[q][d]);
 
                     system_rhs(i) += (LaplaceKernel::single_layer(R) *
-                                       normal_wind                         *
-                                      fe_v_singular.JxW(q));
+                                      normal_wind * fe_v_singular.JxW(q));
 
                     for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
                       {
-                        local_matrix_row_i(j) -= (( LaplaceKernel::double_layer(R) *
+                        local_matrix_row_i(j) -=
+                          ((LaplaceKernel::double_layer(R) *
                             singular_normals[q]) *
                            fe_v_singular.shape_value(j, q) *
                            fe_v_singular.JxW(q));
@@ -722,8 +719,7 @@ namespace Step34
             // Finally, we need to add the contributions of the current cell
             // to the global matrix.
             for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-              system_matrix(i,local_dof_indices[j])
-              += local_matrix_row_i(j);
+              system_matrix(i, local_dof_indices[j]) += local_matrix_row_i(j);
           }
       }
 
@@ -768,14 +764,15 @@ namespace Step34
   void BEMProblem<dim>::compute_errors(const unsigned int cycle)
   {
     Vector<float> difference_per_cell(tria.n_active_cells());
-    VectorTools::integrate_difference(mapping, dh, phi,
+    VectorTools::integrate_difference(mapping,
+                                      dh,
+                                      phi,
                                       exact_solution,
                                       difference_per_cell,
                                       QGauss<(dim - 1)>(2 * fe.degree + 1),
                                       VectorTools::L2_norm);
-    const double L2_error = VectorTools::compute_global_error(tria,
-                                                              difference_per_cell,
-                                                              VectorTools::L2_norm);
+    const double L2_error = VectorTools::compute_global_error(
+      tria, difference_per_cell, VectorTools::L2_norm);
 
     // The error in the alpha vector can be computed directly using the
     // Vector::linfty_norm() function, since on each node, the value should be
@@ -788,14 +785,10 @@ namespace Step34
     const unsigned int n_active_cells = tria.n_active_cells();
     const unsigned int n_dofs         = dh.n_dofs();
 
-    deallog << "Cycle " << cycle << ':'
+    deallog << "Cycle " << cycle << ':' << std::endl
+            << "   Number of active cells:       " << n_active_cells
             << std::endl
-            << "   Number of active cells:       "
-            << n_active_cells
-            << std::endl
-            << "   Number of degrees of freedom: "
-            << n_dofs
-            << std::endl;
+            << "   Number of degrees of freedom: " << n_dofs << std::endl;
 
     convergence_table.add_value("cycle", cycle);
     convergence_table.add_value("cells", n_active_cells);
@@ -872,17 +865,15 @@ namespace Step34
   template <>
   const Quadrature<2> &BEMProblem<3>::get_singular_quadrature(
     const DoFHandler<2, 3>::active_cell_iterator &,
-                                         const unsigned int index) const
+    const unsigned int index) const
   {
-    Assert(index < fe.dofs_per_cell,
-           ExcIndexRange(0, fe.dofs_per_cell, index));
+    Assert(index < fe.dofs_per_cell, ExcIndexRange(0, fe.dofs_per_cell, index));
 
     static std::vector<QGaussOneOverR<2>> quadratures;
     if (quadratures.size() == 0)
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-        quadratures.emplace_back(singular_quadrature_order,
-                                 fe.get_unit_support_points()[i],
-                                 true);
+        quadratures.emplace_back(
+          singular_quadrature_order, fe.get_unit_support_points()[i], true);
     return quadratures[index];
   }
 
@@ -892,15 +883,16 @@ namespace Step34
     const DoFHandler<1, 2>::active_cell_iterator &cell,
     const unsigned int                            index) const
   {
-    Assert(index < fe.dofs_per_cell,
-           ExcIndexRange(0, fe.dofs_per_cell, index));
+    Assert(index < fe.dofs_per_cell, ExcIndexRange(0, fe.dofs_per_cell, index));
 
     static Quadrature<1> *q_pointer = nullptr;
-    if (q_pointer) delete q_pointer;
+    if (q_pointer)
+      delete q_pointer;
 
     q_pointer = new QGaussLogR<1>(singular_quadrature_order,
                                   fe.get_unit_support_points()[index],
-                                  1./cell->measure(), true);
+                                  1. / cell->measure(),
+                                  true);
     return (*q_pointer);
   }
 
@@ -936,16 +928,16 @@ namespace Step34
     external_dh.distribute_dofs(external_fe);
     external_phi.reinit(external_dh.n_dofs());
 
-    typename DoFHandler<dim-1,dim>::active_cell_iterator
-    cell = dh.begin_active(),
+    typename DoFHandler<dim - 1, dim>::active_cell_iterator cell =
+                                                              dh.begin_active(),
                                                             endc = dh.end();
 
 
-    FEValues<dim-1,dim> fe_v(mapping, fe, *quadrature,
-                             update_values |
-                             update_cell_normal_vectors |
-                             update_quadrature_points |
-                             update_JxW_values);
+    FEValues<dim - 1, dim> fe_v(mapping,
+                                fe,
+                                *quadrature,
+                                update_values | update_cell_normal_vectors |
+                                  update_quadrature_points | update_JxW_values);
 
     const unsigned int n_q_points = fe_v.n_quadrature_points;
 
@@ -956,15 +948,15 @@ namespace Step34
     std::vector<Vector<double>> local_wind(n_q_points, Vector<double>(dim));
 
     std::vector<Point<dim>> external_support_points(external_dh.n_dofs());
-    DoFTools::map_dofs_to_support_points<dim>(StaticMappingQ1<dim>::mapping,
-                                              external_dh, external_support_points);
+    DoFTools::map_dofs_to_support_points<dim>(
+      StaticMappingQ1<dim>::mapping, external_dh, external_support_points);
 
     for (cell = dh.begin_active(); cell != endc; ++cell)
       {
         fe_v.reinit(cell);
 
-        const std::vector<Point<dim>> &    q_points = fe_v.get_quadrature_points();
-        const std::vector<Tensor<1, dim>> &normals  = fe_v.get_normal_vectors();
+        const std::vector<Point<dim>> &q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
         cell->get_dof_indices(dofs);
         fe_v.get_function_values(phi, local_phi);
@@ -981,14 +973,11 @@ namespace Step34
         for (unsigned int i = 0; i < external_dh.n_dofs(); ++i)
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
-
               const Tensor<1, dim> R = q_points[q] - external_support_points[i];
 
-              external_phi(i) += ( ( LaplaceKernel::single_layer(R) *
-                                     normal_wind[q]
-                                     +
-                                     (LaplaceKernel::double_layer(R) *
-                                      normals[q] )            *
+              external_phi(i) +=
+                ((LaplaceKernel::single_layer(R) * normal_wind[q] +
+                  (LaplaceKernel::double_layer(R) * normals[q]) *
                     local_phi[q]) *
                  fe_v.JxW(q));
             }
@@ -1000,9 +989,9 @@ namespace Step34
     data_out.add_data_vector(external_phi, "external_phi");
     data_out.build_patches();
 
-    const std::string
-    filename = Utilities::int_to_string(dim) + "d_external.vtk";
-    std::ofstream     file(filename);
+    const std::string filename =
+      Utilities::int_to_string(dim) + "d_external.vtk";
+    std::ofstream file(filename);
 
     data_out.write_vtk(file);
   }
@@ -1018,18 +1007,20 @@ namespace Step34
     DataOut<dim - 1, DoFHandler<dim - 1, dim>> dataout;
 
     dataout.attach_dof_handler(dh);
-    dataout.add_data_vector(phi, "phi",
-                            DataOut<dim-1, DoFHandler<dim-1, dim> >::type_dof_data);
-    dataout.add_data_vector(alpha, "alpha",
+    dataout.add_data_vector(
+      phi, "phi", DataOut<dim - 1, DoFHandler<dim - 1, dim>>::type_dof_data);
+    dataout.add_data_vector(
+      alpha,
+      "alpha",
       DataOut<dim - 1, DoFHandler<dim - 1, dim>>::type_dof_data);
-    dataout.build_patches(mapping,
-                          mapping.get_degree(),
-                          DataOut<dim - 1, DoFHandler<dim - 1, dim>>::curved_inner_cells);
+    dataout.build_patches(
+      mapping,
+      mapping.get_degree(),
+      DataOut<dim - 1, DoFHandler<dim - 1, dim>>::curved_inner_cells);
 
-    std::string filename = ( Utilities::int_to_string(dim) +
-                             "d_boundary_solution_" +
-                             Utilities::int_to_string(cycle) +
-                             ".vtk" );
+    std::string filename =
+      (Utilities::int_to_string(dim) + "d_boundary_solution_" +
+       Utilities::int_to_string(cycle) + ".vtk");
     std::ofstream file(filename);
 
     dataout.write_vtk(file);
@@ -1042,10 +1033,10 @@ namespace Step34
         convergence_table.set_scientific("L2(phi)", true);
         convergence_table.set_scientific("Linfty(alpha)", true);
 
-        convergence_table
-        .evaluate_convergence_rates("L2(phi)", ConvergenceTable::reduction_rate_log2);
-        convergence_table
-        .evaluate_convergence_rates("Linfty(alpha)", ConvergenceTable::reduction_rate_log2);
+        convergence_table.evaluate_convergence_rates(
+          "L2(phi)", ConvergenceTable::reduction_rate_log2);
+        convergence_table.evaluate_convergence_rates(
+          "Linfty(alpha)", ConvergenceTable::reduction_rate_log2);
         deallog << std::endl;
         convergence_table.write_text(std::cout);
       }
@@ -1059,14 +1050,12 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::run()
   {
-
     read_parameters("parameters.prm");
 
     if (run_in_this_dimension == false)
       {
         deallog << "Run in dimension " << dim
-                << " explicitly disabled in parameter file. "
-                << std::endl;
+                << " explicitly disabled in parameter file. " << std::endl;
         return;
       }
 
@@ -1110,7 +1099,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -1123,7 +1113,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

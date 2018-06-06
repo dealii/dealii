@@ -117,21 +117,25 @@ namespace Step36
   // their values from the input file whose name is specified as an argument
   // to this function:
   template <int dim>
-  EigenvalueProblem<dim>::EigenvalueProblem(const std::string &prm_file)
-    :
+  EigenvalueProblem<dim>::EigenvalueProblem(const std::string &prm_file) :
     fe(1),
     dof_handler(triangulation)
   {
-//TODO investigate why the minimum number of refinement steps required to obtain the correct eigenvalue degeneracies is 6
-    parameters.declare_entry("Global mesh refinement steps", "5",
-                             Patterns::Integer(0, 20),
-                             "The number of times the 1-cell coarse mesh should "
-                             "be refined globally for our computations.");
-    parameters.declare_entry("Number of eigenvalues/eigenfunctions", "5",
+    // TODO investigate why the minimum number of refinement steps required to
+    // obtain the correct eigenvalue degeneracies is 6
+    parameters.declare_entry(
+      "Global mesh refinement steps",
+      "5",
+      Patterns::Integer(0, 20),
+      "The number of times the 1-cell coarse mesh should "
+      "be refined globally for our computations.");
+    parameters.declare_entry("Number of eigenvalues/eigenfunctions",
+                             "5",
                              Patterns::Integer(0, 100),
                              "The number of eigenvalues/eigenfunctions "
                              "to be computed.");
-    parameters.declare_entry("Potential", "0",
+    parameters.declare_entry("Potential",
+                             "0",
                              Patterns::Anything(),
                              "A functional description of the potential.");
 
@@ -181,7 +185,8 @@ namespace Step36
   void EigenvalueProblem<dim>::make_grid_and_dofs()
   {
     GridGenerator::hyper_cube(triangulation, -1, 1);
-    triangulation.refine_global(parameters.get_integer("Global mesh refinement steps"));
+    triangulation.refine_global(
+      parameters.get_integer("Global mesh refinement steps"));
     dof_handler.distribute_dofs(fe);
 
     DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
@@ -206,8 +211,8 @@ namespace Step36
     // program can only be run sequentially and will throw an exception if used
     // in parallel.
     IndexSet eigenfunction_index_set = dof_handler.locally_owned_dofs();
-    eigenfunctions
-    .resize(parameters.get_integer("Number of eigenvalues/eigenfunctions"));
+    eigenfunctions.resize(
+      parameters.get_integer("Number of eigenvalues/eigenfunctions"));
     for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       eigenfunctions[i].reinit(eigenfunction_index_set, MPI_COMM_WORLD);
 
@@ -233,7 +238,8 @@ namespace Step36
   {
     QGauss<dim> quadrature_formula(2);
 
-    FEValues<dim> fe_values(fe, quadrature_formula,
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
@@ -253,8 +259,8 @@ namespace Step36
     std::vector<double> potential_values(n_q_points);
 
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -269,33 +275,27 @@ namespace Step36
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
-                cell_stiffness_matrix(i, j)
-                += (fe_values.shape_grad(i, q_point) *
-                    fe_values.shape_grad(j, q_point)
-                    +
+                cell_stiffness_matrix(i, j) +=
+                  (fe_values.shape_grad(i, q_point) *
+                     fe_values.shape_grad(j, q_point) +
                    potential_values[q_point] *
                      fe_values.shape_value(i, q_point) *
-                    fe_values.shape_value(j, q_point)
-                   ) * fe_values.JxW (q_point);
+                     fe_values.shape_value(j, q_point)) *
+                  fe_values.JxW(q_point);
 
-                cell_mass_matrix(i, j)
-                += (fe_values.shape_value(i, q_point) *
-                    fe_values.shape_value(j, q_point)
-                   ) * fe_values.JxW (q_point);
+                cell_mass_matrix(i, j) += (fe_values.shape_value(i, q_point) *
+                                           fe_values.shape_value(j, q_point)) *
+                                          fe_values.JxW(q_point);
               }
 
         // Now that we have the local matrix contributions, we transfer them
         // into the global objects and take care of zero boundary constraints:
         cell->get_dof_indices(local_dof_indices);
 
-        constraints
-        .distribute_local_to_global(cell_stiffness_matrix,
-                                    local_dof_indices,
-                                    stiffness_matrix);
-        constraints
-        .distribute_local_to_global(cell_mass_matrix,
-                                    local_dof_indices,
-                                    mass_matrix);
+        constraints.distribute_local_to_global(
+          cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
+        constraints.distribute_local_to_global(
+          cell_mass_matrix, local_dof_indices, mass_matrix);
       }
 
     // At the end of the function, we tell PETSc that the matrices have now
@@ -326,9 +326,8 @@ namespace Step36
         }
 
     std::cout << "   Spurious eigenvalues are all in the interval "
-              << "[" << min_spurious_eigenvalue << "," << max_spurious_eigenvalue << "]"
-              << std::endl;
-
+              << "[" << min_spurious_eigenvalue << ","
+              << max_spurious_eigenvalue << "]" << std::endl;
   }
 
 
@@ -359,8 +358,10 @@ namespace Step36
 
     eigensolver.set_problem_type(EPS_GHEP);
 
-    eigensolver.solve(stiffness_matrix, mass_matrix,
-                      eigenvalues, eigenfunctions,
+    eigensolver.solve(stiffness_matrix,
+                      mass_matrix,
+                      eigenvalues,
+                      eigenfunctions,
                       eigenfunctions.size());
 
     // The output of the call above is a set of vectors and values. In
@@ -445,20 +446,23 @@ namespace Step36
   {
     make_grid_and_dofs();
 
-    std::cout << "   Number of active cells:       " << triangulation.n_active_cells()
-              << std::endl
-              << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
+    std::cout << "   Number of active cells:       "
+              << triangulation.n_active_cells() << std::endl
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
 
     assemble_system();
 
     const unsigned int n_iterations = solve();
-    std::cout << "   Solver converged in " << n_iterations << " iterations." << std::endl;
+    std::cout << "   Solver converged in " << n_iterations << " iterations."
+              << std::endl;
 
     output_results();
 
     std::cout << std::endl;
     for (unsigned int i = 0; i < eigenvalues.size(); ++i)
-      std::cout << "      Eigenvalue " << i << " : " << eigenvalues[i] << std::endl;
+      std::cout << "      Eigenvalue " << i << " : " << eigenvalues[i]
+                << std::endl;
   }
 } // namespace Step36
 
@@ -474,8 +478,9 @@ int main(int argc, char **argv)
 
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-                  ExcMessage("This program can only be run in serial, use ./step-36"));
+      AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage("This program can only be run in serial, use ./step-36"));
 
       EigenvalueProblem<2> problem("step-36.prm");
       problem.run();
@@ -485,7 +490,8 @@ int main(int argc, char **argv)
   // generated. If that is so, we panic...
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -498,7 +504,8 @@ int main(int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -510,9 +517,7 @@ int main(int argc, char **argv)
 
   // If no exceptions are thrown, then we tell the program to stop monkeying
   // around and exit nicely:
-  std::cout << std::endl
-            << "   Job done."
-            << std::endl;
+  std::cout << std::endl << "   Job done." << std::endl;
 
   return 0;
 }

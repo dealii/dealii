@@ -191,24 +191,22 @@ namespace Step17
     virtual void vector_value(const Point<dim> &p,
                               Vector<double> &  values) const override;
 
-    virtual void vector_value_list(const std::vector<Point<dim> > &points,
+    virtual void
+    vector_value_list(const std::vector<Point<dim>> &points,
                       std::vector<Vector<double>> &  value_list) const override;
   };
 
 
   template <int dim>
-  RightHandSide<dim>::RightHandSide() :
-    Function<dim> (dim)
+  RightHandSide<dim>::RightHandSide() : Function<dim>(dim)
   {}
 
 
   template <int dim>
-  inline
-  void RightHandSide<dim>::vector_value(const Point<dim> &p,
+  inline void RightHandSide<dim>::vector_value(const Point<dim> &p,
                                                Vector<double> &  values) const
   {
-    Assert(values.size() == dim,
-           ExcDimensionMismatch(values.size(), dim));
+    Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
     Assert(dim >= 2, ExcInternalError());
 
     Point<dim> point_1, point_2;
@@ -230,8 +228,9 @@ namespace Step17
 
 
   template <int dim>
-  void RightHandSide<dim>::vector_value_list(const std::vector<Point<dim> > &points,
-                                        std::vector<Vector<double>> &  value_list) const
+  void RightHandSide<dim>::vector_value_list(
+    const std::vector<Point<dim>> &points,
+    std::vector<Vector<double>> &  value_list) const
   {
     const unsigned int n_points = points.size();
 
@@ -239,8 +238,7 @@ namespace Step17
            ExcDimensionMismatch(value_list.size(), n_points));
 
     for (unsigned int p = 0; p < n_points; ++p)
-      RightHandSide<dim>::vector_value(points[p],
-                                       value_list[p]);
+      RightHandSide<dim>::vector_value(points[p], value_list[p]);
   }
 
 
@@ -264,13 +262,11 @@ namespace Step17
   // the latter is determined by testing whether the process currently
   // executing the constructor call is the first in the MPI universe.
   template <int dim>
-  ElasticProblem<dim>::ElasticProblem()
-    :
+  ElasticProblem<dim>::ElasticProblem() :
     mpi_communicator(MPI_COMM_WORLD),
     n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator)),
     this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator)),
-    pcout(std::cout,
-          (this_mpi_process == 0)),
+    pcout(std::cout, (this_mpi_process == 0)),
     dof_handler(triangulation),
     fe(FE_Q<dim>(1), dim)
   {}
@@ -379,9 +375,8 @@ namespace Step17
     // to this process (see step-18 or step-40 for a more efficient way to
     // handle this).
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler, dsp,
-                                    hanging_node_constraints,
-                                    false);
+    DoFTools::make_sparsity_pattern(
+      dof_handler, dsp, hanging_node_constraints, false);
 
     // Now we determine the set of locally owned DoFs and use that to
     // initialize parallel vectors and matrix. Since the matrix and vectors
@@ -397,13 +392,13 @@ namespace Step17
     // as vectors are partitioned with which the matrix is multiplied, while
     // rows have to partitioned in the same way as destination vectors of
     // matrix-vector multiplications:
-    const std::vector<IndexSet> locally_owned_dofs_per_proc = DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
-    const IndexSet locally_owned_dofs = locally_owned_dofs_per_proc[this_mpi_process];
+    const std::vector<IndexSet> locally_owned_dofs_per_proc =
+      DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
+    const IndexSet locally_owned_dofs =
+      locally_owned_dofs_per_proc[this_mpi_process];
 
-    system_matrix.reinit(locally_owned_dofs,
-                         locally_owned_dofs,
-                         dsp,
-                         mpi_communicator);
+    system_matrix.reinit(
+      locally_owned_dofs, locally_owned_dofs, dsp, mpi_communicator);
 
     solution.reinit(locally_owned_dofs, mpi_communicator);
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
@@ -463,7 +458,8 @@ namespace Step17
   void ElasticProblem<dim>::assemble_system()
   {
     QGauss<dim>   quadrature_formula(2);
-    FEValues<dim> fe_values(fe, quadrature_formula,
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
@@ -481,8 +477,7 @@ namespace Step17
     Functions::ConstantFunction<dim> lambda(1.), mu(1.);
 
     RightHandSide<dim>          right_hand_side;
-    std::vector<Vector<double> > rhs_values(n_q_points,
-                                            Vector<double>(dim));
+    std::vector<Vector<double>> rhs_values(n_q_points, Vector<double>(dim));
 
 
     // The next thing is the loop over all elements. Note that we do
@@ -505,8 +500,8 @@ namespace Step17
     // distributing local contributions into the global matrix
     // and right hand sides also takes care of hanging node constraints in the
     // same way as is done in step-6.
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->subdomain_id() == this_mpi_process)
@@ -521,35 +516,29 @@ namespace Step17
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const unsigned int
-              component_i = fe.system_to_component_index(i).first;
+              const unsigned int component_i =
+                fe.system_to_component_index(i).first;
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const unsigned int
-                  component_j = fe.system_to_component_index(j).first;
+                  const unsigned int component_j =
+                    fe.system_to_component_index(j).first;
 
                   for (unsigned int q_point = 0; q_point < n_q_points;
                        ++q_point)
                     {
-                      cell_matrix(i,j)
-                      +=
-                        (
-                          (fe_values.shape_grad(i,q_point)[component_i] *
+                      cell_matrix(i, j) +=
+                        ((fe_values.shape_grad(i, q_point)[component_i] *
                           fe_values.shape_grad(j, q_point)[component_j] *
-                           lambda_values[q_point])
-                          +
+                          lambda_values[q_point]) +
                          (fe_values.shape_grad(i, q_point)[component_j] *
                           fe_values.shape_grad(j, q_point)[component_i] *
-                           mu_values[q_point])
-                          +
+                          mu_values[q_point]) +
                          ((component_i == component_j) ?
                             (fe_values.shape_grad(i, q_point) *
                              fe_values.shape_grad(j, q_point) *
                              mu_values[q_point]) :
-                           0)
-                        )
-                        *
+                            0)) *
                         fe_values.JxW(q_point);
                     }
                 }
@@ -559,8 +548,8 @@ namespace Step17
                                             rhs_values);
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const unsigned int
-              component_i = fe.system_to_component_index(i).first;
+              const unsigned int component_i =
+                fe.system_to_component_index(i).first;
 
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 cell_rhs(i) += fe_values.shape_value(i, q_point) *
@@ -569,10 +558,11 @@ namespace Step17
             }
 
           cell->get_dof_indices(local_dof_indices);
-          hanging_node_constraints
-          .distribute_local_to_global(cell_matrix, cell_rhs,
+          hanging_node_constraints.distribute_local_to_global(cell_matrix,
+                                                              cell_rhs,
                                                               local_dof_indices,
-                                      system_matrix, system_rhs);
+                                                              system_matrix,
+                                                              system_rhs);
         }
 
     // The next step is to "compress" the vector and the system
@@ -612,15 +602,10 @@ namespace Step17
     // we therefore do not eliminate the entries in the affected
     // columns.
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(dim),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       solution,
-                                       system_rhs,
-                                       false);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Functions::ZeroFunction<dim>(dim), boundary_values);
+    MatrixTools::apply_boundary_values(
+      boundary_values, system_matrix, solution, system_rhs, false);
   }
 
 
@@ -660,15 +645,12 @@ namespace Step17
   template <int dim>
   unsigned int ElasticProblem<dim>::solve()
   {
-    SolverControl           solver_control(solution.size(),
-                                           1e-8*system_rhs.l2_norm());
-    PETScWrappers::SolverCG cg(solver_control,
-                               mpi_communicator);
+    SolverControl solver_control(solution.size(), 1e-8 * system_rhs.l2_norm());
+    PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 
-    cg.solve(system_matrix, solution, system_rhs,
-             preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
     // The next step is to distribute hanging node constraints. This is a
     // little tricky, since to fill in the value of a constrained node you
@@ -827,13 +809,11 @@ namespace Step17
     // the elements that are nonzero, so we may miss a few that we
     // computed to zero, but this won't hurt since the original values
     // of the vector is zero anyway.
-    const unsigned int n_local_cells
-      = GridTools::count_cells_with_subdomain_association(triangulation,
+    const unsigned int n_local_cells =
+      GridTools::count_cells_with_subdomain_association(triangulation,
                                                         this_mpi_process);
-    PETScWrappers::MPI::Vector
-    distributed_all_errors(mpi_communicator,
-                           triangulation.n_active_cells(),
-                           n_local_cells);
+    PETScWrappers::MPI::Vector distributed_all_errors(
+      mpi_communicator, triangulation.n_active_cells(), n_local_cells);
 
     for (unsigned int i = 0; i < local_error_per_cell.size(); ++i)
       if (local_error_per_cell(i) != 0)
@@ -850,9 +830,8 @@ namespace Step17
     // does it in exactly the same way.
     const Vector<float> localized_all_errors(distributed_all_errors);
 
-    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                    localized_all_errors,
-                                                    0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, localized_all_errors, 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement();
   }
 
@@ -942,9 +921,7 @@ namespace Step17
     // solution vector to the output object.
     if (this_mpi_process == 0)
       {
-        std::ofstream output("solution-"
-                             + std::to_string(cycle)
-                             + ".vtk");
+        std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
 
         DataOut<dim> data_out;
         data_out.attach_dof_handler(dof_handler);
@@ -1020,26 +997,23 @@ namespace Step17
           refine_grid();
 
         pcout << "   Number of active cells:       "
-              << triangulation.n_active_cells()
-              << std::endl;
+              << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
-        pcout << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+        pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << " (by partition:";
         for (unsigned int p = 0; p < n_mpi_processes; ++p)
           pcout << (p == 0 ? ' ' : '+')
-                << (DoFTools::
-                    count_dofs_with_subdomain_association(dof_handler,
+                << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                     p));
         pcout << ")" << std::endl;
 
         assemble_system();
         const unsigned int n_iterations = solve();
 
-        pcout << "   Solver converged in " << n_iterations
-              << " iterations." << std::endl;
+        pcout << "   Solver converged in " << n_iterations << " iterations."
+              << std::endl;
 
         output_results(cycle);
       }
@@ -1071,7 +1045,8 @@ int main(int argc, char **argv)
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -1084,7 +1059,8 @@ int main(int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

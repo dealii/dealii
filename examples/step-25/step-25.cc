@@ -153,8 +153,9 @@ namespace Step25
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution(const unsigned int n_components = 1,
-                  const double time = 0.) : Function<dim>(n_components, time) {}
+    ExactSolution(const unsigned int n_components = 1, const double time = 0.) :
+      Function<dim>(n_components, time)
+    {}
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
@@ -172,8 +173,7 @@ namespace Step25
             const double m  = 0.5;
             const double c1 = 0.;
             const double c2 = 0.;
-        return -4.*std::atan(m /
-                             std::sqrt(1.-m*m) *
+            return -4. * std::atan(m / std::sqrt(1. - m * m) *
                                    std::sin(std::sqrt(1. - m * m) * t + c2) /
                                    std::cosh(m * p[0] + c1));
           }
@@ -185,8 +185,7 @@ namespace Step25
             const double a0     = 1.;
             const double s      = 1.;
             const double arg    = p[0] * std::cos(theta) +
-                           std::sin(theta) *
-                           (p[1] * std::cosh(lambda) +
+                               std::sin(theta) * (p[1] * std::cosh(lambda) +
                                                   t * std::sinh(lambda));
             return 4. * std::atan(a0 * std::exp(s * arg));
           }
@@ -220,9 +219,7 @@ namespace Step25
   class InitialValues : public Function<dim>
   {
   public:
-    InitialValues(const unsigned int n_components = 1,
-                  const double time = 0.)
-      :
+    InitialValues(const unsigned int n_components = 1, const double time = 0.) :
       Function<dim>(n_components, time)
     {}
 
@@ -267,8 +264,7 @@ namespace Step25
   // technique in step-24 using GridTools::minimal_cell_diameter would work as
   // well.
   template <int dim>
-  SineGordonProblem<dim>::SineGordonProblem()
-    :
+  SineGordonProblem<dim>::SineGordonProblem() :
     fe(1),
     dof_handler(triangulation),
     n_global_refinements(6),
@@ -294,17 +290,14 @@ namespace Step25
     GridGenerator::hyper_cube(triangulation, -10, 10);
     triangulation.refine_global(n_global_refinements);
 
-    std::cout << "   Number of active cells: "
-              << triangulation.n_active_cells()
+    std::cout << "   Number of active cells: " << triangulation.n_active_cells()
               << std::endl
-              << "   Total number of cells: "
-              << triangulation.n_cells()
+              << "   Total number of cells: " << triangulation.n_cells()
               << std::endl;
 
     dof_handler.distribute_dofs(fe);
 
-    std::cout << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+    std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -315,12 +308,9 @@ namespace Step25
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler,
-                                      QGauss<dim>(3),
-                                      mass_matrix);
-    MatrixCreator::create_laplace_matrix(dof_handler,
-                                         QGauss<dim>(3),
-                                         laplace_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
+    MatrixCreator::create_laplace_matrix(
+      dof_handler, QGauss<dim>(3), laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
     solution_update.reinit(dof_handler.n_dofs());
@@ -404,13 +394,13 @@ namespace Step25
   template <int dim>
   void SineGordonProblem<dim>::compute_nl_term(const Vector<double> &old_data,
                                                const Vector<double> &new_data,
-                                               Vector<double> &      nl_term) const
+                                               Vector<double> &nl_term) const
   {
     nl_term = 0;
     const QGauss<dim> quadrature_formula(3);
-    FEValues<dim>     fe_values(fe, quadrature_formula,
-                                update_values |
-                                update_JxW_values |
+    FEValues<dim>     fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values |
                               update_quadrature_points);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
@@ -421,8 +411,8 @@ namespace Step25
     std::vector<double>                  old_data_values(n_q_points);
     std::vector<double>                  new_data_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
@@ -443,10 +433,10 @@ namespace Step25
         // the desired quadrature formula.
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            local_nl_term(i) += (std::sin(theta * new_data_values[q_point] +
+            local_nl_term(i) +=
+              (std::sin(theta * new_data_values[q_point] +
                         (1 - theta) * old_data_values[q_point]) *
-                                 fe_values.shape_value(i, q_point) *
-                                 fe_values.JxW (q_point));
+               fe_values.shape_value(i, q_point) * fe_values.JxW(q_point));
 
         // We conclude by adding up the contributions of the integrals over
         // the cells to the global integral.
@@ -466,24 +456,27 @@ namespace Step25
   // solution, which we again call $w_{\mathrm{old}}$ and $w_{\mathrm{new}}$
   // below, respectively.
   template <int dim>
-  void SineGordonProblem<dim>::compute_nl_matrix(const Vector<double> &old_data,
-                                                 const Vector<double> &new_data,
-                                                 SparseMatrix<double> &nl_matrix) const
+  void SineGordonProblem<dim>::compute_nl_matrix(
+    const Vector<double> &old_data,
+    const Vector<double> &new_data,
+    SparseMatrix<double> &nl_matrix) const
   {
     QGauss<dim>   quadrature_formula(3);
-    FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values | update_JxW_values | update_quadrature_points);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values |
+                              update_quadrature_points);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>                   local_nl_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> local_nl_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     std::vector<double>                  old_data_values(n_q_points);
     std::vector<double>                  new_data_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
@@ -501,11 +494,11 @@ namespace Step25
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              local_nl_matrix(i,j) += (std::cos(theta * new_data_values[q_point] +
+              local_nl_matrix(i, j) +=
+                (std::cos(theta * new_data_values[q_point] +
                           (1 - theta) * old_data_values[q_point]) *
                  fe_values.shape_value(i, q_point) *
-                                       fe_values.shape_value(j, q_point) *
-                 fe_values.JxW(q_point));
+                 fe_values.shape_value(j, q_point) * fe_values.JxW(q_point));
 
         // Finally, we add up the contributions of the integrals over the
         // cells to the global integral.
@@ -513,7 +506,8 @@ namespace Step25
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            nl_matrix.add(local_dof_indices[i], local_dof_indices[j],
+            nl_matrix.add(local_dof_indices[i],
+                          local_dof_indices[j],
                           local_nl_matrix(i, j));
       }
   }
@@ -545,8 +539,7 @@ namespace Step25
   // solution. This number will later be used to generate output on the screen
   // showing how many iterations were needed in each nonlinear iteration.
   template <int dim>
-  unsigned int
-  SineGordonProblem<dim>::solve()
+  unsigned int SineGordonProblem<dim>::solve()
   {
     SolverControl solver_control(1000, 1e-12 * system_rhs.l2_norm());
     SolverCG<>    cg(solver_control);
@@ -554,9 +547,7 @@ namespace Step25
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve(system_matrix, solution_update,
-             system_rhs,
-             preconditioner);
+    cg.solve(system_matrix, solution_update, system_rhs, preconditioner);
 
     return solver_control.last_step();
   }
@@ -566,8 +557,8 @@ namespace Step25
   // This function outputs the results to a file. It is pretty much identical
   // to the respective functions in step-23 and step-24:
   template <int dim>
-  void
-  SineGordonProblem<dim>::output_results(const unsigned int timestep_number) const
+  void SineGordonProblem<dim>::output_results(
+    const unsigned int timestep_number) const
   {
     DataOut<dim> data_out;
 
@@ -575,9 +566,8 @@ namespace Step25
     data_out.add_data_vector(solution, "u");
     data_out.build_patches();
 
-    const std::string filename =  "solution-" +
-                                  Utilities::int_to_string(timestep_number, 3) +
-                                  ".vtk";
+    const std::string filename =
+      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtk";
 
     std::ofstream output(filename);
     data_out.write_vtk(output);
@@ -624,14 +614,14 @@ namespace Step25
     // of the problem, and then advance our solution according to the time
     // stepping formulas we discussed in the Introduction.
     unsigned int timestep_number = 1;
-    for (time += time_step; time <= final_time; time += time_step, ++timestep_number)
+    for (time += time_step; time <= final_time;
+         time += time_step, ++timestep_number)
       {
         old_solution = solution;
 
         std::cout << std::endl
                   << "Time step #" << timestep_number << "; "
-                  << "advancing to t = " << time << "."
-                  << std::endl;
+                  << "advancing to t = " << time << "." << std::endl;
 
         // At the beginning of each time step we must solve the nonlinear
         // equation in the split formulation via Newton's method ---
@@ -652,8 +642,7 @@ namespace Step25
             if (first_iteration == true)
               initial_rhs_norm = system_rhs.l2_norm();
 
-            const unsigned int n_iterations
-              = solve();
+            const unsigned int n_iterations = solve();
 
             solution += solution_update;
 
@@ -665,8 +654,7 @@ namespace Step25
           }
         while (system_rhs.l2_norm() > 1e-6 * initial_rhs_norm);
 
-        std::cout << " CG iterations per nonlinear step."
-                  << std::endl;
+        std::cout << " CG iterations per nonlinear step." << std::endl;
 
         // Upon obtaining the solution to the first equation of the problem at
         // $t=t_n$, we must update the auxiliary velocity variable
@@ -715,7 +703,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -728,7 +717,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -107,13 +107,13 @@ namespace Step16
   {
   public:
     LaplaceIntegrator();
-    virtual void cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const override;
+    virtual void cell(MeshWorker::DoFInfo<dim> &        dinfo,
+                      MeshWorker::IntegrationInfo<dim> &info) const override;
   };
 
 
   template <int dim>
-  LaplaceIntegrator<dim>::LaplaceIntegrator()
-    :
+  LaplaceIntegrator<dim>::LaplaceIntegrator() :
     MeshWorker::LocalIntegrator<dim>(true, false, false)
   {}
 
@@ -126,12 +126,12 @@ namespace Step16
   // contains objects that can be filled in this local integrator. How
   // many objects is determined inside the MeshWorker framework by the
   // assembler class. Here, we test for instance that one matrix is
-  // required (MeshWorker::LocalResults::n_matrices()). The matrices are accessed
-  // through MeshWorker::LocalResults::matrix(), which takes the number of the
-  // matrix as its first argument. The second argument is only used
-  // for integrals over faces, where there are two matrices for each
-  // test function set. In such a case, a second matrix with indicator
-  // 'true' would exist with the same index.
+  // required (MeshWorker::LocalResults::n_matrices()). The matrices are
+  // accessed through MeshWorker::LocalResults::matrix(), which takes the number
+  // of the matrix as its first argument. The second argument is only used for
+  // integrals over faces, where there are two matrices for each test function
+  // set. In such a case, a second matrix with indicator 'true' would exist with
+  // the same index.
 
   // MeshWorker::IntegrationInfo provides one or several FEValues
   // objects, which below are used by
@@ -149,18 +149,21 @@ namespace Step16
   // BlockVector objects, but we are again in the simplest case here,
   // we enter the information into block zero of vector zero.
   template <int dim>
-  void LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
+  void
+  LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
+                               MeshWorker::IntegrationInfo<dim> &info) const
   {
     AssertDimension(dinfo.n_matrices(), 1);
-    const double coefficient = (dinfo.cell->center()(0) > 0.)
-                               ? .1 : 1.;
+    const double coefficient = (dinfo.cell->center()(0) > 0.) ? .1 : 1.;
 
-    LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0), coefficient);
+    LocalIntegrators::Laplace::cell_matrix(
+      dinfo.matrix(0, false).matrix, info.fe_values(0), coefficient);
 
     if (dinfo.n_vectors() > 0)
       {
         std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
-        LocalIntegrators::L2::L2(dinfo.vector(0).block(0), info.fe_values(0), rhs);
+        LocalIntegrators::L2::L2(
+          dinfo.vector(0).block(0), info.fe_values(0), rhs);
       }
   }
 
@@ -239,10 +242,8 @@ namespace Step16
   // Triangulation::limit_level_difference_at_vertices flag to the constructor
   // of the triangulation class.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
-    :
-    triangulation(Triangulation<dim>::
-                  limit_level_difference_at_vertices),
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree) :
+    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
     fe(degree),
     dof_handler(triangulation),
     degree(degree)
@@ -261,13 +262,11 @@ namespace Step16
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    deallog << "   Number of degrees of freedom: "
-            << dof_handler.n_dofs()
+    deallog << "   Number of degrees of freedom: " << dof_handler.n_dofs()
             << " (by level: ";
     for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
       deallog << dof_handler.n_dofs(level)
-              << (level == triangulation.n_levels()-1
-                  ? ")" : ", ");
+              << (level == triangulation.n_levels() - 1 ? ")" : ", ");
     deallog << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -281,9 +280,10 @@ namespace Step16
 
     std::set<types::boundary_id>          dirichlet_boundary_ids = {0};
     Functions::ZeroFunction<dim>          homogeneous_dirichlet_bc;
-    const typename FunctionMap<dim>::type dirichlet_boundary_functions
-    = { { types::boundary_id(0), &homogeneous_dirichlet_bc } };
-    VectorTools::interpolate_boundary_values(static_cast<const DoFHandler<dim>&>(dof_handler),
+    const typename FunctionMap<dim>::type dirichlet_boundary_functions = {
+      {types::boundary_id(0), &homogeneous_dirichlet_bc}};
+    VectorTools::interpolate_boundary_values(
+      static_cast<const DoFHandler<dim> &>(dof_handler),
       dirichlet_boundary_functions,
       constraints);
     constraints.close();
@@ -296,7 +296,8 @@ namespace Step16
     // <code>dirichlet_boundary</code> here as well.
     mg_constrained_dofs.clear();
     mg_constrained_dofs.initialize(dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, dirichlet_boundary_ids);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
+                                                       dirichlet_boundary_ids);
 
 
     // Now for the things that concern the multigrid data structures. First,
@@ -384,20 +385,25 @@ namespace Step16
   {
     MappingQ1<dim>                      mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags update_flags = update_values | update_gradients | update_hessians;
+    UpdateFlags                         update_flags =
+      update_values | update_gradients | update_hessians;
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
-    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>> assembler;
+    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>>
+      assembler;
     assembler.initialize(constraints);
     assembler.initialize(system_matrix, system_rhs);
 
     LaplaceIntegrator<dim> matrix_integrator;
-    MeshWorker::integration_loop<dim, dim> (
-      dof_handler.begin_active(), dof_handler.end(),
-      dof_info, info_box, matrix_integrator, assembler);
+    MeshWorker::integration_loop<dim, dim>(dof_handler.begin_active(),
+                                           dof_handler.end(),
+                                           dof_info,
+                                           info_box,
+                                           matrix_integrator,
+                                           assembler);
 
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (constraints.is_constrained(i))
@@ -421,7 +427,8 @@ namespace Step16
   {
     MappingQ1<dim>                      mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags update_flags = update_values | update_gradients | update_hessians;
+    UpdateFlags                         update_flags =
+      update_values | update_gradients | update_hessians;
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
@@ -433,9 +440,12 @@ namespace Step16
     assembler.initialize_interfaces(mg_interface_in, mg_interface_out);
 
     LaplaceIntegrator<dim> matrix_integrator;
-    MeshWorker::integration_loop<dim, dim> (
-      dof_handler.begin_mg(), dof_handler.end_mg(),
-      dof_info, info_box, matrix_integrator, assembler);
+    MeshWorker::integration_loop<dim, dim>(dof_handler.begin_mg(),
+                                           dof_handler.end_mg(),
+                                           dof_info,
+                                           info_box,
+                                           matrix_integrator,
+                                           assembler);
 
     const unsigned int nlevels = triangulation.n_levels();
     for (unsigned int level = 0; level < nlevels; ++level)
@@ -529,11 +539,8 @@ namespace Step16
 
     // Now, we are ready to set up the V-cycle operator and the multilevel
     // preconditioner.
-    Multigrid<Vector<double> > mg(mg_matrix,
-                                  coarse_grid_solver,
-                                  mg_transfer,
-                                  mg_smoother,
-                                  mg_smoother);
+    Multigrid<Vector<double>> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
@@ -546,8 +553,7 @@ namespace Step16
 
     solution = 0;
 
-    solver.solve(system_matrix, solution, system_rhs,
-                 preconditioner);
+    solver.solve(system_matrix, solution, system_rhs, preconditioner);
     constraints.distribute(solution);
   }
 
@@ -572,9 +578,8 @@ namespace Step16
                                        typename FunctionMap<dim>::type(),
                                        solution,
                                        estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                    estimated_error_per_cell,
-                                                    0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement();
   }
 
@@ -589,9 +594,7 @@ namespace Step16
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
-    std::ofstream output("solution-"
-                         + std::to_string(cycle)
-                         + ".vtk");
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
     data_out.write_vtk(output);
   }
 
@@ -618,8 +621,7 @@ namespace Step16
           refine_grid();
 
         deallog << "   Number of active cells:       "
-                << triangulation.n_active_cells()
-                << std::endl;
+                << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
@@ -649,7 +651,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -662,7 +665,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

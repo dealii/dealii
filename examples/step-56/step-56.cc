@@ -83,7 +83,12 @@ namespace Step56
   // constructor of the main class.
   struct SolverType
   {
-    enum type {FGMRES_ILU, FGMRES_GMG, UMFPACK};
+    enum type
+    {
+      FGMRES_ILU,
+      FGMRES_GMG,
+      UMFPACK
+    };
   };
 
   // @sect3{Functions for Solution and Righthand side}
@@ -100,16 +105,17 @@ namespace Step56
   class Solution : public Function<dim>
   {
   public:
-    Solution() : Function<dim>(dim+1) {}
-    virtual double         value(const Point<dim> & p,
-                                 const unsigned int component = 0) const override;
-    virtual Tensor<1, dim> gradient(const Point<dim> & p,
-                                    const unsigned int component = 0) const override;
+    Solution() : Function<dim>(dim + 1)
+    {}
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
   };
 
   template <>
-  double
-  Solution<2>::value(const Point<2> &p,
+  double Solution<2>::value(const Point<2> &   p,
                             const unsigned int component) const
   {
     Assert(component <= 2 + 1, ExcIndexRange(component, 0, 2 + 1));
@@ -129,8 +135,7 @@ namespace Step56
   }
 
   template <>
-  double
-  Solution<3>::value(const Point<3> &p,
+  double Solution<3>::value(const Point<3> &   p,
                             const unsigned int component) const
   {
     Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
@@ -154,8 +159,7 @@ namespace Step56
 
   // Note that for the gradient we need to return a Tensor<1,dim>
   template <>
-  Tensor<1,2>
-  Solution<2>::gradient(const Point<2> &p,
+  Tensor<1, 2> Solution<2>::gradient(const Point<2> &   p,
                                      const unsigned int component) const
   {
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
@@ -185,8 +189,7 @@ namespace Step56
   }
 
   template <>
-  Tensor<1,3>
-  Solution<3>::gradient(const Point<3> &p,
+  Tensor<1, 3> Solution<3>::gradient(const Point<3> &   p,
                                      const unsigned int component) const
   {
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
@@ -230,15 +233,15 @@ namespace Step56
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim+1) {}
+    RightHandSide() : Function<dim>(dim + 1)
+    {}
 
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
 
   template <>
-  double
-  RightHandSide<2>::value(const Point<2> &p,
+  double RightHandSide<2>::value(const Point<2> &   p,
                                  const unsigned int component) const
   {
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
@@ -257,8 +260,7 @@ namespace Step56
   }
 
   template <>
-  double
-  RightHandSide<3>::value(const Point<3>   &p,
+  double RightHandSide<3>::value(const Point<3> &   p,
                                  const unsigned int component) const
   {
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
@@ -268,11 +270,14 @@ namespace Step56
     double y = p(1);
     double z = p(2);
     if (component == 0)
-      return 2 * PI * PI * sin(PI * x) + PI * cos(PI * x) * cos(PI * y) * sin(PI * z);
+      return 2 * PI * PI * sin(PI * x) +
+             PI * cos(PI * x) * cos(PI * y) * sin(PI * z);
     if (component == 1)
-      return  - PI * PI * PI * y * cos(PI * x) + PI * (-1) * sin(PI * y)*sin(PI * x)*sin(PI * z);
+      return -PI * PI * PI * y * cos(PI * x) +
+             PI * (-1) * sin(PI * y) * sin(PI * x) * sin(PI * z);
     if (component == 2)
-      return - PI * PI * PI * z * cos(PI * x) + PI * cos(PI * z)*sin(PI * x)*cos(PI * y);
+      return -PI * PI * PI * z * cos(PI * x) +
+             PI * cos(PI * z) * sin(PI * x) * cos(PI * y);
     if (component == 3)
       return 0;
 
@@ -306,14 +311,14 @@ namespace Step56
   class BlockSchurPreconditioner : public Subscriptor
   {
   public:
-    BlockSchurPreconditioner(const BlockSparseMatrix<double> &system_matrix,
-                             const SparseMatrix<double> &     schur_complement_matrix,
-                             const PreconditionerAType &      preconditioner_A,
-                             const PreconditionerSType &      preconditioner_S,
-                             const bool                       do_solve_A);
+    BlockSchurPreconditioner(
+      const BlockSparseMatrix<double> &system_matrix,
+      const SparseMatrix<double> &     schur_complement_matrix,
+      const PreconditionerAType &      preconditioner_A,
+      const PreconditionerSType &      preconditioner_S,
+      const bool                       do_solve_A);
 
-    void vmult(BlockVector<double>       &dst,
-               const BlockVector<double> &src) const;
+    void vmult(BlockVector<double> &dst, const BlockVector<double> &src) const;
 
     mutable unsigned int n_iterations_A;
     mutable unsigned int n_iterations_S;
@@ -329,12 +334,12 @@ namespace Step56
 
   template <class PreconditionerAType, class PreconditionerSType>
   BlockSchurPreconditioner<PreconditionerAType, PreconditionerSType>::
-    BlockSchurPreconditioner(const BlockSparseMatrix<double> &system_matrix,
-                             const SparseMatrix<double> &     schur_complement_matrix,
-                             const PreconditionerAType &      preconditioner_A,
-                             const PreconditionerSType &      preconditioner_S,
-                           const bool do_solve_A)
-    :
+    BlockSchurPreconditioner(
+      const BlockSparseMatrix<double> &system_matrix,
+      const SparseMatrix<double> &     schur_complement_matrix,
+      const PreconditionerAType &      preconditioner_A,
+      const PreconditionerSType &      preconditioner_S,
+      const bool                       do_solve_A) :
     n_iterations_A(0),
     n_iterations_S(0),
     system_matrix(system_matrix),
@@ -348,8 +353,8 @@ namespace Step56
 
   template <class PreconditionerAType, class PreconditionerSType>
   void
-  BlockSchurPreconditioner<PreconditionerAType, PreconditionerSType>::
-  vmult(BlockVector<double>       &dst,
+  BlockSchurPreconditioner<PreconditionerAType, PreconditionerSType>::vmult(
+    BlockVector<double> &      dst,
     const BlockVector<double> &src) const
   {
     Vector<double> utmp(src.block(0));
@@ -360,10 +365,8 @@ namespace Step56
       SolverCG<>    cg(solver_control);
 
       dst.block(1) = 0.0;
-      cg.solve(schur_complement_matrix,
-               dst.block(1),
-               src.block(1),
-               preconditioner_S);
+      cg.solve(
+        schur_complement_matrix, dst.block(1), src.block(1), preconditioner_S);
 
       n_iterations_S += solver_control.last_step();
       dst.block(1) *= -1.0;
@@ -384,10 +387,8 @@ namespace Step56
         SolverCG<>    cg(solver_control);
 
         dst.block(0) = 0.0;
-        cg.solve(system_matrix.block(0,0),
-                 dst.block(0),
-                 utmp,
-                 preconditioner_A);
+        cg.solve(
+          system_matrix.block(0, 0), dst.block(0), utmp, preconditioner_A);
 
         n_iterations_A += solver_control.last_step();
       }
@@ -447,8 +448,7 @@ namespace Step56
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(const unsigned int pressure_degree,
-                                    SolverType::type solver_type)
-    :
+                                    SolverType::type   solver_type) :
     pressure_degree(pressure_degree),
     solver_type(solver_type),
     triangulation(Triangulation<dim>::maximum_smoothing),
@@ -458,8 +458,7 @@ namespace Step56
     fe(velocity_fe, 1, FE_Q<dim>(pressure_degree), 1),
     dof_handler(triangulation),
     velocity_dof_handler(triangulation),
-    computing_timer(std::cout, TimerOutput::never,
-                    TimerOutput::wall_times)
+    computing_timer(std::cout, TimerOutput::never, TimerOutput::wall_times)
   {}
 
 
@@ -507,8 +506,10 @@ namespace Step56
 
     if (solver_type == SolverType::FGMRES_GMG)
       {
-        TimerOutput::Scope multigrid_specific(computing_timer, "(Multigrid specific)");
-        TimerOutput::Scope setup_multigrid(computing_timer, "Setup - Multigrid");
+        TimerOutput::Scope multigrid_specific(computing_timer,
+                                              "(Multigrid specific)");
+        TimerOutput::Scope setup_multigrid(computing_timer,
+                                           "Setup - Multigrid");
 
         // This distributes the active dofs and multigrid dofs for the
         // velocity space in a separate DoFHandler as described in the
@@ -526,7 +527,8 @@ namespace Step56
 
         mg_constrained_dofs.clear();
         mg_constrained_dofs.initialize(velocity_dof_handler);
-        mg_constrained_dofs.make_zero_boundary_constraints(velocity_dof_handler, zero_boundary_ids);
+        mg_constrained_dofs.make_zero_boundary_constraints(velocity_dof_handler,
+                                                           zero_boundary_ids);
         const unsigned int n_levels = triangulation.n_levels();
 
         mg_interface_matrices.resize(0, n_levels - 1);
@@ -546,9 +548,9 @@ namespace Step56
       }
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
-    const unsigned int n_u = dofs_per_block[0],
-                       n_p = dofs_per_block[1];
+    DoFTools::count_dofs_per_block(
+      dof_handler, dofs_per_block, block_component);
+    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
     {
       constraints.clear();
@@ -563,8 +565,8 @@ namespace Step56
                                                fe.component_mask(velocities));
 
       // As discussed in the introduction, we need to fix one degree of freedom
-      // of the pressure variable to ensure solvability of the problem. We do this
-      // here by marking the first pressure dof, which has index n_u as a
+      // of the pressure variable to ensure solvability of the problem. We do
+      // this here by marking the first pressure dof, which has index n_u as a
       // constrained dof.
       if (solver_type == SolverType::UMFPACK)
         constraints.add_line(n_u);
@@ -572,13 +574,10 @@ namespace Step56
       constraints.close();
     }
 
-    std::cout << "\tNumber of active cells: "
-              << triangulation.n_active_cells()
+    std::cout << "\tNumber of active cells: " << triangulation.n_active_cells()
               << std::endl
-              << "\tNumber of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << " (" << n_u << '+' << n_p << ')'
-              << std::endl;
+              << "\tNumber of degrees of freedom: " << dof_handler.n_dofs()
+              << " (" << n_u << '+' << n_p << ')' << std::endl;
 
     {
       BlockDynamicSparsityPattern csp(dofs_per_block, dofs_per_block);
@@ -605,15 +604,15 @@ namespace Step56
     system_rhs    = 0;
 
     // If true, we will assemble the pressure mass matrix in the (1,1) block:
-    const bool assemble_pressure_mass_matrix = (solver_type == SolverType::UMFPACK) ? false : true;
+    const bool assemble_pressure_mass_matrix =
+      (solver_type == SolverType::UMFPACK) ? false : true;
 
     QGauss<dim> quadrature_formula(pressure_degree + 2);
 
-    FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values    |
-                            update_quadrature_points  |
-                            update_JxW_values |
-                              update_gradients);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_quadrature_points |
+                              update_JxW_values | update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -625,8 +624,7 @@ namespace Step56
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const RightHandSide<dim>    right_hand_side;
-    std::vector<Vector<double> >      rhs_values(n_q_points,
-                                                 Vector<double>(dim+1));
+    std::vector<Vector<double>> rhs_values(n_q_points, Vector<double>(dim + 1));
 
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
@@ -635,8 +633,8 @@ namespace Step56
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -651,28 +649,28 @@ namespace Step56
           {
             for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
-                symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
-                div_phi_u[k]     = fe_values[velocities].divergence(k, q);
-                phi_p[k]         = fe_values[pressure].value(k, q);
+                symgrad_phi_u[k] =
+                  fe_values[velocities].symmetric_gradient(k, q);
+                div_phi_u[k] = fe_values[velocities].divergence(k, q);
+                phi_p[k]     = fe_values[pressure].value(k, q);
               }
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 for (unsigned int j = 0; j <= i; ++j)
                   {
-                    local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
-                                          - div_phi_u[i] * phi_p[j]
-                                          - phi_p[i] * div_phi_u[j]
-                                          + (assemble_pressure_mass_matrix ? phi_p[i] * phi_p[j] : 0))
-                                         * fe_values.JxW(q);
-
+                    local_matrix(i, j) +=
+                      (2 * (symgrad_phi_u[i] * symgrad_phi_u[j]) -
+                       div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
+                       (assemble_pressure_mass_matrix ? phi_p[i] * phi_p[j] :
+                                                        0)) *
+                      fe_values.JxW(q);
                   }
 
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
                 local_rhs(i) += fe_values.shape_value(i, q) *
-                                rhs_values[q](component_i) *
-                                fe_values.JxW(q);
+                                rhs_values[q](component_i) * fe_values.JxW(q);
               }
           }
 
@@ -681,9 +679,11 @@ namespace Step56
             local_matrix(i, j) = local_matrix(j, i);
 
         cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(local_matrix, local_rhs,
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_rhs,
                                                local_dof_indices,
-                                               system_matrix, system_rhs);
+                                               system_matrix,
+                                               system_rhs);
       }
 
     if (solver_type != SolverType::UMFPACK)
@@ -701,18 +701,19 @@ namespace Step56
   template <int dim>
   void StokesProblem<dim>::assemble_multigrid()
   {
-    TimerOutput::Scope multigrid_specific(computing_timer, "(Multigrid specific)");
-    TimerOutput::Scope assemble_multigrid(computing_timer, "Assemble Multigrid");
+    TimerOutput::Scope multigrid_specific(computing_timer,
+                                          "(Multigrid specific)");
+    TimerOutput::Scope assemble_multigrid(computing_timer,
+                                          "Assemble Multigrid");
 
     mg_matrices = 0.;
 
     QGauss<dim> quadrature_formula(pressure_degree + 2);
 
-    FEValues<dim> fe_values(velocity_fe, quadrature_formula,
-                            update_values    |
-                            update_quadrature_points  |
-                            update_JxW_values |
-                              update_gradients);
+    FEValues<dim> fe_values(velocity_fe,
+                            quadrature_formula,
+                            update_values | update_quadrature_points |
+                              update_JxW_values | update_gradients);
 
     const unsigned int dofs_per_cell = velocity_fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -725,17 +726,20 @@ namespace Step56
 
     std::vector<SymmetricTensor<2, dim>> symgrad_phi_u(dofs_per_cell);
 
-    std::vector<ConstraintMatrix> boundary_constraints(triangulation.n_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints(triangulation.n_levels());
+    std::vector<ConstraintMatrix> boundary_constraints(
+      triangulation.n_levels());
+    std::vector<ConstraintMatrix> boundary_interface_constraints(
+      triangulation.n_levels());
     for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
       {
-        boundary_constraints[level].add_lines(mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines(mg_constrained_dofs.get_boundary_indices(level));
+        boundary_constraints[level].add_lines(
+          mg_constrained_dofs.get_refinement_edge_indices(level));
+        boundary_constraints[level].add_lines(
+          mg_constrained_dofs.get_boundary_indices(level));
         boundary_constraints[level].close();
 
-        IndexSet idx =
-          mg_constrained_dofs.get_refinement_edge_indices(level)
-          & mg_constrained_dofs.get_boundary_indices(level);
+        IndexSet idx = mg_constrained_dofs.get_refinement_edge_indices(level) &
+                       mg_constrained_dofs.get_boundary_indices(level);
 
         boundary_interface_constraints[level].add_lines(idx);
         boundary_interface_constraints[level].close();
@@ -758,9 +762,8 @@ namespace Step56
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               for (unsigned int j = 0; j <= i; ++j)
                 {
-                  cell_matrix(i,j) += (symgrad_phi_u[i]
-                                       * symgrad_phi_u[j])
-                                      * fe_values.JxW(q);
+                  cell_matrix(i, j) +=
+                    (symgrad_phi_u[i] * symgrad_phi_u[j]) * fe_values.JxW(q);
                 }
           }
 
@@ -770,19 +773,15 @@ namespace Step56
 
         cell->get_mg_dof_indices(local_dof_indices);
 
-        boundary_constraints[cell->level()]
-        .distribute_local_to_global(cell_matrix,
-                                    local_dof_indices,
-                                    mg_matrices[cell->level()]);
+        boundary_constraints[cell->level()].distribute_local_to_global(
+          cell_matrix, local_dof_indices, mg_matrices[cell->level()]);
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            if (
-              !mg_constrained_dofs.at_refinement_edge(cell->level(),
-                                                      local_dof_indices[i])
-              || mg_constrained_dofs.at_refinement_edge(cell->level(),
-                                                        local_dof_indices[j])
-            )
+            if (!mg_constrained_dofs.at_refinement_edge(cell->level(),
+                                                        local_dof_indices[i]) ||
+                mg_constrained_dofs.at_refinement_edge(cell->level(),
+                                                       local_dof_indices[j]))
               cell_matrix(i, j) = 0;
 
         boundary_interface_constraints[cell->level()]
@@ -817,7 +816,8 @@ namespace Step56
         computing_timer.leave_subsection();
 
         {
-          TimerOutput::Scope solve_backslash(computing_timer, "Solve - Backslash");
+          TimerOutput::Scope solve_backslash(computing_timer,
+                                             "Solve - Backslash");
           A_direct.vmult(solution, system_rhs);
         }
 
@@ -825,7 +825,8 @@ namespace Step56
         return;
       }
 
-    // Here we must make sure to solve for the residual with "good enough" accuracy
+    // Here we must make sure to solve for the residual with "good enough"
+    // accuracy
     SolverControl solver_control(system_matrix.m(),
                                  1e-10 * system_rhs.l2_norm());
     unsigned int  n_iterations_A;
@@ -844,7 +845,8 @@ namespace Step56
         computing_timer.enter_subsection("(ILU specific)");
         computing_timer.enter_subsection("Solve - Set-up Preconditioner");
 
-        std::cout << "   Computing preconditioner..." << std::endl << std::flush;
+        std::cout << "   Computing preconditioner..." << std::endl
+                  << std::flush;
 
         SparseILU<double> A_preconditioner;
         A_preconditioner.initialize(system_matrix.block(0, 0));
@@ -865,14 +867,10 @@ namespace Step56
         {
           TimerOutput::Scope solve_fmgres(computing_timer, "Solve - FGMRES");
 
-          solver.solve(system_matrix,
-                       solution,
-                       system_rhs,
-                       preconditioner);
+          solver.solve(system_matrix, solution, system_rhs, preconditioner);
           n_iterations_A = preconditioner.n_iterations_A;
           n_iterations_S = preconditioner.n_iterations_S;
         }
-
       }
     else
       {
@@ -902,12 +900,10 @@ namespace Step56
         mg::Matrix<Vector<double>> mg_interface_up(mg_interface_matrices);
         mg::Matrix<Vector<double>> mg_interface_down(mg_interface_matrices);
 
-        // Now, we are ready to set up the V-cycle operator and the multilevel preconditioner.
-        Multigrid<Vector<double> > mg(mg_matrix,
-                                      coarse_grid_solver,
-                                      mg_transfer,
-                                      mg_smoother,
-                                      mg_smoother);
+        // Now, we are ready to set up the V-cycle operator and the multilevel
+        // preconditioner.
+        Multigrid<Vector<double>> mg(
+          mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
         mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
         PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
@@ -918,7 +914,9 @@ namespace Step56
                                     SparseILU<double>::AdditionalData());
 
         const BlockSchurPreconditioner<
-          PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>,
+          PreconditionMG<dim,
+                         Vector<double>,
+                         MGTransferPrebuilt<Vector<double>>>,
           SparseILU<double>>
           preconditioner(system_matrix,
                          pressure_mass_matrix,
@@ -931,10 +929,7 @@ namespace Step56
 
         {
           TimerOutput::Scope solve_fmgres(computing_timer, "Solve - FGMRES");
-          solver.solve(system_matrix,
-                       solution,
-                       system_rhs,
-                       preconditioner);
+          solver.solve(system_matrix, solution, system_rhs, preconditioner);
           n_iterations_A = preconditioner.n_iterations_A;
           n_iterations_S = preconditioner.n_iterations_S;
         }
@@ -942,14 +937,15 @@ namespace Step56
 
     constraints.distribute(solution);
 
-    std::cout << std::endl
-              << "\tNumber of FGMRES iterations: "
-              << solver_control.last_step() << std::endl
-              << "\tTotal number of iterations used for approximation of A inverse: "
-              << n_iterations_A << std::endl
-              << "\tTotal number of iterations used for approximation of S inverse: "
-              << n_iterations_S << std::endl
-              << std::endl;
+    std::cout
+      << std::endl
+      << "\tNumber of FGMRES iterations: " << solver_control.last_step()
+      << std::endl
+      << "\tTotal number of iterations used for approximation of A inverse: "
+      << n_iterations_A << std::endl
+      << "\tTotal number of iterations used for approximation of S inverse: "
+      << n_iterations_S << std::endl
+      << std::endl;
   }
 
 
@@ -965,16 +961,15 @@ namespace Step56
     // in a pressure with mean value zero. Here we make use of the fact that
     // the pressure is component $dim$ and that the finite element space
     // is nodal.
-    const double mean_pressure = VectorTools::compute_mean_value(dof_handler,
-                                 QGauss<dim>(pressure_degree+2),
-                                 solution,
-                                 dim);
+    const double mean_pressure = VectorTools::compute_mean_value(
+      dof_handler, QGauss<dim>(pressure_degree + 2), solution, dim);
     solution.block(1).add(-mean_pressure);
-    std::cout << "   Note: The mean value was adjusted by "
-              << -mean_pressure << std::endl;
+    std::cout << "   Note: The mean value was adjusted by " << -mean_pressure
+              << std::endl;
 
     const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
-    const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim), dim + 1);
+    const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
+                                                     dim + 1);
 
     Vector<float> difference_per_cell(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,
@@ -985,9 +980,8 @@ namespace Step56
                                       VectorTools::L2_norm,
                                       &velocity_mask);
 
-    const double Velocity_L2_error = VectorTools::compute_global_error(triangulation,
-                                     difference_per_cell,
-                                     VectorTools::L2_norm);
+    const double Velocity_L2_error = VectorTools::compute_global_error(
+      triangulation, difference_per_cell, VectorTools::L2_norm);
 
     VectorTools::integrate_difference(dof_handler,
                                       solution,
@@ -997,9 +991,8 @@ namespace Step56
                                       VectorTools::L2_norm,
                                       &pressure_mask);
 
-    const double Pressure_L2_error = VectorTools::compute_global_error(triangulation,
-                                     difference_per_cell,
-                                     VectorTools::L2_norm);
+    const double Pressure_L2_error = VectorTools::compute_global_error(
+      triangulation, difference_per_cell, VectorTools::L2_norm);
 
     VectorTools::integrate_difference(dof_handler,
                                       solution,
@@ -1009,17 +1002,13 @@ namespace Step56
                                       VectorTools::H1_norm,
                                       &velocity_mask);
 
-    const double Velocity_H1_error = VectorTools::compute_global_error(triangulation,
-                                     difference_per_cell,
-                                     VectorTools::H1_norm);
+    const double Velocity_H1_error = VectorTools::compute_global_error(
+      triangulation, difference_per_cell, VectorTools::H1_norm);
 
     std::cout << std::endl
-              << "   Velocity L2 Error: " << Velocity_L2_error
-              << std::endl
-              << "   Pressure L2 Error: " << Pressure_L2_error
-              << std::endl
-              << "   Velocity H1 Error: " << Velocity_H1_error
-              << std::endl;
+              << "   Velocity L2 Error: " << Velocity_L2_error << std::endl
+              << "   Pressure L2 Error: " << Pressure_L2_error << std::endl
+              << "   Velocity H1 Error: " << Velocity_H1_error << std::endl;
   }
 
 
@@ -1034,21 +1023,21 @@ namespace Step56
     solution_names.emplace_back("pressure");
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim, DataComponentInterpretation::component_is_part_of_vector);
-    data_component_interpretation
-    .push_back(DataComponentInterpretation::component_is_scalar);
+      data_component_interpretation(
+        dim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, solution_names,
+    data_out.add_data_vector(solution,
+                             solution_names,
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);
     data_out.build_patches();
 
-    std::ofstream output("solution-"
-                         + Utilities::int_to_string(refinement_cycle, 2)
-                         + ".vtk");
+    std::ofstream output(
+      "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtk");
     data_out.write_vtk(output);
   }
 
@@ -1128,7 +1117,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -1141,7 +1131,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

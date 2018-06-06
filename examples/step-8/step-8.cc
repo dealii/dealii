@@ -193,8 +193,7 @@ namespace Step8
   // compose the system of, and how often it shall be repeated:
 
   template <int dim>
-  ElasticProblem<dim>::ElasticProblem()
-    :
+  ElasticProblem<dim>::ElasticProblem() :
     dof_handler(triangulation),
     fe(FE_Q<dim>(1), dim)
   {}
@@ -272,7 +271,8 @@ namespace Step8
   {
     QGauss<dim> quadrature_formula(2);
 
-    FEValues<dim> fe_values(fe, quadrature_formula,
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
@@ -304,7 +304,8 @@ namespace Step8
     std::vector<Tensor<1, dim>> rhs_values(n_q_points);
 
     // Now we can begin with the loop over all cells:
-    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -343,19 +344,17 @@ namespace Step8
         // contributions:
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            const unsigned int
-            component_i = fe.system_to_component_index(i).first;
+            const unsigned int component_i =
+              fe.system_to_component_index(i).first;
 
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
-                const unsigned int
-                component_j = fe.system_to_component_index(j).first;
+                const unsigned int component_j =
+                  fe.system_to_component_index(j).first;
 
-                for (unsigned int q_point = 0; q_point < n_q_points;
-                     ++q_point)
+                for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                   {
-                    cell_matrix(i,j)
-                    +=
+                    cell_matrix(i, j) +=
                       // The first term is (lambda d_i u_i, d_j v_j) + (mu d_i
                       // u_j, d_j v_i).  Note that
                       // <code>shape_grad(i,q_point)</code> returns the
@@ -366,15 +365,12 @@ namespace Step8
                       // component of the i-th shape function with respect to
                       // the comp(i)th coordinate is accessed by the appended
                       // brackets.
-                      (
-                        (fe_values.shape_grad(i,q_point)[component_i] *
+                      ((fe_values.shape_grad(i, q_point)[component_i] *
                         fe_values.shape_grad(j, q_point)[component_j] *
-                         lambda_values[q_point])
-                        +
+                        lambda_values[q_point]) +
                        (fe_values.shape_grad(i, q_point)[component_j] *
                         fe_values.shape_grad(j, q_point)[component_i] *
-                         mu_values[q_point])
-                        +
+                        mu_values[q_point]) +
                        // The second term is (mu nabla u_i, nabla v_j).  We
                        // need not access a specific component of the
                        // gradient, since we only have to compute the scalar
@@ -390,9 +386,7 @@ namespace Step8
                           (fe_values.shape_grad(i, q_point) *
                            fe_values.shape_grad(j, q_point) *
                            mu_values[q_point]) :
-                         0)
-                      )
-                      *
+                          0)) *
                       fe_values.JxW(q_point);
                   }
               }
@@ -402,8 +396,8 @@ namespace Step8
         // introduction:
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            const unsigned int
-            component_i = fe.system_to_component_index(i).first;
+            const unsigned int component_i =
+              fe.system_to_component_index(i).first;
 
             for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
               cell_rhs(i) += fe_values.shape_value(i, q_point) *
@@ -421,9 +415,8 @@ namespace Step8
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              system_matrix.add(local_dof_indices[i],
-                                local_dof_indices[j],
-                                cell_matrix(i,j));
+              system_matrix.add(
+                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -434,22 +427,19 @@ namespace Step8
 
     // The interpolation of the boundary values needs a small modification:
     // since the solution function is vector-valued, so need to be the
-    // boundary values. The <code>Functions::ZeroFunction</code> constructor accepts a
-    // parameter that tells it that it shall represent a vector valued,
-    // constant zero function with that many components. By default, this
-    // parameter is equal to one, in which case the <code>Functions::ZeroFunction</code>
-    // object would represent a scalar function. Since the solution vector has
-    // <code>dim</code> components, we need to pass <code>dim</code> as number
-    // of components to the zero function as well.
+    // boundary values. The <code>Functions::ZeroFunction</code> constructor
+    // accepts a parameter that tells it that it shall represent a vector
+    // valued, constant zero function with that many components. By default,
+    // this parameter is equal to one, in which case the
+    // <code>Functions::ZeroFunction</code> object would represent a scalar
+    // function. Since the solution vector has <code>dim</code> components, we
+    // need to pass <code>dim</code> as number of components to the zero
+    // function as well.
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(dim),
-                                             boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       system_matrix,
-                                       solution,
-                                       system_rhs);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Functions::ZeroFunction<dim>(dim), boundary_values);
+    MatrixTools::apply_boundary_values(
+      boundary_values, system_matrix, solution, system_rhs);
   }
 
 
@@ -469,8 +459,7 @@ namespace Step8
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve(system_matrix, solution, system_rhs,
-             preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
     hanging_node_constraints.distribute(solution);
   }
@@ -499,9 +488,8 @@ namespace Step8
                                        solution,
                                        estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                    estimated_error_per_cell,
-                                                    0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.3, 0.03);
 
     triangulation.execute_coarsening_and_refinement();
   }
@@ -582,10 +570,10 @@ namespace Step8
   // example. This time, we use the square [-1,1]^d as domain, and we refine
   // it twice globally before starting the first iteration.
   //
-  // The reason for refining twice is a bit accidental: we use the QGauss quadrature
-  // formula with two points in each direction for integration of the right
-  // hand side; that means that there are four quadrature points on each cell
-  // (in 2D). If we only refine the initial grid once globally, then there
+  // The reason for refining twice is a bit accidental: we use the QGauss
+  // quadrature formula with two points in each direction for integration of the
+  // right hand side; that means that there are four quadrature points on each
+  // cell (in 2D). If we only refine the initial grid once globally, then there
   // will be only four quadrature points in each direction on the
   // domain. However, the right hand side function was chosen to be rather
   // localized and in that case, by pure chance, it happens that all quadrature
@@ -631,13 +619,11 @@ namespace Step8
           refine_grid();
 
         std::cout << "   Number of active cells:       "
-                  << triangulation.n_active_cells()
-                  << std::endl;
+                  << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
-        std::cout << "   Number of degrees of freedom: "
-                  << dof_handler.n_dofs()
+        std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                   << std::endl;
 
         assemble_system();
@@ -661,7 +647,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -674,7 +661,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

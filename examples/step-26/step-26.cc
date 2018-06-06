@@ -126,10 +126,7 @@ namespace Step26
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      :
-      Function<dim>(),
-      period(0.2)
+    RightHandSide() : Function<dim>(), period(0.2)
     {}
 
     virtual double value(const Point<dim> & p,
@@ -149,8 +146,9 @@ namespace Step26
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     Assert(dim == 2, ExcNotImplemented());
 
-    const double time                = this->get_time();
-    const double point_within_period = (time / period - std::floor(time / period));
+    const double time = this->get_time();
+    const double point_within_period =
+      (time / period - std::floor(time / period));
 
     if ((point_within_period >= 0.0) && (point_within_period <= 0.2))
       {
@@ -202,8 +200,7 @@ namespace Step26
   // period with 100 time steps) and chooses the Crank Nicolson method
   // by setting $\theta=1/2$.
   template <int dim>
-  HeatEquation<dim>::HeatEquation()
-    :
+  HeatEquation<dim>::HeatEquation() :
     fe(1),
     dof_handler(triangulation),
     time(0.0),
@@ -232,8 +229,7 @@ namespace Step26
     dof_handler.distribute_dofs(fe);
 
     std::cout << std::endl
-              << "==========================================="
-              << std::endl
+              << "===========================================" << std::endl
               << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl
               << "Number of degrees of freedom: " << dof_handler.n_dofs()
@@ -241,8 +237,7 @@ namespace Step26
               << std::endl;
 
     constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            constraints);
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -256,12 +251,10 @@ namespace Step26
     laplace_matrix.reinit(sparsity_pattern);
     system_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler,
-                                      QGauss<dim>(fe.degree+1),
-                                      mass_matrix);
-    MatrixCreator::create_laplace_matrix(dof_handler,
-                                         QGauss<dim>(fe.degree+1),
-                                         laplace_matrix);
+    MatrixCreator::create_mass_matrix(
+      dof_handler, QGauss<dim>(fe.degree + 1), mass_matrix);
+    MatrixCreator::create_laplace_matrix(
+      dof_handler, QGauss<dim>(fe.degree + 1), laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
     old_solution.reinit(dof_handler.n_dofs());
@@ -282,13 +275,12 @@ namespace Step26
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
 
-    cg.solve(system_matrix, solution, system_rhs,
-             preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
     constraints.distribute(solution);
 
-    std::cout << "     " << solver_control.last_step()
-              << " CG iterations." << std::endl;
+    std::cout << "     " << solver_control.last_step() << " CG iterations."
+              << std::endl;
   }
 
 
@@ -306,9 +298,8 @@ namespace Step26
 
     data_out.build_patches();
 
-    const std::string filename = "solution-"
-                                 + Utilities::int_to_string(timestep_number, 3) +
-                                 ".vtk";
+    const std::string filename =
+      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtk";
     std::ofstream output(filename);
     data_out.write_vtk(output);
   }
@@ -349,18 +340,19 @@ namespace Step26
                                        solution,
                                        estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
-                                                      estimated_error_per_cell,
-                                                      0.6, 0.4);
+    GridRefinement::refine_and_coarsen_fixed_fraction(
+      triangulation, estimated_error_per_cell, 0.6, 0.4);
 
     if (triangulation.n_levels() > max_grid_level)
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active(max_grid_level);
-           cell != triangulation.end(); ++cell)
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             triangulation.begin_active(max_grid_level);
+           cell != triangulation.end();
+           ++cell)
         cell->clear_refine_flag();
-    for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active(min_grid_level);
-         cell != triangulation.end_active(min_grid_level); ++cell)
+    for (typename Triangulation<dim>::active_cell_iterator cell =
+           triangulation.begin_active(min_grid_level);
+         cell != triangulation.end_active(min_grid_level);
+         ++cell)
       cell->clear_coarsen_flag();
     // These two loops above are slightly different but this is easily
     // explained. In the first loop, instead of calling
@@ -462,9 +454,8 @@ namespace Step26
     forcing_terms.reinit(solution.size());
 
 
-    VectorTools::interpolate(dof_handler,
-                             Functions::ZeroFunction<dim>(),
-                             old_solution);
+    VectorTools::interpolate(
+      dof_handler, Functions::ZeroFunction<dim>(), old_solution);
     solution = old_solution;
 
     output_results();
@@ -497,18 +488,14 @@ namespace Step26
         // all ends up in the forcing_terms variable:
         RightHandSide<dim> rhs_function;
         rhs_function.set_time(time);
-        VectorTools::create_right_hand_side(dof_handler,
-                                            QGauss<dim>(fe.degree+1),
-                                            rhs_function,
-                                            tmp);
-        forcing_terms   = tmp;
+        VectorTools::create_right_hand_side(
+          dof_handler, QGauss<dim>(fe.degree + 1), rhs_function, tmp);
+        forcing_terms = tmp;
         forcing_terms *= time_step * theta;
 
         rhs_function.set_time(time - time_step);
-        VectorTools::create_right_hand_side(dof_handler,
-                                            QGauss<dim>(fe.degree+1),
-                                            rhs_function,
-                                            tmp);
+        VectorTools::create_right_hand_side(
+          dof_handler, QGauss<dim>(fe.degree + 1), rhs_function, tmp);
 
         forcing_terms.add(time_step * (1 - theta), tmp);
 
@@ -536,15 +523,11 @@ namespace Step26
           boundary_values_function.set_time(time);
 
           std::map<types::global_dof_index, double> boundary_values;
-          VectorTools::interpolate_boundary_values(dof_handler,
-                                                   0,
-                                                   boundary_values_function,
-                                                   boundary_values);
+          VectorTools::interpolate_boundary_values(
+            dof_handler, 0, boundary_values_function, boundary_values);
 
-          MatrixTools::apply_boundary_values(boundary_values,
-                                             system_matrix,
-                                             solution,
-                                             system_rhs);
+          MatrixTools::apply_boundary_values(
+            boundary_values, system_matrix, solution, system_rhs);
         }
 
         // With this out of the way, all we have to do is solve the
@@ -566,7 +549,8 @@ namespace Step26
             (pre_refinement_step < n_adaptive_pre_refinement_steps))
           {
             refine_mesh(initial_global_refinement,
-                        initial_global_refinement + n_adaptive_pre_refinement_steps);
+                        initial_global_refinement +
+                          n_adaptive_pre_refinement_steps);
             ++pre_refinement_step;
 
             tmp.reinit(solution.size());
@@ -579,7 +563,8 @@ namespace Step26
         else if ((timestep_number > 0) && (timestep_number % 5 == 0))
           {
             refine_mesh(initial_global_refinement,
-                        initial_global_refinement + n_adaptive_pre_refinement_steps);
+                        initial_global_refinement +
+                          n_adaptive_pre_refinement_steps);
             tmp.reinit(solution.size());
             forcing_terms.reinit(solution.size());
           }
@@ -663,15 +648,16 @@ int main()
 
       HeatEquation<2> heat_equation_solver;
       heat_equation_solver.run();
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      std::cerr << "Exception on processing: " << std::endl << exc.what()
-                << std::endl << "Aborting!" << std::endl
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
 
@@ -679,11 +665,12 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      std::cerr << "Unknown exception!" << std::endl << "Aborting!"
-                << std::endl
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       return 1;

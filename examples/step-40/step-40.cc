@@ -39,7 +39,8 @@
 // if we are using PETSc (see solve() for an example where this is necessary)
 namespace LA
 {
-#if defined(DEAL_II_WITH_PETSC) && !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
+#if defined(DEAL_II_WITH_PETSC) && \
+  !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
   using namespace dealii::LinearAlgebraPETSc;
 #  define USE_PETSC_LA
 #elif defined(DEAL_II_WITH_TRILINOS)
@@ -135,7 +136,8 @@ namespace Step40
   //   this will be MPI_COMM_WORLD, i.e. all processors the batch scheduling
   //   system has assigned to this particular job.
   // - The presence of the <code>pcout</code> variable of type ConditionOStream.
-  // - The obvious use of parallel::distributed::Triangulation instead of Triangulation.
+  // - The obvious use of parallel::distributed::Triangulation instead of
+  // Triangulation.
   // - The presence of two IndexSet objects that denote which sets of degrees of
   //   freedom (and associated elements of solution and right hand side vectors)
   //   we own on the current processor and which we need (as ghost elements) for
@@ -198,18 +200,15 @@ namespace Step40
   // use to determine how much compute time the different parts of the program
   // take:
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem()
-    :
+  LaplaceProblem<dim>::LaplaceProblem() :
     mpi_communicator(MPI_COMM_WORLD),
     triangulation(mpi_communicator,
-                  typename Triangulation<dim>::MeshSmoothing
-                  (Triangulation<dim>::smoothing_on_refinement |
+                  typename Triangulation<dim>::MeshSmoothing(
+                    Triangulation<dim>::smoothing_on_refinement |
                     Triangulation<dim>::smoothing_on_coarsening)),
     dof_handler(triangulation),
     fe(2),
-    pcout(std::cout,
-          (Utilities::MPI::this_mpi_process(mpi_communicator)
-           == 0)),
+    pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
     computing_timer(mpi_communicator,
                     pcout,
                     TimerOutput::summary,
@@ -259,8 +258,7 @@ namespace Step40
     // around the locally owned cells; we need all of these degrees of
     // freedom, for example, to estimate the error on the local cells).
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                            locally_relevant_dofs);
+    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
     // Next, let us initialize the solution and right hand side vectors. As
     // mentioned above, the solution vector we seek does not only store
@@ -270,8 +268,8 @@ namespace Step40
     // locally owned cells (of course the linear solvers will read from it,
     // but they do not care about the geometric location of degrees of
     // freedom).
-    locally_relevant_solution.reinit(locally_owned_dofs,
-                                     locally_relevant_dofs, mpi_communicator);
+    locally_relevant_solution.reinit(
+      locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
     // The next step is to compute hanging node and boundary value
@@ -295,10 +293,8 @@ namespace Step40
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             constraints);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
     constraints.close();
 
     // The last part of this function deals with initializing the matrix with
@@ -325,17 +321,15 @@ namespace Step40
     // sparsity pattern.
     DynamicSparsityPattern dsp(locally_relevant_dofs);
 
-    DoFTools::make_sparsity_pattern(dof_handler, dsp,
-                                    constraints, false);
-    SparsityTools::distribute_sparsity_pattern(dsp,
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
+    SparsityTools::distribute_sparsity_pattern(
+      dsp,
       dof_handler.n_locally_owned_dofs_per_processor(),
       mpi_communicator,
       locally_relevant_dofs);
 
-    system_matrix.reinit(locally_owned_dofs,
-                         locally_owned_dofs,
-                         dsp,
-                         mpi_communicator);
+    system_matrix.reinit(
+      locally_owned_dofs, locally_owned_dofs, dsp, mpi_communicator);
   }
 
 
@@ -372,10 +366,10 @@ namespace Step40
 
     const QGauss<dim> quadrature_formula(3);
 
-    FEValues<dim> fe_values(fe, quadrature_formula,
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
                             update_values | update_gradients |
-                            update_quadrature_points |
-                              update_JxW_values);
+                              update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -385,8 +379,8 @@ namespace Step40
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -398,13 +392,13 @@ namespace Step40
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
-              const double
-              rhs_value
-                = (fe_values.quadrature_point(q_point)[1]
-                   >
-                     0.5 + 0.25 * std::sin(4.0 * numbers::PI *
-                                     fe_values.quadrature_point(q_point)[0])
-                   ? 1 : -1);
+              const double rhs_value =
+                (fe_values.quadrature_point(q_point)[1] >
+                     0.5 +
+                       0.25 * std::sin(4.0 * numbers::PI *
+                                       fe_values.quadrature_point(q_point)[0]) ?
+                   1 :
+                   -1);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
@@ -413,9 +407,9 @@ namespace Step40
                                           fe_values.shape_grad(j, q_point) *
                                           fe_values.JxW(q_point));
 
-                  cell_rhs(i) += (rhs_value *
-                                  fe_values.shape_value(i,q_point) *
-                                  fe_values.JxW(q_point));
+                  cell_rhs(i) +=
+                    (rhs_value * fe_values.shape_value(i, q_point) *
+                     fe_values.JxW(q_point));
                 }
             }
 
@@ -470,8 +464,8 @@ namespace Step40
   void LaplaceProblem<dim>::solve()
   {
     TimerOutput::Scope t(computing_timer, "solve");
-    LA::MPI::Vector
-    completely_distributed_solution(locally_owned_dofs, mpi_communicator);
+    LA::MPI::Vector    completely_distributed_solution(locally_owned_dofs,
+                                                    mpi_communicator);
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
@@ -492,11 +486,13 @@ namespace Step40
 #endif
     preconditioner.initialize(system_matrix, data);
 
-    solver.solve(system_matrix, completely_distributed_solution, system_rhs,
+    solver.solve(system_matrix,
+                 completely_distributed_solution,
+                 system_rhs,
                  preconditioner);
 
-    pcout << "   Solved in " << solver_control.last_step()
-          << " iterations." << std::endl;
+    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+          << std::endl;
 
     constraints.distribute(completely_distributed_solution);
 
@@ -530,10 +526,8 @@ namespace Step40
                                        typename FunctionMap<dim>::type(),
                                        locally_relevant_solution,
                                        estimated_error_per_cell);
-    parallel::distributed::GridRefinement::
-    refine_and_coarsen_fixed_number(triangulation,
-                                    estimated_error_per_cell,
-                                    0.3, 0.03);
+    parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement();
   }
 
@@ -592,11 +586,9 @@ namespace Step40
     // that nobody ever tries to generate this much data -- you would likely
     // overflow all file system quotas), and <code>.vtu</code> indicates the
     // XML-based Visualization Toolkit (VTK) file format.
-    const std::string filename = ("solution-" +
-                                  Utilities::int_to_string(cycle, 2) +
-                                  "." +
-                                  Utilities::int_to_string
-                                  (triangulation.locally_owned_subdomain(), 4));
+    const std::string filename =
+      ("solution-" + Utilities::int_to_string(cycle, 2) + "." +
+       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
     std::ofstream output((filename + ".vtu"));
     data_out.write_vtu(output);
 
@@ -613,15 +605,11 @@ namespace Step40
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          filenames.push_back("solution-" +
-                              Utilities::int_to_string(cycle, 2) +
-                              "." +
-                              Utilities::int_to_string(i, 4) +
-                              ".vtu");
+          filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
+                              "." + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output("solution-" +
-                                    Utilities::int_to_string(cycle, 2) +
-                                    ".pvtu");
+        std::ofstream master_output(
+          "solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu");
         data_out.write_pvtu_record(master_output, filenames);
       }
   }
@@ -653,8 +641,7 @@ namespace Step40
 #else
           << "Trilinos"
 #endif
-          << " on "
-          << Utilities::MPI::n_mpi_processes(mpi_communicator)
+          << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
           << " MPI rank(s)..." << std::endl;
 
     const unsigned int n_cycles = 8;
@@ -673,10 +660,8 @@ namespace Step40
         setup_system();
 
         pcout << "   Number of active cells:       "
-              << triangulation.n_global_active_cells()
-              << std::endl
-              << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+              << triangulation.n_global_active_cells() << std::endl
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl;
 
         assemble_system();
@@ -726,7 +711,8 @@ int main(int argc, char *argv[])
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -739,7 +725,8 @@ int main(int argc, char *argv[])
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

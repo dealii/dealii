@@ -136,7 +136,8 @@ namespace Step27
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim> () {}
+    RightHandSide() : Function<dim>()
+    {}
 
     virtual double value(const Point<dim> & p,
                          const unsigned int component) const override;
@@ -144,8 +145,7 @@ namespace Step27
 
 
   template <int dim>
-  double
-  RightHandSide<dim>::value(const Point<dim>   &p,
+  double RightHandSide<dim>::value(const Point<dim> &p,
                                    const unsigned int /*component*/) const
   {
     double product = 1;
@@ -153,7 +153,6 @@ namespace Step27
       product *= (p[d] + 1);
     return product;
   }
-
 
 
 
@@ -189,8 +188,7 @@ namespace Step27
   }
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem()
-    :
+  LaplaceProblem<dim>::LaplaceProblem() :
     dof_handler(triangulation),
     max_degree(dim <= 2 ? 7 : 5)
   {
@@ -203,19 +201,19 @@ namespace Step27
 
     // As described in the introduction, we define the Fourier vectors ${\bf
     // k}$ for which we want to compute Fourier coefficients of the solution
-    // on each cell as follows. In 2d, we will need coefficients corresponding to
-    // vectors ${\bf k}=(2 \pi i, 2\pi j)^T$
-    // for which $\sqrt{i^2+j^2}\le N$, with $i,j$ integers and $N$ being the
-    // maximal polynomial degree we use for the finite elements in this
-    // program. The FESeries::Fourier class' constructor first parameter $N$ defines
-    // the number of coefficients in 1D with the total number of coefficients
-    // being $N^{dim}$. Although we will not use coefficients corresponding to
-    // $\sqrt{i^2+j^2}> N$ and $i+j==0$, the overhead of their calculation is minimal.
-    // The transformation matrices for each FiniteElement will be calculated only
-    // once the first time they are required in the course of hp-adaptive
-    // refinement. Because we work on the unit cell, we can do all this work without a
-    // mapping from reference to real cell and consequently can precalculate
-    // these matrices. The calculation of expansion
+    // on each cell as follows. In 2d, we will need coefficients corresponding
+    // to vectors ${\bf k}=(2 \pi i, 2\pi j)^T$ for which $\sqrt{i^2+j^2}\le N$,
+    // with $i,j$ integers and $N$ being the maximal polynomial degree we use
+    // for the finite elements in this program. The FESeries::Fourier class'
+    // constructor first parameter $N$ defines the number of coefficients in 1D
+    // with the total number of coefficients being $N^{dim}$. Although we will
+    // not use coefficients corresponding to
+    // $\sqrt{i^2+j^2}> N$ and $i+j==0$, the overhead of their calculation is
+    // minimal. The transformation matrices for each FiniteElement will be
+    // calculated only once the first time they are required in the course of
+    // hp-adaptive refinement. Because we work on the unit cell, we can do all
+    // this work without a mapping from reference to real cell and consequently
+    // can precalculate these matrices. The calculation of expansion
     // coefficients for a particular set of local degrees of freedom on a given
     // cell then follows as a simple matrix-vector product.
     // The 3d case is handled analogously.
@@ -235,9 +233,8 @@ namespace Step27
       fourier_q_collection.push_back(quadrature);
 
     // Now we are ready to set-up the FESeries::Fourier object
-    fourier = std::make_shared<FESeries::Fourier<dim> >(N,
-                                                        fe_collection,
-                                                        fourier_q_collection);
+    fourier = std::make_shared<FESeries::Fourier<dim>>(
+      N, fe_collection, fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.
@@ -270,16 +267,12 @@ namespace Step27
     system_rhs.reinit(dof_handler.n_dofs());
 
     constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            constraints);
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             constraints);
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
     constraints.close();
 
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                               dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
     sparsity_pattern.copy_from(dsp);
 
@@ -321,7 +314,8 @@ namespace Step27
     hp::FEValues<dim> hp_fe_values(fe_collection,
                                    quadrature_collection,
                                    update_values | update_gradients |
-                                     update_quadrature_points | update_JxW_values);
+                                     update_quadrature_points |
+                                     update_JxW_values);
 
     const RightHandSide<dim> rhs_function;
 
@@ -330,8 +324,8 @@ namespace Step27
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
+                                                                .begin_active(),
                                                        endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -348,30 +342,26 @@ namespace Step27
         const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
 
         std::vector<double> rhs_values(fe_values.n_quadrature_points);
-        rhs_function.value_list(fe_values.get_quadrature_points(),
-                                rhs_values);
+        rhs_function.value_list(fe_values.get_quadrature_points(), rhs_values);
 
-        for (unsigned int q_point = 0;
-             q_point<fe_values.n_quadrature_points;
+        for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
              ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                                     fe_values.shape_grad(j,q_point) *
-                   fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  (fe_values.shape_grad(i, q_point) *
+                   fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              rhs_values[q_point] *
-                              fe_values.JxW(q_point));
+                              rhs_values[q_point] * fe_values.JxW(q_point));
             }
 
         local_dof_indices.resize(dofs_per_cell);
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(cell_matrix, cell_rhs,
-                                               local_dof_indices,
-                                               system_matrix, system_rhs);
+        constraints.distribute_local_to_global(
+          cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
   }
 
@@ -392,8 +382,7 @@ namespace Step27
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve(system_matrix, solution, system_rhs,
-             preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
     constraints.distribute(solution);
   }
@@ -447,10 +436,10 @@ namespace Step27
       {
         typename hp::DoFHandler<dim>::active_cell_iterator
           cell = dof_handler.begin_active(),
-                                                           endc = dof_handler.end();
+          endc = dof_handler.end();
         for (; cell != endc; ++cell)
-          fe_degrees(cell->active_cell_index())
-            = fe_collection[cell->active_fe_index()].degree;
+          fe_degrees(cell->active_cell_index()) =
+            fe_collection[cell->active_fe_index()].degree;
       }
 
       // With now all data vectors available -- solution, estimated errors and
@@ -471,9 +460,8 @@ namespace Step27
 
       // The final step in generating output is to determine a file name, open
       // the file, and write the data into it (here, we use VTK format):
-      const std::string filename = "solution-" +
-                                   Utilities::int_to_string(cycle, 2) +
-                                   ".vtk";
+      const std::string filename =
+        "solution-" + Utilities::int_to_string(cycle, 2) + ".vtk";
       std::ofstream output(filename);
       data_out.write_vtk(output);
     }
@@ -483,9 +471,8 @@ namespace Step27
     // estimated error to flag those cells for refinement that have the
     // largest error. This is what we have always done:
     {
-      GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                      estimated_error_per_cell,
-                                                      0.3, 0.03);
+      GridRefinement::refine_and_coarsen_fixed_number(
+        triangulation, estimated_error_per_cell, 0.3, 0.03);
 
       // Next we would like to figure out which of the cells that have been
       // flagged for refinement should actually have $p$ increased instead of
@@ -508,14 +495,16 @@ namespace Step27
       {
         typename hp::DoFHandler<dim>::active_cell_iterator
           cell = dof_handler.begin_active(),
-                                                           endc = dof_handler.end();
+          endc = dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->refine_flag_set())
             {
-              max_smoothness = std::max(max_smoothness,
-                                        smoothness_indicators(cell->active_cell_index()));
-              min_smoothness = std::min(min_smoothness,
-                                        smoothness_indicators(cell->active_cell_index()));
+              max_smoothness =
+                std::max(max_smoothness,
+                         smoothness_indicators(cell->active_cell_index()));
+              min_smoothness =
+                std::min(min_smoothness,
+                         smoothness_indicators(cell->active_cell_index()));
             }
       }
       const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
@@ -531,12 +520,11 @@ namespace Step27
       {
         typename hp::DoFHandler<dim>::active_cell_iterator
           cell = dof_handler.begin_active(),
-                                                           endc = dof_handler.end();
+          endc = dof_handler.end();
         for (; cell != endc; ++cell)
-          if (cell->refine_flag_set()
-              &&
-              (smoothness_indicators(cell->active_cell_index()) > threshold_smoothness)
-              &&
+          if (cell->refine_flag_set() &&
+              (smoothness_indicators(cell->active_cell_index()) >
+               threshold_smoothness) &&
               (cell->active_fe_index() + 1 < fe_collection.size()))
             {
               cell->clear_refine_flag();
@@ -566,42 +554,30 @@ namespace Step27
   {
     const unsigned int dim = 2;
 
-    static const Point<2> vertices_1[]
-      = {  Point<2> (-1.,   -1.),
-           Point<2> (-1./2, -1.),
-           Point<2> (0.,    -1.),
-           Point<2> (+1./2, -1.),
+    static const Point<2> vertices_1[] = {
+      Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
+      Point<2>(0., -1.),       Point<2>(+1. / 2, -1.),
       Point<2>(+1, -1.),
 
-           Point<2> (-1.,   -1./2.),
-           Point<2> (-1./2, -1./2.),
-           Point<2> (0.,    -1./2.),
-           Point<2> (+1./2, -1./2.),
+      Point<2>(-1., -1. / 2.), Point<2>(-1. / 2, -1. / 2.),
+      Point<2>(0., -1. / 2.),  Point<2>(+1. / 2, -1. / 2.),
       Point<2>(+1, -1. / 2.),
 
-           Point<2> (-1.,   0.),
-           Point<2> (-1./2, 0.),
-           Point<2> (+1./2, 0.),
-           Point<2> (+1,    0.),
+      Point<2>(-1., 0.),       Point<2>(-1. / 2, 0.),
+      Point<2>(+1. / 2, 0.),   Point<2>(+1, 0.),
 
-           Point<2> (-1.,   1./2.),
-           Point<2> (-1./2, 1./2.),
-           Point<2> (0.,    1./2.),
-           Point<2> (+1./2, 1./2.),
+      Point<2>(-1., 1. / 2.),  Point<2>(-1. / 2, 1. / 2.),
+      Point<2>(0., 1. / 2.),   Point<2>(+1. / 2, 1. / 2.),
       Point<2>(+1, 1. / 2.),
 
-           Point<2> (-1.,   1.),
-           Point<2> (-1./2, 1.),
-           Point<2> (0.,    1.),
-           Point<2> (+1./2, 1.),
-           Point<2> (+1,    1.)
-        };
-    const unsigned int
-    n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
+      Point<2>(-1., 1.),       Point<2>(-1. / 2, 1.),
+      Point<2>(0., 1.),        Point<2>(+1. / 2, 1.),
+      Point<2>(+1, 1.)};
+    const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
     const std::vector<Point<dim>> vertices(&vertices_1[0],
                                            &vertices_1[n_vertices]);
-    static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell]
-    = {{0, 1, 5, 6},
+    static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
+      {0, 1, 5, 6},
       {1, 2, 6, 7},
       {2, 3, 7, 8},
       {3, 4, 8, 9},
@@ -612,27 +588,21 @@ namespace Step27
       {14, 15, 19, 20},
       {15, 16, 20, 21},
       {16, 17, 21, 22},
-      {17, 18, 22, 23}
-    };
-    const unsigned int
-    n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+      {17, 18, 22, 23}};
+    const unsigned int n_cells =
+      sizeof(cell_vertices) / sizeof(cell_vertices[0]);
 
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (unsigned int j = 0;
-             j<GeometryInfo<dim>::vertices_per_cell;
-             ++j)
+        for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
       }
 
-    triangulation.create_triangulation(vertices,
-                                       cells,
-                                       SubCellData());
+    triangulation.create_triangulation(vertices, cells, SubCellData());
     triangulation.refine_global(3);
   }
-
 
 
 
@@ -660,14 +630,11 @@ namespace Step27
         setup_system();
 
         std::cout << "   Number of active cells:       "
-                  << triangulation.n_active_cells()
-                  << std::endl
-                  << "   Number of degrees of freedom: "
-                  << dof_handler.n_dofs()
+                  << triangulation.n_active_cells() << std::endl
+                  << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                   << std::endl
                   << "   Number of constraints       : "
-                  << constraints.n_constraints()
-                  << std::endl;
+                  << constraints.n_constraints() << std::endl;
 
         assemble_system();
         solve();
@@ -692,8 +659,7 @@ namespace Step27
   // $0 < i*i+j*j < N*N$ and $0 < i*i+j*j+k*k < N*N$ in 2D and 3D, respectively.
   template <int dim>
   std::pair<bool, unsigned int>
-  LaplaceProblem<dim>::
-  predicate(const TableIndices<dim> &ind)
+  LaplaceProblem<dim>::predicate(const TableIndices<dim> &ind)
   {
     unsigned int v = 0;
     for (unsigned int i = 0; i < dim; i++)
@@ -710,8 +676,7 @@ namespace Step27
   // implementational importance.
   template <int dim>
   void
-  LaplaceProblem<dim>::
-  estimate_smoothness(Vector<float> &smoothness_indicators)
+  LaplaceProblem<dim>::estimate_smoothness(Vector<float> &smoothness_indicators)
   {
     // Since most of the hard work is done for us in FESeries::Fourier and
     // we set up the object of this class in the constructor, what we are left
@@ -719,15 +684,15 @@ namespace Step27
     // perform linear regression to fit their decay slope.
 
 
-    // First thing to do is to loop over all cells and do our work there, i.e. to
-    // locally do the Fourier transform and estimate the decay coefficient. We
-    // will use the following array as a scratch array in the loop to store
+    // First thing to do is to loop over all cells and do our work there, i.e.
+    // to locally do the Fourier transform and estimate the decay coefficient.
+    // We will use the following array as a scratch array in the loop to store
     // local DoF values:
     Vector<double> local_dof_values;
 
     // Then here is the loop:
-    typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
+                                                                .begin_active(),
                                                        endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
@@ -738,43 +703,41 @@ namespace Step27
         // this vector with the matrix ${\cal F}$ corresponding to this finite
         // element. This is done by calling FESeries::Fourier::calculate(),
         // that has to be provided with the <code>local_dof_values</code>,
-        // <code>cell->active_fe_index()</code> and a Table to store coefficients.
+        // <code>cell->active_fe_index()</code> and a Table to store
+        // coefficients.
         local_dof_values.reinit(cell->get_fe().dofs_per_cell);
         cell->get_dof_values(solution, local_dof_values);
 
-        fourier->calculate(local_dof_values,
-                           cell->active_fe_index(),
-                           fourier_coefficients);
+        fourier->calculate(
+          local_dof_values, cell->active_fe_index(), fourier_coefficients);
 
         // The next thing, as explained in the introduction, is that we wanted
         // to only fit our exponential decay of Fourier coefficients to the
         // largest coefficients for each possible value of $|{\bf k}|$. To
-        // this end, we use FESeries::process_coefficients() to rework coefficients
-        // into the desired format.
-        // We'll only take those Fourier
+        // this end, we use FESeries::process_coefficients() to rework
+        // coefficients into the desired format. We'll only take those Fourier
         // coefficients with the largest magnitude for a given value of $|{\bf
         // k}|$ and thereby need to use VectorTools::Linfty_norm:
         std::pair<std::vector<unsigned int>, std::vector<double>> res =
-          FESeries::process_coefficients<dim>(fourier_coefficients,
-                                              std::bind(&LaplaceProblem<dim>::predicate,
-                                                        this,
-                                                        std::placeholders::_1),
+          FESeries::process_coefficients<dim>(
+            fourier_coefficients,
+            std::bind(
+              &LaplaceProblem<dim>::predicate, this, std::placeholders::_1),
             VectorTools::Linfty_norm);
 
-        Assert(res.first.size() == res.second.size(),
-               ExcInternalError());
+        Assert(res.first.size() == res.second.size(), ExcInternalError());
 
-        // The first vector in the <code>std::pair</code> will store values of the predicate,
-        // that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$
-        // in 2D or 3D respectively. This
-        // vector will be the same for all the cells so we can calculate
-        // logarithms of the corresponding Fourier vectors $|{\bf k}|$ only once
-        // in the whole hp-refinement cycle:
+        // The first vector in the <code>std::pair</code> will store values of
+        // the predicate, that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$ in
+        // 2D or 3D respectively. This vector will be the same for all the cells
+        // so we can calculate logarithms of the corresponding Fourier vectors
+        // $|{\bf k}|$ only once in the whole hp-refinement cycle:
         if (ln_k.size() == 0)
           {
             ln_k.resize(res.first.size(), 0);
             for (unsigned int f = 0; f < ln_k.size(); f++)
-              ln_k[f] = std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
+              ln_k[f] =
+                std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
           }
 
         // We have to calculate the logarithms of absolute
@@ -783,11 +746,13 @@ namespace Step27
         for (unsigned int f = 0; f < res.second.size(); f++)
           res.second[f] = std::log(res.second[f]);
 
-        std::pair<double, double> fit = FESeries::linear_regression(ln_k, res.second);
+        std::pair<double, double> fit =
+          FESeries::linear_regression(ln_k, res.second);
 
         // The final step is to compute the Sobolev index $s=\mu-\frac d2$ and
         // store it in the vector of estimated values for each cell:
-        smoothness_indicators(cell->active_cell_index()) = -fit.first - 1. * dim / 2;
+        smoothness_indicators(cell->active_cell_index()) =
+          -fit.first - 1. * dim / 2;
       }
   }
 } // namespace Step27
@@ -811,7 +776,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -824,7 +790,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

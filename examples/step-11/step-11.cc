@@ -113,8 +113,7 @@ namespace Step11
   {
     std::cout << "Using mapping with degree " << mapping_degree << ":"
               << std::endl
-              << "============================"
-              << std::endl;
+              << "============================" << std::endl;
   }
 
 
@@ -149,9 +148,8 @@ namespace Step11
     // whose every element equals <code>true</code> when one just default
     // constructs such an object, so this is what we'll do here.
     std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs(dof_handler,
-                                    ComponentMask(),
-                                    boundary_dofs);
+    DoFTools::extract_boundary_dofs(
+      dof_handler, ComponentMask(), boundary_dofs);
 
     // Now first for the generation of the constraints: as mentioned in the
     // introduction, we constrain one of the nodes on the boundary by the
@@ -161,11 +159,9 @@ namespace Step11
     // <code>std::find</code> returns an iterator to this element), and
     // computing its distance to the overall first element in the array to get
     // its index:
-    const unsigned int first_boundary_dof
-      = std::distance(boundary_dofs.begin(),
-                      std::find(boundary_dofs.begin(),
-                                boundary_dofs.end(),
-                                true));
+    const unsigned int first_boundary_dof = std::distance(
+      boundary_dofs.begin(),
+      std::find(boundary_dofs.begin(), boundary_dofs.end(), true));
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
@@ -178,8 +174,7 @@ namespace Step11
     mean_value_constraints.add_line(first_boundary_dof);
     for (unsigned int i = first_boundary_dof + 1; i < dof_handler.n_dofs(); ++i)
       if (boundary_dofs[i] == true)
-        mean_value_constraints.add_entry(first_boundary_dof,
-                                         i, -1);
+        mean_value_constraints.add_entry(first_boundary_dof, i, -1);
     mean_value_constraints.close();
 
     // Next task is to generate a sparsity pattern. This is indeed a tricky
@@ -214,8 +209,7 @@ namespace Step11
     // pattern due to the differential operator, then condense it with the
     // constraints object which adds those positions in the sparsity pattern
     // that are required for the elimination of the constraint.
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                               dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, dsp);
     mean_value_constraints.condense(dsp);
 
@@ -251,7 +245,6 @@ namespace Step11
   template <int dim>
   void LaplaceProblem<dim>::assemble_and_solve()
   {
-
     // First, we have to assemble the matrix and the right hand side. In all
     // previous examples, we have investigated various ways how to do this
     // manually. However, since the Laplace matrix and simple right hand sides
@@ -270,13 +263,13 @@ namespace Step11
     // side function.
     //
     // Let us look at the way the matrix and body forces are integrated:
-    const unsigned int gauss_degree
-      = std::max(static_cast<unsigned int>(std::ceil(1.*(mapping.get_degree()+1)/2)),
+    const unsigned int gauss_degree = std::max(
+      static_cast<unsigned int>(std::ceil(1. * (mapping.get_degree() + 1) / 2)),
       2U);
-    MatrixTools::create_laplace_matrix(mapping, dof_handler,
-                                       QGauss<dim>(gauss_degree),
-                                       system_matrix);
-    VectorTools::create_right_hand_side(mapping, dof_handler,
+    MatrixTools::create_laplace_matrix(
+      mapping, dof_handler, QGauss<dim>(gauss_degree), system_matrix);
+    VectorTools::create_right_hand_side(mapping,
+                                        dof_handler,
                                         QGauss<dim>(gauss_degree),
                                         Functions::ConstantFunction<dim>(-2),
                                         system_rhs);
@@ -311,10 +304,12 @@ namespace Step11
     // formula as above, but this time of lower dimension since we integrate
     // over faces now instead of cells:
     Vector<double> tmp(system_rhs.size());
-    VectorTools::create_boundary_right_hand_side(mapping, dof_handler,
-                                                 QGauss<dim - 1>(gauss_degree),
-                                                 Functions::ConstantFunction<dim>(1),
-                                                 tmp);
+    VectorTools::create_boundary_right_hand_side(
+      mapping,
+      dof_handler,
+      QGauss<dim - 1>(gauss_degree),
+      Functions::ConstantFunction<dim>(1),
+      tmp);
     // Then add the contributions from the boundary to those from the interior
     // of the domain:
     system_rhs += tmp;
@@ -358,7 +353,8 @@ namespace Step11
     // this might be the case here, but there are cases known of this, and we
     // just want to make sure):
     Vector<float> norm_per_cell(triangulation.n_active_cells());
-    VectorTools::integrate_difference(mapping, dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
@@ -367,14 +363,14 @@ namespace Step11
     // Then, the function just called returns its results as a vector of
     // values each of which denotes the norm on one cell. To get the global
     // norm, we do the following:
-    const double norm = VectorTools::compute_global_error(triangulation,
-                                                          norm_per_cell,
-                                                          VectorTools::H1_seminorm);
+    const double norm = VectorTools::compute_global_error(
+      triangulation, norm_per_cell, VectorTools::H1_seminorm);
 
     // Last task -- generate output:
     output_table.add_value("cells", triangulation.n_active_cells());
     output_table.add_value("|u|_1", norm);
-    output_table.add_value("error", std::fabs(norm - std::sqrt(3.14159265358 / 2)));
+    output_table.add_value("error",
+                           std::fabs(norm - std::sqrt(3.14159265358 / 2)));
   }
 
 
@@ -390,8 +386,7 @@ namespace Step11
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve(system_matrix, solution, system_rhs,
-             preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
   }
 
 
@@ -414,7 +409,8 @@ namespace Step11
   {
     GridGenerator::hyper_ball(triangulation);
 
-    for (unsigned int cycle = 0; cycle < 6; ++cycle, triangulation.refine_global(1))
+    for (unsigned int cycle = 0; cycle < 6;
+         ++cycle, triangulation.refine_global(1))
       {
         setup_system();
         assemble_and_solve();
@@ -445,12 +441,14 @@ int main()
       // but create an unnamed such object and call the <code>run</code>
       // function of it, subsequent to which it is immediately destroyed
       // again.
-      for (unsigned int mapping_degree = 1; mapping_degree <= 3; ++mapping_degree)
+      for (unsigned int mapping_degree = 1; mapping_degree <= 3;
+           ++mapping_degree)
         Step11::LaplaceProblem<2>(mapping_degree).run();
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -462,7 +460,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

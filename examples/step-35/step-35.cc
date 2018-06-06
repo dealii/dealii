@@ -100,20 +100,15 @@ namespace Step35
 
       void              read_data(const char *filename);
       MethodFormulation form;
-      double initial_time,
-             final_time,
-             Reynolds;
+      double            initial_time, final_time, Reynolds;
       double            dt;
-      unsigned int n_global_refines,
-               pressure_degree;
-      unsigned int vel_max_iterations,
-               vel_Krylov_size,
-               vel_off_diagonals,
+      unsigned int      n_global_refines, pressure_degree;
+      unsigned int      vel_max_iterations, vel_Krylov_size, vel_off_diagonals,
         vel_update_prec;
-      double vel_eps,
-             vel_diag_strength;
+      double       vel_eps, vel_diag_strength;
       bool         verbose;
       unsigned int output_interval;
+
     protected:
       ParameterHandler prm;
     };
@@ -138,38 +133,41 @@ namespace Step35
       verbose(true),
       output_interval(15)
     {
-      prm.declare_entry("Method_Form", "rotational",
+      prm.declare_entry("Method_Form",
+                        "rotational",
                         Patterns::Selection("rotational|standard"),
                         " Used to select the type of method that we are going "
                         "to use. ");
       prm.enter_subsection("Physical data");
       {
-        prm.declare_entry("initial_time", "0.",
+        prm.declare_entry("initial_time",
+                          "0.",
                           Patterns::Double(0.),
                           " The initial time of the simulation. ");
-        prm.declare_entry("final_time", "1.",
+        prm.declare_entry("final_time",
+                          "1.",
                           Patterns::Double(0.),
                           " The final time of the simulation. ");
-        prm.declare_entry("Reynolds", "1.",
-                          Patterns::Double(0.),
-                          " The Reynolds number. ");
+        prm.declare_entry(
+          "Reynolds", "1.", Patterns::Double(0.), " The Reynolds number. ");
       }
       prm.leave_subsection();
 
       prm.enter_subsection("Time step data");
       {
-        prm.declare_entry("dt", "5e-4",
-                          Patterns::Double(0.),
-                          " The time step size. ");
+        prm.declare_entry(
+          "dt", "5e-4", Patterns::Double(0.), " The time step size. ");
       }
       prm.leave_subsection();
 
       prm.enter_subsection("Space discretization");
       {
-        prm.declare_entry("n_of_refines", "0",
+        prm.declare_entry("n_of_refines",
+                          "0",
                           Patterns::Integer(0, 15),
                           " The number of global refines we do on the mesh. ");
-        prm.declare_entry("pressure_fe_degree", "1",
+        prm.declare_entry("pressure_fe_degree",
+                          "1",
                           Patterns::Integer(1, 5),
                           " The polynomial degree for the pressure space. ");
       }
@@ -177,35 +175,42 @@ namespace Step35
 
       prm.enter_subsection("Data solve velocity");
       {
-        prm.declare_entry("max_iterations", "1000",
-                          Patterns::Integer(1, 1000),
-                          " The maximal number of iterations GMRES must make. ");
-        prm.declare_entry("eps", "1e-12",
-                          Patterns::Double(0.),
-                          " The stopping criterion. ");
-        prm.declare_entry("Krylov_size", "30",
+        prm.declare_entry(
+          "max_iterations",
+          "1000",
+          Patterns::Integer(1, 1000),
+          " The maximal number of iterations GMRES must make. ");
+        prm.declare_entry(
+          "eps", "1e-12", Patterns::Double(0.), " The stopping criterion. ");
+        prm.declare_entry("Krylov_size",
+                          "30",
                           Patterns::Integer(1),
                           " The size of the Krylov subspace to be used. ");
-        prm.declare_entry("off_diagonals", "60",
+        prm.declare_entry("off_diagonals",
+                          "60",
                           Patterns::Integer(0),
                           " The number of off-diagonal elements ILU must "
                           "compute. ");
-        prm.declare_entry("diag_strength", "0.01",
+        prm.declare_entry("diag_strength",
+                          "0.01",
                           Patterns::Double(0.),
                           " Diagonal strengthening coefficient. ");
-        prm.declare_entry("update_prec", "15",
+        prm.declare_entry("update_prec",
+                          "15",
                           Patterns::Integer(1),
                           " This number indicates how often we need to "
                           "update the preconditioner");
       }
       prm.leave_subsection();
 
-      prm.declare_entry("verbose", "true",
+      prm.declare_entry("verbose",
+                        "true",
                         Patterns::Bool(),
                         " This indicates whether the output of the solution "
                         "process should be verbose. ");
 
-      prm.declare_entry("output_interval", "1",
+      prm.declare_entry("output_interval",
+                        "1",
                         Patterns::Integer(1),
                         " This indicates between how many time steps we print "
                         "the solution. ");
@@ -283,15 +288,16 @@ namespace Step35
     public:
       MultiComponentFunction(const double initial_time = 0.);
       void set_component(const unsigned int d);
+
     protected:
       unsigned int comp;
     };
 
     template <int dim>
-    MultiComponentFunction<dim>::
-    MultiComponentFunction(const double initial_time)
-      :
-      Function<dim> (1, initial_time), comp(0)
+    MultiComponentFunction<dim>::MultiComponentFunction(
+      const double initial_time) :
+      Function<dim>(1, initial_time),
+      comp(0)
     {}
 
 
@@ -321,8 +327,7 @@ namespace Step35
 
 
     template <int dim>
-    Velocity<dim>::Velocity(const double initial_time)
-      :
+    Velocity<dim>::Velocity(const double initial_time) :
       MultiComponentFunction<dim>(initial_time)
     {}
 
@@ -341,8 +346,7 @@ namespace Step35
 
 
     template <int dim>
-    double Velocity<dim>::value(const Point<dim> &p,
-                                const unsigned int) const
+    double Velocity<dim>::value(const Point<dim> &p, const unsigned int) const
     {
       if (this->comp == 0)
         {
@@ -371,15 +375,13 @@ namespace Step35
     };
 
     template <int dim>
-    Pressure<dim>::Pressure(const double initial_time)
-      :
+    Pressure<dim>::Pressure(const double initial_time) :
       Function<dim>(1, initial_time)
     {}
 
 
     template <int dim>
-    double Pressure<dim>::value(const Point<dim> &p,
-                                const unsigned int) const
+    double Pressure<dim>::value(const Point<dim> &p, const unsigned int) const
     {
       return 25. - p(0);
     }
@@ -390,7 +392,8 @@ namespace Step35
                                    const unsigned int) const
     {
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
+      Assert(values.size() == n_points,
+             ExcDimensionMismatch(values.size(), n_points));
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Pressure<dim>::value(points[i]);
     }
@@ -410,8 +413,8 @@ namespace Step35
   public:
     NavierStokesProjection(const RunTimeParameters::Data_Storage &data);
 
-    void run(const bool         verbose    = false,
-             const unsigned int n_plots = 10);
+    void run(const bool verbose = false, const unsigned int n_plots = 10);
+
   protected:
     RunTimeParameters::MethodFormulation type;
 
@@ -466,7 +469,8 @@ namespace Step35
     SparseDirectUMFPACK prec_vel_mass;
 
     DeclException2(ExcInvalidTimeStep,
-                    double, double,
+                   double,
+                   double,
                    << " The time step " << arg1 << " is out of range."
                    << std::endl
                    << " The permitted range is(0," << arg2 << "]");
@@ -516,15 +520,15 @@ namespace Step35
     //
     // To do this in practice, we declare a "synchronous" iterator -- an
     // object that internally consists of several (in our case two) iterators,
-    // and each time the synchronous iteration is moved forward one step, each of
-    // the iterators stored internally is moved forward one step as well, thereby
-    // always staying in sync. As it so happens, there is a deal.II class that
-    // facilitates this sort of thing. (What is important here is to know that
-    // two DoFHandler objects built on the same triangulation will walk over
-    // the cells of the triangulation in the same order.)
+    // and each time the synchronous iteration is moved forward one step, each
+    // of the iterators stored internally is moved forward one step as well,
+    // thereby always staying in sync. As it so happens, there is a deal.II
+    // class that facilitates this sort of thing. (What is important here is to
+    // know that two DoFHandler objects built on the same triangulation will
+    // walk over the cells of the triangulation in the same order.)
     typedef std::tuple<typename DoFHandler<dim>::active_cell_iterator,
-            typename DoFHandler<dim>::active_cell_iterator
-            > IteratorTuple;
+                       typename DoFHandler<dim>::active_cell_iterator>
+      IteratorTuple;
 
     typedef SynchronousIterators<IteratorTuple> IteratorPair;
 
@@ -541,8 +545,7 @@ namespace Step35
 
       InitGradPerTaskData(const unsigned int dd,
                           const unsigned int vdpc,
-                          const unsigned int pdpc)
-        :
+                          const unsigned int pdpc) :
         d(dd),
         vel_dpc(vdpc),
         pres_dpc(pdpc),
@@ -561,14 +564,12 @@ namespace Step35
                           const FE_Q<dim> &  fe_p,
                           const QGauss<dim> &quad,
                           const UpdateFlags  flags_v,
-                          const UpdateFlags flags_p)
-        :
+                          const UpdateFlags  flags_p) :
         nqp(quad.size()),
         fe_val_vel(fe_v, quad, flags_v),
         fe_val_pres(fe_p, quad, flags_p)
       {}
-      InitGradScratchData(const InitGradScratchData &data)
-        :
+      InitGradScratchData(const InitGradScratchData &data) :
         nqp(data.nqp),
         fe_val_vel(data.fe_val_vel.get_fe(),
                    data.fe_val_vel.get_quadrature(),
@@ -593,8 +594,7 @@ namespace Step35
     {
       FullMatrix<double>                   local_advection;
       std::vector<types::global_dof_index> local_dof_indices;
-      AdvectionPerTaskData(const unsigned int dpc)
-        :
+      AdvectionPerTaskData(const unsigned int dpc) :
         local_advection(dpc, dpc),
         local_dof_indices(dpc)
       {}
@@ -610,8 +610,7 @@ namespace Step35
       FEValues<dim>               fe_val;
       AdvectionScratchData(const FE_Q<dim> &  fe,
                            const QGauss<dim> &quad,
-                           const UpdateFlags flags)
-        :
+                           const UpdateFlags  flags) :
         nqp(quad.size()),
         dpc(fe.dofs_per_cell),
         u_star_local(nqp),
@@ -620,8 +619,7 @@ namespace Step35
         fe_val(fe, quad, flags)
       {}
 
-      AdvectionScratchData(const AdvectionScratchData &data)
-        :
+      AdvectionScratchData(const AdvectionScratchData &data) :
         nqp(data.nqp),
         dpc(data.dpc),
         u_star_local(nqp),
@@ -633,7 +631,8 @@ namespace Step35
       {}
     };
 
-    void assemble_one_cell_of_advection(const typename DoFHandler<dim>::active_cell_iterator &cell,
+    void assemble_one_cell_of_advection(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
       AdvectionScratchData &                                scratch,
       AdvectionPerTaskData &                                data);
 
@@ -658,8 +657,8 @@ namespace Step35
   // that the data we read is reasonable and, finally, create the
   // triangulation and load the initial data.
   template <int dim>
-  NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Data_Storage &data)
-    :
+  NavierStokesProjection<dim>::NavierStokesProjection(
+    const RunTimeParameters::Data_Storage &data) :
     type(data.form),
     deg(data.pressure_degree),
     dt(data.dt),
@@ -681,10 +680,10 @@ namespace Step35
     vel_diag_strength(data.vel_diag_strength)
   {
     if (deg < 1)
-      std::cout << " WARNING: The chosen pair of finite element spaces is not stable."
-                << std::endl
-                << " The obtained results will be nonsense"
-                << std::endl;
+      std::cout
+        << " WARNING: The chosen pair of finite element spaces is not stable."
+        << std::endl
+        << " The obtained results will be nonsense" << std::endl;
 
     AssertThrow(!((dt <= 0.) || (dt > .5 * T)), ExcInvalidTimeStep(dt, .5 * T));
 
@@ -693,16 +692,16 @@ namespace Step35
   }
 
 
-  // @sect4{ <code>NavierStokesProjection::create_triangulation_and_dofs</code> }
+  // @sect4{ <code>NavierStokesProjection::create_triangulation_and_dofs</code>
+  // }
 
   // The method that creates the triangulation and refines it the needed
   // number of times.  After creating the triangulation, it creates the mesh
   // dependent data, i.e. it distributes degrees of freedom and renumbers
   // them, and initializes the matrices and vectors that we will use.
   template <int dim>
-  void
-  NavierStokesProjection<dim>::
-  create_triangulation_and_dofs(const unsigned int n_refines)
+  void NavierStokesProjection<dim>::create_triangulation_and_dofs(
+    const unsigned int n_refines)
   {
     GridIn<dim> grid_in;
     grid_in.attach_triangulation(triangulation);
@@ -714,8 +713,7 @@ namespace Step35
       grid_in.read_ucd(file);
     }
 
-    std::cout << "Number of refines = " << n_refines
-              << std::endl;
+    std::cout << "Number of refines = " << n_refines << std::endl;
     triangulation.refine_global(n_refines);
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
@@ -748,10 +746,8 @@ namespace Step35
 
     std::cout << "dim(X_h) = " << (dof_handler_velocity.n_dofs() * dim)
               << std::endl
-              << "dim(M_h) = " << dof_handler_pressure.n_dofs()
-              << std::endl
-              << "Re        = " << Re
-              << std::endl
+              << "dim(M_h) = " << dof_handler_pressure.n_dofs() << std::endl
+              << "Re        = " << Re << std::endl
               << std::endl;
   }
 
@@ -760,8 +756,7 @@ namespace Step35
 
   // This method creates the constant matrices and loads the initial data
   template <int dim>
-  void
-  NavierStokesProjection<dim>::initialize()
+  void NavierStokesProjection<dim>::initialize()
   {
     vel_Laplace_plus_Mass = 0.;
     vel_Laplace_plus_Mass.add(1. / Re, vel_Laplace);
@@ -777,14 +772,17 @@ namespace Step35
       {
         vel_exact.set_time(t_0);
         vel_exact.set_component(d);
-        VectorTools::interpolate(dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n_minus_1[d]);
+        VectorTools::interpolate(
+          dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n_minus_1[d]);
         vel_exact.advance_time(dt);
-        VectorTools::interpolate(dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n[d]);
+        VectorTools::interpolate(
+          dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n[d]);
       }
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code> methods }
+  // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code>
+  // methods }
 
   // In this set of methods we initialize the sparsity patterns, the
   // constraints (if any) and assemble the matrices that do not depend on the
@@ -798,11 +796,11 @@ namespace Step35
   // run and so does not incur a cost in each time step. The necessary
   // modifications would be quite straightforward, however.
   template <int dim>
-  void
-  NavierStokesProjection<dim>::initialize_velocity_matrices()
+  void NavierStokesProjection<dim>::initialize_velocity_matrices()
   {
     {
-      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(), dof_handler_velocity.n_dofs());
+      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(),
+                                 dof_handler_velocity.n_dofs());
       DoFTools::make_sparsity_pattern(dof_handler_velocity, dsp);
       sparsity_pattern_velocity.copy_from(dsp);
     }
@@ -813,22 +811,20 @@ namespace Step35
     vel_Laplace.reinit(sparsity_pattern_velocity);
     vel_Advection.reinit(sparsity_pattern_velocity);
 
-    MatrixCreator::create_mass_matrix(dof_handler_velocity,
-                                      quadrature_velocity,
-                                      vel_Mass);
-    MatrixCreator::create_laplace_matrix(dof_handler_velocity,
-                                         quadrature_velocity,
-                                         vel_Laplace);
+    MatrixCreator::create_mass_matrix(
+      dof_handler_velocity, quadrature_velocity, vel_Mass);
+    MatrixCreator::create_laplace_matrix(
+      dof_handler_velocity, quadrature_velocity, vel_Laplace);
   }
 
   // The initialization of the matrices that act on the pressure space is
   // similar to the ones that act on the velocity space.
   template <int dim>
-  void
-  NavierStokesProjection<dim>::initialize_pressure_matrices()
+  void NavierStokesProjection<dim>::initialize_pressure_matrices()
   {
     {
-      DynamicSparsityPattern dsp(dof_handler_pressure.n_dofs(), dof_handler_pressure.n_dofs());
+      DynamicSparsityPattern dsp(dof_handler_pressure.n_dofs(),
+                                 dof_handler_pressure.n_dofs());
       DoFTools::make_sparsity_pattern(dof_handler_pressure, dsp);
       sparsity_pattern_pressure.copy_from(dsp);
     }
@@ -837,12 +833,10 @@ namespace Step35
     pres_iterative.reinit(sparsity_pattern_pressure);
     pres_Mass.reinit(sparsity_pattern_pressure);
 
-    MatrixCreator::create_laplace_matrix(dof_handler_pressure,
-                                         quadrature_pressure,
-                                         pres_Laplace);
-    MatrixCreator::create_mass_matrix(dof_handler_pressure,
-                                      quadrature_pressure,
-                                      pres_Mass);
+    MatrixCreator::create_laplace_matrix(
+      dof_handler_pressure, quadrature_pressure, pres_Laplace);
+    MatrixCreator::create_mass_matrix(
+      dof_handler_pressure, quadrature_pressure, pres_Mass);
   }
 
 
@@ -854,17 +848,18 @@ namespace Step35
   // before, namely <code>PairedIterators</code> and
   // <code>IteratorPair</code>.
   template <int dim>
-  void
-  NavierStokesProjection<dim>::initialize_gradient_operator()
+  void NavierStokesProjection<dim>::initialize_gradient_operator()
   {
     {
-      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(), dof_handler_pressure.n_dofs());
-      DoFTools::make_sparsity_pattern(dof_handler_velocity, dof_handler_pressure, dsp);
+      DynamicSparsityPattern dsp(dof_handler_velocity.n_dofs(),
+                                 dof_handler_pressure.n_dofs());
+      DoFTools::make_sparsity_pattern(
+        dof_handler_velocity, dof_handler_pressure, dsp);
       sparsity_pattern_pres_vel.copy_from(dsp);
     }
 
-    InitGradPerTaskData per_task_data(0, fe_velocity.dofs_per_cell,
-                                      fe_pressure.dofs_per_cell);
+    InitGradPerTaskData per_task_data(
+      0, fe_velocity.dofs_per_cell, fe_pressure.dofs_per_cell);
     InitGradScratchData scratch_data(fe_velocity,
                                      fe_pressure,
                                      quadrature_velocity,
@@ -875,29 +870,24 @@ namespace Step35
       {
         pres_Diff[d].reinit(sparsity_pattern_pres_vel);
         per_task_data.d = d;
-        WorkStream::run(IteratorPair(IteratorTuple(dof_handler_velocity.begin_active(),
-                                                   dof_handler_pressure.begin_active()
-                                                  )
-                                    ),
-                        IteratorPair(IteratorTuple(dof_handler_velocity.end(),
-                                                   dof_handler_pressure.end()
-                                                  )
-                                    ),
-                        *this,
-                        &NavierStokesProjection<dim>::assemble_one_cell_of_gradient,
-                        &NavierStokesProjection<dim>::copy_gradient_local_to_global,
-                        scratch_data,
-                        per_task_data
-                       );
+        WorkStream::run(
+          IteratorPair(IteratorTuple(dof_handler_velocity.begin_active(),
+                                     dof_handler_pressure.begin_active())),
+          IteratorPair(IteratorTuple(dof_handler_velocity.end(),
+                                     dof_handler_pressure.end())),
+          *this,
+          &NavierStokesProjection<dim>::assemble_one_cell_of_gradient,
+          &NavierStokesProjection<dim>::copy_gradient_local_to_global,
+          scratch_data,
+          per_task_data);
       }
   }
 
   template <int dim>
-  void
-  NavierStokesProjection<dim>::
-  assemble_one_cell_of_gradient(const IteratorPair  &SI,
-                                                             InitGradScratchData &scratch,
-                                                             InitGradPerTaskData &data)
+  void NavierStokesProjection<dim>::assemble_one_cell_of_gradient(
+    const IteratorPair & SI,
+    InitGradScratchData &scratch,
+    InitGradPerTaskData &data)
   {
     scratch.fe_val_vel.reinit(std::get<0>(*SI));
     scratch.fe_val_pres.reinit(std::get<1>(*SI));
@@ -910,21 +900,22 @@ namespace Step35
       {
         for (unsigned int i = 0; i < data.vel_dpc; ++i)
           for (unsigned int j = 0; j < data.pres_dpc; ++j)
-            data.local_grad(i, j) += -scratch.fe_val_vel.JxW(q) *
-                                     scratch.fe_val_vel.shape_grad(i, q)[data.d] *
-                                     scratch.fe_val_pres.shape_value(j, q);
+            data.local_grad(i, j) +=
+              -scratch.fe_val_vel.JxW(q) *
+              scratch.fe_val_vel.shape_grad(i, q)[data.d] *
+              scratch.fe_val_pres.shape_value(j, q);
       }
   }
 
 
   template <int dim>
-  void
-  NavierStokesProjection<dim>::
-  copy_gradient_local_to_global(const InitGradPerTaskData &data)
+  void NavierStokesProjection<dim>::copy_gradient_local_to_global(
+    const InitGradPerTaskData &data)
   {
     for (unsigned int i = 0; i < data.vel_dpc; ++i)
       for (unsigned int j = 0; j < data.pres_dpc; ++j)
-        pres_Diff[data.d].add(data.vel_local_dof_indices[i], data.pres_local_dof_indices[j],
+        pres_Diff[data.d].add(data.vel_local_dof_indices[i],
+                              data.pres_local_dof_indices[j],
                               data.local_grad(i, j));
   }
 
@@ -952,8 +943,7 @@ namespace Step35
   // @endcode
   // and does the right thing in either case.
   template <int dim>
-  void
-  NavierStokesProjection<dim>::run(const bool verbose,
+  void NavierStokesProjection<dim>::run(const bool         verbose,
                                         const unsigned int output_interval)
   {
     ConditionalOStream verbose_cout(std::cout, verbose);
@@ -989,8 +979,7 @@ namespace Step35
 
 
   template <int dim>
-  void
-  NavierStokesProjection<dim>::interpolate_velocity()
+  void NavierStokesProjection<dim>::interpolate_velocity()
   {
     for (unsigned int d = 0; d < dim; ++d)
       {
@@ -1014,8 +1003,7 @@ namespace Step35
   // %parallel would be inefficient (since it leads, for example, to cache
   // congestion) and things will be executed sequentially.
   template <int dim>
-  void
-  NavierStokesProjection<dim>::diffusion_step(const bool reinit_prec)
+  void NavierStokesProjection<dim>::diffusion_step(const bool reinit_prec)
   {
     pres_tmp.equ(-1., pres_n);
     pres_tmp.add(-4. / 3., phi_n, 1. / 3., phi_n_minus_1);
@@ -1037,50 +1025,47 @@ namespace Step35
 
         vel_exact.set_component(d);
         boundary_values.clear();
-        for (std::vector < types::boundary_id > ::const_iterator
-             boundaries = boundary_ids.begin();
+        for (std::vector<types::boundary_id>::const_iterator boundaries =
+               boundary_ids.begin();
              boundaries != boundary_ids.end();
              ++boundaries)
           {
             switch (*boundaries)
               {
                 case 1:
-                VectorTools::
-                interpolate_boundary_values(dof_handler_velocity,
-                                                           *boundaries,
-                                                           Functions::ZeroFunction<dim>(),
-                                                           boundary_values);
+                  VectorTools::interpolate_boundary_values(
+                    dof_handler_velocity,
+                    *boundaries,
+                    Functions::ZeroFunction<dim>(),
+                    boundary_values);
                   break;
                 case 2:
-                VectorTools::
-                interpolate_boundary_values(dof_handler_velocity,
+                  VectorTools::interpolate_boundary_values(dof_handler_velocity,
                                                            *boundaries,
                                                            vel_exact,
                                                            boundary_values);
                   break;
                 case 3:
                   if (d != 0)
-                  VectorTools::
-                  interpolate_boundary_values(dof_handler_velocity,
+                    VectorTools::interpolate_boundary_values(
+                      dof_handler_velocity,
                       *boundaries,
                       Functions::ZeroFunction<dim>(),
                       boundary_values);
                   break;
                 case 4:
-                VectorTools::
-                interpolate_boundary_values(dof_handler_velocity,
-                                                           *boundaries,
-                                                           Functions::ZeroFunction<dim>(),
-                                                           boundary_values);
+                  VectorTools::interpolate_boundary_values(
+                    dof_handler_velocity,
+                    *boundaries,
+                    Functions::ZeroFunction<dim>(),
+                    boundary_values);
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
               }
           }
-        MatrixTools::apply_boundary_values(boundary_values,
-                                           vel_it_matrix[d],
-                                           u_n[d],
-                                           force[d]);
+        MatrixTools::apply_boundary_values(
+          boundary_values, vel_it_matrix[d], u_n[d], force[d]);
       }
 
 
@@ -1089,12 +1074,10 @@ namespace Step35
       {
         if (reinit_prec)
           prec_velocity[d].initialize(vel_it_matrix[d],
-                                      SparseILU<double>::
-                                      AdditionalData(vel_diag_strength,
-                                                     vel_off_diagonals));
-        tasks += Threads::new_task(&NavierStokesProjection<dim>::
-                                   diffusion_component_solve,
-                                   *this, d);
+                                      SparseILU<double>::AdditionalData(
+                                        vel_diag_strength, vel_off_diagonals));
+        tasks += Threads::new_task(
+          &NavierStokesProjection<dim>::diffusion_component_solve, *this, d);
       }
     tasks.join_all();
   }
@@ -1112,7 +1095,8 @@ namespace Step35
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code> method and related}
+  // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code>
+  // method and related}
 
   // The following few functions deal with assembling the advection terms,
   // which is the part of the system matrix for the diffusion step that
@@ -1120,29 +1104,29 @@ namespace Step35
   // loop over all cells in %parallel, using the WorkStream class and other
   // facilities as described in the documentation module on @ref threads.
   template <int dim>
-  void
-  NavierStokesProjection<dim>::assemble_advection_term()
+  void NavierStokesProjection<dim>::assemble_advection_term()
   {
     vel_Advection = 0.;
     AdvectionPerTaskData data(fe_velocity.dofs_per_cell);
-    AdvectionScratchData scratch(fe_velocity, quadrature_velocity,
-                                 update_values |
-                                 update_JxW_values |
+    AdvectionScratchData scratch(fe_velocity,
+                                 quadrature_velocity,
+                                 update_values | update_JxW_values |
                                    update_gradients);
-    WorkStream::run(dof_handler_velocity.begin_active(),
-                    dof_handler_velocity.end(), *this,
-                    &NavierStokesProjection<dim>::assemble_one_cell_of_advection,
-                    &NavierStokesProjection<dim>::copy_advection_local_to_global,
-                    scratch,
-                    data);
+    WorkStream::run(
+      dof_handler_velocity.begin_active(),
+      dof_handler_velocity.end(),
+      *this,
+      &NavierStokesProjection<dim>::assemble_one_cell_of_advection,
+      &NavierStokesProjection<dim>::copy_advection_local_to_global,
+      scratch,
+      data);
   }
 
 
 
   template <int dim>
-  void
-  NavierStokesProjection<dim>::
-  assemble_one_cell_of_advection(const typename DoFHandler<dim>::active_cell_iterator &cell,
+  void NavierStokesProjection<dim>::assemble_one_cell_of_advection(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
     AdvectionScratchData &                                scratch,
     AdvectionPerTaskData &                                data)
   {
@@ -1170,24 +1154,19 @@ namespace Step35
     for (unsigned int q = 0; q < scratch.nqp; ++q)
       for (unsigned int i = 0; i < scratch.dpc; ++i)
         for (unsigned int j = 0; j < scratch.dpc; ++j)
-          data.local_advection(i,j) += (scratch.u_star_local[q] *
-                                        scratch.fe_val.shape_grad(j, q) *
-                                        scratch.fe_val.shape_value(i, q)
-                                        +
-                                        0.5 *
-                                        scratch.u_star_tmp[q] *
-                                        scratch.fe_val.shape_value(i, q) *
-                                        scratch.fe_val.shape_value(j, q))
-                                       *
+          data.local_advection(i, j) +=
+            (scratch.u_star_local[q] * scratch.fe_val.shape_grad(j, q) *
+               scratch.fe_val.shape_value(i, q) +
+             0.5 * scratch.u_star_tmp[q] * scratch.fe_val.shape_value(i, q) *
+               scratch.fe_val.shape_value(j, q)) *
             scratch.fe_val.JxW(q);
   }
 
 
 
   template <int dim>
-  void
-  NavierStokesProjection<dim>::
-  copy_advection_local_to_global(const AdvectionPerTaskData &data)
+  void NavierStokesProjection<dim>::copy_advection_local_to_global(
+    const AdvectionPerTaskData &data)
   {
     for (unsigned int i = 0; i < fe_velocity.dofs_per_cell; ++i)
       for (unsigned int j = 0; j < fe_velocity.dofs_per_cell; ++j)
@@ -1202,8 +1181,7 @@ namespace Step35
 
   // This implements the projection step:
   template <int dim>
-  void
-  NavierStokesProjection<dim>::projection_step(const bool reinit_prec)
+  void NavierStokesProjection<dim>::projection_step(const bool reinit_prec)
   {
     pres_iterative.copy_from(pres_Laplace);
 
@@ -1215,15 +1193,15 @@ namespace Step35
 
     static std::map<types::global_dof_index, double> bval;
     if (reinit_prec)
-      VectorTools::interpolate_boundary_values(dof_handler_pressure, 3,
-                                               Functions::ZeroFunction<dim>(), bval);
+      VectorTools::interpolate_boundary_values(
+        dof_handler_pressure, 3, Functions::ZeroFunction<dim>(), bval);
 
     MatrixTools::apply_boundary_values(bval, pres_iterative, phi_n, pres_tmp);
 
     if (reinit_prec)
       prec_pres_Laplace.initialize(pres_iterative,
-                                   SparseILU<double>::AdditionalData(vel_diag_strength,
-                                       vel_off_diagonals) );
+                                   SparseILU<double>::AdditionalData(
+                                     vel_diag_strength, vel_off_diagonals));
 
     SolverControl solvercontrol(vel_max_its, vel_eps * pres_tmp.l2_norm());
     SolverCG<>    cg(solvercontrol);
@@ -1240,8 +1218,7 @@ namespace Step35
   // \phi^{n+1}, @f] or the rotational form, which is @f[ p^{n+1} = p^n +
   // \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}.  @f]
   template <int dim>
-  void
-  NavierStokesProjection<dim>::update_pressure(const bool reinit_prec)
+  void NavierStokesProjection<dim>::update_pressure(const bool reinit_prec)
   {
     pres_n_minus_1 = pres_n;
     switch (type)
@@ -1288,22 +1265,22 @@ namespace Step35
   void NavierStokesProjection<dim>::output_results(const unsigned int step)
   {
     assemble_vorticity((step == 1));
-    const FESystem<dim> joint_fe(fe_velocity, dim,
-                                 fe_pressure, 1,
-                                 fe_velocity, 1);
-    DoFHandler<dim>     joint_dof_handler(triangulation);
+    const FESystem<dim> joint_fe(
+      fe_velocity, dim, fe_pressure, 1, fe_velocity, 1);
+    DoFHandler<dim> joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
     Assert(joint_dof_handler.n_dofs() ==
              ((dim + 1) * dof_handler_velocity.n_dofs() +
               dof_handler_pressure.n_dofs()),
            ExcInternalError());
-    Vector<double>                       joint_solution(joint_dof_handler.n_dofs());
-    std::vector<types::global_dof_index> loc_joint_dof_indices(joint_fe.dofs_per_cell),
+    Vector<double> joint_solution(joint_dof_handler.n_dofs());
+    std::vector<types::global_dof_index> loc_joint_dof_indices(
+      joint_fe.dofs_per_cell),
       loc_vel_dof_indices(fe_velocity.dofs_per_cell),
       loc_pres_dof_indices(fe_pressure.dofs_per_cell);
     typename DoFHandler<dim>::active_cell_iterator
       joint_cell = joint_dof_handler.begin_active(),
-                                                   joint_endc = joint_dof_handler.end(),
+      joint_endc = joint_dof_handler.end(),
       vel_cell   = dof_handler_velocity.begin_active(),
       pres_cell  = dof_handler_pressure.begin_active();
     for (; joint_cell != joint_endc; ++joint_cell, ++vel_cell, ++pres_cell)
@@ -1318,20 +1295,22 @@ namespace Step35
                 Assert(joint_fe.system_to_base_index(i).first.second < dim,
                        ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) =
-                u_n[ joint_fe.system_to_base_index(i).first.second ]
-                (loc_vel_dof_indices[ joint_fe.system_to_base_index(i).second ]);
+                  u_n[joint_fe.system_to_base_index(i).first.second](
+                    loc_vel_dof_indices[joint_fe.system_to_base_index(i)
+                                          .second]);
                 break;
               case 1:
                 Assert(joint_fe.system_to_base_index(i).first.second == 0,
                        ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) =
-                  pres_n(loc_pres_dof_indices[joint_fe.system_to_base_index(i).second]);
+                  pres_n(loc_pres_dof_indices[joint_fe.system_to_base_index(i)
+                                                .second]);
                 break;
               case 2:
                 Assert(joint_fe.system_to_base_index(i).first.second == 0,
                        ExcInternalError());
-                joint_solution(loc_joint_dof_indices[i]) =
-                  rot_u(loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
+                joint_solution(loc_joint_dof_indices[i]) = rot_u(
+                  loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               default:
                 Assert(false, ExcInternalError());
@@ -1343,19 +1322,18 @@ namespace Step35
     DataOut<dim> data_out;
     data_out.attach_dof_handler(joint_dof_handler);
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      component_interpretation(dim + 2,
-                               DataComponentInterpretation::component_is_part_of_vector);
-    component_interpretation[dim]
-      = DataComponentInterpretation::component_is_scalar;
-    component_interpretation[dim+1]
-      = DataComponentInterpretation::component_is_scalar;
+      component_interpretation(
+        dim + 2, DataComponentInterpretation::component_is_part_of_vector);
+    component_interpretation[dim] =
+      DataComponentInterpretation::component_is_scalar;
+    component_interpretation[dim + 1] =
+      DataComponentInterpretation::component_is_scalar;
     data_out.add_data_vector(joint_solution,
                              joint_solution_names,
                              DataOut<dim>::type_dof_data,
                              component_interpretation);
     data_out.build_patches(deg + 1);
-    std::ofstream output("solution-" +
-                         Utilities::int_to_string(step, 5) +
+    std::ofstream output("solution-" + Utilities::int_to_string(step, 5) +
                          ".vtk");
     data_out.write_vtk(output);
   }
@@ -1377,9 +1355,9 @@ namespace Step35
     if (reinit_prec)
       prec_vel_mass.initialize(vel_Mass);
 
-    FEValues<dim> fe_val_vel(fe_velocity, quadrature_velocity,
-                             update_gradients |
-                             update_JxW_values |
+    FEValues<dim>      fe_val_vel(fe_velocity,
+                             quadrature_velocity,
+                             update_gradients | update_JxW_values |
                                update_values);
     const unsigned int dpc = fe_velocity.dofs_per_cell,
                        nqp = quadrature_velocity.size();
@@ -1389,9 +1367,10 @@ namespace Step35
     std::vector<Tensor<1, dim>> grad_u1(nqp), grad_u2(nqp);
     rot_u = 0.;
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler_velocity.begin_active(),
-                                                   end = dof_handler_velocity.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler_velocity
+                                                            .begin_active(),
+                                                   end =
+                                                     dof_handler_velocity.end();
     for (; cell != end; ++cell)
       {
         fe_val_vel.reinit(cell);
@@ -1402,8 +1381,7 @@ namespace Step35
         for (unsigned int q = 0; q < nqp; ++q)
           for (unsigned int i = 0; i < dpc; ++i)
             loc_rot(i) += (grad_u2[q][0] - grad_u1[q][1]) *
-                          fe_val_vel.shape_value(i, q) *
-                          fe_val_vel.JxW(q);
+                          fe_val_vel.shape_value(i, q) * fe_val_vel.JxW(q);
 
         for (unsigned int i = 0; i < dpc; ++i)
           rot_u(ldi[i]) += loc_rot(i);
@@ -1435,7 +1413,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -1447,7 +1426,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -1458,9 +1438,8 @@ int main()
     }
   std::cout << "----------------------------------------------------"
             << std::endl
-            << "Apparently everything went fine!"
-            << std::endl
-            << "Don't forget to brush your teeth :-)"
-            << std::endl << std::endl;
+            << "Apparently everything went fine!" << std::endl
+            << "Don't forget to brush your teeth :-)" << std::endl
+            << std::endl;
   return 0;
 }

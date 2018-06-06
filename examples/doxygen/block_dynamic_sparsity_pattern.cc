@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// See documentation of BlockDynamicSparsityPattern for documentation of this example
+// See documentation of BlockDynamicSparsityPattern for documentation of this
+// example
 
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -76,8 +77,7 @@ int main()
           for (unsigned int j = 0; j < dofs_per_block[jb]; ++j, ++jg)
             {
               if (sparsity.exists(ig, jg))
-                std::cout << ig << ' ' << jg
-                          << '\t' << ib << jb << std::endl;
+                std::cout << ig << ' ' << jg << '\t' << ib << jb << std::endl;
             }
       }
 }

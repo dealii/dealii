@@ -81,19 +81,17 @@ int main()
 }
 
 
-Explicit::Explicit(const FullMatrix<double> &M)
-  :
-  matrix(&M)
+Explicit::Explicit(const FullMatrix<double> &M) : matrix(&M)
 {
   m.reinit(M.m(), M.n());
 }
 
 
-void
-Explicit::operator() (AnyData &out, const AnyData &in)
+void Explicit::operator()(AnyData &out, const AnyData &in)
 {
   const double timestep = *in.read_ptr<double>("Timestep");
-  if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
+  if (this->notifications.test(Events::initial) ||
+      this->notifications.test(Events::new_timestep_size))
     {
       m.equ(-timestep, *matrix);
       for (unsigned int i = 0; i < m.m(); ++i)
@@ -105,19 +103,17 @@ Explicit::operator() (AnyData &out, const AnyData &in)
 }
 
 
-Implicit::Implicit(const FullMatrix<double> &M)
-  :
-  matrix(&M)
+Implicit::Implicit(const FullMatrix<double> &M) : matrix(&M)
 {
   m.reinit(M.m(), M.n());
 }
 
 
-void
-Implicit::operator() (AnyData &out, const AnyData &in)
+void Implicit::operator()(AnyData &out, const AnyData &in)
 {
   const double timestep = *in.read_ptr<double>("Timestep");
-  if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
+  if (this->notifications.test(Events::initial) ||
+      this->notifications.test(Events::new_timestep_size))
     {
       m.equ(timestep, *matrix);
       for (unsigned int i = 0; i < m.m(); ++i)
@@ -128,5 +124,3 @@ Implicit::operator() (AnyData &out, const AnyData &in)
   m.vmult(*out.entry<Vector<double> *>(0),
           *in.read_ptr<Vector<double>>("Previous time"));
 }
-
-

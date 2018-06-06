@@ -141,9 +141,10 @@ namespace Step9
     };
 
     void assemble_system();
-    void local_assemble_system(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                               AssemblyScratchData &scratch,
-                               AssemblyCopyData &   copy_data);
+    void local_assemble_system(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
+      AssemblyScratchData &                                 scratch,
+      AssemblyCopyData &                                    copy_data);
     void copy_local_to_global(const AssemblyCopyData &copy_data);
 
 
@@ -195,18 +196,20 @@ namespace Step9
   class AdvectionField : public TensorFunction<1, dim>
   {
   public:
-    AdvectionField() : TensorFunction<1,dim> () {}
+    AdvectionField() : TensorFunction<1, dim>()
+    {}
 
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
 
     virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<Tensor<1, dim>> &  values) const override;
+                            std::vector<Tensor<1, dim>> &values) const override;
 
     // In previous examples, we have used assertions that throw exceptions in
     // several places. However, we have never seen how such exceptions are
     // declared. This can be done as follows:
     DeclException2(ExcDimensionMismatch,
-                    unsigned int, unsigned int,
+                   unsigned int,
+                   unsigned int,
                    << "The vector has size " << arg1 << " but should have "
                    << arg2 << " elements.");
     // The syntax may look a little strange, but is reasonable. The format is
@@ -245,8 +248,7 @@ namespace Step9
   // arrays, incompatible parameters to functions and the like; using
   // assertion as in this case can eliminate many of these problems.
   template <int dim>
-  Tensor<1,dim>
-  AdvectionField<dim>::value(const Point<dim> &p) const
+  Tensor<1, dim> AdvectionField<dim>::value(const Point<dim> &p) const
   {
     Point<dim> value;
     value[0] = 2;
@@ -261,7 +263,7 @@ namespace Step9
   template <int dim>
   void
   AdvectionField<dim>::value_list(const std::vector<Point<dim>> &points,
-                                       std::vector<Tensor<1, dim>> &  values) const
+                                  std::vector<Tensor<1, dim>> &  values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -269,7 +271,6 @@ namespace Step9
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = AdvectionField<dim>::value(points[i]);
   }
-
 
 
 
@@ -287,14 +288,15 @@ namespace Step9
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>() {}
+    RightHandSide() : Function<dim>()
+    {}
 
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int             component = 0) const override;
+                            const unsigned int component = 0) const override;
 
   private:
     static const Point<dim> center_point;
@@ -323,8 +325,7 @@ namespace Step9
   // one past the last (i.e. again the half-open interval so often used in the
   // C++ standard library):
   template <int dim>
-  double
-  RightHandSide<dim>::value(const Point<dim>   &p,
+  double RightHandSide<dim>::value(const Point<dim> & p,
                                    const unsigned int component) const
   {
     (void)component;
@@ -338,10 +339,9 @@ namespace Step9
 
 
   template <int dim>
-  void
-  RightHandSide<dim>::value_list(const std::vector<Point<dim> > &points,
+  void RightHandSide<dim>::value_list(const std::vector<Point<dim>> &points,
                                       std::vector<double> &          values,
-                                      const unsigned int             component) const
+                                      const unsigned int component) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -358,38 +358,38 @@ namespace Step9
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>() {}
+    BoundaryValues() : Function<dim>()
+    {}
 
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int             component = 0) const override;
+                            const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double
-  BoundaryValues<dim>::value(const Point<dim>   &p,
+  double BoundaryValues<dim>::value(const Point<dim> & p,
                                     const unsigned int component) const
   {
     (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    const double sine_term = std::sin(16 * numbers::PI * std::sqrt(p.norm_square()));
-    const double weight    = std::exp(-5 * p.norm_square()) / std::exp(-5.);
+    const double sine_term =
+      std::sin(16 * numbers::PI * std::sqrt(p.norm_square()));
+    const double weight = std::exp(-5 * p.norm_square()) / std::exp(-5.);
     return sine_term * weight;
   }
 
 
 
   template <int dim>
-  void
-  BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
+  void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
                                        std::vector<double> &          values,
-                                       const unsigned int             component) const
+                                       const unsigned int component) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -477,7 +477,8 @@ namespace Step9
                          Vector<float> &        error_per_cell);
 
     DeclException2(ExcInvalidVectorLength,
-                    int, int,
+                   int,
+                   int,
                    << "Vector has length " << arg1 << ", but should have "
                    << arg2);
     DeclException0(ExcInsufficientDirections);
@@ -500,10 +501,10 @@ namespace Step9
     {};
 
     template <int dim>
-    static
-    void estimate_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                              EstimateScratchData<dim> &scratch_data,
-                              const EstimateCopyData &  copy_data);
+    static void
+    estimate_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                  EstimateScratchData<dim> &scratch_data,
+                  const EstimateCopyData &  copy_data);
   };
 
 
@@ -515,10 +516,7 @@ namespace Step9
   // the function <code>setup_system</code> follow the same pattern that was
   // used previously, so we need not comment on these three function:
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem()
-    :
-    dof_handler(triangulation),
-    fe(1)
+  AdvectionProblem<dim>::AdvectionProblem() : dof_handler(triangulation), fe(1)
   {}
 
 
@@ -609,13 +607,12 @@ namespace Step9
   // we will have to pass to the constructors of the members of the
   // class:
   template <int dim>
-  AdvectionProblem<dim>::AssemblyScratchData::
-  AssemblyScratchData(const FiniteElement<dim> &fe)
-    :
+  AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
+    const FiniteElement<dim> &fe) :
     fe_values(fe,
               QGauss<dim>(2),
-              update_values   | update_gradients |
-              update_quadrature_points | update_JxW_values),
+              update_values | update_gradients | update_quadrature_points |
+                update_JxW_values),
     fe_face_values(fe,
                    QGauss<dim - 1>(2),
                    update_values | update_quadrature_points |
@@ -625,19 +622,17 @@ namespace Step9
 
 
   template <int dim>
-  AdvectionProblem<dim>::AssemblyScratchData::
-  AssemblyScratchData(const AssemblyScratchData &scratch_data)
-    :
+  AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
+    const AssemblyScratchData &scratch_data) :
     fe_values(scratch_data.fe_values.get_fe(),
               scratch_data.fe_values.get_quadrature(),
-              update_values   | update_gradients |
-              update_quadrature_points | update_JxW_values),
+              update_values | update_gradients | update_quadrature_points |
+                update_JxW_values),
     fe_face_values(scratch_data.fe_face_values.get_fe(),
                    scratch_data.fe_face_values.get_quadrature(),
                    update_values | update_quadrature_points |
                      update_JxW_values | update_normal_vectors)
   {}
-
 
 
 
@@ -675,9 +670,8 @@ namespace Step9
   // the <code>AssemblyScratchData</code> class. We will leave this as
   // an exercise.
   template <int dim>
-  void
-  AdvectionProblem<dim>::
-  local_assemble_system(const typename DoFHandler<dim>::active_cell_iterator &cell,
+  void AdvectionProblem<dim>::local_assemble_system(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
     AssemblyScratchData &                                 scratch_data,
     AssemblyCopyData &                                    copy_data)
   {
@@ -692,8 +686,10 @@ namespace Step9
 
     // Then we define some abbreviations to avoid unnecessarily long lines:
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int n_q_points    = scratch_data.fe_values.get_quadrature().size();
-    const unsigned int n_face_q_points = scratch_data.fe_face_values.get_quadrature().size();
+    const unsigned int n_q_points =
+      scratch_data.fe_values.get_quadrature().size();
+    const unsigned int n_face_q_points =
+      scratch_data.fe_face_values.get_quadrature().size();
 
     // We declare cell matrix and cell right hand side...
     copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -732,20 +728,19 @@ namespace Step9
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            copy_data.cell_matrix(i,j) += ((advection_directions[q_point] *
+            copy_data.cell_matrix(i, j) +=
+              ((advection_directions[q_point] *
                 scratch_data.fe_values.shape_grad(j, q_point) *
                 (scratch_data.fe_values.shape_value(i, q_point) +
-                                             delta *
-                                             (advection_directions[q_point] *
+                 delta * (advection_directions[q_point] *
                           scratch_data.fe_values.shape_grad(i, q_point)))) *
                scratch_data.fe_values.JxW(q_point));
 
-          copy_data.cell_rhs(i) += ((scratch_data.fe_values.shape_value(i,q_point) +
-                                     delta *
-                                     (advection_directions[q_point] *
+          copy_data.cell_rhs(i) +=
+            ((scratch_data.fe_values.shape_value(i, q_point) +
+              delta * (advection_directions[q_point] *
                        scratch_data.fe_values.shape_grad(i, q_point))) *
-                                    rhs_values[q_point] *
-                                    scratch_data.fe_values.JxW (q_point));
+             rhs_values[q_point] * scratch_data.fe_values.JxW(q_point));
         }
 
     // Besides the cell terms which we have built up now, the bilinear
@@ -760,7 +755,8 @@ namespace Step9
     // the direction of flow at this point; we obtain this information
     // using the FEFaceValues object and only decide within the main loop
     // whether a quadrature point is on the inflow boundary.
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+         ++face)
       if (cell->face(face)->at_boundary())
         {
           // Ok, this face of the present cell is on the boundary of the
@@ -771,10 +767,12 @@ namespace Step9
 
           // For the quadrature points at hand, we ask for the values of
           // the inflow function and for the direction of flow:
-          boundary_values.value_list(scratch_data.fe_face_values.get_quadrature_points(),
-                                     face_boundary_values);
-          advection_field.value_list(scratch_data.fe_face_values.get_quadrature_points(),
-                                     face_advection_directions);
+          boundary_values.value_list(
+            scratch_data.fe_face_values.get_quadrature_points(),
+            face_boundary_values);
+          advection_field.value_list(
+            scratch_data.fe_face_values.get_quadrature_points(),
+            face_advection_directions);
 
           // Now loop over all quadrature points and see whether it is on
           // the inflow or outflow part of the boundary. This is
@@ -786,8 +784,8 @@ namespace Step9
           // scalar product with the normal vector must be negative):
           for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
             if (scratch_data.fe_face_values.normal_vector(q_point) *
-                face_advection_directions[q_point]
-                < 0)
+                  face_advection_directions[q_point] <
+                0)
               // If the is part of the inflow boundary, then compute the
               // contributions of this face to the global matrix and right
               // hand side, using the values obtained from the
@@ -796,13 +794,15 @@ namespace Step9
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    copy_data.cell_matrix(i,j) -= (face_advection_directions[q_point] *
+                    copy_data.cell_matrix(i, j) -=
+                      (face_advection_directions[q_point] *
                        scratch_data.fe_face_values.normal_vector(q_point) *
                        scratch_data.fe_face_values.shape_value(i, q_point) *
                        scratch_data.fe_face_values.shape_value(j, q_point) *
                        scratch_data.fe_face_values.JxW(q_point));
 
-                  copy_data.cell_rhs(i) -= (face_advection_directions[q_point] *
+                  copy_data.cell_rhs(i) -=
+                    (face_advection_directions[q_point] *
                      scratch_data.fe_face_values.normal_vector(q_point) *
                      face_boundary_values[q_point] *
                      scratch_data.fe_face_values.shape_value(i, q_point) *
@@ -842,7 +842,6 @@ namespace Step9
 
 
 
-
   // Following is the function that solves the linear system of equations. As
   // the system is no more symmetric positive definite as in all the previous
   // examples, we can't use the Conjugate Gradients method anymore. Rather, we
@@ -857,8 +856,7 @@ namespace Step9
     PreconditionJacobi<> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
 
-    bicgstab.solve(system_matrix, solution, system_rhs,
-                   preconditioner);
+    bicgstab.solve(system_matrix, solution, system_rhs, preconditioner);
 
     hanging_node_constraints.distribute(solution);
   }
@@ -874,13 +872,11 @@ namespace Step9
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    GradientEstimation::estimate(dof_handler,
-                                 solution,
-                                 estimated_error_per_cell);
+    GradientEstimation::estimate(
+      dof_handler, solution, estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                    estimated_error_per_cell,
-                                                    0.5, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.5, 0.03);
 
     triangulation.execute_coarsening_and_refinement();
   }
@@ -930,13 +926,11 @@ namespace Step9
 
 
         std::cout << "   Number of active cells:       "
-                  << triangulation.n_active_cells()
-                  << std::endl;
+                  << triangulation.n_active_cells() << std::endl;
 
         setup_system();
 
-        std::cout << "   Number of degrees of freedom: "
-                  << dof_handler.n_dofs()
+        std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                   << std::endl;
 
         assemble_system();
@@ -954,11 +948,10 @@ namespace Step9
   // <code>EstimateScratchData</code> class used by the
   // <code>estimate_cell()</code> function:
   template <int dim>
-  GradientEstimation::EstimateScratchData<dim>::
-  EstimateScratchData(const FiniteElement<dim> &fe,
+  GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
+    const FiniteElement<dim> &fe,
     const Vector<double> &    solution,
-                      Vector<float>            &error_per_cell)
-    :
+    Vector<float> &           error_per_cell) :
     fe_midpoint_value(fe,
                       QMidpoint<dim>(),
                       update_values | update_quadrature_points),
@@ -968,9 +961,8 @@ namespace Step9
 
 
   template <int dim>
-  GradientEstimation::EstimateScratchData<dim>::
-  EstimateScratchData(const EstimateScratchData &scratch_data)
-    :
+  GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
+    const EstimateScratchData &scratch_data) :
     fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
                       scratch_data.fe_midpoint_value.get_quadrature(),
                       update_values | update_quadrature_points),
@@ -991,22 +983,21 @@ namespace Step9
   // data somewhere in memory, or non-reproducible results), it is
   // well worth the effort to check for such things.
   template <int dim>
-  void
-  GradientEstimation::estimate(const DoFHandler<dim> &dof_handler,
+  void GradientEstimation::estimate(const DoFHandler<dim> &dof_handler,
                                     const Vector<double> & solution,
                                     Vector<float> &        error_per_cell)
   {
-    Assert(error_per_cell.size() == dof_handler.get_triangulation().n_active_cells(),
-           ExcInvalidVectorLength(error_per_cell.size(),
-                                  dof_handler.get_triangulation().n_active_cells()));
+    Assert(
+      error_per_cell.size() == dof_handler.get_triangulation().n_active_cells(),
+      ExcInvalidVectorLength(error_per_cell.size(),
+                             dof_handler.get_triangulation().n_active_cells()));
 
-    WorkStream::run(dof_handler.begin_active(),
+    WorkStream::run(
+      dof_handler.begin_active(),
       dof_handler.end(),
       &GradientEstimation::template estimate_cell<dim>,
       std::function<void(const EstimateCopyData &)>(),
-                    EstimateScratchData<dim> (dof_handler.get_fe(),
-                                              solution,
-                                              error_per_cell),
+      EstimateScratchData<dim>(dof_handler.get_fe(), solution, error_per_cell),
       EstimateCopyData());
   }
 
@@ -1043,7 +1034,8 @@ namespace Step9
   // passing the following as the third argument when calling WorkStream::run()
   // above:
   // @code
-  //    std::function<void (const typename DoFHandler<dim>::active_cell_iterator &,
+  //    std::function<void (const typename DoFHandler<dim>::active_cell_iterator
+  //    &,
   //                        EstimateScratchData<dim>                  &,
   //                        EstimateCopyData                          &)>
   //      (std::bind (&GradientEstimation::template estimate_cell<dim>,
@@ -1053,13 +1045,13 @@ namespace Step9
   // This creates a function object taking three arguments, but when it calls
   // the underlying function object, it simply only uses the first and second
   // argument -- we simply "forget" to use the third argument :-)
-  // In the end, this isn't completely obvious either, and so we didn't implement
-  // it, but hey -- it can be done!)
+  // In the end, this isn't completely obvious either, and so we didn't
+  // implement it, but hey -- it can be done!)
   //
   // Now for the details:
   template <int dim>
-  void
-  GradientEstimation::estimate_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+  void GradientEstimation::estimate_cell(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
     EstimateScratchData<dim> &                            scratch_data,
     const EstimateCopyData &)
   {
@@ -1072,7 +1064,8 @@ namespace Step9
     // a cell. We reserve the maximal number of active neighbors in order to
     // avoid later reallocations. Note how this maximal number of active
     // neighbors is computed here.
-    std::vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
+    std::vector<typename DoFHandler<dim>::active_cell_iterator>
+      active_neighbors;
     active_neighbors.reserve(GeometryInfo<dim>::faces_per_cell *
                              GeometryInfo<dim>::max_children_per_face);
 
@@ -1108,15 +1101,16 @@ namespace Step9
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
     active_neighbors.clear();
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+         ++face_no)
       if (!cell->at_boundary(face_no))
         {
           // First define an abbreviation for the iterator to the face and
           // the neighbor
-          const typename DoFHandler<dim>::face_iterator
-          face = cell->face(face_no);
-          const typename DoFHandler<dim>::cell_iterator
-          neighbor = cell->neighbor(face_no);
+          const typename DoFHandler<dim>::face_iterator face =
+            cell->face(face_no);
+          const typename DoFHandler<dim>::cell_iterator neighbor =
+            cell->neighbor(face_no);
 
           // Then check whether the neighbor is active. If it is, then it
           // is on the same level or one level coarser (if we are not in
@@ -1133,10 +1127,11 @@ namespace Step9
                   // we are left of the present cell (n==0), or go to the
                   // left child if we are on the right (n==1), until we
                   // find an active cell.
-                  typename DoFHandler<dim>::cell_iterator
-                  neighbor_child = neighbor;
+                  typename DoFHandler<dim>::cell_iterator neighbor_child =
+                    neighbor;
                   while (neighbor_child->has_children())
-                    neighbor_child = neighbor_child->child(face_no == 0 ? 1 : 0);
+                    neighbor_child =
+                      neighbor_child->child(face_no == 0 ? 1 : 0);
 
                   // As this used some non-trivial geometrical intuition,
                   // we might want to check whether we did it right,
@@ -1158,8 +1153,7 @@ namespace Step9
                   // an error that is irrecoverable and probably qualifies
                   // as an internal error. We therefore use a predefined
                   // exception class to throw here.
-                  Assert(neighbor_child->neighbor(face_no==0 ? 1 : 0)
-                         ==cell,
+                  Assert(neighbor_child->neighbor(face_no == 0 ? 1 : 0) == cell,
                          ExcInternalError());
 
                   // If the check succeeded, we push the active neighbor
@@ -1169,7 +1163,9 @@ namespace Step9
               else
                 // If we are not in 1d, we collect all neighbor children
                 // `behind' the subfaces of the current face
-                for (unsigned int subface_no = 0; subface_no < face->n_children(); ++subface_no)
+                for (unsigned int subface_no = 0;
+                     subface_no < face->n_children();
+                     ++subface_no)
                   active_neighbors.push_back(
                     cell->neighbor_child_on_subface(face_no, subface_no));
             }
@@ -1182,10 +1178,12 @@ namespace Step9
     // points, of which there are only one, of course. Likewise, the
     // position of the center is the position of the first (and only)
     // quadrature point in real space.
-    const Point<dim> this_center = scratch_data.fe_midpoint_value.quadrature_point(0);
+    const Point<dim> this_center =
+      scratch_data.fe_midpoint_value.quadrature_point(0);
 
     std::vector<double> this_midpoint_value(1);
-    scratch_data.fe_midpoint_value.get_function_values(scratch_data.solution, this_midpoint_value);
+    scratch_data.fe_midpoint_value.get_function_values(scratch_data.solution,
+                                                       this_midpoint_value);
 
 
     // Now loop over all active neighbors and collect the data we
@@ -1196,24 +1194,25 @@ namespace Step9
     // iteration of this inner loop (memory allocation is a rather
     // expensive operation):
     std::vector<double> neighbor_midpoint_value(1);
-    typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
-      neighbor_ptr = active_neighbors.begin();
+    typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::
+      const_iterator neighbor_ptr = active_neighbors.begin();
     for (; neighbor_ptr != active_neighbors.end(); ++neighbor_ptr)
       {
         // First define an abbreviation for the iterator to the active
         // neighbor cell:
-        const typename DoFHandler<dim>::active_cell_iterator
-        neighbor = *neighbor_ptr;
+        const typename DoFHandler<dim>::active_cell_iterator neighbor =
+          *neighbor_ptr;
 
         // Then get the center of the neighbor cell and the value of the
         // finite element function thereon. Note that for this information
         // we have to reinitialize the <code>FEValues</code> object for
         // the neighbor cell.
         scratch_data.fe_midpoint_value.reinit(neighbor);
-        const Point<dim> neighbor_center = scratch_data.fe_midpoint_value.quadrature_point(0);
+        const Point<dim> neighbor_center =
+          scratch_data.fe_midpoint_value.quadrature_point(0);
 
-        scratch_data.fe_midpoint_value.get_function_values(scratch_data.solution,
-                                                           neighbor_midpoint_value);
+        scratch_data.fe_midpoint_value.get_function_values(
+          scratch_data.solution, neighbor_midpoint_value);
 
         // Compute the vector <code>y</code> connecting the centers of the
         // two cells. Note that as opposed to the introduction, we denote
@@ -1229,10 +1228,8 @@ namespace Step9
             Y[i][j] += y[i] * y[j];
 
         // ... and update the sum of difference quotients:
-        projected_gradient += (neighbor_midpoint_value[0] -
-                               this_midpoint_value[0]) /
-                              distance *
-                              y;
+        projected_gradient +=
+          (neighbor_midpoint_value[0] - this_midpoint_value[0]) / distance * y;
       }
 
     // If now, after collecting all the information from the neighbors, we
@@ -1257,8 +1254,7 @@ namespace Step9
     // refine the grid globally, as the case of insufficient directions
     // can not occur if every cell of the initial grid has been refined at
     // least once.
-    AssertThrow(determinant(Y) != 0,
-                ExcInsufficientDirections());
+    AssertThrow(determinant(Y) != 0, ExcInsufficientDirections());
 
     // If, on the other hand the matrix is invertible, then invert it,
     // multiply the other quantity with it and compute the estimated error
@@ -1274,7 +1270,8 @@ namespace Step9
     // at the correct element inside this vector -- but we can ask the
     // cell we're on the how-manyth active cell it is for this:
     scratch_data.error_per_cell(cell->active_cell_index()) =
-      (std::pow(cell->diameter(), 1 + 1.0 * dim / 2) * std::sqrt(gradient.norm_square()));
+      (std::pow(cell->diameter(), 1 + 1.0 * dim / 2) *
+       std::sqrt(gradient.norm_square()));
   }
 } // namespace Step9
 
@@ -1303,7 +1300,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -1315,7 +1313,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

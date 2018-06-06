@@ -30,7 +30,8 @@
 
 namespace LA
 {
-#if defined(DEAL_II_WITH_PETSC) && !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
+#if defined(DEAL_II_WITH_PETSC) && \
+  !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
   using namespace dealii::LinearAlgebraPETSc;
 #  define USE_PETSC_LA
 #elif defined(DEAL_II_WITH_TRILINOS)
@@ -102,12 +103,10 @@ namespace Step55
     class InverseMatrix : public Subscriptor
     {
     public:
-      InverseMatrix(const Matrix         &m,
-                    const Preconditioner &preconditioner);
+      InverseMatrix(const Matrix &m, const Preconditioner &preconditioner);
 
       template <typename VectorType>
-      void vmult(VectorType       &dst,
-                 const VectorType &src) const;
+      void vmult(VectorType &dst, const VectorType &src) const;
 
     private:
       const SmartPointer<const Matrix> matrix;
@@ -116,10 +115,9 @@ namespace Step55
 
 
     template <class Matrix, class Preconditioner>
-    InverseMatrix<Matrix,Preconditioner>::
-    InverseMatrix(const Matrix &m,
-                  const Preconditioner &preconditioner)
-      :
+    InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
+      const Matrix &        m,
+      const Preconditioner &preconditioner) :
       matrix(&m),
       preconditioner(preconditioner)
     {}
@@ -129,11 +127,10 @@ namespace Step55
     template <class Matrix, class Preconditioner>
     template <typename VectorType>
     void
-    InverseMatrix<Matrix,Preconditioner>::
-    vmult(VectorType       &dst,
-                                                      const VectorType &src) const
+    InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &      dst,
+                                                 const VectorType &src) const
     {
-      SolverControl             solver_control(src.size(), 1e-8 * src.l2_norm());
+      SolverControl solver_control(src.size(), 1e-8 * src.l2_norm());
       SolverCG<LA::MPI::Vector> cg(solver_control);
       dst = 0;
 
@@ -154,8 +151,7 @@ namespace Step55
     class BlockDiagonalPreconditioner : public Subscriptor
     {
     public:
-      BlockDiagonalPreconditioner(
-        const PreconditionerA &preconditioner_A,
+      BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,
                                   const PreconditionerS &preconditioner_S);
 
       void vmult(LA::MPI::BlockVector &      dst,
@@ -195,17 +191,16 @@ namespace Step55
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>(dim+1) {}
+    RightHandSide() : Function<dim>(dim + 1)
+    {}
 
     virtual void vector_value(const Point<dim> &p,
                               Vector<double> &  value) const override;
-
   };
 
 
   template <int dim>
-  void
-  RightHandSide<dim>::vector_value(const Point<dim> &p,
+  void RightHandSide<dim>::vector_value(const Point<dim> &p,
                                         Vector<double> &  values) const
   {
     const double R_x = p[0];
@@ -213,8 +208,17 @@ namespace Step55
 
     const double pi  = numbers::PI;
     const double pi2 = pi * pi;
-    values[0] = -1.0L/2.0L*(-2*sqrt(25.0 + 4*pi2) + 10.0)*exp(R_x*(-2*sqrt(25.0 + 4*pi2) + 10.0)) - 0.4*pi2*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*cos(2*R_y*pi) + 0.1*pow(-sqrt(25.0 + 4*pi2) + 5.0, 2)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*cos(2*R_y*pi);
-    values[1] = 0.2*pi*(-sqrt(25.0 + 4*pi2) + 5.0)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*sin(2*R_y*pi) - 0.05*pow(-sqrt(25.0 + 4*pi2) + 5.0, 3)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*sin(2*R_y*pi)/pi;
+    values[0] =
+      -1.0L / 2.0L * (-2 * sqrt(25.0 + 4 * pi2) + 10.0) *
+        exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
+      0.4 * pi2 * exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) +
+      0.1 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 2) *
+        exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi);
+    values[1] = 0.2 * pi * (-sqrt(25.0 + 4 * pi2) + 5.0) *
+                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) -
+                0.05 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 3) *
+                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
+                  pi;
     values[2] = 0;
   }
 
@@ -223,15 +227,15 @@ namespace Step55
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution() : Function<dim>(dim+1) {}
+    ExactSolution() : Function<dim>(dim + 1)
+    {}
 
     virtual void vector_value(const Point<dim> &p,
                               Vector<double> &  value) const override;
   };
 
   template <int dim>
-  void
-  ExactSolution<dim>::vector_value(const Point<dim> &p,
+  void ExactSolution<dim>::vector_value(const Point<dim> &p,
                                         Vector<double> &  values) const
   {
     const double R_x = p[0];
@@ -239,9 +243,25 @@ namespace Step55
 
     const double pi  = numbers::PI;
     const double pi2 = pi * pi;
-    values[0]        = -exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) + 1;
-    values[1] = (1.0L/2.0L)*(-sqrt(25.0 + 4*pi2) + 5.0)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*sin(2*R_y*pi)/pi;
-    values[2] = -1.0L/2.0L*exp(R_x*(-2*sqrt(25.0 + 4*pi2) + 10.0)) - 2.0*(-6538034.74494422 + 0.0134758939981709*exp(4*sqrt(25.0 + 4*pi2)))/(-80.0*exp(3*sqrt(25.0 + 4*pi2)) + 16.0*sqrt(25.0 + 4*pi2)*exp(3*sqrt(25.0 + 4*pi2))) - 1634508.68623606*exp(-3.0*sqrt(25.0 + 4*pi2))/(-10.0 + 2.0*sqrt(25.0 + 4*pi2)) + (-0.00673794699908547*exp(sqrt(25.0 + 4*pi2)) + 3269017.37247211*exp(-3*sqrt(25.0 + 4*pi2)))/(-8*sqrt(25.0 + 4*pi2) + 40.0) + 0.00336897349954273*exp(1.0*sqrt(25.0 + 4*pi2))/(-10.0 + 2.0*sqrt(25.0 + 4*pi2));
+    values[0] =
+      -exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) + 1;
+    values[1] = (1.0L / 2.0L) * (-sqrt(25.0 + 4 * pi2) + 5.0) *
+                exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
+                pi;
+    values[2] =
+      -1.0L / 2.0L * exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
+      2.0 *
+        (-6538034.74494422 +
+         0.0134758939981709 * exp(4 * sqrt(25.0 + 4 * pi2))) /
+        (-80.0 * exp(3 * sqrt(25.0 + 4 * pi2)) +
+         16.0 * sqrt(25.0 + 4 * pi2) * exp(3 * sqrt(25.0 + 4 * pi2))) -
+      1634508.68623606 * exp(-3.0 * sqrt(25.0 + 4 * pi2)) /
+        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2)) +
+      (-0.00673794699908547 * exp(sqrt(25.0 + 4 * pi2)) +
+       3269017.37247211 * exp(-3 * sqrt(25.0 + 4 * pi2))) /
+        (-8 * sqrt(25.0 + 4 * pi2) + 40.0) +
+      0.00336897349954273 * exp(1.0 * sqrt(25.0 + 4 * pi2)) /
+        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2));
   }
 
 
@@ -293,23 +313,18 @@ namespace Step55
 
 
 
-
   template <int dim>
-  StokesProblem<dim>::StokesProblem(unsigned int velocity_degree)
-    :
+  StokesProblem<dim>::StokesProblem(unsigned int velocity_degree) :
     velocity_degree(velocity_degree),
     viscosity(0.1),
     mpi_communicator(MPI_COMM_WORLD),
-    fe(FE_Q<dim>(velocity_degree), dim,
-       FE_Q<dim>(velocity_degree-1), 1),
+    fe(FE_Q<dim>(velocity_degree), dim, FE_Q<dim>(velocity_degree - 1), 1),
     triangulation(mpi_communicator,
-                  typename Triangulation<dim>::MeshSmoothing
-                  (Triangulation<dim>::smoothing_on_refinement |
+                  typename Triangulation<dim>::MeshSmoothing(
+                    Triangulation<dim>::smoothing_on_refinement |
                     Triangulation<dim>::smoothing_on_coarsening)),
     dof_handler(triangulation),
-    pcout(std::cout,
-          (Utilities::MPI::this_mpi_process(mpi_communicator)
-           == 0)),
+    pcout(std::cout, (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
     computing_timer(mpi_communicator,
                     pcout,
                     TimerOutput::summary,
@@ -346,27 +361,24 @@ namespace Step55
     DoFRenumbering::component_wise(dof_handler, stokes_sub_blocks);
 
     std::vector<types::global_dof_index> dofs_per_block(2);
-    DoFTools::count_dofs_per_block(dof_handler, dofs_per_block,
-                                   stokes_sub_blocks);
+    DoFTools::count_dofs_per_block(
+      dof_handler, dofs_per_block, stokes_sub_blocks);
 
-    const unsigned int n_u = dofs_per_block[0],
-                       n_p = dofs_per_block[1];
+    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
-    pcout     << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << " (" << n_u << '+' << n_p << ')'
-              << std::endl;
+    pcout << "   Number of degrees of freedom: " << dof_handler.n_dofs() << " ("
+          << n_u << '+' << n_p << ')' << std::endl;
 
     // We split up the IndexSet for locally owned and locally relevant DoFs
     // into two IndexSets based on how we want to create the block matrices
     // and vectors.
     owned_partitioning.resize(2);
     owned_partitioning[0] = dof_handler.locally_owned_dofs().get_view(0, n_u);
-    owned_partitioning[1] = dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
+    owned_partitioning[1] =
+      dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
     IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                            locally_relevant_dofs);
+    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
     relevant_partitioning.resize(2);
     relevant_partitioning[0] = locally_relevant_dofs.get_view(0, n_u);
     relevant_partitioning[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
@@ -380,8 +392,7 @@ namespace Step55
       constraints.reinit(locally_relevant_dofs);
 
       FEValuesExtractors::Vector velocities(0);
-      DoFTools::make_hanging_node_constraints(dof_handler,
-                                              constraints);
+      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                0,
                                                ExactSolution<dim>(),
@@ -411,17 +422,16 @@ namespace Step55
 
       BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
-      DoFTools::make_sparsity_pattern(dof_handler, coupling, dsp,
-                                      constraints, false);
+      DoFTools::make_sparsity_pattern(
+        dof_handler, coupling, dsp, constraints, false);
 
-      SparsityTools::distribute_sparsity_pattern(dsp,
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
         dof_handler.locally_owned_dofs_per_processor(),
         mpi_communicator,
         locally_relevant_dofs);
 
-      system_matrix.reinit(owned_partitioning,
-                           dsp,
-                           mpi_communicator);
+      system_matrix.reinit(owned_partitioning, dsp, mpi_communicator);
     }
 
     // The preconditioner matrix has a different coupling (we only fill in
@@ -440,9 +450,10 @@ namespace Step55
 
       BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
-      DoFTools::make_sparsity_pattern(dof_handler, coupling, dsp,
-                                      constraints, false);
-      SparsityTools::distribute_sparsity_pattern(dsp,
+      DoFTools::make_sparsity_pattern(
+        dof_handler, coupling, dsp, constraints, false);
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
         dof_handler.locally_owned_dofs_per_processor(),
         mpi_communicator,
         locally_relevant_dofs);
@@ -455,10 +466,10 @@ namespace Step55
     // Finally, we construct the block vectors with the right sizes. The
     // function call with two std::vector<IndexSet> will create a ghosted
     // vector.
-    locally_relevant_solution.reinit(owned_partitioning, relevant_partitioning, mpi_communicator);
+    locally_relevant_solution.reinit(
+      owned_partitioning, relevant_partitioning, mpi_communicator);
     system_rhs.reinit(owned_partitioning, mpi_communicator);
   }
-
 
 
 
@@ -477,10 +488,10 @@ namespace Step55
 
     const QGauss<dim> quadrature_formula(velocity_degree + 1);
 
-    FEValues<dim> fe_values(fe, quadrature_formula,
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
                             update_values | update_gradients |
-                            update_quadrature_points |
-                              update_JxW_values);
+                              update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -490,8 +501,7 @@ namespace Step55
     Vector<double>     cell_rhs(dofs_per_cell);
 
     const RightHandSide<dim>    right_hand_side;
-    std::vector<Vector<double> >      rhs_values(n_q_points,
-                                                 Vector<double>(dim+1));
+    std::vector<Vector<double>> rhs_values(n_q_points, Vector<double>(dim + 1));
 
     std::vector<Tensor<2, dim>> grad_phi_u(dofs_per_cell);
     std::vector<double>         div_phi_u(dofs_per_cell);
@@ -501,8 +511,8 @@ namespace Step55
     const FEValuesExtractors::Vector     velocities(0);
     const FEValuesExtractors::Scalar     pressure(dim);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -527,21 +537,20 @@ namespace Step55
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
-                      cell_matrix(i,j) += ( viscosity * scalar_product(grad_phi_u[i], grad_phi_u[j])
-                                            - div_phi_u[i] * phi_p[j]
-                                            - phi_p[i] * div_phi_u[j])
-                                          * fe_values.JxW(q);
+                      cell_matrix(i, j) +=
+                        (viscosity *
+                           scalar_product(grad_phi_u[i], grad_phi_u[j]) -
+                         div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
+                        fe_values.JxW(q);
 
-                      cell_matrix2(i,j) += 1.0/viscosity * phi_p[i] * phi_p[j]
-                                           * fe_values.JxW(q);
-
+                      cell_matrix2(i, j) += 1.0 / viscosity * phi_p[i] *
+                                            phi_p[j] * fe_values.JxW(q);
                     }
 
                   const unsigned int component_i =
                     fe.system_to_component_index(i).first;
                   cell_rhs(i) += fe_values.shape_value(i, q) *
-                                 rhs_values[q](component_i) *
-                                 fe_values.JxW(q);
+                                 rhs_values[q](component_i) * fe_values.JxW(q);
                 }
             }
 
@@ -553,10 +562,8 @@ namespace Step55
                                                  system_matrix,
                                                  system_rhs);
 
-          constraints.distribute_local_to_global(cell_matrix2,
-                                                 local_dof_indices,
-                                                 preconditioner_matrix);
-
+          constraints.distribute_local_to_global(
+            cell_matrix2, local_dof_indices, preconditioner_matrix);
         }
 
     system_matrix.compress(VectorOperation::add);
@@ -613,9 +620,9 @@ namespace Step55
 
     // The InverseMatrix is used to solve for the mass matrix:
     typedef LinearSolvers::InverseMatrix<LA::MPI::SparseMatrix,
-            LA::MPI::PreconditionAMG> mp_inverse_t;
-    const mp_inverse_t
-    mp_inverse(preconditioner_matrix.block(1,1), prec_S);
+                                         LA::MPI::PreconditionAMG>
+                       mp_inverse_t;
+    const mp_inverse_t mp_inverse(preconditioner_matrix.block(1, 1), prec_S);
 
     // This constructs the block preconditioner based on the preconditioners
     // for the individual blocks defined above.
@@ -629,23 +636,25 @@ namespace Step55
 
     SolverMinRes<LA::MPI::BlockVector> solver(solver_control);
 
-    LA::MPI::BlockVector
-    distributed_solution(owned_partitioning, mpi_communicator);
+    LA::MPI::BlockVector distributed_solution(owned_partitioning,
+                                              mpi_communicator);
 
     constraints.set_zero(distributed_solution);
 
-    solver.solve(system_matrix, distributed_solution, system_rhs, preconditioner);
+    solver.solve(
+      system_matrix, distributed_solution, system_rhs, preconditioner);
 
-    pcout << "   Solved in " << solver_control.last_step()
-          << " iterations." << std::endl;
+    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+          << std::endl;
 
     constraints.distribute(distributed_solution);
 
     // Like in step-56, we subtract the mean pressure to allow error
     // computations against our reference solution, which has a mean value
     // of zero.
-    locally_relevant_solution  = distributed_solution;
-    const double mean_pressure = VectorTools::compute_mean_value(dof_handler,
+    locally_relevant_solution = distributed_solution;
+    const double mean_pressure =
+      VectorTools::compute_mean_value(dof_handler,
                                       QGauss<dim>(velocity_degree + 2),
                                       locally_relevant_solution,
                                       dim);
@@ -679,14 +688,11 @@ namespace Step55
                                            locally_relevant_solution,
                                            estimated_error_per_cell,
                                            fe.component_mask(velocities));
-        parallel::distributed::GridRefinement::
-        refine_and_coarsen_fixed_number(triangulation,
-                                        estimated_error_per_cell,
-                                        0.3, 0.0);
+        parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
+          triangulation, estimated_error_per_cell, 0.3, 0.0);
         triangulation.execute_coarsening_and_refinement();
       }
   }
-
 
 
 
@@ -695,7 +701,8 @@ namespace Step55
   {
     {
       const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
-      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim), dim + 1);
+      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
+                                                       dim + 1);
 
       Vector<double> cellwise_errors(triangulation.n_active_cells());
       QGauss<dim>    quadrature(velocity_degree + 2);
@@ -708,8 +715,8 @@ namespace Step55
                                         VectorTools::L2_norm,
                                         &velocity_mask);
 
-      const double error_u_l2
-        = VectorTools::compute_global_error(triangulation, cellwise_errors, VectorTools::L2_norm);
+      const double error_u_l2 = VectorTools::compute_global_error(
+        triangulation, cellwise_errors, VectorTools::L2_norm);
 
       VectorTools::integrate_difference(dof_handler,
                                         locally_relevant_solution,
@@ -719,11 +726,10 @@ namespace Step55
                                         VectorTools::L2_norm,
                                         &pressure_mask);
 
-      const double error_p_l2
-        = VectorTools::compute_global_error(triangulation, cellwise_errors, VectorTools::L2_norm);
+      const double error_p_l2 = VectorTools::compute_global_error(
+        triangulation, cellwise_errors, VectorTools::L2_norm);
 
-      pcout << "error: u_0: "<< error_u_l2
-            << " p_0: " << error_p_l2
+      pcout << "error: u_0: " << error_u_l2 << " p_0: " << error_p_l2
             << std::endl;
     }
 
@@ -731,10 +737,10 @@ namespace Step55
     std::vector<std::string> solution_names(dim, "velocity");
     solution_names.emplace_back("pressure");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim, DataComponentInterpretation::component_is_part_of_vector);
-    data_component_interpretation
-    .push_back(DataComponentInterpretation::component_is_scalar);
+      data_component_interpretation(
+        dim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
@@ -747,12 +753,14 @@ namespace Step55
     interpolated.reinit(owned_partitioning, MPI_COMM_WORLD);
     VectorTools::interpolate(dof_handler, ExactSolution<dim>(), interpolated);
 
-    LA::MPI::BlockVector interpolated_relevant(owned_partitioning, relevant_partitioning, MPI_COMM_WORLD);
+    LA::MPI::BlockVector interpolated_relevant(
+      owned_partitioning, relevant_partitioning, MPI_COMM_WORLD);
     interpolated_relevant = interpolated;
     {
       std::vector<std::string> solution_names(dim, "ref_u");
       solution_names.emplace_back("ref_p");
-      data_out.add_data_vector(interpolated_relevant, solution_names,
+      data_out.add_data_vector(interpolated_relevant,
+                               solution_names,
                                DataOut<dim>::type_dof_data,
                                data_component_interpretation);
     }
@@ -765,11 +773,9 @@ namespace Step55
 
     data_out.build_patches();
 
-    const std::string filename = ("solution-" +
-                                  Utilities::int_to_string(cycle, 2) +
-                                  "." +
-                                  Utilities::int_to_string
-                                  (triangulation.locally_owned_subdomain(), 4));
+    const std::string filename =
+      ("solution-" + Utilities::int_to_string(cycle, 2) + "." +
+       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
     std::ofstream output((filename + ".vtu"));
     data_out.write_vtu(output);
 
@@ -779,19 +785,14 @@ namespace Step55
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          filenames.push_back("solution-" +
-                              Utilities::int_to_string(cycle, 2) +
-                              "." +
-                              Utilities::int_to_string(i, 4) +
-                              ".vtu");
+          filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
+                              "." + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output("solution-" +
-                                    Utilities::int_to_string(cycle, 2) +
-                                    ".pvtu");
+        std::ofstream master_output(
+          "solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu");
         data_out.write_pvtu_record(master_output, filenames);
       }
   }
-
 
 
 
@@ -834,7 +835,6 @@ namespace Step55
 
 
 
-
 int main(int argc, char *argv[])
 {
   try
@@ -849,7 +849,8 @@ int main(int argc, char *argv[])
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -862,7 +863,8 @@ int main(int argc, char *argv[])
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

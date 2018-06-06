@@ -67,11 +67,9 @@ namespace Step19
   // to list the parameters that are allowed in the parameter file (the
   // <code>ParameterHandler</code> class has a function to do exactly this;
   // see the results section for what it prints):
-  void
-  print_usage_message()
+  void print_usage_message()
   {
-    static const char *message
-      =
+    static const char *message =
       "\n"
       "Converter from deal.II intermediate format to other graphics formats.\n"
       "\n"
@@ -167,7 +165,8 @@ namespace Step19
   // number as well.
   void declare_parameters()
   {
-    prm.declare_entry("Output file", "",
+    prm.declare_entry("Output file",
+                      "",
                       Patterns::Anything(),
                       "The name of the output file to be generated");
 
@@ -185,7 +184,8 @@ namespace Step19
     // assume that it will denote the number of iterations, and that useful
     // numbers of iterations that a user should be able to specify are in the
     // range 1...1000, with a default value of 42:
-    prm.declare_entry("Dummy iterations", "42",
+    prm.declare_entry("Dummy iterations",
+                      "42",
                       Patterns::Integer(1, 1000),
                       "A dummy parameter asking for an integer");
 
@@ -199,11 +199,13 @@ namespace Step19
     // values, separated by the '|' character:
     prm.enter_subsection("Dummy subsection");
     {
-      prm.declare_entry("Dummy generate output", "true",
+      prm.declare_entry("Dummy generate output",
+                        "true",
                         Patterns::Bool(),
                         "A dummy parameter that can be fed with either "
                         "'true' or 'false'");
-      prm.declare_entry("Dummy color of output", "red",
+      prm.declare_entry("Dummy color of output",
+                        "red",
                         Patterns::Selection("red|black|blue"),
                         "A dummy parameter that shows how one can define a "
                         "parameter that can be assigned values from a finite "
@@ -230,9 +232,7 @@ namespace Step19
   // parameter needs to be there. Together with the name of the program (the
   // zeroth parameter), <code>argc</code> must therefore be at least 2. If
   // this is not the case, we print an error message and exit:
-  void
-  parse_command_line(const int     argc,
-                     char *const *argv)
+  void parse_command_line(const int argc, char *const *argv)
   {
     if (argc < 2)
       {
@@ -260,8 +260,7 @@ namespace Step19
             if (args.size() == 1)
               {
                 std::cerr << "Error: flag '-p' must be followed by the "
-                          << "name of a parameter file."
-                          << std::endl;
+                          << "name of a parameter file." << std::endl;
                 print_usage_message();
                 exit(1);
               }
@@ -307,8 +306,7 @@ namespace Step19
             if (args.size() == 1)
               {
                 std::cerr << "Error: flag '-x' must be followed by the "
-                          << "name of an output format."
-                          << std::endl;
+                          << "name of an output format." << std::endl;
                 print_usage_message();
                 exit(1);
               }
@@ -321,8 +319,7 @@ namespace Step19
             if (args.size() == 1)
               {
                 std::cerr << "Error: flag '-o' must be followed by the "
-                          << "name of an output file."
-                          << std::endl;
+                          << "name of an output file." << std::endl;
                 print_usage_message();
                 exit(1);
               }
@@ -401,8 +398,8 @@ namespace Step19
     std::ofstream output_stream(output_file);
     AssertThrow(output_stream, ExcIO());
 
-    const DataOutBase::OutputFormat format
-      = DataOutBase::parse_output_format(output_format);
+    const DataOutBase::OutputFormat format =
+      DataOutBase::parse_output_format(output_format);
 
     // Finally, write the merged data to the output:
     merged_data.write(output_stream, format);
@@ -439,8 +436,8 @@ namespace Step19
     std::ifstream input(input_file_names[0]);
     AssertThrow(input, ExcIO());
 
-    const std::pair<unsigned int, unsigned int>
-    dimensions = DataOutBase::determine_intermediate_format_dimensions(input);
+    const std::pair<unsigned int, unsigned int> dimensions =
+      DataOutBase::determine_intermediate_format_dimensions(input);
 
     switch (dimensions.first)
       {
@@ -509,7 +506,8 @@ int main(int argc, char **argv)
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -522,7 +520,8 @@ int main(int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -136,10 +136,8 @@ namespace Step10
             grid_out.set_flags(gnuplot_flags);
 
             // Finally, generate a filename and a file for output:
-            std::string filename = filename_base
-                                   + "_mapping_q_"
-                                   + Utilities::to_string(degree)
-                                   + ".dat";
+            std::string filename = filename_base + "_mapping_q_" +
+                                   Utilities::to_string(degree) + ".dat";
             std::ofstream gnuplot_file(filename);
 
             // Then write out the triangulation to this file. The last
@@ -270,7 +268,7 @@ namespace Step10
             // `area'...
             typename DoFHandler<dim>::active_cell_iterator
               cell = dof_handler.begin_active(),
-                                                           endc = dof_handler.end();
+              endc = dof_handler.end();
             for (; cell != endc; ++cell)
               {
                 fe_values.reinit(cell);
@@ -297,7 +295,8 @@ namespace Step10
         // `evaluate_all_convergence_rates'
         table.omit_column_from_convergence_rate_evaluation("cells");
         table.omit_column_from_convergence_rate_evaluation("eval.pi");
-        table.evaluate_all_convergence_rates(ConvergenceTable::reduction_rate_log2);
+        table.evaluate_all_convergence_rates(
+          ConvergenceTable::reduction_rate_log2);
 
         // Finally we set the precision and scientific mode for output of some
         // of the quantities...
@@ -344,9 +343,9 @@ namespace Step10
         // Then we create a FEFaceValues object instead of a FEValues object
         // as in the previous function. Again, we pass a mapping as first
         // argument.
-        FEFaceValues<dim> fe_face_values(mapping, fe, quadrature,
-                                         update_JxW_values);
-        ConvergenceTable  table;
+        FEFaceValues<dim> fe_face_values(
+          mapping, fe, quadrature, update_JxW_values);
+        ConvergenceTable table;
 
         for (unsigned int refinement = 0; refinement < 6;
              ++refinement, triangulation.refine_global(1))
@@ -360,27 +359,34 @@ namespace Step10
             // added to the long double variable `perimeter'.
             typename DoFHandler<dim>::active_cell_iterator
               cell                = dof_handler.begin_active(),
-                                                           endc = dof_handler.end();
-            long double perimeter                               = 0;
+              endc                = dof_handler.end();
+            long double perimeter = 0;
             for (; cell != endc; ++cell)
-              for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
+              for (unsigned int face_no = 0;
+                   face_no < GeometryInfo<dim>::faces_per_cell;
+                   ++face_no)
                 if (cell->face(face_no)->at_boundary())
                   {
                     // We reinit the FEFaceValues object with the cell
                     // iterator and the number of the face.
                     fe_face_values.reinit(cell, face_no);
-                    for (unsigned int i = 0; i < fe_face_values.n_quadrature_points; ++i)
-                      perimeter += static_cast<long double>(fe_face_values.JxW(i));
+                    for (unsigned int i = 0;
+                         i < fe_face_values.n_quadrature_points;
+                         ++i)
+                      perimeter +=
+                        static_cast<long double>(fe_face_values.JxW(i));
                   }
             // Then store the evaluated values in the table...
             table.add_value("eval.pi", static_cast<double>(perimeter / 2.0L));
-            table.add_value("error",   static_cast<double> (std::fabs(perimeter/2.0L-pi)));
+            table.add_value(
+              "error", static_cast<double>(std::fabs(perimeter / 2.0L - pi)));
           }
 
         // ...and end this function as we did in the previous one:
         table.omit_column_from_convergence_rate_evaluation("cells");
         table.omit_column_from_convergence_rate_evaluation("eval.pi");
-        table.evaluate_all_convergence_rates(ConvergenceTable::reduction_rate_log2);
+        table.evaluate_all_convergence_rates(
+          ConvergenceTable::reduction_rate_log2);
 
         table.set_precision("eval.pi", 16);
         table.set_scientific("error", true);
@@ -409,7 +415,8 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -422,7 +429,8 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

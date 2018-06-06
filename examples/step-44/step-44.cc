@@ -96,25 +96,23 @@ namespace Step44
   {
     // @sect4{Finite Element system}
 
-    // As mentioned in the introduction, a different order interpolation should be
-    // used for the displacement $\mathbf{u}$ than for the pressure
+    // As mentioned in the introduction, a different order interpolation should
+    // be used for the displacement $\mathbf{u}$ than for the pressure
     // $\widetilde{p}$ and the dilatation $\widetilde{J}$.  Choosing
     // $\widetilde{p}$ and $\widetilde{J}$ as discontinuous (constant) functions
-    // at the element level leads to the mean-dilatation method. The discontinuous
-    // approximation allows $\widetilde{p}$ and $\widetilde{J}$ to be condensed
-    // out and a classical displacement based method is recovered.  Here we
-    // specify the polynomial order used to approximate the solution.  The
-    // quadrature order should be adjusted accordingly.
+    // at the element level leads to the mean-dilatation method. The
+    // discontinuous approximation allows $\widetilde{p}$ and $\widetilde{J}$ to
+    // be condensed out and a classical displacement based method is recovered.
+    // Here we specify the polynomial order used to approximate the solution.
+    // The quadrature order should be adjusted accordingly.
     struct FESystem
     {
       unsigned int poly_degree;
       unsigned int quad_order;
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
 
@@ -122,11 +120,13 @@ namespace Step44
     {
       prm.enter_subsection("Finite element system");
       {
-        prm.declare_entry("Polynomial degree", "2",
+        prm.declare_entry("Polynomial degree",
+                          "2",
                           Patterns::Integer(0),
                           "Displacement system polynomial order");
 
-        prm.declare_entry("Quadrature order", "3",
+        prm.declare_entry("Quadrature order",
+                          "3",
                           Patterns::Integer(0),
                           "Gauss quadrature order");
       }
@@ -154,26 +154,27 @@ namespace Step44
       double       scale;
       double       p_p0;
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
     void Geometry::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Geometry");
       {
-        prm.declare_entry("Global refinement", "2",
+        prm.declare_entry("Global refinement",
+                          "2",
                           Patterns::Integer(0),
                           "Global refinement level");
 
-        prm.declare_entry("Grid scale", "1e-3",
+        prm.declare_entry("Grid scale",
+                          "1e-3",
                           Patterns::Double(0.0),
                           "Global grid scaling factor");
 
-        prm.declare_entry("Pressure ratio p/p0", "100",
+        prm.declare_entry("Pressure ratio p/p0",
+                          "100",
                           Patterns::Selection("20|40|60|80|100"),
                           "Ratio of applied pressure to reference pressure");
       }
@@ -200,24 +201,22 @@ namespace Step44
       double nu;
       double mu;
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
     void Materials::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Material properties");
       {
-        prm.declare_entry("Poisson's ratio", "0.4999",
+        prm.declare_entry("Poisson's ratio",
+                          "0.4999",
                           Patterns::Double(-1.0, 0.5),
                           "Poisson's ratio");
 
-        prm.declare_entry("Shear modulus", "80.194e6",
-                          Patterns::Double(),
-                          "Shear modulus");
+        prm.declare_entry(
+          "Shear modulus", "80.194e6", Patterns::Double(), "Shear modulus");
       }
       prm.leave_subsection();
     }
@@ -246,38 +245,43 @@ namespace Step44
       std::string preconditioner_type;
       double      preconditioner_relaxation;
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
     void LinearSolver::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Linear solver");
       {
-        prm.declare_entry("Solver type", "CG",
+        prm.declare_entry("Solver type",
+                          "CG",
                           Patterns::Selection("CG|Direct"),
                           "Type of solver used to solve the linear system");
 
-        prm.declare_entry("Residual", "1e-6",
+        prm.declare_entry("Residual",
+                          "1e-6",
                           Patterns::Double(0.0),
                           "Linear solver residual(scaled by residual norm)");
 
-        prm.declare_entry("Max iteration multiplier", "1",
+        prm.declare_entry(
+          "Max iteration multiplier",
+          "1",
           Patterns::Double(0.0),
           "Linear solver iterations(multiples of the system matrix size)");
 
-        prm.declare_entry("Use static condensation", "true",
+        prm.declare_entry("Use static condensation",
+                          "true",
                           Patterns::Bool(),
                           "Solve the full block system or a reduced problem");
 
-        prm.declare_entry("Preconditioner type", "ssor",
+        prm.declare_entry("Preconditioner type",
+                          "ssor",
                           Patterns::Selection("jacobi|ssor"),
                           "Type of preconditioner");
 
-        prm.declare_entry("Preconditioner relaxation", "0.65",
+        prm.declare_entry("Preconditioner relaxation",
+                          "0.65",
                           Patterns::Double(0.0),
                           "Preconditioner relaxation value");
       }
@@ -300,35 +304,36 @@ namespace Step44
 
     // @sect4{Nonlinear solver}
 
-    // A Newton-Raphson scheme is used to solve the nonlinear system of governing
-    // equations.  We now define the tolerances and the maximum number of
-    // iterations for the Newton-Raphson nonlinear solver.
+    // A Newton-Raphson scheme is used to solve the nonlinear system of
+    // governing equations.  We now define the tolerances and the maximum number
+    // of iterations for the Newton-Raphson nonlinear solver.
     struct NonlinearSolver
     {
       unsigned int max_iterations_NR;
       double       tol_f;
       double       tol_u;
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
     void NonlinearSolver::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Nonlinear solver");
       {
-        prm.declare_entry("Max iterations Newton-Raphson", "10",
+        prm.declare_entry("Max iterations Newton-Raphson",
+                          "10",
                           Patterns::Integer(0),
                           "Number of Newton-Raphson iterations allowed");
 
-        prm.declare_entry("Tolerance force", "1.0e-9",
+        prm.declare_entry("Tolerance force",
+                          "1.0e-9",
                           Patterns::Double(0.0),
                           "Force residual tolerance");
 
-        prm.declare_entry("Tolerance displacement", "1.0e-6",
+        prm.declare_entry("Tolerance displacement",
+                          "1.0e-6",
                           Patterns::Double(0.0),
                           "Displacement error tolerance");
       }
@@ -354,24 +359,19 @@ namespace Step44
       double delta_t;
       double end_time;
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
     void Time::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Time");
       {
-        prm.declare_entry("End time", "1",
-                          Patterns::Double(),
-                          "End time");
+        prm.declare_entry("End time", "1", Patterns::Double(), "End time");
 
-        prm.declare_entry("Time step size", "0.1",
-                          Patterns::Double(),
-                          "Time step size");
+        prm.declare_entry(
+          "Time step size", "0.1", Patterns::Double(), "Time step size");
       }
       prm.leave_subsection();
     }
@@ -388,8 +388,8 @@ namespace Step44
 
     // @sect4{All parameters}
 
-    // Finally we consolidate all of the above structures into a single container
-    // that holds all of our run-time selections.
+    // Finally we consolidate all of the above structures into a single
+    // container that holds all of our run-time selections.
     struct AllParameters : public FESystem,
                            public Geometry,
                            public Materials,
@@ -400,11 +400,9 @@ namespace Step44
     {
       AllParameters(const std::string &input_file);
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
     AllParameters::AllParameters(const std::string &input_file)
@@ -444,9 +442,7 @@ namespace Step44
   class Time
   {
   public:
-    Time(const double time_end,
-         const double delta_t)
-      :
+    Time(const double time_end, const double delta_t) :
       timestep(0),
       time_current(0.0),
       time_end(time_end),
@@ -512,16 +508,15 @@ namespace Step44
   // and provides a central point that one would need to modify if one were to
   // implement a different material model. For it to work, we will store one
   // object of this type per quadrature point, and in each of these objects
-// store the current state (characterized by the values or measures  of the three fields)
-// so that we can compute the elastic coefficients linearized around the
-// current state.
+  // store the current state (characterized by the values or measures  of the
+  // three fields) so that we can compute the elastic coefficients linearized
+  // around the current state.
   template <int dim>
   class Material_Compressible_Neo_Hook_Three_Field
   {
   public:
     Material_Compressible_Neo_Hook_Three_Field(const double mu,
-                                               const double nu)
-      :
+                                               const double nu) :
       kappa((2.0 * mu * (1.0 + nu)) / (3.0 * (1.0 - 2.0 * nu))),
       c_1(mu / 2.0),
       det_F(1.0),
@@ -643,10 +638,9 @@ namespace Step44
     // \mathfrak{c}_\textrm{vol}$:
     SymmetricTensor<4, dim> get_Jc_vol() const
     {
-
-      return p_tilde * det_F
-             * ( Physics::Elasticity::StandardTensors<dim>::IxI
-                 - (2.0 * Physics::Elasticity::StandardTensors<dim>::S) );
+      return p_tilde * det_F *
+             (Physics::Elasticity::StandardTensors<dim>::IxI -
+              (2.0 * Physics::Elasticity::StandardTensors<dim>::S));
     }
 
     // Calculate the isochoric part of the tangent $J
@@ -655,19 +649,17 @@ namespace Step44
     {
       const SymmetricTensor<2, dim> tau_bar = get_tau_bar();
       const SymmetricTensor<2, dim> tau_iso = get_tau_iso();
-      const SymmetricTensor<4, dim> tau_iso_x_I
-        = outer_product(tau_iso,
-                        Physics::Elasticity::StandardTensors<dim>::I);
-      const SymmetricTensor<4, dim> I_x_tau_iso
-        = outer_product(Physics::Elasticity::StandardTensors<dim>::I,
-                        tau_iso);
+      const SymmetricTensor<4, dim> tau_iso_x_I =
+        outer_product(tau_iso, Physics::Elasticity::StandardTensors<dim>::I);
+      const SymmetricTensor<4, dim> I_x_tau_iso =
+        outer_product(Physics::Elasticity::StandardTensors<dim>::I, tau_iso);
       const SymmetricTensor<4, dim> c_bar = get_c_bar();
 
-      return (2.0 / dim) * trace(tau_bar)
-             * Physics::Elasticity::StandardTensors<dim>::dev_P
-             - (2.0 / dim) * (tau_iso_x_I + I_x_tau_iso)
-             + Physics::Elasticity::StandardTensors<dim>::dev_P * c_bar
-             * Physics::Elasticity::StandardTensors<dim>::dev_P;
+      return (2.0 / dim) * trace(tau_bar) *
+               Physics::Elasticity::StandardTensors<dim>::dev_P -
+             (2.0 / dim) * (tau_iso_x_I + I_x_tau_iso) +
+             Physics::Elasticity::StandardTensors<dim>::dev_P * c_bar *
+               Physics::Elasticity::StandardTensors<dim>::dev_P;
     }
 
     // Calculate the fictitious elasticity tensor $\overline{\mathfrak{c}}$.
@@ -690,8 +682,7 @@ namespace Step44
   class PointHistory
   {
   public:
-    PointHistory()
-      :
+    PointHistory() :
       F_inv(Physics::Elasticity::StandardTensors<dim>::I),
       tau(SymmetricTensor<2, dim>()),
       d2Psi_vol_dJ2(0.0),
@@ -709,8 +700,9 @@ namespace Step44
     // dilation $\widetilde{J}$ field values.
     void setup_lqp(const Parameters::AllParameters &parameters)
     {
-      material = std::make_shared<Material_Compressible_Neo_Hook_Three_Field<dim>>
-                 (parameters.mu, parameters.nu);
+      material =
+        std::make_shared<Material_Compressible_Neo_Hook_Three_Field<dim>>(
+          parameters.mu, parameters.nu);
       update_values(Tensor<2, dim>(), 0.0, 1.0);
     }
 
@@ -746,7 +738,6 @@ namespace Step44
       Jc            = material->get_Jc();
       dPsi_vol_dJ   = material->get_dPsi_vol_dJ();
       d2Psi_vol_dJ2 = material->get_d2Psi_vol_dJ2();
-
     }
 
     // We offer an interface to retrieve certain data.  Here are the kinematic
@@ -824,14 +815,11 @@ namespace Step44
   public:
     Solid(const std::string &input_file);
 
-    virtual
-    ~Solid();
+    virtual ~Solid();
 
-    void
-    run();
+    void run();
 
   private:
-
     // In the private section of this class, we first forward declare a number
     // of objects that are used in parallelizing work using the WorkStream
     // object (see the @ref threads module for more information on this).
@@ -853,81 +841,67 @@ namespace Step44
 
     // We start the collection of member functions with one that builds the
     // grid:
-    void
-    make_grid();
+    void make_grid();
 
     // Set up the finite element system to be solved:
-    void
-    system_setup();
+    void system_setup();
 
-    void
-    determine_component_extractors();
+    void determine_component_extractors();
 
     // Several functions to assemble the system and right hand side matrices
     // using multithreading. Each of them comes as a wrapper function, one
     // that is executed to do the work in the WorkStream model on one cell,
     // and one that copies the work done on this one cell into the global
     // object that represents it:
-    void
-    assemble_system_tangent();
+    void assemble_system_tangent();
 
-    void
-    assemble_system_tangent_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+    void assemble_system_tangent_one_cell(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
       ScratchData_K &                                       scratch,
       PerTaskData_K &                                       data) const;
 
-    void
-    copy_local_to_global_K(const PerTaskData_K &data);
+    void copy_local_to_global_K(const PerTaskData_K &data);
 
-    void
-    assemble_system_rhs();
+    void assemble_system_rhs();
 
-    void
-    assemble_system_rhs_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+    void assemble_system_rhs_one_cell(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
       ScratchData_RHS &                                     scratch,
       PerTaskData_RHS &                                     data) const;
 
-    void
-    copy_local_to_global_rhs(const PerTaskData_RHS &data);
+    void copy_local_to_global_rhs(const PerTaskData_RHS &data);
 
-    void
-    assemble_sc();
+    void assemble_sc();
 
-    void
-    assemble_sc_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                              ScratchData_SC &scratch,
-                              PerTaskData_SC &data);
+    void assemble_sc_one_cell(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
+      ScratchData_SC &                                      scratch,
+      PerTaskData_SC &                                      data);
 
-    void
-    copy_local_to_global_sc(const PerTaskData_SC &data);
+    void copy_local_to_global_sc(const PerTaskData_SC &data);
 
     // Apply Dirichlet boundary conditions on the displacement field
-    void
-    make_constraints(const int &it_nr);
+    void make_constraints(const int &it_nr);
 
     // Create and update the quadrature points. Here, no data needs to be
     // copied into a global object, so the copy_local_to_global function is
     // empty:
-    void
-    setup_qph();
+    void setup_qph();
 
-    void
-    update_qph_incremental(const BlockVector<double> &solution_delta);
+    void update_qph_incremental(const BlockVector<double> &solution_delta);
 
-    void
-    update_qph_incremental_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+    void update_qph_incremental_one_cell(
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
       ScratchData_UQPH &                                    scratch,
       PerTaskData_UQPH &                                    data);
 
-    void
-    copy_local_to_global_UQPH(const PerTaskData_UQPH &/*data*/)
+    void copy_local_to_global_UQPH(const PerTaskData_UQPH & /*data*/)
     {}
 
     // Solve for the displacement using a Newton-Raphson method. We break this
     // function into the nonlinear loop and the function that solves the
     // linearized Newton-Raphson step:
-    void
-    solve_nonlinear_timestep(BlockVector<double> &solution_delta);
+    void solve_nonlinear_timestep(BlockVector<double> &solution_delta);
 
     std::pair<unsigned int, double>
     solve_linear_system(BlockVector<double> &newton_update);
@@ -936,8 +910,7 @@ namespace Step44
     BlockVector<double>
     get_total_solution(const BlockVector<double> &solution_delta) const;
 
-    void
-    output_results() const;
+    void output_results() const;
 
     // Finally, some member variables that describe the current state: A
     // collection of the parameters used to describe the problem setup...
@@ -958,7 +931,8 @@ namespace Step44
     // step-18, deal.II's native quadrature point data manager is employed
     // here.
     CellDataStorage<typename Triangulation<dim>::cell_iterator,
-                    PointHistory<dim> > quadrature_point_history;
+                    PointHistory<dim>>
+      quadrature_point_history;
 
     // A description of the finite-element system including the displacement
     // polynomial degree, the degree-of-freedom handler, number of DoFs per
@@ -1014,9 +988,7 @@ namespace Step44
     // normalization factors.
     struct Errors
     {
-      Errors()
-        :
-        norm(1.0), u(1.0), p(1.0), J(1.0)
+      Errors() : norm(1.0), u(1.0), p(1.0), J(1.0)
       {}
 
       void reset()
@@ -1045,27 +1017,20 @@ namespace Step44
       error_update_0, error_update_norm;
 
     // Methods to calculate error measures
-    void
-    get_error_residual(Errors &error_residual);
+    void get_error_residual(Errors &error_residual);
 
-    void
-    get_error_update(const BlockVector<double> &newton_update,
+    void get_error_update(const BlockVector<double> &newton_update,
                           Errors &                   error_update);
 
-    std::pair<double, double>
-    get_error_dilation() const;
+    std::pair<double, double> get_error_dilation() const;
 
     // Compute the volume in the spatial configuration
-    double
-    compute_vol_current() const;
+    double compute_vol_current() const;
 
     // Print information to screen in a pleasing way...
-    static
-    void
-    print_conv_header();
+    static void print_conv_header();
 
-    void
-    print_conv_footer();
+    void print_conv_footer();
   };
 
   // @sect3{Implementation of the <code>Solid</code> class}
@@ -1074,15 +1039,12 @@ namespace Step44
 
   // We initialize the Solid class using data extracted from the parameter file.
   template <int dim>
-  Solid<dim>::Solid(const std::string &input_file)
-    :
+  Solid<dim>::Solid(const std::string &input_file) :
     parameters(input_file),
     vol_reference(0.),
     triangulation(Triangulation<dim>::maximum_smoothing),
     time(parameters.end_time, parameters.delta_t),
-    timer(std::cout,
-          TimerOutput::summary,
-          TimerOutput::wall_times),
+    timer(std::cout, TimerOutput::summary, TimerOutput::wall_times),
     degree(parameters.poly_degree),
     // The Finite Element System is composed of dim continuous displacement
     // DOFs, and discontinuous pressure and dilatation DOFs. In an attempt to
@@ -1092,9 +1054,12 @@ namespace Step44
     // condition, while $Q_1 \times DGPM_0 \times DGPM_0$ elements do
     // not. However, it has been shown that the latter demonstrate good
     // convergence characteristics nonetheless.
-    fe(FE_Q<dim>(parameters.poly_degree), dim, // displacement
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1, // pressure
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1), // dilatation
+    fe(FE_Q<dim>(parameters.poly_degree),
+       dim, // displacement
+       FE_DGPMonomial<dim>(parameters.poly_degree - 1),
+       1, // pressure
+       FE_DGPMonomial<dim>(parameters.poly_degree - 1),
+       1), // dilatation
     dof_handler_ref(triangulation),
     dofs_per_cell(fe.dofs_per_cell),
     u_fe(first_u_component),
@@ -1106,7 +1071,8 @@ namespace Step44
     n_q_points(qf_cell.size()),
     n_q_points_f(qf_face.size())
   {
-    Assert(dim==2 || dim==3, ExcMessage("This problem only works in 2 or 3 space dimensions."));
+    Assert(dim == 2 || dim == 3,
+           ExcMessage("This problem only works in 2 or 3 space dimensions."));
     determine_component_extractors();
   }
 
@@ -1130,20 +1096,21 @@ namespace Step44
   //
   // Care must be taken (or at least some thought given) when imposing the
   // constraint $\widetilde{J}=1$ on the initial solution field. The constraint
-  // corresponds to the determinant of the deformation gradient in the undeformed
-  // configuration, which is the identity tensor.
-  // We use FE_DGPMonomial bases to interpolate the dilatation field, thus we can't
+  // corresponds to the determinant of the deformation gradient in the
+  // undeformed configuration, which is the identity tensor. We use
+  // FE_DGPMonomial bases to interpolate the dilatation field, thus we can't
   // simply set the corresponding dof to unity as they correspond to the
   // monomial coefficients. Thus we use the VectorTools::project function to do
   // the work for us. The VectorTools::project function requires an argument
   // indicating the hanging node constraints. We have none in this program
   // So we have to create a constraint object. In its original state, constraint
-// objects are unsorted, and have to be sorted (using the ConstraintMatrix::close function)
-// before they can be used. Have a look at step-21 for more information.
-// We only need to enforce the initial condition on the dilatation.
-// In order to do this, we make use of a ComponentSelectFunction which acts
-// as a mask and sets the J_component of n_components to 1. This is exactly what
-// we want. Have a look at its usage in step-20 for more information.
+  // objects are unsorted, and have to be sorted (using the
+  // ConstraintMatrix::close function) before they can be used. Have a look at
+  // step-21 for more information. We only need to enforce the initial condition
+  // on the dilatation. In order to do this, we make use of a
+  // ComponentSelectFunction which acts as a mask and sets the J_component of
+  // n_components to 1. This is exactly what we want. Have a look at its usage
+  // in step-20 for more information.
   template <int dim>
   void Solid<dim>::run()
   {
@@ -1153,8 +1120,7 @@ namespace Step44
       ConstraintMatrix constraints;
       constraints.close();
 
-      const ComponentSelectFunction<dim>
-      J_mask(J_component, n_components);
+      const ComponentSelectFunction<dim> J_mask(J_component, n_components);
 
       VectorTools::project(dof_handler_ref,
                            constraints,
@@ -1209,8 +1175,7 @@ namespace Step44
     FullMatrix<double>                   cell_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
 
-    PerTaskData_K(const unsigned int dofs_per_cell)
-      :
+    PerTaskData_K(const unsigned int dofs_per_cell) :
       cell_matrix(dofs_per_cell, dofs_per_cell),
       local_dof_indices(dofs_per_cell)
     {}
@@ -1237,20 +1202,16 @@ namespace Step44
 
     ScratchData_K(const FiniteElement<dim> &fe_cell,
                   const QGauss<dim> &       qf_cell,
-                  const UpdateFlags uf_cell)
-      :
+                  const UpdateFlags         uf_cell) :
       fe_values_ref(fe_cell, qf_cell, uf_cell),
-      Nx(qf_cell.size(),
-         std::vector<double>(fe_cell.dofs_per_cell)),
+      Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell)),
       grad_Nx(qf_cell.size(),
               std::vector<Tensor<2, dim>>(fe_cell.dofs_per_cell)),
       symm_grad_Nx(qf_cell.size(),
-                   std::vector<SymmetricTensor<2, dim> >
-                   (fe_cell.dofs_per_cell))
+                   std::vector<SymmetricTensor<2, dim>>(fe_cell.dofs_per_cell))
     {}
 
-    ScratchData_K(const ScratchData_K &rhs)
-      :
+    ScratchData_K(const ScratchData_K &rhs) :
       fe_values_ref(rhs.fe_values_ref.get_fe(),
                     rhs.fe_values_ref.get_quadrature(),
                     rhs.fe_values_ref.get_update_flags()),
@@ -1278,7 +1239,6 @@ namespace Step44
             }
         }
     }
-
   };
 
   // Next, the same approach is used for the right-hand side assembly.  The
@@ -1290,8 +1250,7 @@ namespace Step44
     Vector<double>                       cell_rhs;
     std::vector<types::global_dof_index> local_dof_indices;
 
-    PerTaskData_RHS(const unsigned int dofs_per_cell)
-      :
+    PerTaskData_RHS(const unsigned int dofs_per_cell) :
       cell_rhs(dofs_per_cell),
       local_dof_indices(dofs_per_cell)
     {}
@@ -1313,20 +1272,18 @@ namespace Step44
     std::vector<std::vector<SymmetricTensor<2, dim>>> symm_grad_Nx;
 
     ScratchData_RHS(const FiniteElement<dim> &fe_cell,
-                    const QGauss<dim> &qf_cell, const UpdateFlags uf_cell,
-                    const QGauss<dim - 1> & qf_face, const UpdateFlags uf_face)
-      :
+                    const QGauss<dim> &       qf_cell,
+                    const UpdateFlags         uf_cell,
+                    const QGauss<dim - 1> &   qf_face,
+                    const UpdateFlags         uf_face) :
       fe_values_ref(fe_cell, qf_cell, uf_cell),
       fe_face_values_ref(fe_cell, qf_face, uf_face),
-      Nx(qf_cell.size(),
-         std::vector<double>(fe_cell.dofs_per_cell)),
+      Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell)),
       symm_grad_Nx(qf_cell.size(),
-                   std::vector<SymmetricTensor<2, dim> >
-                   (fe_cell.dofs_per_cell))
+                   std::vector<SymmetricTensor<2, dim>>(fe_cell.dofs_per_cell))
     {}
 
-    ScratchData_RHS(const ScratchData_RHS &rhs)
-      :
+    ScratchData_RHS(const ScratchData_RHS &rhs) :
       fe_values_ref(rhs.fe_values_ref.get_fe(),
                     rhs.fe_values_ref.get_quadrature(),
                     rhs.fe_values_ref.get_update_flags()),
@@ -1353,7 +1310,6 @@ namespace Step44
             }
         }
     }
-
   };
 
   // Then we define structures to assemble the statically condensed tangent
@@ -1385,8 +1341,7 @@ namespace Step44
     PerTaskData_SC(const unsigned int dofs_per_cell,
                    const unsigned int n_u,
                    const unsigned int n_p,
-                   const unsigned int n_J)
-      :
+                   const unsigned int n_J) :
       cell_matrix(dofs_per_cell, dofs_per_cell),
       local_dof_indices(dofs_per_cell),
       k_orig(dofs_per_cell, dofs_per_cell),
@@ -1458,8 +1413,7 @@ namespace Step44
     ScratchData_UQPH(const FiniteElement<dim> & fe_cell,
                      const QGauss<dim> &        qf_cell,
                      const UpdateFlags          uf_cell,
-                     const BlockVector<double> &solution_total)
-      :
+                     const BlockVector<double> &solution_total) :
       solution_total(solution_total),
       solution_grads_u_total(qf_cell.size()),
       solution_values_p_total(qf_cell.size()),
@@ -1467,8 +1421,7 @@ namespace Step44
       fe_values_ref(fe_cell, qf_cell, uf_cell)
     {}
 
-    ScratchData_UQPH(const ScratchData_UQPH &rhs)
-      :
+    ScratchData_UQPH(const ScratchData_UQPH &rhs) :
       solution_total(rhs.solution_total),
       solution_grads_u_total(rhs.solution_grads_u_total),
       solution_values_p_total(rhs.solution_values_p_total),
@@ -1503,7 +1456,8 @@ namespace Step44
   template <int dim>
   void Solid<dim>::make_grid()
   {
-    GridGenerator::hyper_rectangle(triangulation,
+    GridGenerator::hyper_rectangle(
+      triangulation,
       (dim == 3 ? Point<dim>(0.0, 0.0, 0.0) : Point<dim>(0.0, 0.0)),
       (dim == 3 ? Point<dim>(1.0, 1.0, 1.0) : Point<dim>(1.0, 1.0)),
       true);
@@ -1518,20 +1472,20 @@ namespace Step44
     // a distinct boundary ID number.  The faces we are looking for are on the
     // +y surface and will get boundary ID 6 (zero through five are already
     // used when creating the six faces of the cube domain):
-    typename Triangulation<dim>::active_cell_iterator cell =
-      triangulation.begin_active(), endc = triangulation.end();
+    typename Triangulation<dim>::active_cell_iterator cell = triangulation
+                                                               .begin_active(),
+                                                      endc =
+                                                        triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0;
-           face < GeometryInfo<dim>::faces_per_cell; ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+           ++face)
         {
-          if (cell->face(face)->at_boundary() == true
-              &&
+          if (cell->face(face)->at_boundary() == true &&
               cell->face(face)->center()[1] == 1.0 * parameters.scale)
             {
               if (dim == 3)
                 {
-                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale
-                      &&
+                  if (cell->face(face)->center()[0] < 0.5 * parameters.scale &&
                       cell->face(face)->center()[2] < 0.5 * parameters.scale)
                     cell->face(face)->set_boundary_id(6);
                 }
@@ -1556,22 +1510,24 @@ namespace Step44
   {
     timer.enter_subsection("Setup system");
 
-    std::vector<unsigned int> block_component(n_components, u_dof); // Displacement
-    block_component[p_component] = p_dof;                           // Pressure
-    block_component[J_component] = J_dof;                           // Dilatation
+    std::vector<unsigned int> block_component(n_components,
+                                              u_dof); // Displacement
+    block_component[p_component] = p_dof;             // Pressure
+    block_component[J_component] = J_dof;             // Dilatation
 
     // The DOF handler is then initialized and we renumber the grid in an
     // efficient manner. We also record the number of DOFs per block.
     dof_handler_ref.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
-    DoFTools::count_dofs_per_block(dof_handler_ref, dofs_per_block,
-                                   block_component);
+    DoFTools::count_dofs_per_block(
+      dof_handler_ref, dofs_per_block, block_component);
 
     std::cout << "Triangulation:"
-              << "\n\t Number of active cells: " << triangulation.n_active_cells()
-              << "\n\t Number of degrees of freedom: " << dof_handler_ref.n_dofs()
-              << std::endl;
+              << "\n\t Number of active cells: "
+              << triangulation.n_active_cells()
+              << "\n\t Number of degrees of freedom: "
+              << dof_handler_ref.n_dofs() << std::endl;
 
     // Setup the sparsity pattern and tangent matrix
     tangent_matrix.clear();
@@ -1598,9 +1554,12 @@ namespace Step44
       // The global system matrix initially has the following structure
       // @f{align*}
       // \underbrace{\begin{bmatrix}
-      //   \mathsf{\mathbf{K}}_{uu}  & \mathsf{\mathbf{K}}_{u\widetilde{p}} & \mathbf{0}
-      //   \\ \mathsf{\mathbf{K}}_{\widetilde{p}u} & \mathbf{0} & \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}
-      //   \\ \mathbf{0} & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}} & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
+      //   \mathsf{\mathbf{K}}_{uu}  & \mathsf{\mathbf{K}}_{u\widetilde{p}} &
+      //   \mathbf{0}
+      //   \\ \mathsf{\mathbf{K}}_{\widetilde{p}u} & \mathbf{0} &
+      //   \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}
+      //   \\ \mathbf{0} & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}} &
+      //   \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
       // \end{bmatrix}}_{\mathsf{\mathbf{K}}(\mathbf{\Xi}_{\textrm{i}})}
       //      \underbrace{\begin{bmatrix}
       //          d \mathsf{u}
@@ -1620,17 +1579,14 @@ namespace Step44
       Table<2, DoFTools::Coupling> coupling(n_components, n_components);
       for (unsigned int ii = 0; ii < n_components; ++ii)
         for (unsigned int jj = 0; jj < n_components; ++jj)
-          if (((ii < p_component) && (jj == J_component))
-              || ((ii == J_component) && (jj < p_component))
-              || ((ii == p_component) && (jj == p_component)))
+          if (((ii < p_component) && (jj == J_component)) ||
+              ((ii == J_component) && (jj < p_component)) ||
+              ((ii == p_component) && (jj == p_component)))
             coupling[ii][jj] = DoFTools::none;
           else
             coupling[ii][jj] = DoFTools::always;
-      DoFTools::make_sparsity_pattern(dof_handler_ref,
-                                      coupling,
-                                      dsp,
-                                      constraints,
-                                      false);
+      DoFTools::make_sparsity_pattern(
+        dof_handler_ref, coupling, dsp, constraints, false);
       sparsity_pattern.copy_from(dsp);
     }
 
@@ -1652,17 +1608,16 @@ namespace Step44
 
 
   // @sect4{Solid::determine_component_extractors}
-  // Next we compute some information from the FE system that describes which local
-  // element DOFs are attached to which block component.  This is used later to
-  // extract sub-blocks from the global matrix.
+  // Next we compute some information from the FE system that describes which
+  // local element DOFs are attached to which block component.  This is used
+  // later to extract sub-blocks from the global matrix.
   //
   // In essence, all we need is for the FESystem object to indicate to which
   // block component a DOF on the reference cell is attached to.  Currently, the
   // interpolation fields are setup such that 0 indicates a displacement DOF, 1
   // a pressure DOF and 2 a dilatation DOF.
   template <int dim>
-  void
-  Solid<dim>::determine_component_extractors()
+  void Solid<dim>::determine_component_extractors()
   {
     element_indices_u.clear();
     element_indices_p.clear();
@@ -1695,15 +1650,16 @@ namespace Step44
   {
     std::cout << "    Setting up quadrature point data..." << std::endl;
 
-    quadrature_point_history.initialize(triangulation.begin_active(),
-                                        triangulation.end(),
-                                        n_q_points);
+    quadrature_point_history.initialize(
+      triangulation.begin_active(), triangulation.end(), n_q_points);
 
     // Next we setup the initial quadrature point data.
     // Note that when the quadrature point data is retrieved,
     // it is returned as a vector of smart pointers.
     for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active(); cell != triangulation.end(); ++cell)
+           triangulation.begin_active();
+         cell != triangulation.end();
+         ++cell)
       {
         const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
@@ -1720,15 +1676,17 @@ namespace Step44
   // the task across a number of CPU cores.
   //
   // To start this, we first we need to obtain the total solution as it stands
-  // at this Newton increment and then create the initial copy of the scratch and
-  // copy data objects:
+  // at this Newton increment and then create the initial copy of the scratch
+  // and copy data objects:
   template <int dim>
-  void Solid<dim>::update_qph_incremental(const BlockVector<double> &solution_delta)
+  void
+  Solid<dim>::update_qph_incremental(const BlockVector<double> &solution_delta)
   {
     timer.enter_subsection("Update QPH data");
     std::cout << " UQPH " << std::flush;
 
-    const BlockVector<double> solution_total(get_total_solution(solution_delta));
+    const BlockVector<double> solution_total(
+      get_total_solution(solution_delta));
 
     const UpdateFlags uf_UQPH(update_values | update_gradients);
     PerTaskData_UQPH  per_task_data_UQPH;
@@ -1751,8 +1709,8 @@ namespace Step44
   // Now we describe how we extract data from the solution vector and pass it
   // along to each QP storage object for processing.
   template <int dim>
-  void
-  Solid<dim>::update_qph_incremental_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+  void Solid<dim>::update_qph_incremental_one_cell(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
     ScratchData_UQPH &                                    scratch,
     PerTaskData_UQPH & /*data*/)
   {
@@ -1774,12 +1732,12 @@ namespace Step44
     // displacement gradient and total pressure and dilatation solution
     // values:
     scratch.fe_values_ref.reinit(cell);
-    scratch.fe_values_ref[u_fe].get_function_gradients(scratch.solution_total,
-                                                       scratch.solution_grads_u_total);
-    scratch.fe_values_ref[p_fe].get_function_values(scratch.solution_total,
-                                                    scratch.solution_values_p_total);
-    scratch.fe_values_ref[J_fe].get_function_values(scratch.solution_total,
-                                                    scratch.solution_values_J_total);
+    scratch.fe_values_ref[u_fe].get_function_gradients(
+      scratch.solution_total, scratch.solution_grads_u_total);
+    scratch.fe_values_ref[p_fe].get_function_values(
+      scratch.solution_total, scratch.solution_values_p_total);
+    scratch.fe_values_ref[J_fe].get_function_values(
+      scratch.solution_total, scratch.solution_values_J_total);
 
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       lqph[q_point]->update_values(scratch.solution_grads_u_total[q_point],
@@ -1794,11 +1752,11 @@ namespace Step44
   // its top we create a new vector to store the current Newton update step,
   // reset the error storage objects and print solver header.
   template <int dim>
-  void
-  Solid<dim>::solve_nonlinear_timestep(BlockVector<double> &solution_delta)
+  void Solid<dim>::solve_nonlinear_timestep(BlockVector<double> &solution_delta)
   {
-    std::cout << std::endl << "Timestep " << time.get_timestep() << " @ "
-              << time.current() << "s" << std::endl;
+    std::cout << std::endl
+              << "Timestep " << time.get_timestep() << " @ " << time.current()
+              << "s" << std::endl;
 
     BlockVector<double> newton_update(dofs_per_block);
 
@@ -1823,10 +1781,10 @@ namespace Step44
     // assembly process by not assembling the tangent matrix when convergence
     // is attained.
     unsigned int newton_iteration = 0;
-    for (; newton_iteration < parameters.max_iterations_NR;
-         ++newton_iteration)
+    for (; newton_iteration < parameters.max_iterations_NR; ++newton_iteration)
       {
-        std::cout << " " << std::setw(2) << newton_iteration << " " << std::flush;
+        std::cout << " " << std::setw(2) << newton_iteration << " "
+                  << std::flush;
 
         tangent_matrix = 0.0;
         system_rhs     = 0.0;
@@ -1842,8 +1800,8 @@ namespace Step44
         error_residual_norm = error_residual;
         error_residual_norm.normalize(error_residual_0);
 
-        if (newton_iteration > 0 && error_update_norm.u <  = parameters.tol_u
-                                                             && error_residual_norm.u <= parameters.tol_f)
+        if (newton_iteration > 0 &&error_update_norm.u <
+            = parameters.tol_u && error_residual_norm.u <= parameters.tol_f)
           {
             std::cout << " CONVERGED! " << std::endl;
             print_conv_footer();
@@ -1858,8 +1816,8 @@ namespace Step44
         make_constraints(newton_iteration);
         constraints.condense(tangent_matrix, system_rhs);
 
-        const std::pair<unsigned int, double>
-        lin_solver_output = solve_linear_system(newton_update);
+        const std::pair<unsigned int, double> lin_solver_output =
+          solve_linear_system(newton_update);
 
         get_error_update(newton_update, error_update);
         if (newton_iteration == 0)
@@ -1877,12 +1835,12 @@ namespace Step44
 
         std::cout << " | " << std::fixed << std::setprecision(3) << std::setw(7)
                   << std::scientific << lin_solver_output.first << "  "
-                  << lin_solver_output.second << "  " << error_residual_norm.norm
-                  << "  " << error_residual_norm.u << "  "
-                  << error_residual_norm.p << "  " << error_residual_norm.J
-                  << "  " << error_update_norm.norm << "  " << error_update_norm.u
-                  << "  " << error_update_norm.p << "  " << error_update_norm.J
-                  << "  " << std::endl;
+                  << lin_solver_output.second << "  "
+                  << error_residual_norm.norm << "  " << error_residual_norm.u
+                  << "  " << error_residual_norm.p << "  "
+                  << error_residual_norm.J << "  " << error_update_norm.norm
+                  << "  " << error_update_norm.u << "  " << error_update_norm.p
+                  << "  " << error_update_norm.J << "  " << std::endl;
       }
 
     // At the end, if it turns out that we have in fact done more iterations
@@ -1936,11 +1894,13 @@ namespace Step44
     const std::pair<double, double> error_dil = get_error_dilation();
 
     std::cout << "Relative errors:" << std::endl
-              << "Displacement:\t" << error_update.u / error_update_0.u << std::endl
-              << "Force: \t\t" << error_residual.u / error_residual_0.u << std::endl
+              << "Displacement:\t" << error_update.u / error_update_0.u
+              << std::endl
+              << "Force: \t\t" << error_residual.u / error_residual_0.u
+              << std::endl
               << "Dilatation:\t" << error_dil.first << std::endl
-              << "v / V_0:\t" << error_dil.second *vol_reference << " / " << vol_reference
-              << " = " << error_dil.second << std::endl;
+              << "v / V_0:\t" << error_dil.second * vol_reference << " / "
+              << vol_reference << " = " << error_dil.second << std::endl;
   }
 
 
@@ -1948,16 +1908,16 @@ namespace Step44
 
   // Calculate the volume of the domain in the spatial configuration
   template <int dim>
-  double
-  Solid<dim>::compute_vol_current() const
+  double Solid<dim>::compute_vol_current() const
   {
     double vol_current = 0.0;
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active();
-         cell != triangulation.end(); ++cell)
+    for (typename Triangulation<dim>::active_cell_iterator cell =
+           triangulation.begin_active();
+         cell != triangulation.end();
+         ++cell)
       {
         fe_values_ref.reinit(cell);
 
@@ -1983,23 +1943,24 @@ namespace Step44
   }
 
   // Calculate how well the dilatation $\widetilde{J}$ agrees with $J :=
-  // \textrm{det}\ \mathbf{F}$ from the $L^2$ error $ \bigl[ \int_{\Omega_0} {[ J
+  // \textrm{det}\ \mathbf{F}$ from the $L^2$ error $ \bigl[ \int_{\Omega_0} {[
+  // J
   // - \widetilde{J}]}^{2}\textrm{d}V \bigr]^{1/2}$.
   // We also return the ratio of the current volume of the
   // domain to the reference volume. This is of interest for incompressible
   // media where we want to check how well the isochoric constraint has been
   // enforced.
   template <int dim>
-  std::pair<double, double>
-  Solid<dim>::get_error_dilation() const
+  std::pair<double, double> Solid<dim>::get_error_dilation() const
   {
     double dil_L2_error = 0.0;
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active();
-         cell != triangulation.end(); ++cell)
+    for (typename Triangulation<dim>::active_cell_iterator cell =
+           triangulation.begin_active();
+         cell != triangulation.end();
+         ++cell)
       {
         fe_values_ref.reinit(cell);
 
@@ -2009,11 +1970,11 @@ namespace Step44
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
-            const double det_F_qp             = lqph[q_point]->get_det_F();
-            const double J_tilde_qp           = lqph[q_point]->get_J_tilde();
-            const double the_error_qp_squared = std::pow((det_F_qp - J_tilde_qp),
-                                                         2);
-            const double JxW                  = fe_values_ref.JxW(q_point);
+            const double det_F_qp   = lqph[q_point]->get_det_F();
+            const double J_tilde_qp = lqph[q_point]->get_J_tilde();
+            const double the_error_qp_squared =
+              std::pow((det_F_qp - J_tilde_qp), 2);
+            const double JxW = fe_values_ref.JxW(q_point);
 
             dil_L2_error += the_error_qp_squared * JxW;
           }
@@ -2027,9 +1988,9 @@ namespace Step44
   // @sect4{Solid::get_error_residual}
 
   // Determine the true residual error for the problem.  That is, determine the
-  // error in the residual for the unconstrained degrees of freedom.  Note that to
-  // do so, we need to ignore constrained DOFs by setting the residual in these
-  // vector components to zero.
+  // error in the residual for the unconstrained degrees of freedom.  Note that
+  // to do so, we need to ignore constrained DOFs by setting the residual in
+  // these vector components to zero.
   template <int dim>
   void Solid<dim>::get_error_residual(Errors &error_residual)
   {
@@ -2068,12 +2029,12 @@ namespace Step44
 
   // @sect4{Solid::get_total_solution}
 
-  // This function provides the total solution, which is valid at any Newton step.
-  // This is required as, to reduce computational error, the total solution is
-  // only updated at the end of the timestep.
+  // This function provides the total solution, which is valid at any Newton
+  // step. This is required as, to reduce computational error, the total
+  // solution is only updated at the end of the timestep.
   template <int dim>
-  BlockVector<double>
-  Solid<dim>::get_total_solution(const BlockVector<double> &solution_delta) const
+  BlockVector<double> Solid<dim>::get_total_solution(
+    const BlockVector<double> &solution_delta) const
   {
     BlockVector<double> solution_total(solution_n);
     solution_total += solution_delta;
@@ -2096,8 +2057,7 @@ namespace Step44
 
     tangent_matrix = 0.0;
 
-    const UpdateFlags uf_cell(update_values    |
-                              update_gradients |
+    const UpdateFlags uf_cell(update_values | update_gradients |
                               update_JxW_values);
 
     PerTaskData_K per_task_data(dofs_per_cell);
@@ -2109,17 +2069,17 @@ namespace Step44
     // is a constant function and copy_local_to_global_K is
     // non-constant.
     WorkStream::run(dof_handler_ref.begin_active(),
-      dof_handler_ref.end(),
-      std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
+                    dof_handler_ref.end(),
+                    std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
+                              this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::placeholders::_3),
                     std::bind(&Solid<dim>::copy_local_to_global_K,
                               this,
                               std::placeholders::_1),
-      scratch_data,
-      per_task_data);
+                    scratch_data,
+                    per_task_data);
 
     timer.leave_subsection();
   }
@@ -2147,8 +2107,8 @@ namespace Step44
   // $\textrm{grad}\ \boldsymbol{\varphi} = \textrm{Grad}\ \boldsymbol{\varphi}
   // \ \mathbf{F}^{-1}$.
   template <int dim>
-  void
-  Solid<dim>::assemble_system_tangent_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+  void Solid<dim>::assemble_system_tangent_one_cell(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
     ScratchData_K &                                       scratch,
     PerTaskData_K &                                       data) const
   {
@@ -2170,16 +2130,17 @@ namespace Step44
 
             if (k_group == u_dof)
               {
-                scratch.grad_Nx[q_point][k] = scratch.fe_values_ref[u_fe].gradient(k, q_point)
-                                              * F_inv;
-                scratch.symm_grad_Nx[q_point][k] = symmetrize(scratch.grad_Nx[q_point][k]);
+                scratch.grad_Nx[q_point][k] =
+                  scratch.fe_values_ref[u_fe].gradient(k, q_point) * F_inv;
+                scratch.symm_grad_Nx[q_point][k] =
+                  symmetrize(scratch.grad_Nx[q_point][k]);
               }
             else if (k_group == p_dof)
-              scratch.Nx[q_point][k] = scratch.fe_values_ref[p_fe].value(k,
-                                                                         q_point);
+              scratch.Nx[q_point][k] =
+                scratch.fe_values_ref[p_fe].value(k, q_point);
             else if (k_group == J_dof)
-              scratch.Nx[q_point][k] = scratch.fe_values_ref[J_fe].value(k,
-                                                                         q_point);
+              scratch.Nx[q_point][k] =
+                scratch.fe_values_ref[J_fe].value(k, q_point);
             else
               Assert(k_group <= J_dof, ExcInternalError());
           }
@@ -2200,30 +2161,31 @@ namespace Step44
     // from our quadrature history objects for the current quadrature point.
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       {
-        const Tensor<2, dim>          tau           = lqph[q_point]->get_tau();
-        const SymmetricTensor<4, dim> Jc            = lqph[q_point]->get_Jc();
-        const double                  d2Psi_vol_dJ2 = lqph[q_point]->get_d2Psi_vol_dJ2();
-        const double                  det_F         = lqph[q_point]->get_det_F();
+        const Tensor<2, dim>          tau = lqph[q_point]->get_tau();
+        const SymmetricTensor<4, dim> Jc  = lqph[q_point]->get_Jc();
+        const double d2Psi_vol_dJ2        = lqph[q_point]->get_d2Psi_vol_dJ2();
+        const double det_F                = lqph[q_point]->get_det_F();
 
         // Next we define some aliases to make the assembly process easier to
         // follow
-        const std::vector<double>
-        &N = scratch.Nx[q_point];
-        const std::vector<SymmetricTensor<2, dim> >
-        &symm_grad_Nx = scratch.symm_grad_Nx[q_point];
-        const std::vector<Tensor<2, dim> >
-        &grad_Nx = scratch.grad_Nx[q_point];
-        const double                       JxW     = scratch.fe_values_ref.JxW(q_point);
+        const std::vector<double> &                 N = scratch.Nx[q_point];
+        const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
+          scratch.symm_grad_Nx[q_point];
+        const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
+        const double JxW = scratch.fe_values_ref.JxW(q_point);
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            const unsigned int component_i = fe.system_to_component_index(i).first;
-            const unsigned int i_group     = fe.system_to_base_index(i).first.first;
+            const unsigned int component_i =
+              fe.system_to_component_index(i).first;
+            const unsigned int i_group = fe.system_to_base_index(i).first.first;
 
             for (unsigned int j = 0; j <= i; ++j)
               {
-                const unsigned int component_j = fe.system_to_component_index(j).first;
-                const unsigned int j_group     = fe.system_to_base_index(j).first.first;
+                const unsigned int component_j =
+                  fe.system_to_component_index(j).first;
+                const unsigned int j_group =
+                  fe.system_to_base_index(j).first.first;
 
                 // This is the $\mathsf{\mathbf{k}}_{uu}$
                 // contribution. It comprises a material contribution, and a
@@ -2231,23 +2193,27 @@ namespace Step44
                 // the local matrix diagonals:
                 if ((i_group == j_group) && (i_group == u_dof))
                   {
-                    data.cell_matrix(i, j) += symm_grad_Nx[i] * Jc // The material contribution:
+                    data.cell_matrix(i, j) += symm_grad_Nx[i] *
+                                              Jc // The material contribution:
                                               * symm_grad_Nx[j] * JxW;
-                    if (component_i == component_j) // geometrical stress contribution
-                      data.cell_matrix(i, j) += grad_Nx[i][component_i] * tau
-                                                * grad_Nx[j][component_j] * JxW;
+                    if (component_i ==
+                        component_j) // geometrical stress contribution
+                      data.cell_matrix(i, j) += grad_Nx[i][component_i] * tau *
+                                                grad_Nx[j][component_j] * JxW;
                   }
-                // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$ contribution
+                // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$
+                // contribution
                 else if ((i_group == p_dof) && (j_group == u_dof))
                   {
-                    data.cell_matrix(i, j) += N[i] * det_F
-                                              * (symm_grad_Nx[j]
-                                                 * Physics::Elasticity::StandardTensors<dim>::I)
-                                              * JxW;
+                    data.cell_matrix(i, j) +=
+                      N[i] * det_F *
+                      (symm_grad_Nx[j] *
+                       Physics::Elasticity::StandardTensors<dim>::I) *
+                      JxW;
                   }
-                // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{p}}$
-                // and $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$
-                // contributions:
+                // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J}
+                // \widetilde{p}}$ and $\mathsf{\mathbf{k}}_{ \widetilde{J}
+                // \widetilde{J}}$ contributions:
                 else if ((i_group == J_dof) && (j_group == p_dof))
                   data.cell_matrix(i, j) -= N[i] * N[j] * JxW;
                 else if ((i_group == j_group) && (i_group == J_dof))
@@ -2280,28 +2246,26 @@ namespace Step44
 
     system_rhs = 0.0;
 
-    const UpdateFlags uf_cell(update_values |
-                              update_gradients |
+    const UpdateFlags uf_cell(update_values | update_gradients |
                               update_JxW_values);
-    const UpdateFlags uf_face(update_values |
-                              update_normal_vectors |
+    const UpdateFlags uf_face(update_values | update_normal_vectors |
                               update_JxW_values);
 
     PerTaskData_RHS per_task_data(dofs_per_cell);
     ScratchData_RHS scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
 
     WorkStream::run(dof_handler_ref.begin_active(),
-      dof_handler_ref.end(),
-      std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
+                    dof_handler_ref.end(),
+                    std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
+                              this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::placeholders::_3),
                     std::bind(&Solid<dim>::copy_local_to_global_rhs,
                               this,
                               std::placeholders::_1),
-      scratch_data,
-      per_task_data);
+                    scratch_data,
+                    per_task_data);
 
     timer.leave_subsection();
   }
@@ -2318,8 +2282,8 @@ namespace Step44
 
 
   template <int dim>
-  void
-  Solid<dim>::assemble_system_rhs_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+  void Solid<dim>::assemble_system_rhs_one_cell(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
     ScratchData_RHS &                                     scratch,
     PerTaskData_RHS &                                     data) const
   {
@@ -2341,15 +2305,14 @@ namespace Step44
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
 
             if (k_group == u_dof)
-              scratch.symm_grad_Nx[q_point][k]
-                = symmetrize(scratch.fe_values_ref[u_fe].gradient(k, q_point)
-                             * F_inv);
+              scratch.symm_grad_Nx[q_point][k] = symmetrize(
+                scratch.fe_values_ref[u_fe].gradient(k, q_point) * F_inv);
             else if (k_group == p_dof)
-              scratch.Nx[q_point][k] = scratch.fe_values_ref[p_fe].value(k,
-                                                                         q_point);
+              scratch.Nx[q_point][k] =
+                scratch.fe_values_ref[p_fe].value(k, q_point);
             else if (k_group == J_dof)
-              scratch.Nx[q_point][k] = scratch.fe_values_ref[J_fe].value(k,
-                                                                         q_point);
+              scratch.Nx[q_point][k] =
+                scratch.fe_values_ref[J_fe].value(k, q_point);
             else
               Assert(k_group <= J_dof, ExcInternalError());
           }
@@ -2357,16 +2320,15 @@ namespace Step44
 
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       {
-        const SymmetricTensor<2, dim> tau         = lqph[q_point]->get_tau();
-        const double                  det_F       = lqph[q_point]->get_det_F();
-        const double                  J_tilde     = lqph[q_point]->get_J_tilde();
-        const double                  p_tilde     = lqph[q_point]->get_p_tilde();
-        const double                  dPsi_vol_dJ = lqph[q_point]->get_dPsi_vol_dJ();
+        const SymmetricTensor<2, dim> tau     = lqph[q_point]->get_tau();
+        const double                  det_F   = lqph[q_point]->get_det_F();
+        const double                  J_tilde = lqph[q_point]->get_J_tilde();
+        const double                  p_tilde = lqph[q_point]->get_p_tilde();
+        const double dPsi_vol_dJ = lqph[q_point]->get_dPsi_vol_dJ();
 
-        const std::vector<double>
-        &N = scratch.Nx[q_point];
-        const std::vector<SymmetricTensor<2, dim> >
-        &symm_grad_Nx = scratch.symm_grad_Nx[q_point];
+        const std::vector<double> &                 N = scratch.Nx[q_point];
+        const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
+          scratch.symm_grad_Nx[q_point];
         const double JxW = scratch.fe_values_ref.JxW(q_point);
 
         // We first compute the contributions
@@ -2394,8 +2356,8 @@ namespace Step44
     // the contribution if this is the case.
     for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
          ++face)
-      if (cell->face(face)->at_boundary() == true
-          && cell->face(face)->boundary_id() == 6)
+      if (cell->face(face)->at_boundary() == true &&
+          cell->face(face)->boundary_id() == 6)
         {
           scratch.fe_face_values_ref.reinit(cell, face);
 
@@ -2418,9 +2380,8 @@ namespace Step44
               // Note that the contributions to the right hand side vector we
               // compute here only exist in the displacement components of the
               // vector.
-              static const double  p0        = -4.0
-                                               /
-                                               (parameters.scale * parameters.scale);
+              static const double p0 =
+                -4.0 / (parameters.scale * parameters.scale);
               const double         time_ramp = (time.current() / time.end());
               const double         pressure  = p0 * parameters.p_p0 * time_ramp;
               const Tensor<1, dim> traction  = pressure * N;
@@ -2435,13 +2396,11 @@ namespace Step44
                       const unsigned int component_i =
                         fe.system_to_component_index(i).first;
                       const double Ni =
-                        scratch.fe_face_values_ref.shape_value(i,
-                                                               f_q_point);
-                      const double JxW = scratch.fe_face_values_ref.JxW(
-                                           f_q_point);
+                        scratch.fe_face_values_ref.shape_value(i, f_q_point);
+                      const double JxW =
+                        scratch.fe_face_values_ref.JxW(f_q_point);
 
-                      data.cell_rhs(i) += (Ni * traction[component_i])
-                                          * JxW;
+                      data.cell_rhs(i) += (Ni * traction[component_i]) * JxW;
                     }
                 }
             }
@@ -2503,13 +2462,15 @@ namespace Step44
       const int boundary_id = 0;
 
       if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
+        VectorTools::interpolate_boundary_values(
+          dof_handler_ref,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(x_displacement));
       else
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
+        VectorTools::interpolate_boundary_values(
+          dof_handler_ref,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
@@ -2519,13 +2480,15 @@ namespace Step44
       const int boundary_id = 2;
 
       if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
+        VectorTools::interpolate_boundary_values(
+          dof_handler_ref,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(y_displacement));
       else
-        VectorTools::interpolate_boundary_values(dof_handler_ref,
+        VectorTools::interpolate_boundary_values(
+          dof_handler_ref,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
@@ -2540,33 +2503,35 @@ namespace Step44
           const int boundary_id = 3;
 
           if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
-                                                     (fe.component_mask(x_displacement)
-                                                      |
+              (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
           else
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
-                                                     (fe.component_mask(x_displacement)
-                                                      |
+              (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
         }
         {
           const int boundary_id = 4;
 
           if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
               fe.component_mask(z_displacement));
           else
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2577,20 +2542,20 @@ namespace Step44
           const int boundary_id = 6;
 
           if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
-                                                     (fe.component_mask(x_displacement)
-                                                      |
+              (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
           else
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
-                                                     (fe.component_mask(x_displacement)
-                                                      |
+              (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
         }
       }
@@ -2600,13 +2565,15 @@ namespace Step44
           const int boundary_id = 3;
 
           if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2616,13 +2583,15 @@ namespace Step44
           const int boundary_id = 6;
 
           if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
-            VectorTools::interpolate_boundary_values(dof_handler_ref,
+            VectorTools::interpolate_boundary_values(
+              dof_handler_ref,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2645,26 +2614,30 @@ namespace Step44
   // The static condensation process could be performed at a global level but we
   // need the inverse of one of the blocks. However, since the pressure and
   // dilatation variables are discontinuous, the static condensation (SC)
-  // operation can also be done on a per-cell basis and we can produce the inverse of
-  // the block-diagonal $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}$
-  // block by inverting the local blocks. We can again use TBB to do this since
-  // each operation will be independent of one another.
+  // operation can also be done on a per-cell basis and we can produce the
+  // inverse of the block-diagonal
+  // $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}$ block by inverting the
+  // local blocks. We can again use TBB to do this since each operation will be
+  // independent of one another.
   //
-  // Using the TBB via the WorkStream class, we assemble the contributions to form
+  // Using the TBB via the WorkStream class, we assemble the contributions to
+  // form
   //  $
   //  \mathsf{\mathbf{K}}_{\textrm{con}}
-//  = \bigl[ \mathsf{\mathbf{K}}_{uu} + \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
+  //  = \bigl[ \mathsf{\mathbf{K}}_{uu} +
+  //  \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
   //  $
-  // from each element's contributions. These contributions are then added to the
-  // global stiffness matrix. Given this description, the following two functions
-  // should be clear:
+  // from each element's contributions. These contributions are then added to
+  // the global stiffness matrix. Given this description, the following two
+  // functions should be clear:
   template <int dim>
   void Solid<dim>::assemble_sc()
   {
     timer.enter_subsection("Perform static condensation");
     std::cout << " ASM_SC " << std::flush;
 
-    PerTaskData_SC per_task_data(dofs_per_cell, element_indices_u.size(),
+    PerTaskData_SC per_task_data(dofs_per_cell,
+                                 element_indices_u.size(),
                                  element_indices_p.size(),
                                  element_indices_J.size());
     ScratchData_SC scratch_data;
@@ -2696,8 +2669,8 @@ namespace Step44
   // first find out which global numbers the degrees of freedom on this cell
   // have and reset some data structures:
   template <int dim>
-  void
-  Solid<dim>::assemble_sc_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+  void Solid<dim>::assemble_sc_one_cell(
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
     ScratchData_SC &                                      scratch,
     PerTaskData_SC &                                      data)
   {
@@ -2724,29 +2697,35 @@ namespace Step44
     // is of the form:
     // @f{align*}
     //    \begin{bmatrix}
-    //       \mathsf{\mathbf{k}}_{uu}  &  \mathsf{\mathbf{k}}_{u\widetilde{p}}    & \mathbf{0}
-    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0}  &  \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}
-    //    \\ \mathbf{0}  &  \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}  & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
-    //    \end{bmatrix}
+    //       \mathsf{\mathbf{k}}_{uu}  &  \mathsf{\mathbf{k}}_{u\widetilde{p}}
+    //       & \mathbf{0}
+    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0}  &
+    //    \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}
+    //    \\ \mathbf{0}  &  \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}  &
+    //    \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}} \end{bmatrix}
     // @f}
     //
     // We now need to modify it such that it appear as
     // @f{align*}
     //    \begin{bmatrix}
-    //       \mathsf{\mathbf{k}}_{\textrm{con}}   & \mathsf{\mathbf{k}}_{u\widetilde{p}}    & \mathbf{0}
-    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0} & \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
-    //    \\ \mathbf{0} & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}} & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
-    //    \end{bmatrix}
+    //       \mathsf{\mathbf{k}}_{\textrm{con}}   &
+    //       \mathsf{\mathbf{k}}_{u\widetilde{p}}    & \mathbf{0}
+    //    \\ \mathsf{\mathbf{k}}_{\widetilde{p}u} & \mathbf{0} &
+    //    \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
+    //    \\ \mathbf{0} & \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}} &
+    //    \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}} \end{bmatrix}
     // @f}
-    // with $\mathsf{\mathbf{k}}_{\textrm{con}} = \bigl[ \mathsf{\mathbf{k}}_{uu} +\overline{\overline{\mathsf{\mathbf{k}}}}~ \bigr]$
-    // where
-    // $               \overline{\overline{\mathsf{\mathbf{k}}}} :=
-    // \mathsf{\mathbf{k}}_{u\widetilde{p}} \overline{\mathsf{\mathbf{k}}} \mathsf{\mathbf{k}}_{\widetilde{p}u}
+    // with $\mathsf{\mathbf{k}}_{\textrm{con}} = \bigl[
+    // \mathsf{\mathbf{k}}_{uu} +\overline{\overline{\mathsf{\mathbf{k}}}}~
+    // \bigr]$ where $               \overline{\overline{\mathsf{\mathbf{k}}}}
+    // := \mathsf{\mathbf{k}}_{u\widetilde{p}} \overline{\mathsf{\mathbf{k}}}
+    // \mathsf{\mathbf{k}}_{\widetilde{p}u}
     // $
     // and
     // $
     //    \overline{\mathsf{\mathbf{k}}} =
-    //     \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
+    //     \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{p}}^{-1}
+    //     \mathsf{\mathbf{k}}_{\widetilde{J}\widetilde{J}}
     //    \mathsf{\mathbf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
     // $.
     //
@@ -2776,7 +2755,8 @@ namespace Step44
     // static-condensation $\overline{\overline{\mathsf{\mathbf{k}}}}$.
     //
     // - $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$:
-    //                      Similarly, $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ exists in
+    //                      Similarly, $\mathsf{\mathbf{k}}_{\widetilde{p}
+    //                      \widetilde{J}}$ exists in
     //          the subblock. Since the copy
     //          operation is a += operation, we
     //          need to subtract the existing
@@ -2799,23 +2779,19 @@ namespace Step44
     // extract $\mathsf{\mathbf{k}}$
     // for the dofs associated with
     // the current element
-    data.k_orig.extract_submatrix_from(tangent_matrix,
-                                       data.local_dof_indices,
-                                       data.local_dof_indices);
+    data.k_orig.extract_submatrix_from(
+      tangent_matrix, data.local_dof_indices, data.local_dof_indices);
     // and next the local matrices for
     // $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$
     // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
     // and
     // $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$:
-    data.k_pu.extract_submatrix_from(data.k_orig,
-                                     element_indices_p,
-                                     element_indices_u);
-    data.k_pJ.extract_submatrix_from(data.k_orig,
-                                     element_indices_p,
-                                     element_indices_J);
-    data.k_JJ.extract_submatrix_from(data.k_orig,
-                                     element_indices_J,
-                                     element_indices_J);
+    data.k_pu.extract_submatrix_from(
+      data.k_orig, element_indices_p, element_indices_u);
+    data.k_pJ.extract_submatrix_from(
+      data.k_orig, element_indices_p, element_indices_J);
+    data.k_JJ.extract_submatrix_from(
+      data.k_orig, element_indices_J, element_indices_J);
 
     // To get the inverse of $\mathsf{\mathbf{k}}_{\widetilde{p}
     // \widetilde{J}}$, we invert it directly.  This operation is relatively
@@ -2861,9 +2837,8 @@ namespace Step44
     //    \mathsf{\mathbf{k}}_{\widetilde{p} u}
     //    $
     data.k_pu.Tmmult(data.k_bbar, data.C);
-    data.k_bbar.scatter_matrix_to(element_indices_u,
-                                  element_indices_u,
-                                  data.cell_matrix);
+    data.k_bbar.scatter_matrix_to(
+      element_indices_u, element_indices_u, data.cell_matrix);
 
     // Next we place
     // $\mathsf{\mathbf{k}}^{-1}_{ \widetilde{p} \widetilde{J}}$
@@ -2873,9 +2848,8 @@ namespace Step44
     // that we need to remove the
     // contribution that already exists there.
     data.k_pJ_inv.add(-1.0, data.k_pJ);
-    data.k_pJ_inv.scatter_matrix_to(element_indices_p,
-                                    element_indices_J,
-                                    data.cell_matrix);
+    data.k_pJ_inv.scatter_matrix_to(
+      element_indices_p, element_indices_J, data.cell_matrix);
   }
 
   // @sect4{Solid::solve_linear_system}
@@ -2894,51 +2868,72 @@ namespace Step44
 
     if (parameters.use_static_condensation == true)
       {
-        // Firstly, here is the approach using the (permanent) augmentation of the
-        // tangent matrix.
-        // For the following, recall that
+        // Firstly, here is the approach using the (permanent) augmentation of
+        // the tangent matrix. For the following, recall that
         // @f{align*}
         //  \mathsf{\mathbf{K}}_{\textrm{store}}
         //:=
         //  \begin{bmatrix}
-        //      \mathsf{\mathbf{K}}_{\textrm{con}}      &       \mathsf{\mathbf{K}}_{u\widetilde{p}}    & \mathbf{0}
-        //  \\  \mathsf{\mathbf{K}}_{\widetilde{p}u}    &       \mathbf{0}      &       \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
-        //  \\  \mathbf{0}      &       \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}                & \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
-        //  \end{bmatrix} \, .
+        //      \mathsf{\mathbf{K}}_{\textrm{con}}      &
+        //      \mathsf{\mathbf{K}}_{u\widetilde{p}}    & \mathbf{0}
+        //  \\  \mathsf{\mathbf{K}}_{\widetilde{p}u}    &       \mathbf{0} &
+        //  \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
+        //  \\  \mathbf{0}      &
+        //  \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}                &
+        //  \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}} \end{bmatrix} \, .
         // @f}
         // and
         //  @f{align*}
         //              d \widetilde{\mathsf{\mathbf{p}}}
-        //              & = \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \bigl[
+        //              & =
+        //              \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+        //              \bigl[
         //                       \mathsf{\mathbf{F}}_{\widetilde{J}}
-        //                       - \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}} d \widetilde{\mathsf{\mathbf{J}}} \bigr]
+        //                       -
+        //                       \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
+        //                       d \widetilde{\mathsf{\mathbf{J}}} \bigr]
         //              \\ d \widetilde{\mathsf{\mathbf{J}}}
-        //              & = \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
+        //              & =
+        //              \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
+        //              \bigl[
         //                      \mathsf{\mathbf{F}}_{\widetilde{p}}
-        //              - \mathsf{\mathbf{K}}_{\widetilde{p}u} d \mathsf{\mathbf{u}}
-        //              \bigr]
+        //              - \mathsf{\mathbf{K}}_{\widetilde{p}u} d
+        //              \mathsf{\mathbf{u}} \bigr]
         //               \\ \Rightarrow d \widetilde{\mathsf{\mathbf{p}}}
-        //              &=  \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{F}}_{\widetilde{J}}
-        //              - \underbrace{\bigl[\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
-        //              \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}\bigr]}_{\overline{\mathsf{\mathbf{K}}}}\bigl[ \mathsf{\mathbf{F}}_{\widetilde{p}}
-        //              - \mathsf{\mathbf{K}}_{\widetilde{p}u} d \mathsf{\mathbf{u}} \bigr]
+        //              &= \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+        //              \mathsf{\mathbf{F}}_{\widetilde{J}}
+        //              -
+        //              \underbrace{\bigl[\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+        //              \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
+        //              \mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}\bigr]}_{\overline{\mathsf{\mathbf{K}}}}\bigl[
+        //              \mathsf{\mathbf{F}}_{\widetilde{p}}
+        //              - \mathsf{\mathbf{K}}_{\widetilde{p}u} d
+        //              \mathsf{\mathbf{u}} \bigr]
         //  @f}
         //  and thus
         //  @f[
-        //              \underbrace{\bigl[ \mathsf{\mathbf{K}}_{uu} + \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
-        //              }_{\mathsf{\mathbf{K}}_{\textrm{con}}} d \mathsf{\mathbf{u}}
+        //              \underbrace{\bigl[ \mathsf{\mathbf{K}}_{uu} +
+        //              \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]
+        //              }_{\mathsf{\mathbf{K}}_{\textrm{con}}} d
+        //              \mathsf{\mathbf{u}}
         //              =
         //          \underbrace{
         //              \Bigl[
         //              \mathsf{\mathbf{F}}_{u}
-        //                      - \mathsf{\mathbf{K}}_{u\widetilde{p}} \bigl[ \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathsf{\mathbf{F}}_{\widetilde{J}}
-        //                      - \overline{\mathsf{\mathbf{K}}}\mathsf{\mathbf{F}}_{\widetilde{p}} \bigr]
+        //                      - \mathsf{\mathbf{K}}_{u\widetilde{p}} \bigl[
+        //                      \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+        //                      \mathsf{\mathbf{F}}_{\widetilde{J}}
+        //                      -
+        //                      \overline{\mathsf{\mathbf{K}}}\mathsf{\mathbf{F}}_{\widetilde{p}}
+        //                      \bigr]
         //              \Bigr]}_{\mathsf{\mathbf{F}}_{\textrm{con}}}
         //  @f]
         //  where
         //  @f[
         //              \overline{\overline{\mathsf{\mathbf{K}}}} :=
-        //                      \mathsf{\mathbf{K}}_{u\widetilde{p}} \overline{\mathsf{\mathbf{K}}} \mathsf{\mathbf{K}}_{\widetilde{p}u} \, .
+        //                      \mathsf{\mathbf{K}}_{u\widetilde{p}}
+        //                      \overline{\mathsf{\mathbf{K}}}
+        //                      \mathsf{\mathbf{K}}_{\widetilde{p}u} \, .
         //  @f]
 
         // At the top, we allocate two temporary vectors to help with the
@@ -2952,13 +2947,13 @@ namespace Step44
         // displacement $d\mathbf{u}$.  To this end, we perform static
         // condensation to make
         //    $\mathsf{\mathbf{K}}_{\textrm{con}}
-        //    = \bigl[ \mathsf{\mathbf{K}}_{uu} + \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]$
+        //    = \bigl[ \mathsf{\mathbf{K}}_{uu} +
+        //    \overline{\overline{\mathsf{\mathbf{K}}}}~ \bigr]$
         // and put
         // $\mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}$
-        // in the original $\mathsf{\mathbf{K}}_{\widetilde{p} \widetilde{J}}$ block.
-        // That is, we make $\mathsf{\mathbf{K}}_{\textrm{store}}$.
+        // in the original $\mathsf{\mathbf{K}}_{\widetilde{p} \widetilde{J}}$
+        // block. That is, we make $\mathsf{\mathbf{K}}_{\textrm{store}}$.
         {
-
           assemble_sc();
 
           //              $
@@ -2967,8 +2962,8 @@ namespace Step44
           //              \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
           //              \mathsf{\mathbf{F}}_{\widetilde{p}}
           //              $
-          tangent_matrix.block(p_dof, J_dof).vmult(A.block(J_dof),
-                                                   system_rhs.block(p_dof));
+          tangent_matrix.block(p_dof, J_dof)
+            .vmult(A.block(J_dof), system_rhs.block(p_dof));
           //      $
           //      \mathsf{\mathbf{B}}_{\widetilde{J}}
           //      =
@@ -2976,8 +2971,8 @@ namespace Step44
           //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
           //      \mathsf{\mathbf{F}}_{\widetilde{p}}
           //      $
-          tangent_matrix.block(J_dof, J_dof).vmult(B.block(J_dof),
-                                                   A.block(J_dof));
+          tangent_matrix.block(J_dof, J_dof)
+            .vmult(B.block(J_dof), A.block(J_dof));
           //      $
           //      \mathsf{\mathbf{A}}_{\widetilde{J}}
           //      =
@@ -3001,8 +2996,8 @@ namespace Step44
           //      \mathsf{\mathbf{F}}_{\widetilde{p}}
           //      ]
           //      $
-          tangent_matrix.block(p_dof, J_dof).Tvmult(A.block(p_dof),
-                                                    A.block(J_dof));
+          tangent_matrix.block(p_dof, J_dof)
+            .Tvmult(A.block(p_dof), A.block(J_dof));
           //      $
           //      \mathsf{\mathbf{A}}_{u}
           //      =
@@ -3016,8 +3011,8 @@ namespace Step44
           //      \mathsf{\mathbf{F}}_{\widetilde{p}}
           //      ]
           //      $
-          tangent_matrix.block(u_dof, p_dof).vmult(A.block(u_dof),
-                                                   A.block(p_dof));
+          tangent_matrix.block(u_dof, p_dof)
+            .vmult(A.block(u_dof), A.block(p_dof));
           //      $
           //      \mathsf{\mathbf{F}}_{\text{con}}
           //      =
@@ -3039,15 +3034,15 @@ namespace Step44
           std::cout << " SLV " << std::flush;
           if (parameters.type_lin == "CG")
             {
-              const int solver_its = tangent_matrix.block(u_dof, u_dof).m()
-                                     * parameters.max_iterations_lin;
-              const double tol_sol = parameters.tol_lin
-                                     * system_rhs.block(u_dof).l2_norm();
+              const int solver_its = tangent_matrix.block(u_dof, u_dof).m() *
+                                     parameters.max_iterations_lin;
+              const double tol_sol =
+                parameters.tol_lin * system_rhs.block(u_dof).l2_norm();
 
               SolverControl solver_control(solver_its, tol_sol);
 
               GrowingVectorMemory<Vector<double>> GVM;
-              SolverCG<Vector<double>>            solver_CG(solver_control, GVM);
+              SolverCG<Vector<double>> solver_CG(solver_control, GVM);
 
               // We've chosen by default a SSOR preconditioner as it appears to
               // provide the fastest solver convergence characteristics for this
@@ -3073,7 +3068,8 @@ namespace Step44
               // utilised.
               SparseDirectUMFPACK A_direct;
               A_direct.initialize(tangent_matrix.block(u_dof, u_dof));
-              A_direct.vmult(newton_update.block(u_dof), system_rhs.block(u_dof));
+              A_direct.vmult(newton_update.block(u_dof),
+                             system_rhs.block(u_dof));
 
               lin_it  = 1;
               lin_res = 0.0;
@@ -3108,8 +3104,8 @@ namespace Step44
           //      =
           //      \mathsf{\mathbf{K}}_{\widetilde{p}u} d \mathsf{\mathbf{u}}
           //      $
-          tangent_matrix.block(p_dof, u_dof).vmult(A.block(p_dof),
-                                                   newton_update.block(u_dof));
+          tangent_matrix.block(p_dof, u_dof)
+            .vmult(A.block(p_dof), newton_update.block(u_dof));
           //      $
           //      \mathsf{\mathbf{A}}_{\widetilde{p}}
           //      =
@@ -3132,8 +3128,8 @@ namespace Step44
           //      -\mathsf{\mathbf{K}}_{\widetilde{p}u} d \mathsf{\mathbf{u}}
           //      ]
           //      $
-          tangent_matrix.block(p_dof, J_dof).vmult(newton_update.block(J_dof),
-                                                   A.block(p_dof));
+          tangent_matrix.block(p_dof, J_dof)
+            .vmult(newton_update.block(J_dof), A.block(p_dof));
         }
 
         // we ensure here that any Dirichlet constraints
@@ -3159,8 +3155,8 @@ namespace Step44
           //      \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}}
           //      d \widetilde{\mathsf{\mathbf{J}}}
           //      $
-          tangent_matrix.block(J_dof, J_dof).vmult(A.block(J_dof),
-                                                   newton_update.block(J_dof));
+          tangent_matrix.block(J_dof, J_dof)
+            .vmult(A.block(J_dof), newton_update.block(J_dof));
           //      $
           //      \mathsf{\mathbf{A}}_{\widetilde{J}}
           //       =
@@ -3188,8 +3184,8 @@ namespace Step44
           //    d \widetilde{\mathsf{\mathbf{J}}}
           //    \bigr]
           //    $
-          tangent_matrix.block(p_dof, J_dof).Tvmult(newton_update.block(p_dof),
-                                                    A.block(J_dof));
+          tangent_matrix.block(p_dof, J_dof)
+            .Tvmult(newton_update.block(p_dof), A.block(J_dof));
         }
 
         // We are now at the end, so we distribute all
@@ -3211,17 +3207,17 @@ namespace Step44
             // Manual condensation of the dilatation and pressure fields on
             // a local level, and subsequent post-processing, took quite a
             // bit of effort to achieve. To recap, we had to produce the
-            // inverse matrix $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}$,
-            // which was permanently written into the global tangent matrix.
-            // We then permanently modified $\mathsf{\mathbf{K}}_{uu}$ to
-            // produce $\mathsf{\mathbf{K}}_{\textrm{con}}$. This involved
-            // the extraction and manipulation of local sub-blocks of the
-            // tangent matrix. After solving for the displacement, the
-            // individual matrix-vector operations required to solve for
-            // dilatation and pressure were carefully implemented.
-            // Contrast these many sequence of steps to the much simpler and
-            // transparent implementation using functionality provided by the
-            // LinearOperator class.
+            // inverse matrix
+            // $\mathsf{\mathbf{K}}_{\widetilde{p}\widetilde{J}}^{-1}$, which
+            // was permanently written into the global tangent matrix. We then
+            // permanently modified $\mathsf{\mathbf{K}}_{uu}$ to produce
+            // $\mathsf{\mathbf{K}}_{\textrm{con}}$. This involved the
+            // extraction and manipulation of local sub-blocks of the tangent
+            // matrix. After solving for the displacement, the individual
+            // matrix-vector operations required to solve for dilatation and
+            // pressure were carefully implemented. Contrast these many sequence
+            // of steps to the much simpler and transparent implementation using
+            // functionality provided by the LinearOperator class.
 
             // For ease of later use, we define some aliases for
             // blocks in the RHS vector
@@ -3234,78 +3230,95 @@ namespace Step44
             Vector<double> &d_p = newton_update.block(p_dof);
             Vector<double> &d_J = newton_update.block(J_dof);
 
-            // We next define some linear operators for the tangent matrix sub-blocks
-            // We will exploit the symmetry of the system, so not all blocks
-            // are required.
-            const auto K_uu = linear_operator(tangent_matrix.block(u_dof, u_dof));
-            const auto K_up = linear_operator(tangent_matrix.block(u_dof, p_dof));
-            const auto K_pu = linear_operator(tangent_matrix.block(p_dof, u_dof));
-            const auto K_Jp = linear_operator(tangent_matrix.block(J_dof, p_dof));
-            const auto K_JJ = linear_operator(tangent_matrix.block(J_dof, J_dof));
+            // We next define some linear operators for the tangent matrix
+            // sub-blocks We will exploit the symmetry of the system, so not all
+            // blocks are required.
+            const auto K_uu =
+              linear_operator(tangent_matrix.block(u_dof, u_dof));
+            const auto K_up =
+              linear_operator(tangent_matrix.block(u_dof, p_dof));
+            const auto K_pu =
+              linear_operator(tangent_matrix.block(p_dof, u_dof));
+            const auto K_Jp =
+              linear_operator(tangent_matrix.block(J_dof, p_dof));
+            const auto K_JJ =
+              linear_operator(tangent_matrix.block(J_dof, J_dof));
 
-            // We then construct a LinearOperator that represents the inverse of (square block)
-            // $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}$. Since it is diagonal (or,
-            // when a higher order ansatz it used, nearly diagonal), a Jacobi preconditioner
-            // is suitable.
+            // We then construct a LinearOperator that represents the inverse of
+            // (square block)
+            // $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}$. Since it is
+            // diagonal (or, when a higher order ansatz it used, nearly
+            // diagonal), a Jacobi preconditioner is suitable.
             PreconditionSelector<SparseMatrix<double>, Vector<double>>
               preconditioner_K_Jp_inv("jacobi");
-            preconditioner_K_Jp_inv.use_matrix(tangent_matrix.block(J_dof, p_dof));
-            ReductionControl solver_control_K_Jp_inv(tangent_matrix.block(J_dof, p_dof).m() * parameters.max_iterations_lin,
-                                                     1.0e-30, parameters.tol_lin);
+            preconditioner_K_Jp_inv.use_matrix(
+              tangent_matrix.block(J_dof, p_dof));
+            ReductionControl solver_control_K_Jp_inv(
+              tangent_matrix.block(J_dof, p_dof).m() *
+                parameters.max_iterations_lin,
+              1.0e-30,
+              parameters.tol_lin);
             SolverSelector<Vector<double>> solver_K_Jp_inv;
             solver_K_Jp_inv.select("cg");
             solver_K_Jp_inv.set_control(solver_control_K_Jp_inv);
-            const auto K_Jp_inv = inverse_operator(K_Jp,
-                                                   solver_K_Jp_inv,
-                                                   preconditioner_K_Jp_inv);
+            const auto K_Jp_inv =
+              inverse_operator(K_Jp, solver_K_Jp_inv, preconditioner_K_Jp_inv);
 
-            // Now we can construct that transpose of $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}$
-            // and a linear operator that represents the condensed operations
+            // Now we can construct that transpose of
+            // $\mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}$ and a
+            // linear operator that represents the condensed operations
             // $\overline{\mathsf{\mathbf{K}}}$ and
-            // $\overline{\overline{\mathsf{\mathbf{K}}}}$ and the final augmented matrix
+            // $\overline{\overline{\mathsf{\mathbf{K}}}}$ and the final
+            // augmented matrix
             // $\mathsf{\mathbf{K}}_{\textrm{con}}$.
-            // Note that the schur_complement() operator could also be of use here, but
-            // for clarity and the purpose of demonstrating the similarities between the
-            // formulation and implementation of the linear solution scheme, we will perform
-            // these operations manually.
+            // Note that the schur_complement() operator could also be of use
+            // here, but for clarity and the purpose of demonstrating the
+            // similarities between the formulation and implementation of the
+            // linear solution scheme, we will perform these operations
+            // manually.
             const auto K_pJ_inv     = transpose_operator(K_Jp_inv);
             const auto K_pp_bar     = K_Jp_inv * K_JJ * K_pJ_inv;
             const auto K_uu_bar_bar = K_up * K_pp_bar * K_pu;
             const auto K_uu_con     = K_uu + K_uu_bar_bar;
 
-            // Lastly, we define an operator for inverse of augmented stiffness matrix,
-            // namely $\mathsf{\mathbf{K}}_{\textrm{con}}^{-1}$.
-            // Note that the preconditioner for the augmented stiffness matrix is
-            // different to the case when we use static condensation. In this instance,
-            // the preconditioner is based on a non-modified $\mathsf{\mathbf{K}}_{uu}$,
-            // while with the first approach we actually modified the entries of this
-            // sub-block. However, since $\mathsf{\mathbf{K}}_{\textrm{con}}$ and
-            // $\mathsf{\mathbf{K}}_{uu}$ operate on the same space, it remains adequate
-            // for this problem.
+            // Lastly, we define an operator for inverse of augmented stiffness
+            // matrix, namely $\mathsf{\mathbf{K}}_{\textrm{con}}^{-1}$. Note
+            // that the preconditioner for the augmented stiffness matrix is
+            // different to the case when we use static condensation. In this
+            // instance, the preconditioner is based on a non-modified
+            // $\mathsf{\mathbf{K}}_{uu}$, while with the first approach we
+            // actually modified the entries of this sub-block. However, since
+            // $\mathsf{\mathbf{K}}_{\textrm{con}}$ and
+            // $\mathsf{\mathbf{K}}_{uu}$ operate on the same space, it remains
+            // adequate for this problem.
             PreconditionSelector<SparseMatrix<double>, Vector<double>>
               preconditioner_K_con_inv(parameters.preconditioner_type,
                                        parameters.preconditioner_relaxation);
-            preconditioner_K_con_inv.use_matrix(tangent_matrix.block(u_dof, u_dof));
-            ReductionControl solver_control_K_con_inv(tangent_matrix.block(u_dof, u_dof).m() * parameters.max_iterations_lin,
-                                                      1.0e-30, parameters.tol_lin);
+            preconditioner_K_con_inv.use_matrix(
+              tangent_matrix.block(u_dof, u_dof));
+            ReductionControl solver_control_K_con_inv(
+              tangent_matrix.block(u_dof, u_dof).m() *
+                parameters.max_iterations_lin,
+              1.0e-30,
+              parameters.tol_lin);
             SolverSelector<Vector<double>> solver_K_con_inv;
             solver_K_con_inv.select("cg");
             solver_K_con_inv.set_control(solver_control_K_con_inv);
-            const auto K_uu_con_inv = inverse_operator(K_uu_con,
-                                                       solver_K_con_inv,
-                                                       preconditioner_K_con_inv);
+            const auto K_uu_con_inv = inverse_operator(
+              K_uu_con, solver_K_con_inv, preconditioner_K_con_inv);
 
             // Now we are in a position to solve for the displacement field.
             // We can nest the linear operations, and the result is immediately
             // written to the Newton update vector.
             // It is clear that the implementation closely mimics the derivation
             // stated in the introduction.
-            d_u = K_uu_con_inv * (f_u - K_up * (K_Jp_inv * f_J - K_pp_bar * f_p));
+            d_u =
+              K_uu_con_inv * (f_u - K_up * (K_Jp_inv * f_J - K_pp_bar * f_p));
 
             timer.leave_subsection();
 
-            // The operations need to post-process for the dilatation and pressure
-            // fields are just as easy to express.
+            // The operations need to post-process for the dilatation and
+            // pressure fields are just as easy to express.
             timer.enter_subsection("Linear solver postprocessing");
             std::cout << " PP " << std::flush;
 
@@ -3354,10 +3367,12 @@ namespace Step44
   {
     DataOut<dim> data_out;
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(dim,
-                                  DataComponentInterpretation::component_is_part_of_vector);
-    data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-    data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+      data_component_interpretation(
+        dim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar);
+    data_component_interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar);
 
     std::vector<std::string> solution_name(dim, "displacement");
     solution_name.emplace_back("pressure");
@@ -3407,11 +3422,13 @@ int main()
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      std::cerr << "Exception on processing: " << std::endl << exc.what()
-                << std::endl << "Aborting!" << std::endl
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
 
@@ -3419,11 +3436,12 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      std::cerr << "Unknown exception!" << std::endl << "Aborting!"
-                << std::endl
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       return 1;

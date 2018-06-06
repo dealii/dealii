@@ -134,7 +134,8 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide() : Function<dim>() {}
+  RightHandSide() : Function<dim>()
+  {}
 
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
@@ -146,12 +147,12 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues() : Function<dim>() {}
+  BoundaryValues() : Function<dim>()
+  {}
 
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
 };
-
 
 
 
@@ -231,10 +232,7 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
 // and associates the DoFHandler to the triangulation just as in the previous
 // example program, step-3:
 template <int dim>
-Step4<dim>::Step4 ()
-  :
-  fe(1),
-  dof_handler(triangulation)
+Step4<dim>::Step4() : fe(1), dof_handler(triangulation)
 {}
 
 
@@ -255,11 +253,9 @@ void Step4<dim>::make_grid()
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(4);
 
-  std::cout << "   Number of active cells: "
-            << triangulation.n_active_cells()
+  std::cout << "   Number of active cells: " << triangulation.n_active_cells()
             << std::endl
-            << "   Total number of cells: "
-            << triangulation.n_cells()
+            << "   Total number of cells: " << triangulation.n_cells()
             << std::endl;
 }
 
@@ -275,8 +271,7 @@ void Step4<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: "
-            << dof_handler.n_dofs()
+  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -323,7 +318,8 @@ void Step4<dim>::assemble_system()
   // gradients of the shape function from the FEValues object, as well as the
   // quadrature weights, FEValues::JxW() ). We can tell the FEValues object to
   // do for us by also giving it the #update_quadrature_points flag:
-  FEValues<dim> fe_values(fe, quadrature_formula,
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
                           update_values | update_gradients |
                             update_quadrature_points | update_JxW_values);
 
@@ -366,13 +362,14 @@ void Step4<dim>::assemble_system()
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              cell_matrix(i,j) += (fe_values.shape_grad(i, q_index) *
-                                   fe_values.shape_grad(j, q_index) *
-                 fe_values.JxW(q_index));
+              cell_matrix(i, j) +=
+                (fe_values.shape_grad(i, q_index) *
+                 fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
-            cell_rhs(i) += (fe_values.shape_value(i, q_index) *
-                            right_hand_side.value(fe_values.quadrature_point(q_index)) *
-                            fe_values.JxW(q_index));
+            cell_rhs(i) +=
+              (fe_values.shape_value(i, q_index) *
+               right_hand_side.value(fe_values.quadrature_point(q_index)) *
+               fe_values.JxW(q_index));
           }
       // As a final remark to these loops: when we assemble the local
       // contributions into <code>cell_matrix(i,j)</code>, we have to multiply
@@ -400,9 +397,8 @@ void Step4<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(local_dof_indices[i],
-                              local_dof_indices[j],
-                              cell_matrix(i,j));
+            system_matrix.add(
+              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -411,18 +407,14 @@ void Step4<dim>::assemble_system()
 
   // As the final step in this function, we wanted to have non-homogeneous
   // boundary values in this example, unlike the one before. This is a simple
-  // task, we only have to replace the Functions::ZeroFunction used there by an object of
-  // the class which describes the boundary values we would like to use
-  // (i.e. the <code>BoundaryValues</code> class declared above):
+  // task, we only have to replace the Functions::ZeroFunction used there by an
+  // object of the class which describes the boundary values we would like to
+  // use (i.e. the <code>BoundaryValues</code> class declared above):
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
-                                           BoundaryValues<dim>(),
-                                           boundary_values);
-  MatrixTools::apply_boundary_values(boundary_values,
-                                     system_matrix,
-                                     solution,
-                                     system_rhs);
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, BoundaryValues<dim>(), boundary_values);
+  MatrixTools::apply_boundary_values(
+    boundary_values, system_matrix, solution, system_rhs);
 }
 
 
@@ -436,14 +428,12 @@ void Step4<dim>::solve()
 {
   SolverControl solver_control(1000, 1e-12);
   SolverCG<>    solver(solver_control);
-  solver.solve(system_matrix, solution, system_rhs,
-               PreconditionIdentity());
+  solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
   // We have made one addition, though: since we suppress output from the
   // linear solvers, we have to print the number of iterations by hand.
   std::cout << "   " << solver_control.last_step()
-            << " CG iterations needed to obtain convergence."
-            << std::endl;
+            << " CG iterations needed to obtain convergence." << std::endl;
 }
 
 
@@ -475,9 +465,7 @@ void Step4<dim>::output_results() const
 
   data_out.build_patches();
 
-  std::ofstream output(dim == 2 ?
-                       "solution-2d.vtk" :
-                       "solution-3d.vtk");
+  std::ofstream output(dim == 2 ? "solution-2d.vtk" : "solution-3d.vtk");
   data_out.write_vtk(output);
 }
 
@@ -491,7 +479,8 @@ void Step4<dim>::output_results() const
 template <int dim>
 void Step4<dim>::run()
 {
-  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
+  std::cout << "Solving problem in " << dim << " space dimensions."
+            << std::endl;
 
   make_grid();
   setup_system();

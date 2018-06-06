@@ -84,7 +84,8 @@ namespace Step41
     void make_grid();
     void setup_system();
     void assemble_system();
-    void assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
+    void
+         assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints();
     void solve();
     void output_results(const unsigned int iteration) const;
@@ -120,7 +121,8 @@ namespace Step41
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>() {}
+    RightHandSide() : Function<dim>()
+    {}
 
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
@@ -142,7 +144,8 @@ namespace Step41
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues() : Function<dim>() {}
+    BoundaryValues() : Function<dim>()
+    {}
 
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
@@ -166,7 +169,8 @@ namespace Step41
   class Obstacle : public Function<dim>
   {
   public:
-    Obstacle() : Function<dim>() {}
+    Obstacle() : Function<dim>()
+    {}
 
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
@@ -199,10 +203,7 @@ namespace Step41
   // To everyone who has taken a look at the first few tutorial programs, the
   // constructor is completely obvious:
   template <int dim>
-  ObstacleProblem<dim>::ObstacleProblem()
-    :
-    fe(1),
-    dof_handler(triangulation)
+  ObstacleProblem<dim>::ObstacleProblem() : fe(1), dof_handler(triangulation)
   {}
 
 
@@ -217,11 +218,9 @@ namespace Step41
     GridGenerator::hyper_cube(triangulation, -1, 1);
     triangulation.refine_global(7);
 
-    std::cout << "Number of active cells: "
-              << triangulation.n_active_cells()
+    std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl
-              << "Total number of cells: "
-              << triangulation.n_cells()
+              << "Total number of cells: " << triangulation.n_cells()
               << std::endl;
   }
 
@@ -238,22 +237,16 @@ namespace Step41
     dof_handler.distribute_dofs(fe);
     active_set.set_size(dof_handler.n_dofs());
 
-    std::cout << "Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl
               << std::endl;
 
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             BoundaryValues<dim>(),
-                                             constraints);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, BoundaryValues<dim>(), constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler,
-                                    dsp,
-                                    constraints,
-                                    false);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
 
     system_matrix.reinit(dsp);
     complete_system_matrix.reinit(dsp);
@@ -295,10 +288,10 @@ namespace Step41
     const QGauss<dim>        quadrature_formula(fe.degree + 1);
     const RightHandSide<dim> right_hand_side;
 
-    FEValues<dim>             fe_values(fe, quadrature_formula,
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
                             update_values | update_gradients |
-                                        update_quadrature_points |
-                              update_JxW_values);
+                              update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -308,8 +301,8 @@ namespace Step41
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
@@ -322,13 +315,14 @@ namespace Step41
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i,j) += (fe_values.shape_grad(i, q_point) *
-                                     fe_values.shape_grad(j, q_point) *
-                   fe_values.JxW(q_point));
+                cell_matrix(i, j) +=
+                  (fe_values.shape_grad(i, q_point) *
+                   fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point));
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              right_hand_side.value(fe_values.quadrature_point(q_point)) *
-                              fe_values.JxW(q_point));
+              cell_rhs(i) +=
+                (fe_values.shape_value(i, q_point) *
+                 right_hand_side.value(fe_values.quadrature_point(q_point)) *
+                 fe_values.JxW(q_point));
             }
 
         cell->get_dof_indices(local_dof_indices);
@@ -367,26 +361,23 @@ namespace Step41
   // top of the function that our implicit assumption about the finite element
   // is in fact satisfied.
   template <int dim>
-  void
-  ObstacleProblem<dim>::
-  assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix)
+  void ObstacleProblem<dim>::assemble_mass_matrix_diagonal(
+    TrilinosWrappers::SparseMatrix &mass_matrix)
   {
     Assert(fe.degree == 1, ExcNotImplemented());
 
     const QTrapez<dim> quadrature_formula;
-    FEValues<dim>             fe_values(fe,
-                                        quadrature_formula,
-                                        update_values   |
-                                        update_JxW_values);
+    FEValues<dim>      fe_values(
+      fe, quadrature_formula, update_values | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
@@ -396,15 +387,14 @@ namespace Step41
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            cell_matrix(i,i) += (fe_values.shape_value(i, q_point) *
-                                 fe_values.shape_value(i, q_point) *
-               fe_values.JxW(q_point));
+            cell_matrix(i, i) +=
+              (fe_values.shape_value(i, q_point) *
+               fe_values.shape_value(i, q_point) * fe_values.JxW(q_point));
 
         cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global(cell_matrix,
-                                               local_dof_indices,
-                                               mass_matrix);
+        constraints.distribute_local_to_global(
+          cell_matrix, local_dof_indices, mass_matrix);
       }
   }
 
@@ -429,16 +419,15 @@ namespace Step41
   // At the top of this function, we compute this residual using a function
   // that is part of the matrix classes.
   template <int dim>
-  void
-  ObstacleProblem<dim>::update_solution_and_constraints()
+  void ObstacleProblem<dim>::update_solution_and_constraints()
   {
     std::cout << "   Updating active set..." << std::endl;
 
     const double penalty_parameter = 100.0;
 
-    TrilinosWrappers::MPI::Vector lambda(complete_index_set(dof_handler.n_dofs()));
-    complete_system_matrix.residual(lambda,
-                                    solution, complete_system_rhs);
+    TrilinosWrappers::MPI::Vector lambda(
+      complete_index_set(dof_handler.n_dofs()));
+    complete_system_matrix.residual(lambda, solution, complete_system_rhs);
 
     // compute contact_force[i] = - lambda[i] * diagonal_of_mass_matrix[i]
     contact_force = lambda;
@@ -476,8 +465,8 @@ namespace Step41
     const Obstacle<dim> obstacle;
     std::vector<bool>   dof_touched(dof_handler.n_dofs(), false);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -515,11 +504,9 @@ namespace Step41
           const double obstacle_value = obstacle.value(cell->vertex(v));
           const double solution_value = solution(dof_index);
 
-          if (lambda(dof_index) +
-              penalty_parameter *
+          if (lambda(dof_index) + penalty_parameter *
                                     diagonal_of_mass_matrix(dof_index) *
-              (solution_value - obstacle_value)
-              <
+                                    (solution_value - obstacle_value) <
               0)
             {
               active_set.add_index(dof_index);
@@ -535,16 +522,13 @@ namespace Step41
               << std::endl;
 
     std::cout << "   Residual of the non-contact part of the system: "
-              << lambda.l2_norm()
-              << std::endl;
+              << lambda.l2_norm() << std::endl;
 
     // In a final step, we add to the set of constraints on DoFs we have so
     // far from the active set those that result from Dirichlet boundary
     // values, and close the constraints object:
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             BoundaryValues<dim>(),
-                                             constraints);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, BoundaryValues<dim>(), constraints);
     constraints.close();
   }
 
@@ -570,11 +554,9 @@ namespace Step41
     solver.solve(system_matrix, solution, system_rhs, precondition);
     constraints.distribute(solution);
 
-    std::cout << "      Error: " << reduction_control.initial_value()
-              << " -> " << reduction_control.last_value()
-              << " in "
-              <<  reduction_control.last_step()
-              << " CG iterations."
+    std::cout << "      Error: " << reduction_control.initial_value() << " -> "
+              << reduction_control.last_value() << " in "
+              << reduction_control.last_step() << " CG iterations."
               << std::endl;
   }
 
@@ -602,8 +584,7 @@ namespace Step41
     data_out.build_patches();
 
     std::ofstream output_vtk(std::string("output_") +
-                             Utilities::int_to_string(iteration, 3) +
-                             ".vtk");
+                             Utilities::int_to_string(iteration, 3) + ".vtk");
     data_out.write_vtk(output_vtk);
   }
 
@@ -673,19 +654,21 @@ int main(int argc, char *argv[])
       using namespace dealii;
       using namespace Step41;
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
-                                                          numbers::invalid_unsigned_int);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(
+        argc, argv, numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-                  ExcMessage("This program can only be run in serial, use ./step-41"));
+      AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage("This program can only be run in serial, use ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run();
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -698,7 +681,8 @@ int main(int argc, char *argv[])
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

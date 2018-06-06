@@ -118,9 +118,7 @@ double coefficient(const Point<dim> &p)
 
 // This function is as before.
 template <int dim>
-Step5<dim>::Step5 () :
-  fe(1),
-  dof_handler(triangulation)
+Step5<dim>::Step5() : fe(1), dof_handler(triangulation)
 {}
 
 
@@ -134,8 +132,7 @@ void Step5<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: "
-            << dof_handler.n_dofs()
+  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -171,7 +168,8 @@ void Step5<dim>::assemble_system()
 {
   QGauss<dim> quadrature_formula(2);
 
-  FEValues<dim> fe_values(fe, quadrature_formula,
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
                           update_values | update_gradients |
                             update_quadrature_points | update_JxW_values);
 
@@ -197,18 +195,16 @@ void Step5<dim>::assemble_system()
 
       for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
-          const double current_coefficient = coefficient<dim>
-                                             (fe_values.quadrature_point(q_index));
+          const double current_coefficient =
+            coefficient<dim>(fe_values.quadrature_point(q_index));
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i,j) += (current_coefficient *
-                                     fe_values.shape_grad(i,q_index) *
-                                     fe_values.shape_grad(j,q_index) *
-                                     fe_values.JxW(q_index));
+                cell_matrix(i, j) +=
+                  (current_coefficient * fe_values.shape_grad(i, q_index) *
+                   fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
-              cell_rhs(i) += (fe_values.shape_value(i,q_index) *
-                              1.0 *
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
                               fe_values.JxW(q_index));
             }
         }
@@ -218,9 +214,8 @@ void Step5<dim>::assemble_system()
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            system_matrix.add(local_dof_indices[i],
-                              local_dof_indices[j],
-                              cell_matrix(i,j));
+            system_matrix.add(
+              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -228,14 +223,10 @@ void Step5<dim>::assemble_system()
 
   // With the matrix so built, we use zero boundary values again:
   std::map<types::global_dof_index, double> boundary_values;
-  VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
-                                           Functions::ZeroFunction<dim>(),
-                                           boundary_values);
-  MatrixTools::apply_boundary_values(boundary_values,
-                                     system_matrix,
-                                     solution,
-                                     system_rhs);
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
+  MatrixTools::apply_boundary_values(
+    boundary_values, system_matrix, solution, system_rhs);
 }
 
 
@@ -275,12 +266,10 @@ void Step5<dim>::solve()
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  solver.solve(system_matrix, solution, system_rhs,
-               preconditioner);
+  solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
   std::cout << "   " << solver_control.last_step()
-            << " CG iterations needed to obtain convergence."
-            << std::endl;
+            << " CG iterations needed to obtain convergence." << std::endl;
 }
 
 
@@ -433,8 +422,9 @@ void Step5<dim>::run()
   // not to do, after all.
 
   // So if we got past the assertion, we know that dim==2, and we can now
-  // actually read the grid. It is in UCD (unstructured cell data) format (though
-  // the convention is to use the suffix <code>inp</code> for UCD files):
+  // actually read the grid. It is in UCD (unstructured cell data) format
+  // (though the convention is to use the suffix <code>inp</code> for UCD
+  // files):
   grid_in.read_ucd(input_file);
   // If you like to use another input format, you have to use one of the other
   // <code>grid_in.read_xxx</code> function. (See the documentation of the
@@ -462,10 +452,8 @@ void Step5<dim>::run()
       // Now that we have a mesh for sure, we write some output and do all the
       // things that we have already seen in the previous examples.
       std::cout << "   Number of active cells: "
-                << triangulation.n_active_cells()
-                << std::endl
-                << "   Total number of cells: "
-                << triangulation.n_cells()
+                << triangulation.n_active_cells() << std::endl
+                << "   Total number of cells: " << triangulation.n_cells()
                 << std::endl;
 
       setup_system();
