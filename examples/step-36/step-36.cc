@@ -445,28 +445,22 @@ namespace Step36
   {
     make_grid_and_dofs();
 
-    std::cout << "   Number of active cells:       "
-              << triangulation.n_active_cells()
+    std::cout << "   Number of active cells:       " << triangulation.n_active_cells()
               << std::endl
-              << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << std::endl;
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
 
     assemble_system();
 
     const unsigned int n_iterations = solve();
-    std::cout << "   Solver converged in " << n_iterations
-              << " iterations." << std::endl;
+    std::cout << "   Solver converged in " << n_iterations << " iterations." << std::endl;
 
     output_results();
 
     std::cout << std::endl;
     for (unsigned int i = 0; i < eigenvalues.size(); ++i)
-      std::cout << "      Eigenvalue " << i
-                << " : " << eigenvalues[i]
-                << std::endl;
+      std::cout << "      Eigenvalue " << i << " : " << eigenvalues[i] << std::endl;
   }
-  }
+} // namespace Step36
 
 // @sect3{The <code>main</code> function}
 int main(int argc, char **argv)

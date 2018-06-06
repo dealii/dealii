@@ -720,7 +720,7 @@ namespace Step52
     std::cout << "Cash-Karp:                error=" << solution.l2_norm() << std::endl;
     std::cout << "                steps performed=" << n_steps << std::endl;
   }
-}
+} // namespace Step52
 
 
 

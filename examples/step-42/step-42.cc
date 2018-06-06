@@ -612,7 +612,7 @@ namespace Step42
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = ChineseObstacle<dim>::value(p, c);
     }
-  }
+  } // namespace EquationData
 
   // @sect3{The <code>PlasticityContactProblem</code> class template}
 
@@ -2202,7 +2202,7 @@ namespace Step42
           output_contact_force();
       }
   }
-}
+} // namespace Step42
 
 // @sect3{The <code>main</code> function}
 

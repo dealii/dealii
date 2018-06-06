@@ -1858,7 +1858,7 @@ namespace Step18
   // that initializes and terminates PETSc, calls the classes that do the
   // actual work, and makes sure that we catch all exceptions that propagate
   // up to this point:
-}
+} // namespace Step18
 
 
 int main(int argc, char **argv)

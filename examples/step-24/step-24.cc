@@ -545,7 +545,7 @@ namespace Step24
         old_solution_v = solution_v;
       }
   }
-}
+} // namespace Step24
 
 
 

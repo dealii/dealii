@@ -434,7 +434,7 @@ namespace Step44
       NonlinearSolver::parse_parameters(prm);
       Time::parse_parameters(prm);
     }
-  }
+  } // namespace Parameters
 
   // @sect3{Time class}
 
@@ -3383,15 +3383,12 @@ namespace Step44
     MappingQEulerian<dim> q_mapping(degree, dof_handler_ref, soln);
     data_out.build_patches(q_mapping, degree);
 
-    std::ofstream output("solution-"
-                         + std::to_string(dim)
-                         + "d-"
-                         + std::to_string(time.get_timestep())
-                         + ".vtk");
+    std::ofstream output("solution-" + std::to_string(dim) + "d-" +
+                         std::to_string(time.get_timestep()) + ".vtk");
     data_out.write_vtk(output);
   }
 
-}
+} // namespace Step44
 
 
 // @sect3{Main function}

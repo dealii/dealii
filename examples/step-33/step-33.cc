@@ -1259,7 +1259,7 @@ namespace Step33
       Parameters::Flux::parse_parameters(prm);
       Parameters::Output::parse_parameters(prm);
     }
-  }
+  } // namespace Parameters
 
 
 
@@ -2493,7 +2493,7 @@ namespace Step33
           }
       }
   }
-}
+} // namespace Step33
 
 // @sect3{main()}
 

@@ -630,7 +630,7 @@ namespace Step16
         output_results(cycle);
       }
   }
-}
+} // namespace Step16
 
 
 // @sect3{The main() function}

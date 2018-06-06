@@ -484,7 +484,7 @@ namespace Step19
 
     AssertThrow(false, ExcNotImplemented());
   }
-}
+} // namespace Step19
 
 
 

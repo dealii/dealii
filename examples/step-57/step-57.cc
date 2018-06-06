@@ -859,7 +859,7 @@ namespace Step57
         newton_iteration(1e-12, 50, refinement, true, true);
       }
   }
-}
+} // namespace Step57
 
 int main()
 {

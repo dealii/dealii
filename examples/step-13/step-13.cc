@@ -433,7 +433,7 @@ namespace Step13
     // evaluation classes, representing quantities that one may be interested
     // in. For this example, that much shall be sufficient, so we close the
     // namespace.
-  }
+  } // namespace Evaluation
 
 
   // @sect3{The Laplace solver classes}
@@ -1275,14 +1275,12 @@ namespace Step13
                                          typename FunctionMap<dim>::type(),
                                          this->solution,
                                          estimated_error_per_cell);
-      GridRefinement::refine_and_coarsen_fixed_number(*this->triangulation,
-                                                      estimated_error_per_cell,
-                                                      0.3, 0.03);
+      GridRefinement::refine_and_coarsen_fixed_number(
+        *this->triangulation, estimated_error_per_cell, 0.3, 0.03);
       this->triangulation->execute_coarsening_and_refinement();
     }
 
-  }
-
+  } // namespace LaplaceSolver
 
 
 
@@ -1503,7 +1501,7 @@ namespace Step13
     // And one blank line after all results:
     std::cout << std::endl;
   }
-}
+} // namespace Step13
 
 
 

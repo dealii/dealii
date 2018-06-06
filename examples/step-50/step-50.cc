@@ -84,7 +84,7 @@ namespace LA
 #else
   using namespace dealii::LinearAlgebraTrilinos;
 #endif
-}
+} // namespace LA
 
 // This is C++:
 #include <iostream>
@@ -957,7 +957,7 @@ namespace Step50
         output_results(cycle);
       }
   }
-}
+} // namespace Step50
 
 
 // @sect3{The main() function}

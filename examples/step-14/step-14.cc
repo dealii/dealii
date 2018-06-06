@@ -349,7 +349,7 @@ namespace Step14
                         + ".eps");
       GridOut().write_eps(dof_handler.get_triangulation(), out);
     }
-  }
+  } // namespace Evaluation
 
 
   // @sect3{The Laplace solver classes}
@@ -1019,20 +1019,19 @@ namespace Step14
       // second cell, etc., and we could as well just keep track of this index
       // using an integer counter; but using CellAccessor::active_cell_index()
       // makes this more explicit.)
-      typename DoFHandler<dim>::active_cell_iterator
-      cell = this->dof_handler.begin_active(),
+      typename DoFHandler<dim>::active_cell_iterator cell =
+                                                       this->dof_handler.begin_active(),
                                                      endc = this->dof_handler.end();
       for (; cell != endc; ++cell)
-        estimated_error_per_cell(cell->active_cell_index())
-        *= weighting_function->value (cell->center());
+        estimated_error_per_cell(cell->active_cell_index()) *=
+          weighting_function->value(cell->center());
 
-      GridRefinement::refine_and_coarsen_fixed_number(*this->triangulation,
-                                                      estimated_error_per_cell,
-                                                      0.3, 0.03);
+      GridRefinement::refine_and_coarsen_fixed_number(
+        *this->triangulation, estimated_error_per_cell, 0.3, 0.03);
       this->triangulation->execute_coarsening_and_refinement();
     }
 
-  }
+  } // namespace LaplaceSolver
 
 
   // @sect3{Equation data}
@@ -1419,7 +1418,7 @@ namespace Step14
       // is a grid point, we refine once globally:
       coarse_grid.refine_global(1);
     }
-  }
+  } // namespace Data
 
   // @sect4{Discussion}
   //
@@ -1699,8 +1698,7 @@ namespace Step14
       // at all, by making sure that their volume is non-zero. If not, then
       // the results will be botched, as the right hand side should then still
       // be zero, so throw an exception:
-      AssertThrow(total_volume > 0,
-                  ExcEvaluationPointNotFound(evaluation_point));
+      AssertThrow(total_volume > 0, ExcEvaluationPointNotFound(evaluation_point));
 
       // Finally, we have by now only integrated the gradients of the shape
       // functions, not taking their mean value. We fix this by dividing by
@@ -1709,13 +1707,12 @@ namespace Step14
     }
 
 
-  }
+  } // namespace DualFunctional
 
 
   // @sect3{Extending the LaplaceSolver namespace}
   namespace LaplaceSolver
   {
-
     // @sect4{The DualSolver class}
 
     // In the same way as the <code>PrimalSolver</code> class above, we now
@@ -2714,14 +2711,11 @@ namespace Step14
       // checks that the entries for the sub-faces have been computed and do
       // not carry an invalid value.
       double sum = 0;
-      for (unsigned int subface_no = 0;
-           subface_no<face->n_children(); ++subface_no)
+      for (unsigned int subface_no = 0; subface_no < face->n_children(); ++subface_no)
         {
-          Assert(face_integrals.find(face->child(subface_no)) !=
-                   face_integrals.end(),
+          Assert(face_integrals.find(face->child(subface_no)) != face_integrals.end(),
                  ExcInternalError());
-          Assert(face_integrals[face->child(subface_no)] != -1e20,
-                 ExcInternalError());
+          Assert(face_integrals[face->child(subface_no)] != -1e20, ExcInternalError());
 
           sum += face_integrals[face->child(subface_no)];
         }
@@ -2729,7 +2723,7 @@ namespace Step14
       face_integrals[face] = sum;
     }
 
-  }
+  } // namespace LaplaceSolver
 
 
   // @sect3{A simulation framework}
@@ -2955,7 +2949,7 @@ namespace Step14
     std::cout << std::endl;
   }
 
-}
+} // namespace Step14
 
 
 

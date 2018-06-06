@@ -384,7 +384,7 @@ namespace Step54
         output_results(cycle + 1);
       }
   }
-}
+} // namespace Step54
 
 
 // @sect3{The main() function}

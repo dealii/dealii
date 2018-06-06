@@ -38,7 +38,7 @@ namespace LA
 #else
 #  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
 #endif
-}
+} // namespace LA
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -168,26 +168,23 @@ namespace Step55
 
     template <class PreconditionerA, class PreconditionerS>
     BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::
-    BlockDiagonalPreconditioner(
-      const PreconditionerA &preconditioner_A,
-      const PreconditionerS &preconditioner_S)
-      :
+      BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,
+                                  const PreconditionerS &preconditioner_S) :
       preconditioner_A(preconditioner_A),
       preconditioner_S(preconditioner_S)
     {}
 
 
     template <class PreconditionerA, class PreconditionerS>
-    void
-    BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::
-    vmult(LA::MPI::BlockVector       &dst,
+    void BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::vmult(
+      LA::MPI::BlockVector &      dst,
       const LA::MPI::BlockVector &src) const
     {
       preconditioner_A.vmult(dst.block(0), src.block(0));
       preconditioner_S.vmult(dst.block(1), src.block(1));
     }
 
-  }
+  } // namespace LinearSolvers
 
   // @sect3{Problem setup}
 
@@ -833,7 +830,7 @@ namespace Step55
         pcout << std::endl;
       }
   }
-}
+} // namespace Step55
 
 
 

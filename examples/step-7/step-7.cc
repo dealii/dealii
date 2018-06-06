@@ -1291,7 +1291,7 @@ namespace Step7
   // The final step before going to <code>main()</code> is then to close the
   // namespace <code>Step7</code> into which we have put everything we needed
   // for this program:
-}
+} // namespace Step7
 
 // @sect3{Main function}
 

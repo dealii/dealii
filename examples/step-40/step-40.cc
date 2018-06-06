@@ -47,7 +47,7 @@ namespace LA
 #else
 #  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
 #endif
-}
+} // namespace LA
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -694,7 +694,7 @@ namespace Step40
         pcout << std::endl;
       }
   }
-}
+} // namespace Step40
 
 
 

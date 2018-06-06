@@ -1109,7 +1109,7 @@ namespace Step56
         computing_timer.reset();
       }
   }
-}
+} // namespace Step56
 
 // @sect3{The main function}
 int main()

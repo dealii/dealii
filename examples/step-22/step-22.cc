@@ -1031,7 +1031,7 @@ namespace Step22
         std::cout << std::endl;
       }
   }
-}
+} // namespace Step22
 
 
 // @sect3{The <code>main</code> function}

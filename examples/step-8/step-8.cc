@@ -645,7 +645,7 @@ namespace Step8
         output_results(cycle);
       }
   }
-}
+} // namespace Step8
 
 // @sect3{The <code>main</code> function}
 

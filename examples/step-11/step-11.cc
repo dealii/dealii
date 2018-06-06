@@ -427,7 +427,7 @@ namespace Step11
     output_table.write_text(std::cout);
     std::cout << std::endl;
   }
-}
+} // namespace Step11
 
 
 

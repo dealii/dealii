@@ -224,7 +224,7 @@ namespace Step43
             values[p][d][d] = 1. / permeability;
         }
     }
-  }
+  } // namespace SingleCurvingCrack
 
 
   namespace RandomMedium
@@ -298,7 +298,7 @@ namespace Step43
             values[p][d][d] = 1. / normalized_permeability;
         }
     }
-  }
+  } // namespace RandomMedium
 
 
   // @sect3{Physical quantities}
@@ -459,7 +459,7 @@ namespace Step43
       tmp *= -1;
       m_inverse->vmult(dst.block(1), tmp);
     }
-  }
+  } // namespace LinearSolvers
 
 
   // @sect3{The TwoPhaseFlowProblem class}
@@ -2233,7 +2233,7 @@ namespace Step43
       }
     while (time < = end_time);
   }
-}
+} // namespace Step43
 
 
 

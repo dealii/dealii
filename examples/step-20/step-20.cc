@@ -897,7 +897,7 @@ namespace Step20
     compute_errors();
     output_results();
   }
-}
+} // namespace Step20
 
 
 // @sect3{The <code>main</code> function}

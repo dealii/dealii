@@ -905,7 +905,7 @@ namespace Step29
     solve();
     output_results();
   }
-}
+} // namespace Step29
 
 
 // @sect4{The <code>main</code> function}

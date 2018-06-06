@@ -605,16 +605,15 @@ namespace Step48
     output_time += timer.wall_time();
 
     pcout << std::endl
-          << "   Performed " << timestep_number << " time steps."
+          << "   Performed " << timestep_number << " time steps." << std::endl;
+
+    pcout << "   Average wallclock time per time step: " << wtime / timestep_number << "s"
           << std::endl;
 
-    pcout << "   Average wallclock time per time step: "
-          << wtime / timestep_number << "s" << std::endl;
-
-    pcout << "   Spent " << output_time << "s on output and "
-          << wtime << "s on computations." << std::endl;
+    pcout << "   Spent " << output_time << "s on output and " << wtime
+          << "s on computations." << std::endl;
   }
-  }
+} // namespace Step48
 
 
 

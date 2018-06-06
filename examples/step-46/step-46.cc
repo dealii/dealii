@@ -1082,7 +1082,7 @@ namespace Step46
         std::cout << std::endl;
       }
   }
-}
+} // namespace Step46
 
 
 

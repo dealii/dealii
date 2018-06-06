@@ -587,7 +587,7 @@ namespace Step26
         old_solution = solution;
       }
   }
-}
+} // namespace Step26
 // Now that you have seen what the function does, let us come back to the issue
 // of the <code>goto</code>. In essence, what the code does is
 // something like this:

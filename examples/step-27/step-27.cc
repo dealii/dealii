@@ -790,7 +790,7 @@ namespace Step27
         smoothness_indicators(cell->active_cell_index()) = -fit.first - 1. * dim / 2;
       }
   }
-  }
+} // namespace Step27
 
 
 // @sect3{The main function}

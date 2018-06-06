@@ -708,7 +708,7 @@ namespace Step15
         data_out.write_vtu(output);
       }
   }
-}
+} // namespace Step15
 
 // @sect4{The main function}
 

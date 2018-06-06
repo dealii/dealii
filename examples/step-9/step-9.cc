@@ -1273,12 +1273,10 @@ namespace Step9
     // scratch data object, and all we have to do is know how to get
     // at the correct element inside this vector -- but we can ask the
     // cell we're on the how-manyth active cell it is for this:
-    scratch_data.error_per_cell(cell->active_cell_index())
-      = (std::pow(cell->diameter(),
-                  1+1.0*dim/2) *
-       std::sqrt(gradient.norm_square()));
+    scratch_data.error_per_cell(cell->active_cell_index()) =
+      (std::pow(cell->diameter(), 1 + 1.0 * dim / 2) * std::sqrt(gradient.norm_square()));
   }
-  }
+} // namespace Step9
 
 
 // @sect3{Main function}

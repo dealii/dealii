@@ -694,7 +694,7 @@ namespace Step25
           output_results(timestep_number);
       }
   }
-}
+} // namespace Step25
 
 // @sect3{The <code>main</code> function}
 

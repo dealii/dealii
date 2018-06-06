@@ -206,7 +206,7 @@ namespace Step32
     // so we convert to years using the factor defined here:
     const double year_in_seconds = 60 * 60 * 24 * 365.2425;
 
-  }
+  } // namespace EquationData
 
 
 
@@ -288,7 +288,7 @@ namespace Step32
       const PreconditionerTypeA & a_preconditioner;
       const bool                  do_solve_A;
     };
-  }
+  } // namespace LinearSolvers
 
 
 
@@ -605,7 +605,7 @@ namespace Step32
         old_temperature_laplacians(scratch.old_temperature_laplacians),
         old_old_temperature_laplacians(scratch.old_old_temperature_laplacians)
       {}
-    }
+    } // namespace Scratch
 
 
     // The CopyData objects are even simpler than the Scratch objects as all
@@ -737,8 +737,8 @@ namespace Step32
         local_dof_indices(data.local_dof_indices),
         matrix_for_bc(data.matrix_for_bc)
       {}
-    }
-  }
+    } // namespace CopyData
+  }   // namespace Assembly
 
 
 
@@ -3697,7 +3697,7 @@ namespace Step32
         !((timestep_number - 1) % parameters.graphical_output_interval == 0))
       output_results();
   }
-}
+} // namespace Step32
 
 
 

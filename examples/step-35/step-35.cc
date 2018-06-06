@@ -261,7 +261,7 @@ namespace Step35
 
       output_interval = prm.get_integer("output_interval");
     }
-  }
+  } // namespace RunTimeParameters
 
 
 
@@ -394,7 +394,7 @@ namespace Step35
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Pressure<dim>::value(points[i]);
     }
-  }
+  } // namespace EquationData
 
 
 
@@ -1411,7 +1411,7 @@ namespace Step35
 
     prec_vel_mass.solve(rot_u);
   }
-}
+} // namespace Step35
 
 
 // @sect3{ The main function }
