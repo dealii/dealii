@@ -115,20 +115,20 @@ namespace Step23
   class WaveEquation
   {
   public:
-    WaveEquation();
-    void run();
+    WaveEquation ();
+    void run ();
 
   private:
-    void setup_system();
-    void solve_u();
-    void solve_v();
-    void output_results() const;
+    void setup_system ();
+    void solve_u ();
+    void solve_v ();
+    void output_results () const;
 
-    Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>   triangulation;
+    FE_Q<dim>            fe;
+    DoFHandler<dim>      dof_handler;
 
-    ConstraintMatrix constraints;
+    ConstraintMatrix     constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> mass_matrix;
@@ -136,14 +136,14 @@ namespace Step23
     SparseMatrix<double> matrix_u;
     SparseMatrix<double> matrix_v;
 
-    Vector<double> solution_u, solution_v;
-    Vector<double> old_solution_u, old_solution_v;
-    Vector<double> system_rhs;
+    Vector<double>       solution_u, solution_v;
+    Vector<double>       old_solution_u, old_solution_v;
+    Vector<double>       system_rhs;
 
-    double       time_step;
-    double       time;
-    unsigned int timestep_number;
-    const double theta;
+    double               time_step;
+    double               time;
+    unsigned int         timestep_number;
+    const double         theta;
   };
 
 
@@ -163,11 +163,10 @@ namespace Step23
   class InitialValuesU : public Function<dim>
   {
   public:
-    InitialValuesU() : Function<dim>()
-    {}
+    InitialValuesU () : Function<dim>() {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -175,20 +174,19 @@ namespace Step23
   class InitialValuesV : public Function<dim>
   {
   public:
-    InitialValuesV() : Function<dim>()
-    {}
+    InitialValuesV () : Function<dim>() {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const override;
   };
 
 
 
   template <int dim>
-  double InitialValuesU<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int component) const
+  double InitialValuesU<dim>::value (const Point<dim>  &/*p*/,
+                                     const unsigned int component) const
   {
-    (void)component;
+    (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
@@ -196,10 +194,10 @@ namespace Step23
 
 
   template <int dim>
-  double InitialValuesV<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int component) const
+  double InitialValuesV<dim>::value (const Point<dim>  &/*p*/,
+                                     const unsigned int component) const
   {
-    (void)component;
+    (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
@@ -212,20 +210,19 @@ namespace Step23
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide() : Function<dim>()
-    {}
+    RightHandSide () : Function<dim>() {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const override;
   };
 
 
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                   const unsigned int component) const
+  double RightHandSide<dim>::value (const Point<dim>  &/*p*/,
+                                    const unsigned int component) const
   {
-    (void)component;
+    (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
@@ -238,12 +235,12 @@ namespace Step23
   class BoundaryValuesU : public Function<dim>
   {
   public:
-    BoundaryValuesU() : Function<dim>()
-    {}
+    BoundaryValuesU () : Function<dim>() {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const override;
   };
+
 
 
 
@@ -251,25 +248,27 @@ namespace Step23
   class BoundaryValuesV : public Function<dim>
   {
   public:
-    BoundaryValuesV() : Function<dim>()
-    {}
+    BoundaryValuesV () : Function<dim>() {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const override;
   };
 
 
 
+
   template <int dim>
-  double BoundaryValuesU<dim>::value(const Point<dim> & p,
-                                     const unsigned int component) const
+  double BoundaryValuesU<dim>::value (const Point<dim> &p,
+                                      const unsigned int component) const
   {
-    (void)component;
+    (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
-        (p[1] > -1. / 3))
-      return std::sin(this->get_time() * 4 * numbers::PI);
+    if ((this->get_time() <= 0.5) &&
+        (p[0] < 0) &&
+        (p[1] < 1./3) &&
+        (p[1] > -1./3))
+      return std::sin (this->get_time() * 4 * numbers::PI);
     else
       return 0;
   }
@@ -277,18 +276,22 @@ namespace Step23
 
 
   template <int dim>
-  double BoundaryValuesV<dim>::value(const Point<dim> & p,
-                                     const unsigned int component) const
+  double BoundaryValuesV<dim>::value (const Point<dim> &p,
+                                      const unsigned int component) const
   {
-    (void)component;
+    (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
-        (p[1] > -1. / 3))
-      return (std::cos(this->get_time() * 4 * numbers::PI) * 4 * numbers::PI);
+    if ((this->get_time() <= 0.5) &&
+        (p[0] < 0) &&
+        (p[1] < 1./3) &&
+        (p[1] > -1./3))
+      return (std::cos (this->get_time() * 4 * numbers::PI) *
+              4 * numbers::PI);
     else
       return 0;
   }
+
 
 
 
@@ -305,13 +308,13 @@ namespace Step23
   // time step, see the section on Courant, Friedrichs, and Lewy in the
   // introduction):
   template <int dim>
-  WaveEquation<dim>::WaveEquation() :
-    fe(1),
-    dof_handler(triangulation),
-    time_step(1. / 64),
-    time(time_step),
-    timestep_number(1),
-    theta(0.5)
+  WaveEquation<dim>::WaveEquation () :
+    fe (1),
+    dof_handler (triangulation),
+    time_step (1./64),
+    time (time_step),
+    timestep_number (1),
+    theta (0.5)
   {}
 
 
@@ -322,23 +325,25 @@ namespace Step23
   // first time step. The first few lines are pretty much standard if you've
   // read through the tutorial programs at least up to step-6:
   template <int dim>
-  void WaveEquation<dim>::setup_system()
+  void WaveEquation<dim>::setup_system ()
   {
-    GridGenerator::hyper_cube(triangulation, -1, 1);
-    triangulation.refine_global(7);
+    GridGenerator::hyper_cube (triangulation, -1, 1);
+    triangulation.refine_global (7);
 
-    std::cout << "Number of active cells: " << triangulation.n_active_cells()
+    std::cout << "Number of active cells: "
+              << triangulation.n_active_cells()
               << std::endl;
 
-    dof_handler.distribute_dofs(fe);
+    dof_handler.distribute_dofs (fe);
 
-    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
+    std::cout << "Number of degrees of freedom: "
+              << dof_handler.n_dofs()
               << std::endl
               << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler, dsp);
-    sparsity_pattern.copy_from(dsp);
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from (dsp);
 
     // Then comes a block where we have to initialize the 3 matrices we need
     // in the course of the program: the mass matrix, the Laplace matrix, and
@@ -363,14 +368,15 @@ namespace Step23
     // processors are available in a machine. The matrices for solving linear
     // systems will be filled in the run() method because we need to re-apply
     // boundary conditions every time step.
-    mass_matrix.reinit(sparsity_pattern);
-    laplace_matrix.reinit(sparsity_pattern);
-    matrix_u.reinit(sparsity_pattern);
-    matrix_v.reinit(sparsity_pattern);
+    mass_matrix.reinit (sparsity_pattern);
+    laplace_matrix.reinit (sparsity_pattern);
+    matrix_u.reinit (sparsity_pattern);
+    matrix_v.reinit (sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
-    MatrixCreator::create_laplace_matrix(
-      dof_handler, QGauss<dim>(3), laplace_matrix);
+    MatrixCreator::create_mass_matrix (dof_handler, QGauss<dim>(3),
+                                       mass_matrix);
+    MatrixCreator::create_laplace_matrix (dof_handler, QGauss<dim>(3),
+                                          laplace_matrix);
 
     // The rest of the function is spent on setting vector sizes to the
     // correct value. The final line closes the hanging node constraints
@@ -378,13 +384,13 @@ namespace Step23
     // or have been computed (i.e. there was no need to call
     // DoFTools::make_hanging_node_constraints as in other programs), but we
     // need a constraints object in one place further down below anyway.
-    solution_u.reinit(dof_handler.n_dofs());
-    solution_v.reinit(dof_handler.n_dofs());
-    old_solution_u.reinit(dof_handler.n_dofs());
-    old_solution_v.reinit(dof_handler.n_dofs());
-    system_rhs.reinit(dof_handler.n_dofs());
+    solution_u.reinit (dof_handler.n_dofs());
+    solution_v.reinit (dof_handler.n_dofs());
+    old_solution_u.reinit (dof_handler.n_dofs());
+    old_solution_v.reinit (dof_handler.n_dofs());
+    system_rhs.reinit (dof_handler.n_dofs());
 
-    constraints.close();
+    constraints.close ();
   }
 
 
@@ -403,28 +409,32 @@ namespace Step23
   // is not much of a loss either, but let's keep it simple and just do
   // without:
   template <int dim>
-  void WaveEquation<dim>::solve_u()
+  void WaveEquation<dim>::solve_u ()
   {
-    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl           solver_control (1000, 1e-8*system_rhs.l2_norm());
+    SolverCG<>              cg (solver_control);
 
-    cg.solve(matrix_u, solution_u, system_rhs, PreconditionIdentity());
+    cg.solve (matrix_u, solution_u, system_rhs,
+              PreconditionIdentity());
 
     std::cout << "   u-equation: " << solver_control.last_step()
-              << " CG iterations." << std::endl;
+              << " CG iterations."
+              << std::endl;
   }
 
 
   template <int dim>
-  void WaveEquation<dim>::solve_v()
+  void WaveEquation<dim>::solve_v ()
   {
-    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<>    cg(solver_control);
+    SolverControl           solver_control (1000, 1e-8*system_rhs.l2_norm());
+    SolverCG<>              cg (solver_control);
 
-    cg.solve(matrix_v, solution_v, system_rhs, PreconditionIdentity());
+    cg.solve (matrix_v, solution_v, system_rhs,
+              PreconditionIdentity());
 
     std::cout << "   v-equation: " << solver_control.last_step()
-              << " CG iterations." << std::endl;
+              << " CG iterations."
+              << std::endl;
   }
 
 
@@ -437,21 +447,23 @@ namespace Step23
   // character length using the Utilities::int_to_string function's second
   // argument.
   template <int dim>
-  void WaveEquation<dim>::output_results() const
+  void WaveEquation<dim>::output_results () const
   {
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution_u, "U");
-    data_out.add_data_vector(solution_v, "V");
+    data_out.attach_dof_handler (dof_handler);
+    data_out.add_data_vector (solution_u, "U");
+    data_out.add_data_vector (solution_v, "V");
 
-    data_out.build_patches();
+    data_out.build_patches ();
 
-    const std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".gnuplot";
-    std::ofstream output(filename);
-    data_out.write_gnuplot(output);
+    const std::string filename = "solution-" +
+                                 Utilities::int_to_string (timestep_number, 3) +
+                                 ".gnuplot";
+    std::ofstream output (filename);
+    data_out.write_gnuplot (output);
   }
+
 
 
 
@@ -466,20 +478,16 @@ namespace Step23
   // onto the finite element space described by the DoFHandler object. Can't
   // be any simpler than that:
   template <int dim>
-  void WaveEquation<dim>::run()
+  void WaveEquation<dim>::run ()
   {
     setup_system();
 
-    VectorTools::project(dof_handler,
-                         constraints,
-                         QGauss<dim>(3),
-                         InitialValuesU<dim>(),
-                         old_solution_u);
-    VectorTools::project(dof_handler,
-                         constraints,
-                         QGauss<dim>(3),
-                         InitialValuesV<dim>(),
-                         old_solution_v);
+    VectorTools::project (dof_handler, constraints, QGauss<dim>(3),
+                          InitialValuesU<dim>(),
+                          old_solution_u);
+    VectorTools::project (dof_handler, constraints, QGauss<dim>(3),
+                          InitialValuesV<dim>(),
+                          old_solution_v);
 
     // The next thing is to loop over all the time steps until we reach the
     // end time ($T=5$ in this case). In each time step, we first have to
@@ -503,36 +511,37 @@ namespace Step23
     // we almost always work on a single time step at a time, and where it
     // never happens that, for example, one would like to evaluate a
     // space-time function for all times at any given spatial location.
-    Vector<double> tmp(solution_u.size());
-    Vector<double> forcing_terms(solution_u.size());
+    Vector<double> tmp (solution_u.size());
+    Vector<double> forcing_terms (solution_u.size());
 
-    for (; time <= 5; time += time_step, ++timestep_number)
+    for (; time<=5; time+=time_step, ++timestep_number)
       {
-        std::cout << "Time step " << timestep_number << " at t=" << time
+        std::cout << "Time step " << timestep_number
+                  << " at t=" << time
                   << std::endl;
 
-        mass_matrix.vmult(system_rhs, old_solution_u);
+        mass_matrix.vmult (system_rhs, old_solution_u);
 
-        mass_matrix.vmult(tmp, old_solution_v);
-        system_rhs.add(time_step, tmp);
+        mass_matrix.vmult (tmp, old_solution_v);
+        system_rhs.add (time_step, tmp);
 
-        laplace_matrix.vmult(tmp, old_solution_u);
-        system_rhs.add(-theta * (1 - theta) * time_step * time_step, tmp);
+        laplace_matrix.vmult (tmp, old_solution_u);
+        system_rhs.add (-theta * (1-theta) * time_step * time_step, tmp);
 
         RightHandSide<dim> rhs_function;
-        rhs_function.set_time(time);
-        VectorTools::create_right_hand_side(
-          dof_handler, QGauss<dim>(2), rhs_function, tmp);
+        rhs_function.set_time (time);
+        VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
+                                             rhs_function, tmp);
         forcing_terms = tmp;
         forcing_terms *= theta * time_step;
 
-        rhs_function.set_time(time - time_step);
-        VectorTools::create_right_hand_side(
-          dof_handler, QGauss<dim>(2), rhs_function, tmp);
+        rhs_function.set_time (time-time_step);
+        VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
+                                             rhs_function, tmp);
 
-        forcing_terms.add((1 - theta) * time_step, tmp);
+        forcing_terms.add ((1-theta) * time_step, tmp);
 
-        system_rhs.add(theta * time_step, forcing_terms);
+        system_rhs.add (theta * time_step, forcing_terms);
 
         // After so constructing the right hand side vector of the first
         // equation, all we have to do is apply the correct boundary
@@ -543,11 +552,13 @@ namespace Step23
         // function:
         {
           BoundaryValuesU<dim> boundary_values_u_function;
-          boundary_values_u_function.set_time(time);
+          boundary_values_u_function.set_time (time);
 
-          std::map<types::global_dof_index, double> boundary_values;
-          VectorTools::interpolate_boundary_values(
-            dof_handler, 0, boundary_values_u_function, boundary_values);
+          std::map<types::global_dof_index,double> boundary_values;
+          VectorTools::interpolate_boundary_values (dof_handler,
+                                                    0,
+                                                    boundary_values_u_function,
+                                                    boundary_values);
 
           // The matrix for solve_u() is the same in every time steps, so one
           // could think that it is enough to do this only once at the
@@ -557,12 +568,14 @@ namespace Step23
           // we have to refill the matrix in every time steps before we
           // actually apply boundary data. The actual content is very simple:
           // it is the sum of the mass matrix and a weighted Laplace matrix:
-          matrix_u.copy_from(mass_matrix);
-          matrix_u.add(theta * theta * time_step * time_step, laplace_matrix);
-          MatrixTools::apply_boundary_values(
-            boundary_values, matrix_u, solution_u, system_rhs);
+          matrix_u.copy_from (mass_matrix);
+          matrix_u.add (theta * theta * time_step * time_step, laplace_matrix);
+          MatrixTools::apply_boundary_values (boundary_values,
+                                              matrix_u,
+                                              solution_u,
+                                              system_rhs);
         }
-        solve_u();
+        solve_u ();
 
 
         // The second step, i.e. solving for $V^n$, works similarly, except
@@ -572,29 +585,33 @@ namespace Step23
         // (1-\theta) AU^{n-1}\right]$ plus forcing terms. Boundary values
         // are applied in the same way as before, except that now we have to
         // use the BoundaryValuesV class:
-        laplace_matrix.vmult(system_rhs, solution_u);
+        laplace_matrix.vmult (system_rhs, solution_u);
         system_rhs *= -theta * time_step;
 
-        mass_matrix.vmult(tmp, old_solution_v);
+        mass_matrix.vmult (tmp, old_solution_v);
         system_rhs += tmp;
 
-        laplace_matrix.vmult(tmp, old_solution_u);
-        system_rhs.add(-time_step * (1 - theta), tmp);
+        laplace_matrix.vmult (tmp, old_solution_u);
+        system_rhs.add (-time_step * (1-theta), tmp);
 
         system_rhs += forcing_terms;
 
         {
           BoundaryValuesV<dim> boundary_values_v_function;
-          boundary_values_v_function.set_time(time);
+          boundary_values_v_function.set_time (time);
 
-          std::map<types::global_dof_index, double> boundary_values;
-          VectorTools::interpolate_boundary_values(
-            dof_handler, 0, boundary_values_v_function, boundary_values);
-          matrix_v.copy_from(mass_matrix);
-          MatrixTools::apply_boundary_values(
-            boundary_values, matrix_v, solution_v, system_rhs);
+          std::map<types::global_dof_index,double> boundary_values;
+          VectorTools::interpolate_boundary_values (dof_handler,
+                                                    0,
+                                                    boundary_values_v_function,
+                                                    boundary_values);
+          matrix_v.copy_from (mass_matrix);
+          MatrixTools::apply_boundary_values (boundary_values,
+                                              matrix_v,
+                                              solution_v,
+                                              system_rhs);
         }
-        solve_v();
+        solve_v ();
 
         // Finally, after both solution components have been computed, we
         // output the result, compute the energy in the solution, and go on to
@@ -604,26 +621,25 @@ namespace Step23
         // $\left<V^n,MV^n\right>$ and $\left<U^n,AU^n\right>$ in one step,
         // saving us the expense of a temporary vector and several lines of
         // code:
-        output_results();
+        output_results ();
 
         std::cout << "   Total energy: "
-                  << (mass_matrix.matrix_norm_square(solution_v) +
-                      laplace_matrix.matrix_norm_square(solution_u)) /
-                       2
+                  << (mass_matrix.matrix_norm_square (solution_v) +
+                      laplace_matrix.matrix_norm_square (solution_u)) / 2
                   << std::endl;
 
         old_solution_u = solution_u;
         old_solution_v = solution_v;
       }
   }
-} // namespace Step23
+}
 
 
 // @sect3{The <code>main</code> function}
 
 // What remains is the main function of the program. There is nothing here
 // that hasn't been shown in several of the previous programs:
-int main()
+int main ()
 {
   try
     {
@@ -631,12 +647,11 @@ int main()
       using namespace Step23;
 
       WaveEquation<2> wave_equation_solver;
-      wave_equation_solver.run();
+      wave_equation_solver.run ();
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl
-                << std::endl
+      std::cerr << std::endl << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -649,8 +664,7 @@ int main()
     }
   catch (...)
     {
-      std::cerr << std::endl
-                << std::endl
+      std::cerr << std::endl << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
