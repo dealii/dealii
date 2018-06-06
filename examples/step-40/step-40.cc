@@ -375,7 +375,7 @@ namespace Step40
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_values | update_gradients |
                             update_quadrature_points |
-                            update_JxW_values);
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -402,7 +402,7 @@ namespace Step40
               rhs_value
                 = (fe_values.quadrature_point(q_point)[1]
                    >
-                   0.5+0.25*std::sin(4.0 * numbers::PI *
+                     0.5 + 0.25 * std::sin(4.0 * numbers::PI *
                                      fe_values.quadrature_point(q_point)[0])
                    ? 1 : -1);
 
@@ -415,7 +415,7 @@ namespace Step40
 
                   cell_rhs(i) += (rhs_value *
                                   fe_values.shape_value(i,q_point) *
-                     fe_values.JxW(q_point));
+                                  fe_values.JxW(q_point));
                 }
             }
 

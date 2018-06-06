@@ -112,7 +112,7 @@ namespace Step29
   template <int dim>
   inline
   void DirichletBoundaryValues<dim>::vector_value(const Point<dim> &/*p*/,
-                                             Vector<double> &values) const
+                                                         Vector<double> &values) const
   {
     Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
 
@@ -302,7 +302,7 @@ namespace Step29
     void
     evaluate_vector_field
     (const DataPostprocessorInputs::Vector<dim> &inputs,
-      std::vector<Vector<double>> &computed_quantities) const override;
+      std::vector<Vector<double>> &               computed_quantities) const override;
   };
 
   // In the constructor, we need to call the constructor of the base class
@@ -346,7 +346,7 @@ namespace Step29
     std::vector<Vector<double>> &               computed_quantities) const
   {
     Assert(computed_quantities.size() == inputs.solution_values.size(),
-           ExcDimensionMismatch(computed_quantities.size(), inputs.solution_values.size()));
+      ExcDimensionMismatch(computed_quantities.size(), inputs.solution_values.size()));
 
     // The computation itself is straightforward: We iterate over each entry
     // in the output vector and compute $|u|$ from the corresponding values of
@@ -440,7 +440,7 @@ namespace Step29
     prm.enter_subsection("Mesh & geometry parameters");
 
     const double       focal_distance = prm.get_double("Focal distance");
-    const unsigned int n_refinements = prm.get_integer("Number of refinements");
+    const unsigned int n_refinements  = prm.get_integer("Number of refinements");
 
     prm.leave_subsection();
 
@@ -591,7 +591,7 @@ namespace Step29
     // matrix for storing the local cell contributions as well as an index
     // vector to transfer the cell contributions to the appropriate location
     // in the global system matrix after.
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -660,14 +660,14 @@ namespace Step29
                     // shape functions are supplied by our FEValues object.
 
                     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-                      cell_matrix(i,j) += (((fe_values.shape_value(i,q_point) *
-                           fe_values.shape_value(j, q_point)) *
+                      cell_matrix(i, j) += (((fe_values.shape_value(i, q_point) *
+                                              fe_values.shape_value(j, q_point)) *
                                             (- omega * omega)
                                             +
-                          (fe_values.shape_grad(i, q_point) *
-                           fe_values.shape_grad(j, q_point)) *
-                            c * c) *
-                         fe_values.JxW(q_point));
+                                             (fe_values.shape_grad(i, q_point) *
+                                              fe_values.shape_grad(j, q_point)) *
+                                               c * c) *
+                                            fe_values.JxW(q_point));
 
                     // You might think that we would have to specify which
                     // component of the shape function we'd like to evaluate

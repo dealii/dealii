@@ -246,8 +246,8 @@ namespace Step45
     SchurComplement(const TrilinosWrappers::BlockSparseMatrix &system_matrix,
                     const InverseMatrix<TrilinosWrappers::SparseMatrix,
                                         PreconditionerType> &  A_inverse,
-                    const IndexSet &                           owned_pres,
-                    const MPI_Comm &mpi_communicator);
+      const IndexSet &                                                         owned_pres,
+      const MPI_Comm &mpi_communicator);
 
     void vmult(TrilinosWrappers::MPI::Vector &      dst,
                const TrilinosWrappers::MPI::Vector &src) const;
@@ -266,7 +266,7 @@ namespace Step45
   SchurComplement(const TrilinosWrappers::BlockSparseMatrix &system_matrix,
                   const InverseMatrix<TrilinosWrappers::SparseMatrix,
                   PreconditionerType>                       &A_inverse,
-    const IndexSet &owned_vel,
+    const IndexSet &                                                         owned_vel,
                   const MPI_Comm                            &mpi_communicator)
     :
     system_matrix(&system_matrix),
@@ -319,14 +319,14 @@ namespace Step45
                                        0,
                                        true);
 
-// Before we can prescribe periodicity constraints, we need to ensure that cells
-// on opposite sides of the domain but connected by periodic faces are part of
-// the ghost layer if one of them is stored on the local processor.
-// At this point we need to think about how we want to prescribe periodicity.
-// The vertices $\text{vertices}_2$ of a face on the left boundary should be
-// matched to the vertices $\text{vertices}_1$ of a face on the lower boundary
-// given by $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation
-// matrix $R$ and the offset $b$ are given by
+    // Before we can prescribe periodicity constraints, we need to ensure that cells
+    // on opposite sides of the domain but connected by periodic faces are part of
+    // the ghost layer if one of them is stored on the local processor.
+    // At this point we need to think about how we want to prescribe periodicity.
+    // The vertices $\text{vertices}_2$ of a face on the left boundary should be
+    // matched to the vertices $\text{vertices}_1$ of a face on the lower boundary
+    // given by $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation
+    // matrix $R$ and the offset $b$ are given by
     // @f{align*}
     // R=\begin{pmatrix}
     // 0&1\\-1&0
@@ -334,8 +334,8 @@ namespace Step45
     // \quad
     // b=\begin{pmatrix}0&0\end{pmatrix}.
     // @f}
-// The data structure we are saving the reuslitng information into is here based
-// on the Triangulation.
+    // The data structure we are saving the reuslitng information into is here based
+    // on the Triangulation.
     std::vector<GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator> >
       periodicity_vector;
 
@@ -381,7 +381,7 @@ namespace Step45
       IndexSet locally_relevant_dofs;
       DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
-      relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u+n_p));
+      relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u + n_p));
 
       constraints.clear();
       constraints.reinit(locally_relevant_dofs);
@@ -403,13 +403,13 @@ namespace Step45
                                                constraints,
                                                fe.component_mask(velocities));
 
-// After we provided the mesh with the necessary information for the periodicity
-// constraints, we are now able to actual create them. For describing the
-// matching we are using the same approach as before, i.e., the $\text{vertices}_2$
-// of a face on the left boundary should be matched to the vertices
+      // After we provided the mesh with the necessary information for the periodicity
+      // constraints, we are now able to actual create them. For describing the
+      // matching we are using the same approach as before, i.e., the $\text{vertices}_2$
+      // of a face on the left boundary should be matched to the vertices
       // $\text{vertices}_1$ of a face on the lower boundary given by
-// $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation matrix $R$
-// and the offset $b$ are given by
+      // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation matrix $R$
+      // and the offset $b$ are given by
       // @f{align*}
       // R=\begin{pmatrix}
       // 0&1\\-1&0
@@ -417,8 +417,8 @@ namespace Step45
       // \quad
       // b=\begin{pmatrix}0&0\end{pmatrix}.
       // @f}
-// These two objects not only describe how faces should be matched but also
-// in which sense the solution should be transformed from $\text{face}_2$ to
+      // These two objects not only describe how faces should be matched but also
+      // in which sense the solution should be transformed from $\text{face}_2$ to
       // $\text{face}_1$.
       FullMatrix<double> rotation_matrix(dim);
       rotation_matrix[0][1] = 1.;
@@ -429,11 +429,11 @@ namespace Step45
       // For setting up the constraints, we first store the periodicity
       // information in an auxiliary object of type
       // <code>std::vector@<GridTools::PeriodicFacePair<typename
-// DoFHandler@<dim@>::cell_iterator@> </code>. The periodic boundaries have the
-// boundary indicators 2 (x=0) and 3 (y=0). All the other parameters we
-// have set up before. In this case the direction does not matter. Due to
-// $\text{vertices}_2=R\cdot \text{vertices}_1+b$ this is exactly what we want.
-      std::vector<GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator> >
+      // DoFHandler@<dim@>::cell_iterator@> </code>. The periodic boundaries have the
+      // boundary indicators 2 (x=0) and 3 (y=0). All the other parameters we
+      // have set up before. In this case the direction does not matter. Due to
+      // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ this is exactly what we want.
+      std::vector<GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
         periodicity_vector;
 
       const unsigned int direction = 1;
@@ -442,10 +442,10 @@ namespace Step45
                                         periodicity_vector, offset,
                                         rotation_matrix);
 
-// Next we need to provide information on which vector valued components of
-// the solution should be rotated. Since we choose here to just constraint the
-// velocity and this starts at the first component of the solution vector we
-// simply insert a 0:
+      // Next we need to provide information on which vector valued components of
+      // the solution should be rotated. Since we choose here to just constraint the
+      // velocity and this starts at the first component of the solution vector we
+      // simply insert a 0:
       std::vector<unsigned int> first_vector_components;
       first_vector_components.push_back(0);
 
@@ -480,7 +480,7 @@ namespace Step45
 
       DoFTools::make_sparsity_pattern
       (dof_handler, bsp, constraints, false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+                                      Utilities::MPI::this_mpi_process(mpi_communicator));
 
       bsp.compress();
 
@@ -510,7 +510,7 @@ namespace Step45
                             update_values    |
                             update_quadrature_points  |
                             update_JxW_values |
-                            update_gradients);
+                              update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -550,8 +550,8 @@ namespace Step45
               for (unsigned int k = 0; k < dofs_per_cell; ++k)
                 {
                   symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
-                  div_phi_u[k] = fe_values[velocities].divergence(k, q);
-                  phi_p[k]     = fe_values[pressure].value(k, q);
+                  div_phi_u[k]     = fe_values[velocities].divergence(k, q);
+                  phi_p[k]         = fe_values[pressure].value(k, q);
                 }
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)

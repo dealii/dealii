@@ -183,10 +183,10 @@ namespace Step13
       virtual void operator()(const DoFHandler<dim> &dof_handler,
                               const Vector<double> & solution) const override;
 
-      DeclException1 (ExcEvaluationPointNotFound,
-        Point<dim>,
-        << "The evaluation point " << arg1
-        << " was not found among the vertices of the present grid.");
+      DeclException1(ExcEvaluationPointNotFound,
+                     Point<dim>,
+                     << "The evaluation point " << arg1
+                     << " was not found among the vertices of the present grid.");
     private:
       const Point<dim> evaluation_point;
       TableHandler &   results_table;
@@ -212,7 +212,7 @@ namespace Step13
     void
     PointValueEvaluation<dim>::
          operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+                                               const Vector<double> & solution) const
     {
       // First allocate a variable that will hold the point value. Initialize
       // it with a value that is clearly bogus, so that if we fail to set it
@@ -515,8 +515,8 @@ namespace Step13
 
       virtual void solve_problem() = 0;
       virtual void postprocess(const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
-      virtual void         refine_grid()                            = 0;
-      virtual unsigned int n_dofs() const                           = 0;
+      virtual void         refine_grid()  = 0;
+      virtual unsigned int n_dofs() const = 0;
 
     protected:
       const SmartPointer<Triangulation<dim>> triangulation;
@@ -663,8 +663,8 @@ namespace Step13
 
       void
       local_assemble_matrix(const typename DoFHandler<dim>::active_cell_iterator &cell,
-        AssemblyScratchData &                                 scratch_data,
-        AssemblyCopyData &                                    copy_data) const;
+                            AssemblyScratchData &scratch_data,
+                            AssemblyCopyData &   copy_data) const;
 
       void
       copy_local_to_global(const AssemblyCopyData &copy_data,
@@ -976,7 +976,7 @@ namespace Step13
     template <int dim>
     void
     Solver<dim>::copy_local_to_global(const AssemblyCopyData &copy_data,
-                                           LinearSystem &linear_system) const
+                                           LinearSystem &          linear_system) const
     {
       for (unsigned int i = 0; i < copy_data.local_dof_indices.size(); ++i)
         for (unsigned int j = 0; j < copy_data.local_dof_indices.size(); ++j)
@@ -1146,7 +1146,7 @@ namespace Step13
 
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->dof_handler.begin_active(),
-      endc = this->dof_handler.end();
+                                                     endc = this->dof_handler.end();
       for (; cell != endc; ++cell)
         {
           cell_rhs = 0;
@@ -1204,9 +1204,9 @@ namespace Step13
     template <int dim>
     RefinementGlobal<dim>::
     RefinementGlobal(Triangulation<dim>       &coarse_grid,
-      const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature,
-      const Function<dim> &     rhs_function,
+                                            const FiniteElement<dim> &fe,
+                                            const Quadrature<dim> &   quadrature,
+                                            const Function<dim> &     rhs_function,
                      const Function<dim>      &boundary_values)
       :
       Base<dim>(coarse_grid),
@@ -1253,9 +1253,9 @@ namespace Step13
     template <int dim>
     RefinementKelly<dim>::
     RefinementKelly(Triangulation<dim>       &coarse_grid,
-      const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature,
-      const Function<dim> &     rhs_function,
+                                          const FiniteElement<dim> &fe,
+                                          const Quadrature<dim> &   quadrature,
+                                          const Function<dim> &     rhs_function,
                     const Function<dim>      &boundary_values)
       :
       Base<dim>(coarse_grid),
@@ -1380,8 +1380,8 @@ namespace Step13
   // intermittent mesh refinement:
   template <int dim>
   void
-  run_simulation(LaplaceSolver::Base<dim>                     &solver,
-    const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
+  run_simulation(LaplaceSolver::Base<dim> &                          solver,
+                 const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
   {
     // We will give an indicator of the step we are presently computing, in
     // order to keep the user informed that something is still happening, and
@@ -1484,7 +1484,7 @@ namespace Step13
     // Also generate an evaluator which writes out the solution:
     Evaluation::SolutionOutput<dim>
     postprocessor2 (std::string("solution-")+solver_name,
-                    DataOutBase::gnuplot);
+                                                   DataOutBase::gnuplot);
 
     // Take these two evaluation objects and put them in a list...
     std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;

@@ -115,9 +115,9 @@ namespace Step52
                          const double                           final_time);
 
     unsigned int embedded_explicit_method(const TimeStepping::runge_kutta_method method,
-                             const unsigned int n_time_steps,
-                             const double       initial_time,
-                             const double       final_time);
+                                          const unsigned int n_time_steps,
+                                          const double       initial_time,
+                                          const double       final_time);
 
 
     unsigned int fe_degree;
@@ -467,15 +467,15 @@ namespace Step52
   // <code>evaluate_diffusion</code> is a member function, it needs to be bound
   // to <code>this</code>. Finally, the solution is output every 10 time steps.
   void Diffusion::explicit_method(const TimeStepping::runge_kutta_method method,
-                                  const unsigned int n_time_steps,
-                                  const double       initial_time,
-                                  const double       final_time)
+                                  const unsigned int                     n_time_steps,
+                                  const double                           initial_time,
+                                  const double                           final_time)
   {
     const double time_step = (final_time-initial_time)/static_cast<double> (n_time_steps);
     double time = initial_time;
     solution    = 0.;
 
-    TimeStepping::ExplicitRungeKutta<Vector<double> > explicit_runge_kutta(method);
+    TimeStepping::ExplicitRungeKutta<Vector<double>> explicit_runge_kutta(method);
     output_results(0, method);
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
@@ -499,15 +499,15 @@ namespace Step52
   // and $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$
   // for which we use the two member functions previously introduced.
   void Diffusion::implicit_method(const TimeStepping::runge_kutta_method method,
-                                  const unsigned int n_time_steps,
-                                  const double       initial_time,
-                                  const double       final_time)
+                                  const unsigned int                     n_time_steps,
+                                  const double                           initial_time,
+                                  const double                           final_time)
   {
     const double time_step = (final_time-initial_time)/static_cast<double> (n_time_steps);
     double time = initial_time;
     solution    = 0.;
 
-    TimeStepping::ImplicitRungeKutta<Vector<double> > implicit_runge_kutta(method);
+    TimeStepping::ImplicitRungeKutta<Vector<double>> implicit_runge_kutta(method);
     output_results(0, method);
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
@@ -546,12 +546,12 @@ namespace Step52
   // threshold, a larger time step will be tried for the next time step.
   // <code>delta_t_guess</code> is the guessed time step produced by the embedded method.
   unsigned int Diffusion::embedded_explicit_method(const TimeStepping::runge_kutta_method method,
-    const unsigned int                     n_time_steps,
-    const double                           initial_time,
-    const double                           final_time)
+                                      const unsigned int                     n_time_steps,
+                                      const double                           initial_time,
+                                      const double                           final_time)
   {
-    double time_step = (final_time-initial_time)/static_cast<double> (n_time_steps);
-    double       time          = initial_time;
+    double time_step = (final_time - initial_time) / static_cast<double>(n_time_steps);
+    double time      = initial_time;
     const double coarsen_param = 1.2;
     const double refine_param  = 0.8;
     const double min_delta     = 1e-8;

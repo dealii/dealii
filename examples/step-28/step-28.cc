@@ -253,7 +253,7 @@ namespace Step28
   // value up in the corresponding tables:
   double
   MaterialData::get_diffusion_coefficient(const unsigned int group,
-                                          const unsigned int material_id) const
+                                                 const unsigned int material_id) const
   {
     Assert(group < n_groups,
            ExcIndexRange(group, 0, n_groups));
@@ -311,7 +311,7 @@ namespace Step28
 
   double
   MaterialData::get_fission_spectrum(const unsigned int group,
-                                     const unsigned int material_id) const
+                                            const unsigned int material_id) const
   {
     Assert(group < n_groups,
            ExcIndexRange(group, 0, n_groups));
@@ -827,7 +827,7 @@ namespace Step28
     typename std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
              typename DoFHandler<dim>::cell_iterator> >
              ::const_iterator
-             cell_iter = cell_list.begin();
+      cell_iter = cell_list.begin();
 
     for (; cell_iter != cell_list.end(); ++cell_iter)
       {
@@ -1099,7 +1099,7 @@ namespace Step28
   {
     typename Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
-    endc = triangulation.end();
+                                                      endc = triangulation.end();
 
     for (; cell != endc; ++cell)
       if (error_indicators(cell->active_cell_index()) > refine_threshold)
@@ -1285,9 +1285,9 @@ namespace Step28
                       Patterns::Integer(),
                       "Polynomial degree of the finite element to be used");
     prm.declare_entry("Power iteration tolerance", "1e-12",
-      Patterns::Double(),
-      "Inner power iterations are stopped when the change in k_eff falls "
-      "below this tolerance");
+                      Patterns::Double(),
+                      "Inner power iterations are stopped when the change in k_eff falls "
+                      "below this tolerance");
   }
 
 
@@ -1478,7 +1478,7 @@ namespace Step28
          {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
          {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
          {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
-        { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 },
+         {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
         { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
       }
     };
@@ -1686,7 +1686,7 @@ namespace Step28
         for (unsigned int group = 0; group < parameters.n_groups; ++group)
           threads += Threads::new_thread
                      (&EnergyGroup<dim>::assemble_system_matrix,
-                      *energy_groups[group]);
+                                         *energy_groups[group]);
         threads.join_all();
 
         double       error;

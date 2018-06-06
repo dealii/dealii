@@ -368,11 +368,11 @@ void Step4<dim>::assemble_system()
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i,j) += (fe_values.shape_grad(i, q_index) *
                                    fe_values.shape_grad(j, q_index) *
-                                   fe_values.JxW (q_index));
+                 fe_values.JxW(q_index));
 
             cell_rhs(i) += (fe_values.shape_value(i, q_index) *
-               right_hand_side.value(fe_values.quadrature_point(q_index)) *
-               fe_values.JxW(q_index));
+                            right_hand_side.value(fe_values.quadrature_point(q_index)) *
+                            fe_values.JxW(q_index));
           }
       // As a final remark to these loops: when we assemble the local
       // contributions into <code>cell_matrix(i,j)</code>, we have to multiply

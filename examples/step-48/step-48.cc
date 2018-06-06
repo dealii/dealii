@@ -84,17 +84,17 @@ namespace Step48
                         const double                   time_step);
 
     void apply(LinearAlgebra::distributed::Vector<double> &dst,
-               const std::vector<LinearAlgebra::distributed::Vector<double>*> &src) const;
+          const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const;
 
   private:
     const MatrixFree<dim, double> &            data;
     const VectorizedArray<double>              delta_t_sqr;
     LinearAlgebra::distributed::Vector<double> inv_mass_matrix;
 
-    void local_apply(const MatrixFree<dim,double>               &data,
-      LinearAlgebra::distributed::Vector<double> &                     dst,
-      const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void local_apply(const MatrixFree<dim, double> &             data,
+                     LinearAlgebra::distributed::Vector<double> &dst,
+                     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
+                     const std::pair<unsigned int, unsigned int> &cell_range) const;
   };
 
 
@@ -139,7 +139,7 @@ namespace Step48
     inv_mass_matrix.compress(VectorOperation::add);
     for (unsigned int k = 0; k < inv_mass_matrix.local_size(); ++k)
       if (inv_mass_matrix.local_element(k) > 1e-15)
-        inv_mass_matrix.local_element(k) = 1./inv_mass_matrix.local_element(k);
+        inv_mass_matrix.local_element(k) = 1. / inv_mass_matrix.local_element(k);
       else
         inv_mass_matrix.local_element(k) = 0;
   }
@@ -183,7 +183,7 @@ namespace Step48
   local_apply(const MatrixFree<dim>                      &data,
     LinearAlgebra::distributed::Vector<double> &                     dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
-    const std::pair<unsigned int, unsigned int> &cell_range) const
+    const std::pair<unsigned int, unsigned int> &                    cell_range) const
   {
     AssertDimension(src.size(), 2);
     FEEvaluation<dim, fe_degree> current(data), old(data);
@@ -363,7 +363,7 @@ namespace Step48
     {
       typename Triangulation<dim>::active_cell_iterator
         cell     = triangulation.begin_active(),
-        end_cell = triangulation.end();
+                                                        end_cell = triangulation.end();
       for (; cell != end_cell; ++cell)
         if (cell->is_locally_owned())
           if (cell->center().norm() < 11)
@@ -556,7 +556,7 @@ namespace Step48
                              old_solution);
     output_results(0);
 
-    std::vector<LinearAlgebra::distributed::Vector<double>*> previous_solutions;
+    std::vector<LinearAlgebra::distributed::Vector<double> *> previous_solutions;
     previous_solutions.push_back(&old_solution);
     previous_solutions.push_back(&old_old_solution);
 
@@ -586,7 +586,7 @@ namespace Step48
     Timer  timer;
     double wtime       = 0;
     double output_time = 0;
-    for (time+ = time_step; time <  = final_time; time+ = time_step, ++timestep_number)
+    for (time + = time_step; time < = final_time; time + = time_step, ++timestep_number)
       {
         timer.restart();
         old_old_solution.swap(old_solution);

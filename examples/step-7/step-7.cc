@@ -126,7 +126,7 @@ namespace Step7
   const Point<1>
   SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
     = { Point<1>(-1.0 / 3.0),
-      Point<1>(0.0),
+    Point<1>(0.0),
         Point<1>(+1.0 / 3.0)
       };
 
@@ -136,7 +136,7 @@ namespace Step7
   const Point<2>
   SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
     = { Point<2>(-0.5, +0.5),
-      Point<2>(-0.5, -0.5),
+    Point<2>(-0.5, -0.5),
         Point<2>(+0.5, -0.5)
       };
 
@@ -193,8 +193,8 @@ namespace Step7
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
-    virtual Tensor<1,dim> gradient(const Point<dim>   &p,
-             const unsigned int component = 0) const override;
+    virtual Tensor<1, dim> gradient(const Point<dim> & p,
+                                    const unsigned int component = 0) const override;
   };
 
 
@@ -482,7 +482,7 @@ namespace Step7
   // (which is empty at present, however).
   template <int dim>
   HelmholtzProblem<dim>::HelmholtzProblem(const FiniteElement<dim> &fe,
-    const RefinementMode      refinement_mode) :
+                                          const RefinementMode      refinement_mode) :
     dof_handler(triangulation),
     fe(&fe),
     refinement_mode(refinement_mode)
@@ -608,7 +608,7 @@ namespace Step7
 
     FEFaceValues<dim> fe_face_values(*fe, face_quadrature_formula,
                                      update_values | update_quadrature_points |
-                                     update_normal_vectors | update_JxW_values);
+                                       update_normal_vectors | update_JxW_values);
 
     // Then we need some objects already known from previous examples: An
     // object denoting the right hand side function, its values at the
@@ -655,9 +655,9 @@ namespace Step7
                 cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
                                       fe_values.shape_grad(j,q_point)
                                       +
-                                       fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
+                    fe_values.shape_value(i, q_point) *
+                      fe_values.shape_value(j, q_point)) *
+                   fe_values.JxW(q_point));
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) *
                               rhs_values [q_point] *
@@ -813,13 +813,13 @@ namespace Step7
 
         case adaptive_refinement:
           {
-        Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+            Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-        KellyErrorEstimator<dim>::estimate(dof_handler,
-              QGauss<dim - 1>(3),
-              typename FunctionMap<dim>::type(),
-              solution,
-              estimated_error_per_cell);
+            KellyErrorEstimator<dim>::estimate(dof_handler,
+                                               QGauss<dim - 1>(3),
+                                               typename FunctionMap<dim>::type(),
+                                               solution,
+                                               estimated_error_per_cell);
 
         GridRefinement::refine_and_coarsen_fixed_number(triangulation,
                                                         estimated_error_per_cell,
@@ -989,7 +989,7 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::run()
   {
-    const unsigned int n_cycles = (refinement_mode==global_refinement)?5:9;
+    const unsigned int n_cycles = (refinement_mode == global_refinement) ? 5 : 9;
     for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
       {
         if (cycle == 0)
@@ -999,7 +999,7 @@ namespace Step7
 
             typename Triangulation<dim>::cell_iterator
             cell = triangulation.begin(),
-            endc = triangulation.end();
+                                                       endc = triangulation.end();
             for (; cell != endc; ++cell)
               for (unsigned int face_number = 0;
                    face_number < GeometryInfo<dim>::faces_per_cell;

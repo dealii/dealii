@@ -111,10 +111,10 @@ namespace Step14
       virtual void operator()(const DoFHandler<dim> &dof_handler,
                               const Vector<double> & solution) const override;
 
-      DeclException1 (ExcEvaluationPointNotFound,
-        Point<dim>,
-        << "The evaluation point " << arg1
-        << " was not found among the vertices of the present grid.");
+      DeclException1(ExcEvaluationPointNotFound,
+                     Point<dim>,
+                     << "The evaluation point " << arg1
+                     << " was not found among the vertices of the present grid.");
     private:
       const Point<dim> evaluation_point;
     };
@@ -133,7 +133,7 @@ namespace Step14
     void
     PointValueEvaluation<dim>::
          operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+                                               const Vector<double> & solution) const
     {
       double point_value = 1e20;
 
@@ -185,10 +185,10 @@ namespace Step14
       virtual void operator()(const DoFHandler<dim> &dof_handler,
                               const Vector<double> & solution) const;
 
-      DeclException1 (ExcEvaluationPointNotFound,
-        Point<dim>,
-        << "The evaluation point " << arg1
-        << " was not found among the vertices of the present grid.");
+      DeclException1(ExcEvaluationPointNotFound,
+                     Point<dim>,
+                     << "The evaluation point " << arg1
+                     << " was not found among the vertices of the present grid.");
     private:
       const Point<dim> evaluation_point;
     };
@@ -208,7 +208,7 @@ namespace Step14
     void
     PointXDerivativeEvaluation<dim>::
          operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+                                                     const Vector<double> &solution) const
     {
       // This time initialize the return value with something useful, since we
       // will have to add up a number of contributions and take the mean value
@@ -376,8 +376,8 @@ namespace Step14
 
       virtual void solve_problem() = 0;
       virtual void postprocess(const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
-      virtual void         refine_grid()                            = 0;
-      virtual unsigned int n_dofs() const                           = 0;
+      virtual void         refine_grid()  = 0;
+      virtual unsigned int n_dofs() const = 0;
 
       virtual void set_refinement_cycle(const unsigned int cycle);
 
@@ -489,8 +489,8 @@ namespace Step14
 
       void
       local_assemble_matrix(const typename DoFHandler<dim>::active_cell_iterator &cell,
-        AssemblyScratchData &                                 scratch_data,
-        AssemblyCopyData &                                    copy_data) const;
+                            AssemblyScratchData &scratch_data,
+                            AssemblyCopyData &   copy_data) const;
 
 
       void
@@ -645,7 +645,7 @@ namespace Step14
     template <int dim>
     void
     Solver<dim>::copy_local_to_global(const AssemblyCopyData &copy_data,
-                                           LinearSystem &linear_system) const
+                                           LinearSystem &          linear_system) const
     {
       for (unsigned int i = 0; i < copy_data.local_dof_indices.size(); ++i)
         for (unsigned int j = 0; j < copy_data.local_dof_indices.size(); ++j)
@@ -824,7 +824,7 @@ namespace Step14
 
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->dof_handler.begin_active(),
-      endc = this->dof_handler.end();
+                                                     endc = this->dof_handler.end();
       for (; cell != endc; ++cell)
         {
           cell_rhs = 0;
@@ -870,10 +870,10 @@ namespace Step14
     template <int dim>
     RefinementGlobal<dim>::
     RefinementGlobal(Triangulation<dim>       &coarse_grid,
-      const FiniteElement<dim> & fe,
-      const Quadrature<dim> &    quadrature,
-      const Quadrature<dim - 1> &face_quadrature,
-      const Function<dim> &      rhs_function,
+                                            const FiniteElement<dim> & fe,
+                                            const Quadrature<dim> &    quadrature,
+                                            const Quadrature<dim - 1> &face_quadrature,
+                                            const Function<dim> &      rhs_function,
                      const Function<dim>      &boundary_values)
       :
       Base<dim>(coarse_grid),
@@ -912,10 +912,10 @@ namespace Step14
     template <int dim>
     RefinementKelly<dim>::
     RefinementKelly(Triangulation<dim>       &coarse_grid,
-      const FiniteElement<dim> & fe,
-      const Quadrature<dim> &    quadrature,
-      const Quadrature<dim - 1> &face_quadrature,
-      const Function<dim> &      rhs_function,
+                                          const FiniteElement<dim> & fe,
+                                          const Quadrature<dim> &    quadrature,
+                                          const Quadrature<dim - 1> &face_quadrature,
+                                          const Function<dim> &      rhs_function,
                     const Function<dim>      &boundary_values)
       :
       Base<dim>(coarse_grid),
@@ -1021,7 +1021,7 @@ namespace Step14
       // makes this more explicit.)
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->dof_handler.begin_active(),
-      endc = this->dof_handler.end();
+                                                     endc = this->dof_handler.end();
       for (; cell != endc; ++cell)
         estimated_error_per_cell(cell->active_cell_index())
         *= weighting_function->value (cell->center());
@@ -1217,7 +1217,7 @@ namespace Step14
     double
     CurvedRidges<dim>::BoundaryValues::
     value(const Point<dim>   &p,
-      const unsigned int /*component*/) const
+                                             const unsigned int /*component*/) const
     {
       double q = p(0);
       for (unsigned int i = 1; i < dim; ++i)
@@ -1231,7 +1231,7 @@ namespace Step14
     template <int dim>
     double
     CurvedRidges<dim>::RightHandSide::value(const Point<dim>   &p,
-      const unsigned int /*component*/) const
+                                                   const unsigned int /*component*/) const
     {
       double q = p(0);
       for (unsigned int i = 1; i < dim; ++i)
@@ -1516,10 +1516,10 @@ namespace Step14
       assemble_rhs(const DoFHandler<dim> &dof_handler,
                                 Vector<double> &       rhs) const override;
 
-      DeclException1 (ExcEvaluationPointNotFound,
-        Point<dim>,
-        << "The evaluation point " << arg1
-        << " was not found among the vertices of the present grid.");
+      DeclException1(ExcEvaluationPointNotFound,
+                     Point<dim>,
+                     << "The evaluation point " << arg1
+                     << " was not found among the vertices of the present grid.");
 
     protected:
       const Point<dim> evaluation_point;
@@ -1551,7 +1551,7 @@ namespace Step14
     void
     PointValueEvaluation<dim>::
     assemble_rhs(const DoFHandler<dim> &dof_handler,
-                                            Vector<double> &       rhs) const
+                                                 Vector<double> &       rhs) const
     {
       // So, first set everything to zeros...
       rhs.reinit(dof_handler.n_dofs());
@@ -1598,10 +1598,10 @@ namespace Step14
       assemble_rhs(const DoFHandler<dim> &dof_handler,
                                 Vector<double> &       rhs) const;
 
-      DeclException1 (ExcEvaluationPointNotFound,
-        Point<dim>,
-        << "The evaluation point " << arg1
-        << " was not found among the vertices of the present grid.");
+      DeclException1(ExcEvaluationPointNotFound,
+                     Point<dim>,
+                     << "The evaluation point " << arg1
+                     << " was not found among the vertices of the present grid.");
 
     protected:
       const Point<dim> evaluation_point;
@@ -1637,7 +1637,7 @@ namespace Step14
     void
     PointXDerivativeEvaluation<dim>::
     assemble_rhs(const DoFHandler<dim> &dof_handler,
-      Vector<double> &       rhs) const
+                                                       Vector<double> &       rhs) const
     {
       // Again, first set all entries to zero:
       rhs.reinit(dof_handler.n_dofs());
@@ -1738,14 +1738,14 @@ namespace Step14
     class DualSolver : public Solver<dim>
     {
     public:
-      DualSolver(Triangulation<dim>       &triangulation,
-        const FiniteElement<dim> &                     fe,
-        const Quadrature<dim> &                        quadrature,
-        const Quadrature<dim - 1> &                    face_quadrature,
-        const DualFunctional::DualFunctionalBase<dim> &dual_functional);
+      DualSolver(Triangulation<dim> &                           triangulation,
+                 const FiniteElement<dim> &                     fe,
+                 const Quadrature<dim> &                        quadrature,
+                 const Quadrature<dim - 1> &                    face_quadrature,
+                 const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
     protected:
-      const SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
+      const SmartPointer<const DualFunctional::DualFunctionalBase<dim>> dual_functional;
       virtual void assemble_rhs(Vector<double> &rhs) const override;
 
       static const Functions::ZeroFunction<dim> boundary_values;
@@ -1795,14 +1795,14 @@ namespace Step14
       public DualSolver<dim>
     {
     public:
-      WeightedResidual(Triangulation<dim>       &coarse_grid,
-        const FiniteElement<dim> &                     primal_fe,
-        const FiniteElement<dim> &                     dual_fe,
-        const Quadrature<dim> &                        quadrature,
-        const Quadrature<dim - 1> &                    face_quadrature,
-        const Function<dim> &                          rhs_function,
-        const Function<dim> &                          boundary_values,
-        const DualFunctional::DualFunctionalBase<dim> &dual_functional);
+      WeightedResidual(Triangulation<dim> &                           coarse_grid,
+                       const FiniteElement<dim> &                     primal_fe,
+                       const FiniteElement<dim> &                     dual_fe,
+                       const Quadrature<dim> &                        quadrature,
+                       const Quadrature<dim - 1> &                    face_quadrature,
+                       const Function<dim> &                          rhs_function,
+                       const Function<dim> &                          boundary_values,
+                       const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
       virtual
       void
@@ -1917,12 +1917,12 @@ namespace Step14
 
       struct WeightedResidualScratchData
       {
-        WeightedResidualScratchData(const FiniteElement<dim>  &primal_fe,
-          const Quadrature<dim> &    primal_quadrature,
-          const Quadrature<dim - 1> &primal_face_quadrature,
-          const Function<dim> &      rhs_function,
-          const Vector<double> &     primal_solution,
-          const Vector<double> &     dual_weights);
+        WeightedResidualScratchData(const FiniteElement<dim> & primal_fe,
+                                    const Quadrature<dim> &    primal_quadrature,
+                                    const Quadrature<dim - 1> &primal_face_quadrature,
+                                    const Function<dim> &      rhs_function,
+                                    const Vector<double> &     primal_solution,
+                                    const Vector<double> &     dual_weights);
 
         WeightedResidualScratchData(const WeightedResidualScratchData &scratch_data);
 
@@ -1953,7 +1953,7 @@ namespace Step14
                                 WeightedResidualScratchData &scratch_data,
                                 WeightedResidualCopyData &   copy_data,
                                 Vector<float> &              error_indicators,
-                                FaceIntegrals &face_integrals) const;
+                                FaceIntegrals &              face_integrals) const;
 
       // Then we have functions that do the actual integration of the error
       // representation formula. They will treat the terms on the cell
@@ -1964,21 +1964,21 @@ namespace Step14
                                const Vector<double> &      primal_solution,
                                const Vector<double> &      dual_weights,
                                CellData &                  cell_data,
-                               Vector<float> &error_indicators) const;
+                               Vector<float> &             error_indicators) const;
 
       void
       integrate_over_regular_face(const active_cell_iterator &cell,
                                        const unsigned int          face_no,
-                                       const Vector<double> &primal_solution,
-                                       const Vector<double> &dual_weights,
-                                       FaceData &            face_data,
-                                       FaceIntegrals &face_integrals) const;
+                                       const Vector<double> &      primal_solution,
+                                       const Vector<double> &      dual_weights,
+                                       FaceData &                  face_data,
+                                       FaceIntegrals &             face_integrals) const;
       void
       integrate_over_irregular_face(const active_cell_iterator &cell,
                                          const unsigned int          face_no,
-                                         const Vector<double> &primal_solution,
-                                         const Vector<double> &dual_weights,
-                                         FaceData &            face_data,
+                                         const Vector<double> &      primal_solution,
+                                         const Vector<double> &      dual_weights,
+                                         FaceData &                  face_data,
                                          FaceIntegrals &face_integrals) const;
     };
 
@@ -1992,7 +1992,7 @@ namespace Step14
     template <int dim>
     WeightedResidual<dim>::CellData::
     CellData(const FiniteElement<dim> &fe,
-      const Quadrature<dim> &   quadrature,
+                                              const Quadrature<dim> &   quadrature,
              const Function<dim>      &right_hand_side)
       :
       fe_values(fe, quadrature,
@@ -2037,12 +2037,12 @@ namespace Step14
                           update_values        |
                           update_gradients     |
                           update_JxW_values    |
-                          update_normal_vectors),
+                            update_normal_vectors),
       fe_face_values_neighbor(fe, face_quadrature,
                               update_values     |
                               update_gradients  |
                               update_JxW_values |
-                            update_normal_vectors),
+                                update_normal_vectors),
       fe_subface_values_cell(fe, face_quadrature,
                              update_gradients)
     {
@@ -2068,11 +2068,11 @@ namespace Step14
                           update_JxW_values    |
                             update_normal_vectors),
       fe_face_values_neighbor(face_data.fe_face_values_neighbor.get_fe(),
-        face_data.fe_face_values_neighbor.get_quadrature(),
+                              face_data.fe_face_values_neighbor.get_quadrature(),
                               update_values     |
                               update_gradients  |
                               update_JxW_values |
-          update_normal_vectors),
+                                update_normal_vectors),
       fe_subface_values_cell(face_data.fe_subface_values_cell.get_fe(),
                              face_data.fe_subface_values_cell.get_quadrature(),
                              update_gradients),
@@ -2087,10 +2087,10 @@ namespace Step14
     template <int dim>
     WeightedResidual<dim>::WeightedResidualScratchData::
     WeightedResidualScratchData(const FiniteElement<dim>  &primal_fe,
-        const Quadrature<dim> &    primal_quadrature,
-        const Quadrature<dim - 1> &primal_face_quadrature,
-        const Function<dim> &      rhs_function,
-        const Vector<double> &     primal_solution,
+      const Quadrature<dim> &    primal_quadrature,
+      const Quadrature<dim - 1> &primal_face_quadrature,
+      const Function<dim> &      rhs_function,
+      const Vector<double> &     primal_solution,
                                 const Vector<double>      &dual_weights)
       :
       cell_data(primal_fe, primal_quadrature, rhs_function),
@@ -2350,22 +2350,22 @@ namespace Step14
       // Then hand it all off to WorkStream::run() to compute the
       // estimators for all cells in parallel:
       WorkStream::run(DualSolver<dim>::dof_handler.begin_active(),
-        DualSolver<dim>::dof_handler.end(),
-        std::bind(&WeightedResidual<dim>::estimate_on_one_cell,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3,
-                  std::ref(error_indicators),
-                  std::ref(face_integrals)),
-        std::function<void(const WeightedResidualCopyData &)>(),
-        WeightedResidualScratchData(*DualSolver<dim>::fe,
-                                    *DualSolver<dim>::quadrature,
-                                    *DualSolver<dim>::face_quadrature,
-                                    *this->rhs_function,
-                                    primal_solution,
-                                    dual_weights),
-        WeightedResidualCopyData());
+                      DualSolver<dim>::dof_handler.end(),
+                      std::bind(&WeightedResidual<dim>::estimate_on_one_cell,
+                                this,
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3,
+                                std::ref(error_indicators),
+                                std::ref(face_integrals)),
+                      std::function<void(const WeightedResidualCopyData &)>(),
+                      WeightedResidualScratchData(*DualSolver<dim>::fe,
+                                                  *DualSolver<dim>::quadrature,
+                                                  *DualSolver<dim>::face_quadrature,
+                                                  *this->rhs_function,
+                                                  primal_solution,
+                                                  dual_weights),
+                      WeightedResidualCopyData());
 
       // Once the error contributions are computed, sum them up. For this,
       // note that the cell terms are already set, and that only the edge
@@ -2402,10 +2402,10 @@ namespace Step14
     void
     WeightedResidual<dim>::
     estimate_on_one_cell(const active_cell_iterator   &cell,
-      WeightedResidualScratchData &scratch_data,
-      WeightedResidualCopyData &   copy_data,
-      Vector<float> &              error_indicators,
-      FaceIntegrals &              face_integrals) const
+                                                WeightedResidualScratchData &scratch_data,
+                                                WeightedResidualCopyData &   copy_data,
+                                                Vector<float> &error_indicators,
+                                                FaceIntegrals &face_integrals) const
     {
       // Because of WorkStream, estimate_on_one_cell requires a CopyData object
       // even if it is no used. The next line silences a warning about this unused
@@ -2494,10 +2494,10 @@ namespace Step14
     template <int dim>
     void WeightedResidual<dim>::
     integrate_over_cell(const active_cell_iterator &cell,
-      const Vector<double> &      primal_solution,
-      const Vector<double> &      dual_weights,
-      CellData &                  cell_data,
-      Vector<float> &             error_indicators) const
+                                                    const Vector<double> &primal_solution,
+                                                    const Vector<double> &dual_weights,
+                                                    CellData &            cell_data,
+                                                    Vector<float> &error_indicators) const
     {
       // The tasks to be done are what appears natural from looking at the
       // error estimation formula: first get the right hand side and Laplacian
@@ -2506,7 +2506,7 @@ namespace Step14
       cell_data.fe_values.reinit(cell);
       cell_data.right_hand_side
       ->value_list(cell_data.fe_values.get_quadrature_points(),
-                   cell_data.rhs_values);
+                                            cell_data.rhs_values);
       cell_data.fe_values.get_function_laplacians(primal_solution,
                                                   cell_data.cell_laplacians);
 
@@ -2596,7 +2596,7 @@ namespace Step14
       for (unsigned int p = 0; p < n_q_points; ++p)
         face_integral += (face_data.jump_residual[p] *
                           face_data.dual_weights[p]  *
-           face_data.fe_face_values_cell.JxW(p));
+                          face_data.fe_face_values_cell.JxW(p));
 
       // Double check that the element already exists and that it was not
       // already written to...
@@ -2703,7 +2703,7 @@ namespace Step14
           for (unsigned int p = 0; p < n_q_points; ++p)
             face_integral += (face_data.jump_residual[p] *
                               face_data.dual_weights[p] *
-               face_data.fe_face_values_neighbor.JxW(p));
+                              face_data.fe_face_values_neighbor.JxW(p));
           face_integrals[neighbor_child->face(neighbor_neighbor)]
             = face_integral;
         }
@@ -2866,13 +2866,13 @@ namespace Step14
           {
         solver = std_cxx14::make_unique<LaplaceSolver::WeightedResidual<dim>>
                  (triangulation,
-                primal_fe,
-                dual_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values(),
-                *descriptor.dual_functional);
+              primal_fe,
+              dual_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values(),
+              *descriptor.dual_functional);
             break;
           }
 
@@ -2880,11 +2880,11 @@ namespace Step14
           {
         solver = std_cxx14::make_unique<LaplaceSolver::RefinementGlobal<dim>>
                  (triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
+              primal_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values());
             break;
           }
 
@@ -2892,11 +2892,11 @@ namespace Step14
           {
         solver = std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>
                  (triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
+              primal_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values());
             break;
           }
 

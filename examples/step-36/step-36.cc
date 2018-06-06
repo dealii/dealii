@@ -124,9 +124,9 @@ namespace Step36
   {
 //TODO investigate why the minimum number of refinement steps required to obtain the correct eigenvalue degeneracies is 6
     parameters.declare_entry("Global mesh refinement steps", "5",
-      Patterns::Integer(0, 20),
-      "The number of times the 1-cell coarse mesh should "
-      "be refined globally for our computations.");
+                             Patterns::Integer(0, 20),
+                             "The number of times the 1-cell coarse mesh should "
+                             "be refined globally for our computations.");
     parameters.declare_entry("Number of eigenvalues/eigenfunctions", "5",
                              Patterns::Integer(0, 100),
                              "The number of eigenvalues/eigenfunctions "
@@ -466,7 +466,7 @@ namespace Step36
                 << " : " << eigenvalues[i]
                 << std::endl;
   }
-}
+  }
 
 // @sect3{The <code>main</code> function}
 int main(int argc, char **argv)
@@ -480,8 +480,8 @@ int main(int argc, char **argv)
 
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-        ExcMessage("This program can only be run in serial, use ./step-36"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+                  ExcMessage("This program can only be run in serial, use ./step-36"));
 
       EigenvalueProblem<2> problem("step-36.prm");
       problem.run();

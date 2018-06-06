@@ -308,7 +308,7 @@ namespace Step22
   template <class MatrixType, class PreconditionerType>
   void InverseMatrix<MatrixType,PreconditionerType>::vmult
   (Vector<double>       &dst,
-    const Vector<double> &src) const
+                                                       const Vector<double> &src) const
   {
     SolverControl solver_control(src.size(), 1e-6 * src.l2_norm());
     SolverCG<>    cg(solver_control);
@@ -361,8 +361,8 @@ namespace Step22
 
 
   template <class PreconditionerType>
-  void SchurComplement<PreconditionerType>::vmult(Vector<double>       &dst,
-                                             const Vector<double> &src) const
+  void SchurComplement<PreconditionerType>::vmult(Vector<double> &      dst,
+                                                  const Vector<double> &src) const
   {
     system_matrix->block(0, 1).vmult(tmp1, src);
     A_inverse->vmult(tmp2, tmp1);
@@ -621,14 +621,14 @@ namespace Step22
                             update_values    |
                             update_quadrature_points  |
                             update_JxW_values |
-                            update_gradients);
+                              update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
     const unsigned int n_q_points = quadrature_formula.size();
 
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double>   local_preconditioner_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> local_preconditioner_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     local_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -687,8 +687,8 @@ namespace Step22
             for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
                 symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
-                div_phi_u[k] = fe_values[velocities].divergence(k, q);
-                phi_p[k]     = fe_values[pressure].value(k, q);
+                div_phi_u[k]     = fe_values[velocities].divergence(k, q);
+                phi_p[k]         = fe_values[pressure].value(k, q);
               }
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -740,8 +740,8 @@ namespace Step22
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
             {
-              local_matrix(i, j) = local_matrix(j, i);
-              local_preconditioner_matrix(i,j) = local_preconditioner_matrix(j,i);
+              local_matrix(i, j)                = local_matrix(j, i);
+              local_preconditioner_matrix(i, j) = local_preconditioner_matrix(j, i);
             }
 
         cell->get_dof_indices(local_dof_indices);

@@ -178,8 +178,8 @@ namespace Step35
       prm.enter_subsection("Data solve velocity");
       {
         prm.declare_entry("max_iterations", "1000",
-          Patterns::Integer(1, 1000),
-          " The maximal number of iterations GMRES must make. ");
+                          Patterns::Integer(1, 1000),
+                          " The maximal number of iterations GMRES must make. ");
         prm.declare_entry("eps", "1e-12",
                           Patterns::Double(0.),
                           " The stopping criterion. ");
@@ -682,7 +682,7 @@ namespace Step35
   {
     if (deg < 1)
       std::cout << " WARNING: The chosen pair of finite element spaces is not stable."
-        << std::endl
+                << std::endl
                 << " The obtained results will be nonsense"
                 << std::endl;
 
@@ -879,14 +879,14 @@ namespace Step35
                                                    dof_handler_pressure.begin_active()
                                                   )
                                     ),
-          IteratorPair(IteratorTuple(dof_handler_velocity.end(),
+                        IteratorPair(IteratorTuple(dof_handler_velocity.end(),
                                                    dof_handler_pressure.end()
                                                   )
                                     ),
-          *this,
-          &NavierStokesProjection<dim>::assemble_one_cell_of_gradient,
-          &NavierStokesProjection<dim>::copy_gradient_local_to_global,
-          scratch_data,
+                        *this,
+                        &NavierStokesProjection<dim>::assemble_one_cell_of_gradient,
+                        &NavierStokesProjection<dim>::copy_gradient_local_to_global,
+                        scratch_data,
                         per_task_data
                        );
       }
@@ -896,8 +896,8 @@ namespace Step35
   void
   NavierStokesProjection<dim>::
   assemble_one_cell_of_gradient(const IteratorPair  &SI,
-    InitGradScratchData &scratch,
-    InitGradPerTaskData &data)
+                                                             InitGradScratchData &scratch,
+                                                             InitGradPerTaskData &data)
   {
     scratch.fe_val_vel.reinit(std::get<0>(*SI));
     scratch.fe_val_pres.reinit(std::get<1>(*SI));
@@ -911,8 +911,8 @@ namespace Step35
         for (unsigned int i = 0; i < data.vel_dpc; ++i)
           for (unsigned int j = 0; j < data.pres_dpc; ++j)
             data.local_grad(i, j) += -scratch.fe_val_vel.JxW(q) *
-              scratch.fe_val_vel.shape_grad(i, q)[data.d] *
-              scratch.fe_val_pres.shape_value(j, q);
+                                     scratch.fe_val_vel.shape_grad(i, q)[data.d] *
+                                     scratch.fe_val_pres.shape_value(j, q);
       }
   }
 
@@ -1047,9 +1047,9 @@ namespace Step35
                 case 1:
                 VectorTools::
                 interpolate_boundary_values(dof_handler_velocity,
-                    *boundaries,
-                    Functions::ZeroFunction<dim>(),
-                    boundary_values);
+                                                           *boundaries,
+                                                           Functions::ZeroFunction<dim>(),
+                                                           boundary_values);
                   break;
                 case 2:
                 VectorTools::
@@ -1069,9 +1069,9 @@ namespace Step35
                 case 4:
                 VectorTools::
                 interpolate_boundary_values(dof_handler_velocity,
-                    *boundaries,
-                    Functions::ZeroFunction<dim>(),
-                    boundary_values);
+                                                           *boundaries,
+                                                           Functions::ZeroFunction<dim>(),
+                                                           boundary_values);
                   break;
                 default:
                   Assert(false, ExcNotImplemented());
@@ -1131,10 +1131,10 @@ namespace Step35
                                    update_gradients);
     WorkStream::run(dof_handler_velocity.begin_active(),
                     dof_handler_velocity.end(), *this,
-      &NavierStokesProjection<dim>::assemble_one_cell_of_advection,
-      &NavierStokesProjection<dim>::copy_advection_local_to_global,
-      scratch,
-      data);
+                    &NavierStokesProjection<dim>::assemble_one_cell_of_advection,
+                    &NavierStokesProjection<dim>::copy_advection_local_to_global,
+                    scratch,
+                    data);
   }
 
 
@@ -1291,19 +1291,19 @@ namespace Step35
     const FESystem<dim> joint_fe(fe_velocity, dim,
                                  fe_pressure, 1,
                                  fe_velocity, 1);
-    DoFHandler<dim> joint_dof_handler(triangulation);
+    DoFHandler<dim>     joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
     Assert(joint_dof_handler.n_dofs() ==
              ((dim + 1) * dof_handler_velocity.n_dofs() +
               dof_handler_pressure.n_dofs()),
            ExcInternalError());
-    Vector<double> joint_solution(joint_dof_handler.n_dofs());
+    Vector<double>                       joint_solution(joint_dof_handler.n_dofs());
     std::vector<types::global_dof_index> loc_joint_dof_indices(joint_fe.dofs_per_cell),
       loc_vel_dof_indices(fe_velocity.dofs_per_cell),
       loc_pres_dof_indices(fe_pressure.dofs_per_cell);
     typename DoFHandler<dim>::active_cell_iterator
       joint_cell = joint_dof_handler.begin_active(),
-      joint_endc = joint_dof_handler.end(),
+                                                   joint_endc = joint_dof_handler.end(),
       vel_cell   = dof_handler_velocity.begin_active(),
       pres_cell  = dof_handler_pressure.begin_active();
     for (; joint_cell != joint_endc; ++joint_cell, ++vel_cell, ++pres_cell)
@@ -1325,13 +1325,13 @@ namespace Step35
                 Assert(joint_fe.system_to_base_index(i).first.second == 0,
                        ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) =
-                pres_n(loc_pres_dof_indices[ joint_fe.system_to_base_index(i).second ]);
+                  pres_n(loc_pres_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               case 2:
                 Assert(joint_fe.system_to_base_index(i).first.second == 0,
                        ExcInternalError());
-              joint_solution(loc_joint_dof_indices[i]) =
-                rot_u(loc_vel_dof_indices[ joint_fe.system_to_base_index(i).second ]);
+                joint_solution(loc_joint_dof_indices[i]) =
+                  rot_u(loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               default:
                 Assert(false, ExcInternalError());
@@ -1343,8 +1343,8 @@ namespace Step35
     DataOut<dim> data_out;
     data_out.attach_dof_handler(joint_dof_handler);
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    component_interpretation(dim+2,
-                             DataComponentInterpretation::component_is_part_of_vector);
+      component_interpretation(dim + 2,
+                               DataComponentInterpretation::component_is_part_of_vector);
     component_interpretation[dim]
       = DataComponentInterpretation::component_is_scalar;
     component_interpretation[dim+1]
@@ -1391,7 +1391,7 @@ namespace Step35
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler_velocity.begin_active(),
-    end  = dof_handler_velocity.end();
+                                                   end = dof_handler_velocity.end();
     for (; cell != end; ++cell)
       {
         fe_val_vel.reinit(cell);

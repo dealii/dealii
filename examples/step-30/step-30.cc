@@ -62,7 +62,7 @@ namespace Step30
   public:
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
 
@@ -72,7 +72,7 @@ namespace Step30
   public:
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
 
@@ -204,8 +204,8 @@ namespace Step30
   template <int dim>
   void DGTransportEquation<dim>::assemble_cell_term(
     const FEValues<dim> &fe_v,
-    FullMatrix<double> & ui_vi_matrix,
-    Vector<double> &     cell_vector) const
+                                                    FullMatrix<double> & ui_vi_matrix,
+                                                    Vector<double> &cell_vector) const
   {
     const std::vector<double> &JxW = fe_v.get_JxW_values();
 
@@ -223,7 +223,7 @@ namespace Step30
                                  fe_v.shape_value(j,point) *
                                  JxW[point];
 
-          cell_vector(i) += rhs[point] * fe_v.shape_value(i,point) * JxW[point];
+          cell_vector(i) += rhs[point] * fe_v.shape_value(i, point) * JxW[point];
         }
   }
 
@@ -231,8 +231,8 @@ namespace Step30
   template <int dim>
   void DGTransportEquation<dim>::assemble_boundary_term(
     const FEFaceValues<dim> &fe_v,
-    FullMatrix<double> &     ui_vi_matrix,
-    Vector<double> &         cell_vector) const
+                                                        FullMatrix<double> &ui_vi_matrix,
+                                                        Vector<double> &cell_vector) const
   {
     const std::vector<double> &        JxW     = fe_v.get_JxW_values();
     const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
@@ -406,7 +406,7 @@ namespace Step30
   {
     dof_handler.distribute_dofs(fe);
     sparsity_pattern.reinit(dof_handler.n_dofs(),
-                            dof_handler.n_dofs(),
+      dof_handler.n_dofs(),
                             (GeometryInfo<dim>::faces_per_cell
                              *GeometryInfo<dim>::max_children_per_face+1)*fe.dofs_per_cell);
 
@@ -456,7 +456,7 @@ namespace Step30
       mapping, fe, face_quadrature, face_update_flags);
     FESubfaceValues<dim> fe_v_subface(
       mapping, fe, face_quadrature, face_update_flags);
-    FEFaceValues<dim> fe_v_face_neighbor(
+    FEFaceValues<dim>    fe_v_face_neighbor(
       mapping, fe, face_quadrature, neighbor_face_update_flags);
 
 
@@ -665,7 +665,7 @@ namespace Step30
     cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-      gradient_indicator(cell_no)*=std::pow(cell->diameter(), 1+1.0*dim/2);
+      gradient_indicator(cell_no) *= std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
     // Then we use this indicator to flag the 30 percent of the cells with
     // highest error indicator to be refined.
     GridRefinement::refine_and_coarsen_fixed_number(triangulation,
@@ -697,12 +697,12 @@ namespace Step30
     UpdateFlags face_update_flags
       = UpdateFlags(update_values | update_JxW_values);
 
-    FEFaceValues<dim> fe_v_face(mapping, fe, face_quadrature, face_update_flags);
+    FEFaceValues<dim>    fe_v_face(mapping, fe, face_quadrature, face_update_flags);
     FESubfaceValues<dim> fe_v_subface(mapping, fe, face_quadrature, face_update_flags);
-    FEFaceValues<dim> fe_v_face_neighbor(mapping, fe, face_quadrature, update_values);
+    FEFaceValues<dim>    fe_v_face_neighbor(mapping, fe, face_quadrature, update_values);
 
     // Now we need to loop over all active cells.
-    typename DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active(),
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
@@ -781,7 +781,7 @@ namespace Step30
                           // consideration. Apart from that, we do much the
                           // same as with one of the subcells in the above
                           // case.
-                          unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
+                          unsigned int neighbor2 = cell->neighbor_of_neighbor(face_no);
 
                           fe_v_face.reinit(cell, face_no);
                           fe_v_face_neighbor.reinit(neighbor, neighbor2);

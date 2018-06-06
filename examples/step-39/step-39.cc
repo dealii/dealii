@@ -97,7 +97,7 @@ namespace Step39
   public:
     void cell(MeshWorker::DoFInfo<dim> &                 dinfo,
               typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void boundary(MeshWorker::DoFInfo<dim> &dinfo,
+    void boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
                   typename MeshWorker::IntegrationInfo<dim> &info) const override;
     void face(MeshWorker::DoFInfo<dim> &                 dinfo1,
               MeshWorker::DoFInfo<dim> &                 dinfo2,
@@ -118,7 +118,7 @@ namespace Step39
   template <int dim>
   void MatrixIntegrator<dim>::cell(
     MeshWorker::DoFInfo<dim> &                 dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+                                   typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values());
   }
@@ -127,7 +127,7 @@ namespace Step39
   template <int dim>
   void MatrixIntegrator<dim>::boundary(
     MeshWorker::DoFInfo<dim> &                 dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+                                  typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
     LocalIntegrators::Laplace::nitsche_matrix(
@@ -139,9 +139,9 @@ namespace Step39
   template <int dim>
   void MatrixIntegrator<dim>::face(
     MeshWorker::DoFInfo<dim> &                 dinfo1,
-    MeshWorker::DoFInfo<dim> &                 dinfo2,
-    typename MeshWorker::IntegrationInfo<dim> &info1,
-    typename MeshWorker::IntegrationInfo<dim> &info2) const
+                                   MeshWorker::DoFInfo<dim> &                 dinfo2,
+                                   typename MeshWorker::IntegrationInfo<dim> &info1,
+                                   typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
     LocalIntegrators::Laplace::ip_matrix(
@@ -194,9 +194,9 @@ namespace Step39
 
   template <int dim>
   void RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
-                           MeshWorker::DoFInfo<dim> &,
-                           typename MeshWorker::IntegrationInfo<dim> &,
-                           typename MeshWorker::IntegrationInfo<dim> &) const
+                                MeshWorker::DoFInfo<dim> &,
+                                typename MeshWorker::IntegrationInfo<dim> &,
+                                typename MeshWorker::IntegrationInfo<dim> &) const
   {}
 
 
@@ -258,10 +258,10 @@ namespace Step39
   // Finally, on interior faces, the estimator consists of the jumps of the
   // solution and its normal derivative, weighted appropriately.
   template <int dim>
-  void Estimator<dim>::face(MeshWorker::DoFInfo<dim> &dinfo1,
-                       MeshWorker::DoFInfo<dim> &                 dinfo2,
-                       typename MeshWorker::IntegrationInfo<dim> &info1,
-                       typename MeshWorker::IntegrationInfo<dim> &info2) const
+  void Estimator<dim>::face(MeshWorker::DoFInfo<dim> &                 dinfo1,
+                            MeshWorker::DoFInfo<dim> &                 dinfo2,
+                            typename MeshWorker::IntegrationInfo<dim> &info1,
+                            typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const FEValuesBase<dim> &          fe   = info1.fe_values();
     const std::vector<double> &        uh1  = info1.values[0][0];
@@ -326,7 +326,7 @@ namespace Step39
   template <int dim>
   void ErrorIntegrator<dim>::cell(
     MeshWorker::DoFInfo<dim> &                 dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+                                  typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &   fe = info.fe_values();
     std::vector<Tensor<1, dim>> exact_gradients(fe.n_quadrature_points);
@@ -358,7 +358,7 @@ namespace Step39
   template <int dim>
   void ErrorIntegrator<dim>::boundary(
     MeshWorker::DoFInfo<dim> &                 dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+                                 typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
 
@@ -382,9 +382,9 @@ namespace Step39
   template <int dim>
   void ErrorIntegrator<dim>::face(
     MeshWorker::DoFInfo<dim> &                 dinfo1,
-    MeshWorker::DoFInfo<dim> &                 dinfo2,
-    typename MeshWorker::IntegrationInfo<dim> &info1,
-    typename MeshWorker::IntegrationInfo<dim> &info2) const
+                                  MeshWorker::DoFInfo<dim> &                 dinfo2,
+                                  typename MeshWorker::IntegrationInfo<dim> &info1,
+                                  typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const FEValuesBase<dim> &  fe  = info1.fe_values();
     const std::vector<double> &uh1 = info1.values[0][0];
@@ -542,7 +542,7 @@ namespace Step39
         if (level > 0)
           {
             DynamicSparsityPattern dsp;
-            dsp.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
+            dsp.reinit(dof_handler.n_dofs(level - 1), dof_handler.n_dofs(level));
             MGTools::make_flux_sparsity_pattern_edge(dof_handler, dsp, level);
             mg_sparsity_dg_interface[level].copy_from(dsp);
             mg_matrix_dg_up[level].reinit(mg_sparsity_dg_interface[level]);
@@ -572,7 +572,7 @@ namespace Step39
     // to initialize the container, which will create all necessary
     // FEValuesBase objects for integration.
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags update_flags = update_values | update_gradients;
+    UpdateFlags                         update_flags = update_values | update_gradients;
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
@@ -611,7 +611,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::assemble_mg_matrix()
   {
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags update_flags = update_values | update_gradients;
+    UpdateFlags                         update_flags = update_values | update_gradients;
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
@@ -759,7 +759,7 @@ namespace Step39
 
     // This starts like before,
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
+    const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
     // but now we need to notify the info box of the finite element function we
@@ -827,7 +827,7 @@ namespace Step39
       cell->set_user_index(i);
 
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
+    const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree() + 1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
     AnyData solution_data;

@@ -321,7 +321,7 @@ namespace Step27
     hp::FEValues<dim> hp_fe_values(fe_collection,
                                    quadrature_collection,
                                    update_values | update_gradients |
-                                   update_quadrature_points  |  update_JxW_values);
+                                     update_quadrature_points | update_JxW_values);
 
     const RightHandSide<dim> rhs_function;
 
@@ -359,7 +359,7 @@ namespace Step27
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
                                      fe_values.shape_grad(j,q_point) *
-                                     fe_values.JxW(q_point));
+                   fe_values.JxW(q_point));
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) *
                               rhs_values[q_point] *
@@ -447,7 +447,7 @@ namespace Step27
       {
         typename hp::DoFHandler<dim>::active_cell_iterator
           cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
+                                                           endc = dof_handler.end();
         for (; cell != endc; ++cell)
           fe_degrees(cell->active_cell_index())
             = fe_collection[cell->active_fe_index()].degree;
@@ -508,14 +508,14 @@ namespace Step27
       {
         typename hp::DoFHandler<dim>::active_cell_iterator
           cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
+                                                           endc = dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->refine_flag_set())
             {
               max_smoothness = std::max(max_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
+                                        smoothness_indicators(cell->active_cell_index()));
               min_smoothness = std::min(min_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
+                                        smoothness_indicators(cell->active_cell_index()));
             }
       }
       const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
@@ -531,7 +531,7 @@ namespace Step27
       {
         typename hp::DoFHandler<dim>::active_cell_iterator
           cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
+                                                           endc = dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->refine_flag_set()
               &&
@@ -774,7 +774,7 @@ namespace Step27
           {
             ln_k.resize(res.first.size(), 0);
             for (unsigned int f = 0; f < ln_k.size(); f++)
-              ln_k[f] = std::log(2.0*numbers::PI*std::sqrt(1.*res.first[f]));
+              ln_k[f] = std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
           }
 
         // We have to calculate the logarithms of absolute
@@ -783,13 +783,13 @@ namespace Step27
         for (unsigned int f = 0; f < res.second.size(); f++)
           res.second[f] = std::log(res.second[f]);
 
-        std::pair<double,double> fit = FESeries::linear_regression(ln_k,res.second);
+        std::pair<double, double> fit = FESeries::linear_regression(ln_k, res.second);
 
         // The final step is to compute the Sobolev index $s=\mu-\frac d2$ and
         // store it in the vector of estimated values for each cell:
-        smoothness_indicators(cell->active_cell_index()) = -fit.first - 1.*dim/2;
+        smoothness_indicators(cell->active_cell_index()) = -fit.first - 1. * dim / 2;
       }
-      }
+  }
   }
 
 

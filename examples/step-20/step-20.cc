@@ -168,8 +168,8 @@ namespace Step20
 
 
   template <int dim>
-  double PressureBoundaryValues<dim>::value(const Point<dim>  &p,
-                                     const unsigned int /*component*/) const
+  double PressureBoundaryValues<dim>::value(const Point<dim> &p,
+                                            const unsigned int /*component*/) const
   {
     const double alpha = 0.3;
     const double beta  = 1;
@@ -229,7 +229,7 @@ namespace Step20
     KInverse() : TensorFunction<2,dim>() {}
 
     virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<Tensor<2, dim>> &values) const override;
+                            std::vector<Tensor<2, dim>> &  values) const override;
   };
 
 
@@ -433,7 +433,7 @@ namespace Step20
                               update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values(fe, face_quadrature_formula,
                                      update_values | update_normal_vectors |
-                                     update_quadrature_points  | update_JxW_values);
+                                       update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int n_q_points      = quadrature_formula.size();
@@ -490,15 +490,15 @@ namespace Step20
         for (unsigned int q = 0; q < n_q_points; ++q)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const Tensor<1, dim> phi_i_u = fe_values[velocities].value(i, q);
-              const double div_phi_i_u = fe_values[velocities].divergence(i, q);
-              const double phi_i_p     = fe_values[pressure].value(i, q);
+              const Tensor<1, dim> phi_i_u     = fe_values[velocities].value(i, q);
+              const double         div_phi_i_u = fe_values[velocities].divergence(i, q);
+              const double         phi_i_p     = fe_values[pressure].value(i, q);
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const Tensor<1,dim> phi_j_u     = fe_values[velocities].value(j, q);
-                  const double        div_phi_j_u = fe_values[velocities].divergence(j, q);
-                  const double phi_j_p = fe_values[pressure].value(j, q);
+                  const Tensor<1, dim> phi_j_u = fe_values[velocities].value(j, q);
+                  const double div_phi_j_u     = fe_values[velocities].divergence(j, q);
+                  const double phi_j_p         = fe_values[pressure].value(j, q);
 
                   local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
                                         - div_phi_i_u * phi_j_p
@@ -520,7 +520,7 @@ namespace Step20
 
               pressure_boundary_values
               .value_list(fe_face_values.get_quadrature_points(),
-                          boundary_values);
+                                                  boundary_values);
 
               for (unsigned int q = 0; q < n_face_q_points; ++q)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -734,7 +734,7 @@ namespace Step20
                                    1e-12 * schur_rhs.l2_norm());
       SolverCG<>    cg(solver_control);
 
-      ApproximateSchurComplement approximate_schur(system_matrix);
+      ApproximateSchurComplement                approximate_schur(system_matrix);
       InverseMatrix<ApproximateSchurComplement> approximate_inverse
       (approximate_schur);
       cg.solve(schur_complement, solution.block(1), schur_rhs,

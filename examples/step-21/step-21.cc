@@ -151,7 +151,7 @@ namespace Step21
   template <int dim>
   double
   PressureRightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int /*component*/) const
+                                           const unsigned int /*component*/) const
   {
     return 0;
   }
@@ -175,7 +175,7 @@ namespace Step21
   template <int dim>
   double
   PressureBoundaryValues<dim>::value(const Point<dim> &p,
-                                     const unsigned int /*component*/) const
+                                            const unsigned int /*component*/) const
   {
     return 1 - p[0];
   }
@@ -203,7 +203,7 @@ namespace Step21
   template <int dim>
   double
   SaturationBoundaryValues<dim>::value(const Point<dim> &p,
-                                       const unsigned int /*component*/) const
+                                              const unsigned int /*component*/) const
   {
     if (p[0] == 0)
       return 1;
@@ -361,8 +361,8 @@ namespace Step21
         TensorFunction<2,dim> ()
       {}
 
-      virtual void value_list(const std::vector<Point<dim> > &points,
-                 std::vector<Tensor<2, dim>> &  values) const override;
+      virtual void value_list(const std::vector<Point<dim>> &points,
+                              std::vector<Tensor<2, dim>> &  values) const override;
 
     private:
       static std::vector<Point<dim>> centers;
@@ -704,7 +704,7 @@ namespace Step21
                               update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values(fe, face_quadrature_formula,
                                      update_values | update_normal_vectors |
-                                     update_quadrature_points  | update_JxW_values);
+                                       update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -724,7 +724,7 @@ namespace Step21
     std::vector<double>         boundary_values(n_face_q_points);
     std::vector<Tensor<2, dim>> k_inverse_values(n_q_points);
 
-    std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
+    std::vector<Vector<double>> old_solution_values(n_q_points, Vector<double>(dim + 2));
     std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
         std::vector<Tensor<1,dim> > (dim+2));
 
@@ -770,17 +770,17 @@ namespace Step21
             {
               const double old_s = old_solution_values[q](dim + 1);
 
-              const Tensor<1, dim> phi_i_u = fe_values[velocities].value(i, q);
-              const double div_phi_i_u = fe_values[velocities].divergence(i, q);
-              const double phi_i_p     = fe_values[pressure].value(i, q);
-              const double phi_i_s     = fe_values[saturation].value(i, q);
+              const Tensor<1, dim> phi_i_u     = fe_values[velocities].value(i, q);
+              const double         div_phi_i_u = fe_values[velocities].divergence(i, q);
+              const double         phi_i_p     = fe_values[pressure].value(i, q);
+              const double         phi_i_s     = fe_values[saturation].value(i, q);
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const Tensor<1,dim> phi_j_u     = fe_values[velocities].value(j, q);
-                  const double        div_phi_j_u = fe_values[velocities].divergence(j, q);
-                  const double phi_j_p = fe_values[pressure].value(j, q);
-                  const double phi_j_s = fe_values[saturation].value(j, q);
+                  const Tensor<1, dim> phi_j_u = fe_values[velocities].value(j, q);
+                  const double div_phi_j_u     = fe_values[velocities].divergence(j, q);
+                  const double phi_j_p         = fe_values[pressure].value(j, q);
+                  const double phi_j_s         = fe_values[saturation].value(j, q);
 
                   local_matrix(i,j) += (phi_i_u * k_inverse_values[q] *
                                         mobility_inverse(old_s,viscosity) * phi_j_u
@@ -806,7 +806,7 @@ namespace Step21
 
               pressure_boundary_values
               .value_list(fe_face_values.get_quadrature_points(),
-                          boundary_values);
+                                                  boundary_values);
 
               for (unsigned int q = 0; q < n_face_q_points; ++q)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -856,7 +856,7 @@ namespace Step21
                               update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values(fe, face_quadrature_formula,
                                      update_values | update_normal_vectors |
-                                     update_quadrature_points  | update_JxW_values);
+                                       update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values_neighbor(fe, face_quadrature_formula,
                                               update_values);
 
@@ -866,7 +866,7 @@ namespace Step21
 
     Vector<double> local_rhs(dofs_per_cell);
 
-    std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
+    std::vector<Vector<double>> old_solution_values(n_q_points, Vector<double>(dim + 2));
     std::vector<Vector<double> > old_solution_values_face(n_face_q_points, Vector<double>(dim+2));
     std::vector<Vector<double> > old_solution_values_face_neighbor(n_face_q_points, Vector<double>(dim+2));
     std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
@@ -902,8 +902,8 @@ namespace Step21
               for (unsigned int d = 0; d < dim; ++d)
                 present_u[d] = present_solution_values[q](d);
 
-              const double         phi_i_s = fe_values[saturation].value(i, q);
-              const Tensor<1,dim> grad_phi_i_s = fe_values[saturation].gradient(i, q);
+              const double         phi_i_s      = fe_values[saturation].value(i, q);
+              const Tensor<1, dim> grad_phi_i_s = fe_values[saturation].gradient(i, q);
 
               local_rhs(i) += (time_step *
                                fractional_flow(old_s,viscosity) *
@@ -950,7 +950,7 @@ namespace Step21
                                      old_solution_values_face_neighbor);
 
                 for (unsigned int q = 0; q < n_face_q_points; ++q)
-                  neighbor_saturation[q] = old_solution_values_face_neighbor[q](dim+1);
+                  neighbor_saturation[q] = old_solution_values_face_neighbor[q](dim + 1);
               }
 
 
@@ -997,9 +997,9 @@ namespace Step21
   {
     const InverseMatrix<SparseMatrix<double> >
     m_inverse(system_matrix.block(0,0));
-    Vector<double> tmp(solution.block(0).size());
-    Vector<double> schur_rhs(solution.block(1).size());
-    Vector<double> tmp2(solution.block(2).size());
+    Vector<double>                            tmp(solution.block(0).size());
+    Vector<double>                            schur_rhs(solution.block(1).size());
+    Vector<double>                            tmp2(solution.block(2).size());
 
 
     // First the pressure, using the pressure Schur complement of the first

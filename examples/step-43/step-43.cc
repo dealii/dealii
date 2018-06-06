@@ -97,7 +97,7 @@ namespace Step43
   template <int dim>
   double
   PressureRightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int /*component*/) const
+                                           const unsigned int /*component*/) const
   {
     return 0;
   }
@@ -117,7 +117,7 @@ namespace Step43
   template <int dim>
   double
   PressureBoundaryValues<dim>::value(const Point<dim> &p,
-                                     const unsigned int /*component*/) const
+                                            const unsigned int /*component*/) const
   {
     return 1 - p[0];
   }
@@ -138,7 +138,7 @@ namespace Step43
   template <int dim>
   double
   SaturationBoundaryValues<dim>::value(const Point<dim> &p,
-                                       const unsigned int /*component*/) const
+                                              const unsigned int /*component*/) const
   {
     if (p[0] == 0)
       return 1;
@@ -164,7 +164,7 @@ namespace Step43
   template <int dim>
   double
   SaturationInitialValues<dim>::value(const Point<dim> & /*p*/,
-                                      const unsigned int /*component*/) const
+                                             const unsigned int /*component*/) const
   {
     return 0.2;
   }
@@ -173,7 +173,7 @@ namespace Step43
   template <int dim>
   void
   SaturationInitialValues<dim>::vector_value(const Point<dim> &p,
-                                                  Vector<double> &values) const
+                                                  Vector<double> &  values) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = SaturationInitialValues<dim>::value(p, c);
@@ -238,8 +238,8 @@ namespace Step43
         TensorFunction<2,dim> ()
       {}
 
-      virtual void value_list(const std::vector<Point<dim> > &points,
-                 std::vector<Tensor<2, dim>> &  values) const override;
+      virtual void value_list(const std::vector<Point<dim>> &points,
+                              std::vector<Tensor<2, dim>> &  values) const override;
 
     private:
       static std::vector<Point<dim>> centers;
@@ -394,7 +394,7 @@ namespace Step43
     void
     InverseMatrix<MatrixType,PreconditionerType>::vmult
     (VectorType       &dst,
-      const VectorType &src) const
+                                                              const VectorType &src) const
     {
       SolverControl        solver_control(src.size(), 1e-7 * src.l2_norm());
       SolverCG<VectorType> cg(solver_control);
@@ -416,10 +416,10 @@ namespace Step43
     {
     public:
       BlockSchurPreconditioner(
-        const TrilinosWrappers::BlockSparseMatrix &S,
+        const TrilinosWrappers::BlockSparseMatrix &                                S,
         const InverseMatrix<TrilinosWrappers::SparseMatrix,
                             PreconditionerTypeMp> &Mpinv,
-        const PreconditionerTypeA &                Apreconditioner);
+        const PreconditionerTypeA &Apreconditioner);
 
       void vmult(TrilinosWrappers::MPI::BlockVector &      dst,
                  const TrilinosWrappers::MPI::BlockVector &src) const;
@@ -524,14 +524,14 @@ namespace Step43
     std::pair<double, double> get_extrapolated_saturation_range() const;
     bool   determine_whether_to_solve_for_pressure_and_velocity() const;
     void   project_back_saturation();
-    double                   compute_viscosity(const std::vector<double>          &old_saturation,
-      const std::vector<double> &        old_old_saturation,
-      const std::vector<Tensor<1, dim>> &old_saturation_grads,
-      const std::vector<Tensor<1, dim>> &old_old_saturation_grads,
-      const std::vector<Vector<double>> &present_darcy_values,
-      const double                       global_max_u_F_prime,
-      const double                       global_S_variation,
-      const double                       cell_diameter) const;
+    double compute_viscosity(const std::vector<double> &        old_saturation,
+                             const std::vector<double> &        old_old_saturation,
+                             const std::vector<Tensor<1, dim>> &old_saturation_grads,
+                             const std::vector<Tensor<1, dim>> &old_old_saturation_grads,
+                             const std::vector<Vector<double>> &present_darcy_values,
+                             const double                       global_max_u_F_prime,
+                             const double                       global_S_variation,
+                             const double                       cell_diameter) const;
 
 
     // This all is followed by the member variables, most of which are similar
@@ -572,7 +572,7 @@ namespace Step43
     TrilinosWrappers::MPI::Vector old_old_saturation_solution;
     TrilinosWrappers::MPI::Vector saturation_rhs;
 
-    TrilinosWrappers::MPI::Vector        saturation_matching_last_computed_darcy_solution;
+    TrilinosWrappers::MPI::Vector saturation_matching_last_computed_darcy_solution;
 
     const double saturation_refinement_threshold;
 
@@ -710,7 +710,7 @@ namespace Step43
 
       DoFTools::make_hanging_node_constraints(darcy_dof_handler, darcy_preconditioner_constraints);
       DoFTools::make_zero_boundary_constraints(darcy_dof_handler, darcy_preconditioner_constraints,
-        darcy_fe.component_mask(pressure));
+                                               darcy_fe.component_mask(pressure));
 
       darcy_preconditioner_constraints.close();
     }
@@ -896,7 +896,7 @@ namespace Step43
 
     std::vector<double> old_saturation_values(n_q_points);
 
-    FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   local_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     std::vector<Tensor<1, dim>> phi_u(dofs_per_cell);
@@ -907,7 +907,7 @@ namespace Step43
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = darcy_dof_handler.begin_active(),
-    endc = darcy_dof_handler.end();
+                                                   endc = darcy_dof_handler.end();
     typename DoFHandler<dim>::active_cell_iterator
     saturation_cell = saturation_dof_handler.begin_active();
 
@@ -927,9 +927,9 @@ namespace Step43
           {
             const double old_s = old_saturation_values[q];
 
-            const double inverse_mobility = mobility_inverse(old_s, viscosity);
-            const double mobility         = 1.0 / inverse_mobility;
-            const Tensor<2, dim> permeability = invert(k_inverse_values[q]);
+            const double         inverse_mobility = mobility_inverse(old_s, viscosity);
+            const double         mobility         = 1.0 / inverse_mobility;
+            const Tensor<2, dim> permeability     = invert(k_inverse_values[q]);
 
             for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
@@ -1023,13 +1023,13 @@ namespace Step43
 
     FEValues<dim> darcy_fe_values(darcy_fe, quadrature_formula,
                                   update_values | update_gradients |
-                                  update_quadrature_points  | update_JxW_values);
+                                    update_quadrature_points | update_JxW_values);
 
     FEValues<dim> saturation_fe_values(saturation_fe, quadrature_formula,
                                        update_values);
 
     FEFaceValues<dim> darcy_fe_face_values(darcy_fe, face_quadrature_formula,
-                                           update_values    | update_normal_vectors |
+                                           update_values | update_normal_vectors |
                                            update_quadrature_points  | update_JxW_values);
 
     const unsigned int dofs_per_cell = darcy_fe.dofs_per_cell;
@@ -1105,7 +1105,7 @@ namespace Step43
     // constraints.
     typename DoFHandler<dim>::active_cell_iterator
     cell = darcy_dof_handler.begin_active(),
-    endc = darcy_dof_handler.end();
+                                                   endc = darcy_dof_handler.end();
     typename DoFHandler<dim>::active_cell_iterator
     saturation_cell = saturation_dof_handler.begin_active();
 
@@ -1241,7 +1241,7 @@ namespace Step43
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = saturation_dof_handler.begin_active(),
-      endc = saturation_dof_handler.end();
+                                                   endc = saturation_dof_handler.end();
     for (; cell != endc; ++cell)
       {
         saturation_fe_values.reinit(cell);
@@ -1300,11 +1300,11 @@ namespace Step43
 
     FEValues<dim> saturation_fe_values                   (saturation_fe, quadrature_formula,
                                        update_values | update_gradients |
-                                                          update_quadrature_points  | update_JxW_values);
+                                         update_quadrature_points | update_JxW_values);
     FEValues<dim> darcy_fe_values                        (darcy_fe, quadrature_formula,
                                                           update_values);
     FEFaceValues<dim> saturation_fe_face_values          (saturation_fe, face_quadrature_formula,
-                                                          update_values    | update_normal_vectors |
+                                                update_values | update_normal_vectors |
                                                           update_quadrature_points  | update_JxW_values);
     FEFaceValues<dim> darcy_fe_face_values               (darcy_fe, face_quadrature_formula,
                                                           update_values);
@@ -1315,12 +1315,12 @@ namespace Step43
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const double                    global_max_u_F_prime = get_max_u_F_prime();
-    const std::pair<double,double> global_S_range       = get_extrapolated_saturation_range();
-    const double                   global_S_variation   = global_S_range.second - global_S_range.first;
+    const std::pair<double, double> global_S_range = get_extrapolated_saturation_range();
+    const double global_S_variation = global_S_range.second - global_S_range.first;
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = saturation_dof_handler.begin_active(),
-      endc = saturation_dof_handler.end();
+                                                   endc = saturation_dof_handler.end();
     typename DoFHandler<dim>::active_cell_iterator
     darcy_cell = darcy_dof_handler.begin_active();
     for (; cell != endc; ++cell, ++darcy_cell)
@@ -1377,7 +1377,7 @@ namespace Step43
     std::vector<double>         old_saturation_solution_values(n_q_points);
     std::vector<double>         old_old_saturation_solution_values(n_q_points);
     std::vector<Tensor<1, dim>> old_grad_saturation_solution_values(n_q_points);
-    std::vector<Tensor<1,dim> >  old_old_grad_saturation_solution_values(n_q_points);
+    std::vector<Tensor<1, dim>> old_old_grad_saturation_solution_values(n_q_points);
     std::vector<Vector<double> > present_darcy_solution_values(n_q_points, Vector<double>(dim+1));
 
     saturation_fe_values.get_function_values(old_saturation_solution, old_saturation_solution_values);
@@ -1388,13 +1388,13 @@ namespace Step43
 
     const double nu
       = compute_viscosity(old_saturation_solution_values,
-                        old_old_saturation_solution_values,
-                        old_grad_saturation_solution_values,
-                        old_old_grad_saturation_solution_values,
-                        present_darcy_solution_values,
-                        global_max_u_F_prime,
-                        global_S_variation,
-                        saturation_fe_values.get_cell()->diameter());
+                                        old_old_saturation_solution_values,
+                                        old_grad_saturation_solution_values,
+                                        old_old_grad_saturation_solution_values,
+                                        present_darcy_solution_values,
+                                        global_max_u_F_prime,
+                                        global_S_variation,
+                                        saturation_fe_values.get_cell()->diameter());
 
     Vector<double> local_rhs(dofs_per_cell);
 
@@ -1406,8 +1406,8 @@ namespace Step43
           for (unsigned int d = 0; d < dim; ++d)
             present_u[d] = present_darcy_solution_values[q](d);
 
-          const double         phi_i_s = saturation_fe_values.shape_value(i, q);
-          const Tensor<1,dim> grad_phi_i_s = saturation_fe_values.shape_grad(i, q);
+          const double         phi_i_s      = saturation_fe_values.shape_value(i, q);
+          const Tensor<1, dim> grad_phi_i_s = saturation_fe_values.shape_grad(i, q);
 
           local_rhs(i) += (time_step *
                            fractional_flow(old_s,viscosity) *
@@ -1444,12 +1444,12 @@ namespace Step43
     const FEFaceValues<dim> &                   darcy_fe_face_values,
     const std::vector<types::global_dof_index> &local_dof_indices)
   {
-    const unsigned int dofs_per_cell = saturation_fe_face_values.dofs_per_cell;
-    const unsigned int n_face_q_points    = saturation_fe_face_values.n_quadrature_points;
+    const unsigned int dofs_per_cell   = saturation_fe_face_values.dofs_per_cell;
+    const unsigned int n_face_q_points = saturation_fe_face_values.n_quadrature_points;
 
     Vector<double> local_rhs(dofs_per_cell);
 
-    std::vector<double> old_saturation_solution_values_face(n_face_q_points);
+    std::vector<double>         old_saturation_solution_values_face(n_face_q_points);
     std::vector<Vector<double> > present_darcy_solution_values_face(n_face_q_points,
         Vector<double>(dim+1));
     std::vector<double> neighbor_saturation(n_face_q_points);
@@ -1482,10 +1482,10 @@ namespace Step43
                                            ?
                                            old_saturation_solution_values_face[q]
                                            :
-                               neighbor_saturation[q]),
-                            viscosity) *
-            saturation_fe_face_values.shape_value(i, q) *
-            saturation_fe_face_values.JxW(q);
+                                             neighbor_saturation[q]),
+                                          viscosity) *
+                          saturation_fe_face_values.shape_value(i, q) *
+                          saturation_fe_face_values.JxW(q);
       }
     saturation_constraints.distribute_local_to_global(local_rhs,
                                                       local_dof_indices,
@@ -1523,10 +1523,10 @@ namespace Step43
         {
           const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
                                              TrilinosWrappers::PreconditionIC>
-                mp_inverse(darcy_preconditioner_matrix.block(1,1), *Mp_preconditioner);
+            mp_inverse(darcy_preconditioner_matrix.block(1, 1), *Mp_preconditioner);
 
           const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionIC,
-            TrilinosWrappers::PreconditionIC>
+                                                        TrilinosWrappers::PreconditionIC>
             preconditioner(darcy_matrix, mp_inverse, *Amg_preconditioner);
 
           SolverControl solver_control(darcy_matrix.m(),
@@ -1534,7 +1534,7 @@ namespace Step43
 
           SolverGMRES<TrilinosWrappers::MPI::BlockVector>
           gmres(solver_control,
-                SolverGMRES<TrilinosWrappers::MPI::BlockVector >::AdditionalData(100));
+            SolverGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(100));
 
           for (unsigned int i = 0; i < darcy_solution.size(); ++i)
             if (darcy_constraints.is_constrained(i))
@@ -1625,7 +1625,7 @@ namespace Step43
 
       assemble_saturation_system();
 
-      SolverControl solver_control(saturation_matrix.m(),
+      SolverControl                           solver_control(saturation_matrix.m(),
                                    1e-16 * saturation_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
@@ -1666,7 +1666,7 @@ namespace Step43
     Vector<double> refinement_indicators(triangulation.n_active_cells());
     {
       const QMidpoint<dim> quadrature_formula;
-      FEValues<dim> fe_values(saturation_fe, quadrature_formula, update_gradients);
+      FEValues<dim>        fe_values(saturation_fe, quadrature_formula, update_gradients);
       std::vector<Tensor<1, dim>> grad_saturation(1);
 
       TrilinosWrappers::MPI::Vector extrapolated_saturation_solution(saturation_solution);
@@ -1676,7 +1676,7 @@ namespace Step43
 
       typename DoFHandler<dim>::active_cell_iterator
         cell = saturation_dof_handler.begin_active(),
-        endc = saturation_dof_handler.end();
+                                                     endc = saturation_dof_handler.end();
       for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
         {
           fe_values.reinit(cell);
@@ -1690,7 +1690,7 @@ namespace Step43
     {
       typename DoFHandler<dim>::active_cell_iterator
         cell = saturation_dof_handler.begin_active(),
-        endc = saturation_dof_handler.end();
+                                                     endc = saturation_dof_handler.end();
 
       for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
         {
@@ -1890,7 +1890,7 @@ namespace Step43
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = saturation_dof_handler.begin_active(),
-      endc = saturation_dof_handler.end();
+                                                   endc = saturation_dof_handler.end();
     for (; cell != endc; ++cell)
       {
         double max_local_mobility_reciprocal_difference = 0.0;
@@ -1898,7 +1898,7 @@ namespace Step43
 
         fe_values.reinit(cell);
         fe_values.get_function_values(saturation_matching_last_computed_darcy_solution,
-          old_saturation_after_solving_pressure);
+                                      old_saturation_after_solving_pressure);
         fe_values.get_function_values(saturation_solution,
                                       present_saturation);
 
@@ -1910,7 +1910,7 @@ namespace Step43
             const double mobility_reciprocal_difference
               = std::fabs(mobility_inverse(present_saturation[q],viscosity)
                           -
-                          mobility_inverse(old_saturation_after_solving_pressure[q],viscosity));
+              mobility_inverse(old_saturation_after_solving_pressure[q], viscosity));
 
             max_local_mobility_reciprocal_difference = std::max(max_local_mobility_reciprocal_difference,
                        mobility_reciprocal_difference);
@@ -1920,8 +1920,8 @@ namespace Step43
           }
 
         max_global_aop_indicator = std::max(max_global_aop_indicator,
-                   (max_local_mobility_reciprocal_difference *
-                    max_local_permeability_inverse_l1_norm));
+                                            (max_local_mobility_reciprocal_difference *
+                                             max_local_permeability_inverse_l1_norm));
       }
 
     return (max_global_aop_indicator > AOS_threshold);
@@ -1980,7 +1980,7 @@ namespace Step43
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = darcy_dof_handler.begin_active(),
-    endc = darcy_dof_handler.end();
+                                                   endc = darcy_dof_handler.end();
     typename DoFHandler<dim>::active_cell_iterator
     saturation_cell = saturation_dof_handler.begin_active();
     for (; cell != endc; ++cell, ++saturation_cell)
@@ -2157,8 +2157,8 @@ namespace Step43
     return (beta *
             (max_velocity_times_dF_dS) *
             std::min(cell_diameter,
-                     std::pow(cell_diameter,alpha) *
-                     max_residual / global_scaling));
+                                                       std::pow(cell_diameter, alpha) *
+                                                         max_residual / global_scaling));
   }
 
 
@@ -2254,8 +2254,8 @@ int main(int argc, char *argv[])
                                                           numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-        ExcMessage("This program can only be run in serial, use ./step-43"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+                  ExcMessage("This program can only be run in serial, use ./step-43"));
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run();

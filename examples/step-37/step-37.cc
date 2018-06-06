@@ -101,7 +101,7 @@ namespace Step37
 
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
 
@@ -149,7 +149,7 @@ namespace Step37
   template <int dim>
   void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                                     std::vector<double> &          values,
-                                    const unsigned int component) const
+                                    const unsigned int             component) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -254,17 +254,17 @@ namespace Step37
 
   private:
     virtual void apply_add(LinearAlgebra::distributed::Vector<number> &dst,
-      const LinearAlgebra::distributed::Vector<number> &src) const override;
+              const LinearAlgebra::distributed::Vector<number> &src) const override;
 
-    void local_apply(const MatrixFree<dim,number>                     &data,
-                LinearAlgebra::distributed::Vector<number> &      dst,
-                const LinearAlgebra::distributed::Vector<number> &src,
-                const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void local_apply(const MatrixFree<dim, number> &                   data,
+                     LinearAlgebra::distributed::Vector<number> &      dst,
+                     const LinearAlgebra::distributed::Vector<number> &src,
+                     const std::pair<unsigned int, unsigned int> &     cell_range) const;
 
     void local_compute_diagonal(const MatrixFree<dim,number>                     &data,
-      LinearAlgebra::distributed::Vector<number> & dst,
-      const unsigned int &                         dummy,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+                           LinearAlgebra::distributed::Vector<number> & dst,
+                           const unsigned int &                         dummy,
+                           const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     Table<2, VectorizedArray<number>> coefficient;
   };
@@ -289,7 +289,7 @@ namespace Step37
   LaplaceOperator<dim,fe_degree,number>::clear()
   {
     coefficient.reinit(0, 0);
-    MatrixFreeOperators::Base<dim,LinearAlgebra::distributed::Vector<number> >::clear();
+    MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number>>::clear();
   }
 
 
@@ -716,11 +716,11 @@ namespace Step37
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
 
-    ConstraintMatrix constraints;
-    typedef LaplaceOperator<dim,degree_finite_element,double> SystemMatrixType;
-    SystemMatrixType system_matrix;
+    ConstraintMatrix                                            constraints;
+    typedef LaplaceOperator<dim, degree_finite_element, double> SystemMatrixType;
+    SystemMatrixType                                            system_matrix;
 
-    MGConstrainedDoFs mg_constrained_dofs;
+    MGConstrainedDoFs                                          mg_constrained_dofs;
     typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
     MGLevelObject<LevelMatrixType>                             mg_matrices;
 
@@ -920,7 +920,7 @@ namespace Step37
     Timer time;
 
     system_rhs = 0;
-    FEEvaluation<dim,degree_finite_element> phi(*system_matrix.get_matrix_free());
+    FEEvaluation<dim, degree_finite_element> phi(*system_matrix.get_matrix_free());
     for (unsigned int cell = 0; cell < system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
       {
         phi.reinit(cell);
@@ -1000,7 +1000,7 @@ namespace Step37
     // in the (coarse) mesh, whereas the latter requires global communication
     // over all processors.
     typedef PreconditionChebyshev<LevelMatrixType,LinearAlgebra::distributed::Vector<float> > SmootherType;
-    mg::SmootherRelaxation<SmootherType, LinearAlgebra::distributed::Vector<float> >
+    mg::SmootherRelaxation<SmootherType, LinearAlgebra::distributed::Vector<float>>
                                                          mg_smoother;
     MGLevelObject<typename SmootherType::AdditionalData> smoother_data;
     smoother_data.resize(0, triangulation.n_global_levels() - 1);
@@ -1014,8 +1014,8 @@ namespace Step37
           }
         else
           {
-            smoother_data[0].smoothing_range = 1e-3;
-            smoother_data[0].degree          = numbers::invalid_unsigned_int;
+            smoother_data[0].smoothing_range     = 1e-3;
+            smoother_data[0].degree              = numbers::invalid_unsigned_int;
             smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
           }
         mg_matrices[level].compute_diagonal();
@@ -1023,7 +1023,7 @@ namespace Step37
       }
     mg_smoother.initialize(mg_matrices, smoother_data);
 
-    MGCoarseGridApplySmoother<LinearAlgebra::distributed::Vector<float> > mg_coarse;
+    MGCoarseGridApplySmoother<LinearAlgebra::distributed::Vector<float>> mg_coarse;
     mg_coarse.initialize(mg_smoother);
 
     // The next step is to set up the interface matrices that are needed for the case
@@ -1056,7 +1056,7 @@ namespace Step37
     // Once the interface matrix is created, we set up the remaining Multigrid
     // preconditioner infrastructure in complete analogy to step-16 to obtain
     // a @p preconditioner object that can be applied to a matrix.
-    mg::Matrix<LinearAlgebra::distributed::Vector<float> > mg_matrix(mg_matrices);
+    mg::Matrix<LinearAlgebra::distributed::Vector<float>> mg_matrix(mg_matrices);
 
     MGLevelObject<MatrixFreeOperators::MGInterfaceOperator<LevelMatrixType> > mg_interface_matrices;
     mg_interface_matrices.resize(0, triangulation.n_global_levels() - 1);
@@ -1145,7 +1145,7 @@ namespace Step37
                                  + std::to_string(i)
                                  + ".vtu");
 
-        std::string master_name = "solution-" + Utilities::to_string(cycle) + ".pvtu";
+        std::string   master_name = "solution-" + Utilities::to_string(cycle) + ".pvtu";
         std::ofstream master_output(master_name);
         data_out.write_pvtu_record(master_output, filenames);
       }
@@ -1166,7 +1166,7 @@ namespace Step37
   {
     {
       const unsigned int n_vect_doubles = VectorizedArray<double>::n_array_elements;
-      const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
+      const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
 
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits("

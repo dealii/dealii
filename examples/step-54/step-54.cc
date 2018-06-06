@@ -76,10 +76,10 @@ namespace Step54
     };
 
 
-    TriangulationOnCAD(const std::string &initial_mesh_filename,
-      const std::string &  cad_file_name,
-      const std::string &  output_filename,
-      const ProjectionType surface_projection_kind = NormalProjection);
+    TriangulationOnCAD(const std::string &  initial_mesh_filename,
+                       const std::string &  cad_file_name,
+                       const std::string &  output_filename,
+                       const ProjectionType surface_projection_kind = NormalProjection);
 
 
     ~TriangulationOnCAD();
@@ -112,9 +112,9 @@ namespace Step54
   // surface projector is used in the mesh refinement cycles (see
   // below for details).
 
-  TriangulationOnCAD::TriangulationOnCAD(const std::string &initial_mesh_filename,
-    const std::string &  cad_file_name,
-    const std::string &  output_filename,
+  TriangulationOnCAD::TriangulationOnCAD(const std::string &  initial_mesh_filename,
+                                         const std::string &  cad_file_name,
+                                         const std::string &  output_filename,
                                          const ProjectionType surface_projection_kind)
     :
     initial_mesh_filename(initial_mesh_filename),
@@ -263,7 +263,7 @@ namespace Step54
     // Once the projector is created, we then assign it to all the parts of
     // the triangulation with manifold_id = 2:
     Assert(wires.size() > 0,
-           ExcMessage("I could not find any wire in the CAD file you gave me. Bailing out."));
+      ExcMessage("I could not find any wire in the CAD file you gave me. Bailing out."));
 
     OpenCASCADE::ArclengthProjectionLineManifold<2,3>
     line_projector(wires[0], tolerance);
@@ -290,13 +290,13 @@ namespace Step54
             break;
           }
 
-        // @p If surface_projection_kind value is @p DirectionalProjection, we select the
-      // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh points will
-      // then initially be generated at the barycenter of the cell/edge
-        // considered, and then projected on the CAD surface along a
-        // direction that is specified to the
-        // OpenCASCADE::DirectionalProjectionBoundary constructor. In this case,
-        // the projection is done along the y-axis.
+          // @p If surface_projection_kind value is @p DirectionalProjection, we select the
+          // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh points will
+          // then initially be generated at the barycenter of the cell/edge
+          // considered, and then projected on the CAD surface along a
+          // direction that is specified to the
+          // OpenCASCADE::DirectionalProjectionBoundary constructor. In this case,
+          // the projection is done along the y-axis.
         case DirectionalProjection:
           {
             OpenCASCADE::DirectionalProjectionBoundary<2, 3>
@@ -420,9 +420,9 @@ int main()
       cout << "----------------------------------------------------------" << endl;
       out_mesh_filename = ("3d_mesh_directional_projection");
       TriangulationOnCAD tria_on_cad_dir(in_mesh_filename,
-        cad_file_name,
-        out_mesh_filename,
-        TriangulationOnCAD::DirectionalProjection);
+                                         cad_file_name,
+                                         out_mesh_filename,
+                                         TriangulationOnCAD::DirectionalProjection);
       tria_on_cad_dir.run();
       cout << "----------------------------------------------------------" << endl;
       cout << endl;

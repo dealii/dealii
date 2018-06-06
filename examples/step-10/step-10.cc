@@ -270,7 +270,7 @@ namespace Step10
             // `area'...
             typename DoFHandler<dim>::active_cell_iterator
               cell = dof_handler.begin_active(),
-              endc = dof_handler.end();
+                                                           endc = dof_handler.end();
             for (; cell != endc; ++cell)
               {
                 fe_values.reinit(cell);
@@ -346,7 +346,7 @@ namespace Step10
         // argument.
         FEFaceValues<dim> fe_face_values(mapping, fe, quadrature,
                                          update_JxW_values);
-        ConvergenceTable table;
+        ConvergenceTable  table;
 
         for (unsigned int refinement = 0; refinement < 6;
              ++refinement, triangulation.refine_global(1))
@@ -360,8 +360,8 @@ namespace Step10
             // added to the long double variable `perimeter'.
             typename DoFHandler<dim>::active_cell_iterator
               cell                = dof_handler.begin_active(),
-              endc                = dof_handler.end();
-            long double perimeter = 0;
+                                                           endc = dof_handler.end();
+            long double perimeter                               = 0;
             for (; cell != endc; ++cell)
               for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
                 if (cell->face(face_no)->at_boundary())
@@ -370,7 +370,7 @@ namespace Step10
                     // iterator and the number of the face.
                     fe_face_values.reinit(cell, face_no);
                     for (unsigned int i = 0; i < fe_face_values.n_quadrature_points; ++i)
-                      perimeter += static_cast<long double>(fe_face_values.JxW (i));
+                      perimeter += static_cast<long double>(fe_face_values.JxW(i));
                   }
             // Then store the evaluated values in the table...
             table.add_value("eval.pi", static_cast<double>(perimeter / 2.0L));

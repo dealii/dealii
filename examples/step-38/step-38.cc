@@ -144,8 +144,8 @@ namespace Step38
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
-    virtual Tensor<1,dim> gradient(const Point<dim>   &p,
-             const unsigned int component = 0) const override;
+    virtual Tensor<1, dim> gradient(const Point<dim> & p,
+                                    const unsigned int component = 0) const override;
 
   };
 

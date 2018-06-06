@@ -312,9 +312,9 @@ namespace Step11
     // over faces now instead of cells:
     Vector<double> tmp(system_rhs.size());
     VectorTools::create_boundary_right_hand_side(mapping, dof_handler,
-      QGauss<dim - 1>(gauss_degree),
-      Functions::ConstantFunction<dim>(1),
-      tmp);
+                                                 QGauss<dim - 1>(gauss_degree),
+                                                 Functions::ConstantFunction<dim>(1),
+                                                 tmp);
     // Then add the contributions from the boundary to those from the interior
     // of the domain:
     system_rhs += tmp;
@@ -374,7 +374,7 @@ namespace Step11
     // Last task -- generate output:
     output_table.add_value("cells", triangulation.n_active_cells());
     output_table.add_value("|u|_1", norm);
-    output_table.add_value("error", std::fabs(norm-std::sqrt(3.14159265358/2)));
+    output_table.add_value("error", std::fabs(norm - std::sqrt(3.14159265358 / 2)));
   }
 
 
@@ -445,7 +445,7 @@ int main()
       // but create an unnamed such object and call the <code>run</code>
       // function of it, subsequent to which it is immediately destroyed
       // again.
-      for (unsigned int mapping_degree = 1; mapping_degree <  = 3; ++mapping_degree)
+      for (unsigned int mapping_degree = 1; mapping_degree < = 3; ++mapping_degree)
         Step11::LaplaceProblem<2>(mapping_degree).run();
     }
   catch (std::exception &exc)

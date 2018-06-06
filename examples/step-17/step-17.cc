@@ -231,7 +231,7 @@ namespace Step17
 
   template <int dim>
   void RightHandSide<dim>::vector_value_list(const std::vector<Point<dim> > &points,
-    std::vector<Vector<double>> &  value_list) const
+                                        std::vector<Vector<double>> &  value_list) const
   {
     const unsigned int n_points = points.size();
 

@@ -298,7 +298,7 @@ namespace Step41
     FEValues<dim>             fe_values(fe, quadrature_formula,
                             update_values | update_gradients |
                                         update_quadrature_points |
-                                        update_JxW_values);
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -324,11 +324,11 @@ namespace Step41
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i,j) += (fe_values.shape_grad(i, q_point) *
                                      fe_values.shape_grad(j, q_point) *
-                                     fe_values.JxW (q_point));
+                   fe_values.JxW(q_point));
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                 right_hand_side.value(fe_values.quadrature_point(q_point)) *
-                 fe_values.JxW(q_point));
+                              right_hand_side.value(fe_values.quadrature_point(q_point)) *
+                              fe_values.JxW(q_point));
             }
 
         cell->get_dof_indices(local_dof_indices);
@@ -382,7 +382,7 @@ namespace Step41
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -398,7 +398,7 @@ namespace Step41
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             cell_matrix(i,i) += (fe_values.shape_value(i, q_point) *
                                  fe_values.shape_value(i, q_point) *
-                                 fe_values.JxW (q_point));
+               fe_values.JxW(q_point));
 
         cell->get_dof_indices(local_dof_indices);
 
@@ -677,8 +677,8 @@ int main(int argc, char *argv[])
                                                           numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-        ExcMessage("This program can only be run in serial, use ./step-41"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+                  ExcMessage("This program can only be run in serial, use ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run();

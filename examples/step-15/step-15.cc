@@ -287,7 +287,7 @@ namespace Step15
             const double coeff
               = 1.0 / std::sqrt(1 +
                                 old_solution_gradients[q_point] *
-                                    old_solution_gradients[q_point]);
+                                                       old_solution_gradients[q_point]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {

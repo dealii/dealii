@@ -164,7 +164,7 @@ namespace Step50
 
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
 
@@ -184,7 +184,7 @@ namespace Step50
   template <int dim>
   void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                                     std::vector<double> &          values,
-                                    const unsigned int component) const
+                                    const unsigned int             component) const
   {
     (void)component;
     const unsigned int n_points = points.size();
@@ -368,8 +368,8 @@ namespace Step50
                                   MPI_COMM_WORLD, true);
 
         mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-          mg_dof_handler.locally_owned_mg_dofs(level),
-          dsp,
+                                            mg_dof_handler.locally_owned_mg_dofs(level),
+                                            dsp,
                                             MPI_COMM_WORLD, true);
       }
   }
@@ -523,7 +523,7 @@ namespace Step50
     // freedom at once can be done using
     // ConstraintMatrix::add_lines():
     std::vector<ConstraintMatrix> boundary_constraints(triangulation.n_global_levels());
-    ConstraintMatrix empty_constraints;
+    ConstraintMatrix              empty_constraints;
     for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       {
         IndexSet dofset;
@@ -830,11 +830,11 @@ namespace Step50
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
 
-    KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim>&>(mg_dof_handler),
-      QGauss<dim - 1>(degree + 1),
-      typename FunctionMap<dim>::type(),
-      temp_solution,
-      estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim> &>(mg_dof_handler),
+                                       QGauss<dim - 1>(degree + 1),
+                                       typename FunctionMap<dim>::type(),
+                                       temp_solution,
+                                       estimated_error_per_cell);
 
     parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_fraction(triangulation,

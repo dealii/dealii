@@ -142,8 +142,8 @@ namespace Step9
 
     void assemble_system();
     void local_assemble_system(const typename DoFHandler<dim>::active_cell_iterator &cell,
-      AssemblyScratchData &                                 scratch,
-      AssemblyCopyData &                                    copy_data);
+                               AssemblyScratchData &scratch,
+                               AssemblyCopyData &   copy_data);
     void copy_local_to_global(const AssemblyCopyData &copy_data);
 
 
@@ -200,7 +200,7 @@ namespace Step9
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
 
     virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<Tensor<1, dim>> &values) const override;
+                            std::vector<Tensor<1, dim>> &  values) const override;
 
     // In previous examples, we have used assertions that throw exceptions in
     // several places. However, we have never seen how such exceptions are
@@ -261,7 +261,7 @@ namespace Step9
   template <int dim>
   void
   AdvectionField<dim>::value_list(const std::vector<Point<dim>> &points,
-                                  std::vector<Tensor<1, dim>> &  values) const
+                                       std::vector<Tensor<1, dim>> &  values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -294,7 +294,7 @@ namespace Step9
 
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
 
   private:
     static const Point<dim> center_point;
@@ -341,7 +341,7 @@ namespace Step9
   void
   RightHandSide<dim>::value_list(const std::vector<Point<dim> > &points,
                                       std::vector<double> &          values,
-                                      const unsigned int component) const
+                                      const unsigned int             component) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -365,7 +365,7 @@ namespace Step9
 
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
 
@@ -378,8 +378,8 @@ namespace Step9
     (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    const double sine_term = std::sin(16*numbers::PI*std::sqrt(p.norm_square()));
-    const double weight = std::exp(-5 * p.norm_square()) / std::exp(-5.);
+    const double sine_term = std::sin(16 * numbers::PI * std::sqrt(p.norm_square()));
+    const double weight    = std::exp(-5 * p.norm_square()) / std::exp(-5.);
     return sine_term * weight;
   }
 
@@ -389,7 +389,7 @@ namespace Step9
   void
   BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
                                        std::vector<double> &          values,
-                                       const unsigned int component) const
+                                       const unsigned int             component) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -502,8 +502,8 @@ namespace Step9
     template <int dim>
     static
     void estimate_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                  EstimateScratchData<dim> &scratch_data,
-                  const EstimateCopyData &  copy_data);
+                              EstimateScratchData<dim> &scratch_data,
+                              const EstimateCopyData &  copy_data);
   };
 
 
@@ -692,7 +692,7 @@ namespace Step9
 
     // Then we define some abbreviations to avoid unnecessarily long lines:
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int n_q_points      = scratch_data.fe_values.get_quadrature().size();
+    const unsigned int n_q_points    = scratch_data.fe_values.get_quadrature().size();
     const unsigned int n_face_q_points = scratch_data.fe_face_values.get_quadrature().size();
 
     // We declare cell matrix and cell right hand side...
@@ -772,9 +772,9 @@ namespace Step9
           // For the quadrature points at hand, we ask for the values of
           // the inflow function and for the direction of flow:
           boundary_values.value_list(scratch_data.fe_face_values.get_quadrature_points(),
-            face_boundary_values);
+                                     face_boundary_values);
           advection_field.value_list(scratch_data.fe_face_values.get_quadrature_points(),
-            face_advection_directions);
+                                     face_advection_directions);
 
           // Now loop over all quadrature points and see whether it is on
           // the inflow or outflow part of the boundary. This is
@@ -997,8 +997,8 @@ namespace Step9
                                     Vector<float> &        error_per_cell)
   {
     Assert(error_per_cell.size() == dof_handler.get_triangulation().n_active_cells(),
-      ExcInvalidVectorLength(error_per_cell.size(),
-                             dof_handler.get_triangulation().n_active_cells()));
+           ExcInvalidVectorLength(error_per_cell.size(),
+                                  dof_handler.get_triangulation().n_active_cells()));
 
     WorkStream::run(dof_handler.begin_active(),
       dof_handler.end(),
@@ -1136,7 +1136,7 @@ namespace Step9
                   typename DoFHandler<dim>::cell_iterator
                   neighbor_child = neighbor;
                   while (neighbor_child->has_children())
-                    neighbor_child = neighbor_child->child(face_no==0 ? 1 : 0);
+                    neighbor_child = neighbor_child->child(face_no == 0 ? 1 : 0);
 
                   // As this used some non-trivial geometrical intuition,
                   // we might want to check whether we did it right,
@@ -1197,7 +1197,7 @@ namespace Step9
     // expensive operation):
     std::vector<double> neighbor_midpoint_value(1);
     typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
-    neighbor_ptr = active_neighbors.begin();
+      neighbor_ptr = active_neighbors.begin();
     for (; neighbor_ptr != active_neighbors.end(); ++neighbor_ptr)
       {
         // First define an abbreviation for the iterator to the active
@@ -1278,7 +1278,7 @@ namespace Step9
                   1+1.0*dim/2) *
        std::sqrt(gradient.norm_square()));
   }
-}
+  }
 
 
 // @sect3{Main function}

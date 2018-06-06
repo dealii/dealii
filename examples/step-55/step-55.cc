@@ -131,9 +131,9 @@ namespace Step55
     void
     InverseMatrix<Matrix,Preconditioner>::
     vmult(VectorType       &dst,
-                                                 const VectorType &src) const
+                                                      const VectorType &src) const
     {
-      SolverControl solver_control(src.size(), 1e-8 * src.l2_norm());
+      SolverControl             solver_control(src.size(), 1e-8 * src.l2_norm());
       SolverCG<LA::MPI::Vector> cg(solver_control);
       dst = 0;
 
@@ -242,7 +242,7 @@ namespace Step55
 
     const double pi  = numbers::PI;
     const double pi2 = pi * pi;
-    values[0] = -exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*cos(2*R_y*pi) + 1;
+    values[0]        = -exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) + 1;
     values[1] = (1.0L/2.0L)*(-sqrt(25.0 + 4*pi2) + 5.0)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*sin(2*R_y*pi)/pi;
     values[2] = -1.0L/2.0L*exp(R_x*(-2*sqrt(25.0 + 4*pi2) + 10.0)) - 2.0*(-6538034.74494422 + 0.0134758939981709*exp(4*sqrt(25.0 + 4*pi2)))/(-80.0*exp(3*sqrt(25.0 + 4*pi2)) + 16.0*sqrt(25.0 + 4*pi2)*exp(3*sqrt(25.0 + 4*pi2))) - 1634508.68623606*exp(-3.0*sqrt(25.0 + 4*pi2))/(-10.0 + 2.0*sqrt(25.0 + 4*pi2)) + (-0.00673794699908547*exp(sqrt(25.0 + 4*pi2)) + 3269017.37247211*exp(-3*sqrt(25.0 + 4*pi2)))/(-8*sqrt(25.0 + 4*pi2) + 40.0) + 0.00336897349954273*exp(1.0*sqrt(25.0 + 4*pi2))/(-10.0 + 2.0*sqrt(25.0 + 4*pi2));
   }
@@ -365,7 +365,7 @@ namespace Step55
     // and vectors.
     owned_partitioning.resize(2);
     owned_partitioning[0] = dof_handler.locally_owned_dofs().get_view(0, n_u);
-    owned_partitioning[1] = dof_handler.locally_owned_dofs().get_view(n_u, n_u+n_p);
+    owned_partitioning[1] = dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
     IndexSet locally_relevant_dofs;
     DoFTools::extract_locally_relevant_dofs(dof_handler,
@@ -483,7 +483,7 @@ namespace Step55
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_values | update_gradients |
                             update_quadrature_points |
-                            update_JxW_values);
+                              update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -647,7 +647,7 @@ namespace Step55
     // Like in step-56, we subtract the mean pressure to allow error
     // computations against our reference solution, which has a mean value
     // of zero.
-    locally_relevant_solution = distributed_solution;
+    locally_relevant_solution  = distributed_solution;
     const double mean_pressure = VectorTools::compute_mean_value(dof_handler,
                                       QGauss<dim>(velocity_degree + 2),
                                       locally_relevant_solution,
@@ -698,7 +698,7 @@ namespace Step55
   {
     {
       const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
-      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim), dim+1);
+      const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim), dim + 1);
 
       Vector<double> cellwise_errors(triangulation.n_active_cells());
       QGauss<dim>    quadrature(velocity_degree + 2);

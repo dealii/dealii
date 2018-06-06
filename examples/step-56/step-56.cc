@@ -101,10 +101,10 @@ namespace Step56
   {
   public:
     Solution() : Function<dim>(dim+1) {}
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
-    virtual Tensor<1,dim> gradient(const Point<dim> &p,
-             const unsigned int component = 0) const override;
+    virtual double         value(const Point<dim> & p,
+                                 const unsigned int component = 0) const override;
+    virtual Tensor<1, dim> gradient(const Point<dim> & p,
+                                    const unsigned int component = 0) const override;
   };
 
   template <>
@@ -306,11 +306,11 @@ namespace Step56
   class BlockSchurPreconditioner : public Subscriptor
   {
   public:
-    BlockSchurPreconditioner(const BlockSparseMatrix<double>  &system_matrix,
-      const SparseMatrix<double> &     schur_complement_matrix,
-      const PreconditionerAType &      preconditioner_A,
-      const PreconditionerSType &      preconditioner_S,
-      const bool                       do_solve_A);
+    BlockSchurPreconditioner(const BlockSparseMatrix<double> &system_matrix,
+                             const SparseMatrix<double> &     schur_complement_matrix,
+                             const PreconditionerAType &      preconditioner_A,
+                             const PreconditionerSType &      preconditioner_S,
+                             const bool                       do_solve_A);
 
     void vmult(BlockVector<double>       &dst,
                const BlockVector<double> &src) const;
@@ -329,10 +329,10 @@ namespace Step56
 
   template <class PreconditionerAType, class PreconditionerSType>
   BlockSchurPreconditioner<PreconditionerAType, PreconditionerSType>::
-  BlockSchurPreconditioner(const BlockSparseMatrix<double>  &system_matrix,
-      const SparseMatrix<double> &     schur_complement_matrix,
-      const PreconditionerAType &      preconditioner_A,
-      const PreconditionerSType &      preconditioner_S,
+    BlockSchurPreconditioner(const BlockSparseMatrix<double> &system_matrix,
+                             const SparseMatrix<double> &     schur_complement_matrix,
+                             const PreconditionerAType &      preconditioner_A,
+                             const PreconditionerSType &      preconditioner_S,
                            const bool do_solve_A)
     :
     n_iterations_A(0),
@@ -613,7 +613,7 @@ namespace Step56
                             update_values    |
                             update_quadrature_points  |
                             update_JxW_values |
-                            update_gradients);
+                              update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -652,8 +652,8 @@ namespace Step56
             for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
                 symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
-                div_phi_u[k] = fe_values[velocities].divergence(k, q);
-                phi_p[k]     = fe_values[pressure].value(k, q);
+                div_phi_u[k]     = fe_values[velocities].divergence(k, q);
+                phi_p[k]         = fe_values[pressure].value(k, q);
               }
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -712,7 +712,7 @@ namespace Step56
                             update_values    |
                             update_quadrature_points  |
                             update_JxW_values |
-                            update_gradients);
+                              update_gradients);
 
     const unsigned int dofs_per_cell = velocity_fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -918,7 +918,7 @@ namespace Step56
                                     SparseILU<double>::AdditionalData());
 
         const BlockSchurPreconditioner<
-        PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >,
+          PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>,
           SparseILU<double>>
           preconditioner(system_matrix,
                          pressure_mass_matrix,
@@ -945,11 +945,11 @@ namespace Step56
     std::cout << std::endl
               << "\tNumber of FGMRES iterations: "
               << solver_control.last_step() << std::endl
-      << "\tTotal number of iterations used for approximation of A inverse: "
-      << n_iterations_A << std::endl
-      << "\tTotal number of iterations used for approximation of S inverse: "
-      << n_iterations_S << std::endl
-      << std::endl;
+              << "\tTotal number of iterations used for approximation of A inverse: "
+              << n_iterations_A << std::endl
+              << "\tTotal number of iterations used for approximation of S inverse: "
+              << n_iterations_S << std::endl
+              << std::endl;
   }
 
 
@@ -974,7 +974,7 @@ namespace Step56
               << -mean_pressure << std::endl;
 
     const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
-    const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim), dim+1);
+    const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim), dim + 1);
 
     Vector<float> difference_per_cell(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,

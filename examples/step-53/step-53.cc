@@ -295,19 +295,19 @@ namespace Step53
 
     return Point<3>((R_bar + d) * std::cos(phi) * std::cos(theta),
                     (R_bar + d) * std::sin(phi) * std::cos(theta),
-                     ((1 - ellipticity * ellipticity) * R_bar + d) * std::sin(theta));
+                    ((1 - ellipticity * ellipticity) * R_bar + d) * std::sin(theta));
   }
 
   Point<3>
   AfricaGeometry::pull_back_wgs84(const Point<3> &x) const
   {
-    const double b     = std::sqrt(R * R * (1 - ellipticity * ellipticity));
-    const double ep    = std::sqrt((R * R - b * b) / (b * b));
-    const double p     = std::sqrt(x(0) * x(0) + x(1) * x(1));
-    const double th    = std::atan2(R * x(2), b * p);
-    const double phi   = std::atan2(x(1), x(0));
+    const double b   = std::sqrt(R * R * (1 - ellipticity * ellipticity));
+    const double ep  = std::sqrt((R * R - b * b) / (b * b));
+    const double p   = std::sqrt(x(0) * x(0) + x(1) * x(1));
+    const double th  = std::atan2(R * x(2), b * p);
+    const double phi = std::atan2(x(1), x(0));
     const double theta = std::atan2(x(2) + ep * ep * b * std::pow(std::sin(th),3),
-      (p - (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
+                 (p - (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
     const double R_bar = R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) * std::sin(theta)));
     const double R_plus_d = p / std::cos(theta);
 
@@ -333,7 +333,7 @@ namespace Step53
     const double   d_hat = phi_theta_d_hat[2];
     const double h     = topography.value(phi_theta_d_hat[0],
                                           phi_theta_d_hat[1]);
-    const double   d = d_hat + (d_hat + 500000) / 500000 * h;
+    const double   d     = d_hat + (d_hat + 500000) / 500000 * h;
     const Point<3> phi_theta_d(phi_theta_d_hat[0],
                                phi_theta_d_hat[1],
                                d);
@@ -418,7 +418,7 @@ namespace Step53
     // mother to children, this also happens after several recursive
     // refinement steps.
     triangulation.set_manifold(0, geometry);
-    for (Triangulation < 3 > ::active_cell_iterator cell = triangulation.begin_active();
+    for (Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
          cell!=triangulation.end(); ++cell)
       cell->set_all_manifold_ids(0);
 
@@ -434,7 +434,7 @@ namespace Step53
     // "color" the boundaries by assigning each boundary a unique boundary indicator).
     for (unsigned int i = 0; i < 6; ++i)
       {
-        for (Triangulation < 3 > ::active_cell_iterator cell = triangulation.begin_active();
+        for (Triangulation<3>::active_cell_iterator cell = triangulation.begin_active();
              cell!=triangulation.end(); ++cell)
           for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
             if (cell->face(f)->boundary_id() == 5)

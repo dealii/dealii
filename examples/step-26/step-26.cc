@@ -149,8 +149,8 @@ namespace Step26
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     Assert(dim == 2, ExcNotImplemented());
 
-    const double time = this->get_time();
-    const double point_within_period = (time/period - std::floor(time/period));
+    const double time                = this->get_time();
+    const double point_within_period = (time / period - std::floor(time / period));
 
     if ((point_within_period > = 0.0) && (point_within_period < = 0.2))
       {

@@ -115,11 +115,11 @@ namespace Step46
     void setup_dofs();
     void assemble_system();
     void assemble_interface_term(const FEFaceValuesBase<dim>          &elasticity_fe_face_values,
-      const FEFaceValuesBase<dim> &         stokes_fe_face_values,
-      std::vector<Tensor<1, dim>> &         elasticity_phi,
-      std::vector<SymmetricTensor<2, dim>> &stokes_symgrad_phi_u,
-      std::vector<double> &                 stokes_phi_p,
-      FullMatrix<double> &                  local_interface_matrix) const;
+                                 const FEFaceValuesBase<dim> &stokes_fe_face_values,
+                                 std::vector<Tensor<1, dim>> &elasticity_phi,
+                                 std::vector<SymmetricTensor<2, dim>> &stokes_symgrad_phi_u,
+                                 std::vector<double> &                 stokes_phi_p,
+                                 FullMatrix<double> &local_interface_matrix) const;
     void solve();
     void output_results(const unsigned int refinement_cycle) const;
     void refine_mesh();
@@ -390,10 +390,10 @@ namespace Step46
 
       const FEValuesExtractors::Vector velocities(0);
       VectorTools::interpolate_boundary_values(dof_handler,
-        1,
-        StokesBoundaryValues<dim>(),
-        constraints,
-        fe_collection.component_mask(velocities));
+                                               1,
+                                               StokesBoundaryValues<dim>(),
+                                               constraints,
+                                               fe_collection.component_mask(velocities));
 
       const FEValuesExtractors::Vector displacements(dim + 1);
       VectorTools::interpolate_boundary_values(dof_handler,
@@ -525,8 +525,8 @@ namespace Step46
     const QGauss<dim-1> common_face_quadrature(std::max(stokes_degree+2,
                                                         elasticity_degree+2));
 
-    FEFaceValues<dim>    stokes_fe_face_values(stokes_fe,
-                                               common_face_quadrature,
+    FEFaceValues<dim> stokes_fe_face_values(stokes_fe,
+                                            common_face_quadrature,
                                                update_JxW_values |
                                                update_normal_vectors |
                                                update_gradients);
@@ -537,9 +537,9 @@ namespace Step46
       common_face_quadrature,
                                                   update_JxW_values |
                                                   update_normal_vectors |
-                                                  update_gradients);
+                                              update_gradients);
     FESubfaceValues<dim> elasticity_fe_subface_values(elasticity_fe,
-                                                      common_face_quadrature,
+      common_face_quadrature,
                                                       update_values);
 
     // ...to objects that are needed to describe the local contributions to
@@ -564,9 +564,9 @@ namespace Step46
     const FEValuesExtractors::Scalar pressure(dim);
     const FEValuesExtractors::Vector displacements(dim + 1);
 
-    std::vector<SymmetricTensor<2,dim> > stokes_symgrad_phi_u(stokes_dofs_per_cell);
-    std::vector<double> stokes_div_phi_u(stokes_dofs_per_cell);
-    std::vector<double> stokes_phi_p(stokes_dofs_per_cell);
+    std::vector<SymmetricTensor<2, dim>> stokes_symgrad_phi_u(stokes_dofs_per_cell);
+    std::vector<double>                  stokes_div_phi_u(stokes_dofs_per_cell);
+    std::vector<double>                  stokes_phi_p(stokes_dofs_per_cell);
 
     std::vector<Tensor<2, dim>> elasticity_grad_phi(elasticity_dofs_per_cell);
     std::vector<double>         elasticity_div_phi(elasticity_dofs_per_cell);
@@ -614,8 +614,8 @@ namespace Step46
                 for (unsigned int k = 0; k < dofs_per_cell; ++k)
                   {
                     stokes_symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
-                    stokes_div_phi_u[k]     = fe_values[velocities].divergence(k, q);
-                    stokes_phi_p[k] = fe_values[pressure].value(k, q);
+                    stokes_div_phi_u[k] = fe_values[velocities].divergence(k, q);
+                    stokes_phi_p[k]     = fe_values[pressure].value(k, q);
                   }
 
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -726,9 +726,9 @@ namespace Step46
 
                     cell->neighbor(f)->get_dof_indices(neighbor_dof_indices);
                     constraints.distribute_local_to_global(local_interface_matrix,
-                      local_dof_indices,
-                      neighbor_dof_indices,
-                      system_matrix);
+                                                           local_dof_indices,
+                                                           neighbor_dof_indices,
+                                                           system_matrix);
                   }
 
                 // The second case is if the neighbor has further children. In
@@ -763,9 +763,9 @@ namespace Step46
                           cell->neighbor_child_on_subface(f, subface)
                             ->get_dof_indices(neighbor_dof_indices);
                           constraints.distribute_local_to_global(local_interface_matrix,
-                            local_dof_indices,
-                            neighbor_dof_indices,
-                            system_matrix);
+                                                                 local_dof_indices,
+                                                                 neighbor_dof_indices,
+                                                                 system_matrix);
                         }
                   }
 
@@ -790,9 +790,9 @@ namespace Step46
 
                     cell->neighbor(f)->get_dof_indices(neighbor_dof_indices);
                     constraints.distribute_local_to_global(local_interface_matrix,
-                      local_dof_indices,
-                      neighbor_dof_indices,
-                      system_matrix);
+                                                           local_dof_indices,
+                                                           neighbor_dof_indices,
+                                                           system_matrix);
 
                   }
               }
@@ -835,12 +835,12 @@ namespace Step46
     local_interface_matrix = 0;
     for (unsigned int q = 0; q < n_face_quadrature_points; ++q)
       {
-        const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
+        const Tensor<1, dim> normal_vector = stokes_fe_face_values.normal_vector(q);
 
         for (unsigned int k = 0; k < stokes_fe_face_values.dofs_per_cell; ++k)
           stokes_symgrad_phi_u[k] = stokes_fe_face_values[velocities].symmetric_gradient(k, q);
         for (unsigned int k = 0; k < elasticity_fe_face_values.dofs_per_cell; ++k)
-          elasticity_phi[k] = elasticity_fe_face_values[displacements].value(k,q);
+          elasticity_phi[k] = elasticity_fe_face_values[displacements].value(k, q);
 
         for (unsigned int i = 0; i < elasticity_fe_face_values.dofs_per_cell; ++i)
           for (unsigned int j = 0; j < stokes_fe_face_values.dofs_per_cell; ++j)
@@ -944,19 +944,19 @@ namespace Step46
 
     const FEValuesExtractors::Vector velocities(0);
     KellyErrorEstimator<dim>::estimate(dof_handler,
-      face_q_collection,
-      typename FunctionMap<dim>::type(),
-      solution,
-      stokes_estimated_error_per_cell,
-      fe_collection.component_mask(velocities));
+                                       face_q_collection,
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       stokes_estimated_error_per_cell,
+                                       fe_collection.component_mask(velocities));
 
     const FEValuesExtractors::Vector displacements(dim + 1);
     KellyErrorEstimator<dim>::estimate(dof_handler,
-      face_q_collection,
-      typename FunctionMap<dim>::type(),
-      solution,
-      elasticity_estimated_error_per_cell,
-      fe_collection.component_mask(displacements));
+                                       face_q_collection,
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       elasticity_estimated_error_per_cell,
+                                       fe_collection.component_mask(displacements));
 
     // We then normalize error estimates by dividing by their norm and scale
     // the fluid error indicators by a factor of 4 as discussed in the

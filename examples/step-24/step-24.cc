@@ -497,10 +497,10 @@ namespace Step24
     Vector<double> G2(solution_v.size());
 
     const double end_time = 0.7;
-    for (time = time_step; time <  = end_time; time+ = time_step, ++timestep_number)
+    for (time = time_step; time < = end_time; time + = time_step, ++timestep_number)
       {
         std::cout << std::endl;
-        std::cout<< "time_step " << timestep_number << " @ t=" << time << std::endl;
+        std::cout << "time_step " << timestep_number << " @ t=" << time << std::endl;
 
         mass_matrix.vmult(G1, old_solution_p);
         mass_matrix.vmult(tmp, old_solution_v);

@@ -125,7 +125,7 @@ namespace Step18
           for (unsigned int l = 0; l < dim; ++l)
             tmp[i][j][k][l] = (((i == k) && (j == l) ? mu : 0.0) +
                                ((i == l) && (j == k) ? mu : 0.0) +
-                               ((i == j) && (k == l) ? lambda : 0.0));
+               ((i == j) && (k == l) ? lambda : 0.0));
     return tmp;
   }
 
@@ -602,7 +602,7 @@ namespace Step18
   template <int dim>
   void
   BodyForce<dim>::vector_value_list(const std::vector<Point<dim> > &points,
-    std::vector<Vector<double>> &  value_list) const
+                                         std::vector<Vector<double>> &  value_list) const
   {
     const unsigned int n_points = points.size();
 
@@ -683,7 +683,7 @@ namespace Step18
   void
   IncrementalBoundaryValues<dim>::
   vector_value(const Point<dim> &/*p*/,
-                                               Vector<double> &values) const
+                                                    Vector<double> &values) const
   {
     Assert(values.size() == dim,
            ExcDimensionMismatch(values.size(), dim));
@@ -1020,7 +1020,7 @@ namespace Step18
                   cell_matrix(i,j)
                   += (eps_phi_i * stress_strain_tensor * eps_phi_j
                       *
-                      fe_values.JxW (q_point));
+                                        fe_values.JxW(q_point));
                 }
 
 
@@ -1055,7 +1055,7 @@ namespace Step18
                                   old_stress *
                                   get_strain(fe_values,i,q_point))
                                  *
-                    fe_values.JxW(q_point);
+                                 fe_values.JxW(q_point);
                 }
             }
 
@@ -1263,7 +1263,7 @@ namespace Step18
       // Loop over all the cells...
       typename Triangulation<dim>::active_cell_iterator
         cell = triangulation.begin_active(),
-        endc = triangulation.end();
+                                                        endc = triangulation.end();
       for (; cell != endc; ++cell)
         if (cell->is_locally_owned())
           {

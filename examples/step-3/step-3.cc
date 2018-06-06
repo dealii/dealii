@@ -439,7 +439,7 @@ void Step3::assemble_system()
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i,j) += (fe_values.shape_grad(i, q_index) *
                                    fe_values.shape_grad(j, q_index) *
-                                   fe_values.JxW (q_index));
+                 fe_values.JxW(q_index));
 
           // We then do the same thing for the right hand side. Here,
           // the integral is over the shape function i times the right

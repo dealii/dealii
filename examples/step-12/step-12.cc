@@ -91,7 +91,7 @@ namespace Step12
     BoundaryValues() {}
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int             component = 0) const override;
   };
 
   // Given the flow direction, the inflow boundary of the unit square
@@ -323,10 +323,10 @@ namespace Step12
     MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(), dof_handler.end(),
      dof_info, info_box,
-      &AdvectionProblem<dim>::integrate_cell_term,
-      &AdvectionProblem<dim>::integrate_boundary_term,
-      &AdvectionProblem<dim>::integrate_face_term,
-      assembler);
+        &AdvectionProblem<dim>::integrate_cell_term,
+        &AdvectionProblem<dim>::integrate_boundary_term,
+        &AdvectionProblem<dim>::integrate_face_term,
+        assembler);
   }
 
 
@@ -351,7 +351,7 @@ namespace Step12
     // the current point.
     for (unsigned int point = 0; point < fe_values.n_quadrature_points; ++point)
       {
-        const Tensor<1,dim> beta_at_q_point = beta(fe_values.quadrature_point(point));
+        const Tensor<1, dim> beta_at_q_point = beta(fe_values.quadrature_point(point));
 
         // We solve a homogeneous equation, thus no right hand side shows up
         // in the cell term.  What's left is integrating the matrix entries.
@@ -375,8 +375,8 @@ namespace Step12
     FullMatrix<double> &     local_matrix   = dinfo.matrix(0).matrix;
     Vector<double> &         local_vector   = dinfo.vector(0).block(0);
 
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
-    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors();
+    const std::vector<double> &        JxW     = fe_face_values.get_JxW_values();
+    const std::vector<Tensor<1, dim>> &normals = fe_face_values.get_normal_vectors();
 
     std::vector<double> g(fe_face_values.n_quadrature_points);
 
@@ -434,8 +434,8 @@ namespace Step12
     // hand side vectors. Fortunately, the interface terms only involve the
     // solution and the right hand side does not receive any contributions.
 
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
-    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors();
+    const std::vector<double> &        JxW     = fe_face_values.get_JxW_values();
+    const std::vector<Tensor<1, dim>> &normals = fe_face_values.get_normal_vectors();
 
     for (unsigned int point = 0; point < fe_face_values.n_quadrature_points; ++point)
       {
@@ -456,16 +456,16 @@ namespace Step12
               for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
                 u1_v2_matrix(k,j) += -beta_dot_n *
                                      fe_face_values.shape_value(j,point) *
-                                     fe_face_values_neighbor.shape_value(k,point) *
-                                     JxW[point];
+                                      fe_face_values_neighbor.shape_value(k, point) *
+                                      JxW[point];
           }
         else
           {
             // This one we've already seen, too:
             for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
               for (unsigned int l = 0; l < fe_face_values_neighbor.dofs_per_cell; ++l)
-                u2_v1_matrix(i,l) += beta_dot_n *
-                                     fe_face_values_neighbor.shape_value(l,point) *
+                u2_v1_matrix(i, l) += beta_dot_n *
+                                      fe_face_values_neighbor.shape_value(l, point) *
                                      fe_face_values.shape_value(i,point) *
                                      JxW[point];
 
@@ -551,7 +551,7 @@ namespace Step12
     cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-      gradient_indicator(cell_no)*=std::pow(cell->diameter(), 1+1.0*dim/2);
+      gradient_indicator(cell_no) *= std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
 
     // Finally they serve as refinement indicator.
     GridRefinement::refine_and_coarsen_fixed_number(triangulation,

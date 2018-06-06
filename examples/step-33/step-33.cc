@@ -216,7 +216,7 @@ namespace Step33
     void compute_flux_matrix(const InputVector &W,
                              std::array <std::array
                              <typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components> &flux)
+                                   EulerEquations<dim>::n_components> &flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -228,8 +228,8 @@ namespace Step33
           for (unsigned int e = 0; e < dim; ++e)
             flux[first_momentum_component+d][e]
               = W[first_momentum_component+d] *
-                W[first_momentum_component+e] /
-                W[density_component];
+                                                    W[first_momentum_component + e] /
+                                                    W[density_component];
 
           flux[first_momentum_component + d][d] += pressure;
         }
@@ -368,10 +368,10 @@ namespace Step33
     static
     void
     compute_Wminus(const BoundaryKind (&boundary_kind)[n_components],
-                   const Tensor<1, dim> &normal_vector,
-                   const DataVector &    Wplus,
-                   const Vector<double> &boundary_values,
-                   const DataVector &    Wminus)
+                               const Tensor<1, dim> &normal_vector,
+                               const DataVector &    Wplus,
+                               const Vector<double> &boundary_values,
+                               const DataVector &    Wminus)
     {
       for (unsigned int c = 0; c < n_components; c++)
         switch (boundary_kind[c])
@@ -423,8 +423,8 @@ namespace Step33
               {
                 // We prescribe the velocity (we are dealing with a particular
                 // component here so that the average of the velocities is
-            // orthogonal to the surface normal.  This creates sensitivities of
-            // across the velocity components.
+                // orthogonal to the surface normal.  This creates sensitivities of
+                // across the velocity components.
                 typename DataVector::value_type vdotn = 0;
                 for (unsigned int d = 0; d < dim; d++)
                   {
@@ -459,11 +459,11 @@ namespace Step33
     static
     void
     compute_refinement_indicators(const DoFHandler<dim> &dof_handler,
-                                  const Mapping<dim> &   mapping,
-                                  const Vector<double> & solution,
-                                  Vector<double> &       refinement_indicators)
+                                              const Mapping<dim> &   mapping,
+                                              const Vector<double> & solution,
+                                              Vector<double> &refinement_indicators)
     {
-      const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+      const unsigned int        dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
       std::vector<unsigned int> dofs(dofs_per_cell);
 
       const QMidpoint<dim> quadrature_formula;
@@ -539,7 +539,7 @@ namespace Step33
       void
       evaluate_vector_field
       (const DataPostprocessorInputs::Vector<dim> &inputs,
-        std::vector<Vector<double>> &computed_quantities) const override;
+        std::vector<Vector<double>> &               computed_quantities) const override;
 
       virtual std::vector<std::string> get_names() const override;
 
@@ -774,9 +774,9 @@ namespace Step33
       prm.enter_subsection("linear solver");
       {
         prm.declare_entry("output", "quiet",
-          Patterns::Selection("quiet|verbose"),
-          "State whether output from solver runs should be printed. "
-          "Choices are <quiet|verbose>.");
+                          Patterns::Selection("quiet|verbose"),
+                          "State whether output from solver runs should be printed. "
+                          "Choices are <quiet|verbose>.");
         prm.declare_entry("method", "gmres",
                           Patterns::Selection("gmres|direct"),
                           "The kind of solver for the linear system. "
@@ -921,9 +921,9 @@ namespace Step33
       prm.enter_subsection("flux");
       {
         prm.declare_entry("stab", "mesh",
-          Patterns::Selection("constant|mesh"),
-          "Whether to use a constant stabilization parameter or "
-          "a mesh-dependent one");
+                          Patterns::Selection("constant|mesh"),
+                          "Whether to use a constant stabilization parameter or "
+                          "a mesh-dependent one");
         prm.declare_entry("stab value", "1",
                           Patterns::Double(),
                           "alpha stabilization");
@@ -1144,9 +1144,9 @@ namespace Step33
             for (unsigned int di = 0; di < EulerEquations<dim>::n_components; ++di)
               {
                 prm.declare_entry("w_" + Utilities::int_to_string(di),
-                  "outflow",
-                  Patterns::Selection("inflow|outflow|pressure"),
-                  "<inflow|outflow|pressure>");
+                                  "outflow",
+                                  Patterns::Selection("inflow|outflow|pressure"),
+                                  "<inflow|outflow|pressure>");
 
                 prm.declare_entry("w_" + Utilities::int_to_string(di) +
                                   " value", "0.0",
@@ -1249,8 +1249,8 @@ namespace Step33
           expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
                                     " value");
         initial_conditions.initialize(FunctionParser<dim>::default_variable_names(),
-          expressions,
-          std::map<std::string, double>());
+                                      expressions,
+                                      std::map<std::string, double>());
       }
       prm.leave_subsection();
 
@@ -1288,14 +1288,14 @@ namespace Step33
     void assemble_system();
     void assemble_cell_term(const FEValues<dim> &                       fe_v,
                             const std::vector<types::global_dof_index> &dofs);
-    void assemble_face_term(const unsigned int               face_no,
-      const FEFaceValuesBase<dim> &               fe_v,
-      const FEFaceValuesBase<dim> &               fe_v_neighbor,
-      const std::vector<types::global_dof_index> &dofs,
-      const std::vector<types::global_dof_index> &dofs_neighbor,
-      const bool                                  external_face,
-      const unsigned int                          boundary_id,
-      const double                                face_diameter);
+    void assemble_face_term(const unsigned int                          face_no,
+                            const FEFaceValuesBase<dim> &               fe_v,
+                            const FEFaceValuesBase<dim> &               fe_v_neighbor,
+                            const std::vector<types::global_dof_index> &dofs,
+                            const std::vector<types::global_dof_index> &dofs_neighbor,
+                            const bool                                  external_face,
+                            const unsigned int                          boundary_id,
+                            const double                                face_diameter);
 
     std::pair<unsigned int, double> solve(Vector<double> &solution);
 
@@ -1546,12 +1546,12 @@ namespace Step33
                       neighbor_child->get_dof_indices(dof_indices_neighbor);
 
                       assemble_face_term(face_no, fe_v_subface,
-                        fe_v_face_neighbor,
-                        dof_indices,
-                        dof_indices_neighbor,
-                        false,
-                        numbers::invalid_unsigned_int,
-                        neighbor_child->face(neighbor2)->diameter());
+                                         fe_v_face_neighbor,
+                                         dof_indices,
+                                         dof_indices_neighbor,
+                                         false,
+                                         numbers::invalid_unsigned_int,
+                                         neighbor_child->face(neighbor2)->diameter());
                     }
                 }
 
@@ -1572,7 +1572,7 @@ namespace Step33
 
                   const std::pair<unsigned int, unsigned int>
                   faceno_subfaceno = cell->neighbor_of_coarser_neighbor(face_no);
-                  const unsigned int neighbor_face_no = faceno_subfaceno.first,
+                  const unsigned int neighbor_face_no    = faceno_subfaceno.first,
                                      neighbor_subface_no = faceno_subfaceno.second;
 
                   Assert(neighbor->neighbor_child_on_subface(neighbor_face_no,
@@ -1682,7 +1682,7 @@ namespace Step33
     // Next, we have to define the independent variables that we will try to
     // determine by solving a Newton step. These independent variables are the
     // values of the local degrees of freedom which we extract here:
-    std::vector<Sacado::Fad::DFad<double> > independent_local_dof_values(dofs_per_cell);
+    std::vector<Sacado::Fad::DFad<double>> independent_local_dof_values(dofs_per_cell);
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       independent_local_dof_values[i] = current_solution(dof_indices[i]);
 
@@ -1834,10 +1834,10 @@ namespace Step33
                      fe_v.JxW(point);
 
             for (unsigned int d = 0; d < dim; d++)
-              R_i -= ( parameters.theta * flux[point][component_i][d] +
-                 (1.0 - parameters.theta) * flux_old[point][component_i][d]) *
-                fe_v.shape_grad_component(i, point, component_i)[d] *
-                fe_v.JxW(point);
+              R_i -= (parameters.theta * flux[point][component_i][d] +
+                      (1.0 - parameters.theta) * flux_old[point][component_i][d]) *
+                     fe_v.shape_grad_component(i, point, component_i)[d] *
+                     fe_v.JxW(point);
 
             for (unsigned int d = 0; d < dim; d++)
               R_i += 1.0*std::pow(fe_v.get_cell()->diameter(),
@@ -1847,8 +1847,8 @@ namespace Step33
                 fe_v.shape_grad_component(i, point, component_i)[d] *
                 fe_v.JxW(point);
 
-            R_i -= ( parameters.theta  * forcing[point][component_i] +
-               (1.0 - parameters.theta) * forcing_old[point][component_i]) *
+            R_i -= (parameters.theta * forcing[point][component_i] +
+                    (1.0 - parameters.theta) * forcing_old[point][component_i]) *
               fe_v.shape_value_component(i, point, component_i) *
               fe_v.JxW(point);
           }
@@ -1934,8 +1934,8 @@ namespace Step33
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           const unsigned int component_i = fe_v.get_fe().system_to_component_index(i).first;
-          Wplus[q][component_i] +=  independent_local_dof_values[i] *
-            fe_v.shape_value_component(i, q, component_i);
+          Wplus[q][component_i] += independent_local_dof_values[i] *
+                                   fe_v.shape_value_component(i, q, component_i);
           Wplus_old[q][component_i] +=  old_solution(dof_indices[i]) *
             fe_v.shape_value_component(i, q, component_i);
         }
@@ -2052,7 +2052,7 @@ namespace Step33
               component_i = fe_v.get_fe().system_to_component_index(i).first;
 
               R_i += (parameters.theta * normal_fluxes[point][component_i] +
-                       (1.0 - parameters.theta) * normal_fluxes_old[point][component_i] ) *
+                      (1.0 - parameters.theta) * normal_fluxes_old[point][component_i]) *
                      fe_v.shape_value_component(i, point, component_i) *
                      fe_v.JxW(point);
             }
@@ -2169,7 +2169,7 @@ namespace Step33
         solver.SetUserMatrix(const_cast<Epetra_CrsMatrix *>
                              (&system_matrix.trilinos_matrix()));
 
-        solver.Iterate(parameters.max_iterations, parameters.linear_residual);
+            solver.Iterate(parameters.max_iterations, parameters.linear_residual);
 
             return std::pair<unsigned int, double>(solver.NumIters(),
                                                    solver.TrueResidual());

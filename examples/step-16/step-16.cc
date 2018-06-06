@@ -390,7 +390,7 @@ namespace Step16
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
-    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> > assembler;
+    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>> assembler;
     assembler.initialize(constraints);
     assembler.initialize(system_matrix, system_rhs);
 

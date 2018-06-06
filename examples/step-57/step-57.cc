@@ -243,7 +243,7 @@ namespace Step57
   void
   BlockSchurPreconditioner<PreconditionerMp>::
   vmult(BlockVector<double>       &dst,
-    const BlockVector<double> &src) const
+                                                    const BlockVector<double> &src) const
   {
     Vector<double> utmp(src.block(0));
 
@@ -334,10 +334,10 @@ namespace Step57
 
       DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
       VectorTools::interpolate_boundary_values(dof_handler,
-        0,
-        Functions::ZeroFunction<dim>(dim + 1),
-        zero_constraints,
-        fe.component_mask(velocities));
+                                               0,
+                                               Functions::ZeroFunction<dim>(dim + 1),
+                                               zero_constraints,
+                                               fe.component_mask(velocities));
     }
     zero_constraints.close();
 
@@ -395,7 +395,7 @@ namespace Step57
                             update_values |
                             update_quadrature_points |
                             update_JxW_values |
-                            update_gradients );
+                              update_gradients);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -475,7 +475,7 @@ namespace Step57
                       }
                   }
 
-                double present_velocity_divergence =  trace(present_velocity_gradients[q]);
+                double present_velocity_divergence = trace(present_velocity_gradients[q]);
                 local_rhs(i) += ( - viscosity*scalar_product(present_velocity_gradients[q],grad_phi_u[i])
                                   - present_velocity_gradients[q]*present_velocity_values[q]*phi_u[i]
                                   + present_pressure_values[q]*div_phi_u[i]
@@ -549,7 +549,7 @@ namespace Step57
   {
     const ConstraintMatrix &constraints_used = initial_step ? nonzero_constraints : zero_constraints;
 
-    SolverControl solver_control(system_matrix.m(), 1e-4*system_rhs.l2_norm(), true);
+    SolverControl solver_control(system_matrix.m(), 1e-4 * system_rhs.l2_norm(), true);
     SolverFGMRES<BlockVector<double>> gmres(solver_control);
 
     SparseILU<double> pmass_preconditioner;
@@ -582,7 +582,7 @@ namespace Step57
   template <int dim>
   void StationaryNavierStokes<dim>::refine_mesh()
   {
-    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+    Vector<float>              estimated_error_per_cell(triangulation.n_active_cells());
     FEValuesExtractors::Vector velocity(0);
     KellyErrorEstimator<dim>::estimate(dof_handler,
                                        QGauss<dim - 1>(degree + 1),
@@ -630,17 +630,17 @@ namespace Step57
   // argument "output_result" is whether output should be produced.
 
   template <int dim>
-  void StationaryNavierStokes<dim>::newton_iteration(const double tolerance,
-    const unsigned int max_iteration,
-    const unsigned int max_refinement,
-    const bool         is_initial_step,
-    const bool         output_result)
+  void StationaryNavierStokes<dim>::newton_iteration(const double       tolerance,
+                                                     const unsigned int max_iteration,
+                                                     const unsigned int max_refinement,
+                                                     const bool         is_initial_step,
+                                                     const bool         output_result)
   {
     double current_res;
     double last_res;
     bool   first_step = is_initial_step;
 
-    for (unsigned int refinement = 0; refinement < max_refinement+1; ++refinement)
+    for (unsigned int refinement = 0; refinement < max_refinement + 1; ++refinement)
       {
         unsigned int outer_iteration = 0;
         last_res                     = 1.0;
@@ -739,7 +739,7 @@ namespace Step57
 
     bool is_initial_step = true;
 
-    for (double Re = 1000.0; Re < target_Re; Re = std::min(Re+step_size, target_Re))
+    for (double Re = 1000.0; Re < target_Re; Re = std::min(Re + step_size, target_Re))
       {
         viscosity = 1.0 / Re;
         std::cout << "*****************************************" << std::endl;
@@ -756,7 +756,7 @@ namespace Step57
   // for the output file that also contains the Reynolds number (i.e., the
   // inverse of the viscosity in the current context).
   template <int dim>
-  void StationaryNavierStokes<dim>::output_results(const unsigned int output_index)  const
+  void StationaryNavierStokes<dim>::output_results(const unsigned int output_index) const
   {
     std::vector<std::string> solution_names(dim, "velocity");
     solution_names.emplace_back("pressure");

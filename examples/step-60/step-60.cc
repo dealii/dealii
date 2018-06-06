@@ -311,10 +311,10 @@ namespace Step60
 
     // first we gather all the objects related to the embedding space geometry
 
-    std::unique_ptr<Triangulation<spacedim>> space_grid;
-    std::unique_ptr<GridTools::Cache<spacedim, spacedim> > space_grid_tools_cache;
-    std::unique_ptr<FiniteElement<spacedim>> space_fe;
-    std::unique_ptr<DoFHandler<spacedim>>    space_dh;
+    std::unique_ptr<Triangulation<spacedim>>              space_grid;
+    std::unique_ptr<GridTools::Cache<spacedim, spacedim>> space_grid_tools_cache;
+    std::unique_ptr<FiniteElement<spacedim>>              space_fe;
+    std::unique_ptr<DoFHandler<spacedim>>                 space_dh;
 
     // Then the ones related to the embedded grid, with the DoFHandler associated
     // to the Lagrange multiplier `lambda`
@@ -604,9 +604,9 @@ namespace Step60
       "R=.3, Cx=.4, Cy=.4");
 
 
-        ParameterAcceptor::prm.set("Function expression",
-                                   "R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy");
-      });
+      ParameterAcceptor::prm.set("Function expression",
+                                 "R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy");
+    });
 
     embedded_value_function.declare_parameters_call_back.connect(
       [] () -> void
@@ -711,7 +711,7 @@ namespace Step60
       embedded_mapping =
         std_cxx14::make_unique<MappingFEField<dim, spacedim, Vector<double>, DoFHandler<dim,spacedim> > >
         (*embedded_configuration_dh,
-         embedded_configuration);
+          embedded_configuration);
 
     // In order to construct a well posed coupling interpolation operator $C$,
     // there are some constraints on the relative dimension of the grids between
@@ -849,10 +849,10 @@ namespace Step60
             << embedded_space_maximal_diameter/embedding_space_minimal_diameter << std::endl;
 
     AssertThrow(embedded_space_maximal_diameter < embedding_space_minimal_diameter,
-      ExcMessage("The embedding grid is too refined(or the embedded grid "
-                 "is too coarse). Adjust the parameters so that the minimal "
-                 "grid size of the embedding grid is larger "
-                 "than the maximal grid size of the embedded grid."));
+                ExcMessage("The embedding grid is too refined(or the embedded grid "
+                           "is too coarse). Adjust the parameters so that the minimal "
+                           "grid size of the embedding grid is larger "
+                           "than the maximal grid size of the embedded grid."));
 
     // $\Omega$ has been refined and we can now set up its DoFs
     setup_embedding_dofs();
@@ -892,7 +892,7 @@ namespace Step60
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::setup_embedded_dofs()
   {
-    embedded_dh = std_cxx14::make_unique<DoFHandler<dim,spacedim> >(*embedded_grid);
+    embedded_dh = std_cxx14::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
     embedded_fe = std_cxx14::make_unique<FE_Q<dim,spacedim> >
                   (parameters.embedded_space_finite_element_degree);
     embedded_dh->distribute_dofs(*embedded_fe);
@@ -949,10 +949,10 @@ namespace Step60
                                          stiffness_matrix, (const Function<spacedim> *) nullptr, constraints);
 
       VectorTools::create_right_hand_side(*embedded_mapping,
-        *embedded_dh,
-        QGauss<dim>(2 * embedded_fe->degree + 1),
-        embedded_value_function,
-        embedded_rhs);
+                                          *embedded_dh,
+                                          QGauss<dim>(2 * embedded_fe->degree + 1),
+                                          embedded_value_function,
+                                          embedded_rhs);
     }
     {
       TimerOutput::Scope timer_section(monitor, "Assemble coupling system");

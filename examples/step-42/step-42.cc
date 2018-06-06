@@ -118,7 +118,7 @@ namespace Step42
 
     bool
     get_stress_strain_tensor(const SymmetricTensor<2, dim> &strain_tensor,
-      SymmetricTensor<4, dim> &      stress_strain_tensor) const;
+                                  SymmetricTensor<4, dim> &stress_strain_tensor) const;
 
     void
     get_linearized_stress_strain_tensors(const SymmetricTensor<2, dim> &strain_tensor,
@@ -207,7 +207,7 @@ namespace Step42
                     * strain_tensor;
 
     const SymmetricTensor<2, dim> deviator_stress_tensor = deviator(stress_tensor);
-    const double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
+    const double deviator_stress_tensor_norm             = deviator_stress_tensor.norm();
 
     stress_strain_tensor = stress_strain_tensor_mu;
     if (deviator_stress_tensor_norm > sigma_0)
@@ -249,8 +249,8 @@ namespace Step42
     stress_strain_tensor            = stress_strain_tensor_mu;
     stress_strain_tensor_linearized = stress_strain_tensor_mu;
 
-    SymmetricTensor<2, dim> deviator_stress_tensor = deviator(stress_tensor);
-    const double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
+    SymmetricTensor<2, dim> deviator_stress_tensor      = deviator(stress_tensor);
+    const double            deviator_stress_tensor_norm = deviator_stress_tensor.norm();
 
     if (deviator_stress_tensor_norm > sigma_0)
       {
@@ -807,14 +807,14 @@ namespace Step42
       "will be read from a file named 'obstacle.pbm' that is supposed to be in "
       "ASCII PBM format.");
     prm.declare_entry("output directory", "",
-      Patterns::Anything(),
-      "Directory for output files(graphical output and benchmark "
-      "statistics). If empty, use the current directory.");
+                      Patterns::Anything(),
+                      "Directory for output files(graphical output and benchmark "
+                      "statistics). If empty, use the current directory.");
     prm.declare_entry("transfer solution", "false",
-      Patterns::Bool(),
-      "Whether the solution should be used as a starting guess "
-      "for the next finer mesh. If false, then the iteration starts at "
-      "zero on every mesh.");
+                      Patterns::Bool(),
+                      "Whether the solution should be used as a starting guess "
+                      "for the next finer mesh. If false, then the iteration starts at "
+                      "zero on every mesh.");
     prm.declare_entry("base mesh", "box",
                       Patterns::Selection("box|half sphere"),
                       "Select the shape of the domain: 'box' or 'half sphere'");
@@ -1055,7 +1055,7 @@ namespace Step42
 
       DoFTools::make_sparsity_pattern(dof_handler, sp,
                                       constraints_dirichlet_and_hanging_nodes, false,
-        Utilities::MPI::this_mpi_process(mpi_communicator));
+                                      Utilities::MPI::this_mpi_process(mpi_communicator));
       sp.compress();
       newton_matrix.reinit(sp);
 
@@ -1101,10 +1101,10 @@ namespace Step42
       {
         // interpolate all components of the solution
         VectorTools::interpolate_boundary_values(dof_handler,
-          6,
-          EquationData::BoundaryValues<dim>(),
-          constraints_dirichlet_and_hanging_nodes,
-          ComponentMask());
+                                                 6,
+                                                 EquationData::BoundaryValues<dim>(),
+                                                 constraints_dirichlet_and_hanging_nodes,
+                                                 ComponentMask());
 
         // interpolate x- and y-components of the
         // solution (this is a bit mask, so apply
@@ -1115,14 +1115,14 @@ namespace Step42
           8,
           EquationData::BoundaryValues<dim>(),
           constraints_dirichlet_and_hanging_nodes,
-                                                 (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
+          (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
       }
     else
       VectorTools::interpolate_boundary_values(dof_handler,
-        0,
-        EquationData::BoundaryValues<dim>(),
-        constraints_dirichlet_and_hanging_nodes,
-        ComponentMask());
+                                               0,
+                                               EquationData::BoundaryValues<dim>(),
+                                               constraints_dirichlet_and_hanging_nodes,
+                                               ComponentMask());
 
     constraints_dirichlet_and_hanging_nodes.close();
   }
@@ -1161,7 +1161,7 @@ namespace Step42
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const FEValuesExtractors::Vector displacement(0);
@@ -1184,8 +1184,8 @@ namespace Step42
               for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   cell_matrix(i, i) += (fe_values_face[displacement].value(i, q_point) *
-                     fe_values_face[displacement].value(i, q_point) *
-                     fe_values_face.JxW(q_point));
+                                        fe_values_face[displacement].value(i, q_point) *
+                                        fe_values_face.JxW(q_point));
 
               cell->get_dof_indices(local_dof_indices);
 
@@ -1372,8 +1372,8 @@ namespace Step42
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     const EquationData::BoundaryForce<dim> boundary_force;
-    std::vector<Vector<double>> boundary_force_values(n_face_q_points,
-                                                      Vector<double>(dim));
+    std::vector<Vector<double>>            boundary_force_values(n_face_q_points,
+                                                                 Vector<double>(dim));
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
@@ -1450,7 +1450,7 @@ namespace Step42
                 fe_values_face.reinit(cell, face);
 
                 boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
-                  boundary_force_values);
+                                                 boundary_force_values);
 
                 for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                   {
@@ -1523,8 +1523,8 @@ namespace Step42
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     const EquationData::BoundaryForce<dim> boundary_force;
-    std::vector<Vector<double>> boundary_force_values(n_face_q_points,
-                                                      Vector<double>(dim));
+    std::vector<Vector<double>>            boundary_force_values(n_face_q_points,
+                                                                 Vector<double>(dim));
 
     Vector<double> cell_rhs(dofs_per_cell);
 
@@ -1582,7 +1582,7 @@ namespace Step42
                 fe_values_face.reinit(cell, face);
 
                 boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
-                  boundary_force_values);
+                                                 boundary_force_values);
 
                 for (unsigned int q_point = 0; q_point < n_face_q_points;
                      ++q_point)
@@ -1843,9 +1843,9 @@ namespace Step42
                 residual_norm = residual.l2_norm();
 
                 pcout << "      Residual of the non-contact part of the system: "
-                  << residual_norm << std::endl
-                  << "         with a damping parameter alpha = " << alpha
-                  << std::endl;
+                      << residual_norm << std::endl
+                      << "         with a damping parameter alpha = " << alpha
+                      << std::endl;
 
                 if (residual_norm < previous_residual_norm)
                   break;
@@ -2004,7 +2004,7 @@ namespace Step42
     // Calculation of the contact forces
     TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
     const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
-                       end_res = (newton_rhs_uncondensed.local_range().second);
+                       end_res   = (newton_rhs_uncondensed.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
         distributed_lambda(n) = newton_rhs_uncondensed(n) /
@@ -2101,7 +2101,7 @@ namespace Step42
   {
     TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
     const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
-                       end_res = (newton_rhs_uncondensed.local_range().second);
+                       end_res   = (newton_rhs_uncondensed.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
         distributed_lambda(n) = newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);

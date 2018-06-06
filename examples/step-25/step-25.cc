@@ -404,7 +404,7 @@ namespace Step25
   template <int dim>
   void SineGordonProblem<dim>::compute_nl_term(const Vector<double> &old_data,
                                                const Vector<double> &new_data,
-                                               Vector<double> &nl_term) const
+                                               Vector<double> &      nl_term) const
   {
     nl_term = 0;
     const QGauss<dim> quadrature_formula(3);
@@ -467,8 +467,8 @@ namespace Step25
   // below, respectively.
   template <int dim>
   void SineGordonProblem<dim>::compute_nl_matrix(const Vector<double> &old_data,
-    const Vector<double> &new_data,
-    SparseMatrix<double> &nl_matrix) const
+                                                 const Vector<double> &new_data,
+                                                 SparseMatrix<double> &nl_matrix) const
   {
     QGauss<dim>   quadrature_formula(3);
     FEValues<dim> fe_values(fe, quadrature_formula,
@@ -477,7 +477,7 @@ namespace Step25
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> local_nl_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>                   local_nl_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     std::vector<double>                  old_data_values(n_q_points);
     std::vector<double>                  new_data_values(n_q_points);
@@ -505,7 +505,7 @@ namespace Step25
                           (1 - theta) * old_data_values[q_point]) *
                  fe_values.shape_value(i, q_point) *
                                        fe_values.shape_value(j, q_point) *
-                                       fe_values.JxW (q_point));
+                 fe_values.JxW(q_point));
 
         // Finally, we add up the contributions of the integrals over the
         // cells to the global integral.
@@ -624,7 +624,7 @@ namespace Step25
     // of the problem, and then advance our solution according to the time
     // stepping formulas we discussed in the Introduction.
     unsigned int timestep_number = 1;
-    for (time+ = time_step; time <  = final_time; time+ = time_step, ++timestep_number)
+    for (time + = time_step; time < = final_time; time + = time_step, ++timestep_number)
       {
         old_solution = solution;
 

@@ -218,7 +218,7 @@ namespace Step34
     // integrate the singular kernels in the interior of the cells.
     const Quadrature<dim - 1> &get_singular_quadrature(
       const typename DoFHandler<dim - 1, dim>::active_cell_iterator &cell,
-      const unsigned int index) const;
+      const unsigned int                                             index) const;
 
 
     // The usual deal.II classes can be used for boundary element methods by
@@ -352,7 +352,7 @@ namespace Step34
     prm.enter_subsection("Quadrature rules");
     {
       prm.declare_entry("Quadrature type", "gauss",
-                        Patterns::Selection(QuadratureSelector<(dim-1)>::get_quadrature_names()));
+        Patterns::Selection(QuadratureSelector<(dim - 1)>::get_quadrature_names()));
       prm.declare_entry("Quadrature order", "4", Patterns::Integer());
       prm.declare_entry("Singular quadrature order", "5", Patterns::Integer());
     }
@@ -590,7 +590,7 @@ namespace Step34
     // We construct a vector of support points which will be used in the local
     // integrations:
     std::vector<Point<dim>> support_points(dh.n_dofs());
-    DoFTools::map_dofs_to_support_points<dim-1, dim>( mapping, dh, support_points);
+    DoFTools::map_dofs_to_support_points<dim - 1, dim>(mapping, dh, support_points);
 
 
     // After doing so, we can start the integration loop over all cells, where
@@ -606,8 +606,8 @@ namespace Step34
         fe_v.reinit(cell);
         cell->get_dof_indices(local_dof_indices);
 
-        const std::vector<Point<dim>> &q_points = fe_v.get_quadrature_points();
-        const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
+        const std::vector<Point<dim>> &    q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1, dim>> &normals  = fe_v.get_normal_vectors();
         wind.vector_value_list(q_points, cell_wind);
 
         // We then form the integral over the current cell for all degrees of
@@ -684,13 +684,13 @@ namespace Step34
                 FEValues<dim-1,dim> fe_v_singular(mapping, fe, singular_quadrature,
                                                   update_jacobians |
                                                   update_values |
-                                                  update_cell_normal_vectors |
-                                                  update_quadrature_points );
+                                                       update_cell_normal_vectors |
+                                                       update_quadrature_points);
 
                 fe_v_singular.reinit(cell);
 
-                std::vector<Vector<double> > singular_cell_wind( singular_quadrature.size(),
-                                                                 Vector<double>(dim) );
+                std::vector<Vector<double>> singular_cell_wind(singular_quadrature.size(),
+                                                               Vector<double>(dim));
 
                 const std::vector<Tensor<1,dim> > &singular_normals  = fe_v_singular.get_normal_vectors();
                 const std::vector<Point<dim> >    &singular_q_points = fe_v_singular.get_quadrature_points();
@@ -699,15 +699,15 @@ namespace Step34
 
                 for (unsigned int q = 0; q < singular_quadrature.size(); ++q)
                   {
-                    const Tensor<1,dim> R = singular_q_points[q] - support_points[i];
-                    double normal_wind = 0;
+                    const Tensor<1, dim> R = singular_q_points[q] - support_points[i];
+                    double               normal_wind = 0;
                     for (unsigned int d = 0; d < dim; ++d)
                       normal_wind += (singular_cell_wind[q](d)*
                                       singular_normals[q][d]);
 
                     system_rhs(i) += (LaplaceKernel::single_layer(R) *
                                        normal_wind                         *
-                                       fe_v_singular.JxW(q) );
+                                      fe_v_singular.JxW(q));
 
                     for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
                       {
@@ -872,7 +872,7 @@ namespace Step34
   template <>
   const Quadrature<2> &BEMProblem<3>::get_singular_quadrature(
     const DoFHandler<2, 3>::active_cell_iterator &,
-    const unsigned int index) const
+                                         const unsigned int index) const
   {
     Assert(index < fe.dofs_per_cell,
            ExcIndexRange(0, fe.dofs_per_cell, index));
@@ -963,8 +963,8 @@ namespace Step34
       {
         fe_v.reinit(cell);
 
-        const std::vector<Point<dim>> &q_points = fe_v.get_quadrature_points();
-        const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
+        const std::vector<Point<dim>> &    q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1, dim>> &normals  = fe_v.get_normal_vectors();
 
         cell->get_dof_indices(dofs);
         fe_v.get_function_values(phi, local_phi);
@@ -1002,7 +1002,7 @@ namespace Step34
 
     const std::string
     filename = Utilities::int_to_string(dim) + "d_external.vtk";
-    std::ofstream file(filename);
+    std::ofstream     file(filename);
 
     data_out.write_vtk(file);
   }
@@ -1023,8 +1023,8 @@ namespace Step34
     dataout.add_data_vector(alpha, "alpha",
       DataOut<dim - 1, DoFHandler<dim - 1, dim>>::type_dof_data);
     dataout.build_patches(mapping,
-      mapping.get_degree(),
-      DataOut<dim - 1, DoFHandler<dim - 1, dim>>::curved_inner_cells);
+                          mapping.get_degree(),
+                          DataOut<dim - 1, DoFHandler<dim - 1, dim>>::curved_inner_cells);
 
     std::string filename = ( Utilities::int_to_string(dim) +
                              "d_boundary_solution_" +
