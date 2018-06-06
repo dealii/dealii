@@ -137,8 +137,12 @@ namespace parallel
      * not rely on this class to automatically detect the unsupported case.
      *
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
+     *
+     * @deprecated Use LinearAlgebra::distributed::Vector instead.
      */
-    using LinearAlgebra::distributed::Vector;
+    template <typename Number>
+    using Vector DEAL_II_DEPRECATED =
+      LinearAlgebra::distributed::Vector<Number>;
 
     /*@}*/
   } // namespace distributed

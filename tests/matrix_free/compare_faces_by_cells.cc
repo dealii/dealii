@@ -35,7 +35,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
@@ -78,7 +78,8 @@ public:
   }
 
   void
-  compute_diagonal_by_face(parallel::distributed::Vector<number> &result) const
+  compute_diagonal_by_face(
+    LinearAlgebra::distributed::Vector<number> &result) const
   {
     int dummy;
     result = 0;
@@ -91,7 +92,8 @@ public:
   }
 
   void
-  compute_diagonal_by_cell(parallel::distributed::Vector<number> &result) const
+  compute_diagonal_by_cell(
+    LinearAlgebra::distributed::Vector<number> &result) const
   {
     int dummy;
     result.zero_out_ghosts();
@@ -100,7 +102,8 @@ public:
   }
 
   void
-  initialize_dof_vector(parallel::distributed::Vector<number> &vector) const
+  initialize_dof_vector(
+    LinearAlgebra::distributed::Vector<number> &vector) const
   {
     data.initialize_dof_vector(vector);
   }
@@ -109,15 +112,15 @@ public:
 private:
   void
   local_diagonal_dummy(const MatrixFree<dim, number> &,
-                       parallel::distributed::Vector<number> &,
+                       LinearAlgebra::distributed::Vector<number> &,
                        const int &,
                        const std::pair<unsigned int, unsigned int> &) const
   {}
 
   void
   local_diagonal_face(
-    const MatrixFree<dim, number> &        data,
-    parallel::distributed::Vector<number> &dst,
+    const MatrixFree<dim, number> &             data,
+    LinearAlgebra::distributed::Vector<number> &dst,
     const int &,
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
@@ -207,8 +210,8 @@ private:
 
   void
   local_diagonal_boundary(
-    const MatrixFree<dim, number> &        data,
-    parallel::distributed::Vector<number> &dst,
+    const MatrixFree<dim, number> &             data,
+    LinearAlgebra::distributed::Vector<number> &dst,
     const int &,
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
@@ -251,8 +254,8 @@ private:
 
   void
   local_diagonal_by_cell(
-    const MatrixFree<dim, number> &        data,
-    parallel::distributed::Vector<number> &dst,
+    const MatrixFree<dim, number> &             data,
+    LinearAlgebra::distributed::Vector<number> &dst,
     const int &,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -339,7 +342,7 @@ test()
   LaplaceOperator<dim, fe_degree, n_q_points_1d, number> fine_matrix;
   fine_matrix.initialize(mapping, dof);
 
-  parallel::distributed::Vector<number> res1, res2;
+  LinearAlgebra::distributed::Vector<number> res1, res2;
   fine_matrix.initialize_dof_vector(res1);
   fine_matrix.initialize_dof_vector(res2);
 
@@ -356,7 +359,7 @@ test()
       LaplaceOperator<dim, fe_degree, n_q_points_1d, number> fine_matrix;
       fine_matrix.initialize(mapping, dof, level);
 
-      parallel::distributed::Vector<number> res1, res2;
+      LinearAlgebra::distributed::Vector<number> res1, res2;
       fine_matrix.initialize_dof_vector(res1);
       fine_matrix.initialize_dof_vector(res2);
 

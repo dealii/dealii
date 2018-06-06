@@ -31,7 +31,7 @@
 
 #include <deal.II/fe/component_mask.h>
 
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <string>
 #include <vector>

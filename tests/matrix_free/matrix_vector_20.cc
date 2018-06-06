@@ -35,8 +35,8 @@
 
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/parallel_block_vector.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 
@@ -52,10 +52,10 @@
 
 template <int dim, int fe_degree, typename Number>
 void
-helmholtz_operator(const MatrixFree<dim, Number> &                   data,
-                   parallel::distributed::BlockVector<Number> &      dst,
-                   const parallel::distributed::BlockVector<Number> &src,
-                   const std::pair<unsigned int, unsigned int> &     cell_range)
+helmholtz_operator(const MatrixFree<dim, Number> &                        data,
+                   LinearAlgebra::distributed::BlockVector<Number> &      dst,
+                   const LinearAlgebra::distributed::BlockVector<Number> &src,
+                   const std::pair<unsigned int, unsigned int> &cell_range)
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> phi0(data);
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> phi1(data);
@@ -99,15 +99,16 @@ public:
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in) : data(data_in){};
 
   void
-  vmult(parallel::distributed::BlockVector<Number> &      dst,
-        const parallel::distributed::BlockVector<Number> &src) const
+  vmult(LinearAlgebra::distributed::BlockVector<Number> &      dst,
+        const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
     for (unsigned int i = 0; i < dst.size(); ++i)
       dst[i] = 0;
-    const std::function<void(const MatrixFree<dim, Number> &,
-                             parallel::distributed::BlockVector<Number> &,
-                             const parallel::distributed::BlockVector<Number> &,
-                             const std::pair<unsigned int, unsigned int> &)>
+    const std::function<void(
+      const MatrixFree<dim, Number> &,
+      LinearAlgebra::distributed::BlockVector<Number> &,
+      const LinearAlgebra::distributed::BlockVector<Number> &,
+      const std::pair<unsigned int, unsigned int> &)>
       wrap = helmholtz_operator<dim, fe_degree, Number>;
     data.cell_loop(wrap, dst, src);
   };
@@ -178,9 +179,9 @@ test()
     mf_data.reinit(dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim, fe_degree, number>     mf(mf_data);
-  parallel::distributed::Vector<number>      ref;
-  parallel::distributed::BlockVector<number> in(2), out(2);
+  MatrixFreeTest<dim, fe_degree, number>          mf(mf_data);
+  LinearAlgebra::distributed::Vector<number>      ref;
+  LinearAlgebra::distributed::BlockVector<number> in(2), out(2);
   for (unsigned int i = 0; i < 2; ++i)
     {
       mf_data.initialize_dof_vector(in.block(i));
