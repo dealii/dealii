@@ -230,8 +230,8 @@ namespace Step13
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
       bool evaluation_point_found = false;
-      for (; (cell!=endc) && !evaluation_point_found; ++cell)
-        for (unsigned int vertex=0;
+      for (; (cell != endc) && !evaluation_point_found; ++cell)
+        for (unsigned int vertex = 0;
              vertex<GeometryInfo<dim>::vertices_per_cell;
              ++vertex)
           if (cell->vertex(vertex) == evaluation_point)
@@ -961,9 +961,9 @@ namespace Step13
 
       scratch_data.fe_values.reinit(cell);
 
-      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             copy_data.cell_matrix(i,j) += (scratch_data.fe_values.shape_grad(i,q_point) *
                                            scratch_data.fe_values.shape_grad(j,q_point) *
                                            scratch_data.fe_values.JxW(q_point));
@@ -978,8 +978,8 @@ namespace Step13
     Solver<dim>::copy_local_to_global(const AssemblyCopyData &copy_data,
                                       LinearSystem           &linear_system) const
     {
-      for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
-        for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
+      for (unsigned int i = 0; i < copy_data.local_dof_indices.size(); ++i)
+        for (unsigned int j = 0; j < copy_data.local_dof_indices.size(); ++j)
           linear_system.matrix.add(copy_data.local_dof_indices[i],
                                    copy_data.local_dof_indices[j],
                                    copy_data.cell_matrix(i,j));
@@ -1147,21 +1147,21 @@ namespace Step13
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->dof_handler.begin_active(),
       endc = this->dof_handler.end();
-      for (; cell!=endc; ++cell)
+      for (; cell != endc; ++cell)
         {
           cell_rhs = 0;
           fe_values.reinit(cell);
           rhs_function->value_list(fe_values.get_quadrature_points(),
                                    rhs_values);
 
-          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               cell_rhs(i) += (fe_values.shape_value(i,q_point) *
                               rhs_values[q_point] *
                               fe_values.JxW(q_point));
 
           cell->get_dof_indices(local_dof_indices);
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             rhs(local_dof_indices[i]) += cell_rhs(i);
         };
     }
@@ -1323,7 +1323,7 @@ namespace Step13
                        const unsigned int  /*component*/) const
   {
     double q = p(0);
-    for (unsigned int i=1; i<dim; ++i)
+    for (unsigned int i = 1; i < dim; ++i)
       q += std::sin(10*p(i)+5*p(0)*p(0));
     const double exponential = std::exp(q);
     return exponential;
@@ -1348,13 +1348,13 @@ namespace Step13
                             const unsigned int  /*component*/) const
   {
     double q = p(0);
-    for (unsigned int i=1; i<dim; ++i)
+    for (unsigned int i = 1; i < dim; ++i)
       q += std::sin(10*p(i)+5*p(0)*p(0));
     const double u = std::exp(q);
     double t1 = 1,
            t2 = 0,
            t3 = 0;
-    for (unsigned int i=1; i<dim; ++i)
+    for (unsigned int i = 1; i < dim; ++i)
       {
         t1 += std::cos(10*p(i)+5*p(0)*p(0)) * 10 * p(0);
         t2 += 10*std::cos(10*p(i)+5*p(0)*p(0)) -
@@ -1392,7 +1392,7 @@ namespace Step13
     // Then start a loop which only terminates once the number of degrees of
     // freedom is larger than 20,000 (you may of course change this limit, if
     // you need more -- or less -- accuracy from your program).
-    for (unsigned int step=0; true; ++step)
+    for (unsigned int step = 0; true; ++step)
       {
         // Then give the <code>alive</code> indication for this
         // iteration. Note that the <code>std::flush</code> is needed to have
@@ -1405,7 +1405,7 @@ namespace Step13
         // annoying, but could be shortened by a typedef, if so desired.
         solver.solve_problem();
 
-        for (typename std::list<Evaluation::EvaluationBase<dim> *>::const_iterator
+        for (typename std::list < Evaluation::EvaluationBase < dim > * > ::const_iterator
              i = postprocessor_list.begin();
              i != postprocessor_list.end(); ++i)
           {

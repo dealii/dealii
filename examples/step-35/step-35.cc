@@ -335,7 +335,7 @@ namespace Step35
       const unsigned int n_points = points.size();
       Assert(values.size() == n_points,
              ExcDimensionMismatch(values.size(), n_points));
-      for (unsigned int i=0; i<n_points; ++i)
+      for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Velocity<dim>::value(points[i]);
     }
 
@@ -391,7 +391,7 @@ namespace Step35
     {
       const unsigned int n_points = points.size();
       Assert(values.size() == n_points, ExcDimensionMismatch(values.size(), n_points));
-      for (unsigned int i=0; i<n_points; ++i)
+      for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Pressure<dim>::value(points[i]);
     }
   }
@@ -736,7 +736,7 @@ namespace Step35
     phi_n.reinit(dof_handler_pressure.n_dofs());
     phi_n_minus_1.reinit(dof_handler_pressure.n_dofs());
     pres_tmp.reinit(dof_handler_pressure.n_dofs());
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         u_n[d].reinit(dof_handler_velocity.n_dofs());
         u_n_minus_1[d].reinit(dof_handler_velocity.n_dofs());
@@ -773,7 +773,7 @@ namespace Step35
     VectorTools::interpolate(dof_handler_pressure, pres, pres_n);
     phi_n = 0.;
     phi_n_minus_1 = 0.;
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         vel_exact.set_time(t_0);
         vel_exact.set_component(d);
@@ -807,7 +807,7 @@ namespace Step35
       sparsity_pattern_velocity.copy_from(dsp);
     }
     vel_Laplace_plus_Mass.reinit(sparsity_pattern_velocity);
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       vel_it_matrix[d].reinit(sparsity_pattern_velocity);
     vel_Mass.reinit(sparsity_pattern_velocity);
     vel_Laplace.reinit(sparsity_pattern_velocity);
@@ -871,7 +871,7 @@ namespace Step35
                                      update_gradients | update_JxW_values,
                                      update_values);
 
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         pres_Diff[d].reinit(sparsity_pattern_pres_vel);
         per_task_data.d = d;
@@ -906,10 +906,10 @@ namespace Step35
     std::get<1> (*SI)->get_dof_indices(data.pres_local_dof_indices);
 
     data.local_grad = 0.;
-    for (unsigned int q=0; q<scratch.nqp; ++q)
+    for (unsigned int q = 0; q < scratch.nqp; ++q)
       {
-        for (unsigned int i=0; i<data.vel_dpc; ++i)
-          for (unsigned int j=0; j<data.pres_dpc; ++j)
+        for (unsigned int i = 0; i < data.vel_dpc; ++i)
+          for (unsigned int j = 0; j < data.pres_dpc; ++j)
             data.local_grad(i, j) += -scratch.fe_val_vel.JxW(q) *
                                      scratch.fe_val_vel.shape_grad(i, q)[data.d] *
                                      scratch.fe_val_pres.shape_value(j, q);
@@ -922,8 +922,8 @@ namespace Step35
   NavierStokesProjection<dim>::
   copy_gradient_local_to_global(const InitGradPerTaskData &data)
   {
-    for (unsigned int i=0; i<data.vel_dpc; ++i)
-      for (unsigned int j=0; j<data.pres_dpc; ++j)
+    for (unsigned int i = 0; i < data.vel_dpc; ++i)
+      for (unsigned int j = 0; j < data.pres_dpc; ++j)
         pres_Diff[data.d].add(data.vel_local_dof_indices[i], data.pres_local_dof_indices[j],
                               data.local_grad(i, j) );
   }
@@ -961,7 +961,7 @@ namespace Step35
     const unsigned int n_steps =  static_cast<unsigned int>((T - t_0)/dt);
     vel_exact.set_time(2.*dt);
     output_results(1);
-    for (unsigned int n = 2; n<=n_steps; ++n)
+    for (unsigned int n = 2; n <  = n_steps; ++n)
       {
         if (n % output_interval == 0)
           {
@@ -992,7 +992,7 @@ namespace Step35
   void
   NavierStokesProjection<dim>::interpolate_velocity()
   {
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         u_star[d].equ(2., u_n[d]);
         u_star[d] -=  u_n_minus_1[d];
@@ -1022,7 +1022,7 @@ namespace Step35
 
     assemble_advection_term();
 
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         force[d] = 0.;
         v_tmp.equ(2./dt,u_n[d]);
@@ -1037,7 +1037,7 @@ namespace Step35
 
         vel_exact.set_component(d);
         boundary_values.clear();
-        for (std::vector<types::boundary_id>::const_iterator
+        for (std::vector < types::boundary_id > ::const_iterator
              boundaries = boundary_ids.begin();
              boundaries != boundary_ids.end();
              ++boundaries)
@@ -1085,7 +1085,7 @@ namespace Step35
 
 
     Threads::TaskGroup<void> tasks;
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         if (reinit_prec)
           prec_velocity[d].initialize(vel_it_matrix[d],
@@ -1148,28 +1148,28 @@ namespace Step35
   {
     scratch.fe_val.reinit(cell);
     cell->get_dof_indices(data.local_dof_indices);
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         scratch.fe_val.get_function_values(u_star[d], scratch.u_star_tmp);
-        for (unsigned int q=0; q<scratch.nqp; ++q)
+        for (unsigned int q = 0; q < scratch.nqp; ++q)
           scratch.u_star_local[q](d) = scratch.u_star_tmp[q];
       }
 
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         scratch.fe_val.get_function_gradients(u_star[d], scratch.grad_u_star);
-        for (unsigned int q=0; q<scratch.nqp; ++q)
+        for (unsigned int q = 0; q < scratch.nqp; ++q)
           {
-            if (d==0)
+            if (d == 0)
               scratch.u_star_tmp[q] = 0.;
             scratch.u_star_tmp[q] += scratch.grad_u_star[q][d];
           }
       }
 
     data.local_advection = 0.;
-    for (unsigned int q=0; q<scratch.nqp; ++q)
-      for (unsigned int i=0; i<scratch.dpc; ++i)
-        for (unsigned int j=0; j<scratch.dpc; ++j)
+    for (unsigned int q = 0; q < scratch.nqp; ++q)
+      for (unsigned int i = 0; i < scratch.dpc; ++i)
+        for (unsigned int j = 0; j < scratch.dpc; ++j)
           data.local_advection(i,j) += (scratch.u_star_local[q] *
                                         scratch.fe_val.shape_grad(j, q) *
                                         scratch.fe_val.shape_value(i, q)
@@ -1189,8 +1189,8 @@ namespace Step35
   NavierStokesProjection<dim>::
   copy_advection_local_to_global(const AdvectionPerTaskData &data)
   {
-    for (unsigned int i=0; i<fe_velocity.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe_velocity.dofs_per_cell; ++j)
+    for (unsigned int i = 0; i < fe_velocity.dofs_per_cell; ++i)
+      for (unsigned int j = 0; j < fe_velocity.dofs_per_cell; ++j)
         vel_Advection.add(data.local_dof_indices[i],
                           data.local_dof_indices[j],
                           data.local_advection(i,j));
@@ -1208,7 +1208,7 @@ namespace Step35
     pres_iterative.copy_from(pres_Laplace);
 
     pres_tmp = 0.;
-    for (unsigned d=0; d<dim; ++d)
+    for (unsigned d = 0; d < dim; ++d)
       pres_Diff[d].Tvmult_add(pres_tmp, u_n[d]);
 
     phi_n_minus_1 = phi_n;
@@ -1311,7 +1311,7 @@ namespace Step35
         joint_cell->get_dof_indices(loc_joint_dof_indices);
         vel_cell->get_dof_indices(loc_vel_dof_indices);
         pres_cell->get_dof_indices(loc_pres_dof_indices);
-        for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
           switch (joint_fe.system_to_base_index(i).first.first)
             {
             case 0:
@@ -1399,13 +1399,13 @@ namespace Step35
         fe_val_vel.get_function_gradients(u_n[0], grad_u1);
         fe_val_vel.get_function_gradients(u_n[1], grad_u2);
         loc_rot = 0.;
-        for (unsigned int q=0; q<nqp; ++q)
-          for (unsigned int i=0; i<dpc; ++i)
+        for (unsigned int q = 0; q < nqp; ++q)
+          for (unsigned int i = 0; i < dpc; ++i)
             loc_rot(i) += (grad_u2[q][0] - grad_u1[q][1]) *
                           fe_val_vel.shape_value(i, q) *
                           fe_val_vel.JxW(q);
 
-        for (unsigned int i=0; i<dpc; ++i)
+        for (unsigned int i = 0; i < dpc; ++i)
           rot_u(ldi[i]) += loc_rot(i);
       }
 

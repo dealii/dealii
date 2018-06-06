@@ -144,7 +144,7 @@ void second_grid()
   //
   // In order to demonstrate how to write a loop over all cells, we will
   // refine the grid in five steps towards the inner circle of the domain:
-  for (unsigned int step=0; step<5; ++step)
+  for (unsigned int step = 0; step < 5; ++step)
     {
       // Next, we need to loop over the active cells of the triangulation. You
       // can think of a triangulation as a collection of cells. If it were an
@@ -212,7 +212,7 @@ void second_grid()
           // of <code>&lt;2&gt;</code> to <code>&lt;3&gt;</code>, and do not
           // have to audit our code for the hidden appearance of magic numbers
           // like a 4 that needs to be replaced by an 8:
-          for (unsigned int v=0;
+          for (unsigned int v = 0;
                v < GeometryInfo<2>::vertices_per_cell;
                ++v)
             {

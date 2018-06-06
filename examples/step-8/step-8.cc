@@ -306,7 +306,7 @@ namespace Step8
     // Now we can begin with the loop over all cells:
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
         cell_rhs = 0;
@@ -341,17 +341,17 @@ namespace Step8
         //
         // With this knowledge, we can assemble the local matrix
         // contributions:
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             const unsigned int
             component_i = fe.system_to_component_index(i).first;
 
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
                 const unsigned int
                 component_j = fe.system_to_component_index(j).first;
 
-                for (unsigned int q_point=0; q_point<n_q_points;
+                for (unsigned int q_point = 0; q_point < n_q_points;
                      ++q_point)
                   {
                     cell_matrix(i,j)
@@ -400,12 +400,12 @@ namespace Step8
 
         // Assembling the right hand side is also just as discussed in the
         // introduction:
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             const unsigned int
             component_i = fe.system_to_component_index(i).first;
 
-            for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+            for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
               cell_rhs(i) += fe_values.shape_value(i,q_point) *
                              rhs_values[q_point][component_i] *
                              fe_values.JxW(q_point);
@@ -418,9 +418,9 @@ namespace Step8
         // the matrix and right hand side, once we are done with assembling
         // the entire linear system:
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               system_matrix.add(local_dof_indices[i],
                                 local_dof_indices[j],
                                 cell_matrix(i,j));
@@ -618,7 +618,7 @@ namespace Step8
   template <int dim>
   void ElasticProblem<dim>::run()
   {
-    for (unsigned int cycle=0; cycle<8; ++cycle)
+    for (unsigned int cycle = 0; cycle < 8; ++cycle)
       {
         std::cout << "Cycle " << cycle << ':' << std::endl;
 

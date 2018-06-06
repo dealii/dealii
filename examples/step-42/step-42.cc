@@ -596,7 +596,7 @@ namespace Step42
         return p(1);
       else if (component==2)
         {
-          if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
+          if (p(0) >  = 0.0 && p(0) <  = 1.0 && p(1) >  = 0.0 && p(1) <  = 1.0)
             return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
         }
 
@@ -967,7 +967,7 @@ namespace Step42
         cell = triangulation.begin_active(),
         endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+          for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell;
                ++face_no)
             if (cell->face(face_no)->at_boundary())
               {
@@ -1172,7 +1172,7 @@ namespace Step42
 
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
+        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell;
              ++face)
           if (cell->face(face)->at_boundary()
               &&
@@ -1181,7 +1181,7 @@ namespace Step42
               fe_values_face.reinit(cell, face);
               cell_matrix = 0;
 
-              for (unsigned int q_point = 0; q_point<n_face_q_points; ++q_point)
+              for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   cell_matrix(i, i) += (fe_values_face[displacement].value(i, q_point) *
                                         fe_values_face[displacement].value(i, q_point) *
@@ -1263,7 +1263,7 @@ namespace Step42
 
     for (; cell != endc; ++cell)
       if (!cell->is_artificial())
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
               cell->face(face)->boundary_id() == 1)
@@ -1271,7 +1271,7 @@ namespace Step42
               fe_values_face.reinit(cell, face);
               cell->face(face)->get_dof_indices(dof_indices);
 
-              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+              for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                 {
                   // At each quadrature point (i.e., at each support point of a degree
                   // of freedom located on the contact boundary), we then ask whether
@@ -1442,7 +1442,7 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+          for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
                 &&
                 cell->face(face)->boundary_id() == 1)
@@ -1452,7 +1452,7 @@ namespace Step42
                 boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
                                                  boundary_force_values);
 
-                for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+                for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                   {
                     Tensor<1, dim> rhs_values;
                     rhs_values[2] = boundary_force_values[q_point][2];
@@ -1575,7 +1575,7 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+          for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
                 && cell->face(face)->boundary_id() == 1)
               {
@@ -1734,7 +1734,7 @@ namespace Step42
 
     IndexSet old_active_set(active_set);
 
-    for (unsigned int newton_step = 1; newton_step <= 100; ++newton_step)
+    for (unsigned int newton_step = 1; newton_step <  = 100; ++newton_step)
       {
         if (newton_step == 1
             &&
@@ -1793,7 +1793,7 @@ namespace Step42
         //
         // In either of these two cases, we bypass the line search and just
         // update residual and other vectors as necessary.
-        if ((newton_step==1)
+        if ((newton_step == 1)
             ||
             (transfer_solution && newton_step == 2 && current_refinement_cycle == 0)
             ||
@@ -1889,7 +1889,7 @@ namespace Step42
   {
     if (refinement_strategy == RefinementStrategy::refine_global)
       {
-        for (typename Triangulation<dim>::active_cell_iterator
+        for (typename Triangulation < dim > ::active_cell_iterator
              cell = triangulation.begin_active();
              cell != triangulation.end(); ++cell)
           if (cell->is_locally_owned())
@@ -1958,11 +1958,11 @@ namespace Step42
   {
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
 
-    for (typename DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler < dim > ::active_cell_iterator cell =
            dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       if (cell->is_locally_owned())
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (unsigned int v = 0; v < GeometryInfo < dim > ::vertices_per_cell; ++v)
           if (vertex_touched[cell->vertex_index(v)] == false)
             {
               vertex_touched[cell->vertex_index(v)] = true;
@@ -2128,7 +2128,7 @@ namespace Step42
     endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
               cell->face(face)->boundary_id() == 1)
@@ -2139,7 +2139,7 @@ namespace Step42
               fe_values_face[displacement].get_function_values(lambda,
                                                                lambda_values);
 
-              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+              for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                 contact_force += lambda_values[q_point][2]
                                  * fe_values_face.JxW(q_point);
             }

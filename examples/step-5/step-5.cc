@@ -195,13 +195,13 @@ void Step5<dim>::assemble_system()
 
       fe_values.reinit(cell);
 
-      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
+      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
           const double current_coefficient = coefficient<dim>
                                              (fe_values.quadrature_point(q_index));
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i,j) += (current_coefficient *
                                      fe_values.shape_grad(i,q_index) *
                                      fe_values.shape_grad(j,q_index) *
@@ -215,9 +215,9 @@ void Step5<dim>::assemble_system()
 
 
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i,j));
@@ -452,7 +452,7 @@ void Step5<dim>::run()
   triangulation.set_all_manifold_ids_on_boundary(0);
   triangulation.set_manifold(0, boundary);
 
-  for (unsigned int cycle=0; cycle<6; ++cycle)
+  for (unsigned int cycle = 0; cycle < 6; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 

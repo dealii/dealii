@@ -533,7 +533,7 @@ namespace Step56
         mg_matrices.resize(0, n_levels-1);
         mg_sparsity_patterns.resize(0, n_levels-1);
 
-        for (unsigned int level=0; level<n_levels; ++level)
+        for (unsigned int level = 0; level < n_levels; ++level)
           {
             DynamicSparsityPattern csp(velocity_dof_handler.n_dofs(level),
                                        velocity_dof_handler.n_dofs(level));
@@ -638,7 +638,7 @@ namespace Step56
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         local_matrix = 0;
@@ -647,18 +647,18 @@ namespace Step56
         right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                           rhs_values);
 
-        for (unsigned int q=0; q<n_q_points; ++q)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            for (unsigned int k=0; k<dofs_per_cell; ++k)
+            for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
                 symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
                 div_phi_u[k]     = fe_values[velocities].divergence(k, q);
                 phi_p[k]         = fe_values[pressure].value(k, q);
               }
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
-                for (unsigned int j=0; j<=i; ++j)
+                for (unsigned int j = 0; j <  = i; ++j)
                   {
                     local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                           - div_phi_u[i] * phi_p[j]
@@ -676,8 +676,8 @@ namespace Step56
               }
           }
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = i+1; j < dofs_per_cell; ++j)
             local_matrix(i,j) = local_matrix(j,i);
 
         cell->get_dof_indices(local_dof_indices);
@@ -727,7 +727,7 @@ namespace Step56
 
     std::vector<ConstraintMatrix> boundary_constraints(triangulation.n_levels());
     std::vector<ConstraintMatrix> boundary_interface_constraints(triangulation.n_levels());
-    for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+    for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
       {
         boundary_constraints[level].add_lines(mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines(mg_constrained_dofs.get_boundary_indices(level));
@@ -745,18 +745,18 @@ namespace Step56
     typename DoFHandler<dim>::cell_iterator cell = velocity_dof_handler.begin(),
                                             endc = velocity_dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
 
-        for (unsigned int q=0; q<n_q_points; ++q)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            for (unsigned int k=0; k<dofs_per_cell; ++k)
+            for (unsigned int k = 0; k < dofs_per_cell; ++k)
               symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              for (unsigned int j=0; j<=i; ++j)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (unsigned int j = 0; j <  = i; ++j)
                 {
                   cell_matrix(i,j) += (symgrad_phi_u[i]
                                        * symgrad_phi_u[j])
@@ -764,8 +764,8 @@ namespace Step56
                 }
           }
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = i+1; j < dofs_per_cell; ++j)
             cell_matrix(i,j) = cell_matrix(j,i);
 
         cell->get_mg_dof_indices(local_dof_indices);
@@ -775,8 +775,8 @@ namespace Step56
                                     local_dof_indices,
                                     mg_matrices[cell->level()]);
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             if (
               !mg_constrained_dofs.at_refinement_edge(cell->level(),
                                                       local_dof_indices[i])
@@ -1073,7 +1073,7 @@ namespace Step56
       std::cout << "Now running with UMFPACK" << std::endl;
 
 
-    for (unsigned int refinement_cycle = 0; refinement_cycle<3;
+    for (unsigned int refinement_cycle = 0; refinement_cycle < 3;
          ++refinement_cycle)
       {
         std::cout << "Refinement cycle " << refinement_cycle << std::endl;

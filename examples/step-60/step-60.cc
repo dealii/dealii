@@ -823,7 +823,7 @@ namespace Step60
     // as the amount of local refinement they want around the embedded grid, we
     // make sure that the resulting meshes satisfy our requirements, and if this
     // is not the case, we bail out with an exception.
-    for (unsigned int i=0; i<parameters.delta_refinement; ++i)
+    for (unsigned int i = 0; i < parameters.delta_refinement; ++i)
       {
         const auto point_locations = GridTools::compute_point_locations(*space_grid_tools_cache,
                                      support_points);
@@ -831,7 +831,7 @@ namespace Step60
         for (auto cell : cells)
           {
             cell->set_refine_flag();
-            for (unsigned int face_no=0; face_no<GeometryInfo<spacedim>::faces_per_cell; ++face_no)
+            for (unsigned int face_no = 0; face_no < GeometryInfo < spacedim > ::faces_per_cell; ++face_no)
               if (! cell->at_boundary(face_no))
                 {
                   auto neighbor = cell->neighbor(face_no);

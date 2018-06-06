@@ -403,9 +403,9 @@ namespace Step55
       system_matrix.clear();
 
       Table<2,DoFTools::Coupling> coupling(dim+1, dim+1);
-      for (unsigned int c=0; c<dim+1; ++c)
-        for (unsigned int d=0; d<dim+1; ++d)
-          if (c==dim && d==dim)
+      for (unsigned int c = 0; c < dim+1; ++c)
+        for (unsigned int d = 0; d < dim+1; ++d)
+          if (c == dim && d == dim)
             coupling[c][d] = DoFTools::none;
           else if (c==dim || d==dim || c==d)
             coupling[c][d] = DoFTools::always;
@@ -434,9 +434,9 @@ namespace Step55
       preconditioner_matrix.clear();
 
       Table<2,DoFTools::Coupling> coupling(dim+1, dim+1);
-      for (unsigned int c=0; c<dim+1; ++c)
-        for (unsigned int d=0; d<dim+1; ++d)
-          if (c==dim && d==dim)
+      for (unsigned int c = 0; c < dim+1; ++c)
+        for (unsigned int d = 0; d < dim+1; ++d)
+          if (c == dim && d == dim)
             coupling[c][d] = DoFTools::always;
           else
             coupling[c][d] = DoFTools::none;
@@ -507,7 +507,7 @@ namespace Step55
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
@@ -517,18 +517,18 @@ namespace Step55
           fe_values.reinit(cell);
           right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                             rhs_values);
-          for (unsigned int q=0; q<n_q_points; ++q)
+          for (unsigned int q = 0; q < n_q_points; ++q)
             {
-              for (unsigned int k=0; k<dofs_per_cell; ++k)
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
                 {
                   grad_phi_u[k] = fe_values[velocities].gradient(k, q);
                   div_phi_u[k]  = fe_values[velocities].divergence(k, q);
                   phi_p[k]      = fe_values[pressure].value(k, q);
                 }
 
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  for (unsigned int j=0; j<dofs_per_cell; ++j)
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
                       cell_matrix(i,j) += ( viscosity * scalar_product(grad_phi_u[i], grad_phi_u[j])
                                             - div_phi_u[i] * phi_p[j]
@@ -762,7 +762,7 @@ namespace Step55
 
 
     Vector<float> subdomain(triangulation.n_active_cells());
-    for (unsigned int i=0; i<subdomain.size(); ++i)
+    for (unsigned int i = 0; i < subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector(subdomain, "subdomain");
 
@@ -779,7 +779,7 @@ namespace Step55
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i=0;
+        for (unsigned int i = 0;
              i<Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
           filenames.push_back("solution-" +
@@ -807,7 +807,7 @@ namespace Step55
     pcout << "Running using Trilinos." << std::endl;
 #endif
     const unsigned int n_cycles = 5;
-    for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+    for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
       {
         pcout << "Cycle " << cycle << ':' << std::endl;
 
@@ -821,7 +821,7 @@ namespace Step55
         assemble_system();
         solve();
 
-        if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
+        if (Utilities::MPI::n_mpi_processes(mpi_communicator) <  = 32)
           {
             TimerOutput::Scope t(computing_timer, "output");
             output_results(cycle);

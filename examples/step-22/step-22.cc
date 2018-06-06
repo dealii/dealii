@@ -209,7 +209,7 @@ namespace Step22
   BoundaryValues<dim>::vector_value(const Point<dim> &p,
                                     Vector<double>   &values) const
   {
-    for (unsigned int c=0; c<this->n_components; ++c)
+    for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value(p, c);
   }
 
@@ -246,7 +246,7 @@ namespace Step22
   RightHandSide<dim>::vector_value(const Point<dim> &p,
                                    Vector<double>   &values) const
   {
-    for (unsigned int c=0; c<this->n_components; ++c)
+    for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = RightHandSide<dim>::value(p, c);
   }
 
@@ -547,9 +547,9 @@ namespace Step22
 
       Table<2,DoFTools::Coupling> coupling(dim+1, dim+1);
 
-      for (unsigned int c=0; c<dim+1; ++c)
-        for (unsigned int d=0; d<dim+1; ++d)
-          if (! ((c==dim) && (d==dim)))
+      for (unsigned int c = 0; c < dim+1; ++c)
+        for (unsigned int d = 0; d < dim+1; ++d)
+          if (! ((c == dim) && (d == dim)))
             coupling[c][d] = DoFTools::always;
           else
             coupling[c][d] = DoFTools::none;
@@ -571,9 +571,9 @@ namespace Step22
 
       Table<2,DoFTools::Coupling> preconditioner_coupling(dim+1, dim+1);
 
-      for (unsigned int c=0; c<dim+1; ++c)
-        for (unsigned int d=0; d<dim+1; ++d)
-          if (((c==dim) && (d==dim)))
+      for (unsigned int c = 0; c < dim+1; ++c)
+        for (unsigned int d = 0; d < dim+1; ++d)
+          if (((c == dim) && (d == dim)))
             preconditioner_coupling[c][d] = DoFTools::always;
           else
             preconditioner_coupling[c][d] = DoFTools::none;
@@ -672,7 +672,7 @@ namespace Step22
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         local_matrix = 0;
@@ -682,18 +682,18 @@ namespace Step22
         right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                           rhs_values);
 
-        for (unsigned int q=0; q<n_q_points; ++q)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            for (unsigned int k=0; k<dofs_per_cell; ++k)
+            for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
                 symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
                 div_phi_u[k]     = fe_values[velocities].divergence(k, q);
                 phi_p[k]         = fe_values[pressure].value(k, q);
               }
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
-                for (unsigned int j=0; j<=i; ++j)
+                for (unsigned int j = 0; j <  = i; ++j)
                   {
                     local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                           - div_phi_u[i] * phi_p[j]
@@ -737,8 +737,8 @@ namespace Step22
         // in order to use the standard functions for solving. This is done
         // by flipping the indices in case we are pointing into the empty part
         // of the local matrices.
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = i+1; j < dofs_per_cell; ++j)
             {
               local_matrix(i,j) = local_matrix(j,i);
               local_preconditioner_matrix(i,j) = local_preconditioner_matrix(j,i);
@@ -994,10 +994,10 @@ namespace Step22
     // Dirichlet boundary conditions, i.e.  to faces that are located at 0 in
     // the last coordinate direction. See the example description above for
     // details.
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (typename Triangulation < dim > ::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      for (unsigned int f = 0; f < GeometryInfo < dim > ::faces_per_cell; ++f)
         if (cell->face(f)->center()[dim-1] == 0)
           cell->face(f)->set_all_boundary_ids(1);
 
@@ -1010,7 +1010,7 @@ namespace Step22
     // As first seen in step-6, we cycle over the different refinement levels
     // and refine (except for the first cycle), setup the degrees of freedom
     // and matrices, assemble, solve and create output:
-    for (unsigned int refinement_cycle = 0; refinement_cycle<6;
+    for (unsigned int refinement_cycle = 0; refinement_cycle < 6;
          ++refinement_cycle)
       {
         std::cout << "Refinement cycle " << refinement_cycle << std::endl;

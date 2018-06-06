@@ -87,7 +87,7 @@ namespace Step10
     // that we have hidden the mesh refinement in the loop header, which might
     // be uncommon but nevertheless works. Also it is strangely consistent
     // with incrementing the loop index denoting the refinement level.
-    for (unsigned int refinement=0; refinement<2;
+    for (unsigned int refinement = 0; refinement < 2;
          ++refinement, triangulation.refine_global(1))
       {
         std::cout << "Refinement level: " << refinement << std::endl;
@@ -98,7 +98,7 @@ namespace Step10
         std::string filename_base = "ball_" + Utilities::to_string(refinement);
 
         // Then output the present grid for $Q_1$, $Q_2$, and $Q_3$ mappings:
-        for (unsigned int degree=1; degree<4; ++degree)
+        for (unsigned int degree = 1; degree < 4; ++degree)
           {
             std::cout << "Degree = " << degree << std::endl;
 
@@ -196,7 +196,7 @@ namespace Step10
     const QGauss<dim> quadrature(4);
 
     // Now start by looping over polynomial mapping degrees=1..4:
-    for (unsigned int degree=1; degree<5; ++degree)
+    for (unsigned int degree = 1; degree < 5; ++degree)
       {
         std::cout << "Degree = " << degree << std::endl;
 
@@ -245,7 +245,7 @@ namespace Step10
         ConvergenceTable table;
 
         // Now we loop over several refinement steps of the triangulation.
-        for (unsigned int refinement=0; refinement<6;
+        for (unsigned int refinement = 0; refinement < 6;
              ++refinement, triangulation.refine_global(1))
           {
             // In this loop we first add the number of active cells of the
@@ -271,10 +271,10 @@ namespace Step10
             typename DoFHandler<dim>::active_cell_iterator
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
-            for (; cell!=endc; ++cell)
+            for (; cell != endc; ++cell)
               {
                 fe_values.reinit(cell);
-                for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
+                for (unsigned int i = 0; i < fe_values.n_quadrature_points; ++i)
                   area += static_cast<long double>(fe_values.JxW (i));
               }
 
@@ -330,7 +330,7 @@ namespace Step10
     // We loop over all degrees, create the triangulation, the boundary, the
     // mapping, the dummy finite element and the DoFHandler object as seen
     // before.
-    for (unsigned int degree=1; degree<5; ++degree)
+    for (unsigned int degree = 1; degree < 5; ++degree)
       {
         std::cout << "Degree = " << degree << std::endl;
         Triangulation<dim> triangulation;
@@ -348,7 +348,7 @@ namespace Step10
                                          update_JxW_values);
         ConvergenceTable table;
 
-        for (unsigned int refinement=0; refinement<6;
+        for (unsigned int refinement = 0; refinement < 6;
              ++refinement, triangulation.refine_global(1))
           {
             table.add_value("cells", triangulation.n_active_cells());
@@ -362,14 +362,14 @@ namespace Step10
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
             long double perimeter = 0;
-            for (; cell!=endc; ++cell)
-              for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+            for (; cell != endc; ++cell)
+              for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell; ++face_no)
                 if (cell->face(face_no)->at_boundary())
                   {
                     // We reinit the FEFaceValues object with the cell
                     // iterator and the number of the face.
                     fe_face_values.reinit(cell, face_no);
-                    for (unsigned int i=0; i<fe_face_values.n_quadrature_points; ++i)
+                    for (unsigned int i = 0; i < fe_face_values.n_quadrature_points; ++i)
                       perimeter += static_cast<long double>(fe_face_values.JxW (i));
                   }
             // Then store the evaluated values in the table...

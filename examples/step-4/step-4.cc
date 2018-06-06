@@ -180,7 +180,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
                                  const unsigned int /*component*/) const
 {
   double return_value = 0.0;
-  for (unsigned int i=0; i<dim; ++i)
+  for (unsigned int i = 0; i < dim; ++i)
     return_value += 4.0 * std::pow(p(i), 4.0);
 
   return 1.;//return_value;
@@ -362,10 +362,10 @@ void Step4<dim>::assemble_system()
       // difference to how we did things in step-3: Instead of using a
       // constant right hand side with value 1, we use the object representing
       // the right hand side and evaluate it at the quadrature points:
-      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i,j) += (fe_values.shape_grad(i, q_index) *
                                    fe_values.shape_grad(j, q_index) *
                                    fe_values.JxW (q_index));
@@ -397,9 +397,9 @@ void Step4<dim>::assemble_system()
       // and right hand side is done exactly as before, but here we have again
       // merged some loops for efficiency:
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i,j));

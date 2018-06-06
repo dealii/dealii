@@ -244,7 +244,7 @@ namespace Step54
     Triangulation<2,3>::active_cell_iterator cell = tria.begin_active();
     cell->set_manifold_id(1);
 
-    for (unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
+    for (unsigned int f = 0; f < GeometryInfo < 2 > ::faces_per_cell; ++f)
       cell->face(f)->set_manifold_id(2);
 
     // Once both the CAD geometry and the initial mesh have been
@@ -378,7 +378,7 @@ namespace Step54
     read_domain();
 
     const unsigned int n_cycles = 5;
-    for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+    for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
       {
         refine_mesh();
         output_results(cycle+1);

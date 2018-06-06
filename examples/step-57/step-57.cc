@@ -425,7 +425,7 @@ namespace Step57
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
 
@@ -448,9 +448,9 @@ namespace Step57
         // zero. Since the pressure mass matrix is used while creating the
         // preconditioner, we assemble it here and then move it into a
         // separate SparseMatrix at the end (same as in step-22).
-        for (unsigned int q=0; q<n_q_points; ++q)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            for (unsigned int k=0; k<dofs_per_cell; ++k)
+            for (unsigned int k = 0; k < dofs_per_cell; ++k)
               {
                 div_phi_u[k]  =  fe_values[velocities].divergence(k, q);
                 grad_phi_u[k] =  fe_values[velocities].gradient(k, q);
@@ -458,11 +458,11 @@ namespace Step57
                 phi_p[k]      =  fe_values[pressure]  .value(k, q);
               }
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 if (assemble_matrix)
                   {
-                    for (unsigned int j=0; j<dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
                         local_matrix(i, j) += (  viscosity*scalar_product(grad_phi_u[j], grad_phi_u[i])
                                                  + present_velocity_gradients[q]*phi_u[j]*phi_u[i]
@@ -682,7 +682,7 @@ namespace Step57
                 // that the new residual is smaller than the one of last step, which is done
                 // in the following loop. Also the line search method can be located in step-15.
 
-                for (double alpha = 1.0; alpha > 1e-5; alpha *= 0.5)
+                for (double alpha = 1.0; alpha > 1e-5; alpha * = 0.5)
                   {
                     evaluation_point = present_solution;
                     evaluation_point.add(alpha, newton_update);
@@ -707,7 +707,7 @@ namespace Step57
               {
                 output_results(max_iteration*refinement+outer_iteration);
 
-                if (current_res <= tolerance)
+                if (current_res <  = tolerance)
                   process_solution(refinement);
               }
           }
@@ -739,7 +739,7 @@ namespace Step57
 
     bool is_initial_step = true;
 
-    for (double Re=1000.0; Re < target_Re; Re = std::min(Re+step_size, target_Re))
+    for (double Re = 1000.0; Re < target_Re; Re = std::min(Re+step_size, target_Re))
       {
         viscosity = 1.0/Re;
         std::cout << "*****************************************" << std::endl;
@@ -799,7 +799,7 @@ namespace Step57
 
     f << std::scientific;
 
-    for (unsigned int i=0; i<=100; ++i)
+    for (unsigned int i = 0; i <  = 100; ++i)
       {
         p(dim-1) = i/100.0;
 
@@ -807,7 +807,7 @@ namespace Step57
         VectorTools::point_value(dof_handler, present_solution, p, tmp_vector);
         f << p(dim-1);
 
-        for (int j=0; j<dim; j++)
+        for (int j = 0; j < dim; j++)
           f << " " << tmp_vector(j);
         f << std::endl;
       }

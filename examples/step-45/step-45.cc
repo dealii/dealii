@@ -141,7 +141,7 @@ namespace Step45
   BoundaryValues<dim>::vector_value(const Point<dim> &p,
                                     Vector<double>   &values) const
   {
-    for (unsigned int c=0; c<this->n_components; ++c)
+    for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value(p, c);
   }
 
@@ -169,7 +169,7 @@ namespace Step45
     const Point<dim> center(0.75, 0.1);
     const double r = (p-center).norm();
 
-    if (component==0)
+    if (component == 0)
       return std::exp(-100.*r*r);
     return 0;
   }
@@ -180,7 +180,7 @@ namespace Step45
   RightHandSide<dim>::vector_value(const Point<dim> &p,
                                    Vector<double>   &values) const
   {
-    for (unsigned int c=0; c<this->n_components; ++c)
+    for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = RightHandSide<dim>::value(p, c);
   }
 
@@ -535,7 +535,7 @@ namespace Step45
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -545,18 +545,18 @@ namespace Step45
           right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                             rhs_values);
 
-          for (unsigned int q=0; q<n_q_points; ++q)
+          for (unsigned int q = 0; q < n_q_points; ++q)
             {
-              for (unsigned int k=0; k<dofs_per_cell; ++k)
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
                 {
                   symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
                   div_phi_u[k]     = fe_values[velocities].divergence(k, q);
                   phi_p[k]         = fe_values[pressure].value(k, q);
                 }
 
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  for (unsigned int j=0; j<=i; ++j)
+                  for (unsigned int j = 0; j <  = i; ++j)
                     {
                       local_matrix(i,j) += (symgrad_phi_u[i] * symgrad_phi_u[j]
                                             - div_phi_u[i] * phi_p[j]
@@ -573,8 +573,8 @@ namespace Step45
                 }
             }
 
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=i+1; j<dofs_per_cell; ++j)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (unsigned int j = i+1; j < dofs_per_cell; ++j)
               local_matrix(i,j) = local_matrix(j,i);
 
           cell->get_dof_indices(local_dof_indices);
@@ -673,7 +673,7 @@ namespace Step45
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);
     Vector<float> subdomain(triangulation.n_active_cells());
-    for (unsigned int i=0; i<subdomain.size(); ++i)
+    for (unsigned int i = 0; i < subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector(subdomain, "subdomain");
     data_out.build_patches(mapping, degree+1);
@@ -688,7 +688,7 @@ namespace Step45
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
           filenames.push_back(std::string("solution-") +
                               Utilities::int_to_string(refinement_cycle, 2) +
                               "." +
@@ -733,7 +733,7 @@ namespace Step45
   {
     create_mesh();
 
-    for (unsigned int refinement_cycle = 0; refinement_cycle<9;
+    for (unsigned int refinement_cycle = 0; refinement_cycle < 9;
          ++refinement_cycle)
       {
         pcout << "Refinement cycle " << refinement_cycle << std::endl;

@@ -87,7 +87,7 @@ int main()
   BlockVector<double> result(block_sizes);
   BlockVector<double> x(block_sizes);
   BlockVector<double> y(block_sizes);
-  for (unsigned int i=0; i<result.size(); ++i)
+  for (unsigned int i = 0; i < result.size(); ++i)
     result(i) = i;
 
   matrix.vmult(y, result);

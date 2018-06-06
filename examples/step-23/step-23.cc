@@ -264,7 +264,7 @@ namespace Step23
     (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    if ((this->get_time() <= 0.5) &&
+    if ((this->get_time() <  = 0.5) &&
         (p[0] < 0) &&
         (p[1] < 1./3) &&
         (p[1] > -1./3))
@@ -282,7 +282,7 @@ namespace Step23
     (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    if ((this->get_time() <= 0.5) &&
+    if ((this->get_time() <  = 0.5) &&
         (p[0] < 0) &&
         (p[1] < 1./3) &&
         (p[1] > -1./3))
@@ -514,7 +514,7 @@ namespace Step23
     Vector<double> tmp(solution_u.size());
     Vector<double> forcing_terms(solution_u.size());
 
-    for (; time<=5; time+=time_step, ++timestep_number)
+    for (; time <  = 5; time+ = time_step, ++timestep_number)
       {
         std::cout << "Time step " << timestep_number
                   << " at t=" << time
@@ -533,7 +533,7 @@ namespace Step23
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
                                             rhs_function, tmp);
         forcing_terms = tmp;
-        forcing_terms *= theta * time_step;
+        forcing_terms * = theta * time_step;
 
         rhs_function.set_time(time-time_step);
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),

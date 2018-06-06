@@ -208,7 +208,7 @@ namespace Step36
     IndexSet eigenfunction_index_set = dof_handler.locally_owned_dofs();
     eigenfunctions
     .resize(parameters.get_integer("Number of eigenvalues/eigenfunctions"));
-    for (unsigned int i=0; i<eigenfunctions.size(); ++i)
+    for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       eigenfunctions[i].reinit(eigenfunction_index_set, MPI_COMM_WORLD);
 
     eigenvalues.resize(eigenfunctions.size());
@@ -256,7 +256,7 @@ namespace Step36
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         cell_stiffness_matrix = 0;
@@ -265,9 +265,9 @@ namespace Step36
         potential.value_list(fe_values.get_quadrature_points(),
                              potential_values);
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
                 cell_stiffness_matrix(i, j)
                 += (fe_values.shape_grad(i, q_point) *
@@ -384,7 +384,7 @@ namespace Step36
     // does not necessarily have to be attained at a node, and so
     // $\max_{\mathbf x}\phi_i(\mathbf x)\ge\max_j (\Phi_i)_j$ (although the
     // equality is usually nearly true).
-    for (unsigned int i=0; i<eigenfunctions.size(); ++i)
+    for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       eigenfunctions[i] /= eigenfunctions[i].linfty_norm();
 
     // Finally return the number of iterations it took to converge:
@@ -406,7 +406,7 @@ namespace Step36
 
     data_out.attach_dof_handler(dof_handler);
 
-    for (unsigned int i=0; i<eigenfunctions.size(); ++i)
+    for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       data_out.add_data_vector(eigenfunctions[i],
                                std::string("eigenfunction_") +
                                Utilities::int_to_string(i));
@@ -461,7 +461,7 @@ namespace Step36
     output_results();
 
     std::cout << std::endl;
-    for (unsigned int i=0; i<eigenvalues.size(); ++i)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       std::cout << "      Eigenvalue " << i
                 << " : " << eigenvalues[i]
                 << std::endl;

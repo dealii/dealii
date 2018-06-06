@@ -176,7 +176,7 @@ namespace Step33
     compute_kinetic_energy(const InputVector &W)
     {
       typename InputVector::value_type kinetic_energy = 0;
-      for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         kinetic_energy += W[first_momentum_component+d] *
                           W[first_momentum_component+d];
       kinetic_energy *= 1./(2 * W[density_component]);
@@ -223,9 +223,9 @@ namespace Step33
       // correspond to the momentum terms:
       const typename InputVector::value_type pressure = compute_pressure(W);
 
-      for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         {
-          for (unsigned int e=0; e<dim; ++e)
+          for (unsigned int e = 0; e < dim; ++e)
             flux[first_momentum_component+d][e]
               = W[first_momentum_component+d] *
                 W[first_momentum_component+e] /
@@ -236,10 +236,10 @@ namespace Step33
 
       // Then the terms for the density (i.e. mass conservation), and, lastly,
       // conservation of energy:
-      for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         flux[density_component][d] = W[first_momentum_component+d];
 
-      for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         flux[energy_component][d] = W[first_momentum_component+d] /
                                     W[density_component] *
                                     (W[energy_component] + pressure);
@@ -269,10 +269,10 @@ namespace Step33
       compute_flux_matrix(Wplus, iflux);
       compute_flux_matrix(Wminus, oflux);
 
-      for (unsigned int di=0; di<n_components; ++di)
+      for (unsigned int di = 0; di < n_components; ++di)
         {
           normal_flux[di] = 0;
-          for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int d = 0; d < dim; ++d)
             normal_flux[di] += 0.5*(iflux[di][d] + oflux[di][d]) * normal[d];
 
           normal_flux[di] += 0.5*alpha*(Wplus[di] - Wminus[di]);
@@ -298,7 +298,7 @@ namespace Step33
     {
       const double gravity = -1.0;
 
-      for (unsigned int c=0; c<n_components; ++c)
+      for (unsigned int c = 0; c < n_components; ++c)
         switch (c)
           {
           case first_momentum_component+dim-1:
@@ -406,7 +406,7 @@ namespace Step33
                        Wplus[density_component]);
 
             typename DataVector::value_type kinetic_energy = 0;
-            for (unsigned int d=0; d<dim; ++d)
+            for (unsigned int d = 0; d < dim; ++d)
               if (boundary_kind[d] == inflow_boundary)
                 kinetic_energy += boundary_values(d)*boundary_values(d);
               else
@@ -477,7 +477,7 @@ namespace Step33
       typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
-      for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
+      for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
         {
           fe_v.reinit(cell);
           fe_v.get_function_gradients(solution, dU);
@@ -616,11 +616,11 @@ namespace Step33
     // variables in the input vector, using the
     // <code>first_momentum_component</code> and
     // <code>density_component</code> information:
-    for (unsigned int q=0; q<n_quadrature_points; ++q)
+    for (unsigned int q = 0; q < n_quadrature_points; ++q)
       {
         const double density = inputs.solution_values[q](density_component);
 
-        for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int d = 0; d < dim; ++d)
           computed_quantities[q](d)
             = inputs.solution_values[q](first_momentum_component+d) / density;
 
@@ -639,7 +639,7 @@ namespace Step33
   get_names() const
   {
     std::vector<std::string> names;
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       names.emplace_back("velocity");
     names.emplace_back("pressure");
 
@@ -1085,7 +1085,7 @@ namespace Step33
       :
       values(EulerEquations<dim>::n_components)
     {
-      for (unsigned int c=0; c<EulerEquations<dim>::n_components; ++c)
+      for (unsigned int c = 0; c < EulerEquations < dim > ::n_components; ++c)
         kind[c] = EulerEquations<dim>::no_penetration_boundary;
     }
 
@@ -1131,7 +1131,7 @@ namespace Step33
       prm.leave_subsection();
 
 
-      for (unsigned int b=0; b<max_n_boundaries; ++b)
+      for (unsigned int b = 0; b < max_n_boundaries; ++b)
         {
           prm.enter_subsection("boundary_" +
                                Utilities::int_to_string(b));
@@ -1141,7 +1141,7 @@ namespace Step33
                               "whether the named boundary allows gas to "
                               "penetrate or is a rigid wall");
 
-            for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
+            for (unsigned int di = 0; di < EulerEquations < dim > ::n_components; ++di)
               {
                 prm.declare_entry("w_" + Utilities::int_to_string(di),
                                   "outflow",
@@ -1159,7 +1159,7 @@ namespace Step33
 
       prm.enter_subsection("initial condition");
       {
-        for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
+        for (unsigned int di = 0; di < EulerEquations < dim > ::n_components; ++di)
           prm.declare_entry("w_" + Utilities::int_to_string(di) + " value",
                             "0.0",
                             Patterns::Anything(),
@@ -1198,7 +1198,7 @@ namespace Step33
       }
       prm.leave_subsection();
 
-      for (unsigned int boundary_id=0; boundary_id<max_n_boundaries;
+      for (unsigned int boundary_id = 0; boundary_id < max_n_boundaries;
            ++boundary_id)
         {
           prm.enter_subsection("boundary_" +
@@ -1209,7 +1209,7 @@ namespace Step33
 
             const bool no_penetration = prm.get_bool("no penetration");
 
-            for (unsigned int di=0; di<EulerEquations<dim>::n_components; ++di)
+            for (unsigned int di = 0; di < EulerEquations < dim > ::n_components; ++di)
               {
                 const std::string boundary_type
                   = prm.get("w_" + Utilities::int_to_string(di));
@@ -1245,7 +1245,7 @@ namespace Step33
       {
         std::vector<std::string> expressions(EulerEquations<dim>::n_components,
                                              "0.0");
-        for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
+        for (unsigned int di = 0; di < EulerEquations < dim > ::n_components; di++)
           expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
                                     " value");
         initial_conditions.initialize(FunctionParser<dim>::default_variable_names(),
@@ -1457,7 +1457,7 @@ namespace Step33
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_v.reinit(cell);
         cell->get_dof_indices(dof_indices);
@@ -1470,7 +1470,7 @@ namespace Step33
         // whether we are working on an external or internal face; if it is an
         // external face, the fourth argument denoting the degrees of freedom
         // indices of the neighbor is ignored, so we pass an empty vector):
-        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
+        for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell;
              ++face_no)
           if (cell->at_boundary(face_no))
             {
@@ -1526,7 +1526,7 @@ namespace Step33
                   const unsigned int neighbor2=
                     cell->neighbor_of_neighbor(face_no);
 
-                  for (unsigned int subface_no=0;
+                  for (unsigned int subface_no = 0;
                        subface_no < cell->face(face_no)->n_children();
                        ++subface_no)
                     {
@@ -1683,7 +1683,7 @@ namespace Step33
     // determine by solving a Newton step. These independent variables are the
     // values of the local degrees of freedom which we extract here:
     std::vector<Sacado::Fad::DFad<double> > independent_local_dof_values(dofs_per_cell);
-    for (unsigned int i=0; i<dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       independent_local_dof_values[i] = current_solution(dof_indices[i]);
 
     // The next step incorporates all the magic: we declare a subset of the
@@ -1697,7 +1697,7 @@ namespace Step33
     // trick, marking <code>independent_local_dof_values[i]</code> as the
     // $i$th independent variable out of a total of
     // <code>dofs_per_cell</code>:
-    for (unsigned int i=0; i<dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       independent_local_dof_values[i].diff(i, dofs_per_cell);
 
     // After all these declarations, let us actually compute something. First,
@@ -1716,20 +1716,20 @@ namespace Step33
     // fad types, only the local cell variables, we explicitly code the loop
     // above. Before this, we add another loop that initializes all the fad
     // variables to zero:
-    for (unsigned int q=0; q<n_q_points; ++q)
-      for (unsigned int c=0; c<EulerEquations<dim>::n_components; ++c)
+    for (unsigned int q = 0; q < n_q_points; ++q)
+      for (unsigned int c = 0; c < EulerEquations < dim > ::n_components; ++c)
         {
           W[q][c]       = 0;
           W_old[q][c]   = 0;
-          for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int d = 0; d < dim; ++d)
             {
               grad_W[q][c][d] = 0;
               grad_W_old[q][c][d] = 0;
             }
         }
 
-    for (unsigned int q=0; q<n_q_points; ++q)
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
+    for (unsigned int q = 0; q < n_q_points; ++q)
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           const unsigned int c = fe_v.get_fe().system_to_component_index(i).first;
 
@@ -1768,7 +1768,7 @@ namespace Step33
 
     std::vector < std::array< double, EulerEquations<dim>::n_components> > forcing_old(n_q_points);
 
-    for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int q = 0; q < n_q_points; ++q)
       {
         EulerEquations<dim>::compute_flux_matrix(W_old[q], flux_old[q]);
         EulerEquations<dim>::compute_forcing_vector(W_old[q], forcing_old[q]);
@@ -1813,7 +1813,7 @@ namespace Step33
     // sense, so that we don't need to negative the Jacobian entries.  Then,
     // when we sum into the <code>right_hand_side</code> vector, we negate
     // this residual.
-    for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
       {
         Sacado::Fad::DFad<double> R_i = 0;
 
@@ -1825,7 +1825,7 @@ namespace Step33
         // for the sensitivities to this variable and add them into the
         // Jacobian.
 
-        for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+        for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
           {
             if (parameters.is_stationary == false)
               R_i += 1.0 / parameters.time_step *
@@ -1833,13 +1833,13 @@ namespace Step33
                      fe_v.shape_value_component(i, point, component_i) *
                      fe_v.JxW(point);
 
-            for (unsigned int d=0; d<dim; d++)
+            for (unsigned int d = 0; d < dim; d++)
               R_i -= ( parameters.theta * flux[point][component_i][d] +
                        (1.0-parameters.theta) * flux_old[point][component_i][d] ) *
                      fe_v.shape_grad_component(i, point, component_i)[d] *
                      fe_v.JxW(point);
 
-            for (unsigned int d=0; d<dim; d++)
+            for (unsigned int d = 0; d < dim; d++)
               R_i += 1.0*std::pow(fe_v.get_cell()->diameter(),
                                   parameters.diffusion_power) *
                      ( parameters.theta * grad_W[point][component_i][d] +
@@ -1860,7 +1860,7 @@ namespace Step33
         // temporary array. This information about the whole row of local dofs
         // is then added to the Trilinos matrix at once (which supports the
         // data types we have chosen).
-        for (unsigned int k=0; k<dofs_per_cell; ++k)
+        for (unsigned int k = 0; k < dofs_per_cell; ++k)
           residual_derivatives[k] = R_i.fastAccessDx(k);
         system_matrix.add(dof_indices[i], dof_indices, residual_derivatives);
         right_hand_side(dof_indices[i]) -= R_i.val();
@@ -1930,8 +1930,8 @@ namespace Step33
     Wplus_old(n_q_points, EulerEquations<dim>::n_components),
               Wminus_old(n_q_points, EulerEquations<dim>::n_components);
 
-    for (unsigned int q=0; q<n_q_points; ++q)
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
+    for (unsigned int q = 0; q < n_q_points; ++q)
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           const unsigned int component_i = fe_v.get_fe().system_to_component_index(i).first;
           Wplus[q][component_i] +=  independent_local_dof_values[i] *
@@ -1945,8 +1945,8 @@ namespace Step33
     // independent variables from the neighbor:
     if (external_face == false)
       {
-        for (unsigned int q=0; q<n_q_points; ++q)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               const unsigned int component_i = fe_v_neighbor.get_fe().
                                                system_to_component_index(i).first;
@@ -2025,7 +2025,7 @@ namespace Step33
         alpha = 1;
       }
 
-    for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int q = 0; q < n_q_points; ++q)
       {
         EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
                                                    Wplus[q], Wminus[q], alpha,
@@ -2041,12 +2041,12 @@ namespace Step33
     // sensitivities of the residual contributions to the degrees of freedom on
     // the neighboring cell:
     std::vector<double> residual_derivatives(dofs_per_cell);
-    for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
       if (fe_v.get_fe().has_support_on_face(i, face_no) == true)
         {
           Sacado::Fad::DFad<double> R_i = 0;
 
-          for (unsigned int point=0; point<n_q_points; ++point)
+          for (unsigned int point = 0; point < n_q_points; ++point)
             {
               const unsigned int
               component_i = fe_v.get_fe().system_to_component_index(i).first;
@@ -2057,13 +2057,13 @@ namespace Step33
                      fe_v.JxW(point);
             }
 
-          for (unsigned int k=0; k<dofs_per_cell; ++k)
+          for (unsigned int k = 0; k < dofs_per_cell; ++k)
             residual_derivatives[k] = R_i.fastAccessDx(k);
           system_matrix.add(dof_indices[i], dof_indices, residual_derivatives);
 
           if (external_face == false)
             {
-              for (unsigned int k=0; k<dofs_per_cell; ++k)
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
                 residual_derivatives[k] = R_i.fastAccessDx(dofs_per_cell+k);
               system_matrix.add(dof_indices[i], dof_indices_neighbor,
                                 residual_derivatives);
@@ -2213,7 +2213,7 @@ namespace Step33
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
+    for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
       {
         cell->clear_coarsen_flag();
         cell->clear_refine_flag();
@@ -2355,7 +2355,7 @@ namespace Step33
     predictor = old_solution;
 
     if (parameters.do_refine == true)
-      for (unsigned int i=0; i<parameters.shock_levels; ++i)
+      for (unsigned int i = 0; i < parameters.shock_levels; ++i)
         {
           Vector<double> refinement_indicators(triangulation.n_active_cells());
 

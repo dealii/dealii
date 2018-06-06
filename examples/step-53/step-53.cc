@@ -185,7 +185,7 @@ namespace Step53
     in.push(boost::iostreams::basic_gzip_decompressor<>());
     in.push(boost::iostreams::file_source("topography.txt.gz"));
 
-    for (unsigned int line=0; line<83600; ++line)
+    for (unsigned int line = 0; line < 83600; ++line)
       {
         try
           {
@@ -418,7 +418,7 @@ namespace Step53
     // mother to children, this also happens after several recursive
     // refinement steps.
     triangulation.set_manifold(0, geometry);
-    for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
+    for (Triangulation < 3 > ::active_cell_iterator cell = triangulation.begin_active();
          cell!=triangulation.end(); ++cell)
       cell->set_all_manifold_ids(0);
 
@@ -432,11 +432,11 @@ namespace Step53
     // surface of the domain (and this is what the last <code>true</code> argument
     // in the call to GridGenerator::subdivided_hyper_rectangle() above meant: to
     // "color" the boundaries by assigning each boundary a unique boundary indicator).
-    for (unsigned int i=0; i<6; ++i)
+    for (unsigned int i = 0; i < 6; ++i)
       {
-        for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
+        for (Triangulation < 3 > ::active_cell_iterator cell = triangulation.begin_active();
              cell!=triangulation.end(); ++cell)
-          for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+          for (unsigned int f = 0; f < GeometryInfo < 3 > ::faces_per_cell; ++f)
             if (cell->face(f)->boundary_id() == 5)
               {
                 cell->set_refine_flag();

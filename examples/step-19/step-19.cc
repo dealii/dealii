@@ -244,7 +244,7 @@ namespace Step19
     // handle than the <code>argc</code>/<code>argv</code> mechanism. We omit
     // the name of the executable at the zeroth index:
     std::list<std::string> args;
-    for (int i=1; i<argc; ++i)
+    for (int i = 1; i < argc; ++i)
       args.emplace_back(argv[i]);
 
     // Then process all these parameters. If the parameter is <code>-p</code>,
@@ -380,7 +380,7 @@ namespace Step19
 
     // For all the other input files, we read their data into an intermediate
     // object, and then merge that into the first object declared above:
-    for (unsigned int i=1; i<input_file_names.size(); ++i)
+    for (unsigned int i = 1; i < input_file_names.size(); ++i)
       {
         std::ifstream input(input_file_names[i]);
         AssertThrow(input, ExcIO());

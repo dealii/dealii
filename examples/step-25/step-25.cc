@@ -425,7 +425,7 @@ namespace Step25
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         local_nl_term = 0;
         // Once we re-initialize our <code>FEValues</code> instantiation to
@@ -441,8 +441,8 @@ namespace Step25
         // Now, we can evaluate $\int_K \sin\left[\theta w_{\mathrm{new}} +
         // (1-\theta) w_{\mathrm{old}}\right] \,\varphi_j\,\mathrm{d}x$ using
         // the desired quadrature formula.
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             local_nl_term(i) += (std::sin(theta * new_data_values[q_point] +
                                           (1-theta) * old_data_values[q_point]) *
                                  fe_values.shape_value(i, q_point) *
@@ -452,7 +452,7 @@ namespace Step25
         // the cells to the global integral.
         cell->get_dof_indices(local_dof_indices);
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           nl_term(local_dof_indices[i]) += local_nl_term(i);
       }
   }
@@ -486,7 +486,7 @@ namespace Step25
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         local_nl_matrix = 0;
         // Again, first we re-initialize our <code>FEValues</code>
@@ -498,9 +498,9 @@ namespace Step25
         // Then, we evaluate $\int_K \cos\left[\theta w_{\mathrm{new}} +
         // (1-\theta) w_{\mathrm{old}}\right]\, \varphi_i\,
         // \varphi_j\,\mathrm{d}x$ using the desired quadrature formula.
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               local_nl_matrix(i,j) += (std::cos(theta * new_data_values[q_point] +
                                                 (1-theta) * old_data_values[q_point]) *
                                        fe_values.shape_value(i, q_point) *
@@ -511,8 +511,8 @@ namespace Step25
         // cells to the global integral.
         cell->get_dof_indices(local_dof_indices);
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             nl_matrix.add(local_dof_indices[i], local_dof_indices[j],
                           local_nl_matrix(i,j));
       }
@@ -624,7 +624,7 @@ namespace Step25
     // of the problem, and then advance our solution according to the time
     // stepping formulas we discussed in the Introduction.
     unsigned int timestep_number = 1;
-    for (time+=time_step; time<=final_time; time+=time_step, ++timestep_number)
+    for (time+ = time_step; time <  = final_time; time+ = time_step, ++timestep_number)
       {
         old_solution = solution;
 

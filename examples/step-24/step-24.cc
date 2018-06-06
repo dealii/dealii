@@ -175,7 +175,7 @@ namespace Step24
                                     };
     static const unsigned int n_sources = sizeof(sources)/sizeof(sources[0]);
 
-    for (unsigned int i=0; i<n_sources; ++i)
+    for (unsigned int i = 0; i < n_sources; ++i)
       if (p.distance(sources[i].location) < sources[i].radius)
         return 1;
 
@@ -361,24 +361,24 @@ namespace Step24
       typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
-      for (; cell!=endc; ++cell)
-        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      for (; cell != endc; ++cell)
+        for (unsigned int f = 0; f < GeometryInfo < dim > ::faces_per_cell; ++f)
           if (cell->at_boundary(f))
             {
               cell_matrix = 0;
 
               fe_values.reinit(cell, f);
 
-              for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-                for (unsigned int i=0; i<dofs_per_cell; ++i)
-                  for (unsigned int j=0; j<dofs_per_cell; ++j)
+              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
                                          fe_values.shape_value(j,q_point) *
                                          fe_values.JxW(q_point));
 
               cell->get_dof_indices(local_dof_indices);
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                for (unsigned int j=0; j<dofs_per_cell; ++j)
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   boundary_matrix.add(local_dof_indices[i],
                                       local_dof_indices[j],
                                       cell_matrix(i,j));
@@ -497,7 +497,7 @@ namespace Step24
     Vector<double> G2 (solution_v.size());
 
     const double end_time = 0.7;
-    for (time=time_step; time<=end_time; time+=time_step, ++timestep_number)
+    for (time = time_step; time <  = end_time; time+ = time_step, ++timestep_number)
       {
         std::cout << std::endl;
         std::cout<< "time_step " << timestep_number << " @ t=" << time << std::endl;
@@ -532,7 +532,7 @@ namespace Step24
 
 
         detector_data << time;
-        for (unsigned int i=0 ; i<detector_locations.size(); ++i)
+        for (unsigned int i = 0 ; i < detector_locations.size(); ++i)
           detector_data << " "
                         << VectorTools::point_value(dof_handler,
                                                     solution_p,

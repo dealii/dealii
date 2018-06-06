@@ -149,7 +149,7 @@ namespace Step27
                             const unsigned int  /*component*/) const
   {
     double product = 1;
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d = 0; d < dim; ++d)
       product *= (p[d]+1);
     return product;
   }
@@ -183,7 +183,7 @@ namespace Step27
   void resize(Table<dim,T> &coeff, const unsigned int N)
   {
     TableIndices<dim> size;
-    for (unsigned int d=0; d<dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       size[d] = N;
     coeff.reinit(size);
   }
@@ -194,7 +194,7 @@ namespace Step27
     dof_handler(triangulation),
     max_degree(dim <= 2 ? 7 : 5)
   {
-    for (unsigned int degree=2; degree<=max_degree; ++degree)
+    for (unsigned int degree = 2; degree <  = max_degree; ++degree)
       {
         fe_collection.push_back(FE_Q<dim>(degree));
         quadrature_collection.push_back(QGauss<dim>(degree+1));
@@ -333,7 +333,7 @@ namespace Step27
     typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
 
@@ -351,12 +351,12 @@ namespace Step27
         rhs_function.value_list(fe_values.get_quadrature_points(),
                                 rhs_values);
 
-        for (unsigned int q_point=0;
+        for (unsigned int q_point = 0;
              q_point<fe_values.n_quadrature_points;
              ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
                                      fe_values.shape_grad(j,q_point) *
                                      fe_values.JxW(q_point));
@@ -448,7 +448,7 @@ namespace Step27
         typename hp::DoFHandler<dim>::active_cell_iterator
         cell = dof_handler.begin_active(),
         endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
+        for (; cell != endc; ++cell)
           fe_degrees(cell->active_cell_index())
             = fe_collection[cell->active_fe_index()].degree;
       }
@@ -509,7 +509,7 @@ namespace Step27
         typename hp::DoFHandler<dim>::active_cell_iterator
         cell = dof_handler.begin_active(),
         endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
+        for (; cell != endc; ++cell)
           if (cell->refine_flag_set())
             {
               max_smoothness = std::max(max_smoothness,
@@ -532,7 +532,7 @@ namespace Step27
         typename hp::DoFHandler<dim>::active_cell_iterator
         cell = dof_handler.begin_active(),
         endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
+        for (; cell != endc; ++cell)
           if (cell->refine_flag_set()
               &&
               (smoothness_indicators(cell->active_cell_index()) > threshold_smoothness)
@@ -618,9 +618,9 @@ namespace Step27
     n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
 
     std::vector<CellData<dim> > cells(n_cells, CellData<dim>());
-    for (unsigned int i=0; i<n_cells; ++i)
+    for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (unsigned int j=0;
+        for (unsigned int j = 0;
              j<GeometryInfo<dim>::vertices_per_cell;
              ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
@@ -650,7 +650,7 @@ namespace Step27
   template <int dim>
   void LaplaceProblem<dim>::run()
   {
-    for (unsigned int cycle=0; cycle<6; ++cycle)
+    for (unsigned int cycle = 0; cycle < 6; ++cycle)
       {
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
@@ -696,9 +696,9 @@ namespace Step27
   predicate(const TableIndices<dim> &ind)
   {
     unsigned int v = 0;
-    for (unsigned int i = 0; i <dim; i++)
+    for (unsigned int i = 0; i < dim; i++)
       v += ind[i]*ind[i];
-    if (v>0 && v < max_degree*max_degree)
+    if (v > 0 && v < max_degree*max_degree)
       return std::make_pair(true,v);
     else
       return std::make_pair(false,v);
@@ -729,7 +729,7 @@ namespace Step27
     typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         // Inside the loop, we first need to get the values of the local
         // degrees of freedom (which we put into the

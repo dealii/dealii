@@ -256,7 +256,7 @@ namespace Step15
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
         cell_rhs = 0;
@@ -289,9 +289,9 @@ namespace Step15
                                 old_solution_gradients[q_point] *
                                 old_solution_gradients[q_point]);
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
-                for (unsigned int j=0; j<dofs_per_cell; ++j)
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   {
                     cell_matrix(i, j) += ( ((fe_values.shape_grad(i, q_point)
                                              * coeff
@@ -314,9 +314,9 @@ namespace Step15
           }
 
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               system_matrix.add(local_dof_indices[i],
                                 local_dof_indices[j],
                                 cell_matrix(i,j));
@@ -477,7 +477,7 @@ namespace Step15
                                              0,
                                              BoundaryValues<dim>(),
                                              boundary_values);
-    for (std::map<types::global_dof_index, double>::const_iterator
+    for (std::map < types::global_dof_index, double > ::const_iterator
          p = boundary_values.begin();
          p != boundary_values.end(); ++p)
       present_solution(p->first) = p->second;
@@ -527,7 +527,7 @@ namespace Step15
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         cell_residual = 0;
         fe_values.reinit(cell);
@@ -541,7 +541,7 @@ namespace Step15
                                          gradients);
 
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const double coeff = 1/std::sqrt(1 +
                                              gradients[q_point] *
@@ -555,7 +555,7 @@ namespace Step15
           }
 
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           residual(local_dof_indices[i]) += cell_residual(i);
       }
 
@@ -580,7 +580,7 @@ namespace Step15
     DoFTools::extract_boundary_dofs(dof_handler,
                                     ComponentMask(),
                                     boundary_dofs);
-    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (boundary_dofs[i] == true)
         residual(i) = 0;
 
@@ -640,7 +640,7 @@ namespace Step15
     // Newton iterate already has the correct boundary values. In all
     // following mesh refinement loops, the mesh will be refined adaptively.
     double previous_res = 0;
-    while (first_step || (previous_res>1e-3))
+    while (first_step || (previous_res > 1e-3))
       {
         if (first_step == true)
           {
@@ -676,7 +676,7 @@ namespace Step15
                   << compute_residual(0)
                   << std::endl;
 
-        for (unsigned int inner_iteration=0; inner_iteration<5; ++inner_iteration)
+        for (unsigned int inner_iteration = 0; inner_iteration < 5; ++inner_iteration)
           {
             assemble_system();
             previous_res = system_rhs.l2_norm();

@@ -96,7 +96,7 @@ Explicit::operator() (AnyData &out, const AnyData &in)
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
       m.equ(-timestep, *matrix);
-      for (unsigned int i=0; i<m.m(); ++i)
+      for (unsigned int i = 0; i < m.m(); ++i)
         m(i,i) += 1.;
     }
   this->notifications.clear();
@@ -120,7 +120,7 @@ Implicit::operator() (AnyData &out, const AnyData &in)
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
       m.equ(timestep, *matrix);
-      for (unsigned int i=0; i<m.m(); ++i)
+      for (unsigned int i = 0; i < m.m(); ++i)
         m(i,i) += 1.;
       m.gauss_jordan();
     }

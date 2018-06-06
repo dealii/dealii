@@ -186,7 +186,7 @@ namespace Step32
     TemperatureInitialValues<dim>::vector_value(const Point<dim> &p,
                                                 Vector<double>   &values) const
     {
-      for (unsigned int c=0; c<this->n_components; ++c)
+      for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = TemperatureInitialValues<dim>::value(p, c);
     }
 
@@ -1288,14 +1288,14 @@ namespace Step32
     typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
           fe_values[velocities].get_function_values(stokes_solution,
                                                     velocity_values);
 
-          for (unsigned int q=0; q<n_q_points; ++q)
+          for (unsigned int q = 0; q < n_q_points; ++q)
             max_local_velocity = std::max(max_local_velocity,
                                           velocity_values[q].norm());
         }
@@ -1330,7 +1330,7 @@ namespace Step32
     typename DoFHandler<dim>::active_cell_iterator
     cell = stokes_dof_handler.begin_active(),
     endc = stokes_dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1338,7 +1338,7 @@ namespace Step32
                                                     velocity_values);
 
           double max_local_velocity = 1e-10;
-          for (unsigned int q=0; q<n_q_points; ++q)
+          for (unsigned int q = 0; q < n_q_points; ++q)
             max_local_velocity = std::max(max_local_velocity,
                                           velocity_values[q].norm());
           max_local_cfl = std::max(max_local_cfl,
@@ -1408,7 +1408,7 @@ namespace Step32
     typename DoFHandler<dim>::active_cell_iterator
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1416,7 +1416,7 @@ namespace Step32
                                         old_temperature_values);
           fe_values.get_function_values(old_old_temperature_solution,
                                         old_old_temperature_values);
-          for (unsigned int q=0; q<n_q_points; ++q)
+          for (unsigned int q = 0; q < n_q_points; ++q)
             {
               const double T = (old_temperature_values[q] +
                                 old_old_temperature_values[q]) / 2;
@@ -1491,7 +1491,7 @@ namespace Step32
         typename DoFHandler<dim>::active_cell_iterator
         cell = temperature_dof_handler.begin_active(),
         endc = temperature_dof_handler.end();
-        for (; cell!=endc; ++cell)
+        for (; cell != endc; ++cell)
           if (cell->is_locally_owned())
             {
               fe_values.reinit(cell);
@@ -1500,7 +1500,7 @@ namespace Step32
               fe_values.get_function_values(old_old_temperature_solution,
                                             old_old_temperature_values);
 
-              for (unsigned int q=0; q<n_q_points; ++q)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 {
                   const double temperature =
                     (1. + time_step/old_time_step) * old_temperature_values[q]-
@@ -1518,14 +1518,14 @@ namespace Step32
         typename DoFHandler<dim>::active_cell_iterator
         cell = temperature_dof_handler.begin_active(),
         endc = temperature_dof_handler.end();
-        for (; cell!=endc; ++cell)
+        for (; cell != endc; ++cell)
           if (cell->is_locally_owned())
             {
               fe_values.reinit(cell);
               fe_values.get_function_values(old_temperature_solution,
                                             old_temperature_values);
 
-              for (unsigned int q=0; q<n_q_points; ++q)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 {
                   const double temperature = old_temperature_values[q];
 
@@ -1579,7 +1579,7 @@ namespace Step32
     double max_residual = 0;
     double max_velocity = 0;
 
-    for (unsigned int q=0; q < n_q_points; ++q)
+    for (unsigned int q = 0; q < n_q_points; ++q)
       {
         const Tensor<1,dim> u = (old_velocity_values[q] +
                                  old_old_velocity_values[q]) / 2;
@@ -1714,7 +1714,7 @@ namespace Step32
     cell = temperature_dof_handler.begin_active(),
     endc = temperature_dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           cell->get_dof_indices(local_dof_indices);
@@ -1725,15 +1725,15 @@ namespace Step32
 
           cell_vector = 0;
           matrix_for_bc = 0;
-          for (unsigned int point=0; point<n_q_points; ++point)
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int point = 0; point < n_q_points; ++point)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 cell_vector(i) += rhs_values[point] *
                                   fe_values.shape_value(i,point) *
                                   fe_values.JxW(point);
                 if (temperature_constraints.is_inhomogeneously_constrained(local_dof_indices[i]))
                   {
-                    for (unsigned int j=0; j<dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       matrix_for_bc(j,i) += fe_values.shape_value(i,point) *
                                             fe_values.shape_value(j,point) *
                                             fe_values.JxW(point);
@@ -1860,9 +1860,9 @@ namespace Step32
                                               MPI_COMM_WORLD);
 
     Table<2,DoFTools::Coupling> coupling(dim+1, dim+1);
-    for (unsigned int c=0; c<dim+1; ++c)
-      for (unsigned int d=0; d<dim+1; ++d)
-        if (! ((c==dim) && (d==dim)))
+    for (unsigned int c = 0; c < dim+1; ++c)
+      for (unsigned int d = 0; d < dim+1; ++d)
+        if (! ((c == dim) && (d == dim)))
           coupling[c][d] = DoFTools::always;
         else
           coupling[c][d] = DoFTools::none;
@@ -1894,8 +1894,8 @@ namespace Step32
                                               MPI_COMM_WORLD);
 
     Table<2,DoFTools::Coupling> coupling(dim+1, dim+1);
-    for (unsigned int c=0; c<dim+1; ++c)
-      for (unsigned int d=0; d<dim+1; ++d)
+    for (unsigned int c = 0; c < dim+1; ++c)
+      for (unsigned int d = 0; d < dim+1; ++d)
         if (c == d)
           coupling[c][d] = DoFTools::always;
         else
@@ -2185,16 +2185,16 @@ namespace Step32
 
     data.local_matrix = 0;
 
-    for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int q = 0; q < n_q_points; ++q)
       {
-        for (unsigned int k=0; k<dofs_per_cell; ++k)
+        for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
             scratch.grad_phi_u[k] = scratch.stokes_fe_values[velocities].gradient(k,q);
             scratch.phi_p[k]      = scratch.stokes_fe_values[pressure].value(k, q);
           }
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             data.local_matrix(i,j) += (EquationData::eta *
                                        scalar_product(scratch.grad_phi_u[i],
                                                       scratch.grad_phi_u[j])
@@ -2395,11 +2395,11 @@ namespace Step32
     scratch.temperature_fe_values.get_function_values(old_temperature_solution,
                                                       scratch.old_temperature_values);
 
-    for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int q = 0; q < n_q_points; ++q)
       {
         const double old_temperature = scratch.old_temperature_values[q];
 
-        for (unsigned int k=0; k<dofs_per_cell; ++k)
+        for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
             scratch.phi_u[k] = scratch.stokes_fe_values[velocities].value(k,q);
             if (rebuild_stokes_matrix)
@@ -2411,8 +2411,8 @@ namespace Step32
           }
 
         if (rebuild_stokes_matrix == true)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
               data.local_matrix(i,j) += (EquationData::eta * 2 *
                                          (scratch.grads_phi_u[i] * scratch.grads_phi_u[j])
                                          - (EquationData::pressure_scaling *
@@ -2425,7 +2425,7 @@ namespace Step32
         gravity = EquationData::gravity_vector(scratch.stokes_fe_values
                                                .quadrature_point(q));
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           data.local_rhs(i) += (EquationData::density(old_temperature) *
                                 gravity  *
                                 scratch.phi_u[i]) *
@@ -2537,16 +2537,16 @@ namespace Step32
     data.local_mass_matrix = 0;
     data.local_stiffness_matrix = 0;
 
-    for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int q = 0; q < n_q_points; ++q)
       {
-        for (unsigned int k=0; k<dofs_per_cell; ++k)
+        for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
             scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad(k,q);
             scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value(k, q);
           }
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             {
               data.local_mass_matrix(i,j)
               += (scratch.phi_T[i] * scratch.phi_T[j]
@@ -2705,9 +2705,9 @@ namespace Step32
                           global_entropy_variation,
                           cell->diameter());
 
-    for (unsigned int q=0; q<n_q_points; ++q)
+    for (unsigned int q = 0; q < n_q_points; ++q)
       {
-        for (unsigned int k=0; k<dofs_per_cell; ++k)
+        for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
             scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value(k, q);
             scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad(k,q);
@@ -2771,7 +2771,7 @@ namespace Step32
               2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
              (EquationData::density(ext_T) * EquationData::specific_heat));
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
             data.local_rhs(i) += (T_term_for_rhs * scratch.phi_T[i]
                                   -
@@ -2788,7 +2788,7 @@ namespace Step32
 
             if (temperature_constraints.is_inhomogeneously_constrained(data.local_dof_indices[i]))
               {
-                for (unsigned int j=0; j<dofs_per_cell; ++j)
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   data.matrix_for_bc(j,i) += (scratch.phi_T[i] * scratch.phi_T[j] *
                                               (use_bdf2_scheme ?
                                                ((2*time_step + old_time_step) /
@@ -2983,7 +2983,7 @@ namespace Step32
                distributed_stokes_solution.block(1).local_range().first),
               end   = (distributed_stokes_solution.block(0).size() +
                        distributed_stokes_solution.block(1).local_range().second);
-      for (unsigned int i=start; i<end; ++i)
+      for (unsigned int i = start; i < end; ++i)
         if (stokes_constraints.is_constrained(i))
           distributed_stokes_solution(i) = 0;
 
@@ -3111,7 +3111,7 @@ namespace Step32
                               };
       double global_temperature[2];
 
-      for (unsigned int i=distributed_temperature_solution.local_range().first;
+      for (unsigned int i = distributed_temperature_solution.local_range().first;
            i < distributed_temperature_solution.local_range().second; ++i)
         {
           temperature[0] = std::min<double> (temperature[0],
@@ -3253,9 +3253,9 @@ namespace Step32
     Assert(inputs.solution_values[0].size() == dim+2,
            ExcInternalError());
 
-    for (unsigned int q=0; q<n_quadrature_points; ++q)
+    for (unsigned int q = 0; q < n_quadrature_points; ++q)
       {
-        for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int d = 0; d < dim; ++d)
           computed_quantities[q](d)
             = (inputs.solution_values[q](d) *  EquationData::year_in_seconds * 100);
 
@@ -3266,7 +3266,7 @@ namespace Step32
         computed_quantities[q](dim+1) = temperature;
 
         Tensor<2,dim> grad_u;
-        for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int d = 0; d < dim; ++d)
           grad_u[d] = inputs.solution_gradients[q][d];
         const SymmetricTensor<2,dim> strain_rate = symmetrize(grad_u);
         computed_quantities[q](dim+2) = 2 * EquationData::eta *
@@ -3346,7 +3346,7 @@ namespace Step32
       joint_endc       = joint_dof_handler.end(),
       stokes_cell      = stokes_dof_handler.begin_active(),
       temperature_cell = temperature_dof_handler.begin_active();
-      for (; joint_cell!=joint_endc;
+      for (; joint_cell != joint_endc;
            ++joint_cell, ++stokes_cell, ++temperature_cell)
         if (joint_cell->is_locally_owned())
           {
@@ -3354,7 +3354,7 @@ namespace Step32
             stokes_cell->get_dof_indices(local_stokes_dof_indices);
             temperature_cell->get_dof_indices(local_temperature_dof_indices);
 
-            for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
               if (joint_fe.system_to_base_index(i).first.first == 0)
                 {
                   Assert(joint_fe.system_to_base_index(i).second
@@ -3418,7 +3418,7 @@ namespace Step32
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
           filenames.push_back(std::string("solution-") +
                               Utilities::int_to_string(out_index, 5) +
                               "." +
@@ -3496,7 +3496,7 @@ namespace Step32
                                         0.3, 0.1);
 
       if (triangulation.n_levels() > max_grid_level)
-        for (typename Triangulation<dim>::active_cell_iterator
+        for (typename Triangulation < dim > ::active_cell_iterator
              cell = triangulation.begin_active(max_grid_level);
              cell != triangulation.end(); ++cell)
           cell->clear_refine_flag();
@@ -3724,7 +3724,7 @@ int main(int argc, char *argv[])
                                                           numbers::invalid_unsigned_int);
 
       std::string parameter_filename;
-      if (argc>=2)
+      if (argc >  = 2)
         parameter_filename = argv[1];
       else
         parameter_filename = "step-32.prm";

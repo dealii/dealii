@@ -119,10 +119,10 @@ namespace Step18
   get_stress_strain_tensor(const double lambda, const double mu)
   {
     SymmetricTensor<4,dim> tmp;
-    for (unsigned int i=0; i<dim; ++i)
-      for (unsigned int j=0; j<dim; ++j)
-        for (unsigned int k=0; k<dim; ++k)
-          for (unsigned int l=0; l<dim; ++l)
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = 0; j < dim; ++j)
+        for (unsigned int k = 0; k < dim; ++k)
+          for (unsigned int l = 0; l < dim; ++l)
             tmp[i][j][k][l] = (((i==k) && (j==l) ? mu : 0.0) +
                                ((i==l) && (j==k) ? mu : 0.0) +
                                ((i==j) && (k==l) ? lambda : 0.0));
@@ -197,7 +197,7 @@ namespace Step18
     // First, fill diagonal terms which are simply the derivatives in
     // direction <code>i</code> of the <code>i</code> component of the
     // vector-valued shape function:
-    for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int i = 0; i < dim; ++i)
       tmp[i][i] = fe_values.shape_grad_component(shape_func,q_point,i)[i];
 
     // Then fill the rest of the strain tensor. Note that since the tensor is
@@ -208,8 +208,8 @@ namespace Step18
     // of course stores only one copy). Here, we have picked the upper right
     // half of the tensor, but the lower left one would have been just as
     // good:
-    for (unsigned int i=0; i<dim; ++i)
-      for (unsigned int j=i+1; j<dim; ++j)
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = i+1; j < dim; ++j)
         tmp[i][j]
           = (fe_values.shape_grad_component(shape_func,q_point,i)[j] +
              fe_values.shape_grad_component(shape_func,q_point,j)[i]) / 2;
@@ -245,11 +245,11 @@ namespace Step18
     Assert(grad.size() == dim, ExcInternalError());
 
     SymmetricTensor<2,dim> strain;
-    for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int i = 0; i < dim; ++i)
       strain[i][i] = grad[i][i];
 
-    for (unsigned int i=0; i<dim; ++i)
-      for (unsigned int j=i+1; j<dim; ++j)
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = i+1; j < dim; ++j)
         strain[i][j] = (grad[i][j] + grad[j][i]) / 2;
 
     return strain;
@@ -609,7 +609,7 @@ namespace Step18
     Assert(value_list.size() == n_points,
            ExcDimensionMismatch(value_list.size(), n_points));
 
-    for (unsigned int p=0; p<n_points; ++p)
+    for (unsigned int p = 0; p < n_points; ++p)
       BodyForce<dim>::vector_value(points[p],
                                    value_list[p]);
   }
@@ -705,7 +705,7 @@ namespace Step18
     Assert(value_list.size() == n_points,
            ExcDimensionMismatch(value_list.size(), n_points));
 
-    for (unsigned int p=0; p<n_points; ++p)
+    for (unsigned int p = 0; p < n_points; ++p)
       IncrementalBoundaryValues<dim>::vector_value(points[p],
                                                    value_list[p]);
   }
@@ -798,10 +798,10 @@ namespace Step18
                  outer_radius = 1;
     GridGenerator::cylinder_shell(triangulation,
                                   3, inner_radius, outer_radius);
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (typename Triangulation < dim > ::active_cell_iterator
          cell=triangulation.begin_active();
          cell!=triangulation.end(); ++cell)
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      for (unsigned int f = 0; f < GeometryInfo < dim > ::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
             const Point<dim> face_center = cell->face(f)->center();
@@ -991,7 +991,7 @@ namespace Step18
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
@@ -1008,9 +1008,9 @@ namespace Step18
           // needs to be compared to the clumsy computations needed in
           // step-17, both in the introduction as well as in the respective
           // place in the program:
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              for (unsigned int q_point=0; q_point<n_q_points;
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+              for (unsigned int q_point = 0; q_point < n_q_points;
                    ++q_point)
                 {
                   const SymmetricTensor<2,dim>
@@ -1039,12 +1039,12 @@ namespace Step18
                                        body_force_values);
           // Then we can loop over all degrees of freedom on this cell and
           // compute local contributions to the right hand side:
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               const unsigned int
               component_i = fe.system_to_component_index(i).first;
 
-              for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 {
                   const SymmetricTensor<2,dim> &old_stress
                     = local_quadrature_points_data[q_point].old_stress;
@@ -1264,13 +1264,13 @@ namespace Step18
       typename Triangulation<dim>::active_cell_iterator
       cell = triangulation.begin_active(),
       endc = triangulation.end();
-      for (; cell!=endc; ++cell)
+      for (; cell != endc; ++cell)
         if (cell->is_locally_owned())
           {
             // On these cells, add up the stresses over all quadrature
             // points...
             SymmetricTensor<2,dim> accumulated_stress;
-            for (unsigned int q=0;
+            for (unsigned int q = 0;
                  q<quadrature_formula.size();
                  ++q)
               accumulated_stress +=
@@ -1338,11 +1338,11 @@ namespace Step18
 
     // The record files must be written only once and not by each processor,
     // so we do this on processor 0:
-    if (this_mpi_process==0)
+    if (this_mpi_process == 0)
       {
         // Here we collect all filenames of the current timestep (same format as above)
         std::vector<std::string> filenames;
-        for (unsigned int i=0; i<n_mpi_processes; ++i)
+        for (unsigned int i = 0; i < n_mpi_processes; ++i)
           filenames.push_back("solution-" + Utilities::int_to_string(timestep_no,4)
                               + "." + Utilities::int_to_string(i,3)
                               + ".vtu");
@@ -1403,7 +1403,7 @@ namespace Step18
     pcout << "Timestep " << timestep_no << " at time " << present_time
           << std::endl;
 
-    for (unsigned int cycle=0; cycle<2; ++cycle)
+    for (unsigned int cycle = 0; cycle < 2; ++cycle)
       {
         pcout << "  Cycle " << cycle << ':' << std::endl;
 
@@ -1415,7 +1415,7 @@ namespace Step18
         pcout << "    Number of active cells:       "
               << triangulation.n_active_cells()
               << " (by partition:";
-        for (unsigned int p=0; p<n_mpi_processes; ++p)
+        for (unsigned int p = 0; p < n_mpi_processes; ++p)
           pcout << (p==0 ? ' ' : '+')
                 << (GridTools::
                     count_cells_with_subdomain_association(triangulation,p));
@@ -1426,7 +1426,7 @@ namespace Step18
         pcout << "    Number of degrees of freedom: "
               << dof_handler.n_dofs()
               << " (by partition:";
-        for (unsigned int p=0; p<n_mpi_processes; ++p)
+        for (unsigned int p = 0; p < n_mpi_processes; ++p)
           pcout << (p==0 ? ' ' : '+')
                 << (DoFTools::
                     count_dofs_with_subdomain_association(dof_handler,p));
@@ -1500,7 +1500,7 @@ namespace Step18
                                triangulation.n_active_cells(),
                                n_local_cells);
 
-    for (unsigned int i=0; i<error_per_cell.size(); ++i)
+    for (unsigned int i = 0; i < error_per_cell.size(); ++i)
       if (error_per_cell(i) != 0)
         distributed_error_per_cell(i) = error_per_cell(i);
     distributed_error_per_cell.compress(VectorOperation::insert);
@@ -1615,16 +1615,16 @@ namespace Step18
 
     std::vector<bool> vertex_touched(triangulation.n_vertices(),
                                      false);
-    for (typename DoFHandler<dim>::active_cell_iterator
+    for (typename DoFHandler < dim > ::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (unsigned int v = 0; v < GeometryInfo < dim > ::vertices_per_cell; ++v)
         if (vertex_touched[cell->vertex_index(v)] == false)
           {
             vertex_touched[cell->vertex_index(v)] = true;
 
             Point<dim> vertex_displacement;
-            for (unsigned int d=0; d<dim; ++d)
+            for (unsigned int d = 0; d < dim; ++d)
               vertex_displacement[d]
                 = incremental_displacement(cell->vertex_dof_index(v,d));
 
@@ -1662,7 +1662,7 @@ namespace Step18
     // pointer of a cell which we should not have accessed, a segmentation
     // fault will let us know that this should not have happened:
     unsigned int our_cells = 0;
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (typename Triangulation < dim > ::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       if (cell->is_locally_owned())
@@ -1695,7 +1695,7 @@ namespace Step18
     // quadrature point objects corresponding to this cell in the vector of
     // such objects:
     unsigned int history_index = 0;
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (typename Triangulation < dim > ::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       if (cell->is_locally_owned())
@@ -1780,7 +1780,7 @@ namespace Step18
 
     // Then loop over all cells and do the job in the cells that belong to our
     // subdomain:
-    for (typename DoFHandler<dim>::active_cell_iterator
+    for (typename DoFHandler < dim > ::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       if (cell->is_locally_owned())
@@ -1805,7 +1805,7 @@ namespace Step18
                                            displacement_increment_grads);
 
           // Then loop over the quadrature points of this cell:
-          for (unsigned int q=0; q<quadrature_formula.size(); ++q)
+          for (unsigned int q = 0; q < quadrature_formula.size(); ++q)
             {
               // On each quadrature point, compute the strain increment from
               // the gradients, and multiply it by the stress-strain tensor to

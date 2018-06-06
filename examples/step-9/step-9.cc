@@ -250,7 +250,7 @@ namespace Step9
   {
     Point<dim> value;
     value[0] = 2;
-    for (unsigned int i=1; i<dim; ++i)
+    for (unsigned int i = 1; i < dim; ++i)
       value[i] = 1+0.8*std::sin(8*numbers::PI*p[0]);
 
     return value;
@@ -266,7 +266,7 @@ namespace Step9
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0; i<points.size(); ++i)
+    for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = AdvectionField<dim>::value(points[i]);
   }
 
@@ -346,7 +346,7 @@ namespace Step9
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0; i<points.size(); ++i)
+    for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = RightHandSide<dim>::value(points[i], component);
   }
 
@@ -394,7 +394,7 @@ namespace Step9
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i=0; i<points.size(); ++i)
+    for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = BoundaryValues<dim>::value(points[i], component);
   }
 
@@ -728,10 +728,10 @@ namespace Step9
 
     // ... and assemble the local contributions to the system matrix and
     // right hand side as also discussed above:
-    for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
+    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
             copy_data.cell_matrix(i,j) += ((advection_directions[q_point] *
                                             scratch_data.fe_values.shape_grad(j,q_point)   *
                                             (scratch_data.fe_values.shape_value(i,q_point) +
@@ -760,7 +760,7 @@ namespace Step9
     // the direction of flow at this point; we obtain this information
     // using the FEFaceValues object and only decide within the main loop
     // whether a quadrature point is on the inflow boundary.
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
       if (cell->face(face)->at_boundary())
         {
           // Ok, this face of the present cell is on the boundary of the
@@ -784,7 +784,7 @@ namespace Step9
           // the boundary, the normal vector points outward of the domain,
           // so if the advection direction points into the domain, its
           // scalar product with the normal vector must be negative):
-          for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+          for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
             if (scratch_data.fe_face_values.normal_vector(q_point) *
                 face_advection_directions[q_point]
                 < 0)
@@ -793,9 +793,9 @@ namespace Step9
               // hand side, using the values obtained from the
               // FEFaceValues object and the formulae discussed in the
               // introduction:
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  for (unsigned int j=0; j<dofs_per_cell; ++j)
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     copy_data.cell_matrix(i,j) -= (face_advection_directions[q_point] *
                                                    scratch_data.fe_face_values.normal_vector(q_point) *
                                                    scratch_data.fe_face_values.shape_value(i,q_point) *
@@ -829,9 +829,9 @@ namespace Step9
   void
   AdvectionProblem<dim>::copy_local_to_global(const AssemblyCopyData &copy_data)
   {
-    for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
+    for (unsigned int i = 0; i < copy_data.local_dof_indices.size(); ++i)
       {
-        for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
+        for (unsigned int j = 0; j < copy_data.local_dof_indices.size(); ++j)
           system_matrix.add(copy_data.local_dof_indices[i],
                             copy_data.local_dof_indices[j],
                             copy_data.cell_matrix(i,j));
@@ -914,7 +914,7 @@ namespace Step9
   template <int dim>
   void AdvectionProblem<dim>::run()
   {
-    for (unsigned int cycle=0; cycle<6; ++cycle)
+    for (unsigned int cycle = 0; cycle < 6; ++cycle)
       {
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
@@ -1108,7 +1108,7 @@ namespace Step9
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
     active_neighbors.clear();
-    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+    for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell; ++face_no)
       if (! cell->at_boundary(face_no))
         {
           // First define an abbreviation for the iterator to the face and
@@ -1169,7 +1169,7 @@ namespace Step9
               else
                 // If we are not in 1d, we collect all neighbor children
                 // `behind' the subfaces of the current face
-                for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
+                for (unsigned int subface_no = 0; subface_no < face->n_children(); ++subface_no)
                   active_neighbors.push_back(
                     cell->neighbor_child_on_subface(face_no,subface_no));
             }
@@ -1198,7 +1198,7 @@ namespace Step9
     std::vector<double> neighbor_midpoint_value(1);
     typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
     neighbor_ptr = active_neighbors.begin();
-    for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
+    for (; neighbor_ptr != active_neighbors.end(); ++neighbor_ptr)
       {
         // First define an abbreviation for the iterator to the active
         // neighbor cell:
@@ -1224,8 +1224,8 @@ namespace Step9
         y /= distance;
 
         // Then add up the contribution of this cell to the Y matrix...
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int j=0; j<dim; ++j)
+        for (unsigned int i = 0; i < dim; ++i)
+          for (unsigned int j = 0; j < dim; ++j)
             Y[i][j] += y[i] * y[j];
 
         // ... and update the sum of difference quotients:

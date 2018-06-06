@@ -74,7 +74,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
     std::map<types::boundary_id, unsigned int> boundary_count;
     for (auto cell : triangulation.active_cell_iterators())
       {
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;
@@ -82,7 +82,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
       }
 
     std::cout << " boundary indicators: ";
-    for (const std::pair<const types::boundary_id, unsigned int> &pair : boundary_count)
+    for (const std::pair < const types::boundary_id, unsigned int > &pair : boundary_count)
       {
         std::cout << pair.first << "(" << pair.second << " times) ";
       }
@@ -173,10 +173,10 @@ void grid_3 ()
 
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+      for (unsigned int i = 0; i < GeometryInfo < 2 > ::vertices_per_cell; ++i)
         {
           Point<2> &v = cell->vertex(i);
-          if (std::abs(v(1)-1.0)<1e-5)
+          if (std::abs(v(1)-1.0) < 1e-5)
             v(1) += 0.5;
         }
     }

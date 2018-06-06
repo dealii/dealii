@@ -354,20 +354,20 @@ void Step6<dim>::assemble_system()
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  for (; cell != endc; ++cell)
     {
       cell_matrix = 0;
       cell_rhs = 0;
 
       fe_values.reinit(cell);
 
-      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
+      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
           const double current_coefficient = coefficient<dim>
                                              (fe_values.quadrature_point(q_index));
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i,j) += (current_coefficient *
                                      fe_values.shape_grad(i,q_index) *
                                      fe_values.shape_grad(j,q_index) *
@@ -606,7 +606,7 @@ void Step6<dim>::output_results(const unsigned int cycle) const
 template <int dim>
 void Step6<dim>::run()
 {
-  for (unsigned int cycle=0; cycle<8; ++cycle)
+  for (unsigned int cycle = 0; cycle < 8; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 

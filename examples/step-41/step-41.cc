@@ -273,7 +273,7 @@ namespace Step41
     mass_matrix.reinit(dsp);
     assemble_mass_matrix_diagonal(mass_matrix);
     diagonal_of_mass_matrix.reinit(solution_index_set);
-    for (unsigned int j=0; j<solution.size(); j++)
+    for (unsigned int j = 0; j < solution.size(); j++)
       diagonal_of_mass_matrix(j) = mass_matrix.diag_element(j);
   }
 
@@ -312,16 +312,16 @@ namespace Step41
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
         cell_rhs = 0;
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i,j) += (fe_values.shape_grad(i, q_point) *
                                      fe_values.shape_grad(j, q_point) *
                                      fe_values.JxW (q_point));
@@ -389,13 +389,13 @@ namespace Step41
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             cell_matrix(i,i) += (fe_values.shape_value(i, q_point) *
                                  fe_values.shape_value(i, q_point) *
                                  fe_values.JxW (q_point));
@@ -479,8 +479,8 @@ namespace Step41
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (; cell != endc; ++cell)
+      for (unsigned int v = 0; v < GeometryInfo < dim > ::vertices_per_cell; ++v)
         {
           Assert(dof_handler.get_fe().dofs_per_cell ==
                  GeometryInfo<dim>::vertices_per_cell,
@@ -634,7 +634,7 @@ namespace Step41
     setup_system();
 
     IndexSet active_set_old(active_set);
-    for (unsigned int iteration=0; iteration<=solution.size(); ++iteration)
+    for (unsigned int iteration = 0; iteration <  = solution.size(); ++iteration)
       {
         std::cout << "Newton iteration " << iteration << std::endl;
 

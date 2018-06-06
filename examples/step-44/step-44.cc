@@ -1528,7 +1528,7 @@ namespace Step44
               &&
               cell->face(face)->center()[1] == 1.0 * parameters.scale)
             {
-              if (dim==3)
+              if (dim == 3)
                 {
                   if (cell->face(face)->center()[0] < 0.5 * parameters.scale
                       &&
@@ -1702,7 +1702,7 @@ namespace Step44
     // Next we setup the initial quadrature point data.
     // Note that when the quadrature point data is retrieved,
     // it is returned as a vector of smart pointers.
-    for (typename Triangulation<dim>::active_cell_iterator cell =
+    for (typename Triangulation < dim > ::active_cell_iterator cell =
            triangulation.begin_active(); cell != triangulation.end(); ++cell)
       {
         const std::vector<std::shared_ptr<PointHistory<dim> > > lqph =
@@ -1842,8 +1842,8 @@ namespace Step44
         error_residual_norm = error_residual;
         error_residual_norm.normalize(error_residual_0);
 
-        if (newton_iteration > 0 && error_update_norm.u <= parameters.tol_u
-            && error_residual_norm.u <= parameters.tol_f)
+        if (newton_iteration > 0 && error_update_norm.u <  = parameters.tol_u
+                                                             && error_residual_norm.u <= parameters.tol_f)
           {
             std::cout << " CONVERGED! " << std::endl;
             print_conv_footer();
@@ -1955,7 +1955,7 @@ namespace Step44
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (typename Triangulation < dim > ::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       {
@@ -1997,7 +1997,7 @@ namespace Step44
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (typename Triangulation < dim > ::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       {
@@ -2220,7 +2220,7 @@ namespace Step44
             const unsigned int component_i = fe.system_to_component_index(i).first;
             const unsigned int i_group     = fe.system_to_base_index(i).first.first;
 
-            for (unsigned int j = 0; j <= i; ++j)
+            for (unsigned int j = 0; j <  = i; ++j)
               {
                 const unsigned int component_j = fe.system_to_component_index(j).first;
                 const unsigned int j_group     = fe.system_to_base_index(j).first.first;
@@ -2392,7 +2392,7 @@ namespace Step44
     // Next we assemble the Neumann contribution. We first check to see it the
     // cell face exists on a boundary on which a traction is applied and add
     // the contribution if this is the case.
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+    for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell;
          ++face)
       if (cell->face(face)->at_boundary() == true
           && cell->face(face)->boundary_id() == 6)
@@ -2532,7 +2532,7 @@ namespace Step44
                                                  fe.component_mask(y_displacement));
     }
 
-    if (dim==3)
+    if (dim == 3)
       {
         const FEValuesExtractors::Scalar z_displacement(2);
 

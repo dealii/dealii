@@ -157,7 +157,7 @@ namespace Step37
            ExcIndexRange(component, 0, 1));
 
     const unsigned int n_points = points.size();
-    for (unsigned int i=0; i<n_points; ++i)
+    for (unsigned int i = 0; i < n_points; ++i)
       values[i] = value<double>(points[i],component);
   }
 
@@ -310,10 +310,10 @@ namespace Step37
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(*this->data);
 
     coefficient.reinit(n_cells, phi.n_q_points);
-    for (unsigned int cell=0; cell<n_cells; ++cell)
+    for (unsigned int cell = 0; cell < n_cells; ++cell)
       {
         phi.reinit(cell);
-        for (unsigned int q=0; q<phi.n_q_points; ++q)
+        for (unsigned int q = 0; q < phi.n_q_points; ++q)
           coefficient(cell,q) =
             coefficient_function.value(phi.quadrature_point(q));
       }
@@ -422,7 +422,7 @@ namespace Step37
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(data);
 
-    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         AssertDimension(coefficient.size(0), data.n_macro_cells());
         AssertDimension(coefficient.size(1), phi.n_q_points);
@@ -430,7 +430,7 @@ namespace Step37
         phi.reinit(cell);
         phi.read_dof_values(src);
         phi.evaluate(false, true);
-        for (unsigned int q=0; q<phi.n_q_points; ++q)
+        for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(coefficient(cell,q) *
                               phi.get_gradient(q), q);
         phi.integrate(false, true);
@@ -576,7 +576,7 @@ namespace Step37
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
-    for (unsigned int i=0; i<inverse_diagonal.local_size(); ++i)
+    for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
       {
         Assert(inverse_diagonal.local_element(i) > 0.,
                ExcMessage("No diagonal entry in a positive definite operator "
@@ -646,26 +646,26 @@ namespace Step37
 
     AlignedVector<VectorizedArray<number> > diagonal(phi.dofs_per_cell);
 
-    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         AssertDimension(coefficient.size(0), data.n_macro_cells());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
-        for (unsigned int i=0; i<phi.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<phi.dofs_per_cell; ++j)
+            for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.submit_dof_value(VectorizedArray<number>(), j);
             phi.submit_dof_value(make_vectorized_array<number>(1.), i);
 
             phi.evaluate(false, true);
-            for (unsigned int q=0; q<phi.n_q_points; ++q)
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(coefficient(cell,q) *
                                   phi.get_gradient(q), q);
             phi.integrate(false, true);
             diagonal[i] = phi.get_dof_value(i);
           }
-        for (unsigned int i=0; i<phi.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           phi.submit_dof_value(diagonal[i], i);
         phi.distribute_local_to_global(dst);
       }
@@ -872,7 +872,7 @@ namespace Step37
     mg_constrained_dofs.initialize(dof_handler);
     mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, dirichlet_boundary);
 
-    for (unsigned int level=0; level<nlevels; ++level)
+    for (unsigned int level = 0; level < nlevels; ++level)
       {
         IndexSet relevant_dofs;
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level,
@@ -921,10 +921,10 @@ namespace Step37
 
     system_rhs = 0;
     FEEvaluation<dim,degree_finite_element> phi(*system_matrix.get_matrix_free());
-    for (unsigned int cell=0; cell<system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
+    for (unsigned int cell = 0; cell < system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
       {
         phi.reinit(cell);
-        for (unsigned int q=0; q<phi.n_q_points; ++q)
+        for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_value(make_vectorized_array<double>(1.0), q);
         phi.integrate(true, false);
         phi.distribute_local_to_global(system_rhs);
@@ -1004,7 +1004,7 @@ namespace Step37
     mg_smoother;
     MGLevelObject<typename SmootherType::AdditionalData> smoother_data;
     smoother_data.resize(0, triangulation.n_global_levels()-1);
-    for (unsigned int level = 0; level<triangulation.n_global_levels(); ++level)
+    for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       {
         if (level > 0)
           {
@@ -1060,7 +1060,7 @@ namespace Step37
 
     MGLevelObject<MatrixFreeOperators::MGInterfaceOperator<LevelMatrixType> > mg_interface_matrices;
     mg_interface_matrices.resize(0, triangulation.n_global_levels()-1);
-    for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
+    for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       mg_interface_matrices[level].initialize(mg_matrices[level]);
     mg::Matrix<LinearAlgebra::distributed::Vector<float> > mg_interface(mg_interface_matrices);
 
@@ -1138,7 +1138,7 @@ namespace Step37
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+        for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
           filenames.emplace_back("solution-"
                                  + std::to_string(cycle)
                                  + "."
@@ -1174,7 +1174,7 @@ namespace Step37
             << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL << std::endl;
     }
 
-    for (unsigned int cycle=0; cycle<9-dim; ++cycle)
+    for (unsigned int cycle = 0; cycle < 9-dim; ++cycle)
       {
         pcout << "Cycle " << cycle << std::endl;
 
