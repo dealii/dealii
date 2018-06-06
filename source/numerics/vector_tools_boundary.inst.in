@@ -93,7 +93,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const std::map<types::boundary_id,
                        const Function<deal_II_space_dimension, double> *> &,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const ComponentMask &);
 
       template void
@@ -102,7 +102,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const types::boundary_id,
         const Function<deal_II_space_dimension> &,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const ComponentMask &);
 
       template void
@@ -110,7 +110,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const types::boundary_id,
         const Function<deal_II_space_dimension> &,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const ComponentMask &);
 
       template void
@@ -118,7 +118,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         const DH<deal_II_dimension, deal_II_space_dimension> &,
         const std::map<types::boundary_id,
                        const Function<deal_II_space_dimension, double> *> &,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const ComponentMask &);
     \}
 #endif
@@ -177,7 +177,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::map<types::boundary_id,
                        const Function<deal_II_dimension, double> *> &,
         const Quadrature<deal_II_dimension - 1> &,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         std::vector<unsigned int>);
 
       template void
@@ -186,7 +186,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::map<types::boundary_id,
                        const Function<deal_II_dimension, double> *> &,
         const Quadrature<deal_II_dimension - 1> &,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         std::vector<unsigned int>);
 
 #  if deal_II_dimension != 1
@@ -196,7 +196,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const Function<deal_II_dimension> &,
         const types::boundary_id,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const Mapping<deal_II_dimension> &);
       template void
       project_boundary_values_curl_conforming<deal_II_dimension>(
@@ -204,7 +204,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const Function<deal_II_dimension> &,
         const types::boundary_id,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const hp::MappingCollection<deal_II_dimension> &);
       template void
       project_boundary_values_curl_conforming_l2<deal_II_dimension>(
@@ -212,7 +212,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const Function<deal_II_dimension> &,
         const types::boundary_id,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const Mapping<deal_II_dimension> &);
       template void
       project_boundary_values_curl_conforming_l2<deal_II_dimension>(
@@ -220,7 +220,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const Function<deal_II_dimension> &,
         const types::boundary_id,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const hp::MappingCollection<deal_II_dimension> &);
       template void
       project_boundary_values_div_conforming<deal_II_dimension>(
@@ -228,7 +228,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const Function<deal_II_dimension> &,
         const types::boundary_id,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const Mapping<deal_II_dimension> &);
       template void
       project_boundary_values_div_conforming<deal_II_dimension>(
@@ -236,7 +236,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const Function<deal_II_dimension> &,
         const types::boundary_id,
-        ConstraintMatrix &,
+        AffineConstraints<double> &,
         const hp::MappingCollection<deal_II_dimension> &);
 #  endif
 #endif

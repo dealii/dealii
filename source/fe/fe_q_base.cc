@@ -374,7 +374,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
 
             // The following lines of code should eliminate the problems with
             // the Constraint-Matrix, which appeared for P>=4. The
-            // ConstraintMatrix class complained about different constraints
+            // AffineConstraints class complained about different constraints
             // for the same entry of the Constraint-Matrix.  Actually this
             // difference could be attributed to FP errors, as it was in the
             // range of 1.0e-16. These errors originate in the loss of

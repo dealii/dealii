@@ -28,8 +28,8 @@
 
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -1738,7 +1738,7 @@ namespace FETools
               const DoFHandler<dim, spacedim> &dof2,
               OutVector &                      u2)
   {
-    ConstraintMatrix dummy;
+    AffineConstraints<typename OutVector::value_type> dummy;
     dummy.close();
     extrapolate(dof1, u1, dof2, dummy, u2);
   }
@@ -1747,11 +1747,12 @@ namespace FETools
 
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  extrapolate(const DoFHandler<dim, spacedim> &dof1,
-              const InVector &                 u1,
-              const DoFHandler<dim, spacedim> &dof2,
-              const ConstraintMatrix &         constraints,
-              OutVector &                      u2)
+  extrapolate(
+    const DoFHandler<dim, spacedim> &                        dof1,
+    const InVector &                                         u1,
+    const DoFHandler<dim, spacedim> &                        dof2,
+    const AffineConstraints<typename OutVector::value_type> &constraints,
+    OutVector &                                              u2)
   {
     Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),

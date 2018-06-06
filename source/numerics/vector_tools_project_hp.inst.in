@@ -26,7 +26,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ConstraintMatrix &,
+        const AffineConstraints<VEC::value_type> &,
         const hp::QCollection<deal_II_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,
@@ -37,7 +37,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
       template void
       project(
         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const ConstraintMatrix &,
+        const AffineConstraints<VEC::value_type> &,
         const hp::QCollection<deal_II_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,

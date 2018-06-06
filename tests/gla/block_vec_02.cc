@@ -75,7 +75,8 @@ test()
             << std::endl;
 
 
-  ConstraintMatrix cm;
+  using scalar_type = typename LA::MPI::BlockVector::value_type;
+  AffineConstraints<scalar_type> cm;
   cm.add_line(0);
   cm.add_entry(0, 1, 3.0);
   cm.close();

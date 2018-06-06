@@ -118,7 +118,7 @@ namespace MatrixFreeOperators
    *
    * <h4>Selective use of blocks in MatrixFree</h4>
    *
-   * MatrixFree allows to use several DoFHandler/ConstraintMatrix combinations
+   * MatrixFree allows to use several DoFHandler/AffineConstraints combinations
    * by passing a std::vector with pointers to the respective objects into
    * the MatrixFree::reinit function. This class supports to select only some
    * of the blocks in the underlying MatrixFree object by optional integer
@@ -152,7 +152,7 @@ namespace MatrixFreeOperators
    * system subject to zero Dirichlet boundary conditions is solved that is
    * then added to the initial guess. This setup can be realized by using a
    * vector of two pointers pointing to the same DoFHandler object and a
-   * vector of two pointers to the two ConstraintMatrix objects. If the first
+   * vector of two pointers to the two AffineConstraints objects. If the first
    * constraint matrix is the one including the zero Dirichlet constraints,
    * one would give a std::vector<unsigned int>(1, 0) to the initialize()
    * function, i.e., a vector of length 1 that selects exactly the first
@@ -160,7 +160,7 @@ namespace MatrixFreeOperators
    *
    * For systems of PDEs where the different blocks of MatrixFree are
    * associated with different physical components of the equations, adding
-   * another block with a different ConstraintMatrix argument solely for the
+   * another block with a different AffineConstraints argument solely for the
    * purpose of boundary conditions might lead to cumbersome index
    * handling. Instead, one could set up a second MatrixFree instance with the
    * different constraint matrix but the same interpretation of blocks, and
@@ -219,7 +219,7 @@ namespace MatrixFreeOperators
      * The optional selection vector allows to choose only some components
      * from the underlying MatrixFree object, e.g. just a single one. The
      * entry @p selected_row_blocks[i] in the vector chooses the DoFHandler
-     * and ConstraintMatrix object that was given as the
+     * and AffineConstraints object that was given as the
      * @p selected_row_blocks[i]-th argument to the MatrixFree::reinit() call.
      * Different arguments for rows and columns also make it possible to
      * select non-diagonal blocks or rectangular blocks. If the row vector is
@@ -242,7 +242,7 @@ namespace MatrixFreeOperators
      * The optional selection vector allows to choose only some components
      * from the underlying MatrixFree object, e.g. just a single one. The
      * entry @p selected_row_blocks[i] in the vector chooses the DoFHandler
-     * and ConstraintMatrix object that was given as the
+     * and AffineConstraints object that was given as the
      * @p selected_row_blocks[i]-th argument to the MatrixFree::reinit() call.
      * Since a multigrid operator is always associated to inverting a matrix
      * and thus represents a diagonal block, the same vector for rows and
@@ -263,7 +263,7 @@ namespace MatrixFreeOperators
      * The optional selection vector allows to choose only some components
      * from the underlying MatrixFree object, e.g. just a single one. The
      * entry @p selected_row_blocks[i] in the vector chooses the DoFHandler
-     * and ConstraintMatrix object that was given as the
+     * and AffineConstraints object that was given as the
      * @p selected_row_blocks[i]-th argument to the MatrixFree::reinit() call.
      * Since a multigrid operator is always associated to inverting a matrix
      * and thus represents a diagonal block, the same vector for rows and

@@ -99,8 +99,9 @@ test()
   deallog << "relevant: ";
   locally_relevant_dofs.print(deallog);
 
+  typedef typename LA::MPI::BlockSparseMatrix::value_type number;
 
-  ConstraintMatrix constraints(locally_relevant_dofs);
+  AffineConstraints<number> constraints(locally_relevant_dofs);
   constraints.close();
 
   BlockDynamicSparsityPattern bcsp(locally_relevant_partitioning);
@@ -111,8 +112,7 @@ test()
     MPI_COMM_WORLD,
     locally_relevant_dofs);
 
-  typedef typename LA::MPI::BlockSparseMatrix::value_type number;
-  typename LA::MPI::BlockSparseMatrix                     A;
+  typename LA::MPI::BlockSparseMatrix A;
   A.reinit(locally_owned_partitioning, bcsp, MPI_COMM_WORLD);
 
   QGauss<3>   quadrature(3);

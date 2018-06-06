@@ -35,7 +35,7 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #ifdef DEAL_II_WITH_MPI
@@ -480,12 +480,13 @@ namespace DoFTools
        * It also suppresses very small entries in the constraint matrix to
        * avoid making the sparsity pattern fuller than necessary.
        */
+      template <typename number1, typename number2>
       void
       filter_constraints(
         const std::vector<types::global_dof_index> &master_dofs,
         const std::vector<types::global_dof_index> &slave_dofs,
-        const FullMatrix<double> &                  face_constraints,
-        ConstraintMatrix &                          constraints)
+        const FullMatrix<number1> &                 face_constraints,
+        AffineConstraints<number2> &                constraints)
       {
         Assert(face_constraints.n() == master_dofs.size(),
                ExcDimensionMismatch(master_dofs.size(), face_constraints.n()));
@@ -525,7 +526,7 @@ namespace DoFTools
                 {
                   // add up the absolute values of all constraints in this
                   // line to get a measure of their absolute size
-                  double abs_sum = 0;
+                  number1 abs_sum = 0;
                   for (unsigned int i = 0; i < n_master_dofs; ++i)
                     abs_sum += std::abs(face_constraints(row, i));
 
@@ -552,29 +553,30 @@ namespace DoFTools
     } // namespace
 
 
-
+    template <typename number>
     void
     make_hp_hanging_node_constraints(const dealii::DoFHandler<1> &,
-                                     ConstraintMatrix &)
+                                     AffineConstraints<number> &)
     {
       // nothing to do for regular dof handlers in 1d
     }
 
 
-
+    template <typename number>
     void
     make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1> &,
-                                           ConstraintMatrix &,
+                                           AffineConstraints<number> &,
                                            std::integral_constant<int, 1>)
     {
       // nothing to do for regular dof handlers in 1d
     }
 
 
+    template <typename number>
     void
     make_hp_hanging_node_constraints(
       const dealii::hp::DoFHandler<1> & /*dof_handler*/,
-      ConstraintMatrix & /*constraints*/)
+      AffineConstraints<number> & /*constraints*/)
     {
       // we may have to compute constraints for vertices. gotta think about
       // that a bit more
@@ -583,11 +585,11 @@ namespace DoFTools
     }
 
 
-
+    template <typename number>
     void
     make_oldstyle_hanging_node_constraints(
       const dealii::hp::DoFHandler<1> & /*dof_handler*/,
-      ConstraintMatrix & /*constraints*/,
+      AffineConstraints<number> & /*constraints*/,
       std::integral_constant<int, 1>)
     {
       // we may have to compute constraints for vertices. gotta think about
@@ -597,86 +599,51 @@ namespace DoFTools
     }
 
 
+    template <typename number>
     void
     make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
-                                     ConstraintMatrix &)
+                                     AffineConstraints<number> &)
     {
       // nothing to do for regular dof handlers in 1d
     }
 
 
-
+    template <typename number>
     void
     make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
-                                           ConstraintMatrix &,
+                                           AffineConstraints<number> &,
                                            std::integral_constant<int, 1>)
     {
       // nothing to do for regular dof handlers in 1d
     }
 
 
+    template <typename number>
     void
     make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 3> &,
-                                     ConstraintMatrix &)
+                                     AffineConstraints<number> &)
     {
       // nothing to do for regular dof handlers in 1d
     }
 
+
+    template <typename number>
     void
     make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 3> &,
-                                           ConstraintMatrix &,
+                                           AffineConstraints<number> &,
                                            std::integral_constant<int, 1>)
     {
       // nothing to do for regular dof handlers in 1d
     }
 
 
-    //   currently not used but may be in the future:
 
-    //     void
-    //     make_hp_hanging_node_constraints (const dealii::MDoFHandler<1,2> &,
-    //                                    ConstraintMatrix    &)
-    //     {
-    //                                     // nothing to do for regular
-    //                                     // dof handlers in 1d
-    //     }
-
-
-
-    //     void
-    //     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1,2>
-    //     &,
-    //                                          ConstraintMatrix    &,
-    //                                          std::integral_constant<int, 1>)
-    //     {
-    //                                     // nothing to do for regular
-    //                                     // dof handlers in 1d
-    //     }
-
-
-    //     void
-    //     make_oldstyle_hanging_node_constraints (const
-    //     dealii::hp::DoFHandler<1,2> &/*dof_handler*/,
-    //                                          ConstraintMatrix
-    //                                          &/*constraints*/,
-    //                                          std::integral_constant<int, 1>)
-    //     {
-    //                                     // we may have to compute
-    //                                     // constraints for
-    //                                     // vertices. gotta think about
-    //                                     // that a bit more
-    //
-    // //TODO[WB]: think about what to do here...
-    //     }
-    //#endif
-
-
-
-    template <typename DoFHandlerType>
+    template <typename DoFHandlerType, typename number>
     void
-    make_oldstyle_hanging_node_constraints(const DoFHandlerType &dof_handler,
-                                           ConstraintMatrix &    constraints,
-                                           std::integral_constant<int, 2>)
+    make_oldstyle_hanging_node_constraints(
+      const DoFHandlerType &     dof_handler,
+      AffineConstraints<number> &constraints,
+      std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2;
 
@@ -823,11 +790,12 @@ namespace DoFTools
 
 
 
-    template <typename DoFHandlerType>
+    template <typename DoFHandlerType, typename number>
     void
-    make_oldstyle_hanging_node_constraints(const DoFHandlerType &dof_handler,
-                                           ConstraintMatrix &    constraints,
-                                           std::integral_constant<int, 3>)
+    make_oldstyle_hanging_node_constraints(
+      const DoFHandlerType &     dof_handler,
+      AffineConstraints<number> &constraints,
+      std::integral_constant<int, 3>)
     {
       const unsigned int dim = 3;
 
@@ -1064,10 +1032,10 @@ namespace DoFTools
 
 
 
-    template <typename DoFHandlerType>
+    template <typename DoFHandlerType, typename number>
     void
-    make_hp_hanging_node_constraints(const DoFHandlerType &dof_handler,
-                                     ConstraintMatrix &    constraints)
+    make_hp_hanging_node_constraints(const DoFHandlerType &     dof_handler,
+                                     AffineConstraints<number> &constraints)
     {
       // note: this function is going to be hard to understand if you
       // haven't read the hp paper. however, we try to follow the notation
@@ -1800,10 +1768,10 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
-  make_hanging_node_constraints(const DoFHandlerType &dof_handler,
-                                ConstraintMatrix &    constraints)
+  make_hanging_node_constraints(const DoFHandlerType &     dof_handler,
+                                AffineConstraints<number> &constraints)
   {
     // Decide whether to use the new or old make_hanging_node_constraints
     // function. If all the FiniteElement or all elements in a FECollection
@@ -1827,9 +1795,9 @@ namespace DoFTools
      *
      * Internally used in make_periodicity_constraints.
      *
-     * enter constraints for periodicity into the given ConstraintMatrix object.
-     * this function is called when at least one of the two face iterators
-     * corresponds to an active object without further children
+     * enter constraints for periodicity into the given AffineConstraints
+     * object. this function is called when at least one of the two face
+     * iterators corresponds to an active object without further children
      *
      * @param transformation A matrix that maps degrees of freedom from one face
      * to another. If the DoFs on the two faces are supposed to match exactly,
@@ -1851,7 +1819,7 @@ namespace DoFTools
       const FaceIterator &                         face_1,
       const typename identity<FaceIterator>::type &face_2,
       const FullMatrix<double> &                   transformation,
-      dealii::ConstraintMatrix &                   constraint_matrix,
+      AffineConstraints<double> &                  constraint_matrix,
       const ComponentMask &                        component_mask,
       const bool                                   face_orientation,
       const bool                                   face_flip,
@@ -2360,7 +2328,7 @@ namespace DoFTools
   make_periodicity_constraints(
     const FaceIterator &                         face_1,
     const typename identity<FaceIterator>::type &face_2,
-    dealii::ConstraintMatrix &                   constraint_matrix,
+    AffineConstraints<double> &                  constraint_matrix,
     const ComponentMask &                        component_mask,
     const bool                                   face_orientation,
     const bool                                   face_flip,
@@ -2590,7 +2558,7 @@ namespace DoFTools
     const std::vector<
       GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
       &                              periodic_faces,
-    dealii::ConstraintMatrix &       constraint_matrix,
+    AffineConstraints<double> &      constraints,
     const ComponentMask &            component_mask,
     const std::vector<unsigned int> &first_vector_components)
   {
@@ -2617,7 +2585,7 @@ namespace DoFTools
         // every matching pair:
         make_periodicity_constraints(face_1,
                                      face_2,
-                                     constraint_matrix,
+                                     constraints,
                                      component_mask,
                                      it->orientation[0],
                                      it->orientation[1],
@@ -2633,12 +2601,12 @@ namespace DoFTools
 
   template <typename DoFHandlerType>
   void
-  make_periodicity_constraints(const DoFHandlerType &    dof_handler,
-                               const types::boundary_id  b_id1,
-                               const types::boundary_id  b_id2,
-                               const int                 direction,
-                               dealii::ConstraintMatrix &constraint_matrix,
-                               const ComponentMask &     component_mask)
+  make_periodicity_constraints(const DoFHandlerType &             dof_handler,
+                               const types::boundary_id           b_id1,
+                               const types::boundary_id           b_id2,
+                               const int                          direction,
+                               dealii::AffineConstraints<double> &constraints,
+                               const ComponentMask &component_mask)
   {
     static const int space_dim = DoFHandlerType::space_dimension;
     (void)space_dim;
@@ -2658,18 +2626,18 @@ namespace DoFTools
       dof_handler, b_id1, b_id2, direction, matched_faces);
 
     make_periodicity_constraints<DoFHandlerType>(
-      matched_faces, constraint_matrix, component_mask);
+      matched_faces, constraints, component_mask);
   }
 
 
 
   template <typename DoFHandlerType>
   void
-  make_periodicity_constraints(const DoFHandlerType &    dof_handler,
-                               const types::boundary_id  b_id,
-                               const int                 direction,
-                               dealii::ConstraintMatrix &constraint_matrix,
-                               const ComponentMask &     component_mask)
+  make_periodicity_constraints(const DoFHandlerType &     dof_handler,
+                               const types::boundary_id   b_id,
+                               const int                  direction,
+                               AffineConstraints<double> &constraints,
+                               const ComponentMask &      component_mask)
   {
     static const int dim       = DoFHandlerType::dimension;
     static const int space_dim = DoFHandlerType::space_dimension;
@@ -2690,7 +2658,7 @@ namespace DoFTools
       dof_handler, b_id, direction, matched_faces);
 
     make_periodicity_constraints<DoFHandlerType>(
-      matched_faces, constraint_matrix, component_mask);
+      matched_faces, constraints, component_mask);
   }
 
 
@@ -3231,7 +3199,7 @@ namespace DoFTools
     const DoFHandler<dim, spacedim> &              fine_grid,
     const unsigned int                             fine_component,
     const InterGridMap<DoFHandler<dim, spacedim>> &coarse_to_fine_grid_map,
-    ConstraintMatrix &                             constraints)
+    AffineConstraints<double> &                    constraints)
   {
     // store the weights with which a dof on the parameter grid contributes
     // to a dof on the fine grid. see the long doc below for more info
@@ -3342,7 +3310,7 @@ namespace DoFTools
     // note for people that want to optimize this function: the largest
     // part of the computing time is spent in the following, rather
     // innocent block of code. basically, it must be the
-    // ConstraintMatrix::add_entry call which takes the bulk of the time,
+    // AffineConstraints::add_entry call which takes the bulk of the time,
     // but it is not known to the author how to make it faster...
     std::vector<std::pair<types::global_dof_index, double>> constraint_line;
     for (types::global_dof_index global_dof = 0; global_dof < n_fine_dofs;
@@ -3501,12 +3469,16 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim,
+            int spacedim,
+            template <int, int> class DoFHandlerType,
+            typename number>
   void
-  make_zero_boundary_constraints(const DoFHandlerType<dim, spacedim> &dof,
-                                 const types::boundary_id boundary_id,
-                                 ConstraintMatrix &   zero_boundary_constraints,
-                                 const ComponentMask &component_mask)
+  make_zero_boundary_constraints(
+    const DoFHandlerType<dim, spacedim> &dof,
+    const types::boundary_id             boundary_id,
+    AffineConstraints<number> &          zero_boundary_constraints,
+    const ComponentMask &                component_mask)
   {
     Assert(component_mask.represents_n_components(dof.get_fe(0).n_components()),
            ExcMessage("The number of components in the mask has to be either "
@@ -3587,11 +3559,15 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim,
+            int spacedim,
+            template <int, int> class DoFHandlerType,
+            typename number>
   void
-  make_zero_boundary_constraints(const DoFHandlerType<dim, spacedim> &dof,
-                                 ConstraintMatrix &   zero_boundary_constraints,
-                                 const ComponentMask &component_mask)
+  make_zero_boundary_constraints(
+    const DoFHandlerType<dim, spacedim> &dof,
+    AffineConstraints<number> &          zero_boundary_constraints,
+    const ComponentMask &                component_mask)
   {
     make_zero_boundary_constraints(dof,
                                    numbers::invalid_boundary_id,

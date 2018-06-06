@@ -381,12 +381,12 @@ namespace CUDAWrappers
 
 
 
-    template <int dim>
+    template <int dim, typename number>
     std::vector<types::global_dof_index>
     get_conflict_indices(
       const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-        &                     cell,
-      const ConstraintMatrix &constraints)
+        &                              cell,
+      const AffineConstraints<number> &constraints)
     {
       std::vector<types::global_dof_index> local_dof_indices(
         cell->get_fe().dofs_per_cell);
@@ -476,11 +476,11 @@ namespace CUDAWrappers
 
   template <int dim, typename Number>
   void
-  MatrixFree<dim, Number>::reinit(const Mapping<dim> &    mapping,
-                                  const DoFHandler<dim> & dof_handler,
-                                  const ConstraintMatrix &constraints,
-                                  const Quadrature<1> &   quad,
-                                  const AdditionalData    additional_data)
+  MatrixFree<dim, Number>::reinit(const Mapping<dim> &             mapping,
+                                  const DoFHandler<dim> &          dof_handler,
+                                  const AffineConstraints<Number> &constraints,
+                                  const Quadrature<1> &            quad,
+                                  const AdditionalData additional_data)
   {
     if (typeid(Number) == typeid(double))
       cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
@@ -550,11 +550,10 @@ namespace CUDAWrappers
     CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
     typedef std::function<std::vector<types::global_dof_index>(
       CellFilter const &)>
-                    fun_type;
-    const fun_type &fun =
-      static_cast<fun_type>(std::bind(&internal::get_conflict_indices<dim>,
-                                      std::placeholders::_1,
-                                      constraints));
+               fun_type;
+    const auto fun = [&](const CellFilter &filter) {
+      return internal::get_conflict_indices<dim, Number>(filter, constraints);
+    };
 
     std::vector<std::vector<CellFilter>> graph =
       GraphColoring::make_graph_coloring(begin, end, fun);

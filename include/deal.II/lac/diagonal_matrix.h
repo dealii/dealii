@@ -134,9 +134,9 @@ public:
    * this matrix, entries are only added to the diagonal of the matrix. All
    * other entries are ignored and no exception is thrown.
    *
-   * This function is for a consistent interface with the other matrix classes
-   * in deal.II and can be used in
-   * ConstraintMatrix::distribute_local_to_global to get exactly the same
+   * This function is for a consistent interface with the other matrix
+   * classes in deal.II and can be used in
+   * AffineConstraints::distribute_local_to_global to get exactly the same
    * diagonal as when assembling into a sparse matrix.
    */
   template <typename number2>

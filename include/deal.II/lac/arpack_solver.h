@@ -155,14 +155,13 @@ dseupd_(int *         rvec,
  * and also how to set the parameters appropriately
  * please take a look into the ARPACK manual.
  *
- * @note Whenever you eliminate degrees of freedom using ConstraintMatrix, you
- * generate spurious eigenvalues and eigenvectors. If you make sure that the
- * diagonals of eliminated matrix rows are all equal to one, you get a single
- * additional eigenvalue. But beware that some functions in deal.II set these
- * diagonals to rather arbitrary (from the point of view of eigenvalue
- * problems) values. See also
- * @ref step_36 "step-36"
- * for an example.
+ * @note Whenever you eliminate degrees of freedom using AffineConstraints,
+ * you generate spurious eigenvalues and eigenvectors. If you make sure
+ * that the diagonals of eliminated matrix rows are all equal to one, you
+ * get a single additional eigenvalue. But beware that some functions in
+ * deal.II set these diagonals to rather arbitrary (from the point of view
+ * of eigenvalue problems) values. See also @ref step_36 "step-36" for an
+ * example.
  *
  * @author Baerbel Janssen, Agnieszka Miedlar, 2010, Guido Kanschat 2015, Joscha
  * Gedicke 2016

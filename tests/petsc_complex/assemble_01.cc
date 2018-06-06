@@ -45,7 +45,7 @@ main(int argc, char **argv)
   FullMatrix<PetscScalar> cell_matrix(n, n);
   Vector<PetscScalar>     cell_rhs(n);
 
-  ConstraintMatrix constraints;
+  AffineConstraints<PetscScalar> constraints;
   constraints.close();
 
   std::vector<types::global_dof_index> gdi(n);

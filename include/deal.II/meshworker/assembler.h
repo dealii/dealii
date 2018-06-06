@@ -116,11 +116,14 @@ namespace MeshWorker
        */
       void
       initialize(const BlockInfo *block_info, AnyData &residuals);
+
       /**
        * Initialize the constraints.
        */
       void
-      initialize(const ConstraintMatrix &constraints);
+      initialize(
+        const AffineConstraints<typename VectorType::value_type> &constraints);
+
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -167,10 +170,11 @@ namespace MeshWorker
       SmartPointer<const BlockInfo,
                    ResidualLocalBlocksToGlobalBlocks<VectorType>>
         block_info;
+
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix,
+      SmartPointer<const AffineConstraints<typename VectorType::value_type>,
                    ResidualLocalBlocksToGlobalBlocks<VectorType>>
         constraints;
     };
@@ -225,7 +229,9 @@ namespace MeshWorker
        * Initialize the constraints.
        */
       void
-      initialize(const ConstraintMatrix &constraints);
+      initialize(
+        const AffineConstraints<typename MatrixType::value_type> &constraints);
+
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -280,7 +286,8 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix,
+
+      SmartPointer<const AffineConstraints<typename MatrixType::value_type>,
                    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         constraints;
 
@@ -534,7 +541,7 @@ namespace MeshWorker
     template <typename VectorType>
     inline void
     ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize(
-      const ConstraintMatrix &c)
+      const AffineConstraints<typename VectorType::value_type> &c)
     {
       constraints = &c;
     }
@@ -632,7 +639,7 @@ namespace MeshWorker
     template <typename MatrixType, typename number>
     inline void
     MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize(
-      const ConstraintMatrix &c)
+      const AffineConstraints<typename MatrixType::value_type> &c)
     {
       constraints = &c;
     }

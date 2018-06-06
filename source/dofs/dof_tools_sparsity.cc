@@ -36,8 +36,8 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
@@ -54,13 +54,15 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace DoFTools
 {
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number>
   void
-  make_sparsity_pattern(const DoFHandlerType &    dof,
-                        SparsityPatternType &     sparsity,
-                        const ConstraintMatrix &  constraints,
-                        const bool                keep_constrained_dofs,
-                        const types::subdomain_id subdomain_id)
+  make_sparsity_pattern(const DoFHandlerType &           dof,
+                        SparsityPatternType &            sparsity,
+                        const AffineConstraints<number> &constraints,
+                        const bool                       keep_constrained_dofs,
+                        const types::subdomain_id        subdomain_id)
   {
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
@@ -110,14 +112,16 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number>
   void
-  make_sparsity_pattern(const DoFHandlerType &    dof,
-                        const Table<2, Coupling> &couplings,
-                        SparsityPatternType &     sparsity,
-                        const ConstraintMatrix &  constraints,
-                        const bool                keep_constrained_dofs,
-                        const types::subdomain_id subdomain_id)
+  make_sparsity_pattern(const DoFHandlerType &           dof,
+                        const Table<2, Coupling> &       couplings,
+                        SparsityPatternType &            sparsity,
+                        const AffineConstraints<number> &constraints,
+                        const bool                       keep_constrained_dofs,
+                        const types::subdomain_id        subdomain_id)
   {
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
@@ -477,11 +481,13 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number>
   void
-  make_flux_sparsity_pattern(const DoFHandlerType &    dof,
-                             SparsityPatternType &     sparsity,
-                             const ConstraintMatrix &  constraints,
+  make_flux_sparsity_pattern(const DoFHandlerType &           dof,
+                             SparsityPatternType &            sparsity,
+                             const AffineConstraints<number> &constraints,
                              const bool                keep_constrained_dofs,
                              const types::subdomain_id subdomain_id)
 
@@ -651,8 +657,8 @@ namespace DoFTools
   make_flux_sparsity_pattern(const DoFHandlerType &dof,
                              SparsityPatternType & sparsity)
   {
-    ConstraintMatrix constraints;
-    make_flux_sparsity_pattern(dof, sparsity, constraints);
+    AffineConstraints<double> dummy;
+    make_flux_sparsity_pattern(dof, sparsity, dummy);
   }
 
   template <int dim, int spacedim>
@@ -718,12 +724,14 @@ namespace DoFTools
     {
       // implementation of the same function in namespace DoFTools for
       // non-hp DoFHandlers
-      template <typename DoFHandlerType, typename SparsityPatternType>
+      template <typename DoFHandlerType,
+                typename SparsityPatternType,
+                typename number>
       void
-      make_flux_sparsity_pattern(const DoFHandlerType &  dof,
-                                 SparsityPatternType &   sparsity,
-                                 const ConstraintMatrix &constraints,
-                                 const bool              keep_constrained_dofs,
+      make_flux_sparsity_pattern(const DoFHandlerType &           dof,
+                                 SparsityPatternType &            sparsity,
+                                 const AffineConstraints<number> &constraints,
+                                 const bool keep_constrained_dofs,
                                  const Table<2, Coupling> &int_mask,
                                  const Table<2, Coupling> &flux_mask,
                                  const types::subdomain_id subdomain_id)
@@ -1007,12 +1015,15 @@ namespace DoFTools
 
       // implementation of the same function in namespace DoFTools for hp
       // DoFHandlers
-      template <int dim, int spacedim, typename SparsityPatternType>
+      template <int dim,
+                int spacedim,
+                typename SparsityPatternType,
+                typename number>
       void
       make_flux_sparsity_pattern(
         const dealii::hp::DoFHandler<dim, spacedim> &dof,
         SparsityPatternType &                        sparsity,
-        const ConstraintMatrix &                     constraints,
+        const AffineConstraints<number> &            constraints,
         const bool                                   keep_constrained_dofs,
         const Table<2, Coupling> &                   int_mask,
         const Table<2, Coupling> &                   flux_mask,
@@ -1271,22 +1282,26 @@ namespace DoFTools
                              const Table<2, Coupling> &flux_mask,
                              const types::subdomain_id subdomain_id)
   {
-    ConstraintMatrix constraints;
-    const bool       keep_constrained_dofs = true;
+    AffineConstraints<double> dummy;
+
+    const bool keep_constrained_dofs = true;
+
     make_flux_sparsity_pattern(dof,
                                sparsity,
-                               constraints,
+                               dummy,
                                keep_constrained_dofs,
                                int_mask,
                                flux_mask,
                                subdomain_id);
   }
 
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number>
   void
-  make_flux_sparsity_pattern(const DoFHandlerType &    dof,
-                             SparsityPatternType &     sparsity,
-                             const ConstraintMatrix &  constraints,
+  make_flux_sparsity_pattern(const DoFHandlerType &           dof,
+                             SparsityPatternType &            sparsity,
+                             const AffineConstraints<number> &constraints,
                              const bool                keep_constrained_dofs,
                              const Table<2, Coupling> &int_mask,
                              const Table<2, Coupling> &flux_mask,

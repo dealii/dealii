@@ -144,7 +144,9 @@ public:
    * for Sparse Linear Systems", section 6.7. Called once per iteration
    */
   boost::signals2::connection
-  connect_coefficients_slot(const std::function<void(double, double)> &slot);
+  connect_coefficients_slot(
+    const std::function<void(typename VectorType::value_type,
+                             typename VectorType::value_type)> &slot);
 
   /**
    * Connect a slot to retrieve the estimated condition number. Called on each
@@ -186,8 +188,8 @@ protected:
    */
   static void
   compute_eigs_and_cond(
-    const std::vector<double> &diagonal,
-    const std::vector<double> &offdiagonal,
+    const std::vector<typename VectorType::value_type> &diagonal,
+    const std::vector<typename VectorType::value_type> &offdiagonal,
     const boost::signals2::signal<void(const std::vector<double> &)>
       &                                          eigenvalues_signal,
     const boost::signals2::signal<void(double)> &cond_signal);
@@ -200,7 +202,9 @@ protected:
   /**
    * Signal used to retrieve the CG coefficients. Called on each iteration.
    */
-  boost::signals2::signal<void(double, double)> coefficients_signal;
+  boost::signals2::signal<void(typename VectorType::value_type,
+                               typename VectorType::value_type)>
+    coefficients_signal;
 
   /**
    * Signal used to retrieve the estimated condition number. Called once when
@@ -265,8 +269,8 @@ SolverCG<VectorType>::print_vectors(const unsigned int,
 template <typename VectorType>
 inline void
 SolverCG<VectorType>::compute_eigs_and_cond(
-  const std::vector<double> &diagonal,
-  const std::vector<double> &offdiagonal,
+  const std::vector<typename VectorType::value_type> &diagonal,
+  const std::vector<typename VectorType::value_type> &offdiagonal,
   const boost::signals2::signal<void(const std::vector<double> &)>
     &                                          eigenvalues_signal,
   const boost::signals2::signal<void(double)> &cond_signal)
@@ -274,7 +278,8 @@ SolverCG<VectorType>::compute_eigs_and_cond(
   // Avoid computing eigenvalues unless they are needed.
   if (!cond_signal.empty() || !eigenvalues_signal.empty())
     {
-      TridiagonalMatrix<double> T(diagonal.size(), true);
+      TridiagonalMatrix<typename VectorType::value_type> T(diagonal.size(),
+                                                           true);
       for (size_type i = 0; i < diagonal.size(); ++i)
         {
           T(i, i) = diagonal[i];
@@ -285,8 +290,10 @@ SolverCG<VectorType>::compute_eigs_and_cond(
       // Need two eigenvalues to estimate the condition number.
       if (diagonal.size() > 1)
         {
-          double condition_number = T.eigenvalue(T.n() - 1) / T.eigenvalue(0);
-          cond_signal(condition_number);
+          auto condition_number = T.eigenvalue(T.n() - 1) / T.eigenvalue(0);
+          // Condition number is real valued and nonnegative; simply take
+          // the absolute value:
+          cond_signal(std::abs(condition_number));
         }
       // Avoid copying the eigenvalues of T to a vector unless a signal is
       // connected.
@@ -295,7 +302,9 @@ SolverCG<VectorType>::compute_eigs_and_cond(
           std::vector<double> eigenvalues(T.n());
           for (unsigned int j = 0; j < T.n(); ++j)
             {
-              eigenvalues.at(j) = T.eigenvalue(j);
+              // for a hermitian matrix, all eigenvalues are real-valued
+              // and non-negative, simply return the absolute value:
+              eigenvalues[j] = std::abs(T.eigenvalue(j));
             }
           eigenvalues_signal(eigenvalues);
         }
@@ -312,6 +321,8 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
                             const VectorType &        b,
                             const PreconditionerType &preconditioner)
 {
+  using number = typename VectorType::value_type;
+
   SolverControl::State conv = SolverControl::iterate;
 
   LogStream::Prefix prefix("cg");
@@ -333,13 +344,13 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
 
   // vectors used for eigenvalue
   // computations
-  std::vector<double> diagonal;
-  std::vector<double> offdiagonal;
+  std::vector<typename VectorType::value_type> diagonal;
+  std::vector<typename VectorType::value_type> offdiagonal;
 
   int    it  = 0;
   double res = -std::numeric_limits<double>::max();
 
-  double eigen_beta_alpha = 0;
+  typename VectorType::value_type eigen_beta_alpha = 0;
 
   // resize the vectors, but do not set
   // the values since they'd be overwritten
@@ -348,7 +359,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   d.reinit(x, true);
   h.reinit(x, true);
 
-  double gh, beta;
+  number gh, beta;
 
   // compute residual. if vector is
   // zero, then short-circuit the
@@ -385,12 +396,12 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
       it++;
       A.vmult(h, d);
 
-      double alpha = d * h;
-      Assert(alpha != 0., ExcDivideByZero());
+      number alpha = d * h;
+      Assert(std::abs(alpha) != 0., ExcDivideByZero());
       alpha = gh / alpha;
 
       x.add(alpha, d);
-      res = std::sqrt(g.add_and_dot(alpha, h, g));
+      res = std::sqrt(std::abs(g.add_and_dot(alpha, h, g)));
 
       print_vectors(it, x, g, d);
 
@@ -404,7 +415,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
           preconditioner.vmult(h, g);
 
           beta = gh;
-          Assert(beta != 0., ExcDivideByZero());
+          Assert(std::abs(beta) != 0., ExcDivideByZero());
           gh   = g * h;
           beta = gh / beta;
           d.sadd(beta, -1., h);
@@ -424,7 +435,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
       // the projected matrix.
       if (do_eigenvalues)
         {
-          diagonal.push_back(1. / alpha + eigen_beta_alpha);
+          diagonal.push_back(number(1.) / alpha + eigen_beta_alpha);
           eigen_beta_alpha = beta / alpha;
           offdiagonal.push_back(std::sqrt(beta) / alpha);
         }
@@ -448,7 +459,8 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
 template <typename VectorType>
 boost::signals2::connection
 SolverCG<VectorType>::connect_coefficients_slot(
-  const std::function<void(double, double)> &slot)
+  const std::function<void(typename VectorType::value_type,
+                           typename VectorType::value_type)> &slot)
 {
   return coefficients_signal.connect(slot);
 }

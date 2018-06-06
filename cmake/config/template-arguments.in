@@ -173,19 +173,25 @@ VECTORS_WITH_MATRIX := { Vector<double>;
 
 // Matrices
 SPARSE_MATRICES := { SparseMatrix<double>;
-	             SparseMatrix<float>;
+                     SparseMatrix<float>;
 
-	             BlockSparseMatrix<double>;
-	             BlockSparseMatrix<float>;
-	           
-	             @DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES@;
-	             @DEAL_II_EXPAND_PETSC_SPARSE_MATRICES@;
-	           }
+                     BlockSparseMatrix<double>;
+                     BlockSparseMatrix<float>;
+                     @DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES@;
+                     @DEAL_II_EXPAND_PETSC_SPARSE_MATRICES@;
+                   }
+
+// Special lists for AffineConstraints:
+AFFINE_CONSTRAINTS_MATRIX_TEMPL := { FullMatrix;
+                                     SparseMatrix;
+                                     SparseMatrixEZ;
+                                     ChunkSparseMatrix;
+                                   }
 
 // General container types
-GENERAL_CONTAINER_TYPES := {std::vector;
-                            ArrayView
-                       }
+GENERAL_CONTAINER_TYPES := { std::vector;
+                             ArrayView
+                           }
 
 // DoFHandler and hp::DoFHandler templates
 DOFHANDLER_TEMPLATES := { DoFHandler;
@@ -226,6 +232,16 @@ SPARSITY_PATTERNS := { SparsityPattern;
                        BlockSparsityPattern;
                        BlockDynamicSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
+
+// Special lists for AffineConstraints:
+AFFINE_CONSTRAINTS_SP := { SparsityPattern;
+                           DynamicSparsityPattern;
+                           @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
+                         }
+AFFINE_CONSTRAINTS_SP_BLOCK := { BlockSparsityPattern;
+                                 BlockDynamicSparsityPattern;
+                                 @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@;
+                               }
 
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }

@@ -30,7 +30,7 @@
 #  include <deal.II/fe/mapping.h>
 #  include <deal.II/fe/mapping_q1.h>
 
-#  include <deal.II/lac/constraint_matrix.h>
+#  include <deal.II/lac/affine_constraints.h>
 #  include <deal.II/lac/cuda_vector.h>
 
 #  include <cuda_runtime_api.h>
@@ -153,26 +153,27 @@ namespace CUDAWrappers
 
     /**
      * Extracts the information needed to perform loops over cells. The
-     * DoFHandler and ConstraintMatrix describe the layout of degrees of
-     * freedom, the DoFHandler and the mapping describe the transformation from
-     * unit to real cell, and the finite element underlying the DoFHandler
-     * together with the quadrature formula describe the local operations.
+     * DoFHandler and AffineConstraints objects describe the layout of
+     * degrees of freedom, the DoFHandler and the mapping describe the
+     * transformation from unit to real cell, and the finite element
+     * underlying the DoFHandler together with the quadrature formula
+     * describe the local operations.
      */
     void
-    reinit(const Mapping<dim> &    mapping,
-           const DoFHandler<dim> & dof_handler,
-           const ConstraintMatrix &constraints,
-           const Quadrature<1> &   quad,
-           const AdditionalData    additional_data = AdditionalData());
+    reinit(const Mapping<dim> &             mapping,
+           const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<Number> &constraints,
+           const Quadrature<1> &            quad,
+           const AdditionalData             additional_data = AdditionalData());
 
     /**
      * Initializes the data structures. Same as above but using a Q1 mapping.
      */
     void
-    reinit(const DoFHandler<dim> & dof_handler,
-           const ConstraintMatrix &constraints,
-           const Quadrature<1> &   quad,
-           const AdditionalData    AdditionalData = AdditionalData());
+    reinit(const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<Number> &constraints,
+           const Quadrature<1> &            quad,
+           const AdditionalData             AdditionalData = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.

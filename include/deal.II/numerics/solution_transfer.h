@@ -239,7 +239,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Whether this is a problem you need to worry about or not depends on your
  * application. The situation is easily corrected, of course, by applying
- * ConstraintMatrix::distribute() to your solution vector after transfer,
+ * AffineConstraints::distribute() to your solution vector after transfer,
  * using a constraint matrix object computed on the new DoFHandler object (you
  * probably need to create this object anyway if you have hanging nodes). This
  * is also what is done, for example, in step-15.
@@ -250,7 +250,7 @@ DEAL_II_NAMESPACE_OPEN
  * course exactly the same because the old finite element space is a subspace
  * of the new one. Thus, if the old function was conforming (i.e., satisfied
  * hanging node constraints), then so does the new one, and it is not
- * necessary to call ConstraintMatrix::distribute().
+ * necessary to call AffineConstraints::distribute().
  *
  *
  * <h3>Implementation in the context of hp finite elements</h3>
@@ -284,7 +284,7 @@ DEAL_II_NAMESPACE_OPEN
  * polynomial degree is lowered on some cells, then the old finite element
  * space is not a subspace of the new space and you may run into the same
  * situation as discussed above with hanging nodes. You may want to consider
- * calling ConstraintMatrix::distribute() on the vector obtained by
+ * calling AffineConstraints::distribute() on the vector obtained by
  * transferring the solution.
  *
  * @ingroup numerics

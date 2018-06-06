@@ -504,7 +504,7 @@ namespace GraphColoring
    * third argument needs to accurately describe <i>all</i> degrees of freedom
    * for which anything is written into the matrix or right hand side. In
    * other words, if the writing happens through a function like
-   * ConstraintMatrix::copy_local_to_global(), then the set of conflict
+   * AffineConstraints::copy_local_to_global(), then the set of conflict
    * indices must actually contain not only the degrees of freedom on the
    * current cell, but also those they are linked to by constraints such as
    * hanging nodes.

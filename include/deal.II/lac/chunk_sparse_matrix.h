@@ -1504,7 +1504,7 @@ ChunkSparseMatrix<number>::add(const size_type i,
 
   Assert(cols != nullptr, ExcNotInitialized());
 
-  if (value != 0.)
+  if (std::abs(value) != 0.)
     {
       const size_type index = compute_location(i, j);
       Assert((index != ChunkSparsityPattern::invalid_entry),
@@ -1564,7 +1564,7 @@ ChunkSparseMatrix<number>::operator/=(const number factor)
 {
   Assert(cols != nullptr, ExcNotInitialized());
   Assert(val != nullptr, ExcNotInitialized());
-  Assert(factor != 0, ExcDivideByZero());
+  Assert(std::abs(factor) != 0, ExcDivideByZero());
 
   const number factor_inv = 1. / factor;
 

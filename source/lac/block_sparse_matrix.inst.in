@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-for (S : REAL_SCALARS)
+for (S : REAL_AND_COMPLEX_SCALARS)
   {
     template class BlockSparseMatrix<S>;
   }

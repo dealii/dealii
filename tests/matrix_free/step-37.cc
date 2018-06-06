@@ -129,9 +129,9 @@ namespace Step37
     clear();
 
     void
-    reinit(const DoFHandler<dim> & dof_handler,
-           const ConstraintMatrix &constraints,
-           const unsigned int      level = numbers::invalid_unsigned_int);
+    reinit(const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<number> &constraints,
+           const unsigned int level = numbers::invalid_unsigned_int);
 
     unsigned int
     m() const;
@@ -209,9 +209,9 @@ namespace Step37
   template <int dim, int fe_degree, typename number>
   void
   LaplaceOperator<dim, fe_degree, number>::reinit(
-    const DoFHandler<dim> & dof_handler,
-    const ConstraintMatrix &constraints,
-    const unsigned int      level)
+    const DoFHandler<dim> &          dof_handler,
+    const AffineConstraints<number> &constraints,
+    const unsigned int               level)
   {
     typename MatrixFree<dim, number>::AdditionalData additional_data;
     additional_data.tasks_parallel_scheme =
@@ -377,15 +377,15 @@ namespace Step37
                                                                SystemMatrixType;
     typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
 
-    Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
-    DoFHandler<dim>    dof_handler;
-    ConstraintMatrix   constraints;
+    Triangulation<dim>        triangulation;
+    FE_Q<dim>                 fe;
+    DoFHandler<dim>           dof_handler;
+    AffineConstraints<double> constraints;
 
-    SystemMatrixType                system_matrix;
-    MGLevelObject<LevelMatrixType>  mg_matrices;
-    FullMatrix<float>               coarse_matrix;
-    MGLevelObject<ConstraintMatrix> mg_constraints;
+    SystemMatrixType                        system_matrix;
+    MGLevelObject<LevelMatrixType>          mg_matrices;
+    FullMatrix<float>                       coarse_matrix;
+    MGLevelObject<AffineConstraints<float>> mg_constraints;
 
     Vector<double> solution;
     Vector<double> system_rhs;

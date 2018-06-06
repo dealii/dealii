@@ -1273,7 +1273,7 @@ SparseMatrixEZ<number>::add(const size_type i,
   Assert(j < n(), ExcIndexRange(j, 0, n()));
 
   // ignore zero additions
-  if (value == 0)
+  if (std::abs(value) == 0.)
     return;
 
   Entry *entry = allocate(i, j);
@@ -1342,7 +1342,7 @@ SparseMatrixEZ<number>::add(const size_type  row,
 {
   // TODO: This function can surely be made more efficient
   for (size_type j = 0; j < n_cols; ++j)
-    if ((values[j] != 0) || (elide_zero_values == false))
+    if ((std::abs(values[j]) != 0) || (elide_zero_values == false))
       add(row, col_indices[j], values[j]);
 }
 

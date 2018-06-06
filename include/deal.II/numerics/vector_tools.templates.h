@@ -55,8 +55,8 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -747,7 +747,7 @@ namespace VectorTools
     InterGridMap<DoFHandlerType<dim, spacedim>> intergridmap;
     intergridmap.make_mapping(dof1, dof2);
 
-    ConstraintMatrix dummy;
+    AffineConstraints<typename VectorType::value_type> dummy;
     dummy.close();
 
     interpolate_to_different_mesh(intergridmap, u1, dummy, u2);
@@ -760,11 +760,12 @@ namespace VectorTools
             typename VectorType,
             template <int, int> class DoFHandlerType>
   void
-  interpolate_to_different_mesh(const DoFHandlerType<dim, spacedim> &dof1,
-                                const VectorType &                   u1,
-                                const DoFHandlerType<dim, spacedim> &dof2,
-                                const ConstraintMatrix &constraints,
-                                VectorType &            u2)
+  interpolate_to_different_mesh(
+    const DoFHandlerType<dim, spacedim> &                     dof1,
+    const VectorType &                                        u1,
+    const DoFHandlerType<dim, spacedim> &                     dof2,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    VectorType &                                              u2)
   {
     Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
            ExcMessage("The two DoF handlers must represent triangulations that "
@@ -803,10 +804,10 @@ namespace VectorTools
             template <int, int> class DoFHandlerType>
   void
   interpolate_to_different_mesh(
-    const InterGridMap<DoFHandlerType<dim, spacedim>> &intergridmap,
-    const VectorType &                                 u1,
-    const ConstraintMatrix &                           constraints,
-    VectorType &                                       u2)
+    const InterGridMap<DoFHandlerType<dim, spacedim>> &       intergridmap,
+    const VectorType &                                        u1,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    VectorType &                                              u2)
   {
     const DoFHandlerType<dim, spacedim> &dof1 = intergridmap.get_source_grid();
     const DoFHandlerType<dim, spacedim> &dof2 =
@@ -938,7 +939,7 @@ namespace VectorTools
     template <typename number>
     bool
     constraints_and_b_v_are_compatible(
-      const ConstraintMatrix &                   constraints,
+      const AffineConstraints<number> &          constraints,
       std::map<types::global_dof_index, number> &boundary_values)
     {
       for (typename std::map<types::global_dof_index, number>::iterator it =
@@ -1000,7 +1001,7 @@ namespace VectorTools
     do_project(
       const M_or_MC<dim, spacedim> &                             mapping,
       const DoFHandlerType<dim, spacedim> &                      dof,
-      const ConstraintMatrix &                                   constraints,
+      const AffineConstraints<typename VectorType::value_type> & constraints,
       const Q_or_QC<dim> &                                       quadrature,
       const Function<spacedim, typename VectorType::value_type> &function,
       VectorType &                                               vec_result,
@@ -1099,7 +1100,7 @@ namespace VectorTools
     project_matrix_free(
       const Mapping<dim, spacedim> &   mapping,
       const DoFHandler<dim, spacedim> &dof,
-      const ConstraintMatrix &         constraints,
+      const AffineConstraints<Number> &constraints,
       const Quadrature<dim> &          quadrature,
       const Function<
         spacedim,
@@ -1206,7 +1207,7 @@ namespace VectorTools
     project_matrix_free_degree(
       const Mapping<dim, spacedim> &   mapping,
       const DoFHandler<dim, spacedim> &dof,
-      const ConstraintMatrix &         constraints,
+      const AffineConstraints<Number> &constraints,
       const Quadrature<dim> &          quadrature,
       const Function<
         spacedim,
@@ -1277,7 +1278,7 @@ namespace VectorTools
     project_matrix_free_component(
       const Mapping<dim, spacedim> &   mapping,
       const DoFHandler<dim, spacedim> &dof,
-      const ConstraintMatrix &         constraints,
+      const AffineConstraints<Number> &constraints,
       const Quadrature<dim> &          quadrature,
       const Function<
         spacedim,
@@ -1355,7 +1356,7 @@ namespace VectorTools
     project_matrix_free_copy_vector(
       const Mapping<dim, spacedim> &                             mapping,
       const DoFHandler<dim, spacedim> &                          dof,
-      const ConstraintMatrix &                                   constraints,
+      const AffineConstraints<typename VectorType::value_type> & constraints,
       const Quadrature<dim> &                                    quadrature,
       const Function<spacedim, typename VectorType::value_type> &function,
       VectorType &                                               vec_result,
@@ -1395,15 +1396,16 @@ namespace VectorTools
      */
     template <typename VectorType, int dim>
     void
-    project(const Mapping<dim> &                                  mapping,
-            const DoFHandler<dim> &                               dof,
-            const ConstraintMatrix &                              constraints,
-            const Quadrature<dim> &                               quadrature,
-            const Function<dim, typename VectorType::value_type> &function,
-            VectorType &                                          vec_result,
-            const bool                 enforce_zero_boundary,
-            const Quadrature<dim - 1> &q_boundary,
-            const bool                 project_to_boundary_first)
+    project(
+      const Mapping<dim> &                                      mapping,
+      const DoFHandler<dim> &                                   dof,
+      const AffineConstraints<typename VectorType::value_type> &constraints,
+      const Quadrature<dim> &                                   quadrature,
+      const Function<dim, typename VectorType::value_type> &    function,
+      VectorType &                                              vec_result,
+      const bool                 enforce_zero_boundary,
+      const Quadrature<dim - 1> &q_boundary,
+      const bool                 project_to_boundary_first)
     {
       // If we can, use the matrix-free implementation
       bool use_matrix_free =
@@ -1450,14 +1452,14 @@ namespace VectorTools
     template <int dim, typename VectorType, int spacedim, int fe_degree>
     void
     project_parallel(
-      const Mapping<dim, spacedim> &   mapping,
-      const DoFHandler<dim, spacedim> &dof,
-      const ConstraintMatrix &         constraints,
-      const Quadrature<dim> &          quadrature,
+      const Mapping<dim, spacedim> &                            mapping,
+      const DoFHandler<dim, spacedim> &                         dof,
+      const AffineConstraints<typename VectorType::value_type> &constraints,
+      const Quadrature<dim> &                                   quadrature,
       const std::function<typename VectorType::value_type(
         const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
-        const unsigned int)> &         func,
-      VectorType &                     vec_result)
+        const unsigned int)> &                                  func,
+      VectorType &                                              vec_result)
     {
       typedef typename VectorType::value_type Number;
       Assert(dof.get_fe(0).n_components() == 1,
@@ -1567,13 +1569,13 @@ namespace VectorTools
     void
     project_parallel(
       std::shared_ptr<const MatrixFree<dim, typename VectorType::value_type>>
-                              matrix_free,
-      const ConstraintMatrix &constraints,
+                                                                matrix_free,
+      const AffineConstraints<typename VectorType::value_type> &constraints,
       const std::function<VectorizedArray<typename VectorType::value_type>(
         const unsigned int,
-        const unsigned int)> &func,
-      VectorType &            vec_result,
-      const unsigned int      fe_component)
+        const unsigned int)> &                                  func,
+      VectorType &                                              vec_result,
+      const unsigned int                                        fe_component)
     {
       const DoFHandler<dim, spacedim> &dof =
         matrix_free->get_dof_handler(fe_component);
@@ -1655,14 +1657,14 @@ namespace VectorTools
 
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const Mapping<dim, spacedim> &   mapping,
-          const DoFHandler<dim, spacedim> &dof,
-          const ConstraintMatrix &         constraints,
-          const Quadrature<dim> &          quadrature,
+  project(const Mapping<dim, spacedim> &                            mapping,
+          const DoFHandler<dim, spacedim> &                         dof,
+          const AffineConstraints<typename VectorType::value_type> &constraints,
+          const Quadrature<dim> &                                   quadrature,
           const std::function<typename VectorType::value_type(
             const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
-            const unsigned int)> &         func,
-          VectorType &                     vec_result)
+            const unsigned int)> &                                  func,
+          VectorType &                                              vec_result)
   {
     switch (dof.get_fe().degree)
       {
@@ -1690,7 +1692,7 @@ namespace VectorTools
   void
   project(std::shared_ptr<
             const MatrixFree<dim, typename VectorType::value_type>> matrix_free,
-          const ConstraintMatrix &                                  constraints,
+          const AffineConstraints<typename VectorType::value_type> &constraints,
           const unsigned int      n_q_points_1d,
           const std::function<VectorizedArray<typename VectorType::value_type>(
             const unsigned int,
@@ -1731,7 +1733,7 @@ namespace VectorTools
   void
   project(std::shared_ptr<
             const MatrixFree<dim, typename VectorType::value_type>> matrix_free,
-          const ConstraintMatrix &                                  constraints,
+          const AffineConstraints<typename VectorType::value_type> &constraints,
           const std::function<VectorizedArray<typename VectorType::value_type>(
             const unsigned int,
             const unsigned int)> &                                  func,
@@ -1750,10 +1752,10 @@ namespace VectorTools
 
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const Mapping<dim, spacedim> &   mapping,
-          const DoFHandler<dim, spacedim> &dof,
-          const ConstraintMatrix &         constraints,
-          const Quadrature<dim> &          quadrature,
+  project(const Mapping<dim, spacedim> &                            mapping,
+          const DoFHandler<dim, spacedim> &                         dof,
+          const AffineConstraints<typename VectorType::value_type> &constraints,
+          const Quadrature<dim> &                                   quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec_result,
           const bool                 enforce_zero_boundary,
@@ -1803,9 +1805,9 @@ namespace VectorTools
 
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const DoFHandler<dim, spacedim> &dof,
-          const ConstraintMatrix &         constraints,
-          const Quadrature<dim> &          quadrature,
+  project(const DoFHandler<dim, spacedim> &                         dof,
+          const AffineConstraints<typename VectorType::value_type> &constraints,
+          const Quadrature<dim> &                                   quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec,
           const bool                 enforce_zero_boundary,
@@ -1833,10 +1835,10 @@ namespace VectorTools
 
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const hp::MappingCollection<dim, spacedim> &mapping,
-          const hp::DoFHandler<dim, spacedim> &       dof,
-          const ConstraintMatrix &                    constraints,
-          const hp::QCollection<dim> &                quadrature,
+  project(const hp::MappingCollection<dim, spacedim> &              mapping,
+          const hp::DoFHandler<dim, spacedim> &                     dof,
+          const AffineConstraints<typename VectorType::value_type> &constraints,
+          const hp::QCollection<dim> &                              quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec_result,
           const bool                      enforce_zero_boundary,
@@ -1861,9 +1863,9 @@ namespace VectorTools
 
   template <int dim, typename VectorType, int spacedim>
   void
-  project(const hp::DoFHandler<dim, spacedim> &dof,
-          const ConstraintMatrix &             constraints,
-          const hp::QCollection<dim> &         quadrature,
+  project(const hp::DoFHandler<dim, spacedim> &                     dof,
+          const AffineConstraints<typename VectorType::value_type> &constraints,
+          const hp::QCollection<dim> &                              quadrature,
           const Function<spacedim, typename VectorType::value_type> &function,
           VectorType &                                               vec,
           const bool                      enforce_zero_boundary,
@@ -1891,7 +1893,7 @@ namespace VectorTools
     const Quadrature<dim> &                                    quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,
     VectorType &                                               rhs_vector,
-    const ConstraintMatrix &                                   constraints)
+    const AffineConstraints<typename VectorType::value_type> & constraints)
   {
     typedef typename VectorType::value_type Number;
 
@@ -2007,7 +2009,7 @@ namespace VectorTools
     const Quadrature<dim> &                                    quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,
     VectorType &                                               rhs_vector,
-    const ConstraintMatrix &                                   constraints)
+    const AffineConstraints<typename VectorType::value_type> & constraints)
   {
     create_right_hand_side(StaticMappingQ1<dim, spacedim>::mapping,
                            dof_handler,
@@ -2027,7 +2029,7 @@ namespace VectorTools
     const hp::QCollection<dim> &                               quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,
     VectorType &                                               rhs_vector,
-    const ConstraintMatrix &                                   constraints)
+    const AffineConstraints<typename VectorType::value_type> & constraints)
   {
     typedef typename VectorType::value_type Number;
 
@@ -2160,7 +2162,7 @@ namespace VectorTools
     const hp::QCollection<dim> &                               quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,
     VectorType &                                               rhs_vector,
-    const ConstraintMatrix &                                   constraints)
+    const AffineConstraints<typename VectorType::value_type> & constraints)
   {
     create_right_hand_side(
       hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
@@ -3130,7 +3132,8 @@ namespace VectorTools
 
 
 
-  // ----------- interpolate_boundary_values for ConstraintMatrix --------------
+  // ----------- interpolate_boundary_values for AffineConstraints
+  // --------------
 
 
 
@@ -3143,9 +3146,9 @@ namespace VectorTools
     const Mapping<dim, spacedim> &       mapping,
     const DoFHandlerType<dim, spacedim> &dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                  function_map,
-    ConstraintMatrix &   constraints,
-    const ComponentMask &component_mask_)
+      &                        function_map,
+    AffineConstraints<number> &constraints,
+    const ComponentMask &      component_mask_)
   {
     std::map<types::global_dof_index, number> boundary_values;
     interpolate_boundary_values(
@@ -3176,7 +3179,7 @@ namespace VectorTools
     const DoFHandlerType<dim, spacedim> &dof,
     const types::boundary_id             boundary_component,
     const Function<spacedim, number> &   boundary_function,
-    ConstraintMatrix &                   constraints,
+    AffineConstraints<number> &          constraints,
     const ComponentMask &                component_mask)
   {
     std::map<types::boundary_id, const Function<spacedim, number> *>
@@ -3197,7 +3200,7 @@ namespace VectorTools
     const DoFHandlerType<dim, spacedim> &dof,
     const types::boundary_id             boundary_component,
     const Function<spacedim, number> &   boundary_function,
-    ConstraintMatrix &                   constraints,
+    AffineConstraints<number> &          constraints,
     const ComponentMask &                component_mask)
   {
     interpolate_boundary_values(StaticMappingQ1<dim, spacedim>::mapping,
@@ -3218,9 +3221,9 @@ namespace VectorTools
   interpolate_boundary_values(
     const DoFHandlerType<dim, spacedim> &dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                  function_map,
-    ConstraintMatrix &   constraints,
-    const ComponentMask &component_mask)
+      &                        function_map,
+    AffineConstraints<number> &constraints,
+    const ComponentMask &      component_mask)
   {
     interpolate_boundary_values(StaticMappingQ1<dim, spacedim>::mapping,
                                 dof,
@@ -3479,9 +3482,8 @@ namespace VectorTools
 
 
       // make mass matrix and right hand side
-      SparseMatrix<typename numbers::NumberTraits<number>::real_type>
-                     mass_matrix(sparsity);
-      Vector<number> rhs(sparsity.n_rows());
+      SparseMatrix<number> mass_matrix(sparsity);
+      Vector<number>       rhs(sparsity.n_rows());
 
 
       MatrixCreator::create_boundary_mass_matrix(
@@ -3492,9 +3494,7 @@ namespace VectorTools
         boundary_functions,
         rhs,
         dof_to_boundary_mapping,
-        (const Function<spacedim,
-                        typename numbers::NumberTraits<number>::real_type>
-           *)nullptr,
+        (const Function<spacedim, number> *)nullptr,
         component_mapping);
 
       // For certain weird elements,
@@ -3509,11 +3509,9 @@ namespace VectorTools
 
       // TODO: Maybe we should figure out if the element really needs this
 
-      FilteredMatrix<Vector<typename numbers::NumberTraits<number>::real_type>>
-        filtered_mass_matrix(mass_matrix, true);
-      FilteredMatrix<Vector<typename numbers::NumberTraits<number>::real_type>>
-                        filtered_precondition;
-      std::vector<bool> excluded_dofs(mass_matrix.m(), false);
+      FilteredMatrix<Vector<number>> filtered_mass_matrix(mass_matrix, true);
+      FilteredMatrix<Vector<number>> filtered_precondition;
+      std::vector<bool>              excluded_dofs(mass_matrix.m(), false);
 
       // we assemble mass matrix with unit weight,
       // thus it will be real-valued irrespectively of the underlying algebra
@@ -3643,7 +3641,7 @@ namespace VectorTools
   }
 
 
-  // ---- implementation for project_boundary_values with ConstraintMatrix ----
+  // ---- implementation for project_boundary_values with AffineConstraints ----
 
 
 
@@ -3655,7 +3653,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                        boundary_functions,
     const Quadrature<dim - 1> &q,
-    ConstraintMatrix &         constraints,
+    AffineConstraints<number> &constraints,
     std::vector<unsigned int>  component_mapping)
   {
     std::map<types::global_dof_index, number> boundary_values;
@@ -3683,7 +3681,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                        boundary_functions,
     const Quadrature<dim - 1> &q,
-    ConstraintMatrix &         constraints,
+    AffineConstraints<number> &constraints,
     std::vector<unsigned int>  component_mapping)
   {
     project_boundary_values(StaticMappingQ1<dim, spacedim>::mapping,
@@ -3768,69 +3766,42 @@ namespace VectorTools
     void
     add_constraint(const VectorDoFTuple<dim> &dof_indices,
                    const Tensor<1, dim> &     constraining_vector,
-                   ConstraintMatrix &         constraints,
+                   AffineConstraints<double> &constraints,
                    const double               inhomogeneity = 0)
     {
-      // choose the DoF that has the
-      // largest component in the
-      // constraining_vector as the
-      // one to be constrained as
-      // this makes the process
-      // stable in cases where the
-      // constraining_vector has the
-      // form n=(1,0) or n=(0,1)
+      // choose the DoF that has the largest component in the
+      // constraining_vector as the one to be constrained as this makes the
+      // process stable in cases where the constraining_vector has the form
+      // n=(1,0) or n=(0,1)
       //
-      // we get constraints of the form
-      //   x0 = a_1*x1 + a2*x2 + ...
-      // if one of the weights is
-      // essentially zero then skip
-      // this part. the ConstraintMatrix
-      // can also deal with cases like
-      //   x0 = 0
-      // if necessary
+      // we get constraints of the form x0 = a_1*x1 + a2*x2 + ... if one of
+      // the weights is essentially zero then skip this part. the
+      // AffineConstraints can also deal with cases like x0 = 0 if
+      // necessary
       //
-      // there is a problem if we have a
-      // normal vector of the form
-      // (a,a,small) or (a,a,a). Depending on
-      // round-off we may choose the first or
-      // second component (or third, in the
-      // latter case) as the largest one, and
-      // depending on our choice one or
-      // another degree of freedom will be
-      // constrained. On a single processor
-      // this is not much of a problem, but
-      // it's a nightmare when we run in
-      // parallel and two processors disagree
-      // on which DoF should be
-      // constrained. This led to an
-      // incredibly difficult to find bug in
-      // step-32 when running in parallel
-      // with 9 or more processors.
+      // there is a problem if we have a normal vector of the form
+      // (a,a,small) or (a,a,a). Depending on round-off we may choose the
+      // first or second component (or third, in the latter case) as the
+      // largest one, and depending on our choice one or another degree of
+      // freedom will be constrained. On a single processor this is not
+      // much of a problem, but it's a nightmare when we run in parallel
+      // and two processors disagree on which DoF should be constrained.
+      // This led to an incredibly difficult to find bug in step-32 when
+      // running in parallel with 9 or more processors.
       //
-      // in practice, such normal vectors of
-      // the form (a,a,small) or (a,a,a)
-      // happen not infrequently since they
-      // lie on the diagonals where vertices
-      // frequently happen to land upon mesh
-      // refinement if one starts from a
-      // symmetric and regular body. we work
-      // around this problem in the following
-      // way: if we have a normal vector of
-      // the form (a,b) (similarly algorithm
-      // in 3d), we choose 'a' as the largest
-      // coefficient not if a>b but if
-      // a>b+1e-10. this shifts the problem
-      // away from the frequently visited
-      // diagonal to a line that is off the
-      // diagonal. there will of course be
-      // problems where the exact values of a
-      // and b differ by exactly 1e-10 and we
-      // get into the same instability, but
-      // from a practical viewpoint such
-      // problems should be much rarer. in
-      // particular, meshes have to be very
-      // fine for a vertex to land on
-      // this line if the original body had a
+      // in practice, such normal vectors of the form (a,a,small) or
+      // (a,a,a) happen not infrequently since they lie on the diagonals
+      // where vertices frequently happen to land upon mesh refinement if
+      // one starts from a symmetric and regular body. we work around this
+      // problem in the following way: if we have a normal vector of the
+      // form (a,b) (similarly algorithm in 3d), we choose 'a' as the
+      // largest coefficient not if a>b but if a>b+1e-10. this shifts the
+      // problem away from the frequently visited diagonal to a line that
+      // is off the diagonal. there will of course be problems where the
+      // exact values of a and b differ by exactly 1e-10 and we get into
+      // the same instability, but from a practical viewpoint such problems
+      // should be much rarer. in particular, meshes have to be very fine
+      // for a vertex to land on this line if the original body had a
       // vertex on the diagonal as well
       switch (dim)
         {
@@ -4008,7 +3979,7 @@ namespace VectorTools
     add_tangentiality_constraints(
       const VectorDoFTuple<dim> &dof_indices,
       const Tensor<1, dim> &     tangent_vector,
-      ConstraintMatrix &         constraints,
+      AffineConstraints<double> &constraints,
       const Vector<double> &     b_values = Vector<double>(dim))
     {
       // choose the DoF that has the
@@ -4808,12 +4779,12 @@ namespace VectorTools
   void
 
   project_boundary_values_curl_conforming(
-    const DoFHandler<dim> &  dof_handler,
-    const unsigned int       first_vector_component,
-    const Function<dim> &    boundary_function,
-    const types::boundary_id boundary_component,
-    ConstraintMatrix &       constraints,
-    const Mapping<dim> &     mapping)
+    const DoFHandler<dim> &    dof_handler,
+    const unsigned int         first_vector_component,
+    const Function<dim> &      boundary_function,
+    const types::boundary_id   boundary_component,
+    AffineConstraints<double> &constraints,
+    const Mapping<dim> &       mapping)
   {
     // Projection-based interpolation is performed in two (in 2D) respectively
     // three (in 3D) steps. First the tangential component of the function is
@@ -5061,7 +5032,7 @@ namespace VectorTools
     const unsigned int                first_vector_component,
     const Function<dim> &             boundary_function,
     const types::boundary_id          boundary_component,
-    ConstraintMatrix &                constraints,
+    AffineConstraints<double> &       constraints,
     const hp::MappingCollection<dim> &mapping_collection)
   {
     const hp::FECollection<dim> &fe_collection(dof_handler.get_fe_collection());
@@ -5986,7 +5957,7 @@ namespace VectorTools
       const unsigned int                     first_vector_component,
       const Function<dim> &                  boundary_function,
       const types::boundary_id               boundary_component,
-      ConstraintMatrix &                     constraints,
+      AffineConstraints<double> &            constraints,
       const hp::MappingCollection<dim, dim> &mapping_collection)
     {
       // L2-projection based interpolation formed in one (in 2D) or two (in 3D)
@@ -6295,12 +6266,12 @@ namespace VectorTools
   template <int dim>
   void
   project_boundary_values_curl_conforming_l2(
-    const DoFHandler<dim> &  dof_handler,
-    const unsigned int       first_vector_component,
-    const Function<dim> &    boundary_function,
-    const types::boundary_id boundary_component,
-    ConstraintMatrix &       constraints,
-    const Mapping<dim> &     mapping)
+    const DoFHandler<dim> &    dof_handler,
+    const unsigned int         first_vector_component,
+    const Function<dim> &      boundary_function,
+    const types::boundary_id   boundary_component,
+    AffineConstraints<double> &constraints,
+    const Mapping<dim> &       mapping)
   {
     // non-hp version - calls the internal
     // compute_project_boundary_values_curl_conforming_l2() function
@@ -6323,7 +6294,7 @@ namespace VectorTools
     const unsigned int                     first_vector_component,
     const Function<dim> &                  boundary_function,
     const types::boundary_id               boundary_component,
-    ConstraintMatrix &                     constraints,
+    AffineConstraints<double> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection)
   {
     // hp version - calls the internal
@@ -6352,7 +6323,7 @@ namespace VectorTools
       const unsigned int                          first_vector_component,
       const Function<2> &                         boundary_function,
       const std::vector<DerivativeForm<1, 2, 2>> &jacobians,
-      ConstraintMatrix &                          constraints)
+      AffineConstraints<double> &                 constraints)
     {
       // Compute the integral over the product of the normal components of
       // the boundary function times the normal components of the shape
@@ -6403,7 +6374,7 @@ namespace VectorTools
       cell->face(face)->get_dof_indices(face_dof_indices,
                                         cell->active_fe_index());
 
-      // Copy the computed values in the ConstraintMatrix only, if the degree
+      // Copy the computed values in the AffineConstraints only, if the degree
       // of freedom is not already constrained.
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
         if (!(constraints.is_constrained(face_dof_indices[i])))
@@ -6425,7 +6396,7 @@ namespace VectorTools
       const unsigned int,
       const Function<dim> &,
       const std::vector<DerivativeForm<1, dim, dim>> &,
-      ConstraintMatrix &)
+      AffineConstraints<double> &)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -6532,12 +6503,12 @@ namespace VectorTools
   template <int dim>
   void
   project_boundary_values_div_conforming(
-    const DoFHandler<dim> &  dof_handler,
-    const unsigned int       first_vector_component,
-    const Function<dim> &    boundary_function,
-    const types::boundary_id boundary_component,
-    ConstraintMatrix &       constraints,
-    const Mapping<dim> &     mapping)
+    const DoFHandler<dim> &    dof_handler,
+    const unsigned int         first_vector_component,
+    const Function<dim> &      boundary_function,
+    const types::boundary_id   boundary_component,
+    AffineConstraints<double> &constraints,
+    const Mapping<dim> &       mapping)
   {
     const unsigned int spacedim = dim;
     // Interpolate the normal components
@@ -6636,23 +6607,13 @@ namespace VectorTools
 
         case 3:
           {
-            // In three dimensions the
-            // edges between two faces
-            // are treated twice.
-            // Therefore we store the
-            // computed values in a
-            // vector and copy them over
-            // in the ConstraintMatrix
-            // after all values have been
-            // computed.
-            // If we have two values for
-            // one edge, we choose the one,
-            // which was computed with the
-            // higher order element.
-            // If both elements are of the
-            // same order, we just keep the
-            // first value and do not
-            // compute a second one.
+            // In three dimensions the edges between two faces are treated
+            // twice. Therefore we store the computed values in a vector
+            // and copy them over in the AffineConstraints after all values
+            // have been computed. If we have two values for one edge, we
+            // choose the one, which was computed with the higher order
+            // element. If both elements are of the same order, we just
+            // keep the first value and do not compute a second one.
             const unsigned int &                 n_dofs = dof_handler.n_dofs();
             std::vector<double>                  dof_values(n_dofs);
             std::vector<types::global_dof_index> projected_dofs(n_dofs);
@@ -6670,12 +6631,9 @@ namespace VectorTools
                      ++face)
                   if (cell->face(face)->boundary_id() == boundary_component)
                     {
-                      // This is only
-                      // implemented, if the
-                      // FE is a Raviart-Thomas
-                      // element. If the FE is
-                      // a FESystem we cannot
-                      // check this.
+                      // This is only implemented, if the FE is a
+                      // Raviart-Thomas element. If the FE is a FESystem we
+                      // cannot check this.
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
@@ -6733,7 +6691,7 @@ namespace VectorTools
     const unsigned int                     first_vector_component,
     const Function<dim> &                  boundary_function,
     const types::boundary_id               boundary_component,
-    ConstraintMatrix &                     constraints,
+    AffineConstraints<double> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection)
   {
     const unsigned int           spacedim = dim;
@@ -6900,7 +6858,7 @@ namespace VectorTools
     const DoFHandlerType<dim, spacedim> &dof_handler,
     const unsigned int                   first_vector_component,
     const std::set<types::boundary_id> & boundary_ids,
-    ConstraintMatrix &                   constraints,
+    AffineConstraints<double> &          constraints,
     const Mapping<dim, spacedim> &       mapping)
   {
     ZeroFunction<dim>                            zero_function(dim);
@@ -6923,7 +6881,7 @@ namespace VectorTools
     const unsigned int                    first_vector_component,
     const std::set<types::boundary_id> &  boundary_ids,
     typename FunctionMap<spacedim>::type &function_map,
-    ConstraintMatrix &                    constraints,
+    AffineConstraints<double> &           constraints,
     const Mapping<dim, spacedim> &        mapping)
   {
     Assert(dim > 1,
@@ -7506,7 +7464,7 @@ namespace VectorTools
     const DoFHandlerType<dim, spacedim> &dof_handler,
     const unsigned int                   first_vector_component,
     const std::set<types::boundary_id> & boundary_ids,
-    ConstraintMatrix &                   constraints,
+    AffineConstraints<double> &          constraints,
     const Mapping<dim, spacedim> &       mapping)
   {
     ZeroFunction<dim>                            zero_function(dim);
@@ -7529,10 +7487,11 @@ namespace VectorTools
     const unsigned int                    first_vector_component,
     const std::set<types::boundary_id> &  boundary_ids,
     typename FunctionMap<spacedim>::type &function_map,
-    ConstraintMatrix &                    constraints,
+    AffineConstraints<double> &           constraints,
     const Mapping<dim, spacedim> &        mapping)
   {
-    ConstraintMatrix no_normal_flux_constraints(constraints.get_local_lines());
+    AffineConstraints<double> no_normal_flux_constraints(
+      constraints.get_local_lines());
     compute_nonzero_normal_flux_constraints(dof_handler,
                                             first_vector_component,
                                             boundary_ids,

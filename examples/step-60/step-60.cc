@@ -142,6 +142,7 @@
 // We'll discuss its use in detail later on in the `setup_coupling` method.
 #include <deal.II/non_matching/coupling.h>
 
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_direct.h>

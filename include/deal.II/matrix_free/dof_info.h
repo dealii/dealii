@@ -48,7 +48,7 @@ namespace internal
      * cells. Essentially, this is a smart number cache in the style of a
      * DoFHandler that also embeds the description of constraints directly on
      * the cell level without the need to refer to the external
-     * ConstraintMatrix.
+     * AffineConstraints object.
      *
      * This class only stores index relations. The weights for hanging node
      * constraints are stored in a different field. This is because a
@@ -110,11 +110,12 @@ namespace internal
        * assigned the correct index after all the ghost indices have been
        * collected by the call to @p assign_ghosts.
        */
+      template <typename number>
       void
       read_dof_indices(
         const std::vector<types::global_dof_index> &local_indices,
         const std::vector<unsigned int> &           lexicographic_inv,
-        const ConstraintMatrix &                    constraints,
+        const AffineConstraints<number> &           constraints,
         const unsigned int                          cell_number,
         ConstraintValues<double> &                  constraint_values,
         bool &                                      cell_at_boundary);

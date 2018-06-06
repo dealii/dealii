@@ -30,7 +30,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int                    first_vector_component,
         const std::set<types::boundary_id> &  boundary_ids,
         FunctionMap<deal_II_dimension>::type &function_map,
-        ConstraintMatrix &                    constraints,
+        AffineConstraints<double> &           constraints,
         const Mapping<deal_II_dimension> &    mapping);
 
       template void
@@ -39,7 +39,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int                       first_vector_component,
         const std::set<types::boundary_id> &     boundary_ids,
         FunctionMap<deal_II_dimension>::type &   function_map,
-        ConstraintMatrix &                       constraints,
+        AffineConstraints<double> &              constraints,
         const Mapping<deal_II_dimension> &       mapping);
 
       template void
@@ -48,7 +48,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int                    first_vector_component,
         const std::set<types::boundary_id> &  boundary_ids,
         FunctionMap<deal_II_dimension>::type &function_map,
-        ConstraintMatrix &                    constraints,
+        AffineConstraints<double> &           constraints,
         const Mapping<deal_II_dimension> &    mapping);
       template void
       compute_nonzero_tangential_flux_constraints(
@@ -56,7 +56,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int                       first_vector_component,
         const std::set<types::boundary_id> &     boundary_ids,
         FunctionMap<deal_II_dimension>::type &   function_map,
-        ConstraintMatrix &                       constraints,
+        AffineConstraints<double> &              constraints,
         const Mapping<deal_II_dimension> &       mapping);
 
       template void
@@ -64,7 +64,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                   first_vector_component,
         const std::set<types::boundary_id> & boundary_ids,
-        ConstraintMatrix &                   constraints,
+        AffineConstraints<double> &          constraints,
         const Mapping<deal_II_dimension> &   mapping);
 
       template void
@@ -72,7 +72,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const hp::DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                       first_vector_component,
         const std::set<types::boundary_id> &     boundary_ids,
-        ConstraintMatrix &                       constraints,
+        AffineConstraints<double> &              constraints,
         const Mapping<deal_II_dimension> &       mapping);
 
       template void
@@ -80,7 +80,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                   first_vector_component,
         const std::set<types::boundary_id> & boundary_ids,
-        ConstraintMatrix &                   constraints,
+        AffineConstraints<double> &          constraints,
         const Mapping<deal_II_dimension> &   mapping);
 
       template void
@@ -88,7 +88,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const hp::DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                       first_vector_component,
         const std::set<types::boundary_id> &     boundary_ids,
-        ConstraintMatrix &                       constraints,
+        AffineConstraints<double> &              constraints,
         const Mapping<deal_II_dimension> &       mapping);
 #  endif
 #endif

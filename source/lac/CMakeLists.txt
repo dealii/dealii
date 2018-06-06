@@ -16,6 +16,7 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
+  affine_constraints.cc
   block_matrix_array.cc
   block_sparse_matrix.cc
   block_sparse_matrix_ez.cc
@@ -23,7 +24,6 @@ SET(_unity_include_src
   block_vector.cc
   chunk_sparse_matrix.cc
   chunk_sparsity_pattern.cc
-  constraint_matrix.cc
   dynamic_sparsity_pattern.cc
   exceptions.cc
   full_matrix.cc
@@ -62,10 +62,10 @@ SET(_separate_src
   )
 
 SET(_inst
+  affine_constraints.inst.in
   block_sparse_matrix.inst.in
   block_vector.inst.in
   chunk_sparse_matrix.inst.in
-  constraint_matrix.inst.in
   full_matrix.inst.in
   lapack_full_matrix.inst.in
   la_vector.inst.in

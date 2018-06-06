@@ -30,6 +30,7 @@
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_bicgstab.h>

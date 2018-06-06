@@ -1773,7 +1773,7 @@ namespace internal
                       "and then ensure continuity of the solution by "
                       "explicitly creating constraints that the degrees "
                       "of freedom at these vertices have the same "
-                      "value, using the ConstraintMatrix class."));
+                      "value, using the AffineConstraints class."));
               }
 
           // assert there are no more
@@ -2105,7 +2105,7 @@ namespace internal
                            "and then ensure continuity of the solution by "
                            "explicitly creating constraints that the degrees "
                            "of freedom at these lines have the same "
-                           "value, using the ConstraintMatrix class."));
+                           "value, using the AffineConstraints class."));
 
             // if only one cell: line is at boundary -> give it the boundary
             // indicator zero by default
@@ -9822,7 +9822,7 @@ namespace internal
        * one share one line in 3D. This is a requirement needed for
        * the interpolation of hanging nodes, since otherwise to steps
        * of interpolation would be necessary. This would make the
-       * processes implemented in the @p ConstraintMatrix class much
+       * processes implemented in the @p AffineConstraints class much
        * more complex, since these two steps of interpolation do not
        * commute.
        */
