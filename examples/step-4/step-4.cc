@@ -71,14 +71,14 @@ class Step4
 {
 public:
   Step4 ();
-  void run ();
+  void run();
 
 private:
-  void make_grid ();
+  void make_grid();
   void setup_system();
-  void assemble_system ();
-  void solve ();
-  void output_results () const;
+  void assemble_system();
+  void solve();
+  void output_results() const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -134,10 +134,10 @@ template <int dim>
 class RightHandSide : public Function<dim>
 {
 public:
-  RightHandSide () : Function<dim>() {}
+  RightHandSide() : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const override;
+  virtual double value(const Point<dim>   &p,
+                       const unsigned int  component = 0) const override;
 };
 
 
@@ -146,10 +146,10 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
 public:
-  BoundaryValues () : Function<dim>() {}
+  BoundaryValues() : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const override;
+  virtual double value(const Point<dim>   &p,
+                       const unsigned int  component = 0) const override;
 };
 
 
@@ -176,8 +176,8 @@ public:
 // operator will work just as well) with indices starting at zero as usual in
 // C and C++.
 template <int dim>
-double RightHandSide<dim>::value (const Point<dim> &p,
-                                  const unsigned int /*component*/) const
+double RightHandSide<dim>::value(const Point<dim> &p,
+                                 const unsigned int /*component*/) const
 {
   double return_value = 0.0;
   for (unsigned int i=0; i<dim; ++i)
@@ -192,8 +192,8 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 // point at which we would like to evaluate the function, irrespective of the
 // dimension. So that is what we return:
 template <int dim>
-double BoundaryValues<dim>::value (const Point<dim> &p,
-                                   const unsigned int /*component*/) const
+double BoundaryValues<dim>::value(const Point<dim> &p,
+                                  const unsigned int /*component*/) const
 {
   return p.square();
 }
@@ -233,8 +233,8 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 template <int dim>
 Step4<dim>::Step4 ()
   :
-  fe (1),
-  dof_handler (triangulation)
+  fe(1),
+  dof_handler(triangulation)
 {}
 
 
@@ -250,10 +250,10 @@ Step4<dim>::Step4 ()
 // different, but that is something you need not care about. Let the library
 // handle the difficult things.
 template <int dim>
-void Step4<dim>::make_grid ()
+void Step4<dim>::make_grid()
 {
-  GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (4);
+  GridGenerator::hyper_cube(triangulation, -1, 1);
+  triangulation.refine_global(4);
 
   std::cout << "   Number of active cells: "
             << triangulation.n_active_cells()
@@ -271,22 +271,22 @@ void Step4<dim>::make_grid ()
 // user's perspective is the number of cells resulting, which is much higher
 // in three than in two space dimensions!
 template <int dim>
-void Step4<dim>::setup_system ()
+void Step4<dim>::setup_system()
 {
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
   std::cout << "   Number of degrees of freedom: "
             << dof_handler.n_dofs()
             << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, dsp);
+  DoFTools::make_sparsity_pattern(dof_handler, dsp);
   sparsity_pattern.copy_from(dsp);
 
-  system_matrix.reinit (sparsity_pattern);
+  system_matrix.reinit(sparsity_pattern);
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit(dof_handler.n_dofs());
+  system_rhs.reinit(dof_handler.n_dofs());
 }
 
 
@@ -307,7 +307,7 @@ void Step4<dim>::setup_system ()
 // can make nearly all work for you and you don't have to care about most
 // things.
 template <int dim>
-void Step4<dim>::assemble_system ()
+void Step4<dim>::assemble_system()
 {
   QGauss<dim>  quadrature_formula(2);
 
@@ -323,9 +323,9 @@ void Step4<dim>::assemble_system ()
   // gradients of the shape function from the FEValues object, as well as the
   // quadrature weights, FEValues::JxW() ). We can tell the FEValues object to
   // do for us by also giving it the #update_quadrature_points flag:
-  FEValues<dim> fe_values (fe, quadrature_formula,
-                           update_values   | update_gradients |
-                           update_quadrature_points | update_JxW_values);
+  FEValues<dim> fe_values(fe, quadrature_formula,
+                          update_values   | update_gradients |
+                          update_quadrature_points | update_JxW_values);
 
   // We then again define a few abbreviations. The values of these variables
   // of course depend on the dimension which we are presently using. However,
@@ -334,10 +334,10 @@ void Step4<dim>::assemble_system ()
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs(dofs_per_cell);
 
-  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
   // Next, we again have to loop over all cells and assemble local
   // contributions.  Note, that a cell is a quadrilateral in two space
@@ -348,7 +348,7 @@ void Step4<dim>::assemble_system ()
   // type is hidden by using `auto`:
   for (const auto &cell: dof_handler.active_cell_iterators())
     {
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
       cell_matrix = 0;
       cell_rhs = 0;
 
@@ -366,12 +366,12 @@ void Step4<dim>::assemble_system ()
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              cell_matrix(i,j) += (fe_values.shape_grad (i, q_index) *
-                                   fe_values.shape_grad (j, q_index) *
+              cell_matrix(i,j) += (fe_values.shape_grad(i, q_index) *
+                                   fe_values.shape_grad(j, q_index) *
                                    fe_values.JxW (q_index));
 
-            cell_rhs(i) += (fe_values.shape_value (i, q_index) *
-                            right_hand_side.value (fe_values.quadrature_point (q_index)) *
+            cell_rhs(i) += (fe_values.shape_value(i, q_index) *
+                            right_hand_side.value(fe_values.quadrature_point(q_index)) *
                             fe_values.JxW (q_index));
           }
       // As a final remark to these loops: when we assemble the local
@@ -396,13 +396,13 @@ void Step4<dim>::assemble_system ()
       // With the local systems assembled, the transfer into the global matrix
       // and right hand side is done exactly as before, but here we have again
       // merged some loops for efficiency:
-      cell->get_dof_indices (local_dof_indices);
+      cell->get_dof_indices(local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
           for (unsigned int j=0; j<dofs_per_cell; ++j)
-            system_matrix.add (local_dof_indices[i],
-                               local_dof_indices[j],
-                               cell_matrix(i,j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i,j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
@@ -415,14 +415,14 @@ void Step4<dim>::assemble_system ()
   // the class which describes the boundary values we would like to use
   // (i.e. the <code>BoundaryValues</code> class declared above):
   std::map<types::global_dof_index,double> boundary_values;
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            BoundaryValues<dim>(),
-                                            boundary_values);
-  MatrixTools::apply_boundary_values (boundary_values,
-                                      system_matrix,
-                                      solution,
-                                      system_rhs);
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           BoundaryValues<dim>(),
+                                           boundary_values);
+  MatrixTools::apply_boundary_values(boundary_values,
+                                     system_matrix,
+                                     solution,
+                                     system_rhs);
 }
 
 
@@ -432,12 +432,12 @@ void Step4<dim>::assemble_system ()
 // identical in most programs. In particular, it is dimension independent, so
 // this function is copied verbatim from the previous example.
 template <int dim>
-void Step4<dim>::solve ()
+void Step4<dim>::solve()
 {
-  SolverControl solver_control (1000, 1e-12);
-  SolverCG<>    solver (solver_control);
-  solver.solve (system_matrix, solution, system_rhs,
-                PreconditionIdentity());
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
+  solver.solve(system_matrix, solution, system_rhs,
+               PreconditionIdentity());
 
   // We have made one addition, though: since we suppress output from the
   // linear solvers, we have to print the number of iterations by hand.
@@ -466,19 +466,19 @@ void Step4<dim>::solve ()
 // have other values than 2 or 3, but we neglect this here for the sake of
 // brevity).
 template <int dim>
-void Step4<dim>::output_results () const
+void Step4<dim>::output_results() const
 {
   DataOut<dim> data_out;
 
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(solution, "solution");
 
-  data_out.build_patches ();
+  data_out.build_patches();
 
-  std::ofstream output (dim == 2 ?
-                        "solution-2d.vtk" :
-                        "solution-3d.vtk");
-  data_out.write_vtk (output);
+  std::ofstream output(dim == 2 ?
+                       "solution-2d.vtk" :
+                       "solution-3d.vtk");
+  data_out.write_vtk(output);
 }
 
 
@@ -489,15 +489,15 @@ void Step4<dim>::output_results () const
 // from one line of additional output, it is the same as for the previous
 // example.
 template <int dim>
-void Step4<dim>::run ()
+void Step4<dim>::run()
 {
   std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
 
   make_grid();
-  setup_system ();
-  assemble_system ();
-  solve ();
-  output_results ();
+  setup_system();
+  assemble_system();
+  solve();
+  output_results();
 }
 
 
@@ -527,17 +527,17 @@ void Step4<dim>::run ()
 // variable would only be destroyed at the end of the function, i.e. after
 // running the 3d problem, and would needlessly hog memory while the 3d run
 // could actually use it.
-int main ()
+int main()
 {
-  deallog.depth_console (0);
+  deallog.depth_console(0);
   {
     Step4<2> laplace_problem_2d;
-    laplace_problem_2d.run ();
+    laplace_problem_2d.run();
   }
 
   {
     Step4<3> laplace_problem_3d;
-    laplace_problem_3d.run ();
+    laplace_problem_3d.run();
   }
 
   return 0;

@@ -87,8 +87,8 @@ namespace Step26
     void setup_system();
     void solve_time_step();
     void output_results() const;
-    void refine_mesh (const unsigned int min_grid_level,
-                      const unsigned int max_grid_level);
+    void refine_mesh(const unsigned int min_grid_level,
+                     const unsigned int max_grid_level);
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -126,14 +126,14 @@ namespace Step26
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide ()
+    RightHandSide()
       :
       Function<dim>(),
-      period (0.2)
+      period(0.2)
     {}
 
-    virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p,
+                         const unsigned int component = 0) const override;
 
   private:
     const double period;
@@ -142,12 +142,12 @@ namespace Step26
 
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim> &p,
-                                    const unsigned int component) const
+  double RightHandSide<dim>::value(const Point<dim> &p,
+                                   const unsigned int component) const
   {
     (void) component;
-    Assert (component == 0, ExcIndexRange(component, 0, 1));
-    Assert (dim == 2, ExcNotImplemented());
+    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    Assert(dim == 2, ExcNotImplemented());
 
     const double time = this->get_time();
     const double point_within_period = (time/period - std::floor(time/period));
@@ -176,18 +176,18 @@ namespace Step26
   class BoundaryValues : public Function<dim>
   {
   public:
-    virtual double value (const Point<dim>  &p,
-                          const unsigned int component = 0) const override;
+    virtual double value(const Point<dim>  &p,
+                         const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
-                                     const unsigned int component) const
+  double BoundaryValues<dim>::value(const Point<dim> &/*p*/,
+                                    const unsigned int component) const
   {
     (void) component;
-    Assert (component == 0, ExcIndexRange(component, 0, 1));
+    Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
 
@@ -202,13 +202,13 @@ namespace Step26
   // period with 100 time steps) and chooses the Crank Nicolson method
   // by setting $\theta=1/2$.
   template <int dim>
-  HeatEquation<dim>::HeatEquation ()
+  HeatEquation<dim>::HeatEquation()
     :
     fe(1),
     dof_handler(triangulation),
-    time (0.0),
+    time(0.0),
     time_step(1. / 500),
-    timestep_number (0),
+    timestep_number(0),
     theta(0.5)
   {}
 
@@ -240,9 +240,9 @@ namespace Step26
               << std::endl
               << std::endl;
 
-    constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler,
-                                             constraints);
+    constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler,
+                                            constraints);
     constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
@@ -338,30 +338,30 @@ namespace Step26
   // loops that limit refinement and coarsening to an allowable range of
   // cells:
   template <int dim>
-  void HeatEquation<dim>::refine_mesh (const unsigned int min_grid_level,
-                                       const unsigned int max_grid_level)
+  void HeatEquation<dim>::refine_mesh(const unsigned int min_grid_level,
+                                      const unsigned int max_grid_level)
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(fe.degree+1),
-                                        typename FunctionMap<dim>::type(),
-                                        solution,
-                                        estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim-1>(fe.degree+1),
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-                                                       estimated_error_per_cell,
-                                                       0.6, 0.4);
+    GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
+                                                      estimated_error_per_cell,
+                                                      0.6, 0.4);
 
     if (triangulation.n_levels() > max_grid_level)
       for (typename Triangulation<dim>::active_cell_iterator
            cell = triangulation.begin_active(max_grid_level);
            cell != triangulation.end(); ++cell)
-        cell->clear_refine_flag ();
+        cell->clear_refine_flag();
     for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active(min_grid_level);
          cell != triangulation.end_active(min_grid_level); ++cell)
-      cell->clear_coarsen_flag ();
+      cell->clear_coarsen_flag();
     // These two loops above are slightly different but this is easily
     // explained. In the first loop, instead of calling
     // <code>triangulation.end()</code> we may as well have called
@@ -403,11 +403,11 @@ namespace Step26
     // freedom located on hanging nodes are so that the solution is
     // continuous. This is necessary since SolutionTransfer only operates on
     // cells locally, without regard to the neighborhoof.
-    triangulation.execute_coarsening_and_refinement ();
-    setup_system ();
+    triangulation.execute_coarsening_and_refinement();
+    setup_system();
 
     solution_trans.interpolate(previous_solution, solution);
-    constraints.distribute (solution);
+    constraints.distribute(solution);
   }
 
 
@@ -447,7 +447,7 @@ namespace Step26
     const unsigned int n_adaptive_pre_refinement_steps = 4;
 
     GridGenerator::hyper_L (triangulation);
-    triangulation.refine_global (initial_global_refinement);
+    triangulation.refine_global(initial_global_refinement);
 
     setup_system();
 
@@ -458,8 +458,8 @@ namespace Step26
 
 start_time_iteration:
 
-    tmp.reinit (solution.size());
-    forcing_terms.reinit (solution.size());
+    tmp.reinit(solution.size());
+    forcing_terms.reinit(solution.size());
 
 
     VectorTools::interpolate(dof_handler,
@@ -523,7 +523,7 @@ start_time_iteration:
         system_matrix.copy_from(mass_matrix);
         system_matrix.add(theta * time_step, laplace_matrix);
 
-        constraints.condense (system_matrix, system_rhs);
+        constraints.condense(system_matrix, system_rhs);
 
         // There is one more operation we need to do before we
         // can solve it: boundary values. To this end, we create
@@ -565,12 +565,12 @@ start_time_iteration:
         if ((timestep_number == 1) &&
             (pre_refinement_step < n_adaptive_pre_refinement_steps))
           {
-            refine_mesh (initial_global_refinement,
-                         initial_global_refinement + n_adaptive_pre_refinement_steps);
+            refine_mesh(initial_global_refinement,
+                        initial_global_refinement + n_adaptive_pre_refinement_steps);
             ++pre_refinement_step;
 
-            tmp.reinit (solution.size());
-            forcing_terms.reinit (solution.size());
+            tmp.reinit(solution.size());
+            forcing_terms.reinit(solution.size());
 
             std::cout << std::endl;
 
@@ -578,10 +578,10 @@ start_time_iteration:
           }
         else if ((timestep_number > 0) && (timestep_number % 5 == 0))
           {
-            refine_mesh (initial_global_refinement,
-                         initial_global_refinement + n_adaptive_pre_refinement_steps);
-            tmp.reinit (solution.size());
-            forcing_terms.reinit (solution.size());
+            refine_mesh(initial_global_refinement,
+                        initial_global_refinement + n_adaptive_pre_refinement_steps);
+            tmp.reinit(solution.size());
+            forcing_terms.reinit(solution.size());
           }
 
         old_solution = solution;

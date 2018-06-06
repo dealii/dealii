@@ -106,16 +106,16 @@ namespace Step17
   class ElasticProblem
   {
   public:
-    ElasticProblem ();
-    ~ElasticProblem ();
-    void run ();
+    ElasticProblem();
+    ~ElasticProblem();
+    void run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    unsigned int solve ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void setup_system();
+    void assemble_system();
+    unsigned int solve();
+    void refine_grid();
+    void output_results(const unsigned int cycle) const;
 
     // The first change is that we have to declare a variable that
     // indicates the @ref GlossMPICommunicator "MPI communicator" over
@@ -186,30 +186,30 @@ namespace Step17
   class RightHandSide :  public Function<dim>
   {
   public:
-    RightHandSide ();
+    RightHandSide();
 
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &values) const override;
+    virtual void vector_value(const Point<dim> &p,
+                              Vector<double>   &values) const override;
 
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                    std::vector<Vector<double> >   &value_list) const override;
+    virtual void vector_value_list(const std::vector<Point<dim> > &points,
+                                   std::vector<Vector<double> >   &value_list) const override;
   };
 
 
   template <int dim>
-  RightHandSide<dim>::RightHandSide () :
+  RightHandSide<dim>::RightHandSide() :
     Function<dim> (dim)
   {}
 
 
   template <int dim>
   inline
-  void RightHandSide<dim>::vector_value (const Point<dim> &p,
-                                         Vector<double>   &values) const
+  void RightHandSide<dim>::vector_value(const Point<dim> &p,
+                                        Vector<double>   &values) const
   {
-    Assert (values.size() == dim,
-            ExcDimensionMismatch (values.size(), dim));
-    Assert (dim >= 2, ExcInternalError());
+    Assert(values.size() == dim,
+           ExcDimensionMismatch(values.size(), dim));
+    Assert(dim >= 2, ExcInternalError());
 
     Point<dim> point_1, point_2;
     point_1(0) = 0.5;
@@ -230,17 +230,17 @@ namespace Step17
 
 
   template <int dim>
-  void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                              std::vector<Vector<double> >   &value_list) const
+  void RightHandSide<dim>::vector_value_list(const std::vector<Point<dim> > &points,
+                                             std::vector<Vector<double> >   &value_list) const
   {
     const unsigned int n_points = points.size();
 
-    Assert (value_list.size() == n_points,
-            ExcDimensionMismatch (value_list.size(), n_points));
+    Assert(value_list.size() == n_points,
+           ExcDimensionMismatch(value_list.size(), n_points));
 
     for (unsigned int p=0; p<n_points; ++p)
-      RightHandSide<dim>::vector_value (points[p],
-                                        value_list[p]);
+      RightHandSide<dim>::vector_value(points[p],
+                                       value_list[p]);
   }
 
 
@@ -264,15 +264,15 @@ namespace Step17
   // the latter is determined by testing whether the process currently
   // executing the constructor call is the first in the MPI universe.
   template <int dim>
-  ElasticProblem<dim>::ElasticProblem ()
+  ElasticProblem<dim>::ElasticProblem()
     :
-    mpi_communicator (MPI_COMM_WORLD),
-    n_mpi_processes (Utilities::MPI::n_mpi_processes(mpi_communicator)),
-    this_mpi_process (Utilities::MPI::this_mpi_process(mpi_communicator)),
-    pcout (std::cout,
-           (this_mpi_process == 0)),
-    dof_handler (triangulation),
-    fe (FE_Q<dim>(1), dim)
+    mpi_communicator(MPI_COMM_WORLD),
+    n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator)),
+    this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator)),
+    pcout(std::cout,
+          (this_mpi_process == 0)),
+    dof_handler(triangulation),
+    fe(FE_Q<dim>(1), dim)
   {}
 
 
@@ -281,9 +281,9 @@ namespace Step17
 
   // The destructor is exactly as in step-8.
   template <int dim>
-  ElasticProblem<dim>::~ElasticProblem ()
+  ElasticProblem<dim>::~ElasticProblem()
   {
-    dof_handler.clear ();
+    dof_handler.clear();
   }
 
 
@@ -356,12 +356,12 @@ namespace Step17
   // will actually continue to work whether we have the entire
   // triangulation available, or only a piece of it.
   template <int dim>
-  void ElasticProblem<dim>::setup_system ()
+  void ElasticProblem<dim>::setup_system()
   {
-    GridTools::partition_triangulation (n_mpi_processes, triangulation);
+    GridTools::partition_triangulation(n_mpi_processes, triangulation);
 
-    dof_handler.distribute_dofs (fe);
-    DoFRenumbering::subdomain_wise (dof_handler);
+    dof_handler.distribute_dofs(fe);
+    DoFRenumbering::subdomain_wise(dof_handler);
 
     // We need to initialize the objects denoting hanging node constraints for
     // the present grid. As with the triangulation and DoFHandler objects, we
@@ -369,19 +369,19 @@ namespace Step17
     // will not scale, but we show in step-40 how one can work around this by
     // only storing on each MPI process the constraints for degrees of freedom
     // that actually matter on this particular process.
-    hanging_node_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler,
-                                             hanging_node_constraints);
-    hanging_node_constraints.close ();
+    hanging_node_constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler,
+                                            hanging_node_constraints);
+    hanging_node_constraints.close();
 
     // Now we create the sparsity pattern for the system matrix. Note that we
     // again compute and store all entries and not only the ones relevant
     // to this process (see step-18 or step-40 for a more efficient way to
     // handle this).
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp,
-                                     hanging_node_constraints,
-                                     false);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp,
+                                    hanging_node_constraints,
+                                    false);
 
     // Now we determine the set of locally owned DoFs and use that to
     // initialize parallel vectors and matrix. Since the matrix and vectors
@@ -400,13 +400,13 @@ namespace Step17
     const std::vector<IndexSet> locally_owned_dofs_per_proc = DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
     const IndexSet locally_owned_dofs = locally_owned_dofs_per_proc[this_mpi_process];
 
-    system_matrix.reinit (locally_owned_dofs,
-                          locally_owned_dofs,
-                          dsp,
-                          mpi_communicator);
+    system_matrix.reinit(locally_owned_dofs,
+                         locally_owned_dofs,
+                         dsp,
+                         mpi_communicator);
 
-    solution.reinit (locally_owned_dofs, mpi_communicator);
-    system_rhs.reinit (locally_owned_dofs, mpi_communicator);
+    solution.reinit(locally_owned_dofs, mpi_communicator);
+    system_rhs.reinit(locally_owned_dofs, mpi_communicator);
   }
 
 
@@ -460,29 +460,29 @@ namespace Step17
   // the deal.II full matrix and vector types for the local systems as
   // these are small and need not be shared across processes.)
   template <int dim>
-  void ElasticProblem<dim>::assemble_system ()
+  void ElasticProblem<dim>::assemble_system()
   {
     QGauss<dim>  quadrature_formula(2);
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values   | update_gradients |
-                             update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values(fe, quadrature_formula,
+                            update_values   | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>       cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    std::vector<double>     lambda_values (n_q_points);
-    std::vector<double>     mu_values (n_q_points);
+    std::vector<double>     lambda_values(n_q_points);
+    std::vector<double>     mu_values(n_q_points);
 
     Functions::ConstantFunction<dim> lambda(1.), mu(1.);
 
     RightHandSide<dim>      right_hand_side;
-    std::vector<Vector<double> > rhs_values (n_q_points,
-                                             Vector<double>(dim));
+    std::vector<Vector<double> > rhs_values(n_q_points,
+                                            Vector<double>(dim));
 
 
     // The next thing is the loop over all elements. Note that we do
@@ -514,9 +514,9 @@ namespace Step17
           cell_matrix = 0;
           cell_rhs = 0;
 
-          fe_values.reinit (cell);
+          fe_values.reinit(cell);
 
-          lambda.value_list (fe_values.get_quadrature_points(), lambda_values);
+          lambda.value_list(fe_values.get_quadrature_points(), lambda_values);
           mu.value_list     (fe_values.get_quadrature_points(), mu_values);
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -555,8 +555,8 @@ namespace Step17
                 }
             }
 
-          right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
-                                             rhs_values);
+          right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
+                                            rhs_values);
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             {
               const unsigned int
@@ -568,7 +568,7 @@ namespace Step17
                                fe_values.JxW(q_point);
             }
 
-          cell->get_dof_indices (local_dof_indices);
+          cell->get_dof_indices(local_dof_indices);
           hanging_node_constraints
           .distribute_local_to_global(cell_matrix, cell_rhs,
                                       local_dof_indices,
@@ -612,15 +612,15 @@ namespace Step17
     // we therefore do not eliminate the entries in the affected
     // columns.
     std::map<types::global_dof_index,double> boundary_values;
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              Functions::ZeroFunction<dim>(dim),
-                                              boundary_values);
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix,
-                                        solution,
-                                        system_rhs,
-                                        false);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             boundary_values);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs,
+                                       false);
   }
 
 
@@ -658,17 +658,17 @@ namespace Step17
   //
   // Following this kind of setup, we then solve the linear system:
   template <int dim>
-  unsigned int ElasticProblem<dim>::solve ()
+  unsigned int ElasticProblem<dim>::solve()
   {
-    SolverControl           solver_control (solution.size(),
-                                            1e-8*system_rhs.l2_norm());
-    PETScWrappers::SolverCG cg (solver_control,
-                                mpi_communicator);
+    SolverControl           solver_control(solution.size(),
+                                           1e-8*system_rhs.l2_norm());
+    PETScWrappers::SolverCG cg(solver_control,
+                               mpi_communicator);
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+    cg.solve(system_matrix, solution, system_rhs,
+             preconditioner);
 
     // The next step is to distribute hanging node constraints. This is a
     // little tricky, since to fill in the value of a constrained node you
@@ -694,7 +694,7 @@ namespace Step17
     // in essence every process only needs to send its data to every
     // other process once in bulk, rather than having to respond to
     // queries for individual elements):
-    Vector<double> localized_solution (solution);
+    Vector<double> localized_solution(solution);
 
     // Of course, as in previous discussions, it is clear that such a
     // step cannot scale very far if you wanted to solve large
@@ -706,7 +706,7 @@ namespace Step17
     // ConstraintMatrix::distributed(). In particular, we can compute
     // the values of <i>all</i> constrained degrees of freedom,
     // whether the current process owns them or not:
-    hanging_node_constraints.distribute (localized_solution);
+    hanging_node_constraints.distribute(localized_solution);
 
     // Then transfer everything back into the global vector. The
     // following operation copies those elements of the localized
@@ -769,20 +769,20 @@ namespace Step17
   //   want to modify the value of a following argument (i.e. the one
   //   indicating the subdomain).
   template <int dim>
-  void ElasticProblem<dim>::refine_grid ()
+  void ElasticProblem<dim>::refine_grid()
   {
-    const Vector<double> localized_solution (solution);
+    const Vector<double> localized_solution(solution);
 
-    Vector<float> local_error_per_cell (triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(2),
-                                        typename FunctionMap<dim>::type(),
-                                        localized_solution,
-                                        local_error_per_cell,
-                                        ComponentMask(),
-                                        nullptr,
-                                        MultithreadInfo::n_threads(),
-                                        this_mpi_process);
+    Vector<float> local_error_per_cell(triangulation.n_active_cells());
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim-1>(2),
+                                       typename FunctionMap<dim>::type(),
+                                       localized_solution,
+                                       local_error_per_cell,
+                                       ComponentMask(),
+                                       nullptr,
+                                       MultithreadInfo::n_threads(),
+                                       this_mpi_process);
 
     // Now all processes have computed error indicators for their own
     // cells and stored them in the respective elements of the
@@ -828,17 +828,17 @@ namespace Step17
     // computed to zero, but this won't hurt since the original values
     // of the vector is zero anyway.
     const unsigned int n_local_cells
-      = GridTools::count_cells_with_subdomain_association (triangulation,
-                                                           this_mpi_process);
+      = GridTools::count_cells_with_subdomain_association(triangulation,
+                                                          this_mpi_process);
     PETScWrappers::MPI::Vector
-    distributed_all_errors (mpi_communicator,
-                            triangulation.n_active_cells(),
-                            n_local_cells);
+    distributed_all_errors(mpi_communicator,
+                           triangulation.n_active_cells(),
+                           n_local_cells);
 
     for (unsigned int i=0; i<local_error_per_cell.size(); ++i)
       if (local_error_per_cell(i) != 0)
         distributed_all_errors(i) = local_error_per_cell(i);
-    distributed_all_errors.compress (VectorOperation::insert);
+    distributed_all_errors.compress(VectorOperation::insert);
 
 
     // So now we have this distributed vector that contains the
@@ -848,12 +848,12 @@ namespace Step17
     // coarsening. It is important to recognize that <i>every</i>
     // process does this to its own copy of the triangulation, and
     // does it in exactly the same way.
-    const Vector<float> localized_all_errors (distributed_all_errors);
+    const Vector<float> localized_all_errors(distributed_all_errors);
 
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     localized_all_errors,
-                                                     0.3, 0.03);
-    triangulation.execute_coarsening_and_refinement ();
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    localized_all_errors,
+                                                    0.3, 0.03);
+    triangulation.execute_coarsening_and_refinement();
   }
 
 
@@ -933,42 +933,42 @@ namespace Step17
   // linear system, setting up the block-ILU for the preconditioner, and
   // other operations.)
   template <int dim>
-  void ElasticProblem<dim>::output_results (const unsigned int cycle) const
+  void ElasticProblem<dim>::output_results(const unsigned int cycle) const
   {
-    const Vector<double> localized_solution (solution);
+    const Vector<double> localized_solution(solution);
 
     // This being done, process zero goes ahead with setting up the
     // output file as in step-8, and attaching the (localized)
     // solution vector to the output object.
     if (this_mpi_process == 0)
       {
-        std::ofstream output ("solution-"
-                              + std::to_string(cycle)
-                              + ".vtk");
+        std::ofstream output("solution-"
+                             + std::to_string(cycle)
+                             + ".vtk");
 
         DataOut<dim> data_out;
-        data_out.attach_dof_handler (dof_handler);
+        data_out.attach_dof_handler(dof_handler);
 
         std::vector<std::string> solution_names;
         switch (dim)
           {
           case 1:
-            solution_names.emplace_back ("displacement");
+            solution_names.emplace_back("displacement");
             break;
           case 2:
-            solution_names.emplace_back ("x_displacement");
-            solution_names.emplace_back ("y_displacement");
+            solution_names.emplace_back("x_displacement");
+            solution_names.emplace_back("y_displacement");
             break;
           case 3:
-            solution_names.emplace_back ("x_displacement");
-            solution_names.emplace_back ("y_displacement");
-            solution_names.emplace_back ("z_displacement");
+            solution_names.emplace_back("x_displacement");
+            solution_names.emplace_back("y_displacement");
+            solution_names.emplace_back("z_displacement");
             break;
           default:
-            Assert (false, ExcInternalError());
+            Assert(false, ExcInternalError());
           }
 
-        data_out.add_data_vector (localized_solution, solution_names);
+        data_out.add_data_vector(localized_solution, solution_names);
 
         // The only other thing we do here is that we also output one
         // value per cell indicating which subdomain (i.e., MPI
@@ -982,16 +982,16 @@ namespace Step17
         // floating point vector in a second step, and this vector is
         // added to the DataOut object, which then goes off creating
         // output in VTK format:
-        std::vector<unsigned int> partition_int (triangulation.n_active_cells());
-        GridTools::get_subdomain_association (triangulation, partition_int);
+        std::vector<unsigned int> partition_int(triangulation.n_active_cells());
+        GridTools::get_subdomain_association(triangulation, partition_int);
 
         const Vector<double> partitioning(partition_int.begin(),
                                           partition_int.end());
 
-        data_out.add_data_vector (partitioning, "partitioning");
+        data_out.add_data_vector(partitioning, "partitioning");
 
-        data_out.build_patches ();
-        data_out.write_vtk (output);
+        data_out.build_patches();
+        data_out.write_vtk(output);
       }
   }
 
@@ -1005,7 +1005,7 @@ namespace Step17
   // many degrees of freedom there are per process, and how many
   // iterations it took for the linear solver to converge:
   template <int dim>
-  void ElasticProblem<dim>::run ()
+  void ElasticProblem<dim>::run()
   {
     for (unsigned int cycle=0; cycle<10; ++cycle)
       {
@@ -1013,17 +1013,17 @@ namespace Step17
 
         if (cycle == 0)
           {
-            GridGenerator::hyper_cube (triangulation, -1, 1);
-            triangulation.refine_global (3);
+            GridGenerator::hyper_cube(triangulation, -1, 1);
+            triangulation.refine_global(3);
           }
         else
-          refine_grid ();
+          refine_grid();
 
         pcout << "   Number of active cells:       "
               << triangulation.n_active_cells()
               << std::endl;
 
-        setup_system ();
+        setup_system();
 
         pcout << "   Number of degrees of freedom: "
               << dof_handler.n_dofs()
@@ -1031,17 +1031,17 @@ namespace Step17
         for (unsigned int p=0; p<n_mpi_processes; ++p)
           pcout << (p==0 ? ' ' : '+')
                 << (DoFTools::
-                    count_dofs_with_subdomain_association (dof_handler,
-                                                           p));
+                    count_dofs_with_subdomain_association(dof_handler,
+                                                          p));
         pcout << ")" << std::endl;
 
-        assemble_system ();
-        const unsigned int n_iterations = solve ();
+        assemble_system();
+        const unsigned int n_iterations = solve();
 
         pcout << "   Solver converged in " << n_iterations
               << " iterations." << std::endl;
 
-        output_results (cycle);
+        output_results(cycle);
       }
   }
 }
@@ -1053,7 +1053,7 @@ namespace Step17
 // functions in the other example programs, i.e., it delegates work to
 // the <code>run</code> function of a master object, and only wraps
 // everything into some code to catch exceptions:
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
   try
     {
@@ -1067,7 +1067,7 @@ int main (int argc, char **argv)
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       ElasticProblem<2> elastic_problem;
-      elastic_problem.run ();
+      elastic_problem.run();
     }
   catch (std::exception &exc)
     {

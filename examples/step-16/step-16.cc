@@ -151,7 +151,7 @@ namespace Step16
   template <int dim>
   void LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
   {
-    AssertDimension (dinfo.n_matrices(), 1);
+    AssertDimension(dinfo.n_matrices(), 1);
     const double coefficient = (dinfo.cell->center()(0) > 0.)
                                ? .1 : 1.;
 
@@ -175,16 +175,16 @@ namespace Step16
   class LaplaceProblem
   {
   public:
-    LaplaceProblem (const unsigned int degree);
-    void run ();
+    LaplaceProblem(const unsigned int degree);
+    void run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void assemble_multigrid ();
-    void solve ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void setup_system();
+    void assemble_system();
+    void assemble_multigrid();
+    void solve();
+    void refine_grid();
+    void output_results(const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -239,12 +239,12 @@ namespace Step16
   // Triangulation::limit_level_difference_at_vertices flag to the constructor
   // of the triangulation class.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
     :
-    triangulation (Triangulation<dim>::
-                   limit_level_difference_at_vertices),
-    fe (degree),
-    dof_handler (triangulation),
+    triangulation(Triangulation<dim>::
+                  limit_level_difference_at_vertices),
+    fe(degree),
+    dof_handler(triangulation),
     degree(degree)
   {}
 
@@ -256,10 +256,10 @@ namespace Step16
   // the DoFHandler, we do the same on each level. Then, we follow the
   // same procedure as before to set up the system on the leaf mesh.
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void LaplaceProblem<dim>::setup_system()
   {
-    dof_handler.distribute_dofs (fe);
-    dof_handler.distribute_mg_dofs ();
+    dof_handler.distribute_dofs(fe);
+    dof_handler.distribute_mg_dofs();
 
     deallog << "   Number of degrees of freedom: "
             << dof_handler.n_dofs()
@@ -271,25 +271,25 @@ namespace Step16
     deallog << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
 
-    constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+    constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
     std::set<types::boundary_id>          dirichlet_boundary_ids = { 0 };
     Functions::ZeroFunction<dim>          homogeneous_dirichlet_bc;
     const typename FunctionMap<dim>::type dirichlet_boundary_functions
     = { { types::boundary_id(0), &homogeneous_dirichlet_bc } };
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(dof_handler),
-                                              dirichlet_boundary_functions,
-                                              constraints);
-    constraints.close ();
-    constraints.condense (dsp);
-    sparsity_pattern.copy_from (dsp);
-    system_matrix.reinit (sparsity_pattern);
+    VectorTools::interpolate_boundary_values(static_cast<const DoFHandler<dim>&>(dof_handler),
+                                             dirichlet_boundary_functions,
+                                             constraints);
+    constraints.close();
+    constraints.condense(dsp);
+    sparsity_pattern.copy_from(dsp);
+    system_matrix.reinit(sparsity_pattern);
 
     // The multigrid constraints have to be initialized. They need to know
     // about the boundary values as well, so we pass the
@@ -311,11 +311,11 @@ namespace Step16
     const unsigned int n_levels = triangulation.n_levels();
 
     mg_interface_in.resize(0, n_levels-1);
-    mg_interface_in.clear_elements ();
+    mg_interface_in.clear_elements();
     mg_interface_out.resize(0, n_levels-1);
-    mg_interface_out.clear_elements ();
+    mg_interface_out.clear_elements();
     mg_matrices.resize(0, n_levels-1);
-    mg_matrices.clear_elements ();
+    mg_matrices.clear_elements();
     mg_sparsity_patterns.resize(0, n_levels-1);
 
     // Now, we have to provide a matrix on each level. To this end, we first
@@ -335,11 +335,11 @@ namespace Step16
     // matrices.
     for (unsigned int level=0; level<n_levels; ++level)
       {
-        DynamicSparsityPattern dsp (dof_handler.n_dofs(level),
-                                    dof_handler.n_dofs(level));
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(level),
+                                   dof_handler.n_dofs(level));
         MGTools::make_sparsity_pattern(dof_handler, dsp, level);
 
-        mg_sparsity_patterns[level].copy_from (dsp);
+        mg_sparsity_patterns[level].copy_from(dsp);
 
         mg_matrices[level].reinit(mg_sparsity_patterns[level]);
         mg_interface_in[level].reinit(mg_sparsity_patterns[level]);
@@ -380,7 +380,7 @@ namespace Step16
   // invariant subspace, the value chosen does not affect the
   // convergence of Krylov space solvers.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void LaplaceProblem<dim>::assemble_system()
   {
     MappingQ1<dim> mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -417,7 +417,7 @@ namespace Step16
   // the assembler and the different iterators in the loop.
   // Also, fixing up the matrices in the end is a little more complicated.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_multigrid ()
+  void LaplaceProblem<dim>::assemble_multigrid()
   {
     MappingQ1<dim> mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -474,15 +474,15 @@ namespace Step16
   // coarse mesh had many more cells than the five we have here, something
   // better suited would obviously be necessary here.
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void LaplaceProblem<dim>::solve()
   {
     MGTransferPrebuilt<Vector<double> > mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(dof_handler);
 
     FullMatrix<double> coarse_matrix;
-    coarse_matrix.copy_from (mg_matrices[0]);
+    coarse_matrix.copy_from(mg_matrices[0]);
     MGCoarseGridHouseholder<> coarse_grid_solver;
-    coarse_grid_solver.initialize (coarse_matrix);
+    coarse_grid_solver.initialize(coarse_matrix);
 
     // The next component of a multilevel solver or preconditioner is that we
     // need a smoother on each level. A common choice for this is to use the
@@ -541,14 +541,14 @@ namespace Step16
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
-    SolverControl solver_control (1000, 1e-12);
-    SolverCG<>    solver (solver_control);
+    SolverControl solver_control(1000, 1e-12);
+    SolverCG<>    solver(solver_control);
 
     solution = 0;
 
-    solver.solve (system_matrix, solution, system_rhs,
-                  preconditioner);
-    constraints.distribute (solution);
+    solver.solve(system_matrix, solution, system_rhs,
+                 preconditioner);
+    constraints.distribute(solution);
   }
 
 
@@ -563,36 +563,36 @@ namespace Step16
   // format, to use the more modern visualization programs available today
   // compared to those that were available when step-6 was written.
   template <int dim>
-  void LaplaceProblem<dim>::refine_grid ()
+  void LaplaceProblem<dim>::refine_grid()
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(3),
-                                        typename FunctionMap<dim>::type(),
-                                        solution,
-                                        estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     estimated_error_per_cell,
-                                                     0.3, 0.03);
-    triangulation.execute_coarsening_and_refinement ();
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim-1>(3),
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       estimated_error_per_cell);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3, 0.03);
+    triangulation.execute_coarsening_and_refinement();
   }
 
 
 
   template <int dim>
-  void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+  void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   {
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.build_patches ();
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
+    data_out.build_patches();
 
-    std::ofstream output ("solution-"
-                          + std::to_string(cycle)
-                          + ".vtk");
-    data_out.write_vtk (output);
+    std::ofstream output("solution-"
+                         + std::to_string(cycle)
+                         + ".vtk");
+    data_out.write_vtk(output);
   }
 
 
@@ -603,7 +603,7 @@ namespace Step16
   // <code>assemble_multigrid</code> that takes care of forming the matrices
   // on every level that we need in the multigrid method.
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void LaplaceProblem<dim>::run()
   {
     for (unsigned int cycle=0; cycle<8; ++cycle)
       {
@@ -611,23 +611,23 @@ namespace Step16
 
         if (cycle == 0)
           {
-            GridGenerator::hyper_ball (triangulation);
-            triangulation.refine_global (1);
+            GridGenerator::hyper_ball(triangulation);
+            triangulation.refine_global(1);
           }
         else
-          refine_grid ();
+          refine_grid();
 
         deallog << "   Number of active cells:       "
                 << triangulation.n_active_cells()
                 << std::endl;
 
-        setup_system ();
+        setup_system();
 
-        assemble_system ();
-        assemble_multigrid ();
+        assemble_system();
+        assemble_multigrid();
 
-        solve ();
-        output_results (cycle);
+        solve();
+        output_results(cycle);
       }
   }
 }
@@ -636,7 +636,7 @@ namespace Step16
 // @sect3{The main() function}
 //
 // This is again the same function as in step-6:
-int main ()
+int main()
 {
   try
     {
@@ -645,7 +645,7 @@ int main ()
       deallog.depth_console(2);
 
       LaplaceProblem<2> laplace_problem(1);
-      laplace_problem.run ();
+      laplace_problem.run();
     }
   catch (std::exception &exc)
     {

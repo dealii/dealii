@@ -97,17 +97,17 @@ namespace Step38
   class LaplaceBeltramiProblem
   {
   public:
-    LaplaceBeltramiProblem (const unsigned degree = 2);
-    void run ();
+    LaplaceBeltramiProblem(const unsigned degree = 2);
+    void run();
 
   private:
     static const unsigned int dim = spacedim-1;
 
-    void make_grid_and_dofs ();
-    void assemble_system ();
-    void solve ();
-    void output_results () const;
-    void compute_error () const;
+    void make_grid_and_dofs();
+    void assemble_system();
+    void solve();
+    void output_results() const;
+    void compute_error() const;
 
 
     Triangulation<dim,spacedim>   triangulation;
@@ -139,21 +139,21 @@ namespace Step38
   class Solution  : public Function<dim>
   {
   public:
-    Solution () : Function<dim>() {}
+    Solution() : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim>   &p,
+                         const unsigned int  component = 0) const override;
 
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const override;
+    virtual Tensor<1,dim> gradient(const Point<dim>   &p,
+                                   const unsigned int  component = 0) const override;
 
   };
 
 
   template <>
   double
-  Solution<2>::value (const Point<2> &p,
-                      const unsigned int) const
+  Solution<2>::value(const Point<2> &p,
+                     const unsigned int) const
   {
     return ( -2. * p(0) * p(1) );
   }
@@ -161,8 +161,8 @@ namespace Step38
 
   template <>
   Tensor<1,2>
-  Solution<2>::gradient (const Point<2>   &p,
-                         const unsigned int) const
+  Solution<2>::gradient(const Point<2>   &p,
+                        const unsigned int) const
   {
     Tensor<1,2> return_value;
     return_value[0] = -2. * p(1) * (1 - 2. * p(0) * p(0));
@@ -174,8 +174,8 @@ namespace Step38
 
   template <>
   double
-  Solution<3>::value (const Point<3> &p,
-                      const unsigned int) const
+  Solution<3>::value(const Point<3> &p,
+                     const unsigned int) const
   {
     return (std::sin(numbers::PI * p(0)) *
             std::cos(numbers::PI * p(1))*exp(p(2)));
@@ -184,8 +184,8 @@ namespace Step38
 
   template <>
   Tensor<1,3>
-  Solution<3>::gradient (const Point<3>   &p,
-                         const unsigned int) const
+  Solution<3>::gradient(const Point<3>   &p,
+                        const unsigned int) const
   {
     using numbers::PI;
 
@@ -204,16 +204,16 @@ namespace Step38
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide () : Function<dim>() {}
+    RightHandSide() : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim>   &p,
+                         const unsigned int  component = 0) const override;
   };
 
   template <>
   double
-  RightHandSide<2>::value (const Point<2> &p,
-                           const unsigned int /*component*/) const
+  RightHandSide<2>::value(const Point<2> &p,
+                          const unsigned int /*component*/) const
   {
     return ( -8. * p(0) * p(1) );
   }
@@ -221,8 +221,8 @@ namespace Step38
 
   template <>
   double
-  RightHandSide<3>::value (const Point<3> &p,
-                           const unsigned int /*component*/) const
+  RightHandSide<3>::value(const Point<3> &p,
+                          const unsigned int /*component*/) const
   {
     using numbers::PI;
 
@@ -263,11 +263,11 @@ namespace Step38
   // DoF handler to the triangulation:
   template <int spacedim>
   LaplaceBeltramiProblem<spacedim>::
-  LaplaceBeltramiProblem (const unsigned degree)
+  LaplaceBeltramiProblem(const unsigned degree)
     :
-    fe (degree),
+    fe(degree),
     dof_handler(triangulation),
-    mapping (degree)
+    mapping(degree)
   {}
 
 
@@ -312,20 +312,20 @@ namespace Step38
   // times. The rest of the function is the same as in previous tutorial
   // programs.
   template <int spacedim>
-  void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
+  void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs()
   {
     {
       Triangulation<spacedim> volume_mesh;
       GridGenerator::half_hyper_ball(volume_mesh);
 
       std::set<types::boundary_id> boundary_ids;
-      boundary_ids.insert (0);
+      boundary_ids.insert(0);
 
-      GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
-                                            boundary_ids);
+      GridGenerator::extract_boundary_mesh(volume_mesh, triangulation,
+                                           boundary_ids);
     }
     triangulation.set_all_manifold_ids(0);
-    triangulation.set_manifold (0, SphericalManifold<dim,spacedim>());
+    triangulation.set_manifold(0, SphericalManifold<dim,spacedim>());
 
     triangulation.refine_global(4);
 
@@ -333,20 +333,20 @@ namespace Step38
               << " cells."
               << std::endl;
 
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
     std::cout << "Surface mesh has " << dof_handler.n_dofs()
               << " degrees of freedom."
               << std::endl;
 
-    DynamicSparsityPattern dsp (dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
-    sparsity_pattern.copy_from (dsp);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
+    sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
   }
 
 
@@ -361,26 +361,26 @@ namespace Step38
   // at the $q$th quadrature point. The rest then does not need any changes
   // either:
   template <int spacedim>
-  void LaplaceBeltramiProblem<spacedim>::assemble_system ()
+  void LaplaceBeltramiProblem<spacedim>::assemble_system()
   {
     system_matrix = 0;
     system_rhs = 0;
 
     const QGauss<dim>  quadrature_formula(2*fe.degree);
-    FEValues<dim,spacedim> fe_values (mapping, fe, quadrature_formula,
-                                      update_values              |
-                                      update_gradients           |
-                                      update_quadrature_points   |
-                                      update_JxW_values);
+    FEValues<dim,spacedim> fe_values(mapping, fe, quadrature_formula,
+                                     update_values              |
+                                     update_gradients           |
+                                     update_quadrature_points   |
+                                     update_JxW_values);
 
     const unsigned int        dofs_per_cell = fe.dofs_per_cell;
     const unsigned int        n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>            cell_rhs (dofs_per_cell);
+    FullMatrix<double>        cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>            cell_rhs(dofs_per_cell);
 
     std::vector<double>       rhs_values(n_q_points);
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const RightHandSide<spacedim> rhs;
 
@@ -392,9 +392,9 @@ namespace Step38
         cell_matrix = 0;
         cell_rhs = 0;
 
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
 
-        rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
+        rhs.value_list(fe_values.get_quadrature_points(), rhs_values);
 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -409,29 +409,29 @@ namespace Step38
                            rhs_values[q_point]*
                            fe_values.JxW(q_point);
 
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              system_matrix.add (local_dof_indices[i],
-                                 local_dof_indices[j],
-                                 cell_matrix(i,j));
+              system_matrix.add(local_dof_indices[i],
+                                local_dof_indices[j],
+                                cell_matrix(i,j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
       }
 
     std::map<types::global_dof_index,double> boundary_values;
-    VectorTools::interpolate_boundary_values (mapping,
-                                              dof_handler,
-                                              0,
-                                              Solution<spacedim>(),
-                                              boundary_values);
+    VectorTools::interpolate_boundary_values(mapping,
+                                             dof_handler,
+                                             0,
+                                             Solution<spacedim>(),
+                                             boundary_values);
 
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix,
-                                        solution,
-                                        system_rhs,false);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs,false);
   }
 
 
@@ -441,17 +441,17 @@ namespace Step38
   // The next function is the one that solves the linear system. Here, too, no
   // changes are necessary:
   template <int spacedim>
-  void LaplaceBeltramiProblem<spacedim>::solve ()
+  void LaplaceBeltramiProblem<spacedim>::solve()
   {
-    SolverControl solver_control (solution.size(),
-                                  1e-7 * system_rhs.l2_norm());
-    SolverCG<>    cg (solver_control);
+    SolverControl solver_control(solution.size(),
+                                 1e-7 * system_rhs.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+    cg.solve(system_matrix, solution, system_rhs,
+             preconditioner);
   }
 
 
@@ -483,21 +483,21 @@ namespace Step38
   //   each element in each coordinate direction as many times as the
   //   polynomial degree of the finite element in use.
   template <int spacedim>
-  void LaplaceBeltramiProblem<spacedim>::output_results () const
+  void LaplaceBeltramiProblem<spacedim>::output_results() const
   {
     DataOut<dim,DoFHandler<dim,spacedim> > data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution,
-                              "solution",
-                              DataOut<dim,DoFHandler<dim,spacedim> >::type_dof_data);
-    data_out.build_patches (mapping,
-                            mapping.get_degree());
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution,
+                             "solution",
+                             DataOut<dim,DoFHandler<dim,spacedim> >::type_dof_data);
+    data_out.build_patches(mapping,
+                           mapping.get_degree());
 
-    std::string filename ("solution-");
+    std::string filename("solution-");
     filename += static_cast<char>('0'+spacedim);
     filename += "d.vtk";
-    std::ofstream output (filename);
-    data_out.write_vtk (output);
+    std::ofstream output(filename);
+    data_out.write_vtk(output);
   }
 
 
@@ -511,14 +511,14 @@ namespace Step38
   // solution. To avoid evaluating the error only a superconvergence points,
   // we choose a quadrature rule of sufficiently high order.
   template <int spacedim>
-  void LaplaceBeltramiProblem<spacedim>::compute_error () const
+  void LaplaceBeltramiProblem<spacedim>::compute_error() const
   {
-    Vector<float> difference_per_cell (triangulation.n_active_cells());
-    VectorTools::integrate_difference (mapping, dof_handler, solution,
-                                       Solution<spacedim>(),
-                                       difference_per_cell,
-                                       QGauss<dim>(2*fe.degree+1),
-                                       VectorTools::H1_norm);
+    Vector<float> difference_per_cell(triangulation.n_active_cells());
+    VectorTools::integrate_difference(mapping, dof_handler, solution,
+                                      Solution<spacedim>(),
+                                      difference_per_cell,
+                                      QGauss<dim>(2*fe.degree+1),
+                                      VectorTools::H1_norm);
 
     double h1_error = VectorTools::compute_global_error(triangulation,
                                                         difference_per_cell,
@@ -535,13 +535,13 @@ namespace Step38
   // The last function provides the top-level logic. Its contents are
   // self-explanatory:
   template <int spacedim>
-  void LaplaceBeltramiProblem<spacedim>::run ()
+  void LaplaceBeltramiProblem<spacedim>::run()
   {
     make_grid_and_dofs();
-    assemble_system ();
-    solve ();
-    output_results ();
-    compute_error ();
+    assemble_system();
+    solve();
+    output_results();
+    compute_error();
   }
 }
 
@@ -551,7 +551,7 @@ namespace Step38
 // The remainder of the program is taken up by the <code>main()</code>
 // function. It follows exactly the general layout first introduced in step-6
 // and used in all following tutorial programs:
-int main ()
+int main()
 {
   try
     {

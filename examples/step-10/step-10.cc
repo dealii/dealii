@@ -81,7 +81,7 @@ namespace Step10
     // (and uses FlatManifold for the interior) so we simply call that
     // function and move on:
     Triangulation<dim> triangulation;
-    GridGenerator::hyper_ball (triangulation);
+    GridGenerator::hyper_ball(triangulation);
 
     // Next generate output for this grid and for a once refined grid. Note
     // that we have hidden the mesh refinement in the loop header, which might
@@ -106,7 +106,7 @@ namespace Step10
             // is done using the MappingQ class, which takes as
             // argument to the constructor the polynomial degree which it
             // shall use.
-            const MappingQ<dim> mapping (degree);
+            const MappingQ<dim> mapping(degree);
             // As a side note, for a piecewise linear mapping, you
             // could give a value of <code>1</code> to the constructor
             // of MappingQ, but there is also a class MappingQ1 that
@@ -140,7 +140,7 @@ namespace Step10
                                    + "_mapping_q_"
                                    + Utilities::to_string(degree)
                                    + ".dat";
-            std::ofstream gnuplot_file (filename);
+            std::ofstream gnuplot_file(filename);
 
             // Then write out the triangulation to this file. The last
             // argument of the function is a pointer to a mapping object. This
@@ -148,7 +148,7 @@ namespace Step10
             // MappingQ1 object is taken, which we briefly
             // described above. This would then result in a piecewise linear
             // approximation of the true boundary in the output.
-            grid_out.write_gnuplot (triangulation, gnuplot_file, &mapping);
+            grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);
           }
         std::cout << std::endl;
       }
@@ -178,7 +178,7 @@ namespace Step10
   // constructor of the FEValues object. The actual finite element given to
   // the FEValues object is not used at all, so we could give any.
   template <int dim>
-  void compute_pi_by_area ()
+  void compute_pi_by_area()
   {
     std::cout << "Computation of Pi by the area:" << std::endl
               << "==============================" << std::endl;
@@ -203,9 +203,9 @@ namespace Step10
         // First generate the triangulation, the boundary and the mapping
         // object as already seen.
         Triangulation<dim> triangulation;
-        GridGenerator::hyper_ball (triangulation);
+        GridGenerator::hyper_ball(triangulation);
 
-        const MappingQ<dim> mapping (degree);
+        const MappingQ<dim> mapping(degree);
 
         // We now create a finite element. Unlike the rest of the example
         // programs, we do not actually need to do any computations with shape
@@ -220,7 +220,7 @@ namespace Step10
         // use it, but it will provide us with `active_cell_iterators' that
         // are needed to reinitialize the FEValues object on each cell of the
         // triangulation.
-        DoFHandler<dim> dof_handler (triangulation);
+        DoFHandler<dim> dof_handler(triangulation);
 
         // Now we set up the FEValues object, giving the Mapping, the dummy
         // finite element and the quadrature object to the constructor,
@@ -235,7 +235,7 @@ namespace Step10
         // computation of the mapping from unit to real cell. In previous
         // examples, this argument was omitted, resulting in the implicit use
         // of an object of type MappingQ1.
-        FEValues<dim> fe_values (mapping, fe, quadrature, update_JxW_values);
+        FEValues<dim> fe_values(mapping, fe, quadrature, update_JxW_values);
 
         // We employ an object of the ConvergenceTable class to store all
         // important data like the approximated values for $\pi$ and the error
@@ -246,7 +246,7 @@ namespace Step10
 
         // Now we loop over several refinement steps of the triangulation.
         for (unsigned int refinement=0; refinement<6;
-             ++refinement, triangulation.refine_global (1))
+             ++refinement, triangulation.refine_global(1))
           {
             // In this loop we first add the number of active cells of the
             // current triangulation to the table. This function automatically
@@ -259,7 +259,7 @@ namespace Step10
             // our special case but we call it to make the DoFHandler happy --
             // otherwise it would throw an assertion in the FEValues::reinit
             // function below.
-            dof_handler.distribute_dofs (fe);
+            dof_handler.distribute_dofs(fe);
 
             // We define the variable area as `long double' like we did for
             // the pi variable before.
@@ -273,7 +273,7 @@ namespace Step10
             endc = dof_handler.end();
             for (; cell!=endc; ++cell)
               {
-                fe_values.reinit (cell);
+                fe_values.reinit(cell);
                 for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
                   area += static_cast<long double>(fe_values.JxW (i));
               }
@@ -317,7 +317,7 @@ namespace Step10
   // area. This function is only a variation of the previous function. So we
   // will mainly give documentation for the differences.
   template <int dim>
-  void compute_pi_by_perimeter ()
+  void compute_pi_by_perimeter()
   {
     std::cout << "Computation of Pi by the perimeter:" << std::endl
               << "===================================" << std::endl;
@@ -334,26 +334,26 @@ namespace Step10
       {
         std::cout << "Degree = " << degree << std::endl;
         Triangulation<dim> triangulation;
-        GridGenerator::hyper_ball (triangulation);
+        GridGenerator::hyper_ball(triangulation);
 
-        const MappingQ<dim> mapping (degree);
-        const FE_Q<dim>     fe (1);
+        const MappingQ<dim> mapping(degree);
+        const FE_Q<dim>     fe(1);
 
-        DoFHandler<dim> dof_handler (triangulation);
+        DoFHandler<dim> dof_handler(triangulation);
 
         // Then we create a FEFaceValues object instead of a FEValues object
         // as in the previous function. Again, we pass a mapping as first
         // argument.
-        FEFaceValues<dim> fe_face_values (mapping, fe, quadrature,
-                                          update_JxW_values);
+        FEFaceValues<dim> fe_face_values(mapping, fe, quadrature,
+                                         update_JxW_values);
         ConvergenceTable table;
 
         for (unsigned int refinement=0; refinement<6;
-             ++refinement, triangulation.refine_global (1))
+             ++refinement, triangulation.refine_global(1))
           {
             table.add_value("cells", triangulation.n_active_cells());
 
-            dof_handler.distribute_dofs (fe);
+            dof_handler.distribute_dofs(fe);
 
             // Now we run over all cells and over all faces of each cell. Only
             // the contributions of the `JxW' values on boundary faces are
@@ -368,7 +368,7 @@ namespace Step10
                   {
                     // We reinit the FEFaceValues object with the cell
                     // iterator and the number of the face.
-                    fe_face_values.reinit (cell, face_no);
+                    fe_face_values.reinit(cell, face_no);
                     for (unsigned int i=0; i<fe_face_values.n_quadrature_points; ++i)
                       perimeter += static_cast<long double>(fe_face_values.JxW (i));
                   }
@@ -396,11 +396,11 @@ namespace Step10
 // The following main function just calls the above functions in the order of
 // their appearance. Apart from this, it looks just like the main functions of
 // previous tutorial programs.
-int main ()
+int main()
 {
   try
     {
-      std::cout.precision (16);
+      std::cout.precision(16);
 
       Step10::gnuplot_output<2>();
 

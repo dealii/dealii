@@ -266,7 +266,7 @@ namespace Step54
            ExcMessage("I could not find any wire in the CAD file you gave me. Bailing out."));
 
     OpenCASCADE::ArclengthProjectionLineManifold<2,3>
-    line_projector (wires[0], tolerance);
+    line_projector(wires[0], tolerance);
 
     tria.set_manifold(2, line_projector);
 
@@ -392,7 +392,7 @@ namespace Step54
 // This is the main function of this program. It is in its basic structure
 // like all previous tutorial programs, but runs the main class through the
 // three possibilities of new vertex placement:
-int main ()
+int main()
 {
   try
     {

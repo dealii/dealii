@@ -81,17 +81,17 @@ namespace Step53
   class AfricaTopography
   {
   public:
-    AfricaTopography ();
+    AfricaTopography();
 
-    double value (const double lon,
-                  const double lat) const;
+    double value(const double lon,
+                 const double lat) const;
 
   private:
     const Functions::InterpolatedUniformGridData<2> topography_data;
 
-    static std::array<std::pair<double,double>,2> get_endpoints ();
-    static std::array<unsigned int,2>             n_intervals ();
-    static std::vector<double>                           get_data ();
+    static std::array<std::pair<double,double>,2> get_endpoints();
+    static std::array<unsigned int,2>             n_intervals();
+    static std::vector<double>                           get_data();
   };
 
 
@@ -112,36 +112,36 @@ namespace Step53
   // member functions we call here are static because (i) they do not
   // access any member variables of the class, and (ii) because they are
   // called at a time when the object is not initialized fully anyway.
-  AfricaTopography::AfricaTopography ()
+  AfricaTopography::AfricaTopography()
     :
-    topography_data (get_endpoints(),
-                     n_intervals(),
-                     Table<2,double> (380, 220,
-                                      get_data().begin()))
+    topography_data(get_endpoints(),
+                    n_intervals(),
+                    Table<2,double> (380, 220,
+                                     get_data().begin()))
   {}
 
 
   double
-  AfricaTopography::value (const double lon,
-                           const double lat) const
+  AfricaTopography::value(const double lon,
+                          const double lat) const
   {
-    return topography_data.value (Point<2>(-lat * 180/numbers::PI,
-                                           lon * 180/numbers::PI));
+    return topography_data.value(Point<2>(-lat * 180/numbers::PI,
+                                          lon * 180/numbers::PI));
   }
 
 
   std::array<std::pair<double,double>,2>
-  AfricaTopography::get_endpoints ()
+  AfricaTopography::get_endpoints()
   {
     std::array<std::pair<double,double>,2> endpoints;
-    endpoints[0] = std::make_pair (-6.983333, 11.966667);
-    endpoints[1] = std::make_pair (25, 35.95);
+    endpoints[0] = std::make_pair(-6.983333, 11.966667);
+    endpoints[1] = std::make_pair(25, 35.95);
     return endpoints;
   }
 
 
   std::array<unsigned int,2>
-  AfricaTopography::n_intervals ()
+  AfricaTopography::n_intervals()
   {
     std::array<unsigned int,2> endpoints;
     endpoints[0] = 379;
@@ -176,7 +176,7 @@ namespace Step53
   // in the exception object that will later be printed on the screen
   // identifying the function, file and line where the exception happened.
   std::vector<double>
-  AfricaTopography::get_data ()
+  AfricaTopography::get_data()
   {
     std::vector<double> data;
 
@@ -192,13 +192,13 @@ namespace Step53
             double lat, lon, elevation;
             in >> lat >> lon >> elevation;
 
-            data.push_back (elevation);
+            data.push_back(elevation);
           }
         catch (...)
           {
-            AssertThrow (false,
-                         ExcMessage ("Could not read all 83,600 data points "
-                                     "from the file <topography.txt.gz>!"));
+            AssertThrow(false,
+                        ExcMessage("Could not read all 83,600 data points "
+                                   "from the file <topography.txt.gz>!"));
           }
       }
 
@@ -233,8 +233,8 @@ namespace Step53
     Point<3> push_forward_wgs84 (const Point<3> &phi_theta_d) const;
     Point<3> pull_back_wgs84 (const Point<3> &x) const;
 
-    Point<3> push_forward_topo (const Point<3> &phi_theta_d_hat) const;
-    Point<3> pull_back_topo (const Point<3> &phi_theta_d) const;
+    Point<3> push_forward_topo(const Point<3> &phi_theta_d_hat) const;
+    Point<3> pull_back_topo(const Point<3> &phi_theta_d) const;
   };
 
 
@@ -249,13 +249,13 @@ namespace Step53
   Point<3>
   AfricaGeometry::pull_back(const Point<3> &space_point) const
   {
-    return pull_back_topo (pull_back_wgs84 (space_point));
+    return pull_back_topo(pull_back_wgs84 (space_point));
   }
 
   Point<3>
   AfricaGeometry::push_forward(const Point<3> &chart_point) const
   {
-    return push_forward_wgs84 (push_forward_topo (chart_point));
+    return push_forward_wgs84 (push_forward_topo(chart_point));
   }
 
 
@@ -334,9 +334,9 @@ namespace Step53
     const double h     = topography.value(phi_theta_d_hat[0],
                                           phi_theta_d_hat[1]);
     const double d = d_hat + (d_hat + 500000)/500000*h;
-    const Point<3> phi_theta_d (phi_theta_d_hat[0],
-                                phi_theta_d_hat[1],
-                                d);
+    const Point<3> phi_theta_d(phi_theta_d_hat[0],
+                               phi_theta_d_hat[1],
+                               d);
     return phi_theta_d;
   }
 
@@ -347,9 +347,9 @@ namespace Step53
     const double h = topography.value(phi_theta_d[0],
                                       phi_theta_d[1]);
     const double d_hat = 500000 * (d-h)/(500000+h);
-    const Point<3> phi_theta_d_hat (phi_theta_d[0],
-                                    phi_theta_d[1],
-                                    d_hat);
+    const Point<3> phi_theta_d_hat(phi_theta_d[0],
+                                   phi_theta_d[1],
+                                   d_hat);
     return phi_theta_d_hat;
   }
 
@@ -381,7 +381,7 @@ namespace Step53
   // to the geometry object we have created at the top of the function
   // and leave the second one open, obtaining the desired object to
   // do the transformation.
-  void run ()
+  void run()
   {
     AfricaGeometry   geometry;
     Triangulation<3> triangulation;
@@ -398,14 +398,14 @@ namespace Step53
       subdivisions[0] = 1;
       subdivisions[1] = 2;
       subdivisions[2] = 1;
-      GridGenerator::subdivided_hyper_rectangle (triangulation, subdivisions,
-                                                 corner_points[0], corner_points[1],
-                                                 true);
+      GridGenerator::subdivided_hyper_rectangle(triangulation, subdivisions,
+                                                corner_points[0], corner_points[1],
+                                                true);
 
-      GridTools::transform (std::bind(&AfricaGeometry::push_forward,
-                                      std::cref(geometry),
-                                      std::placeholders::_1),
-                            triangulation);
+      GridTools::transform(std::bind(&AfricaGeometry::push_forward,
+                                     std::cref(geometry),
+                                     std::placeholders::_1),
+                           triangulation);
     }
 
     // The next step is to explain to the triangulation to use our geometry
@@ -439,23 +439,23 @@ namespace Step53
           for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
             if (cell->face(f)->boundary_id() == 5)
               {
-                cell->set_refine_flag ();
+                cell->set_refine_flag();
                 break;
               }
         triangulation.execute_coarsening_and_refinement();
 
         std::cout << "Refinement step " << i+1 << ": "
                   << triangulation.n_active_cells() << " cells, "
-                  << GridTools::minimal_cell_diameter (triangulation)/1000
+                  << GridTools::minimal_cell_diameter(triangulation)/1000
                   << "km minimal cell diameter"
                   << std::endl;
       }
 
     // Having done this all, we can now output the mesh into a file of its own:
     const std::string filename = "mesh.vtu";
-    std::ofstream out (filename);
+    std::ofstream out(filename);
     GridOut grid_out;
-    grid_out.write_vtu (triangulation, out);
+    grid_out.write_vtu(triangulation, out);
   }
 }
 
@@ -466,11 +466,11 @@ namespace Step53
 // Finally, the main function, which follows the same scheme used in all
 // tutorial programs starting with step-6. There isn't much to do here, only
 // to call the single <code>run()</code> function.
-int main ()
+int main()
 {
   try
     {
-      Step53::run ();
+      Step53::run();
     }
   catch (std::exception &exc)
     {

@@ -101,20 +101,20 @@ namespace Step29
   public:
     DirichletBoundaryValues() : Function<dim> (2) {};
 
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &values) const override;
+    virtual void vector_value(const Point<dim> &p,
+                              Vector<double>   &values) const override;
 
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                    std::vector<Vector<double> >   &value_list) const override;
+    virtual void vector_value_list(const std::vector<Point<dim> > &points,
+                                   std::vector<Vector<double> >   &value_list) const override;
   };
 
 
   template <int dim>
   inline
-  void DirichletBoundaryValues<dim>::vector_value (const Point<dim> &/*p*/,
-                                                   Vector<double>   &values) const
+  void DirichletBoundaryValues<dim>::vector_value(const Point<dim> &/*p*/,
+                                                  Vector<double>   &values) const
   {
-    Assert (values.size() == 2, ExcDimensionMismatch (values.size(), 2));
+    Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
 
     values(0) = 1;
     values(1) = 0;
@@ -122,14 +122,14 @@ namespace Step29
 
 
   template <int dim>
-  void DirichletBoundaryValues<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                                        std::vector<Vector<double> >   &value_list) const
+  void DirichletBoundaryValues<dim>::vector_value_list(const std::vector<Point<dim> > &points,
+                                                       std::vector<Vector<double> >   &value_list) const
   {
-    Assert (value_list.size() == points.size(),
-            ExcDimensionMismatch (value_list.size(), points.size()));
+    Assert(value_list.size() == points.size(),
+           ExcDimensionMismatch(value_list.size(), points.size()));
 
     for (unsigned int p=0; p<points.size(); ++p)
-      DirichletBoundaryValues<dim>::vector_value (points[p], value_list[p]);
+      DirichletBoundaryValues<dim>::vector_value(points[p], value_list[p]);
   }
 
   // @sect3{The <code>ParameterReader</code> class}
@@ -174,7 +174,7 @@ namespace Step29
     // omitted second argument to the Patterns::Integer object denotes the
     // half-open interval.  For the focal distance any number greater than
     // zero is accepted:
-    prm.enter_subsection ("Mesh & geometry parameters");
+    prm.enter_subsection("Mesh & geometry parameters");
     {
       prm.declare_entry("Number of refinements", "6",
                         Patterns::Integer(0),
@@ -186,14 +186,14 @@ namespace Step29
                         "Distance of the focal point of the lens "
                         "to the x-axis");
     }
-    prm.leave_subsection ();
+    prm.leave_subsection();
 
     // The next subsection is devoted to the physical parameters appearing in
     // the equation, which are the frequency $\omega$ and wave speed
     // $c$. Again, both need to lie in the half-open interval $[0,\infty)$
     // represented by calling the Patterns::Double class with only the left
     // end-point as argument:
-    prm.enter_subsection ("Physical constants");
+    prm.enter_subsection("Physical constants");
     {
       prm.declare_entry("c", "1.5e5",
                         Patterns::Double(0),
@@ -203,17 +203,17 @@ namespace Step29
                         Patterns::Double(0),
                         "Frequency");
     }
-    prm.leave_subsection ();
+    prm.leave_subsection();
 
 
     // Last but not least we would like to be able to change some properties
     // of the output, like filename and format, through entries in the
     // configuration file, which is the purpose of the last subsection:
-    prm.enter_subsection ("Output parameters");
+    prm.enter_subsection("Output parameters");
     {
       prm.declare_entry("Output file", "solution",
                         Patterns::Anything(),
-                        "Name of the output file (without extension)");
+                        "Name of the output file(without extension)");
 
       // Since different output formats may require different parameters for
       // generating output (like for example, postscript output needs
@@ -237,9 +237,9 @@ namespace Step29
       // declared parameters set to their default values, which can
       // conveniently serve as a starting point for setting the parameters to
       // the values you desire.
-      DataOutInterface<1>::declare_parameters (prm);
+      DataOutInterface<1>::declare_parameters(prm);
     }
-    prm.leave_subsection ();
+    prm.leave_subsection();
   }
 
   // @sect4{<code>ParameterReader::read_parameters</code>}
@@ -249,11 +249,11 @@ namespace Step29
   // the input file whose filename is provided by the caller. After the call
   // to this function is complete, the <code>prm</code> object can be used to
   // retrieve the values of the parameters read in from the file:
-  void ParameterReader::read_parameters (const std::string &parameter_file)
+  void ParameterReader::read_parameters(const std::string &parameter_file)
   {
     declare_parameters();
 
-    prm.parse_input (parameter_file);
+    prm.parse_input(parameter_file);
   }
 
 
@@ -296,7 +296,7 @@ namespace Step29
   class ComputeIntensity : public DataPostprocessorScalar<dim>
   {
   public:
-    ComputeIntensity ();
+    ComputeIntensity();
 
     virtual
     void
@@ -320,7 +320,7 @@ namespace Step29
   // In our case, only the function values of $v$ and $w$ are needed to
   // compute $|u|$, so we're good with the update_values flag.
   template <int dim>
-  ComputeIntensity<dim>::ComputeIntensity ()
+  ComputeIntensity<dim>::ComputeIntensity()
     :
     DataPostprocessorScalar<dim> ("Intensity",
                                   update_values)
@@ -346,7 +346,7 @@ namespace Step29
    std::vector<Vector<double> >               &computed_quantities) const
   {
     Assert(computed_quantities.size() == inputs.solution_values.size(),
-           ExcDimensionMismatch (computed_quantities.size(), inputs.solution_values.size()));
+           ExcDimensionMismatch(computed_quantities.size(), inputs.solution_values.size()));
 
     // The computation itself is straightforward: We iterate over each entry
     // in the output vector and compute $|u|$ from the corresponding values of
@@ -354,9 +354,9 @@ namespace Step29
     for (unsigned int i=0; i<computed_quantities.size(); i++)
       {
         Assert(computed_quantities[i].size() == 1,
-               ExcDimensionMismatch (computed_quantities[i].size(), 1));
+               ExcDimensionMismatch(computed_quantities[i].size(), 1));
         Assert(inputs.solution_values[i].size() == 2,
-               ExcDimensionMismatch (inputs.solution_values[i].size(), 2));
+               ExcDimensionMismatch(inputs.solution_values[i].size(), 2));
 
         computed_quantities[i](0)
           = std::sqrt(inputs.solution_values[i](0)*inputs.solution_values[i](0)
@@ -378,16 +378,16 @@ namespace Step29
   class UltrasoundProblem
   {
   public:
-    UltrasoundProblem (ParameterHandler &);
-    ~UltrasoundProblem ();
-    void run ();
+    UltrasoundProblem(ParameterHandler &);
+    ~UltrasoundProblem();
+    void run();
 
   private:
-    void make_grid ();
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void output_results () const;
+    void make_grid();
+    void setup_system();
+    void assemble_system();
+    void solve();
+    void output_results() const;
 
     ParameterHandler      &prm;
 
@@ -407,7 +407,7 @@ namespace Step29
   // system, which consists of two copies of the scalar Q1 field, one for $v$
   // and one for $w$:
   template <int dim>
-  UltrasoundProblem<dim>::UltrasoundProblem (ParameterHandler  &param)
+  UltrasoundProblem<dim>::UltrasoundProblem(ParameterHandler  &param)
     :
     prm(param),
     dof_handler(triangulation),
@@ -416,7 +416,7 @@ namespace Step29
 
 
   template <int dim>
-  UltrasoundProblem<dim>::~UltrasoundProblem ()
+  UltrasoundProblem<dim>::~UltrasoundProblem()
   {
     dof_handler.clear();
   }
@@ -427,7 +427,7 @@ namespace Step29
   // the geometry is just a unit square (in 2d) with the part of the boundary
   // that represents the transducer lens replaced by a sector of a circle.
   template <int dim>
-  void UltrasoundProblem<dim>::make_grid ()
+  void UltrasoundProblem<dim>::make_grid()
   {
     // First we generate some logging output and start a timer so we can
     // compute execution time when this function is done:
@@ -437,12 +437,12 @@ namespace Step29
     // Then we query the values for the focal distance of the transducer lens
     // and the number of mesh refinement steps from our ParameterHandler
     // object:
-    prm.enter_subsection ("Mesh & geometry parameters");
+    prm.enter_subsection("Mesh & geometry parameters");
 
     const double                focal_distance = prm.get_double("Focal distance");
     const unsigned int  n_refinements  = prm.get_integer("Number of refinements");
 
-    prm.leave_subsection ();
+    prm.leave_subsection();
 
     // Next, two points are defined for position and focal point of the
     // transducer lens, which is the center of the circle whose segment will
@@ -469,10 +469,10 @@ namespace Step29
     // so we mark this edge with a different manifold indicator. Since we will
     // Dirichlet boundary conditions on the transducer, we also change its
     // boundary indicator.
-    GridGenerator::subdivided_hyper_cube (triangulation, 5, 0, 1);
+    GridGenerator::subdivided_hyper_cube(triangulation, 5, 0, 1);
 
     typename Triangulation<dim>::cell_iterator
-    cell = triangulation.begin (),
+    cell = triangulation.begin(),
     endc = triangulation.end();
 
     for (; cell!=endc; ++cell)
@@ -481,8 +481,8 @@ namespace Step29
              ((cell->face(face)->center() - transducer).norm_square() < 0.01) )
           {
 
-            cell->face(face)->set_boundary_id (1);
-            cell->face(face)->set_manifold_id (1);
+            cell->face(face)->set_boundary_id(1);
+            cell->face(face)->set_manifold_id(1);
           }
     // For the circle part of the transducer lens, a SphericalManifold object
     // is used (which, of course, in 2D just represents a circle), with center
@@ -492,13 +492,13 @@ namespace Step29
     // Now global refinement is executed. Cells near the transducer location
     // will be automatically refined according to the circle shaped boundary
     // of the transducer lens:
-    triangulation.refine_global (n_refinements);
+    triangulation.refine_global(n_refinements);
 
     // Lastly, we generate some more logging output. We stop the timer and
     // query the number of CPU seconds elapsed since the beginning of the
     // function:
-    timer.stop ();
-    deallog << "done ("
+    timer.stop();
+    deallog << "done("
             << timer.cpu_time()
             << "s)"
             << std::endl;
@@ -516,23 +516,23 @@ namespace Step29
   // comment. As in the previous function, we also output the run time of what
   // we do here:
   template <int dim>
-  void UltrasoundProblem<dim>::setup_system ()
+  void UltrasoundProblem<dim>::setup_system()
   {
     deallog << "Setting up system... ";
     Timer timer;
 
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
-    sparsity_pattern.copy_from (dsp);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
+    sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit (sparsity_pattern);
-    system_rhs.reinit (dof_handler.n_dofs());
-    solution.reinit (dof_handler.n_dofs());
+    system_matrix.reinit(sparsity_pattern);
+    system_rhs.reinit(dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
 
-    timer.stop ();
-    deallog << "done ("
+    timer.stop();
+    deallog << "done("
             << timer.cpu_time()
             << "s)"
             << std::endl;
@@ -548,7 +548,7 @@ namespace Step29
   // As before, this function takes care of assembling the system matrix and
   // right hand side vector:
   template <int dim>
-  void UltrasoundProblem<dim>::assemble_system ()
+  void UltrasoundProblem<dim>::assemble_system()
   {
     deallog << "Assembling system matrix... ";
     Timer timer;
@@ -557,12 +557,12 @@ namespace Step29
     // and store them in local variables, as they will be used frequently
     // throughout this function.
 
-    prm.enter_subsection ("Physical constants");
+    prm.enter_subsection("Physical constants");
 
     const double omega = prm.get_double("omega"),
                  c     = prm.get_double("c");
 
-    prm.leave_subsection ();
+    prm.leave_subsection();
 
     // As usual, for computing integrals ordinary Gauss quadrature rule is
     // used. Since our bilinear form involves boundary integrals on
@@ -580,19 +580,19 @@ namespace Step29
     // need the values and gradients of the shape functions, and of course the
     // quadrature weights.  For the terms involving the boundary integrals,
     // only shape function values and the quadrature weights are necessary.
-    FEValues<dim>  fe_values (fe, quadrature_formula,
-                              update_values | update_gradients |
-                              update_JxW_values);
+    FEValues<dim>  fe_values(fe, quadrature_formula,
+                             update_values | update_gradients |
+                             update_JxW_values);
 
-    FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
-                                      update_values | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(fe, face_quadrature_formula,
+                                     update_values | update_JxW_values);
 
     // As usual, the system matrix is assembled cell by cell, and we need a
     // matrix for storing the local cell contributions as well as an index
     // vector to transfer the cell contributions to the appropriate location
     // in the global system matrix after.
-    FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -605,7 +605,7 @@ namespace Step29
         // and request the FEValues object to compute the shape functions for
         // the current cell:
         cell_matrix = 0;
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
@@ -697,7 +697,7 @@ namespace Step29
               // blocks of the system matrix, so we ask the FEFaceValues
               // object to provide us with the shape function values on this
               // face:
-              fe_face_values.reinit (cell, face);
+              fe_face_values.reinit(cell, face);
 
 
               // Next, we loop through all DoFs of the current cell to find
@@ -743,15 +743,15 @@ namespace Step29
         // contributions from the local to the global system matrix. To this
         // end, we first get a list of the global indices of the this cells
         // DoFs...
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
 
 
         // ...and then add the entries to the system matrix one by one:
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
-            system_matrix.add (local_dof_indices[i],
-                               local_dof_indices[j],
-                               cell_matrix(i,j));
+            system_matrix.add(local_dof_indices[i],
+                              local_dof_indices[j],
+                              cell_matrix(i,j));
       }
 
 
@@ -760,18 +760,18 @@ namespace Step29
     // values are provided by the <code>DirichletBoundaryValues</code> class
     // we defined above:
     std::map<types::global_dof_index,double> boundary_values;
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              1,
-                                              DirichletBoundaryValues<dim>(),
-                                              boundary_values);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             1,
+                                             DirichletBoundaryValues<dim>(),
+                                             boundary_values);
 
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix,
-                                        solution,
-                                        system_rhs);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
 
-    timer.stop ();
-    deallog << "done ("
+    timer.stop();
+    deallog << "done("
             << timer.cpu_time()
             << "s)"
             << std::endl;
@@ -794,7 +794,7 @@ namespace Step29
   // Note again that for compiling this example program, you need to have the
   // deal.II library built with UMFPACK support.
   template <int dim>
-  void UltrasoundProblem<dim>::solve ()
+  void UltrasoundProblem<dim>::solve()
   {
     deallog << "Solving linear system... ";
     Timer timer;
@@ -811,10 +811,10 @@ namespace Step29
     // After the decomposition, we can use <code>A_direct</code> like a matrix
     // representing the inverse of our system matrix, so to compute the
     // solution we just have to multiply with the right hand side vector:
-    A_direct.vmult (solution, system_rhs);
+    A_direct.vmult(solution, system_rhs);
 
-    timer.stop ();
-    deallog << "done ("
+    timer.stop();
+    deallog << "done("
             << timer.cpu_time()
             << "s)"
             << std::endl;
@@ -831,7 +831,7 @@ namespace Step29
   // rather straightforward and very similar to what is done in the previous
   // tutorials.
   template <int dim>
-  void UltrasoundProblem<dim>::output_results () const
+  void UltrasoundProblem<dim>::output_results() const
   {
     deallog << "Generating output... ";
     Timer timer;
@@ -841,7 +841,7 @@ namespace Step29
     ComputeIntensity<dim> intensities;
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (dof_handler);
+    data_out.attach_dof_handler(dof_handler);
 
     // Next we query the output-related parameters from the ParameterHandler.
     // The DataOut::parse_parameters call acts as a counterpart to the
@@ -854,7 +854,7 @@ namespace Step29
     const std::string output_file    = prm.get("Output file");
     data_out.parse_parameters(prm);
 
-    prm.leave_subsection ();
+    prm.leave_subsection();
 
     // Now we put together the filename from the base name provided by the
     // ParameterHandler and the suffix which is provided by the DataOut class
@@ -863,7 +863,7 @@ namespace Step29
     const std::string filename = output_file +
                                  data_out.default_suffix();
 
-    std::ofstream output (filename);
+    std::ofstream output(filename);
 
     // The solution vectors $v$ and $w$ are added to the DataOut object in the
     // usual way:
@@ -871,21 +871,21 @@ namespace Step29
     solution_names.emplace_back("Re_u");
     solution_names.emplace_back("Im_u");
 
-    data_out.add_data_vector (solution, solution_names);
+    data_out.add_data_vector(solution, solution_names);
 
     // For the intensity, we just call <code>add_data_vector</code> again, but
     // this with our <code>ComputeIntensity</code> object as the second
     // argument, which effectively adds $|u|$ to the output data:
-    data_out.add_data_vector (solution, intensities);
+    data_out.add_data_vector(solution, intensities);
 
     // The last steps are as before. Note that the actual output format is now
     // determined by what is stated in the input file, i.e. one can change the
     // output format without having to re-compile this program:
-    data_out.build_patches ();
-    data_out.write (output);
+    data_out.build_patches();
+    data_out.write(output);
 
-    timer.stop ();
-    deallog << "done ("
+    timer.stop();
+    deallog << "done("
             << timer.cpu_time()
             << "s)"
             << std::endl;
@@ -897,13 +897,13 @@ namespace Step29
 
   // Here we simply execute our functions one after the other:
   template <int dim>
-  void UltrasoundProblem<dim>::run ()
+  void UltrasoundProblem<dim>::run()
   {
-    make_grid ();
-    setup_system ();
-    assemble_system ();
-    solve ();
-    output_results ();
+    make_grid();
+    setup_system();
+    assemble_system();
+    solve();
+    output_results();
   }
 }
 
@@ -917,7 +917,7 @@ namespace Step29
 // parameter values from a textfile called <code>step-29.prm</code>. The
 // values so read are then handed over to an instance of the UltrasoundProblem
 // class:
-int main ()
+int main()
 {
   try
     {
@@ -930,8 +930,8 @@ int main ()
       ParameterReader   param(prm);
       param.read_parameters("step-29.prm");
 
-      UltrasoundProblem<2>  ultrasound_problem (prm);
-      ultrasound_problem.run ();
+      UltrasoundProblem<2>  ultrasound_problem(prm);
+      ultrasound_problem.run();
     }
   catch (std::exception &exc)
     {

@@ -47,7 +47,7 @@ using namespace dealii;
 
 // In the following, first function, we simply use the unit square as domain
 // and produce a globally refined grid from it.
-void first_grid ()
+void first_grid()
 {
   // The first thing to do is to define an object for a triangulation of a
   // two-dimensional domain:
@@ -63,15 +63,15 @@ void first_grid ()
   // Next, we want to fill the triangulation with a single cell for a square
   // domain. The triangulation is the refined four times, to yield $4^4=256$
   // cells in total:
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (4);
+  GridGenerator::hyper_cube(triangulation);
+  triangulation.refine_global(4);
 
   // Now we want to write a graphical representation of the mesh to an output
   // file. The GridOut class of deal.II can do that in a number of different
   // output formats; here, we choose encapsulated postscript (eps) format:
-  std::ofstream out ("grid-1.eps");
+  std::ofstream out("grid-1.eps");
   GridOut grid_out;
-  grid_out.write_eps (triangulation, out);
+  grid_out.write_eps(triangulation, out);
   std::cout << "Grid written to grid-1.eps" << std::endl;
 }
 
@@ -81,7 +81,7 @@ void first_grid ()
 
 // The grid in the following, second function is slightly more complicated in
 // that we use a ring domain and refine the result once globally.
-void second_grid ()
+void second_grid()
 {
   // We start again by defining an object for a triangulation of a
   // two-dimensional domain:
@@ -91,12 +91,12 @@ void second_grid ()
   // point (1,0), and inner and outer radius shall be 0.5 and 1. The number of
   // circumferential cells could be adjusted automatically by this function,
   // but we choose to set it explicitly to 10 as the last argument:
-  const Point<2> center (1,0);
+  const Point<2> center(1,0);
   const double inner_radius = 0.5,
                outer_radius = 1.0;
-  GridGenerator::hyper_shell (triangulation,
-                              center, inner_radius, outer_radius,
-                              10);
+  GridGenerator::hyper_shell(triangulation,
+                             center, inner_radius, outer_radius,
+                             10);
   // By default, the triangulation assumes that all boundaries are
   // straight lines, and all cells are bi-linear quads or tri-linear
   // hexes, and that they are defined by the cells of the coarse grid
@@ -224,11 +224,11 @@ void second_grid ()
               // then also break the loop over all vertices and move on to the
               // next cell.
               const double distance_from_center
-                = center.distance (cell->vertex(v));
+                = center.distance(cell->vertex(v));
 
               if (std::fabs(distance_from_center - inner_radius) < 1e-10)
                 {
-                  cell->set_refine_flag ();
+                  cell->set_refine_flag();
                   break;
                 }
             }
@@ -239,16 +239,16 @@ void second_grid ()
       // so owes its long name to the fact that one can also mark cells for
       // coarsening, and the function does coarsening and refinement all at
       // once:
-      triangulation.execute_coarsening_and_refinement ();
+      triangulation.execute_coarsening_and_refinement();
     }
 
 
   // Finally, after these five iterations of refinement, we want to again
   // write the resulting mesh to a file, again in eps format. This works just
   // as above:
-  std::ofstream out ("grid-2.eps");
+  std::ofstream out("grid-2.eps");
   GridOut grid_out;
-  grid_out.write_eps (triangulation, out);
+  grid_out.write_eps(triangulation, out);
 
   std::cout << "Grid written to grid-2.eps" << std::endl;
 
@@ -274,8 +274,8 @@ void second_grid ()
 
 // Finally, the main function. There isn't much to do here, only to call the
 // two subfunctions, which produce the two grids.
-int main ()
+int main()
 {
-  first_grid ();
-  second_grid ();
+  first_grid();
+  second_grid();
 }

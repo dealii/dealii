@@ -849,7 +849,7 @@ namespace Step60
             << embedded_space_maximal_diameter/embedding_space_minimal_diameter << std::endl;
 
     AssertThrow(embedded_space_maximal_diameter < embedding_space_minimal_diameter,
-                ExcMessage("The embedding grid is too refined (or the embedded grid "
+                ExcMessage("The embedding grid is too refined(or the embedded grid "
                            "is too coarse). Adjust the parameters so that the minimal "
                            "grid size of the embedding grid is larger "
                            "than the maximal grid size of the embedded grid."));

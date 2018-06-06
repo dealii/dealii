@@ -423,14 +423,14 @@ namespace Step39
     void run(unsigned int n_steps);
 
   private:
-    void setup_system ();
-    void assemble_matrix ();
-    void assemble_mg_matrix ();
-    void assemble_right_hand_side ();
-    void error ();
-    double estimate ();
-    void solve ();
-    void output_results (const unsigned int cycle) const;
+    void setup_system();
+    void assemble_matrix();
+    void assemble_mg_matrix();
+    void assemble_right_hand_side();
+    void error();
+    double estimate();
+    void solve();
+    void output_results(const unsigned int cycle) const;
 
     // The member objects related to the discretization are here.
     Triangulation<dim>        triangulation;
@@ -473,7 +473,7 @@ namespace Step39
   template <int dim>
   InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(const FiniteElement<dim> &fe)
     :
-    triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
+    triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
     mapping(),
     fe(fe),
     dof_handler(triangulation),
@@ -686,7 +686,7 @@ namespace Step39
 
     // Then, we need an exact solver for the matrix on the coarsest level.
     FullMatrix<double> coarse_matrix;
-    coarse_matrix.copy_from (mg_matrix[0]);
+    coarse_matrix.copy_from(mg_matrix[0]);
     MGCoarseGridHouseholder<double, Vector<double> > mg_coarse;
     mg_coarse.initialize(coarse_matrix);
 
@@ -863,7 +863,7 @@ namespace Step39
   // name from its various components, including the refinement cycle
   // that we output with two digits.
   template <int dim>
-  void InteriorPenaltyProblem<dim>::output_results (const unsigned int cycle) const
+  void InteriorPenaltyProblem<dim>::output_results(const unsigned int cycle) const
   {
     const std::string filename = "sol-" +
                                  Utilities::int_to_string(cycle,2) +
@@ -871,14 +871,14 @@ namespace Step39
 
     deallog << "Writing solution to <" << filename << ">..."
             << std::endl << std::endl;
-    std::ofstream gnuplot_output (filename);
+    std::ofstream gnuplot_output(filename);
 
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "u");
-    data_out.add_data_vector (estimates.block(0), "est");
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "u");
+    data_out.add_data_vector(estimates.block(0), "est");
 
-    data_out.build_patches ();
+    data_out.build_patches();
 
     data_out.write_gnuplot(gnuplot_output);
   }
@@ -896,10 +896,10 @@ namespace Step39
           triangulation.refine_global(1);
         else
           {
-            GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-                                                               estimates.block(0),
-                                                               0.5, 0.0);
-            triangulation.execute_coarsening_and_refinement ();
+            GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
+                                                              estimates.block(0),
+                                                              0.5, 0.0);
+            triangulation.execute_coarsening_and_refinement();
           }
 
         deallog << "Triangulation "

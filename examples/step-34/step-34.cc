@@ -135,7 +135,7 @@ namespace Step34
 
   private:
 
-    void read_parameters (const std::string &filename);
+    void read_parameters(const std::string &filename);
 
     void read_domain();
 
@@ -331,7 +331,7 @@ namespace Step34
 
 
   template <int dim>
-  void BEMProblem<dim>::read_parameters (const std::string &filename)
+  void BEMProblem<dim>::read_parameters(const std::string &filename)
   {
     deallog << std::endl << "Parsing parameter file " << filename << std::endl
             << "for a " << dim << " dimensional simulation. " << std::endl;
@@ -507,20 +507,20 @@ namespace Step34
     switch (dim)
       {
       case 2:
-        in.open ("coarse_circle.inp");
+        in.open("coarse_circle.inp");
         break;
 
       case 3:
-        in.open ("coarse_sphere.inp");
+        in.open("coarse_sphere.inp");
         break;
 
       default:
-        Assert (false, ExcNotImplemented());
+        Assert(false, ExcNotImplemented());
       }
 
     GridIn<dim-1, dim> gi;
-    gi.attach_triangulation (tria);
-    gi.read_ucd (in);
+    gi.attach_triangulation(tria);
+    gi.read_ucd(in);
 
     tria.set_all_manifold_ids(1);
     tria.set_manifold(1, manifold);
@@ -681,11 +681,11 @@ namespace Step34
                 const Quadrature<dim-1> & singular_quadrature =
                   get_singular_quadrature(cell, singular_index);
 
-                FEValues<dim-1,dim> fe_v_singular (mapping, fe, singular_quadrature,
-                                                   update_jacobians |
-                                                   update_values |
-                                                   update_cell_normal_vectors |
-                                                   update_quadrature_points );
+                FEValues<dim-1,dim> fe_v_singular(mapping, fe, singular_quadrature,
+                                                  update_jacobians |
+                                                  update_values |
+                                                  update_cell_normal_vectors |
+                                                  update_quadrature_points );
 
                 fe_v_singular.reinit(cell);
 
@@ -754,8 +754,8 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::solve_system()
   {
-    SolverGMRES<Vector<double> > solver (solver_control);
-    solver.solve (system_matrix, phi, system_rhs, PreconditionIdentity());
+    SolverGMRES<Vector<double> > solver(solver_control);
+    solver.solve(system_matrix, phi, system_rhs, PreconditionIdentity());
   }
 
 
@@ -767,12 +767,12 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::compute_errors(const unsigned int cycle)
   {
-    Vector<float> difference_per_cell (tria.n_active_cells());
-    VectorTools::integrate_difference (mapping, dh, phi,
-                                       exact_solution,
-                                       difference_per_cell,
-                                       QGauss<(dim-1)>(2*fe.degree+1),
-                                       VectorTools::L2_norm);
+    Vector<float> difference_per_cell(tria.n_active_cells());
+    VectorTools::integrate_difference(mapping, dh, phi,
+                                      exact_solution,
+                                      difference_per_cell,
+                                      QGauss<(dim-1)>(2*fe.degree+1),
+                                      VectorTools::L2_norm);
     const double L2_error = VectorTools::compute_global_error(tria,
                                                               difference_per_cell,
                                                               VectorTools::L2_norm);
@@ -929,7 +929,7 @@ namespace Step34
     GridGenerator::hyper_cube(external_tria, -2, 2);
 
     FE_Q<dim>           external_fe(1);
-    DoFHandler<dim>     external_dh (external_tria);
+    DoFHandler<dim>     external_dh(external_tria);
     Vector<double>      external_phi;
 
     external_tria.refine_global(external_refinement);
@@ -1091,7 +1091,7 @@ namespace Step34
 
 // This is the main function of this program. It is exactly like all previous
 // tutorial programs:
-int main ()
+int main()
 {
   try
     {
@@ -1101,7 +1101,7 @@ int main ()
       const unsigned int degree = 1;
       const unsigned int mapping_degree = 1;
 
-      deallog.depth_console (3);
+      deallog.depth_console(3);
       BEMProblem<2> laplace_problem_2d(degree, mapping_degree);
       laplace_problem_2d.run();
 

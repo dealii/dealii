@@ -103,7 +103,7 @@ namespace Step57
     void solve(const bool initial_step);
     void refine_mesh();
     void process_solution(unsigned int refinement);
-    void output_results (const unsigned int refinement_cycle) const;
+    void output_results(const unsigned int refinement_cycle) const;
     void newton_iteration(const double tolerance,
                           const unsigned int max_iteration,
                           const unsigned int n_refinements,
@@ -163,8 +163,8 @@ namespace Step57
   double BoundaryValues<dim>::value(const Point<dim> &p,
                                     const unsigned int component) const
   {
-    Assert (component < this->n_components,
-            ExcIndexRange (component, 0, this->n_components));
+    Assert(component < this->n_components,
+           ExcIndexRange(component, 0, this->n_components));
     if (component == 0 && std::abs(p[dim-1]-1.0) < 1e-10)
       return 1.0;
 
@@ -172,11 +172,11 @@ namespace Step57
   }
 
   template <int dim>
-  void BoundaryValues<dim>::vector_value ( const Point<dim> &p,
-                                           Vector<double>   &values ) const
+  void BoundaryValues<dim>::vector_value( const Point<dim> &p,
+                                          Vector<double>   &values ) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
-      values(c) = BoundaryValues<dim>::value (p, c);
+      values(c) = BoundaryValues<dim>::value(p, c);
   }
 
 
@@ -200,14 +200,14 @@ namespace Step57
   class BlockSchurPreconditioner : public Subscriptor
   {
   public:
-    BlockSchurPreconditioner (double                                     gamma,
-                              double                                     viscosity,
-                              const BlockSparseMatrix<double>            &S,
-                              const SparseMatrix<double>                 &P,
-                              const PreconditionerMp                     &Mppreconditioner);
+    BlockSchurPreconditioner(double                                     gamma,
+                             double                                     viscosity,
+                             const BlockSparseMatrix<double>            &S,
+                             const SparseMatrix<double>                 &P,
+                             const PreconditionerMp                     &Mppreconditioner);
 
-    void vmult (BlockVector<double>       &dst,
-                const BlockVector<double> &src) const;
+    void vmult(BlockVector<double>       &dst,
+               const BlockVector<double> &src) const;
 
   private:
     const double gamma;
@@ -224,16 +224,16 @@ namespace Step57
 
   template <class PreconditionerMp>
   BlockSchurPreconditioner<PreconditionerMp>::
-  BlockSchurPreconditioner (double                           gamma,
-                            double                           viscosity,
-                            const BlockSparseMatrix<double>  &S,
-                            const SparseMatrix<double>       &P,
-                            const PreconditionerMp           &Mppreconditioner)
+  BlockSchurPreconditioner(double                           gamma,
+                           double                           viscosity,
+                           const BlockSparseMatrix<double>  &S,
+                           const SparseMatrix<double>       &P,
+                           const PreconditionerMp           &Mppreconditioner)
     :
     gamma                (gamma),
     viscosity            (viscosity),
     stokes_matrix        (S),
-    pressure_mass_matrix (P),
+    pressure_mass_matrix(P),
     mp_preconditioner    (Mppreconditioner)
   {
     A_inverse.initialize(stokes_matrix.block(0,0));
@@ -242,14 +242,14 @@ namespace Step57
   template <class PreconditionerMp>
   void
   BlockSchurPreconditioner<PreconditionerMp>::
-  vmult (BlockVector<double>       &dst,
-         const BlockVector<double> &src) const
+  vmult(BlockVector<double>       &dst,
+        const BlockVector<double> &src) const
   {
     Vector<double> utmp(src.block(0));
 
     {
       SolverControl solver_control(1000, 1e-6 * src.block(1).l2_norm());
-      SolverCG<>    cg (solver_control);
+      SolverCG<>    cg(solver_control);
 
       dst.block(1) = 0.0;
       cg.solve(pressure_mass_matrix,
@@ -264,7 +264,7 @@ namespace Step57
       utmp += src.block(0);
     }
 
-    A_inverse.vmult (dst.block(0), utmp);
+    A_inverse.vmult(dst.block(0), utmp);
   }
 
   // @sect3{StationaryNavierStokes class implementation}
@@ -296,7 +296,7 @@ namespace Step57
     pressure_mass_matrix.clear();
 
     // The first step is to associate DoFs with a given mesh.
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
     // We renumber the components to have all velocity DoFs come before
     // the pressure DoFs to be able to split the solution vector in two blocks
@@ -304,10 +304,10 @@ namespace Step57
     //
     std::vector<unsigned int> block_component(dim+1, 0);
     block_component[dim] = 1;
-    DoFRenumbering::component_wise (dof_handler, block_component);
+    DoFRenumbering::component_wise(dof_handler, block_component);
 
-    dofs_per_block.resize (2);
-    DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);
+    dofs_per_block.resize(2);
+    DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
     unsigned int dof_u = dofs_per_block[0];
     unsigned int dof_p = dofs_per_block[1];
 
@@ -358,16 +358,16 @@ namespace Step57
   void StationaryNavierStokes<dim>::initialize_system()
   {
     {
-      BlockDynamicSparsityPattern dsp (dofs_per_block, dofs_per_block);
-      DoFTools::make_sparsity_pattern (dof_handler, dsp, nonzero_constraints);
-      sparsity_pattern.copy_from (dsp);
+      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      DoFTools::make_sparsity_pattern(dof_handler, dsp, nonzero_constraints);
+      sparsity_pattern.copy_from(dsp);
     }
 
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
 
-    present_solution.reinit (dofs_per_block);
-    newton_update.reinit (dofs_per_block);
-    system_rhs.reinit (dofs_per_block);
+    present_solution.reinit(dofs_per_block);
+    newton_update.reinit(dofs_per_block);
+    system_rhs.reinit(dofs_per_block);
   }
 
   // @sect4{StationaryNavierStokes::assemble}
@@ -390,30 +390,30 @@ namespace Step57
 
     QGauss<dim>   quadrature_formula(degree+2);
 
-    FEValues<dim> fe_values (fe,
-                             quadrature_formula,
-                             update_values |
-                             update_quadrature_points |
-                             update_JxW_values |
-                             update_gradients );
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values |
+                            update_quadrature_points |
+                            update_JxW_values |
+                            update_gradients );
 
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    const FEValuesExtractors::Vector velocities (0);
-    const FEValuesExtractors::Scalar pressure (dim);
+    const FEValuesExtractors::Vector velocities(0);
+    const FEValuesExtractors::Scalar pressure(dim);
 
-    FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>   local_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs    (dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // For the linearized system, we create temporary storage for present velocity
     // and gradient, and present pressure. In practice, they are
     // all obtained through their shape functions at quadrature points.
 
     std::vector<Tensor<1, dim> >  present_velocity_values    (n_q_points);
-    std::vector<Tensor<2, dim> >  present_velocity_gradients (n_q_points);
+    std::vector<Tensor<2, dim> >  present_velocity_gradients(n_q_points);
     std::vector<double>           present_pressure_values    (n_q_points);
 
     std::vector<double>           div_phi_u                 (dofs_per_cell);
@@ -452,7 +452,7 @@ namespace Step57
           {
             for (unsigned int k=0; k<dofs_per_cell; ++k)
               {
-                div_phi_u[k]  =  fe_values[velocities].divergence (k, q);
+                div_phi_u[k]  =  fe_values[velocities].divergence(k, q);
                 grad_phi_u[k] =  fe_values[velocities].gradient(k, q);
                 phi_u[k]      =  fe_values[velocities].value(k, q);
                 phi_p[k]      =  fe_values[pressure]  .value(k, q);
@@ -485,7 +485,7 @@ namespace Step57
               }
           }
 
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
 
         const ConstraintMatrix &constraints_used = initial_step ? nonzero_constraints : zero_constraints;
 
@@ -545,28 +545,28 @@ namespace Step57
   // following steps, we will solve for the Newton update so zero
   // constraints are used.
   template <int dim>
-  void StationaryNavierStokes<dim>::solve (const bool initial_step)
+  void StationaryNavierStokes<dim>::solve(const bool initial_step)
   {
     const ConstraintMatrix &constraints_used = initial_step ? nonzero_constraints : zero_constraints;
 
-    SolverControl solver_control (system_matrix.m(), 1e-4*system_rhs.l2_norm(), true);
+    SolverControl solver_control(system_matrix.m(), 1e-4*system_rhs.l2_norm(), true);
     SolverFGMRES<BlockVector<double> > gmres(solver_control);
 
     SparseILU<double> pmass_preconditioner;
-    pmass_preconditioner.initialize (pressure_mass_matrix,
-                                     SparseILU<double>::AdditionalData());
+    pmass_preconditioner.initialize(pressure_mass_matrix,
+                                    SparseILU<double>::AdditionalData());
 
     const BlockSchurPreconditioner<SparseILU<double> >
-    preconditioner (gamma,
-                    viscosity,
-                    system_matrix,
-                    pressure_mass_matrix,
-                    pmass_preconditioner);
+    preconditioner(gamma,
+                   viscosity,
+                   system_matrix,
+                   pressure_mass_matrix,
+                   pmass_preconditioner);
 
-    gmres.solve (system_matrix,
-                 newton_update,
-                 system_rhs,
-                 preconditioner);
+    gmres.solve(system_matrix,
+                newton_update,
+                system_rhs,
+                preconditioner);
     std::cout << " ****FGMRES steps: " << solver_control.last_step() << std::endl;
 
     constraints_used.distribute(newton_update);
@@ -582,30 +582,30 @@ namespace Step57
   template <int dim>
   void StationaryNavierStokes<dim>::refine_mesh()
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
     FEValuesExtractors::Vector velocity(0);
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(degree+1),
-                                        typename FunctionMap<dim>::type(),
-                                        present_solution,
-                                        estimated_error_per_cell,
-                                        fe.component_mask(velocity));
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim-1>(degree+1),
+                                       typename FunctionMap<dim>::type(),
+                                       present_solution,
+                                       estimated_error_per_cell,
+                                       fe.component_mask(velocity));
 
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     estimated_error_per_cell,
-                                                     0.3, 0.0);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3, 0.0);
 
     triangulation.prepare_coarsening_and_refinement();
     SolutionTransfer<dim, BlockVector<double> > solution_transfer(dof_handler);
     solution_transfer.prepare_for_coarsening_and_refinement(present_solution);
-    triangulation.execute_coarsening_and_refinement ();
+    triangulation.execute_coarsening_and_refinement();
 
     // First the DoFHandler is set up and constraints are generated. Then we
     // create a temporary vector "tmp", whose size is according with the
     // solution on the new mesh.
     setup_dofs();
 
-    BlockVector<double> tmp (dofs_per_block);
+    BlockVector<double> tmp(dofs_per_block);
 
     // Transfer solution from coarse to fine mesh and apply boundary value
     // constraints to the new transferred solution. Note that present_solution
@@ -705,7 +705,7 @@ namespace Step57
 
             if (output_result)
               {
-                output_results (max_iteration*refinement+outer_iteration);
+                output_results(max_iteration*refinement+outer_iteration);
 
                 if (current_res <= tolerance)
                   process_solution(refinement);
@@ -756,28 +756,28 @@ namespace Step57
   // for the output file that also contains the Reynolds number (i.e., the
   // inverse of the viscosity in the current context).
   template <int dim>
-  void StationaryNavierStokes<dim>::output_results (const unsigned int output_index)  const
+  void StationaryNavierStokes<dim>::output_results(const unsigned int output_index)  const
   {
-    std::vector<std::string> solution_names (dim, "velocity");
+    std::vector<std::string> solution_names(dim, "velocity");
     solution_names.emplace_back("pressure");
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
     (dim, DataComponentInterpretation::component_is_part_of_vector);
     data_component_interpretation
-    .push_back (DataComponentInterpretation::component_is_scalar);
+    .push_back(DataComponentInterpretation::component_is_scalar);
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (present_solution, solution_names,
-                              DataOut<dim>::type_dof_data,
-                              data_component_interpretation);
-    data_out.build_patches ();
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(present_solution, solution_names,
+                             DataOut<dim>::type_dof_data,
+                             data_component_interpretation);
+    data_out.build_patches();
 
-    std::ofstream output (std::to_string(1.0/viscosity)
-                          + "-solution-"
-                          + Utilities::int_to_string (output_index, 4)
-                          + ".vtk");
-    data_out.write_vtk (output);
+    std::ofstream output(std::to_string(1.0/viscosity)
+                         + "-solution-"
+                         + Utilities::int_to_string(output_index, 4)
+                         + ".vtk");
+    data_out.write_vtk(output);
   }
 
   // @sect4{StationaryNavierStokes::process_solution}
@@ -787,10 +787,10 @@ namespace Step57
   template <int dim>
   void StationaryNavierStokes<dim>::process_solution(unsigned int refinement)
   {
-    std::ofstream f (std::to_string(1.0/viscosity)
-                     + "-line-"
-                     + std::to_string(refinement)
-                     + ".txt");
+    std::ofstream f(std::to_string(1.0/viscosity)
+                    + "-line-"
+                    + std::to_string(refinement)
+                    + ".txt");
     f << "# y u_x u_y" << std::endl;
 
     Point<dim> p;

@@ -138,20 +138,20 @@ namespace Step51
     protected SolutionBase<dim>
   {
   public:
-    Solution () : Function<dim>() {}
+    Solution() : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim>   &p,
+                         const unsigned int  component = 0) const override;
 
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const override;
+    virtual Tensor<1,dim> gradient(const Point<dim>   &p,
+                                   const unsigned int  component = 0) const override;
   };
 
 
 
   template <int dim>
-  double Solution<dim>::value (const Point<dim>   &p,
-                               const unsigned int) const
+  double Solution<dim>::value(const Point<dim>   &p,
+                              const unsigned int) const
   {
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
@@ -168,8 +168,8 @@ namespace Step51
 
 
   template <int dim>
-  Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
-                                         const unsigned int) const
+  Tensor<1,dim> Solution<dim>::gradient(const Point<dim>   &p,
+                                        const unsigned int) const
   {
     Tensor<1,dim> return_value;
 
@@ -198,15 +198,15 @@ namespace Step51
     protected SolutionBase<dim>
   {
   public:
-    SolutionAndGradient () : Function<dim>(dim) {}
+    SolutionAndGradient() : Function<dim>(dim) {}
 
-    virtual void vector_value (const Point<dim>   &p,
-                               Vector<double>     &v) const override;
+    virtual void vector_value(const Point<dim>   &p,
+                              Vector<double>     &v) const override;
   };
 
   template <int dim>
-  void SolutionAndGradient<dim>::vector_value (const Point<dim> &p,
-                                               Vector<double>   &v) const
+  void SolutionAndGradient<dim>::vector_value(const Point<dim> &p,
+                                              Vector<double>   &v) const
   {
     AssertDimension(v.size(), dim+1);
     Solution<dim> solution;
@@ -227,7 +227,7 @@ namespace Step51
   public:
     ConvectionVelocity() : TensorFunction<1,dim>() {}
 
-    virtual Tensor<1,dim> value (const Point<dim> &p) const override;
+    virtual Tensor<1,dim> value(const Point<dim> &p) const override;
   };
 
 
@@ -269,10 +269,10 @@ namespace Step51
     protected SolutionBase<dim>
   {
   public:
-    RightHandSide () : Function<dim>() {}
+    RightHandSide() : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim>   &p,
+                         const unsigned int  component = 0) const override;
 
   private:
     const ConvectionVelocity<dim> convection_velocity;
@@ -280,8 +280,8 @@ namespace Step51
 
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim>   &p,
-                                    const unsigned int) const
+  double RightHandSide<dim>::value(const Point<dim>   &p,
+                                   const unsigned int) const
   {
     Tensor<1,dim> convection = convection_velocity.value(p);
     double return_value = 0;
@@ -325,16 +325,16 @@ namespace Step51
 
     HDG (const unsigned int degree,
          const RefinementMode refinement_mode);
-    void run ();
+    void run();
 
   private:
 
-    void setup_system ();
-    void assemble_system (const bool reconstruct_trace = false);
-    void solve ();
-    void postprocess ();
-    void refine_grid (const unsigned int cylce);
-    void output_results (const unsigned int cycle);
+    void setup_system();
+    void assemble_system(const bool reconstruct_trace = false);
+    void solve();
+    void postprocess();
+    void refine_grid(const unsigned int cylce);
+    void output_results(const unsigned int cycle);
 
     // Data for the assembly and solution of the primal variables.
     struct PerTaskData;
@@ -347,15 +347,15 @@ namespace Step51
 
     // The following three functions are used by WorkStream to do the actual
     // work of the program.
-    void assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                   ScratchData &scratch,
-                                   PerTaskData &task_data);
+    void assemble_system_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                  ScratchData &scratch,
+                                  PerTaskData &task_data);
 
     void copy_local_to_global(const PerTaskData &data);
 
-    void postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                               PostProcessScratchData &scratch,
-                               unsigned int &empty_data);
+    void postprocess_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                              PostProcessScratchData &scratch,
+                              unsigned int &empty_data);
 
 
     Triangulation<dim>   triangulation;
@@ -418,14 +418,14 @@ namespace Step51
   template <int dim>
   HDG<dim>::HDG (const unsigned int degree,
                  const RefinementMode refinement_mode) :
-    fe_local (FE_DGQ<dim>(degree), dim,
-              FE_DGQ<dim>(degree), 1),
-    dof_handler_local (triangulation),
-    fe (degree),
-    dof_handler (triangulation),
-    fe_u_post (degree+1),
-    dof_handler_u_post (triangulation),
-    refinement_mode (refinement_mode)
+    fe_local(FE_DGQ<dim>(degree), dim,
+             FE_DGQ<dim>(degree), 1),
+    dof_handler_local(triangulation),
+    fe(degree),
+    dof_handler(triangulation),
+    fe_u_post(degree+1),
+    dof_handler_u_post(triangulation),
+    refinement_mode(refinement_mode)
   {}
 
 
@@ -437,7 +437,7 @@ namespace Step51
   // objects go with the global skeleton solution.
   template <int dim>
   void
-  HDG<dim>::setup_system ()
+  HDG<dim>::setup_system()
   {
     dof_handler_local.distribute_dofs(fe_local);
     dof_handler.distribute_dofs(fe);
@@ -447,34 +447,34 @@ namespace Step51
               << dof_handler.n_dofs()
               << std::endl;
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
 
-    solution_local.reinit (dof_handler_local.n_dofs());
-    solution_u_post.reinit (dof_handler_u_post.n_dofs());
+    solution_local.reinit(dof_handler_local.n_dofs());
+    solution_u_post.reinit(dof_handler_u_post.n_dofs());
 
-    constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+    constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     typename FunctionMap<dim>::type boundary_functions;
     Solution<dim> solution_function;
     boundary_functions[0] = &solution_function;
-    VectorTools::project_boundary_values (dof_handler,
-                                          boundary_functions,
-                                          QGauss<dim-1>(fe.degree+1),
-                                          constraints);
-    constraints.close ();
+    VectorTools::project_boundary_values(dof_handler,
+                                         boundary_functions,
+                                         QGauss<dim-1>(fe.degree+1),
+                                         constraints);
+    constraints.close();
 
     // When creating the chunk sparsity pattern, we first create the usual
     // compressed sparsity pattern and then set the chunk size, which is equal
     // to the number of dofs on a face, when copying this into the final
     // sparsity pattern.
     {
-      DynamicSparsityPattern dsp (dof_handler.n_dofs());
-      DoFTools::make_sparsity_pattern (dof_handler, dsp,
-                                       constraints, false);
+      DynamicSparsityPattern dsp(dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern(dof_handler, dsp,
+                                      constraints, false);
       sparsity_pattern.copy_from(dsp, fe.dofs_per_face);
     }
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
   }
 
 
@@ -563,20 +563,20 @@ namespace Step51
                 const UpdateFlags local_face_flags,
                 const UpdateFlags flags)
       :
-      fe_values_local (fe_local, quadrature_formula, local_flags),
-      fe_face_values_local (fe_local, face_quadrature_formula, local_face_flags),
-      fe_face_values (fe, face_quadrature_formula, flags),
-      ll_matrix (fe_local.dofs_per_cell, fe_local.dofs_per_cell),
-      lf_matrix (fe_local.dofs_per_cell, fe.dofs_per_cell),
-      fl_matrix (fe.dofs_per_cell, fe_local.dofs_per_cell),
-      tmp_matrix (fe.dofs_per_cell, fe_local.dofs_per_cell),
-      l_rhs (fe_local.dofs_per_cell),
-      tmp_rhs (fe_local.dofs_per_cell),
-      q_phi (fe_local.dofs_per_cell),
-      q_phi_div (fe_local.dofs_per_cell),
-      u_phi (fe_local.dofs_per_cell),
-      u_phi_grad (fe_local.dofs_per_cell),
-      tr_phi (fe.dofs_per_cell),
+      fe_values_local(fe_local, quadrature_formula, local_flags),
+      fe_face_values_local(fe_local, face_quadrature_formula, local_face_flags),
+      fe_face_values(fe, face_quadrature_formula, flags),
+      ll_matrix(fe_local.dofs_per_cell, fe_local.dofs_per_cell),
+      lf_matrix(fe_local.dofs_per_cell, fe.dofs_per_cell),
+      fl_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell),
+      tmp_matrix(fe.dofs_per_cell, fe_local.dofs_per_cell),
+      l_rhs(fe_local.dofs_per_cell),
+      tmp_rhs(fe_local.dofs_per_cell),
+      q_phi(fe_local.dofs_per_cell),
+      q_phi_div(fe_local.dofs_per_cell),
+      u_phi(fe_local.dofs_per_cell),
+      u_phi_grad(fe_local.dofs_per_cell),
+      tr_phi(fe.dofs_per_cell),
       trace_values(face_quadrature_formula.size()),
       fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell),
       fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
@@ -598,26 +598,26 @@ namespace Step51
 
     ScratchData(const ScratchData &sd)
       :
-      fe_values_local (sd.fe_values_local.get_fe(),
-                       sd.fe_values_local.get_quadrature(),
-                       sd.fe_values_local.get_update_flags()),
-      fe_face_values_local (sd.fe_face_values_local.get_fe(),
-                            sd.fe_face_values_local.get_quadrature(),
-                            sd.fe_face_values_local.get_update_flags()),
-      fe_face_values (sd.fe_face_values.get_fe(),
-                      sd.fe_face_values.get_quadrature(),
-                      sd.fe_face_values.get_update_flags()),
-      ll_matrix (sd.ll_matrix),
-      lf_matrix (sd.lf_matrix),
-      fl_matrix (sd.fl_matrix),
-      tmp_matrix (sd.tmp_matrix),
-      l_rhs (sd.l_rhs),
-      tmp_rhs (sd.tmp_rhs),
-      q_phi (sd.q_phi),
-      q_phi_div (sd.q_phi_div),
-      u_phi (sd.u_phi),
-      u_phi_grad (sd.u_phi_grad),
-      tr_phi (sd.tr_phi),
+      fe_values_local(sd.fe_values_local.get_fe(),
+                      sd.fe_values_local.get_quadrature(),
+                      sd.fe_values_local.get_update_flags()),
+      fe_face_values_local(sd.fe_face_values_local.get_fe(),
+                           sd.fe_face_values_local.get_quadrature(),
+                           sd.fe_face_values_local.get_update_flags()),
+      fe_face_values(sd.fe_face_values.get_fe(),
+                     sd.fe_face_values.get_quadrature(),
+                     sd.fe_face_values.get_update_flags()),
+      ll_matrix(sd.ll_matrix),
+      lf_matrix(sd.lf_matrix),
+      fl_matrix(sd.fl_matrix),
+      tmp_matrix(sd.tmp_matrix),
+      l_rhs(sd.l_rhs),
+      tmp_rhs(sd.tmp_rhs),
+      q_phi(sd.q_phi),
+      q_phi_div(sd.q_phi_div),
+      u_phi(sd.u_phi),
+      u_phi_grad(sd.u_phi_grad),
+      tr_phi(sd.tr_phi),
       trace_values(sd.trace_values),
       fe_local_support_on_face(sd.fe_local_support_on_face),
       fe_support_on_face(sd.fe_support_on_face)
@@ -649,28 +649,28 @@ namespace Step51
                            const UpdateFlags local_flags,
                            const UpdateFlags flags)
       :
-      fe_values_local (fe_local, quadrature_formula, local_flags),
-      fe_values (fe, quadrature_formula, flags),
-      u_values (quadrature_formula.size()),
-      u_gradients (quadrature_formula.size()),
-      cell_matrix (fe.dofs_per_cell, fe.dofs_per_cell),
-      cell_rhs (fe.dofs_per_cell),
-      cell_sol (fe.dofs_per_cell)
+      fe_values_local(fe_local, quadrature_formula, local_flags),
+      fe_values(fe, quadrature_formula, flags),
+      u_values(quadrature_formula.size()),
+      u_gradients(quadrature_formula.size()),
+      cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell),
+      cell_rhs(fe.dofs_per_cell),
+      cell_sol(fe.dofs_per_cell)
     {}
 
     PostProcessScratchData(const PostProcessScratchData &sd)
       :
-      fe_values_local (sd.fe_values_local.get_fe(),
-                       sd.fe_values_local.get_quadrature(),
-                       sd.fe_values_local.get_update_flags()),
-      fe_values (sd.fe_values.get_fe(),
-                 sd.fe_values.get_quadrature(),
-                 sd.fe_values.get_update_flags()),
-      u_values (sd.u_values),
-      u_gradients (sd.u_gradients),
-      cell_matrix (sd.cell_matrix),
-      cell_rhs (sd.cell_rhs),
-      cell_sol (sd.cell_sol)
+      fe_values_local(sd.fe_values_local.get_fe(),
+                      sd.fe_values_local.get_quadrature(),
+                      sd.fe_values_local.get_update_flags()),
+      fe_values(sd.fe_values.get_fe(),
+                sd.fe_values.get_quadrature(),
+                sd.fe_values.get_update_flags()),
+      u_values(sd.u_values),
+      u_gradients(sd.u_gradients),
+      cell_matrix(sd.cell_matrix),
+      cell_rhs(sd.cell_rhs),
+      cell_sol(sd.cell_sol)
     {}
   };
 
@@ -685,28 +685,28 @@ namespace Step51
   // local solution (true).
   template <int dim>
   void
-  HDG<dim>::assemble_system (const bool trace_reconstruct)
+  HDG<dim>::assemble_system(const bool trace_reconstruct)
   {
     const QGauss<dim>   quadrature_formula(fe.degree+1);
     const QGauss<dim-1> face_quadrature_formula(fe.degree+1);
 
-    const UpdateFlags local_flags (update_values | update_gradients |
-                                   update_JxW_values | update_quadrature_points);
+    const UpdateFlags local_flags(update_values | update_gradients |
+                                  update_JxW_values | update_quadrature_points);
 
-    const UpdateFlags local_face_flags (update_values);
+    const UpdateFlags local_face_flags(update_values);
 
-    const UpdateFlags flags ( update_values | update_normal_vectors |
-                              update_quadrature_points |
-                              update_JxW_values);
+    const UpdateFlags flags( update_values | update_normal_vectors |
+                             update_quadrature_points |
+                             update_JxW_values);
 
-    PerTaskData task_data (fe.dofs_per_cell,
-                           trace_reconstruct);
-    ScratchData scratch (fe, fe_local,
-                         quadrature_formula,
-                         face_quadrature_formula,
-                         local_flags,
-                         local_face_flags,
-                         flags);
+    PerTaskData task_data(fe.dofs_per_cell,
+                          trace_reconstruct);
+    ScratchData scratch(fe, fe_local,
+                        quadrature_formula,
+                        face_quadrature_formula,
+                        local_flags,
+                        local_face_flags,
+                        flags);
 
     WorkStream::run(dof_handler.begin_active(),
                     dof_handler.end(),
@@ -725,24 +725,24 @@ namespace Step51
   // local contributions of the global matrix $D$.
   template <int dim>
   void
-  HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                      ScratchData &scratch,
-                                      PerTaskData &task_data)
+  HDG<dim>::assemble_system_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                     ScratchData &scratch,
+                                     PerTaskData &task_data)
   {
     // Construct iterator for dof_handler_local for FEValues reinit function.
     typename DoFHandler<dim>::active_cell_iterator
-    loc_cell (&triangulation,
-              cell->level(),
-              cell->index(),
-              &dof_handler_local);
+    loc_cell(&triangulation,
+             cell->level(),
+             cell->index(),
+             &dof_handler_local);
 
     const unsigned int n_q_points    = scratch.fe_values_local.get_quadrature().size();
     const unsigned int n_face_q_points = scratch.fe_face_values_local.get_quadrature().size();
 
     const unsigned int loc_dofs_per_cell = scratch.fe_values_local.get_fe().dofs_per_cell;
 
-    const FEValuesExtractors::Vector fluxes (0);
-    const FEValuesExtractors::Scalar scalar (dim);
+    const FEValuesExtractors::Vector fluxes(0);
+    const FEValuesExtractors::Scalar scalar(dim);
 
     scratch.ll_matrix = 0;
     scratch.l_rhs = 0;
@@ -753,7 +753,7 @@ namespace Step51
         task_data.cell_matrix = 0;
         task_data.cell_vector = 0;
       }
-    scratch.fe_values_local.reinit (loc_cell);
+    scratch.fe_values_local.reinit(loc_cell);
 
     // We first compute the cell-interior contribution to @p ll_matrix matrix
     // (referred to as matrix $A$ in the introduction) corresponding to
@@ -802,7 +802,7 @@ namespace Step51
         // The already obtained $\hat{u}$ values are needed when solving for the
         // local variables.
         if (task_data.trace_reconstruct)
-          scratch.fe_face_values.get_function_values (solution, scratch.trace_values);
+          scratch.fe_face_values.get_function_values(solution, scratch.trace_values);
 
         for (unsigned int q=0; q<n_face_q_points; ++q)
           {
@@ -884,7 +884,7 @@ namespace Step51
                     (cell->face(face)->boundary_id() == 1))
                   {
                     const double neumann_value =
-                      - scratch.exact_solution.gradient (quadrature_point) * normal
+                      - scratch.exact_solution.gradient(quadrature_point) * normal
                       + convection * normal * scratch.exact_solution.value(quadrature_point);
                     for (unsigned int i=0; i<scratch.fe_support_on_face[face].size(); ++i)
                       {
@@ -957,10 +957,10 @@ namespace Step51
   void HDG<dim>::copy_local_to_global(const PerTaskData &data)
   {
     if (data.trace_reconstruct == false)
-      constraints.distribute_local_to_global (data.cell_matrix,
-                                              data.cell_vector,
-                                              data.dof_indices,
-                                              system_matrix, system_rhs);
+      constraints.distribute_local_to_global(data.cell_matrix,
+                                             data.cell_vector,
+                                             data.dof_indices,
+                                             system_matrix, system_rhs);
   }
 
 
@@ -969,13 +969,13 @@ namespace Step51
   // The skeleton solution is solved for by using a BiCGStab solver with
   // identity preconditioner.
   template <int dim>
-  void HDG<dim>::solve ()
+  void HDG<dim>::solve()
   {
-    SolverControl solver_control (system_matrix.m()*10,
-                                  1e-11*system_rhs.l2_norm());
-    SolverBicgstab<> solver (solver_control);
-    solver.solve (system_matrix, solution, system_rhs,
-                  PreconditionIdentity());
+    SolverControl solver_control(system_matrix.m()*10,
+                                 1e-11*system_rhs.l2_norm());
+    SolverBicgstab<> solver(solver_control);
+    solver.solve(system_matrix, solution, system_rhs,
+                 PreconditionIdentity());
 
     std::cout << "   Number of BiCGStab iterations: " << solver_control.last_step()
               << std::endl;
@@ -1022,58 +1022,58 @@ namespace Step51
   {
     {
       const QGauss<dim>   quadrature_formula(fe_u_post.degree+1);
-      const UpdateFlags local_flags (update_values);
-      const UpdateFlags flags ( update_values | update_gradients |
-                                update_JxW_values);
+      const UpdateFlags local_flags(update_values);
+      const UpdateFlags flags( update_values | update_gradients |
+                               update_JxW_values);
 
-      PostProcessScratchData scratch (fe_u_post, fe_local,
-                                      quadrature_formula,
-                                      local_flags,
-                                      flags);
+      PostProcessScratchData scratch(fe_u_post, fe_local,
+                                     quadrature_formula,
+                                     local_flags,
+                                     flags);
 
       WorkStream::run(dof_handler_u_post.begin_active(),
                       dof_handler_u_post.end(),
-                      std::bind (&HDG<dim>::postprocess_one_cell,
-                                 std::ref(*this),
-                                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+                      std::bind(&HDG<dim>::postprocess_one_cell,
+                                std::ref(*this),
+                                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
                       std::function<void(const unsigned int &)>(),
                       scratch,
                       0U);
     }
 
-    Vector<float> difference_per_cell (triangulation.n_active_cells());
+    Vector<float> difference_per_cell(triangulation.n_active_cells());
 
-    ComponentSelectFunction<dim> value_select (dim, dim+1);
-    VectorTools::integrate_difference (dof_handler_local,
-                                       solution_local,
-                                       SolutionAndGradient<dim>(),
-                                       difference_per_cell,
-                                       QGauss<dim>(fe.degree+2),
-                                       VectorTools::L2_norm,
-                                       &value_select);
+    ComponentSelectFunction<dim> value_select(dim, dim+1);
+    VectorTools::integrate_difference(dof_handler_local,
+                                      solution_local,
+                                      SolutionAndGradient<dim>(),
+                                      difference_per_cell,
+                                      QGauss<dim>(fe.degree+2),
+                                      VectorTools::L2_norm,
+                                      &value_select);
     const double L2_error = VectorTools::compute_global_error(triangulation,
                                                               difference_per_cell,
                                                               VectorTools::L2_norm);
 
-    ComponentSelectFunction<dim> gradient_select (std::pair<unsigned int,unsigned int>(0, dim),
-                                                  dim+1);
-    VectorTools::integrate_difference (dof_handler_local,
-                                       solution_local,
-                                       SolutionAndGradient<dim>(),
-                                       difference_per_cell,
-                                       QGauss<dim>(fe.degree+2),
-                                       VectorTools::L2_norm,
-                                       &gradient_select);
+    ComponentSelectFunction<dim> gradient_select(std::pair<unsigned int,unsigned int>(0, dim),
+                                                 dim+1);
+    VectorTools::integrate_difference(dof_handler_local,
+                                      solution_local,
+                                      SolutionAndGradient<dim>(),
+                                      difference_per_cell,
+                                      QGauss<dim>(fe.degree+2),
+                                      VectorTools::L2_norm,
+                                      &gradient_select);
     const double grad_error = VectorTools::compute_global_error(triangulation,
                                                                 difference_per_cell,
                                                                 VectorTools::L2_norm);
 
-    VectorTools::integrate_difference (dof_handler_u_post,
-                                       solution_u_post,
-                                       Solution<dim>(),
-                                       difference_per_cell,
-                                       QGauss<dim>(fe.degree+3),
-                                       VectorTools::L2_norm);
+    VectorTools::integrate_difference(dof_handler_u_post,
+                                      solution_u_post,
+                                      Solution<dim>(),
+                                      difference_per_cell,
+                                      QGauss<dim>(fe.degree+3),
+                                      VectorTools::L2_norm);
     const double post_error = VectorTools::compute_global_error(triangulation,
                                                                 difference_per_cell,
                                                                 VectorTools::L2_norm);
@@ -1108,17 +1108,17 @@ namespace Step51
   // be used for those elements.
   template <int dim>
   void
-  HDG<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                  PostProcessScratchData &scratch,
-                                  unsigned int &)
+  HDG<dim>::postprocess_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                 PostProcessScratchData &scratch,
+                                 unsigned int &)
   {
     typename DoFHandler<dim>::active_cell_iterator
-    loc_cell (&triangulation,
-              cell->level(),
-              cell->index(),
-              &dof_handler_local);
+    loc_cell(&triangulation,
+             cell->level(),
+             cell->index(),
+             &dof_handler_local);
 
-    scratch.fe_values_local.reinit (loc_cell);
+    scratch.fe_values_local.reinit(loc_cell);
     scratch.fe_values.reinit(cell);
 
     FEValuesExtractors::Vector fluxes(0);
@@ -1183,7 +1183,7 @@ namespace Step51
   // objects.  The graphical output for the skeleton variable is done through
   // use of the <code>DataOutFaces</code> class.
   template <int dim>
-  void HDG<dim>::output_results (const unsigned int cycle)
+  void HDG<dim>::output_results(const unsigned int cycle)
   {
     std::string filename;
     switch (refinement_mode)
@@ -1195,7 +1195,7 @@ namespace Step51
         filename = "solution-adaptive";
         break;
       default:
-        Assert (false, ExcNotImplemented());
+        Assert(false, ExcNotImplemented());
       }
 
     std::string face_out(filename);
@@ -1204,21 +1204,21 @@ namespace Step51
     filename += "-q" + Utilities::int_to_string(fe.degree,1);
     filename += "-" + Utilities::int_to_string(cycle,2);
     filename += ".vtk";
-    std::ofstream output (filename);
+    std::ofstream output(filename);
 
     DataOut<dim> data_out;
 
     // We first define the names and types of the local solution,
     // and add the data to @p data_out.
-    std::vector<std::string> names (dim, "gradient");
+    std::vector<std::string> names(dim, "gradient");
     names.emplace_back("solution");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     component_interpretation
     (dim+1, DataComponentInterpretation::component_is_part_of_vector);
     component_interpretation[dim]
       = DataComponentInterpretation::component_is_scalar;
-    data_out.add_data_vector (dof_handler_local, solution_local,
-                              names, component_interpretation);
+    data_out.add_data_vector(dof_handler_local, solution_local,
+                             names, component_interpretation);
 
     // The second data item we add is the post-processed solution.
     // In this case, it is a single scalar variable belonging to
@@ -1226,16 +1226,16 @@ namespace Step51
     std::vector<std::string> post_name(1,"u_post");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     post_comp_type(1, DataComponentInterpretation::component_is_scalar);
-    data_out.add_data_vector (dof_handler_u_post, solution_u_post,
-                              post_name, post_comp_type);
+    data_out.add_data_vector(dof_handler_u_post, solution_u_post,
+                             post_name, post_comp_type);
 
-    data_out.build_patches (fe.degree);
-    data_out.write_vtk (output);
+    data_out.build_patches(fe.degree);
+    data_out.write_vtk(output);
 
     face_out += "-q" + Utilities::int_to_string(fe.degree,1);
     face_out += "-" + Utilities::int_to_string(cycle,2);
     face_out += ".vtk";
-    std::ofstream face_output (face_out);
+    std::ofstream face_output(face_out);
 
 // The <code>DataOutFaces</code> class works analogously to the <code>DataOut</code>
 // class when we have a <code>DoFHandler</code> that defines the solution on
@@ -1246,13 +1246,13 @@ namespace Step51
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     face_component_type(1, DataComponentInterpretation::component_is_scalar);
 
-    data_out_face.add_data_vector (dof_handler,
-                                   solution,
-                                   face_name,
-                                   face_component_type);
+    data_out_face.add_data_vector(dof_handler,
+                                  solution,
+                                  face_name,
+                                  face_component_type);
 
-    data_out_face.build_patches (fe.degree);
-    data_out_face.write_vtk (face_output);
+    data_out_face.build_patches(fe.degree);
+    data_out_face.write_vtk(face_output);
   }
 
 // @sect4{HDG::refine_grid}
@@ -1268,11 +1268,11 @@ namespace Step51
 // give a decent indication of the non-regular regions in the scalar local
 // solutions.
   template <int dim>
-  void HDG<dim>::refine_grid (const unsigned int cycle)
+  void HDG<dim>::refine_grid(const unsigned int cycle)
   {
     if (cycle == 0)
       {
-        GridGenerator::subdivided_hyper_cube (triangulation, 2, -1, 1);
+        GridGenerator::subdivided_hyper_cube(triangulation, 2, -1, 1);
         triangulation.refine_global(3-dim);
       }
     else
@@ -1281,36 +1281,36 @@ namespace Step51
         case global_refinement:
         {
           triangulation.clear();
-          GridGenerator::subdivided_hyper_cube (triangulation, 2+(cycle%2), -1, 1);
+          GridGenerator::subdivided_hyper_cube(triangulation, 2+(cycle%2), -1, 1);
           triangulation.refine_global(3-dim+cycle/2);
           break;
         }
 
         case adaptive_refinement:
         {
-          Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+          Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
           FEValuesExtractors::Scalar scalar(dim);
           typename FunctionMap<dim>::type neumann_boundary;
-          KellyErrorEstimator<dim>::estimate (dof_handler_local,
-                                              QGauss<dim-1>(3),
-                                              neumann_boundary,
-                                              solution_local,
-                                              estimated_error_per_cell,
-                                              fe_local.component_mask(scalar));
+          KellyErrorEstimator<dim>::estimate(dof_handler_local,
+                                             QGauss<dim-1>(3),
+                                             neumann_boundary,
+                                             solution_local,
+                                             estimated_error_per_cell,
+                                             fe_local.component_mask(scalar));
 
-          GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                           estimated_error_per_cell,
-                                                           0.3, 0.);
+          GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                          estimated_error_per_cell,
+                                                          0.3, 0.);
 
-          triangulation.execute_coarsening_and_refinement ();
+          triangulation.execute_coarsening_and_refinement();
 
           break;
         }
 
         default:
         {
-          Assert (false, ExcNotImplemented());
+          Assert(false, ExcNotImplemented());
         }
         }
 
@@ -1320,7 +1320,7 @@ namespace Step51
     // refinement, the flags are set in every refinement step, not just at the
     // beginning.
     typename Triangulation<dim>::cell_iterator
-    cell = triangulation.begin (),
+    cell = triangulation.begin(),
     endc = triangulation.end();
     for (; cell!=endc; ++cell)
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1328,7 +1328,7 @@ namespace Step51
           if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
               ||
               (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
-            cell->face(face)->set_boundary_id (1);
+            cell->face(face)->set_boundary_id(1);
   }
 
   // @sect4{HDG::run}
@@ -1336,18 +1336,18 @@ namespace Step51
   // We loop over 10 cycles, refining the grid on each one.  At the end,
   // convergence tables are created.
   template <int dim>
-  void HDG<dim>::run ()
+  void HDG<dim>::run()
   {
     for (unsigned int cycle=0; cycle<10; ++cycle)
       {
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
-        refine_grid (cycle);
-        setup_system ();
-        assemble_system (false);
-        solve ();
+        refine_grid(cycle);
+        setup_system();
+        assemble_system(false);
+        solve();
         postprocess();
-        output_results (cycle);
+        output_results(cycle);
       }
 
 
@@ -1382,7 +1382,7 @@ namespace Step51
 
 
 
-int main ()
+int main()
 {
   const unsigned int dim = 2;
 
@@ -1397,8 +1397,8 @@ int main ()
                   << "=============================================" << std::endl
                   << std::endl;
 
-        Step51::HDG<dim> hdg_problem (1, Step51::HDG<dim>::adaptive_refinement);
-        hdg_problem.run ();
+        Step51::HDG<dim> hdg_problem(1, Step51::HDG<dim>::adaptive_refinement);
+        hdg_problem.run();
 
         std::cout << std::endl;
       }
@@ -1408,8 +1408,8 @@ int main ()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        Step51::HDG<dim> hdg_problem (1, Step51::HDG<dim>::global_refinement);
-        hdg_problem.run ();
+        Step51::HDG<dim> hdg_problem(1, Step51::HDG<dim>::global_refinement);
+        hdg_problem.run();
 
         std::cout << std::endl;
       }
@@ -1419,8 +1419,8 @@ int main ()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        Step51::HDG<dim> hdg_problem (3, Step51::HDG<dim>::global_refinement);
-        hdg_problem.run ();
+        Step51::HDG<dim> hdg_problem(3, Step51::HDG<dim>::global_refinement);
+        hdg_problem.run();
 
         std::cout << std::endl;
       }

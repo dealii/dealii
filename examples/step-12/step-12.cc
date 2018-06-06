@@ -88,10 +88,10 @@ namespace Step12
   class BoundaryValues:  public Function<dim>
   {
   public:
-    BoundaryValues () {}
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double> &values,
-                             const unsigned int component=0) const override;
+    BoundaryValues() {}
+    virtual void value_list(const std::vector<Point<dim> > &points,
+                            std::vector<double> &values,
+                            const unsigned int component=0) const override;
   };
 
   // Given the flow direction, the inflow boundary of the unit square
@@ -123,9 +123,9 @@ namespace Step12
   // simply leave the $z$-component unset (i.e., at zero), whereas
   // the function can not be used in 1d in its current implementation:
   template <int dim>
-  Tensor<1,dim> beta (const Point<dim> &p)
+  Tensor<1,dim> beta(const Point<dim> &p)
   {
-    Assert (dim >= 2, ExcNotImplemented());
+    Assert(dim >= 2, ExcNotImplemented());
 
     Point<dim> wind_field;
     wind_field(0) = -p(1);
@@ -151,15 +151,15 @@ namespace Step12
   class AdvectionProblem
   {
   public:
-    AdvectionProblem ();
-    void run ();
+    AdvectionProblem();
+    void run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve (Vector<double> &solution);
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void setup_system();
+    void assemble_system();
+    void solve(Vector<double> &solution);
+    void refine_grid();
+    void output_results(const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
     const MappingQ1<dim> mapping;
@@ -206,34 +206,34 @@ namespace Step12
     // respectively) to provide the MeshWorker framework with objects that act
     // as if they had the required number and types of arguments, but have in
     // fact other arguments already bound.
-    static void integrate_cell_term (DoFInfo &dinfo,
-                                     CellInfo &info);
-    static void integrate_boundary_term (DoFInfo &dinfo,
-                                         CellInfo &info);
-    static void integrate_face_term (DoFInfo &dinfo1,
-                                     DoFInfo &dinfo2,
-                                     CellInfo &info1,
-                                     CellInfo &info2);
+    static void integrate_cell_term(DoFInfo &dinfo,
+                                    CellInfo &info);
+    static void integrate_boundary_term(DoFInfo &dinfo,
+                                        CellInfo &info);
+    static void integrate_face_term(DoFInfo &dinfo1,
+                                    DoFInfo &dinfo2,
+                                    CellInfo &info1,
+                                    CellInfo &info2);
   };
 
 
   // We start with the constructor. The 1 in the constructor call of
   // <code>fe</code> is the polynomial degree.
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem ()
+  AdvectionProblem<dim>::AdvectionProblem()
     :
-    mapping (),
-    fe (1),
-    dof_handler (triangulation)
+    mapping(),
+    fe(1),
+    dof_handler(triangulation)
   {}
 
 
   template <int dim>
-  void AdvectionProblem<dim>::setup_system ()
+  void AdvectionProblem<dim>::setup_system()
   {
     // In the function that sets up the usual finite element data structures,
     // we first need to distribute the DoFs.
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
     // We start by generating the sparsity pattern. To this end, we first fill
     // an intermediate object of type DynamicSparsityPattern with the
@@ -244,14 +244,14 @@ namespace Step12
     // function analogue to DoFTools::make_sparsity_pattern, which is called
     // DoFTools::make_flux_sparsity_pattern:
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp);
     sparsity_pattern.copy_from(dsp);
 
     // Finally, we set up the structure of all components of the linear
     // system.
-    system_matrix.reinit (sparsity_pattern);
-    solution.reinit (dof_handler.n_dofs());
-    right_hand_side.reinit (dof_handler.n_dofs());
+    system_matrix.reinit(sparsity_pattern);
+    solution.reinit(dof_handler.n_dofs());
+    right_hand_side.reinit(dof_handler.n_dofs());
   }
 
   // @sect4{The assemble_system function}
@@ -262,7 +262,7 @@ namespace Step12
   // functions and use one of the classes in namespace MeshWorker::Assembler
   // to build the global system.
   template <int dim>
-  void AdvectionProblem<dim>::assemble_system ()
+  void AdvectionProblem<dim>::assemble_system()
   {
     // This is the magic object, which knows everything about the data
     // structures and local integration.  This is the object doing the work in
@@ -336,22 +336,22 @@ namespace Step12
   // called just above. They compute the local contributions to the system
   // matrix and right hand side on cells and faces.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_cell_term (DoFInfo &dinfo,
-                                                   CellInfo &info)
+  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo &dinfo,
+                                                  CellInfo &info)
   {
     // First, let us retrieve some of the objects used here from @p info. Note
     // that these objects can handle much more complex structures, thus the
     // access here looks more complicated than might seem necessary.
     const FEValuesBase<dim> &fe_values = info.fe_values();
     FullMatrix<double> &local_matrix = dinfo.matrix(0).matrix;
-    const std::vector<double> &JxW = fe_values.get_JxW_values ();
+    const std::vector<double> &JxW = fe_values.get_JxW_values();
 
     // With these objects, we continue local integration like always. First,
     // we loop over the quadrature points and compute the advection vector in
     // the current point.
     for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
       {
-        const Tensor<1,dim> beta_at_q_point = beta (fe_values.quadrature_point(point));
+        const Tensor<1,dim> beta_at_q_point = beta(fe_values.quadrature_point(point));
 
         // We solve a homogeneous equation, thus no right hand side shows up
         // in the cell term.  What's left is integrating the matrix entries.
@@ -368,20 +368,20 @@ namespace Step12
   // the base class for both FEFaceValues and FESubfaceValues, in order to get
   // access to normal vectors.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_boundary_term (DoFInfo &dinfo,
-                                                       CellInfo &info)
+  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo &dinfo,
+                                                      CellInfo &info)
   {
     const FEValuesBase<dim> &fe_face_values = info.fe_values();
     FullMatrix<double> &local_matrix = dinfo.matrix(0).matrix;
     Vector<double> &local_vector = dinfo.vector(0).block(0);
 
-    const std::vector<double> &JxW = fe_face_values.get_JxW_values ();
-    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors ();
+    const std::vector<double> &JxW = fe_face_values.get_JxW_values();
+    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors();
 
     std::vector<double> g(fe_face_values.n_quadrature_points);
 
     static BoundaryValues<dim> boundary_function;
-    boundary_function.value_list (fe_face_values.get_quadrature_points(), g);
+    boundary_function.value_list(fe_face_values.get_quadrature_points(), g);
 
     for (unsigned int point=0; point<fe_face_values.n_quadrature_points; ++point)
       {
@@ -406,10 +406,10 @@ namespace Step12
   // two info objects, one for each cell adjacent to the face and we assemble
   // four matrices, one for each cell and two for coupling back and forth.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_face_term (DoFInfo &dinfo1,
-                                                   DoFInfo &dinfo2,
-                                                   CellInfo &info1,
-                                                   CellInfo &info2)
+  void AdvectionProblem<dim>::integrate_face_term(DoFInfo &dinfo1,
+                                                  DoFInfo &dinfo2,
+                                                  CellInfo &info1,
+                                                  CellInfo &info2)
   {
     // For quadrature points, weights, etc., we use the FEValuesBase object of
     // the first argument.
@@ -434,8 +434,8 @@ namespace Step12
     // hand side vectors. Fortunately, the interface terms only involve the
     // solution and the right hand side does not receive any contributions.
 
-    const std::vector<double> &JxW = fe_face_values.get_JxW_values ();
-    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors ();
+    const std::vector<double> &JxW = fe_face_values.get_JxW_values();
+    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors();
 
     for (unsigned int point=0; point<fe_face_values.n_quadrature_points; ++point)
       {
@@ -495,10 +495,10 @@ namespace Step12
   // preconditioner (see the PreconditionBlockSOR class with relaxation=1)
   // does a much better job.
   template <int dim>
-  void AdvectionProblem<dim>::solve (Vector<double> &solution)
+  void AdvectionProblem<dim>::solve(Vector<double> &solution)
   {
-    SolverControl           solver_control (1000, 1e-12);
-    SolverRichardson<>      solver (solver_control);
+    SolverControl           solver_control(1000, 1e-12);
+    SolverRichardson<>      solver(solver_control);
 
     // Here we create the preconditioner,
     PreconditionBlockSSOR<SparseMatrix<double> > preconditioner;
@@ -507,8 +507,8 @@ namespace Step12
     preconditioner.initialize(system_matrix, fe.dofs_per_cell);
 
     // After these preparations we are ready to start the linear solver.
-    solver.solve (system_matrix, solution, right_hand_side,
-                  preconditioner);
+    solver.solve(system_matrix, solution, right_hand_side,
+                 preconditioner);
   }
 
 
@@ -533,18 +533,18 @@ namespace Step12
   // $H^1_\beta$, i.e., the space of functions whose derivatives in direction
   // $\beta$ are square integrable).
   template <int dim>
-  void AdvectionProblem<dim>::refine_grid ()
+  void AdvectionProblem<dim>::refine_grid()
   {
     // The <code>DerivativeApproximation</code> class computes the gradients
     // to float precision. This is sufficient as they are approximate and
     // serve as refinement indicators only.
-    Vector<float> gradient_indicator (triangulation.n_active_cells());
+    Vector<float> gradient_indicator(triangulation.n_active_cells());
 
     // Now the approximate gradients are computed
-    DerivativeApproximation::approximate_gradient (mapping,
-                                                   dof_handler,
-                                                   solution,
-                                                   gradient_indicator);
+    DerivativeApproximation::approximate_gradient(mapping,
+                                                  dof_handler,
+                                                  solution,
+                                                  gradient_indicator);
 
     // and they are cell-wise scaled by the factor $h^{1+d/2}$
     typename DoFHandler<dim>::active_cell_iterator
@@ -554,40 +554,40 @@ namespace Step12
       gradient_indicator(cell_no)*=std::pow(cell->diameter(), 1+1.0*dim/2);
 
     // Finally they serve as refinement indicator.
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     gradient_indicator,
-                                                     0.3, 0.1);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    gradient_indicator,
+                                                    0.3, 0.1);
 
-    triangulation.execute_coarsening_and_refinement ();
+    triangulation.execute_coarsening_and_refinement();
   }
 
 
   // The output of this program consists of eps-files of the adaptively
   // refined grids and the numerical solutions given in gnuplot format.
   template <int dim>
-  void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
+  void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
     // First write the grid in eps format.
     {
       const std::string filename = "grid-" + std::to_string(cycle) + ".eps";
       deallog << "Writing grid to <" << filename << ">" << std::endl;
-      std::ofstream eps_output (filename);
+      std::ofstream eps_output(filename);
 
       GridOut grid_out;
-      grid_out.write_eps (triangulation, eps_output);
+      grid_out.write_eps(triangulation, eps_output);
     }
 
     // Then output the solution in gnuplot format.
     {
       const std::string filename = "sol-" + std::to_string(cycle) + ".gnuplot";
       deallog << "Writing solution to <" << filename << ">" << std::endl;
-      std::ofstream gnuplot_output (filename);
+      std::ofstream gnuplot_output(filename);
 
       DataOut<dim> data_out;
-      data_out.attach_dof_handler (dof_handler);
-      data_out.add_data_vector (solution, "u");
+      data_out.attach_dof_handler(dof_handler);
+      data_out.add_data_vector(solution, "u");
 
-      data_out.build_patches ();
+      data_out.build_patches();
 
       data_out.write_gnuplot(gnuplot_output);
     }
@@ -596,7 +596,7 @@ namespace Step12
 
   // The following <code>run</code> function is similar to previous examples.
   template <int dim>
-  void AdvectionProblem<dim>::run ()
+  void AdvectionProblem<dim>::run()
   {
     for (unsigned int cycle=0; cycle<6; ++cycle)
       {
@@ -604,28 +604,28 @@ namespace Step12
 
         if (cycle == 0)
           {
-            GridGenerator::hyper_cube (triangulation);
+            GridGenerator::hyper_cube(triangulation);
 
-            triangulation.refine_global (3);
+            triangulation.refine_global(3);
           }
         else
-          refine_grid ();
+          refine_grid();
 
 
         deallog << "Number of active cells:       "
                 << triangulation.n_active_cells()
                 << std::endl;
 
-        setup_system ();
+        setup_system();
 
         deallog << "Number of degrees of freedom: "
                 << dof_handler.n_dofs()
                 << std::endl;
 
-        assemble_system ();
-        solve (solution);
+        assemble_system();
+        solve(solution);
 
-        output_results (cycle);
+        output_results(cycle);
       }
   }
 }
@@ -633,12 +633,12 @@ namespace Step12
 
 // The following <code>main</code> function is similar to previous examples as
 // well, and need not be commented on.
-int main ()
+int main()
 {
   try
     {
       Step12::AdvectionProblem<2> dgmethod;
-      dgmethod.run ();
+      dgmethod.run();
     }
   catch (std::exception &exc)
     {

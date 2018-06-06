@@ -126,11 +126,11 @@ namespace Step33
     // functions:
     static
     std::vector<std::string>
-    component_names ()
+    component_names()
     {
-      std::vector<std::string> names (dim, "momentum");
-      names.emplace_back ("density");
-      names.emplace_back ("energy_density");
+      std::vector<std::string> names(dim, "momentum");
+      names.emplace_back("density");
+      names.emplace_back("energy_density");
 
       return names;
     }
@@ -138,15 +138,15 @@ namespace Step33
 
     static
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    component_interpretation ()
+    component_interpretation()
     {
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
       data_component_interpretation
       (dim, DataComponentInterpretation::component_is_part_of_vector);
       data_component_interpretation
-      .push_back (DataComponentInterpretation::component_is_scalar);
+      .push_back(DataComponentInterpretation::component_is_scalar);
       data_component_interpretation
-      .push_back (DataComponentInterpretation::component_is_scalar);
+      .push_back(DataComponentInterpretation::component_is_scalar);
 
       return data_component_interpretation;
     }
@@ -173,7 +173,7 @@ namespace Step33
     template <typename InputVector>
     static
     typename InputVector::value_type
-    compute_kinetic_energy (const InputVector &W)
+    compute_kinetic_energy(const InputVector &W)
     {
       typename InputVector::value_type kinetic_energy = 0;
       for (unsigned int d=0; d<dim; ++d)
@@ -188,7 +188,7 @@ namespace Step33
     template <typename InputVector>
     static
     typename InputVector::value_type
-    compute_pressure (const InputVector &W)
+    compute_pressure(const InputVector &W)
     {
       return ((gas_gamma-1.0) *
               (W[energy_component] - compute_kinetic_energy(W)));
@@ -213,10 +213,10 @@ namespace Step33
     // on it as well:
     template <typename InputVector>
     static
-    void compute_flux_matrix (const InputVector &W,
-                              std::array <std::array
-                              <typename InputVector::value_type, dim>,
-                              EulerEquations<dim>::n_components > &flux)
+    void compute_flux_matrix(const InputVector &W,
+                             std::array <std::array
+                             <typename InputVector::value_type, dim>,
+                             EulerEquations<dim>::n_components > &flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -254,20 +254,20 @@ namespace Step33
     // $\alpha$. It's form has also been given already in the introduction:
     template <typename InputVector>
     static
-    void numerical_normal_flux (const Tensor<1,dim>                &normal,
-                                const InputVector                  &Wplus,
-                                const InputVector                  &Wminus,
-                                const double                        alpha,
-                                std::array
-                                <typename InputVector::value_type, n_components>
-                                &normal_flux)
+    void numerical_normal_flux(const Tensor<1,dim>                &normal,
+                               const InputVector                  &Wplus,
+                               const InputVector                  &Wminus,
+                               const double                        alpha,
+                               std::array
+                               <typename InputVector::value_type, n_components>
+                               &normal_flux)
     {
       std::array
       <std::array <typename InputVector::value_type, dim>,
       EulerEquations<dim>::n_components > iflux, oflux;
 
-      compute_flux_matrix (Wplus, iflux);
-      compute_flux_matrix (Wminus, oflux);
+      compute_flux_matrix(Wplus, iflux);
+      compute_flux_matrix(Wminus, oflux);
 
       for (unsigned int di=0; di<n_components; ++di)
         {
@@ -291,10 +291,10 @@ namespace Step33
     // 2d. This naturally leads to the following function:
     template <typename InputVector>
     static
-    void compute_forcing_vector (const InputVector &W,
-                                 std::array
-                                 <typename InputVector::value_type, n_components>
-                                 &forcing)
+    void compute_forcing_vector(const InputVector &W,
+                                std::array
+                                <typename InputVector::value_type, n_components>
+                                &forcing)
     {
       const double gravity = -1.0;
 
@@ -367,11 +367,11 @@ namespace Step33
     template <typename DataVector>
     static
     void
-    compute_Wminus (const BoundaryKind  (&boundary_kind)[n_components],
-                    const Tensor<1,dim>  &normal_vector,
-                    const DataVector     &Wplus,
-                    const Vector<double> &boundary_values,
-                    const DataVector     &Wminus)
+    compute_Wminus(const BoundaryKind  (&boundary_kind)[n_components],
+                   const Tensor<1,dim>  &normal_vector,
+                   const DataVector     &Wplus,
+                   const Vector<double> &boundary_values,
+                   const DataVector     &Wminus)
     {
       for (unsigned int c = 0; c < n_components; c++)
         switch (boundary_kind[c])
@@ -436,7 +436,7 @@ namespace Step33
           }
 
           default:
-            Assert (false, ExcNotImplemented());
+            Assert(false, ExcNotImplemented());
           }
     }
 
@@ -458,18 +458,18 @@ namespace Step33
     // indicators, but this one does, and it is easy to compute:
     static
     void
-    compute_refinement_indicators (const DoFHandler<dim> &dof_handler,
-                                   const Mapping<dim>    &mapping,
-                                   const Vector<double>  &solution,
-                                   Vector<double>        &refinement_indicators)
+    compute_refinement_indicators(const DoFHandler<dim> &dof_handler,
+                                  const Mapping<dim>    &mapping,
+                                  const Vector<double>  &solution,
+                                  Vector<double>        &refinement_indicators)
     {
       const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
-      std::vector<unsigned int> dofs (dofs_per_cell);
+      std::vector<unsigned int> dofs(dofs_per_cell);
 
       const QMidpoint<dim>  quadrature_formula;
       const UpdateFlags update_flags = update_gradients;
-      FEValues<dim> fe_v (mapping, dof_handler.get_fe(),
-                          quadrature_formula, update_flags);
+      FEValues<dim> fe_v(mapping, dof_handler.get_fe(),
+                         quadrature_formula, update_flags);
 
       std::vector<std::vector<Tensor<1,dim> > >
       dU (1, std::vector<Tensor<1,dim> >(n_components));
@@ -480,7 +480,7 @@ namespace Step33
       for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
         {
           fe_v.reinit(cell);
-          fe_v.get_function_gradients (solution, dU);
+          fe_v.get_function_gradients(solution, dU);
 
           refinement_indicators(cell_no)
             = std::log(1+
@@ -533,7 +533,7 @@ namespace Step33
     class Postprocessor : public DataPostprocessor<dim>
     {
     public:
-      Postprocessor (const bool do_schlieren_plot);
+      Postprocessor(const bool do_schlieren_plot);
 
       virtual
       void
@@ -541,13 +541,13 @@ namespace Step33
       (const DataPostprocessorInputs::Vector<dim> &inputs,
        std::vector<Vector<double> >               &computed_quantities) const override;
 
-      virtual std::vector<std::string> get_names () const override;
+      virtual std::vector<std::string> get_names() const override;
 
       virtual
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      get_data_component_interpretation () const override;
+      get_data_component_interpretation() const override;
 
-      virtual UpdateFlags get_needed_update_flags () const override;
+      virtual UpdateFlags get_needed_update_flags() const override;
 
     private:
       const bool do_schlieren_plot;
@@ -562,9 +562,9 @@ namespace Step33
 
   template <int dim>
   EulerEquations<dim>::Postprocessor::
-  Postprocessor (const bool do_schlieren_plot)
+  Postprocessor(const bool do_schlieren_plot)
     :
-    do_schlieren_plot (do_schlieren_plot)
+    do_schlieren_plot(do_schlieren_plot)
   {}
 
 
@@ -595,19 +595,19 @@ namespace Step33
     const unsigned int n_quadrature_points = inputs.solution_values.size();
 
     if (do_schlieren_plot == true)
-      Assert (inputs.solution_gradients.size() == n_quadrature_points,
-              ExcInternalError());
+      Assert(inputs.solution_gradients.size() == n_quadrature_points,
+             ExcInternalError());
 
-    Assert (computed_quantities.size() == n_quadrature_points,
-            ExcInternalError());
+    Assert(computed_quantities.size() == n_quadrature_points,
+           ExcInternalError());
 
-    Assert (inputs.solution_values[0].size() == n_components,
-            ExcInternalError());
+    Assert(inputs.solution_values[0].size() == n_components,
+           ExcInternalError());
 
     if (do_schlieren_plot == true)
-      Assert (computed_quantities[0].size() == dim+2, ExcInternalError())
+      Assert(computed_quantities[0].size() == dim+2, ExcInternalError())
       else
-        Assert (computed_quantities[0].size() == dim+1, ExcInternalError());
+        Assert(computed_quantities[0].size() == dim+1, ExcInternalError());
 
     // Then loop over all quadrature points and do our work there. The code
     // should be pretty self-explanatory. The order of output variables is
@@ -624,7 +624,7 @@ namespace Step33
           computed_quantities[q](d)
             = inputs.solution_values[q](first_momentum_component+d) / density;
 
-        computed_quantities[q](dim) = compute_pressure (inputs.solution_values[q]);
+        computed_quantities[q](dim) = compute_pressure(inputs.solution_values[q]);
 
         if (do_schlieren_plot == true)
           computed_quantities[q](dim+1) = inputs.solution_gradients[q][density_component] *
@@ -636,15 +636,15 @@ namespace Step33
   template <int dim>
   std::vector<std::string>
   EulerEquations<dim>::Postprocessor::
-  get_names () const
+  get_names() const
   {
     std::vector<std::string> names;
     for (unsigned int d=0; d<dim; ++d)
-      names.emplace_back ("velocity");
-    names.emplace_back ("pressure");
+      names.emplace_back("velocity");
+    names.emplace_back("pressure");
 
     if (do_schlieren_plot == true)
-      names.emplace_back ("schlieren_plot");
+      names.emplace_back("schlieren_plot");
 
     return names;
   }
@@ -653,18 +653,18 @@ namespace Step33
   template <int dim>
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
   EulerEquations<dim>::Postprocessor::
-  get_data_component_interpretation () const
+  get_data_component_interpretation() const
   {
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    interpretation (dim,
-                    DataComponentInterpretation::component_is_part_of_vector);
+    interpretation(dim,
+                   DataComponentInterpretation::component_is_part_of_vector);
 
-    interpretation.push_back (DataComponentInterpretation::
-                              component_is_scalar);
+    interpretation.push_back(DataComponentInterpretation::
+                             component_is_scalar);
 
     if (do_schlieren_plot == true)
-      interpretation.push_back (DataComponentInterpretation::
-                                component_is_scalar);
+      interpretation.push_back(DataComponentInterpretation::
+                               component_is_scalar);
 
     return interpretation;
   }
@@ -674,7 +674,7 @@ namespace Step33
   template <int dim>
   UpdateFlags
   EulerEquations<dim>::Postprocessor::
-  get_needed_update_flags () const
+  get_needed_update_flags() const
   {
     if (do_schlieren_plot == true)
       return update_values | update_gradients;
@@ -763,13 +763,13 @@ namespace Step33
       double ilut_rtol;
       double ilut_drop;
 
-      static void declare_parameters (ParameterHandler &prm);
-      void parse_parameters (ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
 
 
-    void Solver::declare_parameters (ParameterHandler &prm)
+    void Solver::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("linear solver");
       {
@@ -806,7 +806,7 @@ namespace Step33
 
 
 
-    void Solver::parse_parameters (ParameterHandler &prm)
+    void Solver::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("linear solver");
       {
@@ -845,13 +845,13 @@ namespace Step33
       double shock_val;
       double shock_levels;
 
-      static void declare_parameters (ParameterHandler &prm);
-      void parse_parameters (ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
 
 
-    void Refinement::declare_parameters (ParameterHandler &prm)
+    void Refinement::declare_parameters(ParameterHandler &prm)
     {
 
       prm.enter_subsection("refinement");
@@ -879,11 +879,11 @@ namespace Step33
     }
 
 
-    void Refinement::parse_parameters (ParameterHandler &prm)
+    void Refinement::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("refinement");
       {
-        do_refine     = prm.get_bool ("refinement");
+        do_refine     = prm.get_bool("refinement");
         shock_val     = prm.get_double("shock value");
         shock_levels  = prm.get_double("shock levels");
       }
@@ -911,12 +911,12 @@ namespace Step33
 
       double stabilization_value;
 
-      static void declare_parameters (ParameterHandler &prm);
-      void parse_parameters (ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
 
-    void Flux::declare_parameters (ParameterHandler &prm)
+    void Flux::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("flux");
       {
@@ -932,7 +932,7 @@ namespace Step33
     }
 
 
-    void Flux::parse_parameters (ParameterHandler &prm)
+    void Flux::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("flux");
       {
@@ -942,7 +942,7 @@ namespace Step33
         else if (stab == "mesh")
           stabilization_kind = mesh_dependent;
         else
-          AssertThrow (false, ExcNotImplemented());
+          AssertThrow(false, ExcNotImplemented());
 
         stabilization_value = prm.get_double("stab value");
       }
@@ -962,18 +962,18 @@ namespace Step33
       bool schlieren_plot;
       double output_step;
 
-      static void declare_parameters (ParameterHandler &prm);
-      void parse_parameters (ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
 
 
-    void Output::declare_parameters (ParameterHandler &prm)
+    void Output::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("output");
       {
         prm.declare_entry("schlieren plot", "true",
-                          Patterns::Bool (),
+                          Patterns::Bool(),
                           "Whether or not to produce schlieren plots");
         prm.declare_entry("step", "-1",
                           Patterns::Double(),
@@ -984,7 +984,7 @@ namespace Step33
 
 
 
-    void Output::parse_parameters (ParameterHandler &prm)
+    void Output::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("output");
       {
@@ -1057,11 +1057,11 @@ namespace Step33
 
         FunctionParser<dim> values;
 
-        BoundaryConditions ();
+        BoundaryConditions();
       };
 
 
-      AllParameters ();
+      AllParameters();
 
       double diffusion_power;
 
@@ -1074,16 +1074,16 @@ namespace Step33
       FunctionParser<dim> initial_conditions;
       BoundaryConditions  boundary_conditions[max_n_boundaries];
 
-      static void declare_parameters (ParameterHandler &prm);
-      void parse_parameters (ParameterHandler &prm);
+      static void declare_parameters(ParameterHandler &prm);
+      void parse_parameters(ParameterHandler &prm);
     };
 
 
 
     template <int dim>
-    AllParameters<dim>::BoundaryConditions::BoundaryConditions ()
+    AllParameters<dim>::BoundaryConditions::BoundaryConditions()
       :
-      values (EulerEquations<dim>::n_components)
+      values(EulerEquations<dim>::n_components)
     {
       for (unsigned int c=0; c<EulerEquations<dim>::n_components; ++c)
         kind[c] = EulerEquations<dim>::no_penetration_boundary;
@@ -1091,20 +1091,20 @@ namespace Step33
 
 
     template <int dim>
-    AllParameters<dim>::AllParameters ()
+    AllParameters<dim>::AllParameters()
       :
       diffusion_power(0.),
       time_step(1.),
       final_time(1.),
       theta(.5),
       is_stationary(true),
-      initial_conditions (EulerEquations<dim>::n_components)
+      initial_conditions(EulerEquations<dim>::n_components)
     {}
 
 
     template <int dim>
     void
-    AllParameters<dim>::declare_parameters (ParameterHandler &prm)
+    AllParameters<dim>::declare_parameters(ParameterHandler &prm)
     {
       prm.declare_entry("mesh", "grid.inp",
                         Patterns::Anything(),
@@ -1125,8 +1125,8 @@ namespace Step33
         prm.declare_entry("theta scheme value", "0.5",
                           Patterns::Double(0,1),
                           "value for theta that interpolated between explicit "
-                          "Euler (theta=0), Crank-Nicolson (theta=0.5), and "
-                          "implicit Euler (theta=1).");
+                          "Euler(theta=0), Crank-Nicolson(theta=0.5), and "
+                          "implicit Euler(theta=1).");
       }
       prm.leave_subsection();
 
@@ -1167,16 +1167,16 @@ namespace Step33
       }
       prm.leave_subsection();
 
-      Parameters::Solver::declare_parameters (prm);
-      Parameters::Refinement::declare_parameters (prm);
-      Parameters::Flux::declare_parameters (prm);
-      Parameters::Output::declare_parameters (prm);
+      Parameters::Solver::declare_parameters(prm);
+      Parameters::Refinement::declare_parameters(prm);
+      Parameters::Flux::declare_parameters(prm);
+      Parameters::Output::declare_parameters(prm);
     }
 
 
     template <int dim>
     void
-    AllParameters<dim>::parse_parameters (ParameterHandler &prm)
+    AllParameters<dim>::parse_parameters(ParameterHandler &prm)
     {
       mesh_filename = prm.get("mesh");
       diffusion_power = prm.get_double("diffusion power");
@@ -1227,37 +1227,37 @@ namespace Step33
                   boundary_conditions[boundary_id].kind[di]
                     = EulerEquations<dim>::outflow_boundary;
                 else
-                  AssertThrow (false, ExcNotImplemented());
+                  AssertThrow(false, ExcNotImplemented());
 
                 expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
                                           " value");
               }
 
             boundary_conditions[boundary_id].values
-            .initialize (FunctionParser<dim>::default_variable_names(),
-                         expressions,
-                         std::map<std::string, double>());
+            .initialize(FunctionParser<dim>::default_variable_names(),
+                        expressions,
+                        std::map<std::string, double>());
           }
           prm.leave_subsection();
         }
 
       prm.enter_subsection("initial condition");
       {
-        std::vector<std::string> expressions (EulerEquations<dim>::n_components,
-                                              "0.0");
+        std::vector<std::string> expressions(EulerEquations<dim>::n_components,
+                                             "0.0");
         for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
           expressions[di] = prm.get("w_" + Utilities::int_to_string(di) +
                                     " value");
-        initial_conditions.initialize (FunctionParser<dim>::default_variable_names(),
-                                       expressions,
-                                       std::map<std::string, double>());
+        initial_conditions.initialize(FunctionParser<dim>::default_variable_names(),
+                                      expressions,
+                                      std::map<std::string, double>());
       }
       prm.leave_subsection();
 
-      Parameters::Solver::parse_parameters (prm);
-      Parameters::Refinement::parse_parameters (prm);
-      Parameters::Flux::parse_parameters (prm);
-      Parameters::Output::parse_parameters (prm);
+      Parameters::Solver::parse_parameters(prm);
+      Parameters::Refinement::parse_parameters(prm);
+      Parameters::Flux::parse_parameters(prm);
+      Parameters::Output::parse_parameters(prm);
     }
   }
 
@@ -1279,30 +1279,30 @@ namespace Step33
   class ConservationLaw
   {
   public:
-    ConservationLaw (const char *input_filename);
-    void run ();
+    ConservationLaw(const char *input_filename);
+    void run();
 
   private:
-    void setup_system ();
+    void setup_system();
 
-    void assemble_system ();
-    void assemble_cell_term (const FEValues<dim>             &fe_v,
-                             const std::vector<types::global_dof_index> &dofs);
-    void assemble_face_term (const unsigned int               face_no,
-                             const FEFaceValuesBase<dim>     &fe_v,
-                             const FEFaceValuesBase<dim>     &fe_v_neighbor,
-                             const std::vector<types::global_dof_index> &dofs,
-                             const std::vector<types::global_dof_index> &dofs_neighbor,
-                             const bool                       external_face,
-                             const unsigned int               boundary_id,
-                             const double                     face_diameter);
+    void assemble_system();
+    void assemble_cell_term(const FEValues<dim>             &fe_v,
+                            const std::vector<types::global_dof_index> &dofs);
+    void assemble_face_term(const unsigned int               face_no,
+                            const FEFaceValuesBase<dim>     &fe_v,
+                            const FEFaceValuesBase<dim>     &fe_v_neighbor,
+                            const std::vector<types::global_dof_index> &dofs,
+                            const std::vector<types::global_dof_index> &dofs_neighbor,
+                            const bool                       external_face,
+                            const unsigned int               boundary_id,
+                            const double                     face_diameter);
 
-    std::pair<unsigned int, double> solve (Vector<double> &solution);
+    std::pair<unsigned int, double> solve(Vector<double> &solution);
 
-    void compute_refinement_indicators (Vector<double> &indicator) const;
-    void refine_grid (const Vector<double> &indicator);
+    void compute_refinement_indicators(Vector<double> &indicator) const;
+    void refine_grid(const Vector<double> &indicator);
 
-    void output_results () const;
+    void output_results() const;
 
 
 
@@ -1362,22 +1362,22 @@ namespace Step33
   // There is nothing much to say about the constructor. Essentially, it reads
   // the input file and fills the parameter object with the parsed values:
   template <int dim>
-  ConservationLaw<dim>::ConservationLaw (const char *input_filename)
+  ConservationLaw<dim>::ConservationLaw(const char *input_filename)
     :
-    mapping (),
-    fe (FE_Q<dim>(1), EulerEquations<dim>::n_components),
-    dof_handler (triangulation),
-    quadrature (2),
-    face_quadrature (2),
-    verbose_cout (std::cout, false)
+    mapping(),
+    fe(FE_Q<dim>(1), EulerEquations<dim>::n_components),
+    dof_handler(triangulation),
+    quadrature(2),
+    face_quadrature(2),
+    verbose_cout(std::cout, false)
   {
     ParameterHandler prm;
-    Parameters::AllParameters<dim>::declare_parameters (prm);
+    Parameters::AllParameters<dim>::declare_parameters(prm);
 
-    prm.parse_input (input_filename);
-    parameters.parse_parameters (prm);
+    prm.parse_input(input_filename);
+    parameters.parse_parameters(prm);
 
-    verbose_cout.set_condition (parameters.output == Parameters::Solver::verbose);
+    verbose_cout.set_condition(parameters.output == Parameters::Solver::verbose);
   }
 
 
@@ -1389,13 +1389,13 @@ namespace Step33
   // sparsity pattern that we generate as in all the previous tutorial
   // programs.
   template <int dim>
-  void ConservationLaw<dim>::setup_system ()
+  void ConservationLaw<dim>::setup_system()
   {
-    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
-                                dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
 
-    system_matrix.reinit (dsp);
+    system_matrix.reinit(dsp);
   }
 
 
@@ -1423,12 +1423,12 @@ namespace Step33
   // the normal vectors are known to be the negative of the normal vectors of
   // the current cell.
   template <int dim>
-  void ConservationLaw<dim>::assemble_system ()
+  void ConservationLaw<dim>::assemble_system()
   {
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
-    std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
-    std::vector<types::global_dof_index> dof_indices_neighbor (dofs_per_cell);
+    std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
+    std::vector<types::global_dof_index> dof_indices_neighbor(dofs_per_cell);
 
     const UpdateFlags update_flags               = update_values
                                                    | update_gradients
@@ -1448,8 +1448,8 @@ namespace Step33
                                                 face_update_flags);
     FEFaceValues<dim>    fe_v_face_neighbor    (mapping, fe, face_quadrature,
                                                 neighbor_face_update_flags);
-    FESubfaceValues<dim> fe_v_subface_neighbor (mapping, fe, face_quadrature,
-                                                neighbor_face_update_flags);
+    FESubfaceValues<dim> fe_v_subface_neighbor(mapping, fe, face_quadrature,
+                                               neighbor_face_update_flags);
 
     // Then loop over all cells, initialize the FEValues object for the
     // current cell and call the function that assembles the problem on this
@@ -1459,8 +1459,8 @@ namespace Step33
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-        fe_v.reinit (cell);
-        cell->get_dof_indices (dof_indices);
+        fe_v.reinit(cell);
+        cell->get_dof_indices(dof_indices);
 
         assemble_cell_term(fe_v, dof_indices);
 
@@ -1474,14 +1474,14 @@ namespace Step33
              ++face_no)
           if (cell->at_boundary(face_no))
             {
-              fe_v_face.reinit (cell, face_no);
-              assemble_face_term (face_no, fe_v_face,
-                                  fe_v_face,
-                                  dof_indices,
-                                  std::vector<types::global_dof_index>(),
-                                  true,
-                                  cell->face(face_no)->boundary_id(),
-                                  cell->face(face_no)->diameter());
+              fe_v_face.reinit(cell, face_no);
+              assemble_face_term(face_no, fe_v_face,
+                                 fe_v_face,
+                                 dof_indices,
+                                 std::vector<types::global_dof_index>(),
+                                 true,
+                                 cell->face(face_no)->boundary_id(),
+                                 cell->face(face_no)->diameter());
             }
 
         // The alternative is that we are dealing with an internal face. There
@@ -1532,26 +1532,26 @@ namespace Step33
                     {
                       const typename DoFHandler<dim>::active_cell_iterator
                       neighbor_child
-                        = cell->neighbor_child_on_subface (face_no, subface_no);
+                        = cell->neighbor_child_on_subface(face_no, subface_no);
 
-                      Assert (neighbor_child->face(neighbor2) ==
-                              cell->face(face_no)->child(subface_no),
-                              ExcInternalError());
-                      Assert (neighbor_child->has_children() == false,
-                              ExcInternalError());
+                      Assert(neighbor_child->face(neighbor2) ==
+                             cell->face(face_no)->child(subface_no),
+                             ExcInternalError());
+                      Assert(neighbor_child->has_children() == false,
+                             ExcInternalError());
 
-                      fe_v_subface.reinit (cell, face_no, subface_no);
-                      fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
+                      fe_v_subface.reinit(cell, face_no, subface_no);
+                      fe_v_face_neighbor.reinit(neighbor_child, neighbor2);
 
-                      neighbor_child->get_dof_indices (dof_indices_neighbor);
+                      neighbor_child->get_dof_indices(dof_indices_neighbor);
 
-                      assemble_face_term (face_no, fe_v_subface,
-                                          fe_v_face_neighbor,
-                                          dof_indices,
-                                          dof_indices_neighbor,
-                                          false,
-                                          numbers::invalid_unsigned_int,
-                                          neighbor_child->face(neighbor2)->diameter());
+                      assemble_face_term(face_no, fe_v_subface,
+                                         fe_v_face_neighbor,
+                                         dof_indices,
+                                         dof_indices_neighbor,
+                                         false,
+                                         numbers::invalid_unsigned_int,
+                                         neighbor_child->face(neighbor2)->diameter());
                     }
                 }
 
@@ -1568,30 +1568,30 @@ namespace Step33
                   Assert(neighbor->level() == cell->level()-1,
                          ExcInternalError());
 
-                  neighbor->get_dof_indices (dof_indices_neighbor);
+                  neighbor->get_dof_indices(dof_indices_neighbor);
 
                   const std::pair<unsigned int, unsigned int>
                   faceno_subfaceno = cell->neighbor_of_coarser_neighbor(face_no);
                   const unsigned int neighbor_face_no    = faceno_subfaceno.first,
                                      neighbor_subface_no = faceno_subfaceno.second;
 
-                  Assert (neighbor->neighbor_child_on_subface (neighbor_face_no,
-                                                               neighbor_subface_no)
-                          == cell,
-                          ExcInternalError());
+                  Assert(neighbor->neighbor_child_on_subface(neighbor_face_no,
+                                                             neighbor_subface_no)
+                         == cell,
+                         ExcInternalError());
 
-                  fe_v_face.reinit (cell, face_no);
-                  fe_v_subface_neighbor.reinit (neighbor,
-                                                neighbor_face_no,
-                                                neighbor_subface_no);
+                  fe_v_face.reinit(cell, face_no);
+                  fe_v_subface_neighbor.reinit(neighbor,
+                                               neighbor_face_no,
+                                               neighbor_subface_no);
 
-                  assemble_face_term (face_no, fe_v_face,
-                                      fe_v_subface_neighbor,
-                                      dof_indices,
-                                      dof_indices_neighbor,
-                                      false,
-                                      numbers::invalid_unsigned_int,
-                                      cell->face(face_no)->diameter());
+                  assemble_face_term(face_no, fe_v_face,
+                                     fe_v_subface_neighbor,
+                                     dof_indices,
+                                     dof_indices_neighbor,
+                                     false,
+                                     numbers::invalid_unsigned_int,
+                                     cell->face(face_no)->diameter());
                 }
             }
       }
@@ -1659,8 +1659,8 @@ namespace Step33
   template <int dim>
   void
   ConservationLaw<dim>::
-  assemble_cell_term (const FEValues<dim>             &fe_v,
-                      const std::vector<types::global_dof_index> &dof_indices)
+  assemble_cell_term(const FEValues<dim>             &fe_v,
+                     const std::vector<types::global_dof_index> &dof_indices)
   {
     const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
     const unsigned int n_q_points    = fe_v.n_quadrature_points;
@@ -1669,7 +1669,7 @@ namespace Step33
     W (n_q_points, EulerEquations<dim>::n_components);
 
     Table<2,double>
-    W_old (n_q_points, EulerEquations<dim>::n_components);
+    W_old(n_q_points, EulerEquations<dim>::n_components);
 
     Table<3,Sacado::Fad::DFad<double> >
     grad_W (n_q_points, EulerEquations<dim>::n_components, dim);
@@ -1677,7 +1677,7 @@ namespace Step33
     Table<3,double>
     grad_W_old(n_q_points, EulerEquations<dim>::n_components, dim);
 
-    std::vector<double> residual_derivatives (dofs_per_cell);
+    std::vector<double> residual_derivatives(dofs_per_cell);
 
     // Next, we have to define the independent variables that we will try to
     // determine by solving a Newton step. These independent variables are the
@@ -1698,7 +1698,7 @@ namespace Step33
     // $i$th independent variable out of a total of
     // <code>dofs_per_cell</code>:
     for (unsigned int i=0; i<dofs_per_cell; ++i)
-      independent_local_dof_values[i].diff (i, dofs_per_cell);
+      independent_local_dof_values[i].diff(i, dofs_per_cell);
 
     // After all these declarations, let us actually compute something. First,
     // the values of <code>W</code>, <code>W_old</code>, <code>grad_W</code>
@@ -1770,10 +1770,10 @@ namespace Step33
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
-        EulerEquations<dim>::compute_flux_matrix (W_old[q], flux_old[q]);
-        EulerEquations<dim>::compute_forcing_vector (W_old[q], forcing_old[q]);
-        EulerEquations<dim>::compute_flux_matrix (W[q], flux[q]);
-        EulerEquations<dim>::compute_forcing_vector (W[q], forcing[q]);
+        EulerEquations<dim>::compute_flux_matrix(W_old[q], flux_old[q]);
+        EulerEquations<dim>::compute_forcing_vector(W_old[q], forcing_old[q]);
+        EulerEquations<dim>::compute_flux_matrix(W[q], flux[q]);
+        EulerEquations<dim>::compute_forcing_vector(W[q], forcing[q]);
       }
 
 
@@ -1890,8 +1890,8 @@ namespace Step33
     const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
 
     std::vector<Sacado::Fad::DFad<double> >
-    independent_local_dof_values (dofs_per_cell),
-                                 independent_neighbor_dof_values (external_face == false ?
+    independent_local_dof_values(dofs_per_cell),
+                                 independent_neighbor_dof_values(external_face == false ?
                                      dofs_per_cell :
                                      0);
 
@@ -1924,8 +1924,8 @@ namespace Step33
     // that the <code>fe_v</code> variable now is of type FEFaceValues or
     // FESubfaceValues:
     Table<2,Sacado::Fad::DFad<double> >
-    Wplus (n_q_points, EulerEquations<dim>::n_components),
-          Wminus (n_q_points, EulerEquations<dim>::n_components);
+    Wplus(n_q_points, EulerEquations<dim>::n_components),
+          Wminus(n_q_points, EulerEquations<dim>::n_components);
     Table<2,double>
     Wplus_old(n_q_points, EulerEquations<dim>::n_components),
               Wminus_old(n_q_points, EulerEquations<dim>::n_components);
@@ -1973,9 +1973,9 @@ namespace Step33
     // that would otherwise be tremendously complicated.
     else
       {
-        Assert (boundary_id < Parameters::AllParameters<dim>::max_n_boundaries,
-                ExcIndexRange (boundary_id, 0,
-                               Parameters::AllParameters<dim>::max_n_boundaries));
+        Assert(boundary_id < Parameters::AllParameters<dim>::max_n_boundaries,
+               ExcIndexRange(boundary_id, 0,
+                             Parameters::AllParameters<dim>::max_n_boundaries));
 
         std::vector<Vector<double> >
         boundary_values(n_q_points, Vector<double>(EulerEquations<dim>::n_components));
@@ -1985,18 +1985,18 @@ namespace Step33
 
         for (unsigned int q = 0; q < n_q_points; q++)
           {
-            EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
-                                                 fe_v.normal_vector(q),
-                                                 Wplus[q],
-                                                 boundary_values[q],
-                                                 Wminus[q]);
+            EulerEquations<dim>::compute_Wminus(parameters.boundary_conditions[boundary_id].kind,
+                                                fe_v.normal_vector(q),
+                                                Wplus[q],
+                                                boundary_values[q],
+                                                Wminus[q]);
             // Here we assume that boundary type, boundary normal vector and boundary data values
             // maintain the same during time advancing.
-            EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
-                                                 fe_v.normal_vector(q),
-                                                 Wplus_old[q],
-                                                 boundary_values[q],
-                                                 Wminus_old[q]);
+            EulerEquations<dim>::compute_Wminus(parameters.boundary_conditions[boundary_id].kind,
+                                                fe_v.normal_vector(q),
+                                                Wplus_old[q],
+                                                boundary_values[q],
+                                                Wminus_old[q]);
           }
       }
 
@@ -2021,7 +2021,7 @@ namespace Step33
         alpha = face_diameter/(2.0*parameters.time_step);
         break;
       default:
-        Assert (false, ExcNotImplemented());
+        Assert(false, ExcNotImplemented());
         alpha = 1;
       }
 
@@ -2040,7 +2040,7 @@ namespace Step33
     // this is an internal face, we also have to take into account the
     // sensitivities of the residual contributions to the degrees of freedom on
     // the neighboring cell:
-    std::vector<double> residual_derivatives (dofs_per_cell);
+    std::vector<double> residual_derivatives(dofs_per_cell);
     for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
       if (fe_v.get_fe().has_support_on_face(i, face_no) == true)
         {
@@ -2065,8 +2065,8 @@ namespace Step33
             {
               for (unsigned int k=0; k<dofs_per_cell; ++k)
                 residual_derivatives[k] = R_i.fastAccessDx(dofs_per_cell+k);
-              system_matrix.add (dof_indices[i], dof_indices_neighbor,
-                                 residual_derivatives);
+              system_matrix.add(dof_indices[i], dof_indices_neighbor,
+                                residual_derivatives);
             }
 
           right_hand_side(dof_indices[i]) -= R_i.val();
@@ -2083,7 +2083,7 @@ namespace Step33
 
   template <int dim>
   std::pair<unsigned int, double>
-  ConservationLaw<dim>::solve (Vector<double> &newton_update)
+  ConservationLaw<dim>::solve(Vector<double> &newton_update)
   {
     switch (parameters.solver)
       {
@@ -2101,12 +2101,12 @@ namespace Step33
       // may be provided here:
       case Parameters::Solver::direct:
       {
-        SolverControl solver_control (1,0);
-        TrilinosWrappers::SolverDirect::AdditionalData data (
+        SolverControl solver_control(1,0);
+        TrilinosWrappers::SolverDirect::AdditionalData data(
           parameters.output == Parameters::Solver::verbose);
-        TrilinosWrappers::SolverDirect direct (solver_control, data);
+        TrilinosWrappers::SolverDirect direct(solver_control, data);
 
-        direct.solve (system_matrix, newton_update, right_hand_side);
+        direct.solve(system_matrix, newton_update, right_hand_side);
 
         return std::pair<unsigned int, double> (solver_control.last_step(),
                                                 solver_control.last_value());
@@ -2176,7 +2176,7 @@ namespace Step33
       }
       }
 
-    Assert (false, ExcNotImplemented());
+    Assert(false, ExcNotImplemented());
     return std::pair<unsigned int, double> (0,0);
   }
 
@@ -2190,12 +2190,12 @@ namespace Step33
   template <int dim>
   void
   ConservationLaw<dim>::
-  compute_refinement_indicators (Vector<double> &refinement_indicators) const
+  compute_refinement_indicators(Vector<double> &refinement_indicators) const
   {
-    EulerEquations<dim>::compute_refinement_indicators (dof_handler,
-                                                        mapping,
-                                                        predictor,
-                                                        refinement_indicators);
+    EulerEquations<dim>::compute_refinement_indicators(dof_handler,
+                                                       mapping,
+                                                       predictor,
+                                                       refinement_indicators);
   }
 
 
@@ -2207,7 +2207,7 @@ namespace Step33
   // think should be refined:
   template <int dim>
   void
-  ConservationLaw<dim>::refine_grid (const Vector<double> &refinement_indicators)
+  ConservationLaw<dim>::refine_grid(const Vector<double> &refinement_indicators)
   {
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -2243,10 +2243,10 @@ namespace Step33
     SolutionTransfer<dim> soltrans(dof_handler);
     soltrans.prepare_for_coarsening_and_refinement(transfer_in);
 
-    triangulation.execute_coarsening_and_refinement ();
+    triangulation.execute_coarsening_and_refinement();
 
     dof_handler.clear();
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
     {
       Vector<double> new_old_solution(1);
@@ -2260,15 +2260,15 @@ namespace Step33
 
     soltrans.interpolate(transfer_in, transfer_out);
 
-    old_solution.reinit (transfer_out[0].size());
+    old_solution.reinit(transfer_out[0].size());
     old_solution = transfer_out[0];
 
-    predictor.reinit (transfer_out[1].size());
+    predictor.reinit(transfer_out[1].size());
     predictor = transfer_out[1];
 
     current_solution.reinit(dof_handler.n_dofs());
     current_solution = old_solution;
-    right_hand_side.reinit (dof_handler.n_dofs());
+    right_hand_side.reinit(dof_handler.n_dofs());
   }
 
 
@@ -2284,29 +2284,29 @@ namespace Step33
   // time we come to this function and is incremented by one at the end of
   // each invocation.
   template <int dim>
-  void ConservationLaw<dim>::output_results () const
+  void ConservationLaw<dim>::output_results() const
   {
     typename EulerEquations<dim>::Postprocessor
-    postprocessor (parameters.schlieren_plot);
+    postprocessor(parameters.schlieren_plot);
 
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
+    data_out.attach_dof_handler(dof_handler);
 
-    data_out.add_data_vector (current_solution,
-                              EulerEquations<dim>::component_names (),
-                              DataOut<dim>::type_dof_data,
-                              EulerEquations<dim>::component_interpretation ());
+    data_out.add_data_vector(current_solution,
+                             EulerEquations<dim>::component_names(),
+                             DataOut<dim>::type_dof_data,
+                             EulerEquations<dim>::component_interpretation());
 
-    data_out.add_data_vector (current_solution, postprocessor);
+    data_out.add_data_vector(current_solution, postprocessor);
 
-    data_out.build_patches ();
+    data_out.build_patches();
 
     static unsigned int output_file_number = 0;
     std::string filename = "solution-" +
-                           Utilities::int_to_string (output_file_number, 3) +
+                           Utilities::int_to_string(output_file_number, 3) +
                            ".vtk";
-    std::ofstream output (filename);
-    data_out.write_vtk (output);
+    std::ofstream output(filename);
+    data_out.write_vtk(output);
 
     ++output_file_number;
   }
@@ -2326,26 +2326,26 @@ namespace Step33
   // already well adapted to the starting solution. At the end of this
   // process, we output the initial solution.
   template <int dim>
-  void ConservationLaw<dim>::run ()
+  void ConservationLaw<dim>::run()
   {
     {
       GridIn<dim> grid_in;
       grid_in.attach_triangulation(triangulation);
 
       std::ifstream input_file(parameters.mesh_filename);
-      Assert (input_file, ExcFileNotOpen(parameters.mesh_filename.c_str()));
+      Assert(input_file, ExcFileNotOpen(parameters.mesh_filename.c_str()));
 
       grid_in.read_ucd(input_file);
     }
 
     dof_handler.clear();
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
     // Size all of the fields.
-    old_solution.reinit (dof_handler.n_dofs());
-    current_solution.reinit (dof_handler.n_dofs());
-    predictor.reinit (dof_handler.n_dofs());
-    right_hand_side.reinit (dof_handler.n_dofs());
+    old_solution.reinit(dof_handler.n_dofs());
+    current_solution.reinit(dof_handler.n_dofs());
+    predictor.reinit(dof_handler.n_dofs());
+    right_hand_side.reinit(dof_handler.n_dofs());
 
     setup_system();
 
@@ -2357,7 +2357,7 @@ namespace Step33
     if (parameters.do_refine == true)
       for (unsigned int i=0; i<parameters.shock_levels; ++i)
         {
-          Vector<double> refinement_indicators (triangulation.n_active_cells());
+          Vector<double> refinement_indicators(triangulation.n_active_cells());
 
           compute_refinement_indicators(refinement_indicators);
           refine_grid(refinement_indicators);
@@ -2370,13 +2370,13 @@ namespace Step33
           predictor = old_solution;
         }
 
-    output_results ();
+    output_results();
 
     // We then enter into the main time stepping loop. At the top we simply
     // output some status information so one can keep track of where a
     // computation is, as well as the header for a table that indicates
     // progress of the nonlinear inner iteration:
-    Vector<double> newton_update (dof_handler.n_dofs());
+    Vector<double> newton_update(dof_handler.n_dofs());
 
     double time = 0;
     double next_output = time + parameters.output_step;
@@ -2426,12 +2426,12 @@ namespace Step33
             system_matrix = 0;
 
             right_hand_side = 0;
-            assemble_system ();
+            assemble_system();
 
             const double res_norm = right_hand_side.l2_norm();
             if (std::fabs(res_norm) < 1e-10)
               {
-                std::printf("   %-16.3e (converged)\n\n", res_norm);
+                std::printf("   %-16.3e(converged)\n\n", res_norm);
                 break;
               }
             else
@@ -2439,7 +2439,7 @@ namespace Step33
                 newton_update = 0;
 
                 std::pair<unsigned int, double> convergence
-                  = solve (newton_update);
+                  = solve(newton_update);
 
                 current_solution += newton_update;
 
@@ -2448,8 +2448,8 @@ namespace Step33
               }
 
             ++nonlin_iter;
-            AssertThrow (nonlin_iter <= 10,
-                         ExcMessage ("No convergence in nonlinear solver"));
+            AssertThrow(nonlin_iter <= 10,
+                        ExcMessage("No convergence in nonlinear solver"));
           }
 
         // We only get to this point if the Newton iteration has converged, so
@@ -2469,27 +2469,27 @@ namespace Step33
         time += parameters.time_step;
 
         if (parameters.output_step < 0)
-          output_results ();
+          output_results();
         else if (time >= next_output)
           {
-            output_results ();
+            output_results();
             next_output += parameters.output_step;
           }
 
         predictor = current_solution;
-        predictor.sadd (2.0, -1.0, old_solution);
+        predictor.sadd(2.0, -1.0, old_solution);
 
         old_solution = current_solution;
 
         if (parameters.do_refine == true)
           {
-            Vector<double> refinement_indicators (triangulation.n_active_cells());
+            Vector<double> refinement_indicators(triangulation.n_active_cells());
             compute_refinement_indicators(refinement_indicators);
 
             refine_grid(refinement_indicators);
             setup_system();
 
-            newton_update.reinit (dof_handler.n_dofs());
+            newton_update.reinit(dof_handler.n_dofs());
           }
       }
   }
@@ -2500,7 +2500,7 @@ namespace Step33
 // The following ``main'' function is similar to previous examples and need
 // not to be commented on. Note that the program aborts if no input file name
 // is given on the command line.
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   try
     {
@@ -2515,8 +2515,8 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, dealii::numbers::invalid_unsigned_int);
 
-      ConservationLaw<2> cons (argv[1]);
-      cons.run ();
+      ConservationLaw<2> cons(argv[1]);
+      cons.run();
     }
   catch (std::exception &exc)
     {

@@ -108,22 +108,22 @@ namespace Step42
   class ConstitutiveLaw
   {
   public:
-    ConstitutiveLaw (const double E,
-                     const double nu,
-                     const double sigma_0,
-                     const double gamma);
+    ConstitutiveLaw(const double E,
+                    const double nu,
+                    const double sigma_0,
+                    const double gamma);
 
     void
     set_sigma_0 (double sigma_zero);
 
     bool
-    get_stress_strain_tensor (const SymmetricTensor<2, dim> &strain_tensor,
-                              SymmetricTensor<4, dim> &stress_strain_tensor) const;
+    get_stress_strain_tensor(const SymmetricTensor<2, dim> &strain_tensor,
+                             SymmetricTensor<4, dim> &stress_strain_tensor) const;
 
     void
-    get_linearized_stress_strain_tensors (const SymmetricTensor<2, dim> &strain_tensor,
-                                          SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
-                                          SymmetricTensor<4, dim> &stress_strain_tensor) const;
+    get_linearized_stress_strain_tensors(const SymmetricTensor<2, dim> &strain_tensor,
+                                         SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
+                                         SymmetricTensor<4, dim> &stress_strain_tensor) const;
 
   private:
     const double kappa;
@@ -149,22 +149,22 @@ namespace Step42
   // this constructor, we also compute the two principal components of the
   // stress-strain relation and its linearization.
   template <int dim>
-  ConstitutiveLaw<dim>::ConstitutiveLaw (double E,
-                                         double nu,
-                                         double sigma_0,
-                                         double gamma)
+  ConstitutiveLaw<dim>::ConstitutiveLaw(double E,
+                                        double nu,
+                                        double sigma_0,
+                                        double gamma)
     :
-    kappa (E / (3 * (1 - 2 * nu))),
-    mu (E / (2 * (1 + nu))),
+    kappa(E / (3 * (1 - 2 * nu))),
+    mu(E / (2 * (1 + nu))),
     sigma_0(sigma_0),
     gamma(gamma),
-    stress_strain_tensor_kappa (kappa
-                                * outer_product(unit_symmetric_tensor<dim>(),
-                                                unit_symmetric_tensor<dim>())),
-    stress_strain_tensor_mu (2 * mu
-                             * (identity_tensor<dim>()
-                                - outer_product(unit_symmetric_tensor<dim>(),
-                                                unit_symmetric_tensor<dim>()) / 3.0))
+    stress_strain_tensor_kappa(kappa
+                               * outer_product(unit_symmetric_tensor<dim>(),
+                                               unit_symmetric_tensor<dim>())),
+    stress_strain_tensor_mu(2 * mu
+                            * (identity_tensor<dim>()
+                               - outer_product(unit_symmetric_tensor<dim>(),
+                                               unit_symmetric_tensor<dim>()) / 3.0))
   {}
 
 
@@ -197,10 +197,10 @@ namespace Step42
   template <int dim>
   bool
   ConstitutiveLaw<dim>::
-  get_stress_strain_tensor (const SymmetricTensor<2, dim> &strain_tensor,
-                            SymmetricTensor<4, dim> &stress_strain_tensor) const
+  get_stress_strain_tensor(const SymmetricTensor<2, dim> &strain_tensor,
+                           SymmetricTensor<4, dim> &stress_strain_tensor) const
   {
-    Assert (dim == 3, ExcNotImplemented());
+    Assert(dim == 3, ExcNotImplemented());
 
     SymmetricTensor<2, dim> stress_tensor;
     stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)
@@ -236,11 +236,11 @@ namespace Step42
   template <int dim>
   void
   ConstitutiveLaw<dim>::
-  get_linearized_stress_strain_tensors (const SymmetricTensor<2, dim> &strain_tensor,
-                                        SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
-                                        SymmetricTensor<4, dim> &stress_strain_tensor) const
+  get_linearized_stress_strain_tensors(const SymmetricTensor<2, dim> &strain_tensor,
+                                       SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
+                                       SymmetricTensor<4, dim> &stress_strain_tensor) const
   {
-    Assert (dim == 3, ExcNotImplemented());
+    Assert(dim == 3, ExcNotImplemented());
 
     SymmetricTensor<2, dim> stress_tensor;
     stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)
@@ -279,19 +279,19 @@ namespace Step42
     class BoundaryForce : public Function<dim>
     {
     public:
-      BoundaryForce ();
+      BoundaryForce();
 
       virtual
-      double value (const Point<dim> &p,
-                    const unsigned int component = 0) const override;
+      double value(const Point<dim> &p,
+                   const unsigned int component = 0) const override;
 
       virtual
-      void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const override;
+      void vector_value(const Point<dim> &p,
+                        Vector<double> &values) const override;
     };
 
     template <int dim>
-    BoundaryForce<dim>::BoundaryForce ()
+    BoundaryForce<dim>::BoundaryForce()
       :
       Function<dim>(dim)
     {}
@@ -299,16 +299,16 @@ namespace Step42
 
     template <int dim>
     double
-    BoundaryForce<dim>::value (const Point<dim> &,
-                               const unsigned int) const
+    BoundaryForce<dim>::value(const Point<dim> &,
+                              const unsigned int) const
     {
       return 0.;
     }
 
     template <int dim>
     void
-    BoundaryForce<dim>::vector_value (const Point<dim> &p,
-                                      Vector<double> &values) const
+    BoundaryForce<dim>::vector_value(const Point<dim> &p,
+                                     Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = BoundaryForce<dim>::value(p, c);
@@ -320,19 +320,19 @@ namespace Step42
     class BoundaryValues : public Function<dim>
     {
     public:
-      BoundaryValues ();
+      BoundaryValues();
 
-      virtual double value (const Point<dim> &p,
-                            const unsigned int component = 0) const override;
+      virtual double value(const Point<dim> &p,
+                           const unsigned int component = 0) const override;
 
       virtual
-      void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const override;
+      void vector_value(const Point<dim> &p,
+                        Vector<double> &values) const override;
     };
 
 
     template <int dim>
-    BoundaryValues<dim>::BoundaryValues ()
+    BoundaryValues<dim>::BoundaryValues()
       :
       Function<dim>(dim)
     {}
@@ -340,16 +340,16 @@ namespace Step42
 
     template <int dim>
     double
-    BoundaryValues<dim>::value (const Point<dim> &,
-                                const unsigned int) const
+    BoundaryValues<dim>::value(const Point<dim> &,
+                               const unsigned int) const
     {
       return 0.;
     }
 
     template <int dim>
     void
-    BoundaryValues<dim>::vector_value (const Point<dim> &p,
-                                       Vector<double> &values) const
+    BoundaryValues<dim>::vector_value(const Point<dim> &p,
+                                      Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = BoundaryValues<dim>::value(p, c);
@@ -371,15 +371,15 @@ namespace Step42
     class SphereObstacle : public Function<dim>
     {
     public:
-      SphereObstacle (const double z_surface);
+      SphereObstacle(const double z_surface);
 
       virtual
-      double value (const Point<dim> &p,
-                    const unsigned int component = 0) const override;
+      double value(const Point<dim> &p,
+                   const unsigned int component = 0) const override;
 
       virtual
-      void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const override;
+      void vector_value(const Point<dim> &p,
+                        Vector<double> &values) const override;
 
     private:
       const double z_surface;
@@ -387,7 +387,7 @@ namespace Step42
 
 
     template <int dim>
-    SphereObstacle<dim>::SphereObstacle (const double z_surface)
+    SphereObstacle<dim>::SphereObstacle(const double z_surface)
       :
       Function<dim>(dim),
       z_surface(z_surface)
@@ -396,7 +396,7 @@ namespace Step42
 
     template <int dim>
     double
-    SphereObstacle<dim>::value (
+    SphereObstacle<dim>::value(
       const Point<dim> &p, const unsigned int component) const
     {
       if (component == 0)
@@ -421,8 +421,8 @@ namespace Step42
 
     template <int dim>
     void
-    SphereObstacle<dim>::vector_value (const Point<dim> &p,
-                                       Vector<double> &values) const
+    SphereObstacle<dim>::vector_value(const Point<dim> &p,
+                                      Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = SphereObstacle<dim>::value(p, c);
@@ -479,8 +479,8 @@ namespace Step42
       ny(0)
     {
       std::ifstream f(name);
-      AssertThrow (f, ExcMessage (std::string("Can't read from file <") +
-                                  name + ">!"));
+      AssertThrow(f, ExcMessage(std::string("Can't read from file <") +
+                                name + ">!"));
 
       std::string temp;
       f >> temp >> nx >> ny;
@@ -562,12 +562,12 @@ namespace Step42
                       const double z_surface);
 
       virtual
-      double value (const Point<dim> &p,
-                    const unsigned int component = 0) const override;
+      double value(const Point<dim> &p,
+                   const unsigned int component = 0) const override;
 
       virtual
-      void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const override;
+      void vector_value(const Point<dim> &p,
+                        Vector<double> &values) const override;
 
     private:
       const BitmapFile<dim> input_obstacle;
@@ -587,8 +587,8 @@ namespace Step42
 
     template <int dim>
     double
-    ChineseObstacle<dim>::value (const Point<dim> &p,
-                                 const unsigned int component) const
+    ChineseObstacle<dim>::value(const Point<dim> &p,
+                                const unsigned int component) const
     {
       if (component == 0)
         return p(0);
@@ -600,14 +600,14 @@ namespace Step42
             return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
         }
 
-      Assert (false, ExcNotImplemented());
+      Assert(false, ExcNotImplemented());
       return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
     }
 
     template <int dim>
     void
-    ChineseObstacle<dim>::vector_value (const Point<dim> &p,
-                                        Vector<double> &values) const
+    ChineseObstacle<dim>::vector_value(const Point<dim> &p,
+                                       Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = ChineseObstacle<dim>::value(p, c);
@@ -645,26 +645,26 @@ namespace Step42
   class PlasticityContactProblem
   {
   public:
-    PlasticityContactProblem (const ParameterHandler &prm);
+    PlasticityContactProblem(const ParameterHandler &prm);
 
-    void run ();
+    void run();
 
-    static void declare_parameters (ParameterHandler &prm);
+    static void declare_parameters(ParameterHandler &prm);
 
   private:
-    void make_grid ();
-    void setup_system ();
-    void compute_dirichlet_constraints ();
-    void update_solution_and_constraints ();
-    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
-    void assemble_newton_system (const TrilinosWrappers::MPI::Vector &linearization_point);
-    void compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &linearization_point);
-    void solve_newton_system ();
-    void solve_newton ();
-    void refine_grid ();
-    void move_mesh (const TrilinosWrappers::MPI::Vector &displacement) const;
-    void output_results (const std::string &filename_base);
-    void output_contact_force () const;
+    void make_grid();
+    void setup_system();
+    void compute_dirichlet_constraints();
+    void update_solution_and_constraints();
+    void assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
+    void assemble_newton_system(const TrilinosWrappers::MPI::Vector &linearization_point);
+    void compute_nonlinear_residual(const TrilinosWrappers::MPI::Vector &linearization_point);
+    void solve_newton_system();
+    void solve_newton();
+    void refine_grid();
+    void move_mesh(const TrilinosWrappers::MPI::Vector &displacement) const;
+    void output_results(const std::string &filename_base);
+    void output_contact_force() const;
 
     // As far as member variables are concerned, we start with ones that we use to
     // indicate the MPI universe this program runs on, a stream we use to let
@@ -783,7 +783,7 @@ namespace Step42
   // class:
   template <int dim>
   void
-  PlasticityContactProblem<dim>::declare_parameters (ParameterHandler &prm)
+  PlasticityContactProblem<dim>::declare_parameters(ParameterHandler &prm)
   {
     prm.declare_entry("polynomial degree", "1",
                       Patterns::Integer(),
@@ -808,7 +808,7 @@ namespace Step42
                       "ASCII PBM format.");
     prm.declare_entry("output directory", "",
                       Patterns::Anything(),
-                      "Directory for output files (graphical output and benchmark "
+                      "Directory for output files(graphical output and benchmark "
                       "statistics). If empty, use the current directory.");
     prm.declare_entry("transfer solution", "false",
                       Patterns::Bool(),
@@ -830,7 +830,7 @@ namespace Step42
   // creating such a directory if necessary.
   template <int dim>
   PlasticityContactProblem<dim>::
-  PlasticityContactProblem (const ParameterHandler &prm)
+  PlasticityContactProblem(const ParameterHandler &prm)
     :
     mpi_communicator(MPI_COMM_WORLD),
     pcout(std::cout,
@@ -838,33 +838,33 @@ namespace Step42
     computing_timer(MPI_COMM_WORLD, pcout, TimerOutput::never,
                     TimerOutput::wall_times),
 
-    n_initial_global_refinements (prm.get_integer("number of initial refinements")),
+    n_initial_global_refinements(prm.get_integer("number of initial refinements")),
     triangulation(mpi_communicator),
-    fe_degree (prm.get_integer("polynomial degree")),
+    fe_degree(prm.get_integer("polynomial degree")),
     fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree+1)), dim),
     dof_handler(triangulation),
 
-    e_modulus (200000),
-    nu (0.3),
-    gamma (0.01),
+    e_modulus(200000),
+    nu(0.3),
+    gamma(0.01),
     sigma_0(400.0),
-    constitutive_law (e_modulus,
-                      nu,
-                      sigma_0,
-                      gamma),
+    constitutive_law(e_modulus,
+                     nu,
+                     sigma_0,
+                     gamma),
 
-    base_mesh (prm.get("base mesh")),
-    obstacle (prm.get("obstacle") == "read from file"
-              ?
-              static_cast<const Function<dim>*>
-              (new EquationData::ChineseObstacle<dim>("obstacle.pbm", (base_mesh == "box" ? 1.0 : 0.5)))
-              :
-              static_cast<const Function<dim>*>
-              (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
+    base_mesh(prm.get("base mesh")),
+    obstacle(prm.get("obstacle") == "read from file"
+             ?
+             static_cast<const Function<dim>*>
+             (new EquationData::ChineseObstacle<dim>("obstacle.pbm", (base_mesh == "box" ? 1.0 : 0.5)))
+             :
+             static_cast<const Function<dim>*>
+             (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
 
-    transfer_solution (prm.get_bool("transfer solution")),
-    n_refinement_cycles (prm.get_integer("number of cycles")),
-    current_refinement_cycle (0)
+    transfer_solution(prm.get_bool("transfer solution")),
+    n_refinement_cycles(prm.get_integer("number of cycles")),
+    current_refinement_cycle(0)
 
   {
     std::string strat = prm.get("refinement strategy");
@@ -873,7 +873,7 @@ namespace Step42
     else if (strat == "percentage")
       refinement_strategy = RefinementStrategy::refine_percentage;
     else
-      AssertThrow (false, ExcNotImplemented());
+      AssertThrow(false, ExcNotImplemented());
 
     output_dir = prm.get("output directory");
     if (output_dir != "" && *(output_dir.rbegin()) != '/')
@@ -909,14 +909,14 @@ namespace Step42
   // has boundary indicator zero, while the remainder has boundary
   // indicator one.
   Point<3>
-  rotate_half_sphere (const Point<3> &in)
+  rotate_half_sphere(const Point<3> &in)
   {
     return Point<3>(in(2), in(1), -in(0));
   }
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::make_grid ()
+  PlasticityContactProblem<dim>::make_grid()
   {
     if (base_mesh == "half sphere")
       {
@@ -1001,7 +1001,7 @@ namespace Step42
   // stops it again).
   template <int dim>
   void
-  PlasticityContactProblem<dim>::setup_system ()
+  PlasticityContactProblem<dim>::setup_system()
   {
     /* setup dofs and get index sets for locally owned and relevant dofs */
     {
@@ -1092,7 +1092,7 @@ namespace Step42
   //   the curved part of the boundary, associated with boundary indicator zero.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::compute_dirichlet_constraints ()
+  PlasticityContactProblem<dim>::compute_dirichlet_constraints()
   {
     constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
     constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
@@ -1151,7 +1151,7 @@ namespace Step42
   template <int dim>
   void
   PlasticityContactProblem<dim>::
-  assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
+  assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix)
   {
     QGaussLobatto<dim-1> face_quadrature_formula(fe.degree + 1);
 
@@ -1217,7 +1217,7 @@ namespace Step42
   // the contact:
   template <int dim>
   void
-  PlasticityContactProblem<dim>::update_solution_and_constraints ()
+  PlasticityContactProblem<dim>::update_solution_and_constraints()
   {
     std::vector<bool> dof_touched(dof_handler.n_dofs(), false);
 
@@ -1354,7 +1354,7 @@ namespace Step42
   template <int dim>
   void
   PlasticityContactProblem<dim>::
-  assemble_newton_system (const TrilinosWrappers::MPI::Vector &linearization_point)
+  assemble_newton_system(const TrilinosWrappers::MPI::Vector &linearization_point)
   {
     TimerOutput::Scope t(computing_timer, "Assembling");
 
@@ -1505,7 +1505,7 @@ namespace Step42
   template <int dim>
   void
   PlasticityContactProblem<dim>::
-  compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &linearization_point)
+  compute_nonlinear_residual(const TrilinosWrappers::MPI::Vector &linearization_point)
   {
     QGauss<dim>   quadrature_formula(fe.degree + 1);
     QGauss<dim-1> face_quadrature_formula(fe.degree + 1);
@@ -1641,7 +1641,7 @@ namespace Step42
   // systems.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::solve_newton_system ()
+  PlasticityContactProblem<dim>::solve_newton_system()
   {
     TimerOutput::Scope t(computing_timer, "Solve");
 
@@ -1719,7 +1719,7 @@ namespace Step42
   // previous step will always fail in the first step.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::solve_newton ()
+  PlasticityContactProblem<dim>::solve_newton()
   {
     TrilinosWrappers::MPI::Vector old_solution(locally_owned_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector residual(locally_owned_dofs, mpi_communicator);
@@ -1885,7 +1885,7 @@ namespace Step42
   // need the information computed by <code>compute_nonlinear_residual()</code>.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::refine_grid ()
+  PlasticityContactProblem<dim>::refine_grid()
   {
     if (refinement_strategy == RefinementStrategy::refine_global)
       {
@@ -1893,7 +1893,7 @@ namespace Step42
              cell = triangulation.begin_active();
              cell != triangulation.end(); ++cell)
           if (cell->is_locally_owned())
-            cell->set_refine_flag ();
+            cell->set_refine_flag();
       }
     else
       {
@@ -1954,7 +1954,7 @@ namespace Step42
   template <int dim>
   void
   PlasticityContactProblem<dim>::
-  move_mesh (const TrilinosWrappers::MPI::Vector &displacement) const
+  move_mesh(const TrilinosWrappers::MPI::Vector &displacement) const
   {
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
 
@@ -1993,7 +1993,7 @@ namespace Step42
   // ghost entries for all locally relevant degrees of freedom.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::output_results (const std::string &filename_base)
+  PlasticityContactProblem<dim>::output_results(const std::string &filename_base)
   {
     TimerOutput::Scope t(computing_timer, "Graphical output");
 
@@ -2097,7 +2097,7 @@ namespace Step42
   // to the distributed_lambda vector.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::output_contact_force () const
+  PlasticityContactProblem<dim>::output_contact_force() const
   {
     TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
     const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
@@ -2161,7 +2161,7 @@ namespace Step42
   // computations on this mesh.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::run ()
+  PlasticityContactProblem<dim>::run()
   {
     computing_timer.reset();
     for (; current_refinement_cycle < n_refinement_cycles;
@@ -2208,7 +2208,7 @@ namespace Step42
 
 // There really isn't much to the <code>main()</code> function. It looks
 // like they always do:
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   using namespace dealii;
   using namespace Step42;
@@ -2224,8 +2224,8 @@ int main (int argc, char *argv[])
         }
 
       prm.parse_input(argv[1]);
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
-                                                           numbers::invalid_unsigned_int);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
+                                                          numbers::invalid_unsigned_int);
       {
         PlasticityContactProblem<3> problem(prm);
         problem.run();

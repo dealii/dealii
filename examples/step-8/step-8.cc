@@ -82,16 +82,16 @@ namespace Step8
   class ElasticProblem
   {
   public:
-    ElasticProblem ();
-    ~ElasticProblem ();
-    void run ();
+    ElasticProblem();
+    ~ElasticProblem();
+    void run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void setup_system();
+    void assemble_system();
+    void solve();
+    void refine_grid();
+    void output_results(const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
     DoFHandler<dim>      dof_handler;
@@ -135,12 +135,12 @@ namespace Step8
   // we terminate the program in the second assertion. The program will work
   // just fine in 3d, however.
   template <int dim>
-  void right_hand_side (const std::vector<Point<dim> > &points,
-                        std::vector<Tensor<1, dim> >   &values)
+  void right_hand_side(const std::vector<Point<dim> > &points,
+                       std::vector<Tensor<1, dim> >   &values)
   {
-    Assert (values.size() == points.size(),
-            ExcDimensionMismatch (values.size(), points.size()));
-    Assert (dim >= 2, ExcNotImplemented());
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
+    Assert(dim >= 2, ExcNotImplemented());
 
     // The rest of the function implements computing force values. We will use
     // a constant (unit) force in x-direction located in two little circles
@@ -193,10 +193,10 @@ namespace Step8
   // compose the system of, and how often it shall be repeated:
 
   template <int dim>
-  ElasticProblem<dim>::ElasticProblem ()
+  ElasticProblem<dim>::ElasticProblem()
     :
-    dof_handler (triangulation),
-    fe (FE_Q<dim>(1), dim)
+    dof_handler(triangulation),
+    fe(FE_Q<dim>(1), dim)
   {}
   // In fact, the <code>FESystem</code> class has several more constructors
   // which can perform more complex operations than just stacking together
@@ -209,9 +209,9 @@ namespace Step8
 
   // The destructor, on the other hand, is exactly as in step-6:
   template <int dim>
-  ElasticProblem<dim>::~ElasticProblem ()
+  ElasticProblem<dim>::~ElasticProblem()
   {
-    dof_handler.clear ();
+    dof_handler.clear();
   }
 
 
@@ -228,25 +228,25 @@ namespace Step8
   // vector-valued or whether it is, for example, a scalar Hermite element
   // with several degrees of freedom on each vertex).
   template <int dim>
-  void ElasticProblem<dim>::setup_system ()
+  void ElasticProblem<dim>::setup_system()
   {
-    dof_handler.distribute_dofs (fe);
-    hanging_node_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler,
-                                             hanging_node_constraints);
-    hanging_node_constraints.close ();
+    dof_handler.distribute_dofs(fe);
+    hanging_node_constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler,
+                                            hanging_node_constraints);
+    hanging_node_constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
                                     dsp,
                                     hanging_node_constraints,
                                     /*keep_constrained_dofs = */ true);
-    sparsity_pattern.copy_from (dsp);
+    sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
   }
 
 
@@ -268,28 +268,28 @@ namespace Step8
   // <code>dim</code> times the number of degrees of freedom per cell of the
   // Q1 element, though this is not explicit knowledge we need to care about:
   template <int dim>
-  void ElasticProblem<dim>::assemble_system ()
+  void ElasticProblem<dim>::assemble_system()
   {
     QGauss<dim>  quadrature_formula(2);
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values   | update_gradients |
-                             update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values(fe, quadrature_formula,
+                            update_values   | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>       cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // As was shown in previous examples as well, we need a place where to
     // store the values of the coefficients at all the quadrature points on a
     // cell. In the present situation, we have two coefficients, lambda and
     // mu.
-    std::vector<double>     lambda_values (n_q_points);
-    std::vector<double>     mu_values (n_q_points);
+    std::vector<double>     lambda_values(n_q_points);
+    std::vector<double>     mu_values(n_q_points);
 
     // Well, we could as well have omitted the above two arrays since we will
     // use constant coefficients for both lambda and mu, which can be declared
@@ -301,7 +301,7 @@ namespace Step8
 
     // Like the two constant functions above, we will call the function
     // right_hand_side just once per cell to make things simpler.
-    std::vector<Tensor<1, dim> > rhs_values (n_q_points);
+    std::vector<Tensor<1, dim> > rhs_values(n_q_points);
 
     // Now we can begin with the loop over all cells:
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
@@ -311,13 +311,13 @@ namespace Step8
         cell_matrix = 0;
         cell_rhs = 0;
 
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
 
         // Next we get the values of the coefficients at the quadrature
         // points. Likewise for the right hand side:
-        lambda.value_list (fe_values.get_quadrature_points(), lambda_values);
+        lambda.value_list(fe_values.get_quadrature_points(), lambda_values);
         mu.value_list     (fe_values.get_quadrature_points(), mu_values);
-        right_hand_side (fe_values.get_quadrature_points(), rhs_values);
+        right_hand_side(fe_values.get_quadrature_points(), rhs_values);
 
         // Then assemble the entries of the local stiffness matrix and right
         // hand side vector. This follows almost one-to-one the pattern
@@ -417,20 +417,20 @@ namespace Step8
         // examples. The same holds for the elimination of hanging nodes from
         // the matrix and right hand side, once we are done with assembling
         // the entire linear system:
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              system_matrix.add (local_dof_indices[i],
-                                 local_dof_indices[j],
-                                 cell_matrix(i,j));
+              system_matrix.add(local_dof_indices[i],
+                                local_dof_indices[j],
+                                cell_matrix(i,j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
       }
 
-    hanging_node_constraints.condense (system_matrix);
-    hanging_node_constraints.condense (system_rhs);
+    hanging_node_constraints.condense(system_matrix);
+    hanging_node_constraints.condense(system_rhs);
 
     // The interpolation of the boundary values needs a small modification:
     // since the solution function is vector-valued, so need to be the
@@ -442,14 +442,14 @@ namespace Step8
     // <code>dim</code> components, we need to pass <code>dim</code> as number
     // of components to the zero function as well.
     std::map<types::global_dof_index,double> boundary_values;
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              Functions::ZeroFunction<dim>(dim),
-                                              boundary_values);
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix,
-                                        solution,
-                                        system_rhs);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             boundary_values);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       system_matrix,
+                                       solution,
+                                       system_rhs);
   }
 
 
@@ -461,18 +461,18 @@ namespace Step8
   // requirements for the use of the CG solver), which the system indeed
   // is. Therefore, we need not change anything.
   template <int dim>
-  void ElasticProblem<dim>::solve ()
+  void ElasticProblem<dim>::solve()
   {
-    SolverControl           solver_control (1000, 1e-12);
-    SolverCG<>              cg (solver_control);
+    SolverControl           solver_control(1000, 1e-12);
+    SolverCG<>              cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+    cg.solve(system_matrix, solution, system_rhs,
+             preconditioner);
 
-    hanging_node_constraints.distribute (solution);
+    hanging_node_constraints.distribute(solution);
   }
 
 
@@ -489,21 +489,21 @@ namespace Step8
   // indicators. However, for the current problem, it seems appropriate to
   // consider all displacement components with equal weight.
   template <int dim>
-  void ElasticProblem<dim>::refine_grid ()
+  void ElasticProblem<dim>::refine_grid()
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(2),
-                                        typename FunctionMap<dim>::type(),
-                                        solution,
-                                        estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim-1>(2),
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     estimated_error_per_cell,
-                                                     0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3, 0.03);
 
-    triangulation.execute_coarsening_and_refinement ();
+    triangulation.execute_coarsening_and_refinement();
   }
 
 
@@ -535,10 +535,10 @@ namespace Step8
   // condition <code>false</code> can never be satisfied, so the program
   // will always abort whenever it gets to the default statement:
   template <int dim>
-  void ElasticProblem<dim>::output_results (const unsigned int cycle) const
+  void ElasticProblem<dim>::output_results(const unsigned int cycle) const
   {
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
+    data_out.attach_dof_handler(dof_handler);
 
     std::vector<std::string> solution_names;
     switch (dim)
@@ -556,7 +556,7 @@ namespace Step8
         solution_names.emplace_back("z_displacement");
         break;
       default:
-        Assert (false, ExcNotImplemented());
+        Assert(false, ExcNotImplemented());
       }
 
     // After setting up the names for the different components of the
@@ -567,11 +567,11 @@ namespace Step8
     // string there. (In fact, the function we had used before would
     // convert the single string into a vector with only one element
     // and forwards that to the other function.)
-    data_out.add_data_vector (solution, solution_names);
-    data_out.build_patches ();
+    data_out.add_data_vector(solution, solution_names);
+    data_out.build_patches();
 
-    std::ofstream output ("solution-" + std::to_string(cycle) + ".vtk");
-    data_out.write_vtk (output);
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
+    data_out.write_vtk(output);
   }
 
 
@@ -616,7 +616,7 @@ namespace Step8
   // to see the right hand side. Thus, we refine twice globally. (Any larger
   // number of global refinement steps would of course also work.)
   template <int dim>
-  void ElasticProblem<dim>::run ()
+  void ElasticProblem<dim>::run()
   {
     for (unsigned int cycle=0; cycle<8; ++cycle)
       {
@@ -624,25 +624,25 @@ namespace Step8
 
         if (cycle == 0)
           {
-            GridGenerator::hyper_cube (triangulation, -1, 1);
-            triangulation.refine_global (2);
+            GridGenerator::hyper_cube(triangulation, -1, 1);
+            triangulation.refine_global(2);
           }
         else
-          refine_grid ();
+          refine_grid();
 
         std::cout << "   Number of active cells:       "
                   << triangulation.n_active_cells()
                   << std::endl;
 
-        setup_system ();
+        setup_system();
 
         std::cout << "   Number of degrees of freedom: "
                   << dof_handler.n_dofs()
                   << std::endl;
 
-        assemble_system ();
-        solve ();
-        output_results (cycle);
+        assemble_system();
+        solve();
+        output_results(cycle);
       }
   }
 }
@@ -652,12 +652,12 @@ namespace Step8
 // After closing the <code>Step8</code> namespace in the last line above, the
 // following is the main function of the program and is again exactly like in
 // step-6 (apart from the changed class names, of course).
-int main ()
+int main()
 {
   try
     {
       Step8::ElasticProblem<2> elastic_problem_2d;
-      elastic_problem_2d.run ();
+      elastic_problem_2d.run();
     }
   catch (std::exception &exc)
     {

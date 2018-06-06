@@ -263,11 +263,11 @@ namespace Step44
 
         prm.declare_entry("Residual", "1e-6",
                           Patterns::Double(0.0),
-                          "Linear solver residual (scaled by residual norm)");
+                          "Linear solver residual(scaled by residual norm)");
 
         prm.declare_entry("Max iteration multiplier", "1",
                           Patterns::Double(0.0),
-                          "Linear solver iterations (multiples of the system matrix size)");
+                          "Linear solver iterations(multiples of the system matrix size)");
 
         prm.declare_entry("Use static condensation", "true",
                           Patterns::Bool(),
@@ -444,8 +444,8 @@ namespace Step44
   class Time
   {
   public:
-    Time (const double time_end,
-          const double delta_t)
+    Time(const double time_end,
+         const double delta_t)
       :
       timestep(0),
       time_current(0.0),
@@ -707,7 +707,7 @@ namespace Step44
     // values and stresses based on the current deformation measure
     // $\textrm{Grad}\mathbf{u}_{\textrm{n}}$, pressure $\widetilde{p}$ and
     // dilation $\widetilde{J}$ field values.
-    void setup_lqp (const Parameters::AllParameters &parameters)
+    void setup_lqp(const Parameters::AllParameters &parameters)
     {
       material = std::make_shared<Material_Compressible_Neo_Hook_Three_Field<dim>>
                  (parameters.mu, parameters.nu);
@@ -728,9 +728,9 @@ namespace Step44
     // general, the conversion to SymmetricTensor will fail. We can avoid this
     // back and forth by converting $I$ to Tensor first, and then performing
     // the addition as between nonsymmetric tensors:
-    void update_values (const Tensor<2, dim> &Grad_u_n,
-                        const double p_tilde,
-                        const double J_tilde)
+    void update_values(const Tensor<2, dim> &Grad_u_n,
+                       const double p_tilde,
+                       const double J_tilde)
     {
       const Tensor<2, dim> F = Physics::Elasticity::Kinematics::F(Grad_u_n);
       material->update_material_data(F, p_tilde, J_tilde);
@@ -1057,7 +1057,7 @@ namespace Step44
 
     // Compute the volume in the spatial configuration
     double
-    compute_vol_current () const;
+    compute_vol_current() const;
 
     // Print information to screen in a pleasing way...
     static
@@ -1096,15 +1096,15 @@ namespace Step44
        FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1, // pressure
        FE_DGPMonomial<dim>(parameters.poly_degree - 1), 1), // dilatation
     dof_handler_ref(triangulation),
-    dofs_per_cell (fe.dofs_per_cell),
+    dofs_per_cell(fe.dofs_per_cell),
     u_fe(first_u_component),
     p_fe(p_component),
     J_fe(J_component),
     dofs_per_block(n_blocks),
     qf_cell(parameters.quad_order),
     qf_face(parameters.quad_order),
-    n_q_points (qf_cell.size()),
-    n_q_points_f (qf_face.size())
+    n_q_points(qf_cell.size()),
+    n_q_points_f(qf_face.size())
   {
     Assert(dim==2 || dim==3, ExcMessage("This problem only works in 2 or 3 space dimensions."));
     determine_component_extractors();
@@ -1154,13 +1154,13 @@ namespace Step44
       constraints.close();
 
       const ComponentSelectFunction<dim>
-      J_mask (J_component, n_components);
+      J_mask(J_component, n_components);
 
-      VectorTools::project (dof_handler_ref,
-                            constraints,
-                            QGauss<dim>(degree+2),
-                            J_mask,
-                            solution_n);
+      VectorTools::project(dof_handler_ref,
+                           constraints,
+                           QGauss<dim>(degree+2),
+                           J_mask,
+                           solution_n);
     }
     output_results();
     time.increment();
@@ -1508,7 +1508,7 @@ namespace Step44
                                    (dim==3 ? Point<dim>(1.0, 1.0, 1.0) : Point<dim>(1.0, 1.0)),
                                    true);
     GridTools::scale(parameters.scale, triangulation);
-    triangulation.refine_global(std::max (1U, parameters.global_refinement));
+    triangulation.refine_global(std::max(1U, parameters.global_refinement));
 
     vol_reference = GridTools::volume(triangulation);
     std::cout << "Grid:\n\t Reference volume: " << vol_reference << std::endl;
@@ -1893,8 +1893,8 @@ namespace Step44
     // exception object that identify the location (filename and line number)
     // where the exception was raised to make it simpler to identify where the
     // problem happened.
-    AssertThrow (newton_iteration < parameters.max_iterations_NR,
-                 ExcMessage("No convergence in nonlinear solver!"));
+    AssertThrow(newton_iteration < parameters.max_iterations_NR,
+                ExcMessage("No convergence in nonlinear solver!"));
   }
 
 
@@ -3054,8 +3054,8 @@ namespace Step44
               // problem on a single-thread machine.  However, this might not be
               // true for different problem sizes.
               PreconditionSelector<SparseMatrix<double>, Vector<double> >
-              preconditioner (parameters.preconditioner_type,
-                              parameters.preconditioner_relaxation);
+              preconditioner(parameters.preconditioner_type,
+                             parameters.preconditioner_relaxation);
               preconditioner.use_matrix(tangent_matrix.block(u_dof, u_dof));
 
               solver_CG.solve(tangent_matrix.block(u_dof, u_dof),
@@ -3079,7 +3079,7 @@ namespace Step44
               lin_res = 0.0;
             }
           else
-            Assert (false, ExcMessage("Linear solver type not implemented"));
+            Assert(false, ExcMessage("Linear solver type not implemented"));
 
           timer.leave_subsection();
         }
@@ -3248,10 +3248,10 @@ namespace Step44
             // when a higher order ansatz it used, nearly diagonal), a Jacobi preconditioner
             // is suitable.
             PreconditionSelector< SparseMatrix<double>, Vector<double> >
-            preconditioner_K_Jp_inv ("jacobi");
+            preconditioner_K_Jp_inv("jacobi");
             preconditioner_K_Jp_inv.use_matrix(tangent_matrix.block(J_dof, p_dof));
-            ReductionControl solver_control_K_Jp_inv (tangent_matrix.block(J_dof, p_dof).m() * parameters.max_iterations_lin,
-                                                      1.0e-30, parameters.tol_lin);
+            ReductionControl solver_control_K_Jp_inv(tangent_matrix.block(J_dof, p_dof).m() * parameters.max_iterations_lin,
+                                                     1.0e-30, parameters.tol_lin);
             SolverSelector< Vector<double> > solver_K_Jp_inv;
             solver_K_Jp_inv.select("cg");
             solver_K_Jp_inv.set_control(solver_control_K_Jp_inv);
@@ -3283,11 +3283,11 @@ namespace Step44
             // $\mathsf{\mathbf{K}}_{uu}$ operate on the same space, it remains adequate
             // for this problem.
             PreconditionSelector< SparseMatrix<double>, Vector<double> >
-            preconditioner_K_con_inv (parameters.preconditioner_type,
-                                      parameters.preconditioner_relaxation);
+            preconditioner_K_con_inv(parameters.preconditioner_type,
+                                     parameters.preconditioner_relaxation);
             preconditioner_K_con_inv.use_matrix(tangent_matrix.block(u_dof, u_dof));
-            ReductionControl solver_control_K_con_inv (tangent_matrix.block(u_dof, u_dof).m() * parameters.max_iterations_lin,
-                                                       1.0e-30, parameters.tol_lin);
+            ReductionControl solver_control_K_con_inv(tangent_matrix.block(u_dof, u_dof).m() * parameters.max_iterations_lin,
+                                                      1.0e-30, parameters.tol_lin);
             SolverSelector< Vector<double> > solver_K_con_inv;
             solver_K_con_inv.select("cg");
             solver_K_con_inv.set_control(solver_control_K_con_inv);
@@ -3333,7 +3333,7 @@ namespace Step44
             std::cout << " -- " << std::flush;
           }
         else
-          Assert (false, ExcMessage("Linear solver type not implemented"));
+          Assert(false, ExcMessage("Linear solver type not implemented"));
 
         timer.leave_subsection();
 
@@ -3383,11 +3383,11 @@ namespace Step44
     MappingQEulerian<dim> q_mapping(degree, dof_handler_ref, soln);
     data_out.build_patches(q_mapping, degree);
 
-    std::ofstream output ("solution-"
-                          + std::to_string(dim)
-                          + "d-"
-                          + std::to_string(time.get_timestep())
-                          + ".vtk");
+    std::ofstream output("solution-"
+                         + std::to_string(dim)
+                         + "d-"
+                         + std::to_string(time.get_timestep())
+                         + ".vtk");
     data_out.write_vtk(output);
   }
 
@@ -3397,7 +3397,7 @@ namespace Step44
 // @sect3{Main function}
 // Lastly we provide the main driver function which appears
 // no different to the other tutorials.
-int main ()
+int main()
 {
   using namespace dealii;
   using namespace Step44;

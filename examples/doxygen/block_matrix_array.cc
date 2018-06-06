@@ -58,7 +58,7 @@ double Cdata[2][2] =
   {1., 8.}
 };
 
-int main ()
+int main()
 {
   FullMatrix<float> A(4,4);
   FullMatrix<float> B1(4,2);

@@ -66,14 +66,14 @@ using namespace dealii;
 // This is the function that produced the circular grid in the previous step-1
 // example program with fewer refinements steps. The sole difference is that it
 // returns the grid it produces via its argument.
-void make_grid (Triangulation<2> &triangulation)
+void make_grid(Triangulation<2> &triangulation)
 {
-  const Point<2> center (1,0);
+  const Point<2> center(1,0);
   const double inner_radius = 0.5,
                outer_radius = 1.0;
-  GridGenerator::hyper_shell (triangulation,
-                              center, inner_radius, outer_radius,
-                              5 );
+  GridGenerator::hyper_shell(triangulation,
+                             center, inner_radius, outer_radius,
+                             5 );
 
   for (unsigned int step=0; step<3; ++step)
     {
@@ -83,16 +83,16 @@ void make_grid (Triangulation<2> &triangulation)
              ++v)
           {
             const double distance_from_center
-              = center.distance (cell->vertex(v));
+              = center.distance(cell->vertex(v));
 
             if (std::fabs(distance_from_center - inner_radius) < 1e-10)
               {
-                cell->set_refine_flag ();
+                cell->set_refine_flag();
                 break;
               }
           }
 
-      triangulation.execute_coarsening_and_refinement ();
+      triangulation.execute_coarsening_and_refinement();
     }
 }
 
@@ -127,10 +127,10 @@ void make_grid (Triangulation<2> &triangulation)
 // <code>DoFHandler</code> object to allocate storage for the degrees of
 // freedom (in deal.II lingo: we <i>distribute degrees of
 // freedom</i>).
-void distribute_dofs (DoFHandler<2> &dof_handler)
+void distribute_dofs(DoFHandler<2> &dof_handler)
 {
   const FE_Q<2> finite_element(1);
-  dof_handler.distribute_dofs (finite_element);
+  dof_handler.distribute_dofs(finite_element);
 
   // Now that we have associated a degree of freedom with a global number to
   // each vertex, we wonder how to visualize this?  There is no simple way to
@@ -178,17 +178,17 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 
   // We then fill this object with the places where nonzero elements will be
   // located given the present numbering of degrees of freedom:
-  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
+  DoFTools::make_sparsity_pattern(dof_handler, dynamic_sparsity_pattern);
 
   // Now we are ready to create the actual sparsity pattern that we could
   // later use for our matrix. It will just contain the data already assembled
   // in the DynamicSparsityPattern.
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
+  sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
   // With this, we can now write the results to a file:
-  std::ofstream out ("sparsity_pattern1.svg");
-  sparsity_pattern.print_svg (out);
+  std::ofstream out("sparsity_pattern1.svg");
+  sparsity_pattern.print_svg(out);
   // The result is stored in an <code>.svg</code> file, where each nonzero entry in the
   // matrix corresponds with a red square in the image. The output will be
   // shown below.
@@ -232,19 +232,19 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 // more localized around the diagonal. The only interesting part of the
 // function is the first call to <code>DoFRenumbering::Cuthill_McKee</code>,
 // the rest is essentially as before:
-void renumber_dofs (DoFHandler<2> &dof_handler)
+void renumber_dofs(DoFHandler<2> &dof_handler)
 {
-  DoFRenumbering::Cuthill_McKee (dof_handler);
+  DoFRenumbering::Cuthill_McKee(dof_handler);
 
   DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
                                                   dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
+  DoFTools::make_sparsity_pattern(dof_handler, dynamic_sparsity_pattern);
 
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
+  sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
-  std::ofstream out ("sparsity_pattern2.svg");
-  sparsity_pattern.print_svg (out);
+  std::ofstream out("sparsity_pattern2.svg");
+  sparsity_pattern.print_svg(out);
 }
 
 // Again, the output is shown below. Note that the nonzero entries are
@@ -270,13 +270,13 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 // and create the triangulation, then create a <code>DoFHandler</code> object
 // and associate it to the triangulation, and finally call above two functions
 // on it:
-int main ()
+int main()
 {
   Triangulation<2> triangulation;
-  make_grid (triangulation);
+  make_grid(triangulation);
 
-  DoFHandler<2> dof_handler (triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
-  distribute_dofs (dof_handler);
-  renumber_dofs (dof_handler);
+  distribute_dofs(dof_handler);
+  renumber_dofs(dof_handler);
 }
