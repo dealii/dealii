@@ -2220,7 +2220,7 @@ namespace Step44
             const unsigned int component_i = fe.system_to_component_index(i).first;
             const unsigned int i_group     = fe.system_to_base_index(i).first.first;
 
-            for (unsigned int j = 0; j < = i; ++j)
+            for (unsigned int j = 0; j <= i; ++j)
               {
                 const unsigned int component_j = fe.system_to_component_index(j).first;
                 const unsigned int j_group     = fe.system_to_base_index(j).first.first;

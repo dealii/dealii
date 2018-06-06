@@ -556,7 +556,7 @@ namespace Step45
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  for (unsigned int j = 0; j < = i; ++j)
+                  for (unsigned int j = 0; j <= i; ++j)
                     {
                       local_matrix(i,j) += (symgrad_phi_u[i] * symgrad_phi_u[j]
                                             - div_phi_u[i] * phi_p[j]

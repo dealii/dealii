@@ -633,10 +633,10 @@ namespace Step59
   // function. The only difference is the fact that we do not have a separate
   // FEFaceEvaluation object that provides us with exterior values $u^+$, but
   // we must define them from the boundary conditions and interior values
-  // $u^-$. As explained in the introduction, we use $u^+ = -u^- + 2
-  // g_\text{D}$ and $\mathbf{n}^-\cdot \nabla u^+ = \mathbf{n}^-\cdot \nabla
+  // $u^-$. As explained in the introduction, we use $u^+= -u^- + 2
+  // g_\text{D}$ and $\mathbf{n}^-\cdot \nabla u^+= \mathbf{n}^-\cdot \nabla
   // u^-$ on Dirichlet boundaries and $u^+=u^-$ and $\mathbf{n}^-\cdot \nabla
-  // u^+ = -\mathbf{n}^-\cdot \nabla u^- + 2 g_\text{N}$ on Neumann
+  // u^+= -\mathbf{n}^-\cdot \nabla u^- + 2 g_\text{N}$ on Neumann
   // boundaries. Since this operation implements the homogeneous part, i.e.,
   // the matrix-vector product, we must neglect the boundary functions
   // $g_\text{D}$ and $g_\text{N}$ here, and added them to the right hand side
@@ -842,7 +842,7 @@ namespace Step59
               for (unsigned int j = 0; j < N; ++j)
                 laplace_matrices[d](i, j) = scaling_factor * laplace_unscaled(i, j);
           }
-        if (cell_matrices.size() < = phi.get_mapping_data_index_offset())
+        if (cell_matrices.size() <= phi.get_mapping_data_index_offset())
           cell_matrices.resize(phi.get_mapping_data_index_offset() + 1);
         cell_matrices[phi.get_mapping_data_index_offset()]
         .reinit(mass_matrices, laplace_matrices);
@@ -1088,9 +1088,9 @@ namespace Step59
     // Secondly, we also need to apply the Dirichlet and Neumann boundary
     // conditions. This function is the missing part of to the function
     // `LaplaceOperator::apply_boundary()` function once the exterior solution
-    // values $u^+ = -u^- + 2 g_\text{D}$ and $\mathbf{n}^-\cdot \nabla u^+ =
+    // values $u^+= -u^- + 2 g_\text{D}$ and $\mathbf{n}^-\cdot \nabla u^+=
     // \mathbf{n}^-\cdot \nabla u^-$ on Dirichlet boundaries and $u^+=u^-$ and
-    // $\mathbf{n}^-\cdot \nabla u^+ = -\mathbf{n}^-\cdot \nabla u^- + 2
+    // $\mathbf{n}^-\cdot \nabla u^+= -\mathbf{n}^-\cdot \nabla u^- + 2
     // g_\text{N}$ on Neumann boundaries are inserted and expanded in terms of
     // the boundary functions $g_\text{D}$ and $g_\text{N}$. One thing to
     // remember is that we move the boundary conditions to the right hand

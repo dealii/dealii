@@ -596,7 +596,7 @@ namespace Step42
         return p(1);
       else if (component == 2)
         {
-          if (p(0) > = 0.0 && p(0) < = 1.0 && p(1) > = 0.0 && p(1) < = 1.0)
+          if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
             return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
         }
 
@@ -1734,7 +1734,7 @@ namespace Step42
 
     IndexSet old_active_set(active_set);
 
-    for (unsigned int newton_step = 1; newton_step < = 100; ++newton_step)
+    for (unsigned int newton_step = 1; newton_step <= 100; ++newton_step)
       {
         if (newton_step == 1
             &&

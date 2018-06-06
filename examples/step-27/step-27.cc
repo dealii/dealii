@@ -194,7 +194,7 @@ namespace Step27
     dof_handler(triangulation),
     max_degree(dim <= 2 ? 7 : 5)
   {
-    for (unsigned int degree = 2; degree < = max_degree; ++degree)
+    for (unsigned int degree = 2; degree <= max_degree; ++degree)
       {
         fe_collection.push_back(FE_Q<dim>(degree));
         quadrature_collection.push_back(QGauss<dim>(degree + 1));

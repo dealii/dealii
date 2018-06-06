@@ -682,7 +682,7 @@ namespace Step57
                 // that the new residual is smaller than the one of last step, which is done
                 // in the following loop. Also the line search method can be located in step-15.
 
-                for (double alpha = 1.0; alpha > 1e-5; alpha * = 0.5)
+                for (double alpha = 1.0; alpha > 1e-5; alpha *= 0.5)
                   {
                     evaluation_point = present_solution;
                     evaluation_point.add(alpha, newton_update);
@@ -707,7 +707,7 @@ namespace Step57
               {
                 output_results(max_iteration * refinement + outer_iteration);
 
-                if (current_res < = tolerance)
+                if (current_res <= tolerance)
                   process_solution(refinement);
               }
           }
@@ -799,7 +799,7 @@ namespace Step57
 
     f << std::scientific;
 
-    for (unsigned int i = 0; i < = 100; ++i)
+    for (unsigned int i = 0; i <= 100; ++i)
       {
         p(dim - 1) = i / 100.0;
 

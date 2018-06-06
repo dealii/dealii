@@ -497,7 +497,7 @@ namespace Step24
     Vector<double> G2(solution_v.size());
 
     const double end_time = 0.7;
-    for (time = time_step; time < = end_time; time + = time_step, ++timestep_number)
+    for (time = time_step; time <= end_time; time += time_step, ++timestep_number)
       {
         std::cout << std::endl;
         std::cout << "time_step " << timestep_number << " @ t=" << time << std::endl;

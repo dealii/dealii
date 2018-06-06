@@ -152,7 +152,7 @@ namespace Step26
     const double time                = this->get_time();
     const double point_within_period = (time / period - std::floor(time / period));
 
-    if ((point_within_period > = 0.0) && (point_within_period < = 0.2))
+    if ((point_within_period >= 0.0) && (point_within_period <= 0.2))
       {
         if ((p[0] > 0.5) && (p[1] > -0.5))
           return 1;
@@ -475,7 +475,7 @@ namespace Step26
     // Recall that it contains the term $MU^{n-1}-(1-\theta)k_n AU^{n-1}$.
     // We put these terms into the variable system_rhs, with the
     // help of a temporary vector:
-    while (time < = 0.5)
+    while (time <= 0.5)
       {
         time += time_step;
         ++timestep_number;
@@ -502,7 +502,7 @@ namespace Step26
                                             rhs_function,
                                             tmp);
         forcing_terms   = tmp;
-        forcing_terms * = time_step * theta;
+        forcing_terms *= time_step * theta;
 
         rhs_function.set_time(time - time_step);
         VectorTools::create_right_hand_side(dof_handler,

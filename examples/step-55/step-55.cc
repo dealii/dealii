@@ -818,7 +818,7 @@ namespace Step55
         assemble_system();
         solve();
 
-        if (Utilities::MPI::n_mpi_processes(mpi_communicator) < = 32)
+        if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
           {
             TimerOutput::Scope t(computing_timer, "output");
             output_results(cycle);

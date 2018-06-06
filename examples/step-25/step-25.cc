@@ -624,7 +624,7 @@ namespace Step25
     // of the problem, and then advance our solution according to the time
     // stepping formulas we discussed in the Introduction.
     unsigned int timestep_number = 1;
-    for (time + = time_step; time < = final_time; time + = time_step, ++timestep_number)
+    for (time += time_step; time <= final_time; time += time_step, ++timestep_number)
       {
         old_solution = solution;
 

@@ -3724,7 +3724,7 @@ int main(int argc, char *argv[])
                                                           numbers::invalid_unsigned_int);
 
       std::string parameter_filename;
-      if (argc > = 2)
+      if (argc >= 2)
         parameter_filename = argv[1];
       else
         parameter_filename = "step-32.prm";

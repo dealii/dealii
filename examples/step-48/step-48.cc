@@ -586,7 +586,7 @@ namespace Step48
     Timer  timer;
     double wtime       = 0;
     double output_time = 0;
-    for (time + = time_step; time < = final_time; time + = time_step, ++timestep_number)
+    for (time += time_step; time <= final_time; time += time_step, ++timestep_number)
       {
         timer.restart();
         old_old_solution.swap(old_solution);

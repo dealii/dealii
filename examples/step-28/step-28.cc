@@ -1370,9 +1370,9 @@ namespace Step28
 
     std::vector<unsigned int> n_subdivisions;
     n_subdivisions.push_back(assemblies_x * rods_per_assembly_x);
-    if (dim > = 2)
+    if (dim >= 2)
       n_subdivisions.push_back(assemblies_y * rods_per_assembly_y);
-    if (dim > = 3)
+    if (dim >= 3)
       n_subdivisions.push_back(assemblies_z);
 
     Triangulation<dim> coarse_grid;

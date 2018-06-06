@@ -1846,7 +1846,7 @@ namespace Step31
     old_time_step                 = time_step;
     const double maximal_velocity = get_maximal_velocity();
 
-    if (maximal_velocity > = 0.01)
+    if (maximal_velocity >= 0.01)
       time_step = 1./(1.7*dim*std::sqrt(1.*dim)) /
                   temperature_degree *
                   GridTools::minimal_cell_diameter(triangulation) /
@@ -2191,7 +2191,7 @@ namespace Step31
         old_temperature_solution     = temperature_solution;
       }
     // Do all the above until we arrive at time 100.
-    while (time < = 100);
+    while (time <= 100);
   }
 } // namespace Step31
 

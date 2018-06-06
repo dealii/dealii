@@ -1135,7 +1135,7 @@ namespace Step43
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 const double old_s = old_saturation_values[q];
-                for (unsigned int j = 0; j < = i; ++j)
+                for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i,j) += (phi_u[i] * k_inverse_values[q] *
                                           mobility_inverse(old_s,viscosity) * phi_u[j]
@@ -1872,7 +1872,7 @@ namespace Step43
   bool
   TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity() const
   {
-    if (timestep_number < = 2)
+    if (timestep_number <= 2)
       return true;
 
     const QGauss<dim>  quadrature_formula(saturation_degree + 2);
@@ -2231,7 +2231,7 @@ namespace Step43
         old_old_saturation_solution = old_saturation_solution;
         old_saturation_solution     = saturation_solution;
       }
-    while (time < = end_time);
+    while (time <= end_time);
   }
 } // namespace Step43
 

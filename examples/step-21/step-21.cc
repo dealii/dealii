@@ -1268,7 +1268,7 @@ namespace Step21
                   << std::endl
                   << std::endl;
       }
-    while (time < = 1.);
+    while (time <= 1.);
   }
 } // namespace Step21
 

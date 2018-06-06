@@ -445,7 +445,7 @@ int main()
       // but create an unnamed such object and call the <code>run</code>
       // function of it, subsequent to which it is immediately destroyed
       // again.
-      for (unsigned int mapping_degree = 1; mapping_degree < = 3; ++mapping_degree)
+      for (unsigned int mapping_degree = 1; mapping_degree <= 3; ++mapping_degree)
         Step11::LaplaceProblem<2>(mapping_degree).run();
     }
   catch (std::exception &exc)

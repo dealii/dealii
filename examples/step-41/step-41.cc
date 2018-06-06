@@ -634,7 +634,7 @@ namespace Step41
     setup_system();
 
     IndexSet active_set_old(active_set);
-    for (unsigned int iteration = 0; iteration < = solution.size(); ++iteration)
+    for (unsigned int iteration = 0; iteration <= solution.size(); ++iteration)
       {
         std::cout << "Newton iteration " << iteration << std::endl;
 

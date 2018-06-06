@@ -658,7 +658,7 @@ namespace Step56
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
-                for (unsigned int j = 0; j < = i; ++j)
+                for (unsigned int j = 0; j <= i; ++j)
                   {
                     local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                           - div_phi_u[i] * phi_p[j]
@@ -756,7 +756,7 @@ namespace Step56
               symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              for (unsigned int j = 0; j < = i; ++j)
+              for (unsigned int j = 0; j <= i; ++j)
                 {
                   cell_matrix(i,j) += (symgrad_phi_u[i]
                                        * symgrad_phi_u[j])

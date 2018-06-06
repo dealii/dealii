@@ -961,7 +961,7 @@ namespace Step35
     const unsigned int n_steps = static_cast<unsigned int>((T - t_0) / dt);
     vel_exact.set_time(2. * dt);
     output_results(1);
-    for (unsigned int n = 2; n < = n_steps; ++n)
+    for (unsigned int n = 2; n <= n_steps; ++n)
       {
         if (n % output_interval == 0)
           {
