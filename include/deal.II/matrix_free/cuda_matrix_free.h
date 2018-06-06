@@ -307,17 +307,21 @@ namespace CUDAWrappers
 
 
   // This function determines the number of cells per block, possibly at compile
-  // time
+  // time (by virtue of being 'constexpr')
   // TODO this function should be rewritten using meta-programming
   __host__ __device__ constexpr unsigned int
            cells_per_block_shmem(int dim, int fe_degree)
   {
-    return dim == 2 ?
-             (fe_degree == 1 ?
-                32 :
-                fe_degree == 2 ? 8 :
-                                 fe_degree == 3 ? 4 : fe_degree == 4 ? 4 : 1) :
-             dim == 3 ? (fe_degree == 1 ? 8 : fe_degree == 2 ? 2 : 1) : 1;
+    /* clang-format off */
+    return dim==2 ? (fe_degree==1 ? 32 :
+                     fe_degree==2 ? 8 :
+                     fe_degree==3 ? 4 :
+                     fe_degree==4 ? 4 :
+                     1) :
+           dim==3 ? (fe_degree==1 ? 8 :
+                     fe_degree==2 ? 2 :
+                     1) : 1;
+    /* clang-format on */
   }
 } // namespace CUDAWrappers
 
