@@ -116,23 +116,23 @@ namespace Step50
     void refine_grid();
     void output_results(const unsigned int cycle) const;
 
-    ConditionalOStream                        pcout;
+    ConditionalOStream pcout;
 
-    parallel::distributed::Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>    mg_dof_handler;
+    parallel::distributed::Triangulation<dim> triangulation;
+    FE_Q<dim>                                 fe;
+    DoFHandler<dim>                           mg_dof_handler;
 
     typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector vector_t;
+    typedef LA::MPI::Vector       vector_t;
 
     matrix_t system_matrix;
 
     IndexSet locally_relevant_set;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix constraints;
 
-    vector_t       solution;
-    vector_t       system_rhs;
+    vector_t solution;
+    vector_t system_rhs;
 
     const unsigned int degree;
 
@@ -142,7 +142,7 @@ namespace Step50
     MGLevelObject<matrix_t> mg_matrices;
     MGLevelObject<matrix_t> mg_interface_matrices;
     //
-    MGConstrainedDoFs                    mg_constrained_dofs;
+    MGConstrainedDoFs mg_constrained_dofs;
   };
 
 
@@ -159,12 +159,12 @@ namespace Step50
   public:
     Coefficient() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
 
-    virtual void value_list(const std::vector<Point<dim> > &points,
-                            std::vector<double>            &values,
-                            const unsigned int              component = 0) const override;
+    virtual void value_list(const std::vector<Point<dim>> &points,
+                            std::vector<double> &          values,
+                            const unsigned int component = 0) const override;
   };
 
 
@@ -173,7 +173,7 @@ namespace Step50
   double Coefficient<dim>::value(const Point<dim> &p,
                                  const unsigned int) const
   {
-    if (p.square() < 0.5*0.5)
+    if (p.square() < 0.5 * 0.5)
       return 5;
     else
       return 1;
@@ -182,9 +182,9 @@ namespace Step50
 
 
   template <int dim>
-  void Coefficient<dim>::value_list(const std::vector<Point<dim> > &points,
-                                    std::vector<double>            &values,
-                                    const unsigned int              component) const
+  void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
+                                    std::vector<double> &          values,
+                                    const unsigned int component) const
   {
     (void)component;
     const unsigned int n_points = points.size();
@@ -235,7 +235,7 @@ namespace Step50
            == 0)),
     triangulation(MPI_COMM_WORLD,Triangulation<dim>::
                   limit_level_difference_at_vertices,
-                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
     fe(degree),
     mg_dof_handler(triangulation),
     degree(degree)
@@ -283,9 +283,9 @@ namespace Step50
     constraints.reinit(locally_relevant_set);
     DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
-    std::set<types::boundary_id>         dirichlet_boundary_ids;
-    typename FunctionMap<dim>::type      dirichlet_boundary;
-    Functions::ConstantFunction<dim>                    homogeneous_dirichlet_bc(1.0);
+    std::set<types::boundary_id>     dirichlet_boundary_ids;
+    typename FunctionMap<dim>::type  dirichlet_boundary;
+    Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(1.0);
     dirichlet_boundary_ids.insert(0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values(mg_dof_handler,
@@ -325,9 +325,9 @@ namespace Step50
     // can be destroyed upon resizing.
     const unsigned int n_levels = triangulation.n_global_levels();
 
-    mg_interface_matrices.resize(0, n_levels-1);
+    mg_interface_matrices.resize(0, n_levels - 1);
     mg_interface_matrices.clear_elements();
-    mg_matrices.resize(0, n_levels-1);
+    mg_matrices.resize(0, n_levels - 1);
     mg_matrices.clear_elements();
 
     // Now, we have to provide a matrix on each
@@ -368,8 +368,8 @@ namespace Step50
                                   MPI_COMM_WORLD, true);
 
         mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-                                            mg_dof_handler.locally_owned_mg_dofs(level),
-                                            dsp,
+          mg_dof_handler.locally_owned_mg_dofs(level),
+          dsp,
                                             MPI_COMM_WORLD, true);
       }
   }
@@ -396,17 +396,17 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::assemble_system()
   {
-    const QGauss<dim>  quadrature_formula(degree+1);
+    const QGauss<dim> quadrature_formula(degree + 1);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values    |  update_gradients |
-                            update_quadrature_points  |  update_JxW_values);
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs(dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -415,12 +415,12 @@ namespace Step50
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = mg_dof_handler.begin_active(),
-    endc = mg_dof_handler.end();
+                                                   endc = mg_dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
-          cell_rhs = 0;
+          cell_rhs    = 0;
 
           fe_values.reinit(cell);
 
@@ -432,7 +432,7 @@ namespace Step50
               {
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   cell_matrix(i,j) += (coefficient_values[q_point] *
-                                       fe_values.shape_grad(i,q_point) *
+                     fe_values.shape_grad(i, q_point) *
                                        fe_values.shape_grad(j,q_point) *
                                        fe_values.JxW(q_point));
 
@@ -472,16 +472,16 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid()
   {
-    QGauss<dim>  quadrature_formula(1+degree);
+    QGauss<dim> quadrature_formula(1 + degree);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values   | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
 
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-    const unsigned int   n_q_points      = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -559,7 +559,7 @@ namespace Step50
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i,j) += (coefficient_values[q_point] *
-                                     fe_values.shape_grad(i,q_point) *
+                   fe_values.shape_grad(i, q_point) *
                                      fe_values.shape_grad(j,q_point) *
                                      fe_values.JxW(q_point));
 
@@ -646,14 +646,14 @@ namespace Step50
                 }
               else
                 {
-                  cell_matrix(i,j) = 0;
+                  cell_matrix(i, j) = 0;
                 }
 
 
           empty_constraints
           .distribute_local_to_global(cell_matrix,
-                                      local_dof_indices,
-                                      mg_interface_matrices[cell->level()]);
+            local_dof_indices,
+            mg_interface_matrices[cell->level()]);
         }
 
     for (unsigned int i = 0; i < triangulation.n_global_levels(); ++i)
@@ -699,11 +699,11 @@ namespace Step50
 
     matrix_t &coarse_matrix = mg_matrices[0];
 
-    SolverControl coarse_solver_control(1000, 1e-10, false, false);
-    SolverCG<vector_t> coarse_solver(coarse_solver_control);
+    SolverControl        coarse_solver_control(1000, 1e-10, false, false);
+    SolverCG<vector_t>   coarse_solver(coarse_solver_control);
     PreconditionIdentity id;
     MGCoarseGridIterativeSolver<vector_t, SolverCG<vector_t>, matrix_t, PreconditionIdentity>
-    coarse_grid_solver(coarse_solver, coarse_matrix, id);
+      coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
     // The next component of a multilevel solver or preconditioner is
     // that we need a smoother on each level. A common choice for this
@@ -736,11 +736,11 @@ namespace Step50
     // preconditioner make sure that we get a
     // symmetric operator even for nonsymmetric
     // smoothers:
-    typedef LA::MPI::PreconditionJacobi Smoother;
+    typedef LA::MPI::PreconditionJacobi                  Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
-    //mg_smoother.set_symmetric(false);
+    // mg_smoother.set_symmetric(false);
 
     // The next preparatory step is that we
     // must wrap our level and interface
@@ -767,7 +767,7 @@ namespace Step50
                             mg_transfer,
                             mg_smoother,
                             mg_smoother);
-    //mg.set_debug(6);
+    // mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
@@ -777,7 +777,7 @@ namespace Step50
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl solver_control(500, 1e-8*system_rhs.l2_norm(), false);
+    SolverControl      solver_control(500, 1e-8 * system_rhs.l2_norm(), false);
     SolverCG<vector_t> solver(solver_control);
 
     if (false)
@@ -831,10 +831,10 @@ namespace Step50
     temp_solution = solution;
 
     KellyErrorEstimator<dim>::estimate(static_cast<DoFHandler<dim>&>(mg_dof_handler),
-                                       QGauss<dim-1>(degree+1),
-                                       typename FunctionMap<dim>::type(),
-                                       temp_solution,
-                                       estimated_error_per_cell);
+      QGauss<dim - 1>(degree + 1),
+      typename FunctionMap<dim>::type(),
+      temp_solution,
+      estimated_error_per_cell);
 
     parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_fraction(triangulation,
@@ -857,9 +857,9 @@ namespace Step50
 
 
     LA::MPI::Vector temp = solution;
-    system_matrix.residual(temp,solution,system_rhs);
+    system_matrix.residual(temp, solution, system_rhs);
     LA::MPI::Vector res_ghosted = temp_solution;
-    res_ghosted = temp;
+    res_ghosted                 = temp;
 
     data_out.attach_dof_handler(mg_dof_handler);
     data_out.add_data_vector(temp_solution, "solution");
@@ -876,7 +876,7 @@ namespace Step50
                                   "." +
                                   Utilities::int_to_string
                                   (triangulation.locally_owned_subdomain(), 4) +
-                                  ".vtu");
+       ".vtu");
     std::ofstream output(filename);
     data_out.write_vtu(output);
 
@@ -973,7 +973,7 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      LaplaceProblem<2> laplace_problem(1/*degree*/);
+      LaplaceProblem<2> laplace_problem(1 /*degree*/);
       laplace_problem.run();
     }
   catch (std::exception &exc)

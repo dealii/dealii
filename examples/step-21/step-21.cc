@@ -100,28 +100,28 @@ namespace Step21
     void run();
 
   private:
-    void make_grid_and_dofs();
-    void assemble_system();
-    void assemble_rhs_S ();
+    void   make_grid_and_dofs();
+    void   assemble_system();
+    void   assemble_rhs_S();
     double get_maximal_velocity() const;
-    void solve();
-    void project_back_saturation();
-    void output_results() const;
+    void   solve();
+    void   project_back_saturation();
+    void   output_results() const;
 
-    const unsigned int   degree;
+    const unsigned int degree;
 
-    Triangulation<dim>   triangulation;
-    FESystem<dim>        fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FESystem<dim>      fe;
+    DoFHandler<dim>    dof_handler;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
     const unsigned int n_refinement_steps;
 
-    double time_step;
+    double       time_step;
     unsigned int timestep_number;
-    double viscosity;
+    double       viscosity;
 
     BlockVector<double> solution;
     BlockVector<double> old_solution;
@@ -142,15 +142,15 @@ namespace Step21
   public:
     PressureRightHandSide() : Function<dim>(1) {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
   double
-  PressureRightHandSide<dim>::value(const Point<dim>  &/*p*/,
+  PressureRightHandSide<dim>::value(const Point<dim> & /*p*/,
                                     const unsigned int /*component*/) const
   {
     return 0;
@@ -167,17 +167,17 @@ namespace Step21
   public:
     PressureBoundaryValues() : Function<dim>(1) {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
   template <int dim>
   double
-  PressureBoundaryValues<dim>::value(const Point<dim>  &p,
+  PressureBoundaryValues<dim>::value(const Point<dim> &p,
                                      const unsigned int /*component*/) const
   {
-    return 1-p[0];
+    return 1 - p[0];
   }
 
 
@@ -194,8 +194,8 @@ namespace Step21
   public:
     SaturationBoundaryValues() : Function<dim>(1) {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
@@ -232,11 +232,11 @@ namespace Step21
   public:
     InitialValues() : Function<dim>(dim+2) {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double>   &value) const override;
+                              Vector<double> &  value) const override;
 
   };
 
@@ -244,18 +244,18 @@ namespace Step21
   template <int dim>
   double
   InitialValues<dim>::value(const Point<dim>  &p,
-                            const unsigned int component) const
+                                   const unsigned int component) const
   {
-    return Functions::ZeroFunction<dim>(dim+2).value(p, component);
+    return Functions::ZeroFunction<dim>(dim + 2).value(p, component);
   }
 
 
   template <int dim>
   void
   InitialValues<dim>::vector_value(const Point<dim> &p,
-                                   Vector<double>   &values) const
+                                        Vector<double> &  values) const
   {
-    Functions::ZeroFunction<dim>(dim+2).vector_value(p, values);
+    Functions::ZeroFunction<dim>(dim + 2).vector_value(p, values);
   }
 
 
@@ -278,7 +278,7 @@ namespace Step21
   namespace SingleCurvingCrack
   {
     template <int dim>
-    class KInverse : public TensorFunction<2,dim>
+    class KInverse : public TensorFunction<2, dim>
     {
     public:
       KInverse()
@@ -286,15 +286,15 @@ namespace Step21
         TensorFunction<2,dim> ()
       {}
 
-      virtual void value_list(const std::vector<Point<dim> > &points,
-                              std::vector<Tensor<2,dim> >    &values) const;
+      virtual void value_list(const std::vector<Point<dim>> &points,
+                              std::vector<Tensor<2, dim>> &  values) const;
     };
 
 
     template <int dim>
     void
     KInverse<dim>::value_list(const std::vector<Point<dim> > &points,
-                              std::vector<Tensor<2,dim> >    &values) const
+                                   std::vector<Tensor<2, dim>> &  values) const
     {
       Assert(points.size() == values.size(),
              ExcDimensionMismatch(points.size(), values.size()));
@@ -309,10 +309,10 @@ namespace Step21
           const double permeability = std::max(std::exp(-(distance_to_flowline*
                                                           distance_to_flowline)
                                                         / (0.1 * 0.1)),
-                                               0.01);
+                     0.01);
 
           for (unsigned int d = 0; d < dim; ++d)
-            values[p][d][d] = 1./permeability;
+            values[p][d][d] = 1. / permeability;
         }
     }
   }
@@ -353,7 +353,7 @@ namespace Step21
   namespace RandomMedium
   {
     template <int dim>
-    class KInverse : public TensorFunction<2,dim>
+    class KInverse : public TensorFunction<2, dim>
     {
     public:
       KInverse()
@@ -362,19 +362,19 @@ namespace Step21
       {}
 
       virtual void value_list(const std::vector<Point<dim> > &points,
-                              std::vector<Tensor<2,dim> >    &values) const override;
+                 std::vector<Tensor<2, dim>> &  values) const override;
 
     private:
-      static std::vector<Point<dim> > centers;
+      static std::vector<Point<dim>> centers;
 
-      static std::vector<Point<dim> > get_centers();
+      static std::vector<Point<dim>> get_centers();
     };
 
 
 
     template <int dim>
-    std::vector<Point<dim> >
-    KInverse<dim>::centers = KInverse<dim>::get_centers();
+    std::vector<Point<dim>>
+      KInverse<dim>::centers = KInverse<dim>::get_centers();
 
 
     template <int dim>
@@ -387,10 +387,10 @@ namespace Step21
                                100 :
                                throw ExcNotImplemented()));
 
-      std::vector<Point<dim> > centers_list(N);
+      std::vector<Point<dim>> centers_list(N);
       for (unsigned int i = 0; i < N; ++i)
         for (unsigned int d = 0; d < dim; ++d)
-          centers_list[i][d] = static_cast<double>(rand())/RAND_MAX;
+          centers_list[i][d] = static_cast<double>(rand()) / RAND_MAX;
 
       return centers_list;
     }
@@ -400,7 +400,7 @@ namespace Step21
     template <int dim>
     void
     KInverse<dim>::value_list(const std::vector<Point<dim> > &points,
-                              std::vector<Tensor<2,dim> >    &values) const
+                                   std::vector<Tensor<2, dim>> &  values) const
     {
       Assert(points.size() == values.size(),
              ExcDimensionMismatch(points.size(), values.size()));
@@ -418,7 +418,7 @@ namespace Step21
             = std::min(std::max(permeability, 0.01), 4.);
 
           for (unsigned int d = 0; d < dim; ++d)
-            values[p][d][d] = 1./normalized_permeability;
+            values[p][d][d] = 1. / normalized_permeability;
         }
     }
   }
@@ -433,13 +433,13 @@ namespace Step21
   double mobility_inverse(const double S,
                           const double viscosity)
   {
-    return 1.0 / (1.0/viscosity * S * S + (1-S) * (1-S));
+    return 1.0 / (1.0 / viscosity * S * S + (1 - S) * (1 - S));
   }
 
   double fractional_flow(const double S,
                          const double viscosity)
   {
-    return S*S / (S * S + viscosity * (1-S) * (1-S));
+    return S * S / (S * S + viscosity * (1 - S) * (1 - S));
   }
 
 
@@ -483,11 +483,11 @@ namespace Step21
 
 
   template <class MatrixType>
-  void InverseMatrix<MatrixType>::vmult(Vector<double>       &dst,
+  void InverseMatrix<MatrixType>::vmult(Vector<double> &      dst,
                                         const Vector<double> &src) const
   {
     SolverControl solver_control(std::max<unsigned int>(src.size(), 200),
-                                 1e-8*src.l2_norm());
+                                 1e-8 * src.l2_norm());
     SolverCG<>    cg(solver_control);
 
     dst = 0;
@@ -500,15 +500,15 @@ namespace Step21
   class SchurComplement : public Subscriptor
   {
   public:
-    SchurComplement(const BlockSparseMatrix<double> &A,
-                    const InverseMatrix<SparseMatrix<double> > &Minv);
+    SchurComplement(const BlockSparseMatrix<double> &          A,
+                    const InverseMatrix<SparseMatrix<double>> &Minv);
 
     void vmult(Vector<double>       &dst,
                const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double> > > m_inverse;
+    const SmartPointer<const BlockSparseMatrix<double>>           system_matrix;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double>>> m_inverse;
 
     mutable Vector<double> tmp1, tmp2;
   };
@@ -521,17 +521,17 @@ namespace Step21
     :
     system_matrix(&A),
     m_inverse(&Minv),
-    tmp1 (A.block(0,0).m()),
-    tmp2 (A.block(0,0).m())
+    tmp1(A.block(0, 0).m()),
+    tmp2(A.block(0, 0).m())
   {}
 
 
-  void SchurComplement::vmult(Vector<double>       &dst,
+  void SchurComplement::vmult(Vector<double> &      dst,
                               const Vector<double> &src) const
   {
-    system_matrix->block(0,1).vmult(tmp1, src);
+    system_matrix->block(0, 1).vmult(tmp1, src);
     m_inverse->vmult(tmp2, tmp1);
-    system_matrix->block(1,0).vmult(dst, tmp2);
+    system_matrix->block(1, 0).vmult(dst, tmp2);
   }
 
 
@@ -545,7 +545,7 @@ namespace Step21
                const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
 
     mutable Vector<double> tmp1, tmp2;
   };
@@ -555,17 +555,17 @@ namespace Step21
   ApproximateSchurComplement(const BlockSparseMatrix<double> &A)
     :
     system_matrix(&A),
-    tmp1 (A.block(0,0).m()),
-    tmp2 (A.block(0,0).m())
+    tmp1(A.block(0, 0).m()),
+    tmp2(A.block(0, 0).m())
   {}
 
 
-  void ApproximateSchurComplement::vmult(Vector<double>       &dst,
+  void ApproximateSchurComplement::vmult(Vector<double> &      dst,
                                          const Vector<double> &src) const
   {
-    system_matrix->block(0,1).vmult(tmp1, src);
-    system_matrix->block(0,0).precondition_Jacobi(tmp2, tmp1);
-    system_matrix->block(1,0).vmult(dst, tmp2);
+    system_matrix->block(0, 1).vmult(tmp1, src);
+    system_matrix->block(0, 0).precondition_Jacobi(tmp2, tmp1);
+    system_matrix->block(1, 0).vmult(dst, tmp2);
   }
 
 
@@ -616,11 +616,11 @@ namespace Step21
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::component_wise(dof_handler);
 
-    std::vector<types::global_dof_index> dofs_per_component(dim+2);
+    std::vector<types::global_dof_index> dofs_per_component(dim + 2);
     DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
     const unsigned int n_u = dofs_per_component[0],
                        n_p = dofs_per_component[dim],
-                       n_s = dofs_per_component[dim+1];
+                       n_s = dofs_per_component[dim + 1];
 
     std::cout << "Number of active cells: "
               << triangulation.n_active_cells()
@@ -634,16 +634,16 @@ namespace Step21
     const unsigned int
     n_couplings = dof_handler.max_couplings_between_dofs();
 
-    sparsity_pattern.reinit(3,3);
-    sparsity_pattern.block(0,0).reinit(n_u, n_u, n_couplings);
-    sparsity_pattern.block(1,0).reinit(n_p, n_u, n_couplings);
-    sparsity_pattern.block(2,0).reinit(n_s, n_u, n_couplings);
-    sparsity_pattern.block(0,1).reinit(n_u, n_p, n_couplings);
-    sparsity_pattern.block(1,1).reinit(n_p, n_p, n_couplings);
-    sparsity_pattern.block(2,1).reinit(n_s, n_p, n_couplings);
-    sparsity_pattern.block(0,2).reinit(n_u, n_s, n_couplings);
-    sparsity_pattern.block(1,2).reinit(n_p, n_s, n_couplings);
-    sparsity_pattern.block(2,2).reinit(n_s, n_s, n_couplings);
+    sparsity_pattern.reinit(3, 3);
+    sparsity_pattern.block(0, 0).reinit(n_u, n_u, n_couplings);
+    sparsity_pattern.block(1, 0).reinit(n_p, n_u, n_couplings);
+    sparsity_pattern.block(2, 0).reinit(n_s, n_u, n_couplings);
+    sparsity_pattern.block(0, 1).reinit(n_u, n_p, n_couplings);
+    sparsity_pattern.block(1, 1).reinit(n_p, n_p, n_couplings);
+    sparsity_pattern.block(2, 1).reinit(n_s, n_p, n_couplings);
+    sparsity_pattern.block(0, 2).reinit(n_u, n_s, n_couplings);
+    sparsity_pattern.block(1, 2).reinit(n_p, n_s, n_couplings);
+    sparsity_pattern.block(2, 2).reinit(n_s, n_s, n_couplings);
 
     sparsity_pattern.collect_sizes();
 
@@ -693,26 +693,26 @@ namespace Step21
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_system()
   {
-    system_matrix=0;
-    system_rhs=0;
+    system_matrix = 0;
+    system_rhs    = 0;
 
-    QGauss<dim>   quadrature_formula(degree+2);
-    QGauss<dim-1> face_quadrature_formula(degree+2);
+    QGauss<dim>     quadrature_formula(degree + 2);
+    QGauss<dim - 1> face_quadrature_formula(degree + 2);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values    | update_gradients |
-                            update_quadrature_points  | update_JxW_values);
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values(fe, face_quadrature_formula,
-                                     update_values    | update_normal_vectors |
+                                     update_values | update_normal_vectors |
                                      update_quadrature_points  | update_JxW_values);
 
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-    const unsigned int   n_q_points      = quadrature_formula.size();
-    const unsigned int   n_face_q_points = face_quadrature_formula.size();
+    const unsigned int n_q_points      = quadrature_formula.size();
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-    FullMatrix<double>   local_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>       local_rhs(dofs_per_cell);
+    FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     local_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -720,9 +720,9 @@ namespace Step21
     const PressureBoundaryValues<dim> pressure_boundary_values;
     const RandomMedium::KInverse<dim> k_inverse;
 
-    std::vector<double>               pressure_rhs_values(n_q_points);
-    std::vector<double>               boundary_values(n_face_q_points);
-    std::vector<Tensor<2,dim> >       k_inverse_values(n_q_points);
+    std::vector<double>         pressure_rhs_values(n_q_points);
+    std::vector<double>         boundary_values(n_face_q_points);
+    std::vector<Tensor<2, dim>> k_inverse_values(n_q_points);
 
     std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
     std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
@@ -730,16 +730,16 @@ namespace Step21
 
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
-    const FEValuesExtractors::Scalar saturation(dim+1);
+    const FEValuesExtractors::Scalar saturation(dim + 1);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         local_matrix = 0;
-        local_rhs = 0;
+        local_rhs    = 0;
 
         // Here's the first significant difference: We have to get the values
         // of the saturation function of the previous time step at the
@@ -768,19 +768,19 @@ namespace Step21
         for (unsigned int q = 0; q < n_q_points; ++q)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const double old_s = old_solution_values[q](dim+1);
+              const double old_s = old_solution_values[q](dim + 1);
 
-              const Tensor<1,dim> phi_i_u      = fe_values[velocities].value(i, q);
-              const double        div_phi_i_u  = fe_values[velocities].divergence(i, q);
-              const double        phi_i_p      = fe_values[pressure].value(i, q);
-              const double        phi_i_s      = fe_values[saturation].value(i, q);
+              const Tensor<1, dim> phi_i_u = fe_values[velocities].value(i, q);
+              const double div_phi_i_u = fe_values[velocities].divergence(i, q);
+              const double phi_i_p     = fe_values[pressure].value(i, q);
+              const double phi_i_s     = fe_values[saturation].value(i, q);
 
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
                   const Tensor<1,dim> phi_j_u     = fe_values[velocities].value(j, q);
                   const double        div_phi_j_u = fe_values[velocities].divergence(j, q);
-                  const double        phi_j_p     = fe_values[pressure].value(j, q);
-                  const double        phi_j_s     = fe_values[saturation].value(j, q);
+                  const double phi_j_p = fe_values[pressure].value(j, q);
+                  const double phi_j_s = fe_values[saturation].value(j, q);
 
                   local_matrix(i,j) += (phi_i_u * k_inverse_values[q] *
                                         mobility_inverse(old_s,viscosity) * phi_j_u
@@ -798,7 +798,7 @@ namespace Step21
         // Next, we also have to deal with the pressure boundary values. This,
         // again is as in step-20:
         for (unsigned int face_no = 0;
-             face_no<GeometryInfo<dim>::faces_per_cell;
+             face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           if (cell->at_boundary(face_no))
             {
@@ -847,24 +847,24 @@ namespace Step21
   // side of the saturation equation once the velocity has been computed. We
   // therefore have this separate function to this end.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
+  void TwoPhaseFlowProblem<dim>::assemble_rhs_S()
   {
-    QGauss<dim>   quadrature_formula(degree+2);
-    QGauss<dim-1> face_quadrature_formula(degree+2);
+    QGauss<dim>       quadrature_formula(degree + 2);
+    QGauss<dim - 1>   face_quadrature_formula(degree + 2);
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values    | update_gradients |
-                            update_quadrature_points  | update_JxW_values);
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values(fe, face_quadrature_formula,
-                                     update_values    | update_normal_vectors |
+                                     update_values | update_normal_vectors |
                                      update_quadrature_points  | update_JxW_values);
     FEFaceValues<dim> fe_face_values_neighbor(fe, face_quadrature_formula,
                                               update_values);
 
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-    const unsigned int   n_q_points      = quadrature_formula.size();
-    const unsigned int   n_face_q_points = face_quadrature_formula.size();
+    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int n_q_points      = quadrature_formula.size();
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-    Vector<double>       local_rhs(dofs_per_cell);
+    Vector<double> local_rhs(dofs_per_cell);
 
     std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
     std::vector<Vector<double> > old_solution_values_face(n_face_q_points, Vector<double>(dim+2));
@@ -872,16 +872,16 @@ namespace Step21
     std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
     std::vector<Vector<double> > present_solution_values_face(n_face_q_points, Vector<double>(dim+2));
 
-    std::vector<double> neighbor_saturation(n_face_q_points);
+    std::vector<double>                  neighbor_saturation(n_face_q_points);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     SaturationBoundaryValues<dim> saturation_boundary_values;
 
-    const FEValuesExtractors::Scalar saturation(dim+1);
+    const FEValuesExtractors::Scalar saturation(dim + 1);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         local_rhs = 0;
@@ -897,12 +897,12 @@ namespace Step21
         for (unsigned int q = 0; q < n_q_points; ++q)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const double old_s = old_solution_values[q](dim+1);
-              Tensor<1,dim> present_u;
+              const double   old_s = old_solution_values[q](dim + 1);
+              Tensor<1, dim> present_u;
               for (unsigned int d = 0; d < dim; ++d)
                 present_u[d] = present_solution_values[q](d);
 
-              const double        phi_i_s      = fe_values[saturation].value(i, q);
+              const double         phi_i_s = fe_values[saturation].value(i, q);
               const Tensor<1,dim> grad_phi_i_s = fe_values[saturation].gradient(i, q);
 
               local_rhs(i) += (time_step *
@@ -956,7 +956,7 @@ namespace Step21
 
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
-                Tensor<1,dim> present_u_face;
+                Tensor<1, dim> present_u_face;
                 for (unsigned int d = 0; d < dim; ++d)
                   present_u_face[d] = present_solution_values_face[q](d);
 
@@ -972,10 +972,10 @@ namespace Step21
                                                    ?
                                                    old_solution_values_face[q](dim+1)
                                                    :
-                                                   neighbor_saturation[q]),
-                                                  viscosity) *
-                                  fe_face_values[saturation].value(i,q) *
-                                  fe_face_values.JxW(q);
+                                       neighbor_saturation[q]),
+                                    viscosity) *
+                    fe_face_values[saturation].value(i, q) *
+                    fe_face_values.JxW(q);
               }
           }
 
@@ -999,14 +999,14 @@ namespace Step21
     m_inverse(system_matrix.block(0,0));
     Vector<double> tmp(solution.block(0).size());
     Vector<double> schur_rhs(solution.block(1).size());
-    Vector<double> tmp2 (solution.block(2).size());
+    Vector<double> tmp2(solution.block(2).size());
 
 
     // First the pressure, using the pressure Schur complement of the first
     // two equations:
     {
       m_inverse.vmult(tmp, system_rhs.block(0));
-      system_matrix.block(1,0).vmult(schur_rhs, tmp);
+      system_matrix.block(1, 0).vmult(schur_rhs, tmp);
       schur_rhs -= system_rhs.block(1);
 
 
@@ -1021,7 +1021,7 @@ namespace Step21
 
 
       SolverControl solver_control(solution.block(1).size(),
-                                   1e-12*schur_rhs.l2_norm());
+                                   1e-12 * schur_rhs.l2_norm());
       SolverCG<>    cg(solver_control);
 
       cg.solve(schur_complement, solution.block(1), schur_rhs,
@@ -1035,7 +1035,7 @@ namespace Step21
 
     // Now the velocity:
     {
-      system_matrix.block(0,1).vmult(tmp, solution.block(1));
+      system_matrix.block(0, 1).vmult(tmp, solution.block(1));
       tmp *= -1;
       tmp += system_rhs.block(0);
 
@@ -1060,12 +1060,12 @@ namespace Step21
     // The next step is to assemble the right hand side, and then to pass
     // everything on for solution. At the end, we project back saturations
     // onto the physically reasonable range:
-    assemble_rhs_S ();
+    assemble_rhs_S();
     {
 
-      SolverControl solver_control(system_matrix.block(2,2).m(),
-                                   1e-8*system_rhs.block(2).l2_norm());
-      SolverCG<>   cg(solver_control);
+      SolverControl solver_control(system_matrix.block(2, 2).m(),
+                                   1e-8 * system_rhs.block(2).l2_norm());
+      SolverCG<>    cg(solver_control);
       cg.solve(system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
                PreconditionIdentity());
 
@@ -1094,7 +1094,7 @@ namespace Step21
   // all output file names have the same length, and consequently sort well
   // when creating a directory listing.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::output_results()  const
+  void TwoPhaseFlowProblem<dim>::output_results() const
   {
     if (timestep_number % 5 != 0)
       return;
@@ -1102,23 +1102,23 @@ namespace Step21
     std::vector<std::string> solution_names;
     switch (dim)
       {
-      case 2:
-        solution_names.emplace_back("u");
-        solution_names.emplace_back("v");
-        solution_names.emplace_back("p");
-        solution_names.emplace_back("S");
-        break;
+        case 2:
+          solution_names.emplace_back("u");
+          solution_names.emplace_back("v");
+          solution_names.emplace_back("p");
+          solution_names.emplace_back("S");
+          break;
 
-      case 3:
-        solution_names.emplace_back("u");
-        solution_names.emplace_back("v");
-        solution_names.emplace_back("w");
-        solution_names.emplace_back("p");
-        solution_names.emplace_back("S");
-        break;
+        case 3:
+          solution_names.emplace_back("u");
+          solution_names.emplace_back("v");
+          solution_names.emplace_back("w");
+          solution_names.emplace_back("p");
+          solution_names.emplace_back("S");
+          break;
 
-      default:
-        Assert(false, ExcNotImplemented());
+        default:
+          Assert(false, ExcNotImplemented());
       }
 
     DataOut<dim> data_out;
@@ -1126,7 +1126,7 @@ namespace Step21
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, solution_names);
 
-    data_out.build_patches(degree+1);
+    data_out.build_patches(degree + 1);
 
     std::ofstream output("solution-"
                          + Utilities::int_to_string(timestep_number,4)
@@ -1174,19 +1174,19 @@ namespace Step21
   double
   TwoPhaseFlowProblem<dim>::get_maximal_velocity() const
   {
-    QGauss<dim>   quadrature_formula(degree+2);
+    QGauss<dim>        quadrature_formula(degree + 2);
     const unsigned int   n_q_points
       = quadrature_formula.size();
 
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_values);
-    std::vector<Vector<double> > solution_values(n_q_points,
-                                                 Vector<double>(dim+2));
-    double max_velocity = 0;
+    std::vector<Vector<double>> solution_values(n_q_points,
+                                                Vector<double>(dim + 2));
+    double                      max_velocity = 0;
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
@@ -1194,7 +1194,7 @@ namespace Step21
 
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
-            Tensor<1,dim> velocity;
+            Tensor<1, dim> velocity;
             for (unsigned int i = 0; i < dim; ++i)
               velocity[i] = solution_values[q](i);
 
@@ -1243,7 +1243,7 @@ namespace Step21
 
       VectorTools::project(dof_handler,
                            constraints,
-                           QGauss<dim>(degree+2),
+                           QGauss<dim>(degree + 2),
                            InitialValues<dim>(),
                            old_solution);
     }
@@ -1268,7 +1268,7 @@ namespace Step21
                   << std::endl
                   << std::endl;
       }
-    while (time <  = 1.);
+    while (time < = 1.);
   }
 }
 

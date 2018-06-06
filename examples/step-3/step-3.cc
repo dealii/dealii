@@ -94,7 +94,7 @@ using namespace dealii;
 class Step3
 {
 public:
-  Step3 ();
+  Step3();
 
   void run();
 
@@ -114,9 +114,9 @@ private:
   // the triangulation and the global numbering of the degrees of freedom (we
   // will specify the exact polynomial degree of the finite element in the
   // constructor of this class)...
-  Triangulation<2>     triangulation;
-  FE_Q<2>              fe;
-  DoFHandler<2>        dof_handler;
+  Triangulation<2> triangulation;
+  FE_Q<2>          fe;
+  DoFHandler<2>    dof_handler;
 
   // ...variables for the sparsity pattern and values of the system matrix
   // resulting from the discretization of the Laplace equation...
@@ -125,8 +125,8 @@ private:
 
   // ...and variables which will hold the right hand side and solution
   // vectors.
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Vector<double> solution;
+  Vector<double> system_rhs;
 };
 
 // @sect4{Step3::Step3}
@@ -275,7 +275,7 @@ void Step3::assemble_system()
   // 2D. This quadrature formula integrates polynomials of degrees up to three
   // exactly (in 1D). It is easy to check that this is sufficient for the
   // present problem:
-  QGauss<2>  quadrature_formula(2);
+  QGauss<2> quadrature_formula(2);
   // And we initialize the object which we have briefly talked about above. It
   // needs to be told which finite element we want to use, and the quadrature
   // points and their weights (jointly described by a Quadrature object). As
@@ -361,8 +361,8 @@ void Step3::assemble_system()
   // bit more readable. You will see them in many places in larger programs,
   // and `dofs_per_cell` and `n_q_points` are more or less by convention the
   // standard names for these purposes:
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
   // Now, we said that we wanted to assemble the global matrix and vector
   // cell-by-cell. We could write the results directly into the global matrix,
@@ -375,8 +375,8 @@ void Step3::assemble_system()
   // are coupling with all others, and we should use a full matrix object
   // rather than a sparse one for the local operations; everything will be
   // transferred to a global sparse matrix later on):
-  FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs(dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
   // When assembling the contributions of each cell, we do this with the local
   // numbering of the degrees of freedom (i.e. the number running from zero
@@ -398,7 +398,7 @@ void Step3::assemble_system()
   // triangulation by flagging them with refinement indicators. Here we're only
   // examining the cells without modifying them, so it's good practice to
   // declare `cell` as `const` in order to enforce this invariant.
-  for (const auto &cell: dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
       // We are now sitting on one cell, and we would like the values and
       // gradients of the shape functions be computed, as well as the
@@ -411,7 +411,7 @@ void Step3::assemble_system()
       // Next, reset the local cell's contributions to global matrix and
       // global right hand side to zero, before we fill them:
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
       // Now it is time to start integration over the cell, which we
       // do by looping over all quadrature points, which we will
@@ -515,7 +515,7 @@ void Step3::assemble_system()
   // their boundary values (which are zero here for all entries). This mapping
   // of DoF numbers to boundary values is done by the <code>std::map</code>
   // class.
-  std::map<types::global_dof_index,double> boundary_values;
+  std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            Functions::ZeroFunction<2>(),
@@ -548,12 +548,12 @@ void Step3::solve()
   // find out how many were really used), and stop if the norm of the residual
   // is below $10^{-12}$. In practice, the latter criterion will be the one
   // which stops the iteration:
-  SolverControl           solver_control(1000, 1e-12);
+  SolverControl solver_control(1000, 1e-12);
   // Then we need the solver itself. The template parameter to the SolverCG
   // class is the type of the vectors, but the empty angle brackets indicate
   // that we simply take the default argument (which is
   // <code>Vector@<double@></code>):
-  SolverCG<>              solver(solver_control);
+  SolverCG<> solver(solver_control);
 
   // Now solve the system of equations. The CG solver takes a preconditioner
   // as its fourth argument. We don't feel ready to delve into this yet, so we

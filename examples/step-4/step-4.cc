@@ -70,7 +70,7 @@ template <int dim>
 class Step4
 {
 public:
-  Step4 ();
+  Step4();
   void run();
 
 private:
@@ -80,15 +80,15 @@ private:
   void solve();
   void output_results() const;
 
-  Triangulation<dim>   triangulation;
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
+  Triangulation<dim> triangulation;
+  FE_Q<dim>          fe;
+  DoFHandler<dim>    dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Vector<double> solution;
+  Vector<double> system_rhs;
 };
 
 
@@ -136,8 +136,8 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide() : Function<dim>() {}
 
-  virtual double value(const Point<dim>   &p,
-                       const unsigned int  component = 0) const override;
+  virtual double value(const Point<dim> & p,
+                       const unsigned int component = 0) const override;
 };
 
 
@@ -148,8 +148,8 @@ class BoundaryValues : public Function<dim>
 public:
   BoundaryValues() : Function<dim>() {}
 
-  virtual double value(const Point<dim>   &p,
-                       const unsigned int  component = 0) const override;
+  virtual double value(const Point<dim> & p,
+                       const unsigned int component = 0) const override;
 };
 
 
@@ -183,7 +183,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
   for (unsigned int i = 0; i < dim; ++i)
     return_value += 4.0 * std::pow(p(i), 4.0);
 
-  return 1.;//return_value;
+  return 1.; // return_value;
 }
 
 
@@ -309,7 +309,7 @@ void Step4<dim>::setup_system()
 template <int dim>
 void Step4<dim>::assemble_system()
 {
-  QGauss<dim>  quadrature_formula(2);
+  QGauss<dim> quadrature_formula(2);
 
   // We wanted to have a non-constant right hand side, so we use an object of
   // the class declared above to generate the necessary data. Since this right
@@ -324,18 +324,18 @@ void Step4<dim>::assemble_system()
   // quadrature weights, FEValues::JxW() ). We can tell the FEValues object to
   // do for us by also giving it the #update_quadrature_points flag:
   FEValues<dim> fe_values(fe, quadrature_formula,
-                          update_values   | update_gradients |
-                          update_quadrature_points | update_JxW_values);
+                          update_values | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
   // We then again define a few abbreviations. The values of these variables
   // of course depend on the dimension which we are presently using. However,
   // the FE and Quadrature classes do all the necessary work for you and you
   // don't have to care about the dimension dependent parts:
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs(dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -346,11 +346,11 @@ void Step4<dim>::assemble_system()
   // depending on the dimension we are in, but to the outside world they look
   // alike and you will probably never see a difference. In any case, the real
   // type is hidden by using `auto`:
-  for (const auto &cell: dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit(cell);
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
       // Now we have to assemble the local matrix and right hand side. This is
       // done exactly like in the previous example, but now we revert the
@@ -371,8 +371,8 @@ void Step4<dim>::assemble_system()
                                    fe_values.JxW (q_index));
 
             cell_rhs(i) += (fe_values.shape_value(i, q_index) *
-                            right_hand_side.value(fe_values.quadrature_point(q_index)) *
-                            fe_values.JxW (q_index));
+               right_hand_side.value(fe_values.quadrature_point(q_index)) *
+               fe_values.JxW(q_index));
           }
       // As a final remark to these loops: when we assemble the local
       // contributions into <code>cell_matrix(i,j)</code>, we have to multiply
@@ -414,7 +414,7 @@ void Step4<dim>::assemble_system()
   // task, we only have to replace the Functions::ZeroFunction used there by an object of
   // the class which describes the boundary values we would like to use
   // (i.e. the <code>BoundaryValues</code> class declared above):
-  std::map<types::global_dof_index,double> boundary_values;
+  std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            BoundaryValues<dim>(),

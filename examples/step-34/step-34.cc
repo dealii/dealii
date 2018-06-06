@@ -79,37 +79,37 @@ namespace Step34
   namespace LaplaceKernel
   {
     template <int dim>
-    double single_layer(const Tensor<1,dim> &R)
+    double single_layer(const Tensor<1, dim> &R)
     {
       switch (dim)
         {
-        case 2:
-          return (-std::log(R.norm()) / (2*numbers::PI) );
+          case 2:
+            return (-std::log(R.norm()) / (2 * numbers::PI));
 
-        case 3:
-          return (1./( R.norm()*4*numbers::PI ) );
+          case 3:
+            return (1. / (R.norm() * 4 * numbers::PI));
 
-        default:
-          Assert(false, ExcInternalError());
-          return 0.;
+          default:
+            Assert(false, ExcInternalError());
+            return 0.;
         }
     }
 
 
 
     template <int dim>
-    Tensor<1,dim> double_layer(const Tensor<1,dim> &R)
+    Tensor<1, dim> double_layer(const Tensor<1, dim> &R)
     {
       switch (dim)
         {
-        case 2:
-          return R / ( -2*numbers::PI * R.norm_square());
-        case 3:
-          return R / ( -4*numbers::PI * R.norm_square() * R.norm() );
+          case 2:
+            return R / (-2 * numbers::PI * R.norm_square());
+          case 3:
+            return R / (-4 * numbers::PI * R.norm_square() * R.norm());
 
-        default:
-          Assert(false, ExcInternalError());
-          return Tensor<1,dim>();
+          default:
+            Assert(false, ExcInternalError());
+            return Tensor<1, dim>();
         }
     }
   }
@@ -128,7 +128,7 @@ namespace Step34
   class BEMProblem
   {
   public:
-    BEMProblem(const unsigned int fe_degree = 1,
+    BEMProblem(const unsigned int fe_degree      = 1,
                const unsigned int mapping_degree = 1);
 
     void run();
@@ -216,8 +216,8 @@ namespace Step34
     // To allow for dimension independent programming, we specialize this
     // single function to extract the singular quadrature formula needed to
     // integrate the singular kernels in the interior of the cells.
-    const Quadrature<dim-1> & get_singular_quadrature(
-      const typename DoFHandler<dim-1, dim>::active_cell_iterator &cell,
+    const Quadrature<dim - 1> &get_singular_quadrature(
+      const typename DoFHandler<dim - 1, dim>::active_cell_iterator &cell,
       const unsigned int index) const;
 
 
@@ -237,10 +237,10 @@ namespace Step34
     // finite element space. The order of the finite element space and of the
     // mapping can be selected in the constructor of the class.
 
-    Triangulation<dim-1, dim>   tria;
-    FE_Q<dim-1,dim>             fe;
-    DoFHandler<dim-1,dim>       dh;
-    MappingQ<dim-1, dim>      mapping;
+    Triangulation<dim - 1, dim> tria;
+    FE_Q<dim - 1, dim>          fe;
+    DoFHandler<dim - 1, dim>    dh;
+    MappingQ<dim - 1, dim>      mapping;
 
     // In BEM methods, the matrix that is generated is dense. Depending on the
     // size of the problem, the final system might be solved by direct LU
@@ -248,21 +248,21 @@ namespace Step34
     // unpreconditioned GMRES method. Building a preconditioner for BEM method
     // is non trivial, and we don't treat this subject here.
 
-    FullMatrix<double>    system_matrix;
-    Vector<double>        system_rhs;
+    FullMatrix<double> system_matrix;
+    Vector<double>     system_rhs;
 
     // The next two variables will denote the solution $\phi$ as well as a
     // vector that will hold the values of $\alpha(\mathbf x)$ (the fraction
     // of $\Omega$ visible from a point $\mathbf x$) at the support points of
     // our shape functions.
 
-    Vector<double>              phi;
-    Vector<double>              alpha;
+    Vector<double> phi;
+    Vector<double> alpha;
 
     // The convergence table is used to output errors in the exact solution
     // and in the computed alphas.
 
-    ConvergenceTable  convergence_table;
+    ConvergenceTable convergence_table;
 
     // The following variables are the ones that we fill through a parameter
     // file.  The new objects that we use in this example are the
@@ -286,8 +286,8 @@ namespace Step34
     Functions::ParsedFunction<dim> wind;
     Functions::ParsedFunction<dim> exact_solution;
 
-    unsigned int singular_quadrature_order;
-    std::shared_ptr<Quadrature<dim-1> > quadrature;
+    unsigned int                         singular_quadrature_order;
+    std::shared_ptr<Quadrature<dim - 1>> quadrature;
 
     SolverControl solver_control;
 
@@ -424,9 +424,9 @@ namespace Step34
     // then proceed to extract these values from the ParameterHandler object:
     prm.parse_input(filename);
 
-    n_cycles = prm.get_integer("Number of cycles");
+    n_cycles            = prm.get_integer("Number of cycles");
     external_refinement = prm.get_integer("External refinement");
-    extend_solution = prm.get_bool("Extend solution on the -2,2 box");
+    extend_solution     = prm.get_bool("Extend solution on the -2,2 box");
 
     prm.enter_subsection("Quadrature rules");
     {
@@ -438,15 +438,15 @@ namespace Step34
     }
     prm.leave_subsection();
 
-    prm.enter_subsection(std::string("Wind function ")+
-                         Utilities::int_to_string(dim)+std::string("d"));
+    prm.enter_subsection(std::string("Wind function ") +
+                         Utilities::int_to_string(dim) + std::string("d"));
     {
       wind.parse_parameters(prm);
     }
     prm.leave_subsection();
 
-    prm.enter_subsection(std::string("Exact solution ")+
-                         Utilities::int_to_string(dim)+std::string("d"));
+    prm.enter_subsection(std::string("Exact solution ") +
+                         Utilities::int_to_string(dim) + std::string("d"));
     {
       exact_solution.parse_parameters(prm);
     }
@@ -500,25 +500,25 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::read_domain()
   {
-    static const Point<dim> center = Point<dim>();
-    static const SphericalManifold<dim-1, dim> manifold(center);
+    static const Point<dim>                      center = Point<dim>();
+    static const SphericalManifold<dim - 1, dim> manifold(center);
 
     std::ifstream in;
     switch (dim)
       {
-      case 2:
-        in.open("coarse_circle.inp");
-        break;
+        case 2:
+          in.open("coarse_circle.inp");
+          break;
 
-      case 3:
-        in.open("coarse_sphere.inp");
-        break;
+        case 3:
+          in.open("coarse_sphere.inp");
+          break;
 
-      default:
-        Assert(false, ExcNotImplemented());
+        default:
+          Assert(false, ExcNotImplemented());
       }
 
-    GridIn<dim-1, dim> gi;
+    GridIn<dim - 1, dim> gi;
     gi.attach_triangulation(tria);
     gi.read_ucd(in);
 
@@ -539,7 +539,7 @@ namespace Step34
 
     dh.distribute_dofs(fe);
 
-    const unsigned int n_dofs =  dh.n_dofs();
+    const unsigned int n_dofs = dh.n_dofs();
 
     system_matrix.reinit(n_dofs, n_dofs);
 
@@ -571,8 +571,8 @@ namespace Step34
 
     std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
-    std::vector<Vector<double> > cell_wind(n_q_points, Vector<double>(dim) );
-    double normal_wind;
+    std::vector<Vector<double>> cell_wind(n_q_points, Vector<double>(dim));
+    double                      normal_wind;
 
     // Unlike in finite element methods, if we use a collocation boundary
     // element method, then in each assembly loop we only assemble the
@@ -581,7 +581,7 @@ namespace Step34
     // cell. This is done using a vector of fe.dofs_per_cell elements, which
     // will then be distributed to the matrix in the global row $i$. The
     // following object will hold this information:
-    Vector<double>      local_matrix_row_i(fe.dofs_per_cell);
+    Vector<double> local_matrix_row_i(fe.dofs_per_cell);
 
     // The index $i$ runs on the collocation points, which are the support
     // points of the $i$th basis function, while $j$ runs on inner integration
@@ -589,7 +589,7 @@ namespace Step34
 
     // We construct a vector of support points which will be used in the local
     // integrations:
-    std::vector<Point<dim> > support_points(dh.n_dofs());
+    std::vector<Point<dim>> support_points(dh.n_dofs());
     DoFTools::map_dofs_to_support_points<dim-1, dim>( mapping, dh, support_points);
 
 
@@ -599,15 +599,15 @@ namespace Step34
     // be constant, but it doesn't hurt to be more general):
     typename DoFHandler<dim-1,dim>::active_cell_iterator
     cell = dh.begin_active(),
-    endc = dh.end();
+                                                            endc = dh.end();
 
     for (cell = dh.begin_active(); cell != endc; ++cell)
       {
         fe_v.reinit(cell);
         cell->get_dof_indices(local_dof_indices);
 
-        const std::vector<Point<dim> >    &q_points = fe_v.get_quadrature_points();
-        const std::vector<Tensor<1,dim> > &normals  = fe_v.get_normal_vectors();
+        const std::vector<Point<dim>> &q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
         wind.vector_value_list(q_points, cell_wind);
 
         // We then form the integral over the current cell for all degrees of
@@ -617,19 +617,19 @@ namespace Step34
         // of the local degrees of freedom is the same as the support point
         // $i$. A the beginning of the loop we therefore check whether this is
         // the case, and we store which one is the singular index:
-        for (unsigned int i = 0; i < dh.n_dofs() ; ++i)
+        for (unsigned int i = 0; i < dh.n_dofs(); ++i)
           {
 
             local_matrix_row_i = 0;
 
-            bool is_singular = false;
+            bool         is_singular    = false;
             unsigned int singular_index = numbers::invalid_unsigned_int;
 
             for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
               if (local_dof_indices[j] == i)
                 {
                   singular_index = j;
-                  is_singular = true;
+                  is_singular    = true;
                   break;
                 }
 
@@ -643,11 +643,11 @@ namespace Step34
                   {
                     normal_wind = 0;
                     for (unsigned int d = 0; d < dim; ++d)
-                      normal_wind += normals[q][d]*cell_wind[q](d);
+                      normal_wind += normals[q][d] * cell_wind[q](d);
 
-                    const Tensor<1,dim> R = q_points[q] - support_points[i];
+                    const Tensor<1, dim> R = q_points[q] - support_points[i];
 
-                    system_rhs(i) += ( LaplaceKernel::single_layer(R)   *
+                    system_rhs(i) += (LaplaceKernel::single_layer(R) *
                                        normal_wind                      *
                                        fe_v.JxW(q) );
 
@@ -678,7 +678,7 @@ namespace Step34
                 Assert(singular_index != numbers::invalid_unsigned_int,
                        ExcInternalError());
 
-                const Quadrature<dim-1> & singular_quadrature =
+                const Quadrature<dim - 1> &singular_quadrature =
                   get_singular_quadrature(cell, singular_index);
 
                 FEValues<dim-1,dim> fe_v_singular(mapping, fe, singular_quadrature,
@@ -705,16 +705,16 @@ namespace Step34
                       normal_wind += (singular_cell_wind[q](d)*
                                       singular_normals[q][d]);
 
-                    system_rhs(i) += ( LaplaceKernel::single_layer(R) *
+                    system_rhs(i) += (LaplaceKernel::single_layer(R) *
                                        normal_wind                         *
                                        fe_v_singular.JxW(q) );
 
                     for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
                       {
                         local_matrix_row_i(j) -= (( LaplaceKernel::double_layer(R) *
-                                                    singular_normals[q])                *
-                                                  fe_v_singular.shape_value(j,q)        *
-                                                  fe_v_singular.JxW(q)       );
+                            singular_normals[q]) *
+                           fe_v_singular.shape_value(j, q) *
+                           fe_v_singular.JxW(q));
                       }
                   }
               }
@@ -744,7 +744,7 @@ namespace Step34
     system_matrix.vmult(alpha, ones);
     alpha.add(1);
     for (unsigned int i = 0; i < dh.n_dofs(); ++i)
-      system_matrix(i,i) +=  alpha(i);
+      system_matrix(i, i) += alpha(i);
   }
 
 
@@ -754,7 +754,7 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::solve_system()
   {
-    SolverGMRES<Vector<double> > solver(solver_control);
+    SolverGMRES<Vector<double>> solver(solver_control);
     solver.solve(system_matrix, phi, system_rhs, PreconditionIdentity());
   }
 
@@ -771,7 +771,7 @@ namespace Step34
     VectorTools::integrate_difference(mapping, dh, phi,
                                       exact_solution,
                                       difference_per_cell,
-                                      QGauss<(dim-1)>(2*fe.degree+1),
+                                      QGauss<(dim - 1)>(2 * fe.degree + 1),
                                       VectorTools::L2_norm);
     const double L2_error = VectorTools::compute_global_error(tria,
                                                               difference_per_cell,
@@ -784,9 +784,9 @@ namespace Step34
     Vector<double> difference_per_node(alpha);
     difference_per_node.add(-.5);
 
-    const double alpha_error = difference_per_node.linfty_norm();
-    const unsigned int n_active_cells=tria.n_active_cells();
-    const unsigned int n_dofs=dh.n_dofs();
+    const double       alpha_error    = difference_per_node.linfty_norm();
+    const unsigned int n_active_cells = tria.n_active_cells();
+    const unsigned int n_dofs         = dh.n_dofs();
 
     deallog << "Cycle " << cycle << ':'
             << std::endl
@@ -871,13 +871,13 @@ namespace Step34
 
   template <>
   const Quadrature<2> &BEMProblem<3>::get_singular_quadrature(
-    const DoFHandler<2,3>::active_cell_iterator &,
+    const DoFHandler<2, 3>::active_cell_iterator &,
     const unsigned int index) const
   {
     Assert(index < fe.dofs_per_cell,
            ExcIndexRange(0, fe.dofs_per_cell, index));
 
-    static std::vector<QGaussOneOverR<2> > quadratures;
+    static std::vector<QGaussOneOverR<2>> quadratures;
     if (quadratures.size() == 0)
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         quadratures.emplace_back(singular_quadrature_order,
@@ -889,8 +889,8 @@ namespace Step34
 
   template <>
   const Quadrature<1> &BEMProblem<2>::get_singular_quadrature(
-    const DoFHandler<1,2>::active_cell_iterator &cell,
-    const unsigned int index) const
+    const DoFHandler<1, 2>::active_cell_iterator &cell,
+    const unsigned int                            index) const
   {
     Assert(index < fe.dofs_per_cell,
            ExcIndexRange(0, fe.dofs_per_cell, index));
@@ -925,12 +925,12 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::compute_exterior_solution()
   {
-    Triangulation<dim>  external_tria;
+    Triangulation<dim> external_tria;
     GridGenerator::hyper_cube(external_tria, -2, 2);
 
-    FE_Q<dim>           external_fe(1);
-    DoFHandler<dim>     external_dh(external_tria);
-    Vector<double>      external_phi;
+    FE_Q<dim>       external_fe(1);
+    DoFHandler<dim> external_dh(external_tria);
+    Vector<double>  external_phi;
 
     external_tria.refine_global(external_refinement);
     external_dh.distribute_dofs(external_fe);
@@ -938,7 +938,7 @@ namespace Step34
 
     typename DoFHandler<dim-1,dim>::active_cell_iterator
     cell = dh.begin_active(),
-    endc = dh.end();
+                                                            endc = dh.end();
 
 
     FEValues<dim-1,dim> fe_v(mapping, fe, *quadrature,
@@ -951,11 +951,11 @@ namespace Step34
 
     std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
 
-    std::vector<double> local_phi(n_q_points);
-    std::vector<double> normal_wind(n_q_points);
-    std::vector<Vector<double> > local_wind(n_q_points, Vector<double>(dim) );
+    std::vector<double>         local_phi(n_q_points);
+    std::vector<double>         normal_wind(n_q_points);
+    std::vector<Vector<double>> local_wind(n_q_points, Vector<double>(dim));
 
-    std::vector<Point<dim> > external_support_points(external_dh.n_dofs());
+    std::vector<Point<dim>> external_support_points(external_dh.n_dofs());
     DoFTools::map_dofs_to_support_points<dim>(StaticMappingQ1<dim>::mapping,
                                               external_dh, external_support_points);
 
@@ -963,8 +963,8 @@ namespace Step34
       {
         fe_v.reinit(cell);
 
-        const std::vector<Point<dim> >    &q_points = fe_v.get_quadrature_points();
-        const std::vector<Tensor<1,dim> > &normals  = fe_v.get_normal_vectors();
+        const std::vector<Point<dim>> &q_points = fe_v.get_quadrature_points();
+        const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
         cell->get_dof_indices(dofs);
         fe_v.get_function_values(phi, local_phi);
@@ -975,22 +975,22 @@ namespace Step34
           {
             normal_wind[q] = 0;
             for (unsigned int d = 0; d < dim; ++d)
-              normal_wind[q] += normals[q][d]*local_wind[q](d);
+              normal_wind[q] += normals[q][d] * local_wind[q](d);
           }
 
         for (unsigned int i = 0; i < external_dh.n_dofs(); ++i)
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
 
-              const Tensor<1,dim> R = q_points[q] - external_support_points[i];
+              const Tensor<1, dim> R = q_points[q] - external_support_points[i];
 
               external_phi(i) += ( ( LaplaceKernel::single_layer(R) *
                                      normal_wind[q]
                                      +
                                      (LaplaceKernel::double_layer(R) *
                                       normals[q] )            *
-                                     local_phi[q] )           *
-                                   fe_v.JxW(q) );
+                    local_phi[q]) *
+                 fe_v.JxW(q));
             }
       }
 
@@ -1015,16 +1015,16 @@ namespace Step34
   template <int dim>
   void BEMProblem<dim>::output_results(const unsigned int cycle)
   {
-    DataOut<dim-1, DoFHandler<dim-1, dim> > dataout;
+    DataOut<dim - 1, DoFHandler<dim - 1, dim>> dataout;
 
     dataout.attach_dof_handler(dh);
     dataout.add_data_vector(phi, "phi",
                             DataOut<dim-1, DoFHandler<dim-1, dim> >::type_dof_data);
     dataout.add_data_vector(alpha, "alpha",
-                            DataOut<dim-1, DoFHandler<dim-1, dim> >::type_dof_data);
+      DataOut<dim - 1, DoFHandler<dim - 1, dim>>::type_dof_data);
     dataout.build_patches(mapping,
-                          mapping.get_degree(),
-                          DataOut<dim-1, DoFHandler<dim-1, dim> >::curved_inner_cells);
+      mapping.get_degree(),
+      DataOut<dim - 1, DoFHandler<dim - 1, dim>>::curved_inner_cells);
 
     std::string filename = ( Utilities::int_to_string(dim) +
                              "d_boundary_solution_" +
@@ -1034,7 +1034,7 @@ namespace Step34
 
     dataout.write_vtk(file);
 
-    if (cycle == n_cycles-1)
+    if (cycle == n_cycles - 1)
       {
         convergence_table.set_precision("L2(phi)", 3);
         convergence_table.set_precision("Linfty(alpha)", 3);
@@ -1098,7 +1098,7 @@ int main()
       using namespace dealii;
       using namespace Step34;
 
-      const unsigned int degree = 1;
+      const unsigned int degree         = 1;
       const unsigned int mapping_degree = 1;
 
       deallog.depth_console(3);

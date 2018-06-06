@@ -186,17 +186,17 @@ namespace Step16
     void refine_grid();
     void output_results(const unsigned int cycle) const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix constraints;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Vector<double> solution;
+    Vector<double> system_rhs;
 
     const unsigned int degree;
 
@@ -215,11 +215,11 @@ namespace Step16
     // refinement edge between two different refinement levels. It
     // thus serves a similar purpose as ConstraintMatrix, but on each
     // level.
-    MGLevelObject<SparsityPattern>       mg_sparsity_patterns;
-    MGLevelObject<SparseMatrix<double> > mg_matrices;
-    MGLevelObject<SparseMatrix<double> > mg_interface_in;
-    MGLevelObject<SparseMatrix<double> > mg_interface_out;
-    MGConstrainedDoFs                    mg_constrained_dofs;
+    MGLevelObject<SparsityPattern>      mg_sparsity_patterns;
+    MGLevelObject<SparseMatrix<double>> mg_matrices;
+    MGLevelObject<SparseMatrix<double>> mg_interface_in;
+    MGLevelObject<SparseMatrix<double>> mg_interface_out;
+    MGConstrainedDoFs                   mg_constrained_dofs;
   };
 
 
@@ -279,13 +279,13 @@ namespace Step16
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
-    std::set<types::boundary_id>          dirichlet_boundary_ids = { 0 };
+    std::set<types::boundary_id>          dirichlet_boundary_ids = {0};
     Functions::ZeroFunction<dim>          homogeneous_dirichlet_bc;
     const typename FunctionMap<dim>::type dirichlet_boundary_functions
     = { { types::boundary_id(0), &homogeneous_dirichlet_bc } };
     VectorTools::interpolate_boundary_values(static_cast<const DoFHandler<dim>&>(dof_handler),
-                                             dirichlet_boundary_functions,
-                                             constraints);
+      dirichlet_boundary_functions,
+      constraints);
     constraints.close();
     constraints.condense(dsp);
     sparsity_pattern.copy_from(dsp);
@@ -310,13 +310,13 @@ namespace Step16
     // upon resizing.
     const unsigned int n_levels = triangulation.n_levels();
 
-    mg_interface_in.resize(0, n_levels-1);
+    mg_interface_in.resize(0, n_levels - 1);
     mg_interface_in.clear_elements();
-    mg_interface_out.resize(0, n_levels-1);
+    mg_interface_out.resize(0, n_levels - 1);
     mg_interface_out.clear_elements();
-    mg_matrices.resize(0, n_levels-1);
+    mg_matrices.resize(0, n_levels - 1);
     mg_matrices.clear_elements();
-    mg_sparsity_patterns.resize(0, n_levels-1);
+    mg_sparsity_patterns.resize(0, n_levels - 1);
 
     // Now, we have to provide a matrix on each level. To this end, we first
     // use the MGTools::make_sparsity_pattern function to first generate a
@@ -382,7 +382,7 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_system()
   {
-    MappingQ1<dim> mapping;
+    MappingQ1<dim>                      mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
     UpdateFlags update_flags = update_values | update_gradients | update_hessians;
     info_box.add_update_flags_all(update_flags);
@@ -419,7 +419,7 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid()
   {
-    MappingQ1<dim> mapping;
+    MappingQ1<dim>                      mapping;
     MeshWorker::IntegrationInfoBox<dim> info_box;
     UpdateFlags update_flags = update_values | update_gradients | update_hessians;
     info_box.add_update_flags_all(update_flags);
@@ -427,7 +427,7 @@ namespace Step16
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
-    MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
+    MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double>> assembler;
     assembler.initialize(mg_constrained_dofs);
     assembler.initialize(mg_matrices);
     assembler.initialize_interfaces(mg_interface_in, mg_interface_out);
@@ -441,8 +441,8 @@ namespace Step16
     for (unsigned int level = 0; level < nlevels; ++level)
       {
         for (unsigned int i = 0; i < dof_handler.n_dofs(level); ++i)
-          if (mg_constrained_dofs.is_boundary_index(level,i) ||
-              mg_constrained_dofs.at_refinement_edge(level,i))
+          if (mg_constrained_dofs.is_boundary_index(level, i) ||
+              mg_constrained_dofs.at_refinement_edge(level, i))
             mg_matrices[level].set(i, i, 1.);
       }
   }
@@ -476,7 +476,7 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::solve()
   {
-    MGTransferPrebuilt<Vector<double> > mg_transfer(mg_constrained_dofs);
+    MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(dof_handler);
 
     FullMatrix<double> coarse_matrix;
@@ -510,8 +510,8 @@ namespace Step16
     // iteration (which requires a symmetric preconditioner) below, we need to
     // let the multilevel preconditioner make sure that we get a symmetric
     // operator even for nonsymmetric smoothers:
-    typedef PreconditionSOR<SparseMatrix<double> > Smoother;
-    mg::SmootherRelaxation<Smoother, Vector<double> > mg_smoother;
+    typedef PreconditionSOR<SparseMatrix<double>>    Smoother;
+    mg::SmootherRelaxation<Smoother, Vector<double>> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);
     mg_smoother.set_symmetric(true);
@@ -523,9 +523,9 @@ namespace Step16
     // the transpose operator for the latter operation, allowing us to
     // initialize both up and down versions of the operator with the matrices
     // we already built:
-    mg::Matrix<Vector<double> > mg_matrix(mg_matrices);
-    mg::Matrix<Vector<double> > mg_interface_up(mg_interface_in);
-    mg::Matrix<Vector<double> > mg_interface_down(mg_interface_out);
+    mg::Matrix<Vector<double>> mg_matrix(mg_matrices);
+    mg::Matrix<Vector<double>> mg_interface_up(mg_interface_in);
+    mg::Matrix<Vector<double>> mg_interface_down(mg_interface_out);
 
     // Now, we are ready to set up the V-cycle operator and the multilevel
     // preconditioner.
@@ -536,8 +536,8 @@ namespace Step16
                                   mg_smoother);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
-    PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >
-    preconditioner(dof_handler, mg, mg_transfer);
+    PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double>>>
+      preconditioner(dof_handler, mg, mg_transfer);
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
@@ -568,7 +568,7 @@ namespace Step16
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
     KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim-1>(3),
+                                       QGauss<dim - 1>(3),
                                        typename FunctionMap<dim>::type(),
                                        solution,
                                        estimated_error_per_cell);

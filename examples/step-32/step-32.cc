@@ -119,11 +119,11 @@ namespace Step32
     const double radiogenic_heating    = 7.4e-12; /* W / kg     */
 
 
-    const double R0      = 6371000.-2890000.;     /* m          */
-    const double R1      = 6371000.-  35000.;     /* m          */
+    const double R0 = 6371000. - 2890000.; /* m          */
+    const double R1 = 6371000. - 35000.;   /* m          */
 
-    const double T0      = 4000+273;              /* K          */
-    const double T1      =  700+273;              /* K          */
+    const double T0 = 4000 + 273; /* K          */
+    const double T1 = 700 + 273;  /* K          */
 
 
     // The next set of definitions are for functions that encode the density
@@ -139,10 +139,10 @@ namespace Step32
 
 
     template <int dim>
-    Tensor<1,dim> gravity_vector(const Point<dim> &p)
+    Tensor<1, dim> gravity_vector(const Point<dim> &p)
     {
       const double r = p.norm();
-      return -(1.245e-6 * r + 7.714e13/r/r) * p / r;
+      return -(1.245e-6 * r + 7.714e13 / r / r) * p / r;
     }
 
 
@@ -153,11 +153,11 @@ namespace Step32
     public:
       TemperatureInitialValues() : Function<dim>(1) {}
 
-      virtual double value(const Point<dim>   &p,
-                           const unsigned int  component = 0) const override;
+      virtual double value(const Point<dim> & p,
+                           const unsigned int component = 0) const override;
 
       virtual void vector_value(const Point<dim> &p,
-                                Vector<double>   &value) const override;
+                                Vector<double> &  value) const override;
     };
 
 
@@ -165,26 +165,26 @@ namespace Step32
     template <int dim>
     double
     TemperatureInitialValues<dim>::value(const Point<dim>  &p,
-                                         const unsigned int) const
+                                                const unsigned int) const
     {
       const double r = p.norm();
-      const double h = R1-R0;
+      const double h = R1 - R0;
 
-      const double s = (r-R0)/h;
+      const double s = (r - R0) / h;
       const double q = (dim==3)?std::max(0.0,cos(numbers::PI*abs(p(2)/R1))):1.0;
-      const double phi   = std::atan2(p(0),p(1));
+      const double phi = std::atan2(p(0), p(1));
       const double tau = s
                          +
                          0.2 * s * (1-s) * std::sin(6*phi) * q;
 
-      return T0*(1.0-tau) + T1*tau;
+      return T0 * (1.0 - tau) + T1 * tau;
     }
 
 
     template <int dim>
     void
     TemperatureInitialValues<dim>::vector_value(const Point<dim> &p,
-                                                Vector<double>   &values) const
+                                                Vector<double> &  values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = TemperatureInitialValues<dim>::value(p, c);
@@ -204,7 +204,7 @@ namespace Step32
     // happen in SI units (kilogram, meter, seconds) but writing geological
     // times in seconds yields numbers that one can't relate to reality, and
     // so we convert to years using the factor defined here:
-    const double year_in_seconds  = 60*60*24*365.2425;
+    const double year_in_seconds = 60 * 60 * 24 * 365.2425;
 
   }
 
@@ -236,18 +236,18 @@ namespace Step32
     public:
       BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,
                                const TrilinosWrappers::BlockSparseMatrix &Spre,
-                               const PreconditionerTypeMp                &Mppreconditioner,
-                               const PreconditionerTypeA                 &Apreconditioner,
+                               const PreconditionerTypeMp &Mppreconditioner,
+                               const PreconditionerTypeA & Apreconditioner,
                                const bool                                 do_solve_A)
         :
-        stokes_matrix     (&S),
-        stokes_preconditioner_matrix     (&Spre),
+        stokes_matrix(&S),
+        stokes_preconditioner_matrix(&Spre),
         mp_preconditioner(Mppreconditioner),
-        a_preconditioner  (Apreconditioner),
-        do_solve_A        (do_solve_A)
+        a_preconditioner(Apreconditioner),
+        do_solve_A(do_solve_A)
       {}
 
-      void vmult(TrilinosWrappers::MPI::BlockVector       &dst,
+      void vmult(TrilinosWrappers::MPI::BlockVector &      dst,
                  const TrilinosWrappers::MPI::BlockVector &src) const
       {
         TrilinosWrappers::MPI::Vector utmp(src.block(0));
@@ -257,7 +257,7 @@ namespace Step32
 
           SolverCG<TrilinosWrappers::MPI::Vector> solver(solver_control);
 
-          solver.solve(stokes_preconditioner_matrix->block(1,1),
+          solver.solve(stokes_preconditioner_matrix->block(1, 1),
                        dst.block(1), src.block(1),
                        mp_preconditioner);
 
@@ -265,14 +265,14 @@ namespace Step32
         }
 
         {
-          stokes_matrix->block(0,1).vmult(utmp, dst.block(1));
-          utmp*=-1.0;
+          stokes_matrix->block(0, 1).vmult(utmp, dst.block(1));
+          utmp *= -1.0;
           utmp.add(src.block(0));
         }
 
         if (do_solve_A == true)
           {
-            SolverControl solver_control(5000, utmp.l2_norm()*1e-2);
+            SolverControl solver_control(5000, utmp.l2_norm() * 1e-2);
             TrilinosWrappers::SolverCG solver(solver_control);
             solver.solve(stokes_matrix->block(0,0), dst.block(0), utmp,
                          a_preconditioner);
@@ -285,8 +285,8 @@ namespace Step32
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_preconditioner_matrix;
       const PreconditionerTypeMp &mp_preconditioner;
-      const PreconditionerTypeA  &a_preconditioner;
-      const bool do_solve_A;
+      const PreconditionerTypeA & a_preconditioner;
+      const bool                  do_solve_A;
     };
   }
 
@@ -342,24 +342,24 @@ namespace Step32
       struct StokesPreconditioner
       {
         StokesPreconditioner(const FiniteElement<dim> &stokes_fe,
-                             const Quadrature<dim>    &stokes_quadrature,
-                             const Mapping<dim>       &mapping,
+                             const Quadrature<dim> &   stokes_quadrature,
+                             const Mapping<dim> &      mapping,
                              const UpdateFlags         update_flags);
 
         StokesPreconditioner(const StokesPreconditioner &data);
 
 
-        FEValues<dim>               stokes_fe_values;
+        FEValues<dim> stokes_fe_values;
 
-        std::vector<Tensor<2,dim> > grad_phi_u;
+        std::vector<Tensor<2, dim>> grad_phi_u;
         std::vector<double>         phi_p;
       };
 
       template <int dim>
       StokesPreconditioner<dim>::
       StokesPreconditioner(const FiniteElement<dim> &stokes_fe,
-                           const Quadrature<dim>    &stokes_quadrature,
-                           const Mapping<dim>       &mapping,
+        const Quadrature<dim> &   stokes_quadrature,
+        const Mapping<dim> &      mapping,
                            const UpdateFlags         update_flags)
         :
         stokes_fe_values(mapping, stokes_fe, stokes_quadrature,
@@ -398,8 +398,8 @@ namespace Step32
       struct StokesSystem : public StokesPreconditioner<dim>
       {
         StokesSystem(const FiniteElement<dim> &stokes_fe,
-                     const Mapping<dim>       &mapping,
-                     const Quadrature<dim>    &stokes_quadrature,
+                     const Mapping<dim> &      mapping,
+                     const Quadrature<dim> &   stokes_quadrature,
                      const UpdateFlags         stokes_update_flags,
                      const FiniteElement<dim> &temperature_fe,
                      const UpdateFlags         temperature_update_flags);
@@ -407,28 +407,28 @@ namespace Step32
         StokesSystem(const StokesSystem<dim> &data);
 
 
-        FEValues<dim>                        temperature_fe_values;
+        FEValues<dim> temperature_fe_values;
 
-        std::vector<Tensor<1,dim> >          phi_u;
-        std::vector<SymmetricTensor<2,dim> > grads_phi_u;
+        std::vector<Tensor<1, dim>>          phi_u;
+        std::vector<SymmetricTensor<2, dim>> grads_phi_u;
         std::vector<double>                  div_phi_u;
 
-        std::vector<double>                  old_temperature_values;
+        std::vector<double> old_temperature_values;
       };
 
 
       template <int dim>
       StokesSystem<dim>::
       StokesSystem(const FiniteElement<dim> &stokes_fe,
-                   const Mapping<dim>       &mapping,
-                   const Quadrature<dim>    &stokes_quadrature,
-                   const UpdateFlags         stokes_update_flags,
-                   const FiniteElement<dim> &temperature_fe,
+        const Mapping<dim> &      mapping,
+        const Quadrature<dim> &   stokes_quadrature,
+        const UpdateFlags         stokes_update_flags,
+        const FiniteElement<dim> &temperature_fe,
                    const UpdateFlags         temperature_update_flags)
         :
         StokesPreconditioner<dim> (stokes_fe, stokes_quadrature,
-                                   mapping,
-                                   stokes_update_flags),
+                                  mapping,
+                                  stokes_update_flags),
         temperature_fe_values(mapping, temperature_fe, stokes_quadrature,
                               temperature_update_flags),
         phi_u(stokes_fe.dofs_per_cell),
@@ -442,7 +442,7 @@ namespace Step32
       StokesSystem<dim>::
       StokesSystem(const StokesSystem<dim> &scratch)
         :
-        StokesPreconditioner<dim> (scratch),
+        StokesPreconditioner<dim>(scratch),
         temperature_fe_values(scratch.temperature_fe_values.get_mapping(),
                               scratch.temperature_fe_values.get_fe(),
                               scratch.temperature_fe_values.get_quadrature(),
@@ -461,31 +461,31 @@ namespace Step32
       struct TemperatureMatrix
       {
         TemperatureMatrix(const FiniteElement<dim> &temperature_fe,
-                          const Mapping<dim>       &mapping,
-                          const Quadrature<dim>    &temperature_quadrature);
+                          const Mapping<dim> &      mapping,
+                          const Quadrature<dim> &   temperature_quadrature);
 
         TemperatureMatrix(const TemperatureMatrix &data);
 
 
-        FEValues<dim>               temperature_fe_values;
+        FEValues<dim> temperature_fe_values;
 
         std::vector<double>         phi_T;
-        std::vector<Tensor<1,dim> > grad_phi_T;
+        std::vector<Tensor<1, dim>> grad_phi_T;
       };
 
 
       template <int dim>
       TemperatureMatrix<dim>::
       TemperatureMatrix(const FiniteElement<dim> &temperature_fe,
-                        const Mapping<dim>       &mapping,
+        const Mapping<dim> &      mapping,
                         const Quadrature<dim>    &temperature_quadrature)
         :
         temperature_fe_values(mapping,
                               temperature_fe, temperature_quadrature,
-                              update_values    | update_gradients |
-                              update_JxW_values),
-        phi_T (temperature_fe.dofs_per_cell),
-        grad_phi_T (temperature_fe.dofs_per_cell)
+                              update_values | update_gradients |
+                                update_JxW_values),
+        phi_T(temperature_fe.dofs_per_cell),
+        grad_phi_T(temperature_fe.dofs_per_cell)
       {}
 
 
@@ -497,8 +497,8 @@ namespace Step32
                               scratch.temperature_fe_values.get_fe(),
                               scratch.temperature_fe_values.get_quadrature(),
                               scratch.temperature_fe_values.get_update_flags()),
-        phi_T (scratch.phi_T),
-        grad_phi_T (scratch.grad_phi_T)
+        phi_T(scratch.phi_T),
+        grad_phi_T(scratch.grad_phi_T)
       {}
 
 
@@ -515,40 +515,40 @@ namespace Step32
       template <int dim>
       struct TemperatureRHS
       {
-        TemperatureRHS (const FiniteElement<dim> &temperature_fe,
-                        const FiniteElement<dim> &stokes_fe,
-                        const Mapping<dim>       &mapping,
-                        const Quadrature<dim>    &quadrature);
+        TemperatureRHS(const FiniteElement<dim> &temperature_fe,
+                       const FiniteElement<dim> &stokes_fe,
+                       const Mapping<dim> &      mapping,
+                       const Quadrature<dim> &   quadrature);
 
-        TemperatureRHS (const TemperatureRHS &data);
+        TemperatureRHS(const TemperatureRHS &data);
 
 
-        FEValues<dim>                        temperature_fe_values;
-        FEValues<dim>                        stokes_fe_values;
+        FEValues<dim> temperature_fe_values;
+        FEValues<dim> stokes_fe_values;
 
-        std::vector<double>                  phi_T;
-        std::vector<Tensor<1,dim> >          grad_phi_T;
+        std::vector<double>         phi_T;
+        std::vector<Tensor<1, dim>> grad_phi_T;
 
-        std::vector<Tensor<1,dim> >          old_velocity_values;
-        std::vector<Tensor<1,dim> >          old_old_velocity_values;
+        std::vector<Tensor<1, dim>> old_velocity_values;
+        std::vector<Tensor<1, dim>> old_old_velocity_values;
 
-        std::vector<SymmetricTensor<2,dim> > old_strain_rates;
-        std::vector<SymmetricTensor<2,dim> > old_old_strain_rates;
+        std::vector<SymmetricTensor<2, dim>> old_strain_rates;
+        std::vector<SymmetricTensor<2, dim>> old_old_strain_rates;
 
-        std::vector<double>                  old_temperature_values;
-        std::vector<double>                  old_old_temperature_values;
-        std::vector<Tensor<1,dim> >          old_temperature_grads;
-        std::vector<Tensor<1,dim> >          old_old_temperature_grads;
-        std::vector<double>                  old_temperature_laplacians;
-        std::vector<double>                  old_old_temperature_laplacians;
+        std::vector<double>         old_temperature_values;
+        std::vector<double>         old_old_temperature_values;
+        std::vector<Tensor<1, dim>> old_temperature_grads;
+        std::vector<Tensor<1, dim>> old_old_temperature_grads;
+        std::vector<double>         old_temperature_laplacians;
+        std::vector<double>         old_old_temperature_laplacians;
       };
 
 
       template <int dim>
       TemperatureRHS<dim>::
       TemperatureRHS (const FiniteElement<dim> &temperature_fe,
-                      const FiniteElement<dim> &stokes_fe,
-                      const Mapping<dim>       &mapping,
+        const FiniteElement<dim> &stokes_fe,
+        const Mapping<dim> &      mapping,
                       const Quadrature<dim>    &quadrature)
         :
         temperature_fe_values(mapping,
@@ -557,12 +557,12 @@ namespace Step32
                               update_gradients |
                               update_hessians  |
                               update_quadrature_points |
-                              update_JxW_values),
+                                update_JxW_values),
         stokes_fe_values(mapping,
                          stokes_fe, quadrature,
                          update_values | update_gradients),
-        phi_T (temperature_fe.dofs_per_cell),
-        grad_phi_T (temperature_fe.dofs_per_cell),
+        phi_T(temperature_fe.dofs_per_cell),
+        grad_phi_T(temperature_fe.dofs_per_cell),
 
         old_velocity_values(quadrature.size()),
         old_old_velocity_values(quadrature.size()),
@@ -590,8 +590,8 @@ namespace Step32
                          scratch.stokes_fe_values.get_fe(),
                          scratch.stokes_fe_values.get_quadrature(),
                          scratch.stokes_fe_values.get_update_flags()),
-        phi_T (scratch.phi_T),
-        grad_phi_T (scratch.grad_phi_T),
+        phi_T(scratch.phi_T),
+        grad_phi_T(scratch.grad_phi_T),
 
         old_velocity_values(scratch.old_velocity_values),
         old_old_velocity_values(scratch.old_old_velocity_values),
@@ -625,7 +625,7 @@ namespace Step32
         StokesPreconditioner(const FiniteElement<dim> &stokes_fe);
         StokesPreconditioner(const StokesPreconditioner &data);
 
-        FullMatrix<double>          local_matrix;
+        FullMatrix<double>                   local_matrix;
         std::vector<types::global_dof_index> local_dof_indices;
       };
 
@@ -661,7 +661,7 @@ namespace Step32
       StokesSystem<dim>::
       StokesSystem(const FiniteElement<dim> &stokes_fe)
         :
-        StokesPreconditioner<dim> (stokes_fe),
+        StokesPreconditioner<dim>(stokes_fe),
         local_rhs(stokes_fe.dofs_per_cell)
       {}
 
@@ -669,7 +669,7 @@ namespace Step32
       StokesSystem<dim>::
       StokesSystem(const StokesSystem<dim> &data)
         :
-        StokesPreconditioner<dim> (data),
+        StokesPreconditioner<dim>(data),
         local_rhs(data.local_rhs)
       {}
 
@@ -681,9 +681,9 @@ namespace Step32
         TemperatureMatrix(const FiniteElement<dim> &temperature_fe);
         TemperatureMatrix(const TemperatureMatrix &data);
 
-        FullMatrix<double>          local_mass_matrix;
-        FullMatrix<double>          local_stiffness_matrix;
-        std::vector<types::global_dof_index>   local_dof_indices;
+        FullMatrix<double>                   local_mass_matrix;
+        FullMatrix<double>                   local_stiffness_matrix;
+        std::vector<types::global_dof_index> local_dof_indices;
       };
 
       template <int dim>
@@ -711,12 +711,12 @@ namespace Step32
       template <int dim>
       struct TemperatureRHS
       {
-        TemperatureRHS (const FiniteElement<dim> &temperature_fe);
-        TemperatureRHS (const TemperatureRHS &data);
+        TemperatureRHS(const FiniteElement<dim> &temperature_fe);
+        TemperatureRHS(const TemperatureRHS &data);
 
-        Vector<double>              local_rhs;
+        Vector<double>                       local_rhs;
         std::vector<types::global_dof_index> local_dof_indices;
-        FullMatrix<double>          matrix_for_bc;
+        FullMatrix<double>                   matrix_for_bc;
       };
 
       template <int dim>
@@ -766,37 +766,37 @@ namespace Step32
     void run();
 
   private:
-    void setup_dofs();
-    void assemble_stokes_preconditioner();
-    void build_stokes_preconditioner();
-    void assemble_stokes_system();
-    void assemble_temperature_matrix();
-    void assemble_temperature_system(const double maximal_velocity);
-    void project_temperature_field();
+    void   setup_dofs();
+    void   assemble_stokes_preconditioner();
+    void   build_stokes_preconditioner();
+    void   assemble_stokes_system();
+    void   assemble_temperature_matrix();
+    void   assemble_temperature_system(const double maximal_velocity);
+    void   project_temperature_field();
     double get_maximal_velocity() const;
     double get_cfl_number() const;
     double get_entropy_variation(const double average_temperature) const;
-    std::pair<double,double> get_extrapolated_temperature_range() const;
-    void solve();
-    void output_results();
-    void refine_mesh(const unsigned int max_grid_level);
+    std::pair<double, double> get_extrapolated_temperature_range() const;
+    void                      solve();
+    void                      output_results();
+    void                      refine_mesh(const unsigned int max_grid_level);
 
     double
     compute_viscosity(const std::vector<double>          &old_temperature,
-                      const std::vector<double>          &old_old_temperature,
-                      const std::vector<Tensor<1,dim> >  &old_temperature_grads,
-                      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
-                      const std::vector<double>          &old_temperature_laplacians,
-                      const std::vector<double>          &old_old_temperature_laplacians,
-                      const std::vector<Tensor<1,dim> >  &old_velocity_values,
-                      const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
-                      const std::vector<SymmetricTensor<2,dim> >  &old_strain_rates,
-                      const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
-                      const double                        global_u_infty,
-                      const double                        global_T_variation,
-                      const double                        average_temperature,
-                      const double                        global_entropy_variation,
-                      const double                        cell_diameter) const;
+      const std::vector<double> &        old_old_temperature,
+      const std::vector<Tensor<1, dim>> &old_temperature_grads,
+      const std::vector<Tensor<1, dim>> &old_old_temperature_grads,
+      const std::vector<double> &        old_temperature_laplacians,
+      const std::vector<double> &        old_old_temperature_laplacians,
+      const std::vector<Tensor<1, dim>> &old_velocity_values,
+      const std::vector<Tensor<1, dim>> &old_old_velocity_values,
+      const std::vector<SymmetricTensor<2, dim>> &old_strain_rates,
+      const std::vector<SymmetricTensor<2, dim>> &old_old_strain_rates,
+      const double                                global_u_infty,
+      const double                                global_T_variation,
+      const double                                average_temperature,
+      const double                                global_entropy_variation,
+      const double                                cell_diameter) const;
 
   public:
 
@@ -809,9 +809,9 @@ namespace Step32
       Parameters(const std::string &parameter_filename);
 
       static void declare_parameters(ParameterHandler &prm);
-      void parse_parameters(ParameterHandler &prm);
+      void        parse_parameters(ParameterHandler &prm);
 
-      double       end_time;
+      double end_time;
 
       unsigned int initial_global_refinement;
       unsigned int initial_adaptive_refinement;
@@ -821,9 +821,9 @@ namespace Step32
 
       unsigned int adaptive_refinement_interval;
 
-      double       stabilization_alpha;
-      double       stabilization_c_R;
-      double       stabilization_beta;
+      double stabilization_alpha;
+      double stabilization_c_R;
+      double stabilization_beta;
 
       unsigned int stokes_velocity_degree;
       bool         use_locally_conservative_discretization;
@@ -832,7 +832,7 @@ namespace Step32
     };
 
   private:
-    Parameters                               &parameters;
+    Parameters &parameters;
 
     // The <code>pcout</code> (for <i>%parallel <code>std::cout</code></i>)
     // object is used to simplify writing output: each MPI process can use
@@ -841,7 +841,7 @@ namespace Step32
     // many times over; with the ConditionalOStream class, only the output
     // generated by one MPI process will actually be printed to screen,
     // whereas the output by all the other threads will simply be forgotten.
-    ConditionalOStream                        pcout;
+    ConditionalOStream pcout;
 
     // The following member variables will then again be similar to those in
     // step-31 (and to other tutorial programs). As mentioned in the
@@ -877,46 +877,46 @@ namespace Step32
     parallel::distributed::Triangulation<dim> triangulation;
     double                                    global_Omega_diameter;
 
-    const MappingQ<dim>                       mapping;
+    const MappingQ<dim> mapping;
 
-    const FESystem<dim>                       stokes_fe;
-    DoFHandler<dim>                           stokes_dof_handler;
-    ConstraintMatrix                          stokes_constraints;
+    const FESystem<dim> stokes_fe;
+    DoFHandler<dim>     stokes_dof_handler;
+    ConstraintMatrix    stokes_constraints;
 
-    TrilinosWrappers::BlockSparseMatrix       stokes_matrix;
-    TrilinosWrappers::BlockSparseMatrix       stokes_preconditioner_matrix;
+    TrilinosWrappers::BlockSparseMatrix stokes_matrix;
+    TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
-    TrilinosWrappers::MPI::BlockVector        stokes_solution;
-    TrilinosWrappers::MPI::BlockVector        old_stokes_solution;
-    TrilinosWrappers::MPI::BlockVector        stokes_rhs;
-
-
-    FE_Q<dim>                                 temperature_fe;
-    DoFHandler<dim>                           temperature_dof_handler;
-    ConstraintMatrix                          temperature_constraints;
-
-    TrilinosWrappers::SparseMatrix            temperature_mass_matrix;
-    TrilinosWrappers::SparseMatrix            temperature_stiffness_matrix;
-    TrilinosWrappers::SparseMatrix            temperature_matrix;
-
-    TrilinosWrappers::MPI::Vector             temperature_solution;
-    TrilinosWrappers::MPI::Vector             old_temperature_solution;
-    TrilinosWrappers::MPI::Vector             old_old_temperature_solution;
-    TrilinosWrappers::MPI::Vector             temperature_rhs;
+    TrilinosWrappers::MPI::BlockVector stokes_solution;
+    TrilinosWrappers::MPI::BlockVector old_stokes_solution;
+    TrilinosWrappers::MPI::BlockVector stokes_rhs;
 
 
-    double                                    time_step;
-    double                                    old_time_step;
-    unsigned int                              timestep_number;
+    FE_Q<dim>        temperature_fe;
+    DoFHandler<dim>  temperature_dof_handler;
+    ConstraintMatrix temperature_constraints;
+
+    TrilinosWrappers::SparseMatrix temperature_mass_matrix;
+    TrilinosWrappers::SparseMatrix temperature_stiffness_matrix;
+    TrilinosWrappers::SparseMatrix temperature_matrix;
+
+    TrilinosWrappers::MPI::Vector temperature_solution;
+    TrilinosWrappers::MPI::Vector old_temperature_solution;
+    TrilinosWrappers::MPI::Vector old_old_temperature_solution;
+    TrilinosWrappers::MPI::Vector temperature_rhs;
+
+
+    double       time_step;
+    double       old_time_step;
+    unsigned int timestep_number;
 
     std::shared_ptr<TrilinosWrappers::PreconditionAMG>    Amg_preconditioner;
     std::shared_ptr<TrilinosWrappers::PreconditionJacobi> Mp_preconditioner;
     std::shared_ptr<TrilinosWrappers::PreconditionJacobi> T_preconditioner;
 
-    bool                                      rebuild_stokes_matrix;
-    bool                                      rebuild_stokes_preconditioner;
-    bool                                      rebuild_temperature_matrices;
-    bool                                      rebuild_temperature_preconditioner;
+    bool rebuild_stokes_matrix;
+    bool rebuild_stokes_preconditioner;
+    bool rebuild_temperature_matrices;
+    bool rebuild_temperature_preconditioner;
 
     // The next member variable, <code>computing_timer</code> is used to
     // conveniently account for compute time spent in certain "sections" of
@@ -927,18 +927,18 @@ namespace Step32
     // of the TimerOutput class) we will then produce a nice summary of the
     // times spent in the different sections into which we categorize the
     // run-time of this program.
-    TimerOutput                               computing_timer;
+    TimerOutput computing_timer;
 
     // After these member variables we have a number of auxiliary functions
     // that have been broken out of the ones listed above. Specifically, there
     // are first three functions that we call from <code>setup_dofs</code> and
     // then the ones that do the assembling of linear systems:
     void setup_stokes_matrix(const std::vector<IndexSet> &stokes_partitioning,
-                             const std::vector<IndexSet> &stokes_relevant_partitioning);
+      const std::vector<IndexSet> &stokes_relevant_partitioning);
     void setup_stokes_preconditioner(const std::vector<IndexSet> &stokes_partitioning,
-                                     const std::vector<IndexSet> &stokes_relevant_partitioning);
+      const std::vector<IndexSet> &stokes_relevant_partitioning);
     void setup_temperature_matrices(const IndexSet &temperature_partitioning,
-                                    const IndexSet &temperature_relevant_partitioning);
+      const IndexSet &temperature_relevant_partitioning);
 
 
     // Following the @ref MTWorkStream "task-based parallelization" paradigm,
@@ -951,8 +951,8 @@ namespace Step32
     // in this program. The following eight functions do exactly this:
     void
     local_assemble_stokes_preconditioner(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                         Assembly::Scratch::StokesPreconditioner<dim> &scratch,
-                                         Assembly::CopyData::StokesPreconditioner<dim> &data);
+      Assembly::Scratch::StokesPreconditioner<dim> &        scratch,
+      Assembly::CopyData::StokesPreconditioner<dim> &       data);
 
     void
     copy_local_to_global_stokes_preconditioner(const Assembly::CopyData::StokesPreconditioner<dim> &data);
@@ -960,8 +960,8 @@ namespace Step32
 
     void
     local_assemble_stokes_system(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                 Assembly::Scratch::StokesSystem<dim>  &scratch,
-                                 Assembly::CopyData::StokesSystem<dim> &data);
+      Assembly::Scratch::StokesSystem<dim> &                scratch,
+      Assembly::CopyData::StokesSystem<dim> &               data);
 
     void
     copy_local_to_global_stokes_system(const Assembly::CopyData::StokesSystem<dim> &data);
@@ -969,8 +969,8 @@ namespace Step32
 
     void
     local_assemble_temperature_matrix(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                      Assembly::Scratch::TemperatureMatrix<dim>  &scratch,
-                                      Assembly::CopyData::TemperatureMatrix<dim> &data);
+      Assembly::Scratch::TemperatureMatrix<dim> &           scratch,
+      Assembly::CopyData::TemperatureMatrix<dim> &          data);
 
     void
     copy_local_to_global_temperature_matrix(const Assembly::CopyData::TemperatureMatrix<dim> &data);
@@ -979,11 +979,11 @@ namespace Step32
 
     void
     local_assemble_temperature_rhs(const std::pair<double,double> global_T_range,
-                                   const double                   global_max_velocity,
-                                   const double                   global_entropy_variation,
-                                   const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                   Assembly::Scratch::TemperatureRHS<dim> &scratch,
-                                   Assembly::CopyData::TemperatureRHS<dim> &data);
+      const double                    global_max_velocity,
+      const double                    global_entropy_variation,
+      const typename DoFHandler<dim>::active_cell_iterator &cell,
+      Assembly::Scratch::TemperatureRHS<dim> &              scratch,
+      Assembly::CopyData::TemperatureRHS<dim> &             data);
 
     void
     copy_local_to_global_temperature_rhs(const Assembly::CopyData::TemperatureRHS<dim> &data);
@@ -1023,7 +1023,7 @@ namespace Step32
     initial_adaptive_refinement(2),
     adaptive_refinement_interval(10),
     stabilization_alpha(2),
-    stabilization_c_R (0.11),
+    stabilization_c_R(0.11),
     stabilization_beta(0.078),
     stokes_velocity_degree(2),
     use_locally_conservative_discretization(true),
@@ -1107,19 +1107,19 @@ namespace Step32
     prm.enter_subsection("Discretization");
     {
       prm.declare_entry("Stokes velocity polynomial degree", "2",
-                        Patterns::Integer(1),
-                        "The polynomial degree to use for the velocity variables "
-                        "in the Stokes system.");
+        Patterns::Integer(1),
+        "The polynomial degree to use for the velocity variables "
+        "in the Stokes system.");
       prm.declare_entry("Temperature polynomial degree", "2",
-                        Patterns::Integer(1),
-                        "The polynomial degree to use for the temperature variable.");
+        Patterns::Integer(1),
+        "The polynomial degree to use for the temperature variable.");
       prm.declare_entry("Use locally conservative discretization", "true",
-                        Patterns::Bool(),
-                        "Whether to use a Stokes discretization that is locally "
-                        "conservative at the expense of a larger number of degrees "
-                        "of freedom, or to go with a cheaper discretization "
-                        "that does not locally conserve mass(although it is "
-                        "globally conservative.");
+        Patterns::Bool(),
+        "Whether to use a Stokes discretization that is locally "
+        "conservative at the expense of a larger number of degrees "
+        "of freedom, or to go with a cheaper discretization "
+        "that does not locally conserve mass(although it is "
+        "globally conservative.");
     }
     prm.leave_subsection();
   }
@@ -1135,13 +1135,13 @@ namespace Step32
   BoussinesqFlowProblem<dim>::Parameters::
   parse_parameters(ParameterHandler &prm)
   {
-    end_time                    = prm.get_double("End time");
-    initial_global_refinement   = prm.get_integer("Initial global refinement");
+    end_time                  = prm.get_double("End time");
+    initial_global_refinement = prm.get_integer("Initial global refinement");
     initial_adaptive_refinement = prm.get_integer("Initial adaptive refinement");
 
     adaptive_refinement_interval= prm.get_integer("Time steps between mesh refinement");
 
-    generate_graphical_output   = prm.get_bool("Generate graphical output");
+    generate_graphical_output = prm.get_bool("Generate graphical output");
     graphical_output_interval   = prm.get_integer("Time steps between graphical output");
 
     prm.enter_subsection("Stabilization parameters");
@@ -1155,7 +1155,7 @@ namespace Step32
     prm.enter_subsection("Discretization");
     {
       stokes_velocity_degree = prm.get_integer("Stokes velocity polynomial degree");
-      temperature_degree     = prm.get_integer("Temperature polynomial degree");
+      temperature_degree = prm.get_integer("Temperature polynomial degree");
       use_locally_conservative_discretization
         = prm.get_bool("Use locally conservative discretization");
     }
@@ -1201,7 +1201,7 @@ namespace Step32
     triangulation(MPI_COMM_WORLD,
                   typename Triangulation<dim>::MeshSmoothing
                   (Triangulation<dim>::smoothing_on_refinement |
-                   Triangulation<dim>::smoothing_on_coarsening)),
+                    Triangulation<dim>::smoothing_on_coarsening)),
 
     global_Omega_diameter(0.),
 
@@ -1276,10 +1276,10 @@ namespace Step32
   {
     const QIterated<dim> quadrature_formula(QTrapez<1>(),
                                             parameters.stokes_velocity_degree);
-    const unsigned int n_q_points = quadrature_formula.size();
+    const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(mapping, stokes_fe, quadrature_formula, update_values);
-    std::vector<Tensor<1,dim> > velocity_values(n_q_points);
+    std::vector<Tensor<1, dim>> velocity_values(n_q_points);
 
     const FEValuesExtractors::Vector velocities(0);
 
@@ -1318,10 +1318,10 @@ namespace Step32
   {
     const QIterated<dim> quadrature_formula(QTrapez<1>(),
                                             parameters.stokes_velocity_degree);
-    const unsigned int n_q_points = quadrature_formula.size();
+    const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(mapping, stokes_fe, quadrature_formula, update_values);
-    std::vector<Tensor<1,dim> > velocity_values(n_q_points);
+    std::vector<Tensor<1, dim>> velocity_values(n_q_points);
 
     const FEValuesExtractors::Vector velocities(0);
 
@@ -1377,7 +1377,7 @@ namespace Step32
     if (parameters.stabilization_alpha != 2)
       return 1.;
 
-    const QGauss<dim> quadrature_formula(parameters.temperature_degree+1);
+    const QGauss<dim>  quadrature_formula(parameters.temperature_degree + 1);
     const unsigned int n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(temperature_fe, quadrature_formula,
@@ -1406,8 +1406,8 @@ namespace Step32
            entropy_integrated = 0;
 
     typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
+      cell = temperature_dof_handler.begin_active(),
+      endc = temperature_dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -1440,18 +1440,18 @@ namespace Step32
     // the minimal entropies equals forming the negative of the maximum over
     // the negative of the minimal entropies; this maximum can then be
     // combined with forming the maximum over the maximal entropies.
-    const double local_sums[2]   = { entropy_integrated, area },
-                                   local_maxima[2] = { -min_entropy, max_entropy };
+    const double local_sums[2]   = {entropy_integrated, area},
+                 local_maxima[2] = {-min_entropy, max_entropy};
     double global_sums[2], global_maxima[2];
 
-    Utilities::MPI::sum(local_sums,   MPI_COMM_WORLD, global_sums);
+    Utilities::MPI::sum(local_sums, MPI_COMM_WORLD, global_sums);
     Utilities::MPI::max(local_maxima, MPI_COMM_WORLD, global_maxima);
 
     // Having computed everything this way, we can then compute the average
     // entropy and find the $L^\infty$ norm by taking the larger of the
     // deviation of the maximum or minimum from the average:
     const double average_entropy = global_sums[0] / global_sums[1];
-    const double entropy_diff = std::max(global_maxima[1] - average_entropy,
+    const double entropy_diff    = std::max(global_maxima[1] - average_entropy,
                                          average_entropy - (-global_maxima[0]));
     return entropy_diff;
   }
@@ -1471,12 +1471,12 @@ namespace Step32
   // order temperature extrapolation scheme when at least two previous time
   // steps are available.
   template <int dim>
-  std::pair<double,double>
+  std::pair<double, double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range() const
   {
     const QIterated<dim> quadrature_formula(QTrapez<1>(),
                                             parameters.temperature_degree);
-    const unsigned int n_q_points = quadrature_formula.size();
+    const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(mapping, temperature_fe, quadrature_formula,
                             update_values);
@@ -1489,8 +1489,8 @@ namespace Step32
     if (timestep_number != 0)
       {
         typename DoFHandler<dim>::active_cell_iterator
-        cell = temperature_dof_handler.begin_active(),
-        endc = temperature_dof_handler.end();
+          cell = temperature_dof_handler.begin_active(),
+          endc = temperature_dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->is_locally_owned())
             {
@@ -1504,7 +1504,7 @@ namespace Step32
                 {
                   const double temperature =
                     (1. + time_step/old_time_step) * old_temperature_values[q]-
-                    time_step/old_time_step * old_old_temperature_values[q];
+                    time_step / old_time_step * old_old_temperature_values[q];
 
                   min_local_temperature = std::min(min_local_temperature,
                                                    temperature);
@@ -1516,8 +1516,8 @@ namespace Step32
     else
       {
         typename DoFHandler<dim>::active_cell_iterator
-        cell = temperature_dof_handler.begin_active(),
-        endc = temperature_dof_handler.end();
+          cell = temperature_dof_handler.begin_active(),
+          endc = temperature_dof_handler.end();
         for (; cell != endc; ++cell)
           if (cell->is_locally_owned())
             {
@@ -1556,20 +1556,20 @@ namespace Step32
   double
   BoussinesqFlowProblem<dim>::
   compute_viscosity(const std::vector<double>          &old_temperature,
-                    const std::vector<double>          &old_old_temperature,
-                    const std::vector<Tensor<1,dim> >  &old_temperature_grads,
-                    const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
-                    const std::vector<double>          &old_temperature_laplacians,
-                    const std::vector<double>          &old_old_temperature_laplacians,
-                    const std::vector<Tensor<1,dim> >  &old_velocity_values,
-                    const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
-                    const std::vector<SymmetricTensor<2,dim> >  &old_strain_rates,
-                    const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
-                    const double                        global_u_infty,
-                    const double                        global_T_variation,
-                    const double                        average_temperature,
-                    const double                        global_entropy_variation,
-                    const double                        cell_diameter) const
+    const std::vector<double> &                 old_old_temperature,
+    const std::vector<Tensor<1, dim>> &         old_temperature_grads,
+    const std::vector<Tensor<1, dim>> &         old_old_temperature_grads,
+    const std::vector<double> &                 old_temperature_laplacians,
+    const std::vector<double> &                 old_old_temperature_laplacians,
+    const std::vector<Tensor<1, dim>> &         old_velocity_values,
+    const std::vector<Tensor<1, dim>> &         old_old_velocity_values,
+    const std::vector<SymmetricTensor<2, dim>> &old_strain_rates,
+    const std::vector<SymmetricTensor<2, dim>> &old_old_strain_rates,
+    const double                                global_u_infty,
+    const double                                global_T_variation,
+    const double                                average_temperature,
+    const double                                global_entropy_variation,
+    const double                                cell_diameter) const
   {
     if (global_u_infty == 0)
       return 5e-3 * cell_diameter;
@@ -1599,16 +1599,16 @@ namespace Step32
         const double gamma
           = ((EquationData::radiogenic_heating * EquationData::density(T)
               +
-              2 * EquationData::eta * strain_rate * strain_rate) /
-             (EquationData::density(T) * EquationData::specific_heat));
+            2 * EquationData::eta * strain_rate * strain_rate) /
+           (EquationData::density(T) * EquationData::specific_heat));
 
         double residual
           = std::abs(dT_dt + u_grad_T - kappa_Delta_T - gamma);
         if (parameters.stabilization_alpha == 2)
           residual *= std::abs(T - average_temperature);
 
-        max_residual = std::max(residual,        max_residual);
-        max_velocity = std::max(std::sqrt(u*u), max_velocity);
+        max_residual = std::max(residual, max_residual);
+        max_velocity = std::max(std::sqrt(u * u), max_velocity);
       }
 
     const double max_viscosity = (parameters.stabilization_beta *
@@ -1629,7 +1629,7 @@ namespace Step32
           entropy_viscosity = (parameters.stabilization_c_R *
                                cell_diameter * global_Omega_diameter *
                                max_velocity * max_residual /
-                               (global_u_infty * global_T_variation));
+             (global_u_infty * global_T_variation));
 
         return std::min(max_viscosity, entropy_viscosity);
       }
@@ -1686,7 +1686,7 @@ namespace Step32
   {
     assemble_temperature_matrix();
 
-    QGauss<dim> quadrature(parameters.temperature_degree+2);
+    QGauss<dim> quadrature(parameters.temperature_degree + 2);
     UpdateFlags update_flags = UpdateFlags(update_values   |
                                            update_quadrature_points |
                                            update_JxW_values);
@@ -1696,23 +1696,23 @@ namespace Step32
                        n_q_points    = fe_values.n_quadrature_points;
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    Vector<double> cell_vector(dofs_per_cell);
+    Vector<double>                       cell_vector(dofs_per_cell);
     FullMatrix<double> matrix_for_bc(dofs_per_cell, dofs_per_cell);
 
     std::vector<double> rhs_values(n_q_points);
 
     IndexSet row_temp_matrix_partitioning(temperature_mass_matrix.n());
     row_temp_matrix_partitioning.add_range(temperature_mass_matrix.local_range().first,
-                                           temperature_mass_matrix.local_range().second);
+      temperature_mass_matrix.local_range().second);
     TrilinosWrappers::MPI::Vector rhs(row_temp_matrix_partitioning),
-                     solution(row_temp_matrix_partitioning);
+      solution(row_temp_matrix_partitioning);
 
 
     const EquationData::TemperatureInitialValues<dim> initial_temperature;
 
     typename DoFHandler<dim>::active_cell_iterator
-    cell = temperature_dof_handler.begin_active(),
-    endc = temperature_dof_handler.end();
+      cell = temperature_dof_handler.begin_active(),
+      endc = temperature_dof_handler.end();
 
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
@@ -1723,20 +1723,20 @@ namespace Step32
           initial_temperature.value_list(fe_values.get_quadrature_points(),
                                          rhs_values);
 
-          cell_vector = 0;
+          cell_vector   = 0;
           matrix_for_bc = 0;
           for (unsigned int point = 0; point < n_q_points; ++point)
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
                 cell_vector(i) += rhs_values[point] *
-                                  fe_values.shape_value(i,point) *
+                                  fe_values.shape_value(i, point) *
                                   fe_values.JxW(point);
                 if (temperature_constraints.is_inhomogeneously_constrained(local_dof_indices[i]))
                   {
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                      matrix_for_bc(j,i) += fe_values.shape_value(i,point) *
-                                            fe_values.shape_value(j,point) *
-                                            fe_values.JxW(point);
+                      matrix_for_bc(j, i) += fe_values.shape_value(i, point) *
+                                             fe_values.shape_value(j, point) *
+                                             fe_values.JxW(point);
                   }
               }
 
@@ -1750,7 +1750,7 @@ namespace Step32
 
     // Now that we have the right linear system, we solve it using the CG
     // method with a simple Jacobi preconditioner:
-    SolverControl solver_control(5*rhs.size(), 1e-12*rhs.l2_norm());
+    SolverControl solver_control(5 * rhs.size(), 1e-12 * rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
     TrilinosWrappers::PreconditionJacobi preconditioner_mass;
@@ -1777,8 +1777,8 @@ namespace Step32
     // where initialized to contain ghost elements as well) also get the
     // correct ghost elements. In other words, the assignment here requires
     // communication between processors:
-    temperature_solution = solution;
-    old_temperature_solution = solution;
+    temperature_solution         = solution;
+    old_temperature_solution     = solution;
     old_old_temperature_solution = solution;
   }
 
@@ -1851,7 +1851,7 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   setup_stokes_matrix(const std::vector<IndexSet> &stokes_partitioning,
-                      const std::vector<IndexSet> &stokes_relevant_partitioning)
+    const std::vector<IndexSet> &stokes_relevant_partitioning)
   {
     stokes_matrix.clear();
 
@@ -1859,10 +1859,10 @@ namespace Step32
                                               stokes_relevant_partitioning,
                                               MPI_COMM_WORLD);
 
-    Table<2,DoFTools::Coupling> coupling(dim+1, dim+1);
-    for (unsigned int c = 0; c < dim+1; ++c)
-      for (unsigned int d = 0; d < dim+1; ++d)
-        if (! ((c == dim) && (d == dim)))
+    Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
+    for (unsigned int c = 0; c < dim + 1; ++c)
+      for (unsigned int d = 0; d < dim + 1; ++d)
+        if (!((c == dim) && (d == dim)))
           coupling[c][d] = DoFTools::always;
         else
           coupling[c][d] = DoFTools::none;
@@ -1882,7 +1882,7 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   setup_stokes_preconditioner(const std::vector<IndexSet> &stokes_partitioning,
-                              const std::vector<IndexSet> &stokes_relevant_partitioning)
+    const std::vector<IndexSet> &stokes_relevant_partitioning)
   {
     Amg_preconditioner.reset();
     Mp_preconditioner.reset();
@@ -1893,9 +1893,9 @@ namespace Step32
                                               stokes_relevant_partitioning,
                                               MPI_COMM_WORLD);
 
-    Table<2,DoFTools::Coupling> coupling(dim+1, dim+1);
-    for (unsigned int c = 0; c < dim+1; ++c)
-      for (unsigned int d = 0; d < dim+1; ++d)
+    Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
+    for (unsigned int c = 0; c < dim + 1; ++c)
+      for (unsigned int d = 0; d < dim + 1; ++d)
         if (c == d)
           coupling[c][d] = DoFTools::always;
         else
@@ -1915,7 +1915,7 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   setup_temperature_matrices(const IndexSet &temperature_partitioner,
-                             const IndexSet &temperature_relevant_partitioner)
+    const IndexSet &temperature_relevant_partitioner)
   {
     T_preconditioner.reset();
     temperature_mass_matrix.clear();
@@ -1991,7 +1991,7 @@ namespace Step32
   {
     TimerOutput::Scope timing_section(computing_timer, "Setup dof systems");
 
-    std::vector<unsigned int> stokes_sub_blocks(dim+1,0);
+    std::vector<unsigned int> stokes_sub_blocks(dim + 1, 0);
     stokes_sub_blocks[dim] = 1;
     stokes_dof_handler.distribute_dofs(stokes_fe);
     DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
@@ -2032,8 +2032,8 @@ namespace Step32
     IndexSet stokes_relevant_set;
     {
       IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
-      stokes_partitioning.push_back(stokes_index_set.get_view(0,n_u));
-      stokes_partitioning.push_back(stokes_index_set.get_view(n_u,n_u+n_p));
+      stokes_partitioning.push_back(stokes_index_set.get_view(0, n_u));
+      stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
       DoFTools::extract_locally_relevant_dofs(stokes_dof_handler,
                                               stokes_relevant_set);
@@ -2065,10 +2065,10 @@ namespace Step32
 
       FEValuesExtractors::Vector velocity_components(0);
       VectorTools::interpolate_boundary_values(stokes_dof_handler,
-                                               0,
-                                               Functions::ZeroFunction<dim>(dim+1),
-                                               stokes_constraints,
-                                               stokes_fe.component_mask(velocity_components));
+        0,
+        Functions::ZeroFunction<dim>(dim + 1),
+        stokes_constraints,
+        stokes_fe.component_mask(velocity_components));
 
       std::set<types::boundary_id> no_normal_flux_boundaries;
       no_normal_flux_boundaries.insert(1);
@@ -2085,13 +2085,13 @@ namespace Step32
       DoFTools::make_hanging_node_constraints(temperature_dof_handler,
                                               temperature_constraints);
       VectorTools::interpolate_boundary_values(temperature_dof_handler,
-                                               0,
-                                               EquationData::TemperatureInitialValues<dim>(),
-                                               temperature_constraints);
+        0,
+        EquationData::TemperatureInitialValues<dim>(),
+        temperature_constraints);
       VectorTools::interpolate_boundary_values(temperature_dof_handler,
-                                               1,
-                                               EquationData::TemperatureInitialValues<dim>(),
-                                               temperature_constraints);
+        1,
+        EquationData::TemperatureInitialValues<dim>(),
+        temperature_constraints);
       temperature_constraints.close();
     }
 
@@ -2171,10 +2171,10 @@ namespace Step32
   void
   BoussinesqFlowProblem<dim>::
   local_assemble_stokes_preconditioner(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                       Assembly::Scratch::StokesPreconditioner<dim> &scratch,
-                                       Assembly::CopyData::StokesPreconditioner<dim> &data)
+    Assembly::Scratch::StokesPreconditioner<dim> &        scratch,
+    Assembly::CopyData::StokesPreconditioner<dim> &       data)
   {
-    const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
     const unsigned int   n_q_points      = scratch.stokes_fe_values.n_quadrature_points;
 
     const FEValuesExtractors::Vector velocities(0);
@@ -2190,7 +2190,7 @@ namespace Step32
         for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
             scratch.grad_phi_u[k] = scratch.stokes_fe_values[velocities].gradient(k,q);
-            scratch.phi_p[k]      = scratch.stokes_fe_values[pressure].value(k, q);
+            scratch.phi_p[k] = scratch.stokes_fe_values[pressure].value(k, q);
           }
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -2200,7 +2200,7 @@ namespace Step32
                                                       scratch.grad_phi_u[j])
                                        +
                                        (1./EquationData::eta) *
-                                       EquationData::pressure_scaling *
+                 EquationData::pressure_scaling *
                                        EquationData::pressure_scaling *
                                        (scratch.phi_p[i] * scratch.phi_p[j]))
                                       * scratch.stokes_fe_values.JxW(q);
@@ -2276,30 +2276,30 @@ namespace Step32
   {
     stokes_preconditioner_matrix = 0;
 
-    const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree+1);
+    const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree + 1);
 
     typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-    CellFilter;
+      CellFilter;
 
     WorkStream::
     run(CellFilter(IteratorFilters::LocallyOwnedCell(),
                    stokes_dof_handler.begin_active()),
-        CellFilter(IteratorFilters::LocallyOwnedCell(),
+      CellFilter(IteratorFilters::LocallyOwnedCell(),
                    stokes_dof_handler.end()),
         std::bind(&BoussinesqFlowProblem<dim>::
                   local_assemble_stokes_preconditioner,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3),
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3),
         std::bind(&BoussinesqFlowProblem<dim>::
                   copy_local_to_global_stokes_preconditioner,
-                  this,
-                  std::placeholders::_1),
+        this,
+        std::placeholders::_1),
         Assembly::Scratch::
         StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
-                                   mapping,
+        mapping,
                                    update_JxW_values |
                                    update_values |
                                    update_gradients),
@@ -2328,24 +2328,24 @@ namespace Step32
 
     assemble_stokes_preconditioner();
 
-    std::vector<std::vector<bool> > constant_modes;
-    FEValuesExtractors::Vector velocity_components(0);
+    std::vector<std::vector<bool>> constant_modes;
+    FEValuesExtractors::Vector     velocity_components(0);
     DoFTools::extract_constant_modes(stokes_dof_handler,
-                                     stokes_fe.component_mask(velocity_components),
-                                     constant_modes);
+      stokes_fe.component_mask(velocity_components),
+      constant_modes);
 
     Mp_preconditioner = std::make_shared<TrilinosWrappers::PreconditionJacobi>();
     Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>();
 
     TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
-    Amg_data.constant_modes = constant_modes;
-    Amg_data.elliptic = true;
+    Amg_data.constant_modes        = constant_modes;
+    Amg_data.elliptic              = true;
     Amg_data.higher_order_elements = true;
-    Amg_data.smoother_sweeps = 2;
+    Amg_data.smoother_sweeps       = 2;
     Amg_data.aggregation_threshold = 0.02;
 
-    Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1));
-    Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
+    Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1, 1));
+    Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0, 0),
                                    Amg_data);
 
     rebuild_stokes_preconditioner = false;
@@ -2370,8 +2370,8 @@ namespace Step32
   void
   BoussinesqFlowProblem<dim>::
   local_assemble_stokes_system(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                               Assembly::Scratch::StokesSystem<dim> &scratch,
-                               Assembly::CopyData::StokesSystem<dim> &data)
+    Assembly::Scratch::StokesSystem<dim> &                scratch,
+    Assembly::CopyData::StokesSystem<dim> &               data)
   {
     const unsigned int dofs_per_cell = scratch.stokes_fe_values.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = scratch.stokes_fe_values.n_quadrature_points;
@@ -2401,7 +2401,7 @@ namespace Step32
 
         for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
-            scratch.phi_u[k] = scratch.stokes_fe_values[velocities].value(k,q);
+            scratch.phi_u[k] = scratch.stokes_fe_values[velocities].value(k, q);
             if (rebuild_stokes_matrix)
               {
                 scratch.grads_phi_u[k] = scratch.stokes_fe_values[velocities].symmetric_gradient(k,q);
@@ -2462,31 +2462,31 @@ namespace Step32
     TimerOutput::Scope timer_section(computing_timer, "   Assemble Stokes system");
 
     if (rebuild_stokes_matrix == true)
-      stokes_matrix=0;
+      stokes_matrix = 0;
 
-    stokes_rhs=0;
+    stokes_rhs = 0;
 
-    const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree+1);
+    const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree + 1);
 
     typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-    CellFilter;
+      CellFilter;
 
     WorkStream::
     run(CellFilter(IteratorFilters::LocallyOwnedCell(),
                    stokes_dof_handler.begin_active()),
-        CellFilter(IteratorFilters::LocallyOwnedCell(),
+      CellFilter(IteratorFilters::LocallyOwnedCell(),
                    stokes_dof_handler.end()),
         std::bind(&BoussinesqFlowProblem<dim>::
                   local_assemble_stokes_system,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3),
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3),
         std::bind(&BoussinesqFlowProblem<dim>::
                   copy_local_to_global_stokes_system,
-                  this,
-                  std::placeholders::_1),
+                this,
+                std::placeholders::_1),
         Assembly::Scratch::
         StokesSystem<dim> (stokes_fe, mapping, quadrature_formula,
                            (update_values    |
@@ -2497,8 +2497,8 @@ namespace Step32
                              update_gradients
                              :
                              UpdateFlags(0))),
-                           temperature_fe,
-                           update_values),
+        temperature_fe,
+        update_values),
         Assembly::CopyData::
         StokesSystem<dim> (stokes_fe));
 
@@ -2525,8 +2525,8 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   local_assemble_temperature_matrix(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                    Assembly::Scratch::TemperatureMatrix<dim> &scratch,
-                                    Assembly::CopyData::TemperatureMatrix<dim> &data)
+    Assembly::Scratch::TemperatureMatrix<dim> &           scratch,
+    Assembly::CopyData::TemperatureMatrix<dim> &          data)
   {
     const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = scratch.temperature_fe_values.n_quadrature_points;
@@ -2534,7 +2534,7 @@ namespace Step32
     scratch.temperature_fe_values.reinit(cell);
     cell->get_dof_indices(data.local_dof_indices);
 
-    data.local_mass_matrix = 0;
+    data.local_mass_matrix      = 0;
     data.local_stiffness_matrix = 0;
 
     for (unsigned int q = 0; q < n_q_points; ++q)
@@ -2542,7 +2542,7 @@ namespace Step32
         for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
             scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad(k,q);
-            scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value(k, q);
+            scratch.phi_T[k] = scratch.temperature_fe_values.shape_value(k, q);
           }
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -2555,7 +2555,7 @@ namespace Step32
               data.local_stiffness_matrix(i,j)
               += (EquationData::kappa * scratch.grad_phi_T[i] * scratch.grad_phi_T[j]
                   *
-                  scratch.temperature_fe_values.JxW(q));
+                 scratch.temperature_fe_values.JxW(q));
             }
       }
   }
@@ -2571,8 +2571,8 @@ namespace Step32
                                                        data.local_dof_indices,
                                                        temperature_mass_matrix);
     temperature_constraints.distribute_local_to_global(data.local_stiffness_matrix,
-                                                       data.local_dof_indices,
-                                                       temperature_stiffness_matrix);
+      data.local_dof_indices,
+      temperature_stiffness_matrix);
   }
 
 
@@ -2583,30 +2583,30 @@ namespace Step32
       return;
 
     TimerOutput::Scope timer_section(computing_timer, "   Assemble temperature matrices");
-    temperature_mass_matrix = 0;
+    temperature_mass_matrix      = 0;
     temperature_stiffness_matrix = 0;
 
-    const QGauss<dim> quadrature_formula(parameters.temperature_degree+2);
+    const QGauss<dim> quadrature_formula(parameters.temperature_degree + 2);
 
     typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-    CellFilter;
+      CellFilter;
 
     WorkStream::
     run(CellFilter(IteratorFilters::LocallyOwnedCell(),
-                   temperature_dof_handler.begin_active()),
-        CellFilter(IteratorFilters::LocallyOwnedCell(),
-                   temperature_dof_handler.end()),
+                 temperature_dof_handler.begin_active()),
+      CellFilter(IteratorFilters::LocallyOwnedCell(),
+                 temperature_dof_handler.end()),
         std::bind(&BoussinesqFlowProblem<dim>::
                   local_assemble_temperature_matrix,
-                  this,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3),
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3),
         std::bind(&BoussinesqFlowProblem<dim>::
                   copy_local_to_global_temperature_matrix,
-                  this,
-                  std::placeholders::_1),
+        this,
+        std::placeholders::_1),
         Assembly::Scratch::
         TemperatureMatrix<dim> (temperature_fe, mapping, quadrature_formula),
         Assembly::CopyData::
@@ -2615,7 +2615,7 @@ namespace Step32
     temperature_mass_matrix.compress(VectorOperation::add);
     temperature_stiffness_matrix.compress(VectorOperation::add);
 
-    rebuild_temperature_matrices = false;
+    rebuild_temperature_matrices       = false;
     rebuild_temperature_preconditioner = true;
   }
 
@@ -2638,11 +2638,11 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   local_assemble_temperature_rhs(const std::pair<double,double> global_T_range,
-                                 const double                   global_max_velocity,
-                                 const double                   global_entropy_variation,
-                                 const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                 Assembly::Scratch::TemperatureRHS<dim> &scratch,
-                                 Assembly::CopyData::TemperatureRHS<dim> &data)
+    const double                    global_max_velocity,
+    const double                    global_entropy_variation,
+    const typename DoFHandler<dim>::active_cell_iterator &cell,
+    Assembly::Scratch::TemperatureRHS<dim> &              scratch,
+    Assembly::CopyData::TemperatureRHS<dim> &             data)
   {
     const bool use_bdf2_scheme = (timestep_number != 0);
 
@@ -2651,7 +2651,7 @@ namespace Step32
 
     const FEValuesExtractors::Vector velocities(0);
 
-    data.local_rhs = 0;
+    data.local_rhs     = 0;
     data.matrix_for_bc = 0;
     cell->get_dof_indices(data.local_dof_indices);
 
@@ -2690,26 +2690,26 @@ namespace Step32
 
     const double nu
       = compute_viscosity(scratch.old_temperature_values,
-                          scratch.old_old_temperature_values,
-                          scratch.old_temperature_grads,
-                          scratch.old_old_temperature_grads,
-                          scratch.old_temperature_laplacians,
-                          scratch.old_old_temperature_laplacians,
-                          scratch.old_velocity_values,
-                          scratch.old_old_velocity_values,
-                          scratch.old_strain_rates,
-                          scratch.old_old_strain_rates,
-                          global_max_velocity,
-                          global_T_range.second - global_T_range.first,
-                          0.5 * (global_T_range.second + global_T_range.first),
-                          global_entropy_variation,
-                          cell->diameter());
+                        scratch.old_old_temperature_values,
+                        scratch.old_temperature_grads,
+                        scratch.old_old_temperature_grads,
+                        scratch.old_temperature_laplacians,
+                        scratch.old_old_temperature_laplacians,
+                        scratch.old_velocity_values,
+                        scratch.old_old_velocity_values,
+                        scratch.old_strain_rates,
+                        scratch.old_old_strain_rates,
+                        global_max_velocity,
+                        global_T_range.second - global_T_range.first,
+                        0.5 * (global_T_range.second + global_T_range.first),
+                        global_entropy_variation,
+                        cell->diameter());
 
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
         for (unsigned int k = 0; k < dofs_per_cell; ++k)
           {
-            scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value(k, q);
+            scratch.phi_T[k] = scratch.temperature_fe_values.shape_value(k, q);
             scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad(k,q);
           }
 
@@ -2730,10 +2730,10 @@ namespace Step32
              (scratch.old_temperature_values[q] *
               (1 + time_step/old_time_step)
               -
-              scratch.old_old_temperature_values[q] *
+                              scratch.old_old_temperature_values[q] *
               time_step/old_time_step)
              :
-             scratch.old_temperature_values[q]);
+                             scratch.old_temperature_values[q]);
 
         const Tensor<1,dim> ext_grad_T
           = (use_bdf2_scheme ?
@@ -2743,7 +2743,7 @@ namespace Step32
               scratch.old_old_temperature_grads[q] *
               time_step/old_time_step)
              :
-             scratch.old_temperature_grads[q]);
+                             scratch.old_temperature_grads[q]);
 
         const Tensor<1,dim> extrapolated_u
           = (use_bdf2_scheme ?
@@ -2769,7 +2769,7 @@ namespace Step32
           = ((EquationData::radiogenic_heating * EquationData::density(ext_T)
               +
               2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
-             (EquationData::density(ext_T) * EquationData::specific_heat));
+           (EquationData::density(ext_T) * EquationData::specific_heat));
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
@@ -2784,7 +2784,7 @@ namespace Step32
                                   time_step *
                                   gamma * scratch.phi_T[i])
                                  *
-                                 scratch.temperature_fe_values.JxW(q);
+              scratch.temperature_fe_values.JxW(q);
 
             if (temperature_constraints.is_inhomogeneously_constrained(data.local_dof_indices[i]))
               {
@@ -2799,7 +2799,7 @@ namespace Step32
                                               EquationData::kappa *
                                               time_step)
                                              *
-                                             scratch.temperature_fe_values.JxW(q);
+                    scratch.temperature_fe_values.JxW(q);
               }
           }
       }
@@ -2873,7 +2873,7 @@ namespace Step32
     // same in every call to the correct values:
     temperature_rhs = 0;
 
-    const QGauss<dim> quadrature_formula(parameters.temperature_degree+2);
+    const QGauss<dim> quadrature_formula(parameters.temperature_degree + 2);
     const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
 
@@ -2884,26 +2884,26 @@ namespace Step32
 
     typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-    CellFilter;
+      CellFilter;
 
     WorkStream::
     run(CellFilter(IteratorFilters::LocallyOwnedCell(),
-                   temperature_dof_handler.begin_active()),
-        CellFilter(IteratorFilters::LocallyOwnedCell(),
-                   temperature_dof_handler.end()),
+                 temperature_dof_handler.begin_active()),
+      CellFilter(IteratorFilters::LocallyOwnedCell(),
+                 temperature_dof_handler.end()),
         std::bind(&BoussinesqFlowProblem<dim>::
                   local_assemble_temperature_rhs,
-                  this,
-                  global_T_range,
-                  maximal_velocity,
-                  global_entropy_variation,
-                  std::placeholders::_1,
-                  std::placeholders::_2,
-                  std::placeholders::_3),
+                this,
+                global_T_range,
+                maximal_velocity,
+                global_entropy_variation,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3),
         std::bind(&BoussinesqFlowProblem<dim>::
                   copy_local_to_global_temperature_rhs,
-                  this,
-                  std::placeholders::_1),
+        this,
+        std::placeholders::_1),
         Assembly::Scratch::
         TemperatureRHS<dim> (temperature_fe, stokes_fe, mapping,
                              quadrature_formula),
@@ -2979,10 +2979,10 @@ namespace Step32
       distributed_stokes_solution.block(1) /= EquationData::pressure_scaling;
 
       const unsigned int
-      start = (distributed_stokes_solution.block(0).size() +
-               distributed_stokes_solution.block(1).local_range().first),
-              end   = (distributed_stokes_solution.block(0).size() +
-                       distributed_stokes_solution.block(1).local_range().second);
+        start = (distributed_stokes_solution.block(0).size() +
+                 distributed_stokes_solution.block(1).local_range().first),
+        end   = (distributed_stokes_solution.block(0).size() +
+               distributed_stokes_solution.block(1).local_range().second);
       for (unsigned int i = start; i < end; ++i)
         if (stokes_constraints.is_constrained(i))
           distributed_stokes_solution(i) = 0;
@@ -2990,17 +2990,17 @@ namespace Step32
 
       PrimitiveVectorMemory<TrilinosWrappers::MPI::BlockVector> mem;
 
-      unsigned int n_iterations = 0;
-      const double solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
+      unsigned int  n_iterations     = 0;
+      const double  solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
       SolverControl solver_control(30, solver_tolerance);
 
       try
         {
           const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                TrilinosWrappers::PreconditionJacobi>
+            TrilinosWrappers::PreconditionJacobi>
                 preconditioner(stokes_matrix, stokes_preconditioner_matrix,
                                *Mp_preconditioner, *Amg_preconditioner,
-                               false);
+                           false);
 
           SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
           solver(solver_control, mem,
@@ -3015,10 +3015,10 @@ namespace Step32
       catch (SolverControl::NoConvergence &)
         {
           const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                TrilinosWrappers::PreconditionJacobi>
+            TrilinosWrappers::PreconditionJacobi>
                 preconditioner(stokes_matrix, stokes_preconditioner_matrix,
                                *Mp_preconditioner, *Amg_preconditioner,
-                               true);
+                           true);
 
           SolverControl solver_control_refined(stokes_matrix.m(), solver_tolerance);
           SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
@@ -3066,14 +3066,14 @@ namespace Step32
 
       old_time_step = time_step;
 
-      const double scaling = (dim==3 ? 0.25 : 1.0);
-      time_step = (scaling/(2.1*dim*std::sqrt(1.*dim)) /
+      const double scaling = (dim == 3 ? 0.25 : 1.0);
+      time_step            = (scaling / (2.1 * dim * std::sqrt(1. * dim)) /
                    (parameters.temperature_degree *
                     get_cfl_number()));
 
       const double maximal_velocity = get_maximal_velocity();
       pcout << "   Maximal velocity: "
-            << maximal_velocity *EquationData::year_in_seconds * 100
+            << maximal_velocity * EquationData::year_in_seconds * 100
             << " cm/year"
             << std::endl;
       pcout << "   " << "Time step: "
@@ -3089,8 +3089,8 @@ namespace Step32
       TimerOutput::Scope timer_section(computing_timer, "   Solve temperature system");
 
       SolverControl solver_control(temperature_matrix.m(),
-                                   1e-12*temperature_rhs.l2_norm());
-      SolverCG<TrilinosWrappers::MPI::Vector>   cg(solver_control);
+                                   1e-12 * temperature_rhs.l2_norm());
+      SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
       TrilinosWrappers::MPI::Vector
       distributed_temperature_solution(temperature_rhs);
@@ -3106,7 +3106,7 @@ namespace Step32
             << solver_control.last_step()
             << " CG iterations for temperature" << std::endl;
 
-      double temperature[2] = { std::numeric_limits<double>::max(),
+      double temperature[2] = {std::numeric_limits<double>::max(),
                                 -std::numeric_limits<double>::max()
                               };
       double global_temperature[2];
@@ -3155,7 +3155,7 @@ namespace Step32
     void
     evaluate_vector_field
     (const DataPostprocessorInputs::Vector<dim> &inputs,
-     std::vector<Vector<double> >               &computed_quantities) const override;
+      std::vector<Vector<double>> &computed_quantities) const override;
 
     virtual std::vector<std::string> get_names() const override;
 
@@ -3207,8 +3207,8 @@ namespace Step32
   get_data_component_interpretation() const
   {
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    interpretation(dim,
-                   DataComponentInterpretation::component_is_part_of_vector);
+      interpretation(dim,
+                     DataComponentInterpretation::component_is_part_of_vector);
 
     interpretation.push_back(DataComponentInterpretation::component_is_scalar);
     interpretation.push_back(DataComponentInterpretation::component_is_scalar);
@@ -3243,7 +3243,7 @@ namespace Step32
   BoussinesqFlowProblem<dim>::Postprocessor::
   evaluate_vector_field
   (const DataPostprocessorInputs::Vector<dim> &inputs,
-   std::vector<Vector<double> >               &computed_quantities) const
+    std::vector<Vector<double>> &               computed_quantities) const
   {
     const unsigned int n_quadrature_points = inputs.solution_values.size();
     Assert(inputs.solution_gradients.size() == n_quadrature_points,
@@ -3262,17 +3262,17 @@ namespace Step32
         const double pressure = (inputs.solution_values[q](dim)-minimal_pressure);
         computed_quantities[q](dim) = pressure;
 
-        const double temperature = inputs.solution_values[q](dim+1);
-        computed_quantities[q](dim+1) = temperature;
+        const double temperature        = inputs.solution_values[q](dim + 1);
+        computed_quantities[q](dim + 1) = temperature;
 
-        Tensor<2,dim> grad_u;
+        Tensor<2, dim> grad_u;
         for (unsigned int d = 0; d < dim; ++d)
           grad_u[d] = inputs.solution_gradients[q][d];
-        const SymmetricTensor<2,dim> strain_rate = symmetrize(grad_u);
+        const SymmetricTensor<2, dim> strain_rate = symmetrize(grad_u);
         computed_quantities[q](dim+2) = 2 * EquationData::eta *
                                         strain_rate * strain_rate;
 
-        computed_quantities[q](dim+3) = partition;
+        computed_quantities[q](dim + 3) = partition;
       }
   }
 
@@ -3330,7 +3330,7 @@ namespace Step32
     DoFHandler<dim> joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
     Assert(joint_dof_handler.n_dofs() ==
-           stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
+             stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
            ExcInternalError());
 
     TrilinosWrappers::MPI::Vector joint_solution;
@@ -3342,10 +3342,10 @@ namespace Step32
       std::vector<types::global_dof_index> local_temperature_dof_indices(temperature_fe.dofs_per_cell);
 
       typename DoFHandler<dim>::active_cell_iterator
-      joint_cell       = joint_dof_handler.begin_active(),
-      joint_endc       = joint_dof_handler.end(),
-      stokes_cell      = stokes_dof_handler.begin_active(),
-      temperature_cell = temperature_dof_handler.begin_active();
+        joint_cell       = joint_dof_handler.begin_active(),
+        joint_endc       = joint_dof_handler.end(),
+        stokes_cell      = stokes_dof_handler.begin_active(),
+        temperature_cell = temperature_dof_handler.begin_active();
       for (; joint_cell != joint_endc;
            ++joint_cell, ++stokes_cell, ++temperature_cell)
         if (joint_cell->is_locally_owned())
@@ -3359,7 +3359,7 @@ namespace Step32
                 {
                   Assert(joint_fe.system_to_base_index(i).second
                          <
-                         local_stokes_dof_indices.size(),
+                           local_stokes_dof_indices.size(),
                          ExcInternalError());
 
                   joint_solution(local_joint_dof_indices[i])
@@ -3372,11 +3372,11 @@ namespace Step32
                          ExcInternalError());
                   Assert(joint_fe.system_to_base_index(i).second
                          <
-                         local_temperature_dof_indices.size(),
+                           local_temperature_dof_indices.size(),
                          ExcInternalError());
                   joint_solution(local_joint_dof_indices[i])
                     = temperature_solution(local_temperature_dof_indices
-                                           [joint_fe.system_to_base_index(i).second]);
+                        [joint_fe.system_to_base_index(i).second]);
                 }
           }
     }
@@ -3390,20 +3390,20 @@ namespace Step32
     locally_relevant_joint_solution = joint_solution;
 
     Postprocessor postprocessor(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                                stokes_solution.block(1).min());
+      stokes_solution.block(1).min());
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(joint_dof_handler);
     data_out.add_data_vector(locally_relevant_joint_solution, postprocessor);
     data_out.build_patches();
 
-    static int out_index=0;
+    static int        out_index = 0;
     const std::string filename = ("solution-" +
                                   Utilities::int_to_string(out_index, 5) +
                                   "." +
                                   Utilities::int_to_string
                                   (triangulation.locally_owned_subdomain(), 4) +
-                                  ".vtu");
+       ".vtu");
     std::ofstream output(filename);
     data_out.write_vtu(output);
 
@@ -3470,10 +3470,10 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::refine_mesh(const unsigned int max_grid_level)
   {
-    parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
-    temperature_trans(temperature_dof_handler);
+    parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector>
+      temperature_trans(temperature_dof_handler);
     parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::BlockVector>
-    stokes_trans(stokes_dof_handler);
+      stokes_trans(stokes_dof_handler);
 
     {
       TimerOutput::Scope timer_section(computing_timer, "Refine mesh structure, part 1");
@@ -3481,14 +3481,14 @@ namespace Step32
       Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
       KellyErrorEstimator<dim>::estimate(temperature_dof_handler,
-                                         QGauss<dim-1>(parameters.temperature_degree+1),
-                                         typename FunctionMap<dim>::type(),
-                                         temperature_solution,
-                                         estimated_error_per_cell,
-                                         ComponentMask(),
-                                         nullptr,
-                                         0,
-                                         triangulation.locally_owned_subdomain());
+        QGauss<dim - 1>(parameters.temperature_degree + 1),
+        typename FunctionMap<dim>::type(),
+        temperature_solution,
+        estimated_error_per_cell,
+        ComponentMask(),
+        nullptr,
+        0,
+        triangulation.locally_owned_subdomain());
 
       parallel::distributed::GridRefinement::
       refine_and_coarsen_fixed_fraction(triangulation,
@@ -3531,8 +3531,8 @@ namespace Step32
       TimerOutput::Scope timer_section(computing_timer, "Refine mesh structure, part 2");
 
       {
-        TrilinosWrappers::MPI::Vector distributed_temp1 (temperature_rhs);
-        TrilinosWrappers::MPI::Vector distributed_temp2 (temperature_rhs);
+        TrilinosWrappers::MPI::Vector distributed_temp1(temperature_rhs);
+        TrilinosWrappers::MPI::Vector distributed_temp2(temperature_rhs);
 
         std::vector<TrilinosWrappers::MPI::Vector *> tmp(2);
         tmp[0] = &(distributed_temp1);
@@ -3586,7 +3586,7 @@ namespace Step32
                                Point<dim>(),
                                EquationData::R0,
                                EquationData::R1,
-                               (dim==3) ? 96 : 12,
+                               (dim == 3) ? 96 : 12,
                                true);
 
     global_Omega_diameter = GridTools::diameter(triangulation);
@@ -3597,11 +3597,11 @@ namespace Step32
 
     unsigned int pre_refinement_step = 0;
 
-start_time_iteration:
+  start_time_iteration:
 
     project_temperature_field();
 
-    timestep_number           = 0;
+    timestep_number = 0;
     time_step = old_time_step = 0;
 
     double time = 0;
@@ -3660,15 +3660,15 @@ start_time_iteration:
         old_temperature_solution     = temperature_solution;
         if (old_time_step > 0)
           {
-            //Trilinos sadd does not like ghost vectors even as input. Copy
-            //into distributed vectors for now:
+            // Trilinos sadd does not like ghost vectors even as input. Copy
+            // into distributed vectors for now:
             {
               TrilinosWrappers::MPI::BlockVector distr_solution(stokes_rhs);
               distr_solution = stokes_solution;
               TrilinosWrappers::MPI::BlockVector distr_old_solution(stokes_rhs);
               distr_old_solution = old_old_stokes_solution;
               distr_solution .sadd(1.+time_step/old_time_step, -time_step/old_time_step,
-                                   distr_old_solution);
+                                  distr_old_solution);
               stokes_solution = distr_solution;
             }
             {
@@ -3677,7 +3677,7 @@ start_time_iteration:
               TrilinosWrappers::MPI::Vector distr_old_solution(temperature_rhs);
               distr_old_solution = old_old_temperature_solution;
               distr_solution .sadd(1.+time_step/old_time_step, -time_step/old_time_step,
-                                   distr_old_solution);
+                                  distr_old_solution);
               temperature_solution = distr_solution;
             }
           }
@@ -3694,7 +3694,7 @@ start_time_iteration:
     // step unless we had just done so before we left the do-while loop
     if ((parameters.generate_graphical_output == true)
         &&
-        !((timestep_number-1) % parameters.graphical_output_interval == 0))
+        !((timestep_number - 1) % parameters.graphical_output_interval == 0))
       output_results();
   }
 }
@@ -3724,14 +3724,14 @@ int main(int argc, char *argv[])
                                                           numbers::invalid_unsigned_int);
 
       std::string parameter_filename;
-      if (argc >  = 2)
+      if (argc > = 2)
         parameter_filename = argv[1];
       else
         parameter_filename = "step-32.prm";
 
-      const int dim = 2;
-      BoussinesqFlowProblem<dim>::Parameters  parameters(parameter_filename);
-      BoussinesqFlowProblem<dim> flow_problem(parameters);
+      const int                              dim = 2;
+      BoussinesqFlowProblem<dim>::Parameters parameters(parameter_filename);
+      BoussinesqFlowProblem<dim>             flow_problem(parameters);
       flow_problem.run();
     }
   catch (std::exception &exc)

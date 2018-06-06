@@ -90,26 +90,26 @@ namespace Step26
     void refine_mesh(const unsigned int min_grid_level,
                      const unsigned int max_grid_level);
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> mass_matrix;
     SparseMatrix<double> laplace_matrix;
     SparseMatrix<double> system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       old_solution;
-    Vector<double>       system_rhs;
+    Vector<double> solution;
+    Vector<double> old_solution;
+    Vector<double> system_rhs;
 
-    double               time;
-    double               time_step;
-    unsigned int         timestep_number;
+    double       time;
+    double       time_step;
+    unsigned int timestep_number;
 
-    const double         theta;
+    const double theta;
   };
 
 
@@ -132,7 +132,7 @@ namespace Step26
       period(0.2)
     {}
 
-    virtual double value(const Point<dim> &p,
+    virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
 
   private:
@@ -142,17 +142,17 @@ namespace Step26
 
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> &p,
+  double RightHandSide<dim>::value(const Point<dim> & p,
                                    const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     Assert(dim == 2, ExcNotImplemented());
 
     const double time = this->get_time();
     const double point_within_period = (time/period - std::floor(time/period));
 
-    if ((point_within_period >  = 0.0) && (point_within_period <  = 0.2))
+    if ((point_within_period > = 0.0) && (point_within_period < = 0.2))
       {
         if ((p[0] > 0.5) && (p[1] > -0.5))
           return 1;
@@ -176,17 +176,17 @@ namespace Step26
   class BoundaryValues : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim>  &p,
+    virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double BoundaryValues<dim>::value(const Point<dim> &/*p*/,
+  double BoundaryValues<dim>::value(const Point<dim> & /*p*/,
                                     const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
@@ -277,7 +277,7 @@ namespace Step26
   void HeatEquation<dim>::solve_time_step()
   {
     SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
-    SolverCG<> cg(solver_control);
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
@@ -344,7 +344,7 @@ namespace Step26
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
     KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim-1>(fe.degree+1),
+                                       QGauss<dim - 1>(fe.degree + 1),
                                        typename FunctionMap<dim>::type(),
                                        solution,
                                        estimated_error_per_cell);
@@ -443,10 +443,10 @@ namespace Step26
   template <int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = 2;
+    const unsigned int initial_global_refinement       = 2;
     const unsigned int n_adaptive_pre_refinement_steps = 4;
 
-    GridGenerator::hyper_L (triangulation);
+    GridGenerator::hyper_L(triangulation);
     triangulation.refine_global(initial_global_refinement);
 
     setup_system();
@@ -456,7 +456,7 @@ namespace Step26
     Vector<double> tmp;
     Vector<double> forcing_terms;
 
-start_time_iteration:
+  start_time_iteration:
 
     tmp.reinit(solution.size());
     forcing_terms.reinit(solution.size());
@@ -475,7 +475,7 @@ start_time_iteration:
     // Recall that it contains the term $MU^{n-1}-(1-\theta)k_n AU^{n-1}$.
     // We put these terms into the variable system_rhs, with the
     // help of a temporary vector:
-    while (time <  = 0.5)
+    while (time < = 0.5)
       {
         time += time_step;
         ++timestep_number;
@@ -501,7 +501,7 @@ start_time_iteration:
                                             QGauss<dim>(fe.degree+1),
                                             rhs_function,
                                             tmp);
-        forcing_terms = tmp;
+        forcing_terms   = tmp;
         forcing_terms * = time_step * theta;
 
         rhs_function.set_time(time - time_step);

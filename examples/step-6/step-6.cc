@@ -95,8 +95,8 @@ template <int dim>
 class Step6
 {
 public:
-  Step6 ();
-  ~Step6 ();
+  Step6();
+  ~Step6();
 
   void run();
 
@@ -109,14 +109,14 @@ private:
 
   Triangulation<dim> triangulation;
 
-  FE_Q<dim>          fe;
-  DoFHandler<dim>    dof_handler;
+  FE_Q<dim>       fe;
+  DoFHandler<dim> dof_handler;
 
 
   // This is the new variable in the main class. We need an object which holds
   // a list of constraints to hold the hanging nodes and the boundary
   // conditions.
-  ConstraintMatrix     constraints;
+  ConstraintMatrix constraints;
 
   // The sparsity pattern and sparse matrix are deliberately declared in the
   // opposite of the order used in step-2 through step-5 to demonstrate the
@@ -124,8 +124,8 @@ private:
   SparseMatrix<double> system_matrix;
   SparsityPattern      sparsity_pattern;
 
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Vector<double> solution;
+  Vector<double> system_rhs;
 };
 
 
@@ -136,7 +136,7 @@ private:
 template <int dim>
 double coefficient(const Point<dim> &p)
 {
-  if (p.square() < 0.5*0.5)
+  if (p.square() < 0.5 * 0.5)
     return 20;
   else
     return 1;
@@ -218,7 +218,7 @@ Step6<dim>::Step6 ()
 // We show the output of the other case (where we do not call
 // SparseMatrix::clear()) in the results section below.
 template <int dim>
-Step6<dim>::~Step6 ()
+Step6<dim>::~Step6()
 {
   system_matrix.clear();
 }
@@ -337,27 +337,27 @@ void Step6<dim>::setup_system()
 template <int dim>
 void Step6<dim>::assemble_system()
 {
-  const QGauss<dim>  quadrature_formula(3);
+  const QGauss<dim> quadrature_formula(3);
 
   FEValues<dim> fe_values(fe, quadrature_formula,
-                          update_values    |  update_gradients |
-                          update_quadrature_points  |  update_JxW_values);
+                          update_values | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs(dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
       fe_values.reinit(cell);
 
@@ -419,8 +419,8 @@ void Step6<dim>::assemble_system()
 template <int dim>
 void Step6<dim>::solve()
 {
-  SolverControl      solver_control(1000, 1e-12);
-  SolverCG<>         solver(solver_control);
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
@@ -495,7 +495,7 @@ void Step6<dim>::refine_grid()
   Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate(dof_handler,
-                                     QGauss<dim-1>(3),
+                                     QGauss<dim - 1>(3),
                                      typename FunctionMap<dim>::type(),
                                      solution,
                                      estimated_error_per_cell);
@@ -560,7 +560,7 @@ template <int dim>
 void Step6<dim>::output_results(const unsigned int cycle) const
 {
   {
-    GridOut grid_out;
+    GridOut       grid_out;
     std::ofstream output("grid-" + std::to_string(cycle) + ".eps");
     grid_out.write_eps(triangulation, output);
   }

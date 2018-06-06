@@ -99,20 +99,20 @@ namespace Step29
   class DirichletBoundaryValues : public Function<dim>
   {
   public:
-    DirichletBoundaryValues() : Function<dim> (2) {};
+    DirichletBoundaryValues() : Function<dim>(2){};
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double>   &values) const override;
+                              Vector<double> &  values) const override;
 
     virtual void vector_value_list(const std::vector<Point<dim> > &points,
-                                   std::vector<Vector<double> >   &value_list) const override;
+                      std::vector<Vector<double>> &  value_list) const override;
   };
 
 
   template <int dim>
   inline
   void DirichletBoundaryValues<dim>::vector_value(const Point<dim> &/*p*/,
-                                                  Vector<double>   &values) const
+                                             Vector<double> &values) const
   {
     Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
 
@@ -123,7 +123,7 @@ namespace Step29
 
   template <int dim>
   void DirichletBoundaryValues<dim>::vector_value_list(const std::vector<Point<dim> > &points,
-                                                       std::vector<Vector<double> >   &value_list) const
+    std::vector<Vector<double>> &  value_list) const
   {
     Assert(value_list.size() == points.size(),
            ExcDimensionMismatch(value_list.size(), points.size()));
@@ -146,7 +146,7 @@ namespace Step29
     void read_parameters(const std::string &);
 
   private:
-    void declare_parameters();
+    void              declare_parameters();
     ParameterHandler &prm;
   };
 
@@ -302,7 +302,7 @@ namespace Step29
     void
     evaluate_vector_field
     (const DataPostprocessorInputs::Vector<dim> &inputs,
-     std::vector<Vector<double> >               &computed_quantities) const override;
+      std::vector<Vector<double>> &computed_quantities) const override;
   };
 
   // In the constructor, we need to call the constructor of the base class
@@ -343,7 +343,7 @@ namespace Step29
   void
   ComputeIntensity<dim>::evaluate_vector_field
   (const DataPostprocessorInputs::Vector<dim> &inputs,
-   std::vector<Vector<double> >               &computed_quantities) const
+    std::vector<Vector<double>> &               computed_quantities) const
   {
     Assert(computed_quantities.size() == inputs.solution_values.size(),
            ExcDimensionMismatch(computed_quantities.size(), inputs.solution_values.size()));
@@ -389,15 +389,15 @@ namespace Step29
     void solve();
     void output_results() const;
 
-    ParameterHandler      &prm;
+    ParameterHandler &prm;
 
-    Triangulation<dim>     triangulation;
-    DoFHandler<dim>        dof_handler;
-    FESystem<dim>          fe;
+    Triangulation<dim> triangulation;
+    DoFHandler<dim>    dof_handler;
+    FESystem<dim>      fe;
 
-    SparsityPattern        sparsity_pattern;
-    SparseMatrix<double>   system_matrix;
-    Vector<double>         solution, system_rhs;
+    SparsityPattern      sparsity_pattern;
+    SparseMatrix<double> system_matrix;
+    Vector<double>       solution, system_rhs;
   };
 
 
@@ -439,8 +439,8 @@ namespace Step29
     // object:
     prm.enter_subsection("Mesh & geometry parameters");
 
-    const double                focal_distance = prm.get_double("Focal distance");
-    const unsigned int  n_refinements  = prm.get_integer("Number of refinements");
+    const double       focal_distance = prm.get_double("Focal distance");
+    const unsigned int n_refinements = prm.get_integer("Number of refinements");
 
     prm.leave_subsection();
 
@@ -454,9 +454,9 @@ namespace Step29
     const Point<dim>    transducer = (dim == 2) ?
                                      Point<dim> (0.5, 0.0) :
                                      Point<dim> (0.5, 0.5, 0.0);
-    const Point<dim>   focal_point = (dim == 2) ?
-                                     Point<dim> (0.5, focal_distance) :
-                                     Point<dim> (0.5, 0.5, focal_distance);
+    const Point<dim> focal_point = (dim == 2) ?
+                                     Point<dim>(0.5, focal_distance) :
+                                     Point<dim>(0.5, 0.5, focal_distance);
 
 
     // As initial coarse grid we take a simple unit square with 5 subdivisions
@@ -473,12 +473,12 @@ namespace Step29
 
     typename Triangulation<dim>::cell_iterator
     cell = triangulation.begin(),
-    endc = triangulation.end();
+                                               endc = triangulation.end();
 
     for (; cell != endc; ++cell)
       for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
-        if ( cell->face(face)->at_boundary() &&
-             ((cell->face(face)->center() - transducer).norm_square() < 0.01) )
+        if (cell->face(face)->at_boundary() &&
+            ((cell->face(face)->center() - transducer).norm_square() < 0.01))
           {
 
             cell->face(face)->set_boundary_id(1);
@@ -568,12 +568,12 @@ namespace Step29
     // used. Since our bilinear form involves boundary integrals on
     // $\Gamma_2$, we also need a quadrature rule for surface integration on
     // the faces, which are $dim-1$ dimensional:
-    QGauss<dim>    quadrature_formula(2);
-    QGauss<dim-1>  face_quadrature_formula(2);
+    QGauss<dim>     quadrature_formula(2);
+    QGauss<dim - 1> face_quadrature_formula(2);
 
-    const unsigned int n_q_points       = quadrature_formula.size(),
-                       n_face_q_points  = face_quadrature_formula.size(),
-                       dofs_per_cell    = fe.dofs_per_cell;
+    const unsigned int n_q_points      = quadrature_formula.size(),
+                       n_face_q_points = face_quadrature_formula.size(),
+                       dofs_per_cell   = fe.dofs_per_cell;
 
     // The FEValues objects will evaluate the shape functions for us.  For the
     // part of the bilinear form that involves integration on $\Omega$, we'll
@@ -581,8 +581,8 @@ namespace Step29
     // quadrature weights.  For the terms involving the boundary integrals,
     // only shape function values and the quadrature weights are necessary.
     FEValues<dim>  fe_values(fe, quadrature_formula,
-                             update_values | update_gradients |
-                             update_JxW_values);
+                            update_values | update_gradients |
+                              update_JxW_values);
 
     FEFaceValues<dim> fe_face_values(fe, face_quadrature_formula,
                                      update_values | update_JxW_values);
@@ -596,7 +596,7 @@ namespace Step29
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
       {
@@ -661,13 +661,13 @@ namespace Step29
 
                     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                       cell_matrix(i,j) += (((fe_values.shape_value(i,q_point) *
-                                             fe_values.shape_value(j,q_point)) *
+                           fe_values.shape_value(j, q_point)) *
                                             (- omega * omega)
                                             +
-                                            (fe_values.shape_grad(i,q_point) *
-                                             fe_values.shape_grad(j,q_point)) *
-                                            c * c) *
-                                           fe_values.JxW(q_point));
+                          (fe_values.shape_grad(i, q_point) *
+                           fe_values.shape_grad(j, q_point)) *
+                            c * c) *
+                         fe_values.JxW(q_point));
 
                     // You might think that we would have to specify which
                     // component of the shape function we'd like to evaluate
@@ -689,7 +689,7 @@ namespace Step29
         // absorbing boundary conditions:
         for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary() &&
-              (cell->face(face)->boundary_id() == 0) )
+              (cell->face(face)->boundary_id() == 0))
             {
 
 
@@ -732,11 +732,11 @@ namespace Step29
                     // of them to which component it belongs.
                     for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
                       cell_matrix(i,j) += ((fe.system_to_component_index(i).first == 0) ? -1 : 1) *
-                                          fe_face_values.shape_value(i,q_point) *
+                        fe_face_values.shape_value(i, q_point) *
                                           fe_face_values.shape_value(j,q_point) *
                                           c *
                                           omega *
-                                          fe_face_values.JxW(q_point);
+                        fe_face_values.JxW(q_point);
             }
 
         // Now we are done with this cell and have to transfer its
@@ -759,7 +759,7 @@ namespace Step29
     // which is characterized by the boundary indicator 1. The Dirichlet
     // values are provided by the <code>DirichletBoundaryValues</code> class
     // we defined above:
-    std::map<types::global_dof_index,double> boundary_values;
+    std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
                                              1,
                                              DirichletBoundaryValues<dim>(),
@@ -805,7 +805,7 @@ namespace Step29
     // SparseDirectUMFPACK object, and at the same time kicks off the
     // LU-decomposition. Hence, this is also the point where most of the
     // computational work in this program happens.
-    SparseDirectUMFPACK  A_direct;
+    SparseDirectUMFPACK A_direct;
     A_direct.initialize(system_matrix);
 
     // After the decomposition, we can use <code>A_direct</code> like a matrix
@@ -839,7 +839,7 @@ namespace Step29
     // Define objects of our <code>ComputeIntensity</code> class and a DataOut
     // object:
     ComputeIntensity<dim> intensities;
-    DataOut<dim> data_out;
+    DataOut<dim>          data_out;
 
     data_out.attach_dof_handler(dof_handler);
 
@@ -851,7 +851,7 @@ namespace Step29
     // corresponding properties of the DataOut object accordingly.
     prm.enter_subsection("Output parameters");
 
-    const std::string output_file    = prm.get("Output file");
+    const std::string output_file = prm.get("Output file");
     data_out.parse_parameters(prm);
 
     prm.leave_subsection();
@@ -926,11 +926,11 @@ int main()
 
       deallog.depth_console(5);
 
-      ParameterHandler  prm;
-      ParameterReader   param(prm);
+      ParameterHandler prm;
+      ParameterReader  param(prm);
       param.read_parameters("step-29.prm");
 
-      UltrasoundProblem<2>  ultrasound_problem(prm);
+      UltrasoundProblem<2> ultrasound_problem(prm);
       ultrasound_problem.run();
     }
   catch (std::exception &exc)

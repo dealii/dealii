@@ -93,18 +93,18 @@ namespace Step8
     void refine_grid();
     void output_results(const unsigned int cycle) const;
 
-    Triangulation<dim>   triangulation;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    DoFHandler<dim>    dof_handler;
 
-    FESystem<dim>        fe;
+    FESystem<dim> fe;
 
-    ConstraintMatrix     hanging_node_constraints;
+    ConstraintMatrix hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Vector<double> solution;
+    Vector<double> system_rhs;
   };
 
 
@@ -135,8 +135,8 @@ namespace Step8
   // we terminate the program in the second assertion. The program will work
   // just fine in 3d, however.
   template <int dim>
-  void right_hand_side(const std::vector<Point<dim> > &points,
-                       std::vector<Tensor<1, dim> >   &values)
+  void right_hand_side(const std::vector<Point<dim>> &points,
+                       std::vector<Tensor<1, dim>> &  values)
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -160,15 +160,15 @@ namespace Step8
         // If <code>points[point_n]</code> is in a circle (sphere) of radius
         // 0.2 around one of these points, then set the force in x-direction
         // to one, otherwise to zero:
-        if (((points[point_n]-point_1).norm_square() < 0.2*0.2) ||
-            ((points[point_n]-point_2).norm_square() < 0.2*0.2))
+        if (((points[point_n] - point_1).norm_square() < 0.2 * 0.2) ||
+            ((points[point_n] - point_2).norm_square() < 0.2 * 0.2))
           values[point_n][0] = 1.0;
         else
           values[point_n][0] = 0.0;
 
         // Likewise, if <code>points[point_n]</code> is in the vicinity of the
         // origin, then set the y-force to one, otherwise to zero:
-        if (points[point_n].norm_square() < 0.2*0.2)
+        if (points[point_n].norm_square() < 0.2 * 0.2)
           values[point_n][1] = 1.0;
         else
           values[point_n][1] = 0.0;
@@ -270,17 +270,17 @@ namespace Step8
   template <int dim>
   void ElasticProblem<dim>::assemble_system()
   {
-    QGauss<dim>  quadrature_formula(2);
+    QGauss<dim> quadrature_formula(2);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values   | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs(dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -288,8 +288,8 @@ namespace Step8
     // store the values of the coefficients at all the quadrature points on a
     // cell. In the present situation, we have two coefficients, lambda and
     // mu.
-    std::vector<double>     lambda_values(n_q_points);
-    std::vector<double>     mu_values(n_q_points);
+    std::vector<double> lambda_values(n_q_points);
+    std::vector<double> mu_values(n_q_points);
 
     // Well, we could as well have omitted the above two arrays since we will
     // use constant coefficients for both lambda and mu, which can be declared
@@ -301,7 +301,7 @@ namespace Step8
 
     // Like the two constant functions above, we will call the function
     // right_hand_side just once per cell to make things simpler.
-    std::vector<Tensor<1, dim> > rhs_values(n_q_points);
+    std::vector<Tensor<1, dim>> rhs_values(n_q_points);
 
     // Now we can begin with the loop over all cells:
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
@@ -309,14 +309,14 @@ namespace Step8
     for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
-        cell_rhs = 0;
+        cell_rhs    = 0;
 
         fe_values.reinit(cell);
 
         // Next we get the values of the coefficients at the quadrature
         // points. Likewise for the right hand side:
         lambda.value_list(fe_values.get_quadrature_points(), lambda_values);
-        mu.value_list     (fe_values.get_quadrature_points(), mu_values);
+        mu.value_list(fe_values.get_quadrature_points(), mu_values);
         right_hand_side(fe_values.get_quadrature_points(), rhs_values);
 
         // Then assemble the entries of the local stiffness matrix and right
@@ -368,28 +368,28 @@ namespace Step8
                       // brackets.
                       (
                         (fe_values.shape_grad(i,q_point)[component_i] *
-                         fe_values.shape_grad(j,q_point)[component_j] *
+                        fe_values.shape_grad(j, q_point)[component_j] *
                          lambda_values[q_point])
                         +
-                        (fe_values.shape_grad(i,q_point)[component_j] *
-                         fe_values.shape_grad(j,q_point)[component_i] *
+                       (fe_values.shape_grad(i, q_point)[component_j] *
+                        fe_values.shape_grad(j, q_point)[component_i] *
                          mu_values[q_point])
                         +
-                        // The second term is (mu nabla u_i, nabla v_j).  We
-                        // need not access a specific component of the
-                        // gradient, since we only have to compute the scalar
-                        // product of the two gradients, of which an
-                        // overloaded version of the operator* takes care, as
-                        // in previous examples.
-                        //
-                        // Note that by using the ?: operator, we only do this
-                        // if comp(i) equals comp(j), otherwise a zero is
-                        // added (which will be optimized away by the
-                        // compiler).
-                        ((component_i == component_j) ?
-                         (fe_values.shape_grad(i,q_point) *
-                          fe_values.shape_grad(j,q_point) *
-                          mu_values[q_point])  :
+                       // The second term is (mu nabla u_i, nabla v_j).  We
+                       // need not access a specific component of the
+                       // gradient, since we only have to compute the scalar
+                       // product of the two gradients, of which an
+                       // overloaded version of the operator* takes care, as
+                       // in previous examples.
+                       //
+                       // Note that by using the ?: operator, we only do this
+                       // if comp(i) equals comp(j), otherwise a zero is
+                       // added (which will be optimized away by the
+                       // compiler).
+                       ((component_i == component_j) ?
+                          (fe_values.shape_grad(i, q_point) *
+                           fe_values.shape_grad(j, q_point) *
+                           mu_values[q_point]) :
                          0)
                       )
                       *
@@ -406,7 +406,7 @@ namespace Step8
             component_i = fe.system_to_component_index(i).first;
 
             for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-              cell_rhs(i) += fe_values.shape_value(i,q_point) *
+              cell_rhs(i) += fe_values.shape_value(i, q_point) *
                              rhs_values[q_point][component_i] *
                              fe_values.JxW(q_point);
           }
@@ -441,7 +441,7 @@ namespace Step8
     // object would represent a scalar function. Since the solution vector has
     // <code>dim</code> components, we need to pass <code>dim</code> as number
     // of components to the zero function as well.
-    std::map<types::global_dof_index,double> boundary_values;
+    std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(dim),
@@ -463,8 +463,8 @@ namespace Step8
   template <int dim>
   void ElasticProblem<dim>::solve()
   {
-    SolverControl           solver_control(1000, 1e-12);
-    SolverCG<>              cg(solver_control);
+    SolverControl solver_control(1000, 1e-12);
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
@@ -494,7 +494,7 @@ namespace Step8
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
     KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim-1>(2),
+                                       QGauss<dim - 1>(2),
                                        typename FunctionMap<dim>::type(),
                                        solution,
                                        estimated_error_per_cell);
@@ -543,20 +543,20 @@ namespace Step8
     std::vector<std::string> solution_names;
     switch (dim)
       {
-      case 1:
-        solution_names.emplace_back("displacement");
-        break;
-      case 2:
-        solution_names.emplace_back("x_displacement");
-        solution_names.emplace_back("y_displacement");
-        break;
-      case 3:
-        solution_names.emplace_back("x_displacement");
-        solution_names.emplace_back("y_displacement");
-        solution_names.emplace_back("z_displacement");
-        break;
-      default:
-        Assert(false, ExcNotImplemented());
+        case 1:
+          solution_names.emplace_back("displacement");
+          break;
+        case 2:
+          solution_names.emplace_back("x_displacement");
+          solution_names.emplace_back("y_displacement");
+          break;
+        case 3:
+          solution_names.emplace_back("x_displacement");
+          solution_names.emplace_back("y_displacement");
+          solution_names.emplace_back("z_displacement");
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
       }
 
     // After setting up the names for the different components of the

@@ -85,13 +85,13 @@ namespace Step12
   // data. Since only its values are used, we implement value_list(), but
   // leave all other functions of Function undefined.
   template <int dim>
-  class BoundaryValues:  public Function<dim>
+  class BoundaryValues : public Function<dim>
   {
   public:
     BoundaryValues() {}
-    virtual void value_list(const std::vector<Point<dim> > &points,
-                            std::vector<double> &values,
-                            const unsigned int component=0) const override;
+    virtual void value_list(const std::vector<Point<dim>> &points,
+                            std::vector<double> &          values,
+                            const unsigned int component = 0) const override;
   };
 
   // Given the flow direction, the inflow boundary of the unit square
@@ -100,19 +100,19 @@ namespace Step12
   // right boundary. The values of this function on the outflow boundaries
   // will not be used within the DG scheme.
   template <int dim>
-  void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
-                                       std::vector<double> &values,
+  void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
+                                       std::vector<double> &          values,
                                        const unsigned int) const
   {
-    Assert(values.size()==points.size(),
-           ExcDimensionMismatch(values.size(),points.size()));
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
         if (points[i](0) < 0.5)
-          values[i]=1.;
+          values[i] = 1.;
         else
-          values[i]=0.;
+          values[i] = 0.;
       }
   }
 
@@ -123,7 +123,7 @@ namespace Step12
   // simply leave the $z$-component unset (i.e., at zero), whereas
   // the function can not be used in 1d in its current implementation:
   template <int dim>
-  Tensor<1,dim> beta(const Point<dim> &p)
+  Tensor<1, dim> beta(const Point<dim> &p)
   {
     Assert(dim >= 2, ExcNotImplemented());
 
@@ -168,8 +168,8 @@ namespace Step12
     // specified in the constructor). If you want to use a DG method of a
     // different degree the whole program stays the same, only replace 1 in
     // the constructor by the desired polynomial degree.
-    FE_DGQ<dim>          fe;
-    DoFHandler<dim>      dof_handler;
+    FE_DGQ<dim>     fe;
+    DoFHandler<dim> dof_handler;
 
     // The next four members represent the linear system to be
     // solved. <code>system_matrix</code> and <code>right_hand_side</code> are
@@ -180,8 +180,8 @@ namespace Step12
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       right_hand_side;
+    Vector<double> solution;
+    Vector<double> right_hand_side;
 
     // Finally, we have to provide functions that assemble the cell, boundary,
     // and inner face terms. Within the MeshWorker framework, the loop over
@@ -190,7 +190,7 @@ namespace Step12
     // then work on intermediate objects for which first, we here define
     // typedefs to the info objects handed to the local integration functions
     // in order to make our life easier below.
-    typedef MeshWorker::DoFInfo<dim> DoFInfo;
+    typedef MeshWorker::DoFInfo<dim>         DoFInfo;
     typedef MeshWorker::IntegrationInfo<dim> CellInfo;
 
     // The following three functions are then the ones that get called inside
@@ -210,8 +210,8 @@ namespace Step12
                                     CellInfo &info);
     static void integrate_boundary_term(DoFInfo &dinfo,
                                         CellInfo &info);
-    static void integrate_face_term(DoFInfo &dinfo1,
-                                    DoFInfo &dinfo2,
+    static void integrate_face_term(DoFInfo & dinfo1,
+                                    DoFInfo & dinfo2,
                                     CellInfo &info1,
                                     CellInfo &info2);
   };
@@ -278,7 +278,7 @@ namespace Step12
     // formula with number of points one higher than the polynomial degree
     // used. Since the quadratures for cells, boundary and interior faces can
     // be selected independently, we have to hand over this value three times.
-    const unsigned int n_gauss_points = dof_handler.get_fe().degree+1;
+    const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
     info_box.initialize_gauss_quadrature(n_gauss_points,
                                          n_gauss_points,
                                          n_gauss_points);
@@ -305,8 +305,8 @@ namespace Step12
     // Now, we have to create the assembler object and tell it, where to put
     // the local data. These will be our system matrix and the right hand
     // side.
-    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >
-    assembler;
+    MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double>>
+      assembler;
     assembler.initialize(system_matrix, right_hand_side);
 
     // Finally, the integration loop over all active cells (determined by the
@@ -323,10 +323,10 @@ namespace Step12
     MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(), dof_handler.end(),
      dof_info, info_box,
-     &AdvectionProblem<dim>::integrate_cell_term,
-     &AdvectionProblem<dim>::integrate_boundary_term,
-     &AdvectionProblem<dim>::integrate_face_term,
-     assembler);
+      &AdvectionProblem<dim>::integrate_cell_term,
+      &AdvectionProblem<dim>::integrate_boundary_term,
+      &AdvectionProblem<dim>::integrate_face_term,
+      assembler);
   }
 
 
@@ -336,15 +336,15 @@ namespace Step12
   // called just above. They compute the local contributions to the system
   // matrix and right hand side on cells and faces.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo &dinfo,
+  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo & dinfo,
                                                   CellInfo &info)
   {
     // First, let us retrieve some of the objects used here from @p info. Note
     // that these objects can handle much more complex structures, thus the
     // access here looks more complicated than might seem necessary.
-    const FEValuesBase<dim> &fe_values = info.fe_values();
-    FullMatrix<double> &local_matrix = dinfo.matrix(0).matrix;
-    const std::vector<double> &JxW = fe_values.get_JxW_values();
+    const FEValuesBase<dim> &  fe_values    = info.fe_values();
+    FullMatrix<double> &       local_matrix = dinfo.matrix(0).matrix;
+    const std::vector<double> &JxW          = fe_values.get_JxW_values();
 
     // With these objects, we continue local integration like always. First,
     // we loop over the quadrature points and compute the advection vector in
@@ -357,8 +357,8 @@ namespace Step12
         // in the cell term.  What's left is integrating the matrix entries.
         for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
           for (unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
-            local_matrix(i,j) += -beta_at_q_point *
-                                 fe_values.shape_grad(i,point) *
+            local_matrix(i, j) += -beta_at_q_point *
+                                  fe_values.shape_grad(i, point) *
                                  fe_values.shape_value(j,point) *
                                  JxW[point];
       }
@@ -368,14 +368,14 @@ namespace Step12
   // the base class for both FEFaceValues and FESubfaceValues, in order to get
   // access to normal vectors.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo &dinfo,
+  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo & dinfo,
                                                       CellInfo &info)
   {
     const FEValuesBase<dim> &fe_face_values = info.fe_values();
-    FullMatrix<double> &local_matrix = dinfo.matrix(0).matrix;
-    Vector<double> &local_vector = dinfo.vector(0).block(0);
+    FullMatrix<double> &     local_matrix   = dinfo.matrix(0).matrix;
+    Vector<double> &         local_vector   = dinfo.vector(0).block(0);
 
-    const std::vector<double> &JxW = fe_face_values.get_JxW_values();
+    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
     const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors();
 
     std::vector<double> g(fe_face_values.n_quadrature_points);
@@ -397,7 +397,7 @@ namespace Step12
           for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
             local_vector(i) += -beta_dot_n *
                                g[point] *
-                               fe_face_values.shape_value(i,point) *
+                               fe_face_values.shape_value(i, point) *
                                JxW[point];
       }
   }
@@ -406,8 +406,8 @@ namespace Step12
   // two info objects, one for each cell adjacent to the face and we assemble
   // four matrices, one for each cell and two for coupling back and forth.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_face_term(DoFInfo &dinfo1,
-                                                  DoFInfo &dinfo2,
+  void AdvectionProblem<dim>::integrate_face_term(DoFInfo & dinfo1,
+                                                  DoFInfo & dinfo2,
                                                   CellInfo &info1,
                                                   CellInfo &info2)
   {
@@ -425,16 +425,16 @@ namespace Step12
     // in each info object refer to the test functions on the respective
     // cell. The first matrix contains the interior couplings of that cell,
     // while the second contains the couplings between cells.
-    FullMatrix<double> &u1_v1_matrix = dinfo1.matrix(0,false).matrix;
-    FullMatrix<double> &u2_v1_matrix = dinfo1.matrix(0,true).matrix;
-    FullMatrix<double> &u1_v2_matrix = dinfo2.matrix(0,true).matrix;
-    FullMatrix<double> &u2_v2_matrix = dinfo2.matrix(0,false).matrix;
+    FullMatrix<double> &u1_v1_matrix = dinfo1.matrix(0, false).matrix;
+    FullMatrix<double> &u2_v1_matrix = dinfo1.matrix(0, true).matrix;
+    FullMatrix<double> &u1_v2_matrix = dinfo2.matrix(0, true).matrix;
+    FullMatrix<double> &u2_v2_matrix = dinfo2.matrix(0, false).matrix;
 
     // Here, following the previous functions, we would have the local right
     // hand side vectors. Fortunately, the interface terms only involve the
     // solution and the right hand side does not receive any contributions.
 
-    const std::vector<double> &JxW = fe_face_values.get_JxW_values();
+    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
     const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors();
 
     for (unsigned int point = 0; point < fe_face_values.n_quadrature_points; ++point)
@@ -497,11 +497,11 @@ namespace Step12
   template <int dim>
   void AdvectionProblem<dim>::solve(Vector<double> &solution)
   {
-    SolverControl           solver_control(1000, 1e-12);
-    SolverRichardson<>      solver(solver_control);
+    SolverControl      solver_control(1000, 1e-12);
+    SolverRichardson<> solver(solver_control);
 
     // Here we create the preconditioner,
-    PreconditionBlockSSOR<SparseMatrix<double> > preconditioner;
+    PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
     // then assign the matrix to it and set the right block size:
     preconditioner.initialize(system_matrix, fe.dofs_per_cell);
@@ -549,7 +549,7 @@ namespace Step12
     // and they are cell-wise scaled by the factor $h^{1+d/2}$
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
       gradient_indicator(cell_no)*=std::pow(cell->diameter(), 1+1.0*dim/2);
 

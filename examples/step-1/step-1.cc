@@ -70,7 +70,7 @@ void first_grid()
   // file. The GridOut class of deal.II can do that in a number of different
   // output formats; here, we choose encapsulated postscript (eps) format:
   std::ofstream out("grid-1.eps");
-  GridOut grid_out;
+  GridOut       grid_out;
   grid_out.write_eps(triangulation, out);
   std::cout << "Grid written to grid-1.eps" << std::endl;
 }
@@ -91,7 +91,7 @@ void second_grid()
   // point (1,0), and inner and outer radius shall be 0.5 and 1. The number of
   // circumferential cells could be adjusted automatically by this function,
   // but we choose to set it explicitly to 10 as the last argument:
-  const Point<2> center(1,0);
+  const Point<2> center(1, 0);
   const double inner_radius = 0.5,
                outer_radius = 1.0;
   GridGenerator::hyper_shell(triangulation,
@@ -196,7 +196,7 @@ void second_grid()
       // <a href="http://en.cppreference.com/w/cpp/language/range-for">range-
       // based for loops</a>, which wrap up all of the syntax shown above into a
       // much shorter form:
-      for (auto cell: triangulation.active_cell_iterators())
+      for (auto cell : triangulation.active_cell_iterators())
         {
           // @note See @ref Iterators for more information about the iterator
           // classes used in deal.II, and @ref CPP11 for more information about
@@ -247,7 +247,7 @@ void second_grid()
   // write the resulting mesh to a file, again in eps format. This works just
   // as above:
   std::ofstream out("grid-2.eps");
-  GridOut grid_out;
+  GridOut       grid_out;
   grid_out.write_eps(triangulation, out);
 
   std::cout << "Grid written to grid-2.eps" << std::endl;

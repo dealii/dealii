@@ -84,27 +84,27 @@ namespace Step45
     void output_results(const unsigned int refinement_cycle) const;
     void refine_mesh();
 
-    const unsigned int   degree;
+    const unsigned int degree;
 
-    MPI_Comm                                    mpi_communicator;
+    MPI_Comm mpi_communicator;
 
-    parallel::distributed::Triangulation<dim>   triangulation;
-    FESystem<dim>                               fe;
-    DoFHandler<dim>                             dof_handler;
+    parallel::distributed::Triangulation<dim> triangulation;
+    FESystem<dim>                             fe;
+    DoFHandler<dim>                           dof_handler;
 
-    ConstraintMatrix                            constraints;
-    std::vector<IndexSet>                       owned_partitioning;
-    std::vector<IndexSet>                       relevant_partitioning;
+    ConstraintMatrix      constraints;
+    std::vector<IndexSet> owned_partitioning;
+    std::vector<IndexSet> relevant_partitioning;
 
-    TrilinosWrappers::BlockSparsityPattern      sparsity_pattern;
-    TrilinosWrappers::BlockSparseMatrix         system_matrix;
+    TrilinosWrappers::BlockSparsityPattern sparsity_pattern;
+    TrilinosWrappers::BlockSparseMatrix    system_matrix;
 
-    TrilinosWrappers::MPI::BlockVector          solution;
-    TrilinosWrappers::MPI::BlockVector          system_rhs;
+    TrilinosWrappers::MPI::BlockVector solution;
+    TrilinosWrappers::MPI::BlockVector system_rhs;
 
-    ConditionalOStream                          pcout;
+    ConditionalOStream pcout;
 
-    MappingQ<dim>                               mapping;
+    MappingQ<dim> mapping;
   };
 
 
@@ -115,20 +115,20 @@ namespace Step45
   public:
     BoundaryValues() : Function<dim>(dim+1) {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double>   &value) const override;
+                              Vector<double> &  value) const override;
   };
 
 
   template <int dim>
   double
   BoundaryValues<dim>::value(const Point<dim>  &/*p*/,
-                             const unsigned int component) const
+                                    const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component < this->n_components,
            ExcIndexRange(component, 0, this->n_components));
 
@@ -139,7 +139,7 @@ namespace Step45
   template <int dim>
   void
   BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                    Vector<double>   &values) const
+                                         Vector<double> &  values) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value(p, c);
@@ -152,11 +152,11 @@ namespace Step45
   public:
     RightHandSide() : Function<dim>(dim+1) {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double>   &value) const override;
+                              Vector<double> &  value) const override;
 
   };
 
@@ -164,13 +164,13 @@ namespace Step45
   template <int dim>
   double
   RightHandSide<dim>::value(const Point<dim>  &p,
-                            const unsigned int component) const
+                                   const unsigned int component) const
   {
     const Point<dim> center(0.75, 0.1);
-    const double r = (p-center).norm();
+    const double     r = (p - center).norm();
 
     if (component == 0)
-      return std::exp(-100.*r*r);
+      return std::exp(-100. * r * r);
     return 0;
   }
 
@@ -178,7 +178,7 @@ namespace Step45
   template <int dim>
   void
   RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                   Vector<double>   &values) const
+                                        Vector<double> &  values) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = RightHandSide<dim>::value(p, c);
@@ -190,19 +190,19 @@ namespace Step45
   class InverseMatrix : public Subscriptor
   {
   public:
-    InverseMatrix(const MatrixType         &m,
+    InverseMatrix(const MatrixType &        m,
                   const PreconditionerType &preconditioner,
-                  const IndexSet           &locally_owned,
-                  const MPI_Comm           &mpi_communicator);
+                  const IndexSet &          locally_owned,
+                  const MPI_Comm &          mpi_communicator);
 
-    void vmult(TrilinosWrappers::MPI::Vector       &dst,
+    void vmult(TrilinosWrappers::MPI::Vector &      dst,
                const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const MatrixType> matrix;
+    const SmartPointer<const MatrixType>         matrix;
     const SmartPointer<const PreconditionerType> preconditioner;
 
-    const MPI_Comm *mpi_communicator;
+    const MPI_Comm *                      mpi_communicator;
     mutable TrilinosWrappers::MPI::Vector tmp;
   };
 
@@ -211,8 +211,8 @@ namespace Step45
   template <class MatrixType, class PreconditionerType>
   InverseMatrix<MatrixType,PreconditionerType>::InverseMatrix
   (const MatrixType         &m,
-   const PreconditionerType &preconditioner,
-   const IndexSet           &locally_owned,
+    const PreconditionerType &preconditioner,
+    const IndexSet &          locally_owned,
    const MPI_Comm           &mpi_communicator)
     :
     matrix(&m),
@@ -226,11 +226,11 @@ namespace Step45
   template <class MatrixType, class PreconditionerType>
   void InverseMatrix<MatrixType,PreconditionerType>::vmult
   (TrilinosWrappers::MPI::Vector       &dst,
-   const TrilinosWrappers::MPI::Vector &src) const
+    const TrilinosWrappers::MPI::Vector &src) const
   {
-    SolverControl solver_control(src.size(), 1e-6*src.l2_norm());
-    TrilinosWrappers::SolverCG    cg(solver_control,
-                                     TrilinosWrappers::SolverCG::AdditionalData());
+    SolverControl              solver_control(src.size(), 1e-6 * src.l2_norm());
+    TrilinosWrappers::SolverCG cg(solver_control,
+                                  TrilinosWrappers::SolverCG::AdditionalData());
 
     tmp = 0.;
     cg.solve(*matrix, tmp, src, *preconditioner);
@@ -245,11 +245,11 @@ namespace Step45
   public:
     SchurComplement(const TrilinosWrappers::BlockSparseMatrix &system_matrix,
                     const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                    PreconditionerType>                       &A_inverse,
-                    const IndexSet                            &owned_pres,
-                    const MPI_Comm                            &mpi_communicator);
+                                        PreconditionerType> &  A_inverse,
+                    const IndexSet &                           owned_pres,
+                    const MPI_Comm &mpi_communicator);
 
-    void vmult(TrilinosWrappers::MPI::Vector       &dst,
+    void vmult(TrilinosWrappers::MPI::Vector &      dst,
                const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
@@ -266,13 +266,13 @@ namespace Step45
   SchurComplement(const TrilinosWrappers::BlockSparseMatrix &system_matrix,
                   const InverseMatrix<TrilinosWrappers::SparseMatrix,
                   PreconditionerType>                       &A_inverse,
-                  const IndexSet                            &owned_vel,
+    const IndexSet &owned_vel,
                   const MPI_Comm                            &mpi_communicator)
     :
     system_matrix(&system_matrix),
     A_inverse(&A_inverse),
-    tmp1 (owned_vel, mpi_communicator),
-    tmp2 (tmp1)
+    tmp1(owned_vel, mpi_communicator),
+    tmp2(tmp1)
   {}
 
 
@@ -280,11 +280,11 @@ namespace Step45
   template <class PreconditionerType>
   void SchurComplement<PreconditionerType>::vmult
   (TrilinosWrappers::MPI::Vector       &dst,
-   const TrilinosWrappers::MPI::Vector &src) const
+    const TrilinosWrappers::MPI::Vector &src) const
   {
-    system_matrix->block(0,1).vmult(tmp1, src);
+    system_matrix->block(0, 1).vmult(tmp1, src);
     A_inverse->vmult(tmp2, tmp1);
-    system_matrix->block(1,0).vmult(dst, tmp2);
+    system_matrix->block(1, 0).vmult(dst, tmp2);
   }
 
 
@@ -300,15 +300,15 @@ namespace Step45
     dof_handler(triangulation),
     pcout(std::cout,
           Utilities::MPI::this_mpi_process(mpi_communicator) == 0),
-    mapping(degree+1)
+    mapping(degree + 1)
   {}
-// @endcond
-//
-// @sect3{Setting up periodicity constraints on distributed triangulations}
+  // @endcond
+  //
+  // @sect3{Setting up periodicity constraints on distributed triangulations}
   template <int dim>
   void StokesProblem<dim>::create_mesh()
   {
-    Point<dim> center;
+    Point<dim>   center;
     const double inner_radius = .5;
     const double outer_radius = 1.;
 
@@ -327,42 +327,42 @@ namespace Step45
 // matched to the vertices $\text{vertices}_1$ of a face on the lower boundary
 // given by $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation
 // matrix $R$ and the offset $b$ are given by
-// @f{align*}
-// R=\begin{pmatrix}
-// 0&1\\-1&0
-// \end{pmatrix},
-// \quad
-// b=\begin{pmatrix}0&0\end{pmatrix}.
-// @f}
+    // @f{align*}
+    // R=\begin{pmatrix}
+    // 0&1\\-1&0
+    // \end{pmatrix},
+    // \quad
+    // b=\begin{pmatrix}0&0\end{pmatrix}.
+    // @f}
 // The data structure we are saving the reuslitng information into is here based
 // on the Triangulation.
     std::vector<GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator> >
-    periodicity_vector;
+      periodicity_vector;
 
     FullMatrix<double> rotation_matrix(dim);
-    rotation_matrix[0][1]=1.;
-    rotation_matrix[1][0]=-1.;
+    rotation_matrix[0][1] = 1.;
+    rotation_matrix[1][0] = -1.;
 
     GridTools::collect_periodic_faces(triangulation, 2, 3, 1,
                                       periodicity_vector, Tensor<1, dim>(),
                                       rotation_matrix);
 
-// Now telling the triangulation about the desired periodicity is
-// particularly easy by just calling
-// parallel::distributed::Triangulation::add_periodicity.
+    // Now telling the triangulation about the desired periodicity is
+    // particularly easy by just calling
+    // parallel::distributed::Triangulation::add_periodicity.
     triangulation.add_periodicity(periodicity_vector);
 
-    triangulation.refine_global(4-dim);
+    triangulation.refine_global(4 - dim);
   }
 
 
-// @sect3{Setting up periodicity constraints on distributed triangulations}
+  // @sect3{Setting up periodicity constraints on distributed triangulations}
   template <int dim>
   void StokesProblem<dim>::setup_dofs()
   {
     dof_handler.distribute_dofs(fe);
 
-    std::vector<unsigned int> block_component(dim+1,0);
+    std::vector<unsigned int> block_component(dim + 1, 0);
     block_component[dim] = 1;
     DoFRenumbering::component_wise(dof_handler, block_component);
 
@@ -375,7 +375,7 @@ namespace Step45
       owned_partitioning.clear();
       IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
       owned_partitioning.push_back(locally_owned_dofs.get_view(0, n_u));
-      owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u+n_p));
+      owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u + n_p));
 
       relevant_partitioning.clear();
       IndexSet locally_relevant_dofs;
@@ -407,34 +407,34 @@ namespace Step45
 // constraints, we are now able to actual create them. For describing the
 // matching we are using the same approach as before, i.e., the $\text{vertices}_2$
 // of a face on the left boundary should be matched to the vertices
-// $\text{vertices}_1$ of a face on the lower boundary given by
+      // $\text{vertices}_1$ of a face on the lower boundary given by
 // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation matrix $R$
 // and the offset $b$ are given by
-// @f{align*}
-// R=\begin{pmatrix}
-// 0&1\\-1&0
-// \end{pmatrix},
-// \quad
-// b=\begin{pmatrix}0&0\end{pmatrix}.
-// @f}
+      // @f{align*}
+      // R=\begin{pmatrix}
+      // 0&1\\-1&0
+      // \end{pmatrix},
+      // \quad
+      // b=\begin{pmatrix}0&0\end{pmatrix}.
+      // @f}
 // These two objects not only describe how faces should be matched but also
 // in which sense the solution should be transformed from $\text{face}_2$ to
-// $\text{face}_1$.
+      // $\text{face}_1$.
       FullMatrix<double> rotation_matrix(dim);
-      rotation_matrix[0][1]=1.;
-      rotation_matrix[1][0]=-1.;
+      rotation_matrix[0][1] = 1.;
+      rotation_matrix[1][0] = -1.;
 
-      Tensor<1,dim> offset;
+      Tensor<1, dim> offset;
 
-// For setting up the constraints, we first store the periodicity
-// information in an auxiliary object of type
-// <code>std::vector@<GridTools::PeriodicFacePair<typename
+      // For setting up the constraints, we first store the periodicity
+      // information in an auxiliary object of type
+      // <code>std::vector@<GridTools::PeriodicFacePair<typename
 // DoFHandler@<dim@>::cell_iterator@> </code>. The periodic boundaries have the
 // boundary indicators 2 (x=0) and 3 (y=0). All the other parameters we
 // have set up before. In this case the direction does not matter. Due to
 // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ this is exactly what we want.
       std::vector<GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator> >
-      periodicity_vector;
+        periodicity_vector;
 
       const unsigned int direction = 1;
 
@@ -449,12 +449,12 @@ namespace Step45
       std::vector<unsigned int> first_vector_components;
       first_vector_components.push_back(0);
 
-// After setting up all the information in periodicity_vector all we have
-// to do is to tell make_periodicity_constraints to create the desired
-// constraints.
+      // After setting up all the information in periodicity_vector all we have
+      // to do is to tell make_periodicity_constraints to create the desired
+      // constraints.
       DoFTools::make_periodicity_constraints<DoFHandler<dim> >
       (periodicity_vector, constraints, fe.component_mask(velocities),
-       first_vector_components);
+        first_vector_components);
 
       VectorTools::interpolate_boundary_values(mapping,
                                                dof_handler,
@@ -480,7 +480,7 @@ namespace Step45
 
       DoFTools::make_sparsity_pattern
       (dof_handler, bsp, constraints, false,
-       Utilities::MPI::this_mpi_process(mpi_communicator));
+        Utilities::MPI::this_mpi_process(mpi_communicator));
 
       bsp.compress();
 
@@ -493,18 +493,18 @@ namespace Step45
                     mpi_communicator);
   }
 
-// The rest of the program is then again identical to step-22. We will omit
-// it here now, but as before, you can find these parts in the "Plain program"
-// section below.
+  // The rest of the program is then again identical to step-22. We will omit
+  // it here now, but as before, you can find these parts in the "Plain program"
+  // section below.
 
-// @cond SKIP
+  // @cond SKIP
   template <int dim>
   void StokesProblem<dim>::assemble_system()
   {
-    system_matrix=0.;
-    system_rhs=0.;
+    system_matrix = 0.;
+    system_rhs    = 0.;
 
-    QGauss<dim>   quadrature_formula(degree+2);
+    QGauss<dim> quadrature_formula(degree + 2);
 
     FEValues<dim> fe_values(mapping, fe, quadrature_formula,
                             update_values    |
@@ -512,35 +512,35 @@ namespace Step45
                             update_JxW_values |
                             update_gradients);
 
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-    const unsigned int   n_q_points      = quadrature_formula.size();
+    const unsigned int n_q_points = quadrature_formula.size();
 
-    FullMatrix<double>   local_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>       local_rhs(dofs_per_cell);
+    FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     local_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    const RightHandSide<dim>          right_hand_side;
+    const RightHandSide<dim>    right_hand_side;
     std::vector<Vector<double> >      rhs_values(n_q_points,
                                                  Vector<double>(dim+1));
 
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
 
-    std::vector<SymmetricTensor<2,dim> > symgrad_phi_u(dofs_per_cell);
-    std::vector<double>                  div_phi_u   (dofs_per_cell);
-    std::vector<double>                  phi_p       (dofs_per_cell);
+    std::vector<SymmetricTensor<2, dim>> symgrad_phi_u(dofs_per_cell);
+    std::vector<double>                  div_phi_u(dofs_per_cell);
+    std::vector<double>                  phi_p(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
           local_matrix = 0;
-          local_rhs = 0;
+          local_rhs    = 0;
 
           right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
                                             rhs_values);
@@ -550,13 +550,13 @@ namespace Step45
               for (unsigned int k = 0; k < dofs_per_cell; ++k)
                 {
                   symgrad_phi_u[k] = fe_values[velocities].symmetric_gradient(k, q);
-                  div_phi_u[k]     = fe_values[velocities].divergence(k, q);
-                  phi_p[k]         = fe_values[pressure].value(k, q);
+                  div_phi_u[k] = fe_values[velocities].divergence(k, q);
+                  phi_p[k]     = fe_values[pressure].value(k, q);
                 }
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  for (unsigned int j = 0; j <  = i; ++j)
+                  for (unsigned int j = 0; j < = i; ++j)
                     {
                       local_matrix(i,j) += (symgrad_phi_u[i] * symgrad_phi_u[j]
                                             - div_phi_u[i] * phi_p[j]
@@ -567,15 +567,15 @@ namespace Step45
 
                   const unsigned int component_i =
                     fe.system_to_component_index(i).first;
-                  local_rhs(i) += fe_values.shape_value(i,q) *
+                  local_rhs(i) += fe_values.shape_value(i, q) *
                                   rhs_values[q](component_i) *
                                   fe_values.JxW(q);
                 }
             }
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = i+1; j < dofs_per_cell; ++j)
-              local_matrix(i,j) = local_matrix(j,i);
+            for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
+              local_matrix(i, j) = local_matrix(j, i);
 
           cell->get_dof_indices(local_dof_indices);
           constraints.distribute_local_to_global(local_matrix, local_rhs,
@@ -595,14 +595,14 @@ namespace Step45
   void StokesProblem<dim>::solve()
   {
     TrilinosWrappers::PreconditionJacobi A_preconditioner;
-    A_preconditioner.initialize(system_matrix.block(0,0));
+    A_preconditioner.initialize(system_matrix.block(0, 0));
 
     const InverseMatrix<TrilinosWrappers::SparseMatrix,
-          TrilinosWrappers::PreconditionJacobi>
-          A_inverse(system_matrix.block(0,0),
-                    A_preconditioner,
-                    owned_partitioning[0],
-                    mpi_communicator);
+                        TrilinosWrappers::PreconditionJacobi>
+      A_inverse(system_matrix.block(0, 0),
+                A_preconditioner,
+                owned_partitioning[0],
+                mpi_communicator);
 
     TrilinosWrappers::MPI::BlockVector tmp(owned_partitioning,
                                            mpi_communicator);
@@ -611,7 +611,7 @@ namespace Step45
       TrilinosWrappers::MPI::Vector schur_rhs(owned_partitioning[1],
                                               mpi_communicator);
       A_inverse.vmult(tmp.block(0), system_rhs.block(0));
-      system_matrix.block(1,0).vmult(schur_rhs, tmp.block(0));
+      system_matrix.block(1, 0).vmult(schur_rhs, tmp.block(0));
       schur_rhs -= system_rhs.block(1);
 
       SchurComplement<TrilinosWrappers::PreconditionJacobi>
@@ -620,11 +620,11 @@ namespace Step45
                        mpi_communicator);
 
       SolverControl solver_control(solution.block(1).size(),
-                                   1e-6*schur_rhs.l2_norm());
+                                   1e-6 * schur_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
       TrilinosWrappers::PreconditionAMG preconditioner;
-      preconditioner.initialize(system_matrix.block(1,1));
+      preconditioner.initialize(system_matrix.block(1, 1));
 
       InverseMatrix<TrilinosWrappers::SparseMatrix,
                     TrilinosWrappers::PreconditionAMG>
@@ -637,18 +637,18 @@ namespace Step45
                preconditioner);
 
       constraints.distribute(tmp);
-      solution.block(1)=tmp.block(1);
+      solution.block(1) = tmp.block(1);
     }
 
     {
-      system_matrix.block(0,1).vmult(tmp.block(0), tmp.block(1));
+      system_matrix.block(0, 1).vmult(tmp.block(0), tmp.block(1));
       tmp.block(0) *= -1;
       tmp.block(0) += system_rhs.block(0);
 
       A_inverse.vmult(tmp.block(0), tmp.block(0));
 
       constraints.distribute(tmp);
-      solution.block(0)=tmp.block(0);
+      solution.block(0) = tmp.block(0);
     }
   }
 
@@ -656,7 +656,7 @@ namespace Step45
 
   template <int dim>
   void
-  StokesProblem<dim>::output_results(const unsigned int refinement_cycle)  const
+  StokesProblem<dim>::output_results(const unsigned int refinement_cycle) const
   {
     std::vector<std::string> solution_names(dim, "velocity");
     solution_names.emplace_back("pressure");
@@ -676,7 +676,7 @@ namespace Step45
     for (unsigned int i = 0; i < subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector(subdomain, "subdomain");
-    data_out.build_patches(mapping, degree+1);
+    data_out.build_patches(mapping, degree + 1);
 
     std::ofstream output("solution-"
                          + Utilities::int_to_string(refinement_cycle, 2)
@@ -697,7 +697,7 @@ namespace Step45
         const std::string
         pvtu_master_filename = ("solution-" +
                                 Utilities::int_to_string(refinement_cycle, 2) +
-                                ".pvtu");
+           ".pvtu");
         std::ofstream pvtu_master(pvtu_master_filename);
         data_out.write_pvtu_record(pvtu_master, filenames);
       }
@@ -714,7 +714,7 @@ namespace Step45
 
     FEValuesExtractors::Scalar pressure(dim);
     KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim-1>(degree+1),
+                                       QGauss<dim - 1>(degree + 1),
                                        typename FunctionMap<dim>::type(),
                                        solution,
                                        estimated_error_per_cell,
@@ -765,7 +765,7 @@ int main(int argc, char *argv[])
       using namespace Step45;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      StokesProblem<2> flow_problem(1);
+      StokesProblem<2>                 flow_problem(1);
       flow_problem.run();
     }
   catch (std::exception &exc)

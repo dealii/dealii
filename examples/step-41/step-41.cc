@@ -89,20 +89,20 @@ namespace Step41
     void solve();
     void output_results(const unsigned int iteration) const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
-    ConstraintMatrix     constraints;
-    IndexSet             active_set;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
+    ConstraintMatrix   constraints;
+    IndexSet           active_set;
 
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix complete_system_matrix;
 
-    TrilinosWrappers::MPI::Vector  solution;
-    TrilinosWrappers::MPI::Vector  system_rhs;
-    TrilinosWrappers::MPI::Vector  complete_system_rhs;
-    TrilinosWrappers::MPI::Vector  diagonal_of_mass_matrix;
-    TrilinosWrappers::MPI::Vector  contact_force;
+    TrilinosWrappers::MPI::Vector solution;
+    TrilinosWrappers::MPI::Vector system_rhs;
+    TrilinosWrappers::MPI::Vector complete_system_rhs;
+    TrilinosWrappers::MPI::Vector diagonal_of_mass_matrix;
+    TrilinosWrappers::MPI::Vector contact_force;
   };
 
 
@@ -122,15 +122,15 @@ namespace Step41
   public:
     RightHandSide() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
   template <int dim>
   double RightHandSide<dim>::value(const Point<dim> &,
                                    const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     return -10;
@@ -144,15 +144,15 @@ namespace Step41
   public:
     BoundaryValues() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
   template <int dim>
   double BoundaryValues<dim>::value(const Point<dim> &,
                                     const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     return 0;
@@ -168,15 +168,15 @@ namespace Step41
   public:
     Obstacle() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double Obstacle<dim>::value(const Point<dim> &p,
+  double Obstacle<dim>::value(const Point<dim> & p,
                               const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     if (p(0) < -0.5)
@@ -292,31 +292,31 @@ namespace Step41
     system_matrix = 0;
     system_rhs    = 0;
 
-    const QGauss<dim>         quadrature_formula(fe.degree+1);
-    const RightHandSide<dim>  right_hand_side;
+    const QGauss<dim>        quadrature_formula(fe.degree + 1);
+    const RightHandSide<dim> right_hand_side;
 
     FEValues<dim>             fe_values(fe, quadrature_formula,
-                                        update_values   | update_gradients |
+                            update_values | update_gradients |
                                         update_quadrature_points |
                                         update_JxW_values);
 
-    const unsigned int        dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int        n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>        cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>            cell_rhs(dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
-        cell_rhs = 0;
+        cell_rhs    = 0;
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -327,8 +327,8 @@ namespace Step41
                                      fe_values.JxW (q_point));
 
               cell_rhs(i) += (fe_values.shape_value(i, q_point) *
-                              right_hand_side.value(fe_values.quadrature_point(q_point)) *
-                              fe_values.JxW (q_point));
+                 right_hand_side.value(fe_values.quadrature_point(q_point)) *
+                 fe_values.JxW(q_point));
             }
 
         cell->get_dof_indices(local_dof_indices);
@@ -373,21 +373,21 @@ namespace Step41
   {
     Assert(fe.degree == 1, ExcNotImplemented());
 
-    const QTrapez<dim>        quadrature_formula;
+    const QTrapez<dim> quadrature_formula;
     FEValues<dim>             fe_values(fe,
                                         quadrature_formula,
                                         update_values   |
                                         update_JxW_values);
 
-    const unsigned int        dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int        n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>        cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
       {
@@ -478,15 +478,15 @@ namespace Step41
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (unsigned int v = 0; v < GeometryInfo < dim > ::vertices_per_cell; ++v)
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
           Assert(dof_handler.get_fe().dofs_per_cell ==
-                 GeometryInfo<dim>::vertices_per_cell,
+                   GeometryInfo<dim>::vertices_per_cell,
                  ExcNotImplemented());
 
-          const unsigned int dof_index = cell->vertex_dof_index(v,0);
+          const unsigned int dof_index = cell->vertex_dof_index(v, 0);
 
           if (dof_touched[dof_index] == false)
             dof_touched[dof_index] = true;
@@ -517,7 +517,7 @@ namespace Step41
 
           if (lambda(dof_index) +
               penalty_parameter *
-              diagonal_of_mass_matrix(dof_index) *
+                                    diagonal_of_mass_matrix(dof_index) *
               (solution_value - obstacle_value)
               <
               0)
@@ -562,9 +562,9 @@ namespace Step41
   {
     std::cout << "   Solving system..." << std::endl;
 
-    ReductionControl                    reduction_control(100, 1e-12, 1e-3);
-    SolverCG<TrilinosWrappers::MPI::Vector>  solver(reduction_control);
-    TrilinosWrappers::PreconditionAMG   precondition;
+    ReductionControl                        reduction_control(100, 1e-12, 1e-3);
+    SolverCG<TrilinosWrappers::MPI::Vector> solver(reduction_control);
+    TrilinosWrappers::PreconditionAMG       precondition;
     precondition.initialize(system_matrix);
 
     solver.solve(system_matrix, solution, system_rhs, precondition);
@@ -634,7 +634,7 @@ namespace Step41
     setup_system();
 
     IndexSet active_set_old(active_set);
-    for (unsigned int iteration = 0; iteration <  = solution.size(); ++iteration)
+    for (unsigned int iteration = 0; iteration < = solution.size(); ++iteration)
       {
         std::cout << "Newton iteration " << iteration << std::endl;
 
@@ -678,7 +678,7 @@ int main(int argc, char *argv[])
 
       // This program can only be run in serial. Otherwise, throw an exception.
       AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-                  ExcMessage("This program can only be run in serial, use ./step-41"));
+        ExcMessage("This program can only be run in serial, use ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run();

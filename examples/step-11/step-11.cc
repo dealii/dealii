@@ -84,19 +84,19 @@ namespace Step11
     void assemble_and_solve();
     void solve();
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
-    MappingQ<dim>        mapping;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
+    MappingQ<dim>      mapping;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
     ConstraintMatrix     mean_value_constraints;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Vector<double> solution;
+    Vector<double> system_rhs;
 
-    TableHandler         output_table;
+    TableHandler output_table;
   };
 
 
@@ -176,7 +176,7 @@ namespace Step11
     // of what is to come later:
     mean_value_constraints.clear();
     mean_value_constraints.add_line(first_boundary_dof);
-    for (unsigned int i = first_boundary_dof+1; i < dof_handler.n_dofs(); ++i)
+    for (unsigned int i = first_boundary_dof + 1; i < dof_handler.n_dofs(); ++i)
       if (boundary_dofs[i] == true)
         mean_value_constraints.add_entry(first_boundary_dof,
                                          i, -1);
@@ -272,7 +272,7 @@ namespace Step11
     // Let us look at the way the matrix and body forces are integrated:
     const unsigned int gauss_degree
       = std::max(static_cast<unsigned int>(std::ceil(1.*(mapping.get_degree()+1)/2)),
-                 2U);
+      2U);
     MatrixTools::create_laplace_matrix(mapping, dof_handler,
                                        QGauss<dim>(gauss_degree),
                                        system_matrix);
@@ -312,9 +312,9 @@ namespace Step11
     // over faces now instead of cells:
     Vector<double> tmp(system_rhs.size());
     VectorTools::create_boundary_right_hand_side(mapping, dof_handler,
-                                                 QGauss<dim-1>(gauss_degree),
-                                                 Functions::ConstantFunction<dim>(1),
-                                                 tmp);
+      QGauss<dim - 1>(gauss_degree),
+      Functions::ConstantFunction<dim>(1),
+      tmp);
     // Then add the contributions from the boundary to those from the interior
     // of the domain:
     system_rhs += tmp;
@@ -362,7 +362,7 @@ namespace Step11
                                       solution,
                                       Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
-                                      QGauss<dim>(gauss_degree+1),
+                                      QGauss<dim>(gauss_degree + 1),
                                       VectorTools::H1_seminorm);
     // Then, the function just called returns its results as a vector of
     // values each of which denotes the norm on one cell. To get the global
@@ -384,8 +384,8 @@ namespace Step11
   template <int dim>
   void LaplaceProblem<dim>::solve()
   {
-    SolverControl           solver_control(1000, 1e-12);
-    SolverCG<>              cg(solver_control);
+    SolverControl solver_control(1000, 1e-12);
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);

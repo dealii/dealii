@@ -71,7 +71,7 @@ template <int dim>
 class Step5
 {
 public:
-  Step5 ();
+  Step5();
   void run();
 
 private:
@@ -80,15 +80,15 @@ private:
   void solve();
   void output_results(const unsigned int cycle) const;
 
-  Triangulation<dim>   triangulation;
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
+  Triangulation<dim> triangulation;
+  FE_Q<dim>          fe;
+  DoFHandler<dim>    dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Vector<double> solution;
+  Vector<double> system_rhs;
 };
 
 
@@ -106,7 +106,7 @@ private:
 template <int dim>
 double coefficient(const Point<dim> &p)
 {
-  if (p.square() < 0.5*0.5)
+  if (p.square() < 0.5 * 0.5)
     return 20;
   else
     return 1;
@@ -169,17 +169,17 @@ void Step5<dim>::setup_system()
 template <int dim>
 void Step5<dim>::assemble_system()
 {
-  QGauss<dim>  quadrature_formula(2);
+  QGauss<dim> quadrature_formula(2);
 
   FEValues<dim> fe_values(fe, quadrature_formula,
-                          update_values    |  update_gradients |
-                          update_quadrature_points  |  update_JxW_values);
+                          update_values | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs(dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -188,10 +188,10 @@ void Step5<dim>::assemble_system()
   // change in this part, compared to step-4, is that we will use the
   // <code>coefficient</code> function defined above to compute the
   // coefficient value at each quadrature point.
-  for (const auto &cell: dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
       fe_values.reinit(cell);
 
@@ -227,7 +227,7 @@ void Step5<dim>::assemble_system()
     }
 
   // With the matrix so built, we use zero boundary values again:
-  std::map<types::global_dof_index,double> boundary_values;
+  std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            Functions::ZeroFunction<dim>(),
@@ -269,8 +269,8 @@ void Step5<dim>::assemble_system()
 template <int dim>
 void Step5<dim>::solve()
 {
-  SolverControl           solver_control(1000, 1e-12);
-  SolverCG<>              solver(solver_control);
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
@@ -420,7 +420,7 @@ void Step5<dim>::run()
   // it will later also be linked to libraries that have been compiled for
   // optimized mode. In order to switch back to debug mode, simply recompile
   // with the command <code>make debug</code>.
-  Assert(dim==2, ExcInternalError());
+  Assert(dim == 2, ExcInternalError());
   // ExcInternalError is a globally defined exception, which may be thrown
   // whenever something is terribly wrong. Usually, one would like to use more
   // specific exceptions, and particular in this case one would of course try

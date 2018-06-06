@@ -89,9 +89,9 @@ namespace Step53
   private:
     const Functions::InterpolatedUniformGridData<2> topography_data;
 
-    static std::array<std::pair<double,double>,2> get_endpoints();
-    static std::array<unsigned int,2>             n_intervals();
-    static std::vector<double>                           get_data();
+    static std::array<std::pair<double, double>, 2> get_endpoints();
+    static std::array<unsigned int, 2>              n_intervals();
+    static std::vector<double>                      get_data();
   };
 
 
@@ -133,7 +133,7 @@ namespace Step53
   std::array<std::pair<double,double>,2>
   AfricaTopography::get_endpoints()
   {
-    std::array<std::pair<double,double>,2> endpoints;
+    std::array<std::pair<double, double>, 2> endpoints;
     endpoints[0] = std::make_pair(-6.983333, 11.966667);
     endpoints[1] = std::make_pair(25, 35.95);
     return endpoints;
@@ -143,7 +143,7 @@ namespace Step53
   std::array<unsigned int,2>
   AfricaTopography::n_intervals()
   {
-    std::array<unsigned int,2> endpoints;
+    std::array<unsigned int, 2> endpoints;
     endpoints[0] = 379;
     endpoints[1] = 219;
     return endpoints;
@@ -211,7 +211,7 @@ namespace Step53
   // The following class is then the main one of this program. Its structure
   // has been described in much detail in the introduction and does not need
   // much introduction any more.
-  class AfricaGeometry : public ChartManifold<3,3>
+  class AfricaGeometry : public ChartManifold<3, 3>
   {
   public:
     virtual
@@ -222,16 +222,16 @@ namespace Step53
     Point<3>
     push_forward(const Point<3> &chart_point) const override;
 
-    virtual std::unique_ptr<Manifold<3,3> > clone() const override;
+    virtual std::unique_ptr<Manifold<3, 3>> clone() const override;
 
   private:
-    static const double    R;
-    static const double    ellipticity;
+    static const double R;
+    static const double ellipticity;
 
     const AfricaTopography topography;
 
-    Point<3> push_forward_wgs84 (const Point<3> &phi_theta_d) const;
-    Point<3> pull_back_wgs84 (const Point<3> &x) const;
+    Point<3> push_forward_wgs84(const Point<3> &phi_theta_d) const;
+    Point<3> pull_back_wgs84(const Point<3> &x) const;
 
     Point<3> push_forward_topo(const Point<3> &phi_theta_d_hat) const;
     Point<3> pull_back_topo(const Point<3> &phi_theta_d) const;
@@ -249,13 +249,13 @@ namespace Step53
   Point<3>
   AfricaGeometry::pull_back(const Point<3> &space_point) const
   {
-    return pull_back_topo(pull_back_wgs84 (space_point));
+    return pull_back_topo(pull_back_wgs84(space_point));
   }
 
   Point<3>
   AfricaGeometry::push_forward(const Point<3> &chart_point) const
   {
-    return push_forward_wgs84 (push_forward_topo(chart_point));
+    return push_forward_wgs84(push_forward_topo(chart_point));
   }
 
 
@@ -293,8 +293,8 @@ namespace Step53
     const double R_bar = R / std::sqrt(1 - (ellipticity * ellipticity *
                                             std::sin(theta) * std::sin(theta)));
 
-    return Point<3> ((R_bar + d) * std::cos(phi) * std::cos(theta),
-                     (R_bar + d) * std::sin(phi) * std::cos(theta),
+    return Point<3>((R_bar + d) * std::cos(phi) * std::cos(theta),
+                    (R_bar + d) * std::sin(phi) * std::cos(theta),
                      ((1 - ellipticity * ellipticity) * R_bar + d) * std::sin(theta));
   }
 
@@ -307,15 +307,15 @@ namespace Step53
     const double th    = std::atan2(R * x(2), b * p);
     const double phi   = std::atan2(x(1), x(0));
     const double theta = std::atan2(x(2) + ep * ep * b * std::pow(std::sin(th),3),
-                                    (p - (ellipticity * ellipticity * R  * std::pow(std::cos(th),3))));
+      (p - (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
     const double R_bar = R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) * std::sin(theta)));
     const double R_plus_d = p / std::cos(theta);
 
     Point<3> phi_theta_d;
     if (phi < 0)
-      phi_theta_d[0] = phi + 2*numbers::PI;
-    else if (phi > 2*numbers::PI)
-      phi_theta_d[0] = phi - 2*numbers::PI;
+      phi_theta_d[0] = phi + 2 * numbers::PI;
+    else if (phi > 2 * numbers::PI)
+      phi_theta_d[0] = phi - 2 * numbers::PI;
     else
       phi_theta_d[0] = phi;
     phi_theta_d[1] = theta;
@@ -330,10 +330,10 @@ namespace Step53
   Point<3>
   AfricaGeometry::push_forward_topo(const Point<3> &phi_theta_d_hat) const
   {
-    const double d_hat = phi_theta_d_hat[2];
+    const double   d_hat = phi_theta_d_hat[2];
     const double h     = topography.value(phi_theta_d_hat[0],
                                           phi_theta_d_hat[1]);
-    const double d = d_hat + (d_hat + 500000)/500000*h;
+    const double   d = d_hat + (d_hat + 500000) / 500000 * h;
     const Point<3> phi_theta_d(phi_theta_d_hat[0],
                                phi_theta_d_hat[1],
                                d);
@@ -343,10 +343,10 @@ namespace Step53
   Point<3>
   AfricaGeometry::pull_back_topo(const Point<3> &phi_theta_d) const
   {
-    const double d = phi_theta_d[2];
+    const double   d     = phi_theta_d[2];
     const double h = topography.value(phi_theta_d[0],
                                       phi_theta_d[1]);
-    const double d_hat = 500000 * (d-h)/(500000+h);
+    const double   d_hat = 500000 * (d - h) / (500000 + h);
     const Point<3> phi_theta_d_hat(phi_theta_d[0],
                                    phi_theta_d[1],
                                    d_hat);
@@ -436,7 +436,7 @@ namespace Step53
       {
         for (Triangulation < 3 > ::active_cell_iterator cell = triangulation.begin_active();
              cell!=triangulation.end(); ++cell)
-          for (unsigned int f = 0; f < GeometryInfo < 3 > ::faces_per_cell; ++f)
+          for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
             if (cell->face(f)->boundary_id() == 5)
               {
                 cell->set_refine_flag();
@@ -444,17 +444,17 @@ namespace Step53
               }
         triangulation.execute_coarsening_and_refinement();
 
-        std::cout << "Refinement step " << i+1 << ": "
+        std::cout << "Refinement step " << i + 1 << ": "
                   << triangulation.n_active_cells() << " cells, "
-                  << GridTools::minimal_cell_diameter(triangulation)/1000
+                  << GridTools::minimal_cell_diameter(triangulation) / 1000
                   << "km minimal cell diameter"
                   << std::endl;
       }
 
     // Having done this all, we can now output the mesh into a file of its own:
     const std::string filename = "mesh.vtu";
-    std::ofstream out(filename);
-    GridOut grid_out;
+    std::ofstream     out(filename);
+    GridOut           grid_out;
     grid_out.write_vtu(triangulation, out);
   }
 }

@@ -164,24 +164,24 @@ namespace Step40
     void refine_grid();
     void output_results(const unsigned int cycle) const;
 
-    MPI_Comm                                  mpi_communicator;
+    MPI_Comm mpi_communicator;
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    DoFHandler<dim>                           dof_handler;
-    FE_Q<dim>                                 fe;
+    DoFHandler<dim> dof_handler;
+    FE_Q<dim>       fe;
 
-    IndexSet                                  locally_owned_dofs;
-    IndexSet                                  locally_relevant_dofs;
+    IndexSet locally_owned_dofs;
+    IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix                          constraints;
+    ConstraintMatrix constraints;
 
-    LA::MPI::SparseMatrix                     system_matrix;
-    LA::MPI::Vector                           locally_relevant_solution;
-    LA::MPI::Vector                           system_rhs;
+    LA::MPI::SparseMatrix system_matrix;
+    LA::MPI::Vector       locally_relevant_solution;
+    LA::MPI::Vector       system_rhs;
 
-    ConditionalOStream                        pcout;
-    TimerOutput                               computing_timer;
+    ConditionalOStream pcout;
+    TimerOutput        computing_timer;
   };
 
 
@@ -204,7 +204,7 @@ namespace Step40
     triangulation(mpi_communicator,
                   typename Triangulation<dim>::MeshSmoothing
                   (Triangulation<dim>::smoothing_on_refinement |
-                   Triangulation<dim>::smoothing_on_coarsening)),
+                    Triangulation<dim>::smoothing_on_coarsening)),
     dof_handler(triangulation),
     fe(2),
     pcout(std::cout,
@@ -328,9 +328,9 @@ namespace Step40
     DoFTools::make_sparsity_pattern(dof_handler, dsp,
                                     constraints, false);
     SparsityTools::distribute_sparsity_pattern(dsp,
-                                               dof_handler.n_locally_owned_dofs_per_processor(),
-                                               mpi_communicator,
-                                               locally_relevant_dofs);
+      dof_handler.n_locally_owned_dofs_per_processor(),
+      mpi_communicator,
+      locally_relevant_dofs);
 
     system_matrix.reinit(locally_owned_dofs,
                          locally_owned_dofs,
@@ -370,29 +370,29 @@ namespace Step40
   {
     TimerOutput::Scope t(computing_timer, "assembly");
 
-    const QGauss<dim>  quadrature_formula(3);
+    const QGauss<dim> quadrature_formula(3);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            update_values    |  update_gradients |
+                            update_values | update_gradients |
                             update_quadrature_points |
                             update_JxW_values);
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs(dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
-          cell_rhs = 0;
+          cell_rhs    = 0;
 
           fe_values.reinit(cell);
 
@@ -409,13 +409,13 @@ namespace Step40
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                                         fe_values.shape_grad(j,q_point) *
-                                         fe_values.JxW(q_point));
+                    cell_matrix(i, j) += (fe_values.shape_grad(i, q_point) *
+                                          fe_values.shape_grad(j, q_point) *
+                                          fe_values.JxW(q_point));
 
                   cell_rhs(i) += (rhs_value *
                                   fe_values.shape_value(i,q_point) *
-                                  fe_values.JxW(q_point));
+                     fe_values.JxW(q_point));
                 }
             }
 
@@ -526,7 +526,7 @@ namespace Step40
 
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim-1>(3),
+                                       QGauss<dim - 1>(3),
                                        typename FunctionMap<dim>::type(),
                                        locally_relevant_solution,
                                        estimated_error_per_cell);
@@ -611,7 +611,7 @@ namespace Step40
       {
         std::vector<std::string> filenames;
         for (unsigned int i = 0;
-             i<Utilities::MPI::n_mpi_processes(mpi_communicator);
+             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
           filenames.push_back("solution-" +
                               Utilities::int_to_string(cycle, 2) +
@@ -682,7 +682,7 @@ namespace Step40
         assemble_system();
         solve();
 
-        if (Utilities::MPI::n_mpi_processes(mpi_communicator) <  = 32)
+        if (Utilities::MPI::n_mpi_processes(mpi_communicator) < = 32)
           {
             TimerOutput::Scope t(computing_timer, "output");
             output_results(cycle);

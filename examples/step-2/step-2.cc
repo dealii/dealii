@@ -68,7 +68,7 @@ using namespace dealii;
 // returns the grid it produces via its argument.
 void make_grid(Triangulation<2> &triangulation)
 {
-  const Point<2> center(1,0);
+  const Point<2> center(1, 0);
   const double inner_radius = 0.5,
                outer_radius = 1.0;
   GridGenerator::hyper_shell(triangulation,
@@ -77,7 +77,7 @@ void make_grid(Triangulation<2> &triangulation)
 
   for (unsigned int step = 0; step < 3; ++step)
     {
-      for (auto cell: triangulation.active_cell_iterators())
+      for (auto cell : triangulation.active_cell_iterators())
         for (unsigned int v = 0;
              v < GeometryInfo<2>::vertices_per_cell;
              ++v)

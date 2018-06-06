@@ -74,7 +74,7 @@ namespace Step59
   // degrees in the `main()` function.
 
   const unsigned int degree_finite_element = 8;
-  const unsigned int dimension = 3;
+  const unsigned int dimension             = 3;
 
   // @sect3{Equation data}
 
@@ -99,8 +99,8 @@ namespace Step59
   public:
     Solution() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int   = 0) const override final
+    virtual double value(const Point<dim> &p,
+                         const unsigned int = 0) const override final
     {
       double val = 1.;
       for (unsigned int d = 0; d < dim; ++d)
@@ -108,11 +108,11 @@ namespace Step59
       return val;
     }
 
-    virtual Tensor<1,dim> gradient(const Point<dim>   &p,
-                                   const unsigned int  = 0) const override final
+    virtual Tensor<1, dim> gradient(const Point<dim> &p,
+                                    const unsigned int = 0) const override final
     {
-      const double arg = numbers::PI * 2.4;
-      Tensor<1,dim> grad;
+      const double   arg = numbers::PI * 2.4;
+      Tensor<1, dim> grad;
       for (unsigned int d = 0; d < dim; ++d)
         {
           grad[d] = 1.;
@@ -134,11 +134,11 @@ namespace Step59
   public:
     RightHandSide() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int   = 0) const override final
+    virtual double value(const Point<dim> &p,
+                         const unsigned int = 0) const override final
     {
       const double arg = numbers::PI * 2.4;
-      double val = 1.;
+      double       val = 1.;
       for (unsigned int d = 0; d < dim; ++d)
         val *= std::cos(arg * p[d]);
       return dim * arg * arg * val;
@@ -174,7 +174,7 @@ namespace Step59
 
     LaplaceOperator() = default;
 
-    void initialize(std::shared_ptr<const MatrixFree<dim,number> > data);
+    void initialize(std::shared_ptr<const MatrixFree<dim, number>> data);
 
     void clear();
 
@@ -185,34 +185,34 @@ namespace Step59
     std::shared_ptr<const MatrixFree<dim,number> >
     get_matrix_free() const;
 
-    void vmult(LinearAlgebra::distributed::Vector<number> &dst,
+    void vmult(LinearAlgebra::distributed::Vector<number> &      dst,
                const LinearAlgebra::distributed::Vector<number> &src) const;
 
-    void Tvmult(LinearAlgebra::distributed::Vector<number> &dst,
+    void Tvmult(LinearAlgebra::distributed::Vector<number> &      dst,
                 const LinearAlgebra::distributed::Vector<number> &src) const;
 
     number get_penalty_factor() const
     {
-      return 1.0 * fe_degree * (fe_degree+1);
+      return 1.0 * fe_degree * (fe_degree + 1);
     }
 
   private:
     void apply_cell(const MatrixFree<dim,number>                     &data,
-                    LinearAlgebra::distributed::Vector<number>       &dst,
-                    const LinearAlgebra::distributed::Vector<number> &src,
-                    const std::pair<unsigned int,unsigned int>       &cell_range) const;
+               LinearAlgebra::distributed::Vector<number> &      dst,
+               const LinearAlgebra::distributed::Vector<number> &src,
+               const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     void apply_face(const MatrixFree<dim,number>                     &data,
-                    LinearAlgebra::distributed::Vector<number>       &dst,
-                    const LinearAlgebra::distributed::Vector<number> &src,
-                    const std::pair<unsigned int,unsigned int>       &face_range) const;
+               LinearAlgebra::distributed::Vector<number> &      dst,
+               const LinearAlgebra::distributed::Vector<number> &src,
+               const std::pair<unsigned int, unsigned int> &face_range) const;
 
     void apply_boundary(const MatrixFree<dim,number>                     &data,
-                        LinearAlgebra::distributed::Vector<number>       &dst,
-                        const LinearAlgebra::distributed::Vector<number> &src,
-                        const std::pair<unsigned int,unsigned int>       &face_range) const;
+      LinearAlgebra::distributed::Vector<number> &      dst,
+      const LinearAlgebra::distributed::Vector<number> &src,
+      const std::pair<unsigned int, unsigned int> &     face_range) const;
 
-    std::shared_ptr<const MatrixFree<dim,number> > data;
+    std::shared_ptr<const MatrixFree<dim, number>> data;
   };
 
 
@@ -236,17 +236,17 @@ namespace Step59
 
     void initialize(const LaplaceOperator<dim, fe_degree, number> &op);
 
-    void vmult(LinearAlgebra::distributed::Vector<number>       &dst,
+    void vmult(LinearAlgebra::distributed::Vector<number> &      dst,
                const LinearAlgebra::distributed::Vector<number> &src) const;
 
-    void Tvmult(LinearAlgebra::distributed::Vector<number>       &dst,
+    void Tvmult(LinearAlgebra::distributed::Vector<number> &      dst,
                 const LinearAlgebra::distributed::Vector<number> &src) const
     {
       vmult(dst, src);
     }
 
   private:
-    std::shared_ptr<const MatrixFree<dim,number> > data;
+    std::shared_ptr<const MatrixFree<dim, number>> data;
     std::vector<TensorProductMatrixSymmetricSum<dim,VectorizedArray<number>, fe_degree+1> > cell_matrices;
   };
 
@@ -274,7 +274,7 @@ namespace Step59
   template <int dim, typename number>
   void
   adjust_ghost_range_if_necessary(const MatrixFree<dim,number> &data,
-                                  const LinearAlgebra::distributed::Vector<number> &vec)
+    const LinearAlgebra::distributed::Vector<number> &vec)
   {
     if (vec.get_partitioner().get() == data.get_dof_info(0).vector_partitioner.get())
       return;
@@ -313,7 +313,7 @@ namespace Step59
 
 
   template <int dim, int fe_degree, typename number>
-  std::shared_ptr<const MatrixFree<dim,number> >
+  std::shared_ptr<const MatrixFree<dim, number>>
   LaplaceOperator<dim,fe_degree,number>
   ::get_matrix_free() const
   {
@@ -433,7 +433,7 @@ namespace Step59
   void
   LaplaceOperator<dim,fe_degree,number>
   ::vmult(LinearAlgebra::distributed::Vector<number> &dst,
-          const LinearAlgebra::distributed::Vector<number> &src) const
+    const LinearAlgebra::distributed::Vector<number> &src) const
   {
     adjust_ghost_range_if_necessary(*data, dst);
     adjust_ghost_range_if_necessary(*data, src);
@@ -441,8 +441,8 @@ namespace Step59
                &LaplaceOperator::apply_face,
                &LaplaceOperator::apply_boundary,
                this, dst, src, /*zero_dst =*/ true,
-               MatrixFree<dim,number>::DataAccessOnFaces::gradients,
-               MatrixFree<dim,number>::DataAccessOnFaces::gradients);
+               MatrixFree<dim, number>::DataAccessOnFaces::gradients,
+               MatrixFree<dim, number>::DataAccessOnFaces::gradients);
   }
 
 
@@ -454,7 +454,7 @@ namespace Step59
   void
   LaplaceOperator<dim,fe_degree,number>
   ::Tvmult(LinearAlgebra::distributed::Vector<number> &dst,
-           const LinearAlgebra::distributed::Vector<number> &src) const
+    const LinearAlgebra::distributed::Vector<number> &src) const
   {
     vmult(dst, src);
   }
@@ -477,11 +477,11 @@ namespace Step59
   void
   LaplaceOperator<dim,fe_degree,number>
   ::apply_cell(const MatrixFree<dim,number>                     &data,
-               LinearAlgebra::distributed::Vector<number>       &dst,
-               const LinearAlgebra::distributed::Vector<number> &src,
-               const std::pair<unsigned int,unsigned int>       &cell_range) const
+    LinearAlgebra::distributed::Vector<number> &      dst,
+    const LinearAlgebra::distributed::Vector<number> &src,
+    const std::pair<unsigned int, unsigned int> &     cell_range) const
   {
-    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(data);
+    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
@@ -530,9 +530,9 @@ namespace Step59
   void
   LaplaceOperator<dim,fe_degree,number>
   ::apply_face(const MatrixFree<dim,number>                     &data,
-               LinearAlgebra::distributed::Vector<number>       &dst,
-               const LinearAlgebra::distributed::Vector<number> &src,
-               const std::pair<unsigned int,unsigned int>       &face_range) const
+    LinearAlgebra::distributed::Vector<number> &      dst,
+    const LinearAlgebra::distributed::Vector<number> &src,
+    const std::pair<unsigned int, unsigned int> &     face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,fe_degree+1,1,number> phi_inner(data, true);
     FEFaceEvaluation<dim,fe_degree,fe_degree+1,1,number> phi_outer(data, false);
@@ -579,8 +579,8 @@ namespace Step59
           = 0.5 * (std::abs((phi_inner.get_normal_vector(0)*
                              phi_inner.inverse_jacobian(0))[dim-1])
                    +
-                   std::abs((phi_outer.get_normal_vector(0)*
-                             phi_outer.inverse_jacobian(0))[dim-1]));
+                 std::abs((phi_outer.get_normal_vector(0) *
+                           phi_outer.inverse_jacobian(0))[dim - 1]));
         const VectorizedArray<number> sigma = inverse_length_normal_to_face * get_penalty_factor();
 
         // In the loop over the quadrature points, we eventually compute all
@@ -660,9 +660,9 @@ namespace Step59
   void
   LaplaceOperator<dim,fe_degree,number>
   ::apply_boundary(const MatrixFree<dim,number>                     &data,
-                   LinearAlgebra::distributed::Vector<number>       &dst,
-                   const LinearAlgebra::distributed::Vector<number> &src,
-                   const std::pair<unsigned int,unsigned int>       &face_range) const
+    LinearAlgebra::distributed::Vector<number> &      dst,
+    const LinearAlgebra::distributed::Vector<number> &src,
+    const std::pair<unsigned int, unsigned int> &     face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,fe_degree+1,1,number> phi_inner(data, true);
     for (unsigned int face = face_range.first; face < face_range.second; ++face)
@@ -672,7 +672,7 @@ namespace Step59
 
         const VectorizedArray<number> inverse_length_normal_to_face
           = std::abs((phi_inner.get_normal_vector(0)*
-                      phi_inner.inverse_jacobian(0))[dim-1]);
+                    phi_inner.inverse_jacobian(0))[dim - 1]);
         const VectorizedArray<number> sigma = inverse_length_normal_to_face * get_penalty_factor();
 
         const bool is_dirichlet = (data.get_boundary_id(face) == 0);
@@ -714,8 +714,8 @@ namespace Step59
     data = op.get_matrix_free();
 
     std::string name = data->get_dof_handler().get_fe().get_name();
-    name.replace(name.find('<')+1, 1, "1");
-    std::unique_ptr<FiniteElement<1> > fe_1d = FETools::get_fe_by_name<1>(name);
+    name.replace(name.find('<') + 1, 1, "1");
+    std::unique_ptr<FiniteElement<1>> fe_1d = FETools::get_fe_by_name<1>(name);
 
     // As for computing the 1D matrices on the unit element, we simply write
     // down what a typical assembly procedure over rows and columns of the
@@ -729,10 +729,10 @@ namespace Step59
     // this class as a smoother inside a multigrid scheme, this error is not
     // going to have any significant effect and merely affects smoothing
     // quality.
-    const unsigned int N = fe_degree+1;
-    FullMatrix<double> laplace_unscaled(N, N);
-    std::array<Table<2,VectorizedArray<number> >,dim> mass_matrices;
-    std::array<Table<2,VectorizedArray<number> >,dim> laplace_matrices;
+    const unsigned int                                 N = fe_degree + 1;
+    FullMatrix<double>                                 laplace_unscaled(N, N);
+    std::array<Table<2, VectorizedArray<number>>, dim> mass_matrices;
+    std::array<Table<2, VectorizedArray<number>>, dim> laplace_matrices;
     for (unsigned int d = 0; d < dim; ++d)
       {
         mass_matrices[d].reinit(N, N);
@@ -754,7 +754,7 @@ namespace Step59
                              )* quadrature.weight(q);
             }
           for (unsigned int d = 0; d < dim; ++d)
-            mass_matrices[d](i,j) = sum_mass;
+            mass_matrices[d](i, j) = sum_mass;
 
           // The left and right boundary terms assembled by the next two
           // statements appear to have somewhat arbitrary signs, but those are
@@ -763,22 +763,22 @@ namespace Step59
           sum_laplace += (1.*fe_1d->shape_value(i, Point<1>()) *
                           fe_1d->shape_value(j, Point<1>()) * op.get_penalty_factor()
                           +
-                          0.5*fe_1d->shape_grad(i, Point<1>())[0] *
+             0.5 * fe_1d->shape_grad(i, Point<1>())[0] *
                           fe_1d->shape_value(j, Point<1>())
                           +
-                          0.5*fe_1d->shape_grad(j, Point<1>())[0] *
-                          fe_1d->shape_value(i, Point<1>()));
+             0.5 * fe_1d->shape_grad(j, Point<1>())[0] *
+               fe_1d->shape_value(i, Point<1>()));
 
           sum_laplace += (1.*fe_1d->shape_value(i, Point<1>(1.0)) *
                           fe_1d->shape_value(j, Point<1>(1.0)) * op.get_penalty_factor()
                           -
-                          0.5*fe_1d->shape_grad(i, Point<1>(1.0))[0] *
+             0.5 * fe_1d->shape_grad(i, Point<1>(1.0))[0] *
                           fe_1d->shape_value(j, Point<1>(1.0))
                           -
-                          0.5*fe_1d->shape_grad(j, Point<1>(1.0))[0] *
-                          fe_1d->shape_value(i, Point<1>(1.0)));
+             0.5 * fe_1d->shape_grad(j, Point<1>(1.0))[0] *
+               fe_1d->shape_value(i, Point<1>(1.0)));
 
-          laplace_unscaled(i,j) = sum_laplace;
+          laplace_unscaled(i, j) = sum_laplace;
         }
 
     // Next, we go through the cells and pass the scaled matrices to
@@ -802,7 +802,7 @@ namespace Step59
     // Jacobian, and set the weight as $\text{det}(J) / h_d^2$ according to
     // the 1D Laplacian times $d-1$ copies of the mass matrix.
     cell_matrices.clear();
-    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(*data);
+    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*data);
     unsigned int old_mapping_data_index = numbers::invalid_unsigned_int;
     for (unsigned int cell = 0; cell < data->n_cell_batches(); ++cell)
       {
@@ -825,7 +825,7 @@ namespace Step59
         VectorizedArray<number> jacobian_determinant = inverse_jacobian[0][0];
         for (unsigned int e = 1; e < dim; ++e)
           jacobian_determinant *= inverse_jacobian[e][e];
-        jacobian_determinant = 1./jacobian_determinant;
+        jacobian_determinant = 1. / jacobian_determinant;
 
         for (unsigned int d = 0; d < dim; ++d)
           {
@@ -842,8 +842,8 @@ namespace Step59
               for (unsigned int j = 0; j < N; ++j)
                 laplace_matrices[d](i, j) = scaling_factor * laplace_unscaled(i,j);
           }
-        if (cell_matrices.size() <  = phi.get_mapping_data_index_offset())
-          cell_matrices.resize(phi.get_mapping_data_index_offset()+1);
+        if (cell_matrices.size() < = phi.get_mapping_data_index_offset())
+          cell_matrices.resize(phi.get_mapping_data_index_offset() + 1);
         cell_matrices[phi.get_mapping_data_index_offset()]
         .reinit(mass_matrices, laplace_matrices);
       }
@@ -867,12 +867,12 @@ namespace Step59
   void
   PreconditionBlockJacobi<dim,fe_degree,number>
   ::vmult(LinearAlgebra::distributed::Vector<number> &dst,
-          const LinearAlgebra::distributed::Vector<number> &src) const
+    const LinearAlgebra::distributed::Vector<number> &src) const
   {
     adjust_ghost_range_if_necessary(*data, dst);
     adjust_ghost_range_if_necessary(*data, src);
 
-    FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi(*data);
+    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*data);
     for (unsigned int cell = 0; cell < data->n_cell_batches(); ++cell)
       {
         phi.reinit(cell);
@@ -910,26 +910,26 @@ namespace Step59
     void analyze_results() const;
 
 #ifdef DEAL_II_WITH_P4EST
-    parallel::distributed::Triangulation<dim>  triangulation;
+    parallel::distributed::Triangulation<dim> triangulation;
 #else
-    Triangulation<dim>                         triangulation;
+    Triangulation<dim> triangulation;
 #endif
 
-    FE_DGQHermite<dim>                         fe;
-    DoFHandler<dim>                            dof_handler;
+    FE_DGQHermite<dim> fe;
+    DoFHandler<dim>    dof_handler;
 
-    typedef LaplaceOperator<dim,fe_degree,double> SystemMatrixType;
-    SystemMatrixType                           system_matrix;
+    typedef LaplaceOperator<dim, fe_degree, double> SystemMatrixType;
+    SystemMatrixType                                system_matrix;
 
-    typedef LaplaceOperator<dim,fe_degree,float>  LevelMatrixType;
-    MGLevelObject<LevelMatrixType>             mg_matrices;
+    typedef LaplaceOperator<dim, fe_degree, float> LevelMatrixType;
+    MGLevelObject<LevelMatrixType>                 mg_matrices;
 
     LinearAlgebra::distributed::Vector<double> solution;
     LinearAlgebra::distributed::Vector<double> system_rhs;
 
-    double                                     setup_time;
-    ConditionalOStream                         pcout;
-    ConditionalOStream                         time_details;
+    double             setup_time;
+    ConditionalOStream pcout;
+    ConditionalOStream time_details;
   };
 
 
@@ -939,8 +939,8 @@ namespace Step59
     :
 #ifdef DEAL_II_WITH_P4EST
     triangulation(MPI_COMM_WORLD,
-                  Triangulation<dim>::limit_level_difference_at_vertices,
-                  parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
+      Triangulation<dim>::limit_level_difference_at_vertices,
+      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
 #else
     triangulation(Triangulation<dim>::limit_level_difference_at_vertices),
 #endif
@@ -970,7 +970,7 @@ namespace Step59
   // value `update_default` of UpdateFlags.
 
   template <int dim, int fe_degree>
-  void LaplaceProblem<dim,fe_degree>::setup_system()
+  void LaplaceProblem<dim, fe_degree>::setup_system()
   {
     Timer time;
     setup_time = 0;
@@ -994,9 +994,9 @@ namespace Step59
     dummy.close();
 
     {
-      typename MatrixFree<dim,double>::AdditionalData additional_data;
+      typename MatrixFree<dim, double>::AdditionalData additional_data;
       additional_data.tasks_parallel_scheme =
-        MatrixFree<dim,double>::AdditionalData::none;
+        MatrixFree<dim, double>::AdditionalData::none;
       additional_data.mapping_update_flags = (update_gradients | update_JxW_values
                                               | update_quadrature_points);
       additional_data.mapping_update_flags_inner_faces = (update_gradients |
@@ -1005,7 +1005,7 @@ namespace Step59
       additional_data.mapping_update_flags_boundary_faces = (update_gradients |
                                                              update_JxW_values |
                                                              update_normal_vectors |
-                                                             update_quadrature_points);
+         update_quadrature_points);
       std::shared_ptr<MatrixFree<dim,double> >
       system_mf_storage(new MatrixFree<dim,double>());
       system_mf_storage->reinit(dof_handler, dummy, QGauss<1>(fe.degree+1),
@@ -1022,13 +1022,13 @@ namespace Step59
     time.restart();
 
     const unsigned int nlevels = triangulation.n_global_levels();
-    mg_matrices.resize(0, nlevels-1);
+    mg_matrices.resize(0, nlevels - 1);
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
-        typename MatrixFree<dim,float>::AdditionalData additional_data;
+        typename MatrixFree<dim, float>::AdditionalData additional_data;
         additional_data.tasks_parallel_scheme =
-          MatrixFree<dim,float>::AdditionalData::none;
+          MatrixFree<dim, float>::AdditionalData::none;
         additional_data.mapping_update_flags = (update_gradients | update_JxW_values);
         additional_data.mapping_update_flags_inner_faces = (update_gradients | update_JxW_values);
         additional_data.mapping_update_flags_boundary_faces = (update_gradients | update_JxW_values);
@@ -1061,11 +1061,11 @@ namespace Step59
   LaplaceProblem<dim,fe_degree>::compute_rhs()
   {
     Timer time;
-    system_rhs = 0;
-    const MatrixFree<dim,double> &data = *system_matrix.get_matrix_free();
-    FEEvaluation<dim,fe_degree> phi(data);
-    RightHandSide<dim> rhs_func;
-    Solution<dim> exact_solution;
+    system_rhs                          = 0;
+    const MatrixFree<dim, double> &data = *system_matrix.get_matrix_free();
+    FEEvaluation<dim, fe_degree>   phi(data);
+    RightHandSide<dim>             rhs_func;
+    Solution<dim>                  exact_solution;
     for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         phi.reinit(cell);
@@ -1109,7 +1109,7 @@ namespace Step59
     // of several faces into one for vectorization) is given by
     // MatrixFree::n_inner_face_batches(), whereas the number of boundary face
     // batches is given by MatrixFree::n_boundary_face_batches().
-    FEFaceEvaluation<dim,fe_degree> phi_face(data, true);
+    FEFaceEvaluation<dim, fe_degree> phi_face(data, true);
     for (unsigned int face = data.n_inner_face_batches();
          face<data.n_inner_face_batches()+data.n_boundary_face_batches(); ++face)
       {
@@ -1141,10 +1141,10 @@ namespace Step59
                 // Neumann case (where we add something to the normal
                 // derivative).
                 if (data.get_boundary_id(face) == 0)
-                  test_value[v] = 2.0*exact_solution.value(single_point);
+                  test_value[v] = 2.0 * exact_solution.value(single_point);
                 else
                   {
-                    Tensor<1,dim> normal;
+                    Tensor<1, dim> normal;
                     for (unsigned int d = 0; d < dim; ++d)
                       normal[d] = phi_face.get_normal_vector(q)[d][v];
                     test_normal_derivative[v] = -normal *
@@ -1152,7 +1152,7 @@ namespace Step59
                   }
               }
             phi_face.submit_value(test_value*sigma - test_normal_derivative, q);
-            phi_face.submit_normal_derivative(-0.5*test_value, q);
+            phi_face.submit_normal_derivative(-0.5 * test_value, q);
           }
         phi_face.integrate_scatter(true, true, system_rhs);
       }
@@ -1180,10 +1180,10 @@ namespace Step59
   // iteration used for smoothing, but instead our newly resolved class
   // `%PreconditionBlockJacobi`. The mechanisms are the same, though.
   template <int dim, int fe_degree>
-  void LaplaceProblem<dim,fe_degree>::solve()
+  void LaplaceProblem<dim, fe_degree>::solve()
   {
-    Timer time;
-    MGTransferMatrixFree<dim,float> mg_transfer;
+    Timer                            time;
+    MGTransferMatrixFree<dim, float> mg_transfer;
     mg_transfer.build(dof_handler);
     setup_time += time.wall_time();
     time_details << "MG build transfer time        " << time.wall_time() << " s\n";
@@ -1192,21 +1192,21 @@ namespace Step59
     typedef PreconditionChebyshev<LevelMatrixType,LinearAlgebra::distributed::Vector<float>,
             PreconditionBlockJacobi<dim,fe_degree,float> > SmootherType;
     mg::SmootherRelaxation<SmootherType, LinearAlgebra::distributed::Vector<float> >
-    mg_smoother;
+                                                         mg_smoother;
     MGLevelObject<typename SmootherType::AdditionalData> smoother_data;
-    smoother_data.resize(0, triangulation.n_global_levels()-1);
+    smoother_data.resize(0, triangulation.n_global_levels() - 1);
     for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
       {
         if (level > 0)
           {
-            smoother_data[level].smoothing_range = 15.;
-            smoother_data[level].degree = 2;
+            smoother_data[level].smoothing_range     = 15.;
+            smoother_data[level].degree              = 2;
             smoother_data[level].eig_cg_n_iterations = 10;
           }
         else
           {
             smoother_data[0].smoothing_range = 2e-2;
-            smoother_data[0].degree = numbers::invalid_unsigned_int;
+            smoother_data[0].degree          = numbers::invalid_unsigned_int;
             smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
           }
         smoother_data[level].preconditioner.reset(new PreconditionBlockJacobi<dim,fe_degree,float>());
@@ -1226,15 +1226,15 @@ namespace Step59
                                                              mg_smoother);
 
     PreconditionMG<dim, LinearAlgebra::distributed::Vector<float>,
-                   MGTransferMatrixFree<dim,float> >
-                   preconditioner(dof_handler, mg, mg_transfer);
+                   MGTransferMatrixFree<dim, float>>
+      preconditioner(dof_handler, mg, mg_transfer);
 
-    SolverControl solver_control(10000, 1e-12*system_rhs.l2_norm());
-    SolverCG<LinearAlgebra::distributed::Vector<double> > cg(solver_control);
+    SolverControl solver_control(10000, 1e-12 * system_rhs.l2_norm());
+    SolverCG<LinearAlgebra::distributed::Vector<double>> cg(solver_control);
     setup_time += time.wall_time();
     time_details << "MG build smoother time        " << time.wall_time() << "s\n";
     pcout << "Total setup time              " << setup_time
-          << " s\n";
+                 << "s\n";
 
     time.reset();
     time.start();
@@ -1254,14 +1254,14 @@ namespace Step59
   // numerical result against the analytic solution.
 
   template <int dim, int fe_degree>
-  void LaplaceProblem<dim,fe_degree>::analyze_results() const
+  void LaplaceProblem<dim, fe_degree>::analyze_results() const
   {
     Vector<float> error_per_cell(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       error_per_cell,
-                                      QGauss<dim>(fe.degree+2),
+                                      QGauss<dim>(fe.degree + 2),
                                       VectorTools::L2_norm);
     pcout << "Verification via L2 error:    "
           << std::sqrt(Utilities::MPI::sum(error_per_cell.norm_sqr(), MPI_COMM_WORLD))
@@ -1281,14 +1281,14 @@ namespace Step59
   // definition of `Solution`) as compared to the $y$ and $z$ directions.
 
   template <int dim, int fe_degree>
-  void LaplaceProblem<dim,fe_degree>::run()
+  void LaplaceProblem<dim, fe_degree>::run()
   {
     const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
     pcout << "Running with " << n_ranks
           << " MPI process" << (n_ranks > 1 ? "es" : "")
           << ", element " << fe.get_name()
           << std::endl << std::endl;
-    for (unsigned int cycle = 0; cycle < 9-dim; ++cycle)
+    for (unsigned int cycle = 0; cycle < 9 - dim; ++cycle)
       {
         pcout << "Cycle " << cycle << std::endl;
 
@@ -1302,15 +1302,15 @@ namespace Step59
             triangulation.begin_active()->face(0)->set_boundary_id(10);
             triangulation.begin_active()->face(1)->set_boundary_id(11);
             triangulation.begin_active()->face(2)->set_boundary_id(0);
-            for (unsigned int f = 3; f < GeometryInfo < dim > ::faces_per_cell; ++f)
+            for (unsigned int f = 3; f < GeometryInfo<dim>::faces_per_cell; ++f)
               triangulation.begin_active()->face(f)->set_boundary_id(1);
 
             std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator> >
-            periodic_faces;
+              periodic_faces;
             GridTools::collect_periodic_faces(triangulation, 10, 11, 0, periodic_faces);
             triangulation.add_periodicity(periodic_faces);
 
-            triangulation.refine_global(6-2*dim);
+            triangulation.refine_global(6 - 2 * dim);
           }
         triangulation.refine_global(1);
         setup_system();
@@ -1337,7 +1337,7 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
-      LaplaceProblem<dimension,degree_finite_element> laplace_problem;
+      LaplaceProblem<dimension, degree_finite_element> laplace_problem;
       laplace_problem.run();
     }
   catch (std::exception &exc)

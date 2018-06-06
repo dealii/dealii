@@ -33,11 +33,11 @@ class Explicit : public OperatorBase
 {
 public:
   Explicit(const FullMatrix<double> &matrix);
-  void operator() (AnyData &out, const AnyData &in);
+  void operator()(AnyData &out, const AnyData &in);
 
 private:
   SmartPointer<const FullMatrix<double>, Explicit> matrix;
-  FullMatrix<double> m;
+  FullMatrix<double>                               m;
 };
 
 
@@ -45,11 +45,11 @@ class Implicit : public OperatorBase
 {
 public:
   Implicit(const FullMatrix<double> &matrix);
-  void operator() (AnyData &out, const AnyData &in);
+  void operator()(AnyData &out, const AnyData &in);
 
 private:
   SmartPointer<const FullMatrix<double>, Implicit> matrix;
-  FullMatrix<double> m;
+  FullMatrix<double>                               m;
 };
 
 // End of declarations
@@ -57,17 +57,17 @@ private:
 int main()
 {
   FullMatrix<double> matrix(2);
-  matrix(0,0) = 0.;
-  matrix(1,1) = 0.;
-  matrix(0,1) = 3.14;
-  matrix(1,0) = -3.14;
+  matrix(0, 0) = 0.;
+  matrix(1, 1) = 0.;
+  matrix(0, 1) = 3.14;
+  matrix(1, 0) = -3.14;
 
-  OutputOperator<Vector<double> > out;
+  OutputOperator<Vector<double>> out;
   out.initialize_stream(std::cout);
 
-  Explicit op_explicit(matrix);
-  Implicit op_implicit(matrix);
-  ThetaTimestepping<Vector<double> > solver(op_explicit, op_implicit);
+  Explicit                          op_explicit(matrix);
+  Implicit                          op_implicit(matrix);
+  ThetaTimestepping<Vector<double>> solver(op_explicit, op_implicit);
   solver.set_output(out);
 
   Vector<double> value(2);
@@ -97,11 +97,11 @@ Explicit::operator() (AnyData &out, const AnyData &in)
     {
       m.equ(-timestep, *matrix);
       for (unsigned int i = 0; i < m.m(); ++i)
-        m(i,i) += 1.;
+        m(i, i) += 1.;
     }
   this->notifications.clear();
-  m.vmult(*out.entry<Vector<double>*>(0),
-          *in.read_ptr<Vector<double> >("Previous iterate"));
+  m.vmult(*out.entry<Vector<double> *>(0),
+          *in.read_ptr<Vector<double>>("Previous iterate"));
 }
 
 
@@ -121,12 +121,12 @@ Implicit::operator() (AnyData &out, const AnyData &in)
     {
       m.equ(timestep, *matrix);
       for (unsigned int i = 0; i < m.m(); ++i)
-        m(i,i) += 1.;
+        m(i, i) += 1.;
       m.gauss_jordan();
     }
   this->notifications.clear();
-  m.vmult(*out.entry<Vector<double>*>(0),
-          *in.read_ptr<Vector<double> >("Previous time"));
+  m.vmult(*out.entry<Vector<double> *>(0),
+          *in.read_ptr<Vector<double>>("Previous time"));
 }
 
 

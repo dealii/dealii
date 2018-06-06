@@ -33,8 +33,8 @@ using namespace dealii;
 double Adata[4][4] =
 {
   {4., .5, .1, 0.},
-  {.5, 4., .5, .1},
-  {.1, .5, 4., .5},
+                      {.5, 4., .5, .1},
+                      {.1, .5, 4., .5},
   {0., .1, .5, 4.}
 };
 
@@ -60,10 +60,10 @@ double Cdata[2][2] =
 
 int main()
 {
-  FullMatrix<float> A(4,4);
-  FullMatrix<float> B1(4,2);
-  FullMatrix<float> B2(2,4);
-  FullMatrix<float> C(2,2);
+  FullMatrix<float> A(4, 4);
+  FullMatrix<float> B1(4, 2);
+  FullMatrix<float> B2(2, 4);
+  FullMatrix<float> C(2, 2);
 
   A.fill(&Adata[0][0]);
   B1.fill(&B1data[0][0]);
@@ -72,12 +72,12 @@ int main()
 
   BlockMatrixArray<double> matrix(2, 2);
 
-  matrix.enter(A,0,0,2.);
-  matrix.enter(B1,0,1,-1.);
-  matrix.enter(B2,0,1,1., true);
-  matrix.enter(B2,1,0,1.);
-  matrix.enter(B1,1,0,-1., true);
-  matrix.enter(C,1,1);
+  matrix.enter(A, 0, 0, 2.);
+  matrix.enter(B1, 0, 1, -1.);
+  matrix.enter(B2, 0, 1, 1., true);
+  matrix.enter(B2, 1, 0, 1.);
+  matrix.enter(B1, 1, 0, -1., true);
+  matrix.enter(C, 1, 1);
   matrix.print_latex(deallog);
 
   std::vector<unsigned int> block_sizes(2);
@@ -92,10 +92,10 @@ int main()
 
   matrix.vmult(y, result);
 
-  SolverControl control(100,1.e-10);
+  SolverControl        control(100, 1.e-10);
   PreconditionIdentity id;
 
-  SolverCG<BlockVector<double> > cg(control);
+  SolverCG<BlockVector<double>> cg(control);
   cg.solve(matrix, x, y, id);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
@@ -104,24 +104,24 @@ int main()
           << std::sqrt(matrix.matrix_norm_square(x))
           << std::endl;
 
-  FullMatrix<float> Ainv(4,4);
+  FullMatrix<float> Ainv(4, 4);
   Ainv.invert(A);
-  FullMatrix<float> Cinv(2,2);
+  FullMatrix<float> Cinv(2, 2);
   Cinv.invert(C);
 
   BlockTrianglePrecondition<double>
   precondition(2);
-  precondition.enter(Ainv,0,0,.5);
-  precondition.enter(Cinv,1,1);
+  precondition.enter(Ainv, 0, 0, .5);
+  precondition.enter(Cinv, 1, 1);
 
   cg.solve(matrix, x, y, precondition);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
 
-  precondition.enter(B1,1,0,-1., true);
-  precondition.enter(B2,1,0,1.);
+  precondition.enter(B1, 1, 0, -1., true);
+  precondition.enter(B2, 1, 0, 1.);
 
-  SolverGMRES<BlockVector<double> > gmres(control);
+  SolverGMRES<BlockVector<double>> gmres(control);
   gmres.solve(matrix, x, y, precondition);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;

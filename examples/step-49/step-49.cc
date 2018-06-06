@@ -59,7 +59,7 @@ using namespace dealii;
 // format that can easily be visualized in the same way as was done in step-1.
 template <int dim>
 void print_mesh_info(const Triangulation<dim> &triangulation,
-                     const std::string        &filename)
+                     const std::string &       filename)
 {
   std::cout << "Mesh info:" << std::endl
             << " dimension: " << dim << std::endl
@@ -92,7 +92,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // Finally, produce a graphical representation of the mesh to an output
   // file:
   std::ofstream out(filename);
-  GridOut grid_out;
+  GridOut       grid_out;
   grid_out.write_eps(triangulation, out);
   std::cout << " written to " << filename
             << std::endl
@@ -107,7 +107,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
 // discussed in the introduction how to generate it. This follows the same
 // pattern as used in step-5 to load a mesh, although there it was written in
 // a different file format (UCD instead of MSH).
-void grid_1 ()
+void grid_1()
 {
   Triangulation<2> triangulation;
 
@@ -125,15 +125,15 @@ void grid_1 ()
 // Here, we first create two triangulations and then merge them into one.  As
 // discussed in the introduction, it is important to ensure that the vertices
 // at the common interface are located at the same coordinates.
-void grid_2 ()
+void grid_2()
 {
   Triangulation<2> tria1;
   GridGenerator::hyper_cube_with_cylindrical_hole(tria1, 0.25, 1.0);
 
-  Triangulation<2> tria2;
+  Triangulation<2>          tria2;
   std::vector<unsigned int> repetitions(2);
-  repetitions[0]=3;
-  repetitions[1]=2;
+  repetitions[0] = 3;
+  repetitions[1] = 2;
   GridGenerator::subdivided_hyper_rectangle(tria2, repetitions,
                                             Point<2>(1.0,-1.0),
                                             Point<2>(4.0,1.0));
@@ -166,17 +166,17 @@ void grid_2 ()
 // to keep a std::set of those vertex indices that we have already moved
 // (which we can obtain using <code>cell-@>vertex_index(i)</code> and only
 // move those vertices whose index isn't in the set yet.
-void grid_3 ()
+void grid_3()
 {
   Triangulation<2> triangulation;
   GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, 0.25, 1.0);
 
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int i = 0; i < GeometryInfo < 2 > ::vertices_per_cell; ++i)
+      for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
         {
           Point<2> &v = cell->vertex(i);
-          if (std::abs(v(1)-1.0) < 1e-5)
+          if (std::abs(v(1) - 1.0) < 1e-5)
             v(1) += 0.5;
         }
     }
@@ -238,7 +238,7 @@ void grid_4()
 // transformation and use the simplest method: a lambda function.
 void grid_5()
 {
-  Triangulation<2> triangulation;
+  Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = 14;
   repetitions[1] = 2;
@@ -249,9 +249,9 @@ void grid_5()
 
   GridTools::transform([](const Point<2> &in) -> Point<2>
   {
-    return {in[0], in[1] + std::sin(in[0]/5.0*numbers::PI)};
-  },
-  triangulation);
+      return {in[0], in[1] + std::sin(in[0] / 5.0 * numbers::PI)};
+    },
+    triangulation);
   print_mesh_info(triangulation, "grid-5.eps");
 }
 
@@ -271,10 +271,10 @@ struct Grid6Func
 {
   double trans(const double y) const
   {
-    return std::tanh(2*y)/tanh(2);
+    return std::tanh(2 * y) / tanh(2);
   }
 
-  Point<2> operator() (const Point<2> &in) const
+  Point<2> operator()(const Point<2> &in) const
   {
     return Point<2> (in(0),
                      trans(in(1)));
@@ -284,7 +284,7 @@ struct Grid6Func
 
 void grid_6()
 {
-  Triangulation<2> triangulation;
+  Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 40;
   GridGenerator::subdivided_hyper_rectangle(triangulation,
@@ -307,7 +307,7 @@ void grid_6()
 // super-convergence properties.
 void grid_7()
 {
-  Triangulation<2> triangulation;
+  Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 16;
   GridGenerator::subdivided_hyper_rectangle(triangulation, repetitions,
@@ -327,13 +327,13 @@ int main()
 {
   try
     {
-      grid_1 ();
-      grid_2 ();
-      grid_3 ();
-      grid_4 ();
-      grid_5 ();
-      grid_6 ();
-      grid_7 ();
+      grid_1();
+      grid_2();
+      grid_3();
+      grid_4();
+      grid_5();
+      grid_6();
+      grid_7();
     }
   catch (std::exception &exc)
     {

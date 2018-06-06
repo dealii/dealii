@@ -79,9 +79,9 @@ namespace Step24
     void solve_v();
     void output_results() const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
 
     ConstraintMatrix constraints;
 
@@ -90,11 +90,11 @@ namespace Step24
     SparseMatrix<double> mass_matrix;
     SparseMatrix<double> laplace_matrix;
 
-    Vector<double>       solution_p, solution_v;
-    Vector<double>       old_solution_p, old_solution_v;
-    Vector<double>       system_rhs_p, system_rhs_v;
+    Vector<double> solution_p, solution_v;
+    Vector<double> old_solution_p, old_solution_v;
+    Vector<double> system_rhs_p, system_rhs_v;
 
-    double time_step, time;
+    double       time_step, time;
     unsigned int timestep_number;
     const double theta;
 
@@ -104,13 +104,13 @@ namespace Step24
     //  wave speed $c_0$ that will enter all the formulas with the Laplace
     //  matrix (which we still define as $(\nabla \phi_i,\nabla \phi_j)$):
     SparseMatrix<double> boundary_matrix;
-    const double wave_speed;
+    const double         wave_speed;
 
     // The last thing we have to take care of is that we wanted to evaluate
     // the solution at a certain number of detector locations. We need an
     // array to hold these locations, declared here and filled in the
     // constructor:
-    std::vector<Point<dim> > detector_locations;
+    std::vector<Point<dim>> detector_locations;
   };
 
 
@@ -144,8 +144,8 @@ namespace Step24
       Function<dim>()
     {}
 
-    virtual double value(const Point<dim> &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
 
   private:
     struct Source
@@ -167,13 +167,13 @@ namespace Step24
   double InitialValuesP<dim>::value(const Point<dim> &p,
                                     const unsigned int /*component*/) const
   {
-    static const Source sources[] = {Source(Point<dim> (0, 0),         0.025),
-                                     Source(Point<dim> (-0.135, 0),    0.05),
-                                     Source(Point<dim> (0.17, 0),      0.03),
-                                     Source(Point<dim> (-0.25, 0),     0.02),
+    static const Source       sources[] = {Source(Point<dim>(0, 0), 0.025),
+                                     Source(Point<dim>(-0.135, 0), 0.05),
+                                     Source(Point<dim>(0.17, 0), 0.03),
+                                     Source(Point<dim>(-0.25, 0), 0.02),
                                      Source(Point<dim> (-0.05, -0.15), 0.015)
                                     };
-    static const unsigned int n_sources = sizeof(sources)/sizeof(sources[0]);
+    static const unsigned int n_sources = sizeof(sources) / sizeof(sources[0]);
 
     for (unsigned int i = 0; i < n_sources; ++i)
       if (p.distance(sources[i].location) < sources[i].radius)
@@ -220,14 +220,14 @@ namespace Step24
     Assert(dim == 2, ExcNotImplemented());
 
     const double detector_step_angle = 2.25;
-    const double detector_radius = 0.5;
+    const double detector_radius     = 0.5;
 
     for (double detector_angle = 2*numbers::PI;
          detector_angle >= 0;
-         detector_angle -= detector_step_angle/360*2*numbers::PI)
+         detector_angle -= detector_step_angle / 360 * 2 * numbers::PI)
       detector_locations.push_back(Point<dim> (std::cos(detector_angle),
                                                std::sin(detector_angle)) *
-                                   detector_radius);
+        detector_radius);
   }
 
 
@@ -277,7 +277,7 @@ namespace Step24
 
     time_step = GridTools::minimal_cell_diameter(triangulation) /
                 wave_speed /
-                std::sqrt(1.*dim);
+                std::sqrt(1. * dim);
 
     std::cout << "Number of active cells: "
               << triangulation.n_active_cells()
@@ -345,14 +345,14 @@ namespace Step24
     // do something only if that particular face is at the boundary of the
     // domain. Like this:
     {
-      const QGauss<dim-1>  quadrature_formula(3);
+      const QGauss<dim - 1> quadrature_formula(3);
       FEFaceValues<dim> fe_values(fe, quadrature_formula,
                                   update_values  |  update_JxW_values);
 
-      const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-      const unsigned int   n_q_points    = quadrature_formula.size();
+      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int n_q_points    = quadrature_formula.size();
 
-      FullMatrix<double>   cell_matrix(dofs_per_cell, dofs_per_cell);
+      FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
 
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -360,9 +360,9 @@ namespace Step24
 
       typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+                                                     endc = dof_handler.end();
       for (; cell != endc; ++cell)
-        for (unsigned int f = 0; f < GeometryInfo < dim > ::faces_per_cell; ++f)
+        for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->at_boundary(f))
             {
               cell_matrix = 0;
@@ -372,16 +372,16 @@ namespace Step24
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
-                                         fe_values.shape_value(j,q_point) *
-                                         fe_values.JxW(q_point));
+                    cell_matrix(i, j) += (fe_values.shape_value(i, q_point) *
+                                          fe_values.shape_value(j, q_point) *
+                                          fe_values.JxW(q_point));
 
               cell->get_dof_indices(local_dof_indices);
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   boundary_matrix.add(local_dof_indices[i],
                                       local_dof_indices[j],
-                                      cell_matrix(i,j));
+                                      cell_matrix(i, j));
             }
 
     }
@@ -414,8 +414,8 @@ namespace Step24
   template <int dim>
   void TATForwardProblem<dim>::solve_p()
   {
-    SolverControl           solver_control(1000, 1e-8*system_rhs_p.l2_norm());
-    SolverCG<>              cg(solver_control);
+    SolverControl solver_control(1000, 1e-8 * system_rhs_p.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     cg.solve(system_matrix, solution_p, system_rhs_p,
              PreconditionIdentity());
@@ -429,8 +429,8 @@ namespace Step24
   template <int dim>
   void TATForwardProblem<dim>::solve_v()
   {
-    SolverControl           solver_control(1000, 1e-8*system_rhs_v.l2_norm());
-    SolverCG<>              cg(solver_control);
+    SolverControl solver_control(1000, 1e-8 * system_rhs_v.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     cg.solve(mass_matrix, solution_v, system_rhs_v,
              PreconditionIdentity());
@@ -493,8 +493,8 @@ namespace Step24
     std::ofstream detector_data("detectors.dat");
 
     Vector<double> tmp(solution_p.size());
-    Vector<double> G1 (solution_p.size());
-    Vector<double> G2 (solution_v.size());
+    Vector<double> G1(solution_p.size());
+    Vector<double> G2(solution_v.size());
 
     const double end_time = 0.7;
     for (time = time_step; time <  = end_time; time+ = time_step, ++timestep_number)
@@ -504,11 +504,11 @@ namespace Step24
 
         mass_matrix.vmult(G1, old_solution_p);
         mass_matrix.vmult(tmp, old_solution_v);
-        G1.add(time_step * (1-theta), tmp);
+        G1.add(time_step * (1 - theta), tmp);
 
         mass_matrix.vmult(G2, old_solution_v);
         laplace_matrix.vmult(tmp, old_solution_p);
-        G2.add(-wave_speed * wave_speed * time_step * (1-theta), tmp);
+        G2.add(-wave_speed * wave_speed * time_step * (1 - theta), tmp);
 
         boundary_matrix.vmult(tmp, old_solution_p);
         G2.add(wave_speed, tmp);
@@ -532,7 +532,7 @@ namespace Step24
 
 
         detector_data << time;
-        for (unsigned int i = 0 ; i < detector_locations.size(); ++i)
+        for (unsigned int i = 0; i < detector_locations.size(); ++i)
           detector_data << " "
                         << VectorTools::point_value(dof_handler,
                                                     solution_p,

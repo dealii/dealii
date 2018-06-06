@@ -131,7 +131,7 @@ namespace Step10
             // face is drawn by 30 small lines instead of only one. This is
             // sufficient to give us the impression of seeing a curved line,
             // rather than a set of straight lines.
-            GridOut grid_out;
+            GridOut               grid_out;
             GridOutFlags::Gnuplot gnuplot_flags(false, 60);
             grid_out.set_flags(gnuplot_flags);
 
@@ -269,13 +269,13 @@ namespace Step10
             // for each cell, and add up all the `JxW' values for this cell to
             // `area'...
             typename DoFHandler<dim>::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
+              cell = dof_handler.begin_active(),
+              endc = dof_handler.end();
             for (; cell != endc; ++cell)
               {
                 fe_values.reinit(cell);
                 for (unsigned int i = 0; i < fe_values.n_quadrature_points; ++i)
-                  area += static_cast<long double>(fe_values.JxW (i));
+                  area += static_cast<long double>(fe_values.JxW(i));
               }
 
             // ...and store the resulting area values and the errors in the
@@ -287,8 +287,8 @@ namespace Step10
             // a <code>long double</code>, in contrast to the global namespace
             // where only one such function is declared (which takes and
             // returns a double).
-            table.add_value("eval.pi", static_cast<double> (area));
-            table.add_value("error",   static_cast<double> (std::fabs(area-pi)));
+            table.add_value("eval.pi", static_cast<double>(area));
+            table.add_value("error", static_cast<double>(std::fabs(area - pi)));
           }
 
         // We want to compute the convergence rates of the `error'
@@ -325,7 +325,7 @@ namespace Step10
     // We take the same order of quadrature but this time a `dim-1'
     // dimensional quadrature as we will integrate over (boundary) lines
     // rather than over cells.
-    const QGauss<dim-1> quadrature(4);
+    const QGauss<dim - 1> quadrature(4);
 
     // We loop over all degrees, create the triangulation, the boundary, the
     // mapping, the dummy finite element and the DoFHandler object as seen
@@ -359,8 +359,8 @@ namespace Step10
             // the contributions of the `JxW' values on boundary faces are
             // added to the long double variable `perimeter'.
             typename DoFHandler<dim>::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
+              cell                = dof_handler.begin_active(),
+              endc                = dof_handler.end();
             long double perimeter = 0;
             for (; cell != endc; ++cell)
               for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell; ++face_no)
@@ -373,7 +373,7 @@ namespace Step10
                       perimeter += static_cast<long double>(fe_face_values.JxW (i));
                   }
             // Then store the evaluated values in the table...
-            table.add_value("eval.pi", static_cast<double> (perimeter/2.0L));
+            table.add_value("eval.pi", static_cast<double>(perimeter / 2.0L));
             table.add_value("error",   static_cast<double> (std::fabs(perimeter/2.0L-pi)));
           }
 
@@ -404,8 +404,8 @@ int main()
 
       Step10::gnuplot_output<2>();
 
-      Step10::compute_pi_by_area<2> ();
-      Step10::compute_pi_by_perimeter<2> ();
+      Step10::compute_pi_by_area<2>();
+      Step10::compute_pi_by_perimeter<2>();
     }
   catch (std::exception &exc)
     {

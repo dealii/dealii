@@ -108,27 +108,27 @@ namespace Step15
     void run();
 
   private:
-    void setup_system(const bool initial_step);
-    void assemble_system();
-    void solve();
-    void refine_mesh();
-    void set_boundary_values();
+    void   setup_system(const bool initial_step);
+    void   assemble_system();
+    void   solve();
+    void   refine_mesh();
+    void   set_boundary_values();
     double compute_residual(const double alpha) const;
     double determine_step_length() const;
 
-    Triangulation<dim>   triangulation;
+    Triangulation<dim> triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+    DoFHandler<dim> dof_handler;
+    FE_Q<dim>       fe;
 
-    ConstraintMatrix     hanging_node_constraints;
+    ConstraintMatrix hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    Vector<double>       present_solution;
-    Vector<double>       newton_update;
-    Vector<double>       system_rhs;
+    Vector<double> present_solution;
+    Vector<double> newton_update;
+    Vector<double> system_rhs;
   };
 
   // @sect3{Boundary condition}
@@ -142,8 +142,8 @@ namespace Step15
   public:
     BoundaryValues() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
@@ -151,7 +151,7 @@ namespace Step15
   double BoundaryValues<dim>::value(const Point<dim> &p,
                                     const unsigned int /*component*/) const
   {
-    return std::sin(2 * numbers::PI * (p[0]+p[1]));
+    return std::sin(2 * numbers::PI * (p[0] + p[1]));
   }
 
   // @sect3{The <code>MinimalSurfaceProblem</code> class implementation}
@@ -233,33 +233,33 @@ namespace Step15
   template <int dim>
   void MinimalSurfaceProblem<dim>::assemble_system()
   {
-    const QGauss<dim>  quadrature_formula(3);
+    const QGauss<dim> quadrature_formula(3);
 
     system_matrix = 0;
-    system_rhs = 0;
+    system_rhs    = 0;
 
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_gradients         |
                             update_quadrature_points |
-                            update_JxW_values);
+                              update_JxW_values);
 
-    const unsigned int           dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int           n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>           cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>               cell_rhs(dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
-    std::vector<Tensor<1, dim> > old_solution_gradients(n_q_points);
+    std::vector<Tensor<1, dim>> old_solution_gradients(n_q_points);
 
-    std::vector<types::global_dof_index>    local_dof_indices(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         cell_matrix = 0;
-        cell_rhs = 0;
+        cell_rhs    = 0;
 
         fe_values.reinit(cell);
 
@@ -287,7 +287,7 @@ namespace Step15
             const double coeff
               = 1.0 / std::sqrt(1 +
                                 old_solution_gradients[q_point] *
-                                old_solution_gradients[q_point]);
+                                    old_solution_gradients[q_point]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               {
@@ -331,7 +331,7 @@ namespace Step15
     hanging_node_constraints.condense(system_matrix);
     hanging_node_constraints.condense(system_rhs);
 
-    std::map<types::global_dof_index,double> boundary_values;
+    std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(),
@@ -353,7 +353,7 @@ namespace Step15
   void MinimalSurfaceProblem<dim>::solve()
   {
     SolverControl solver_control(system_rhs.size(),
-                                 system_rhs.l2_norm()*1e-6);
+                                 system_rhs.l2_norm() * 1e-6);
     SolverCG<>    solver(solver_control);
 
     PreconditionSSOR<> preconditioner;
@@ -381,7 +381,7 @@ namespace Step15
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
     KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim-1>(3),
+                                       QGauss<dim - 1>(3),
                                        typename FunctionMap<dim>::type(),
                                        present_solution,
                                        estimated_error_per_cell);
@@ -510,23 +510,23 @@ namespace Step15
     evaluation_point = present_solution;
     evaluation_point.add(alpha, newton_update);
 
-    const QGauss<dim>  quadrature_formula(3);
+    const QGauss<dim> quadrature_formula(3);
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_gradients         |
                             update_quadrature_points |
-                            update_JxW_values);
+                              update_JxW_values);
 
-    const unsigned int           dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int           n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    Vector<double>               cell_residual(dofs_per_cell);
-    std::vector<Tensor<1, dim> > gradients(n_q_points);
+    Vector<double>              cell_residual(dofs_per_cell);
+    std::vector<Tensor<1, dim>> gradients(n_q_points);
 
-    std::vector<types::global_dof_index>    local_dof_indices(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         cell_residual = 0;
@@ -700,7 +700,7 @@ namespace Step15
         const std::string filename = "solution-" +
                                      Utilities::int_to_string(refinement, 2) +
                                      ".vtk";
-        std::ofstream output(filename);
+        std::ofstream         output(filename);
         DataOutBase::VtkFlags vtk_flags;
         vtk_flags.compression_level =
           DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;

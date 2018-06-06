@@ -124,11 +124,11 @@ namespace Step23
     void solve_v();
     void output_results() const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> mass_matrix;
@@ -136,14 +136,14 @@ namespace Step23
     SparseMatrix<double> matrix_u;
     SparseMatrix<double> matrix_v;
 
-    Vector<double>       solution_u, solution_v;
-    Vector<double>       old_solution_u, old_solution_v;
-    Vector<double>       system_rhs;
+    Vector<double> solution_u, solution_v;
+    Vector<double> old_solution_u, old_solution_v;
+    Vector<double> system_rhs;
 
-    double               time_step;
-    double               time;
-    unsigned int         timestep_number;
-    const double         theta;
+    double       time_step;
+    double       time;
+    unsigned int timestep_number;
+    const double theta;
   };
 
 
@@ -165,8 +165,8 @@ namespace Step23
   public:
     InitialValuesU () : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
@@ -176,17 +176,17 @@ namespace Step23
   public:
     InitialValuesV () : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double InitialValuesU<dim>::value(const Point<dim>  &/*p*/,
+  double InitialValuesU<dim>::value(const Point<dim> & /*p*/,
                                     const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
@@ -194,10 +194,10 @@ namespace Step23
 
 
   template <int dim>
-  double InitialValuesV<dim>::value(const Point<dim>  &/*p*/,
+  double InitialValuesV<dim>::value(const Point<dim> & /*p*/,
                                     const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
@@ -212,17 +212,17 @@ namespace Step23
   public:
     RightHandSide() : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim>  &/*p*/,
+  double RightHandSide<dim>::value(const Point<dim> & /*p*/,
                                    const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
@@ -237,8 +237,8 @@ namespace Step23
   public:
     BoundaryValuesU () : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
@@ -250,24 +250,24 @@ namespace Step23
   public:
     BoundaryValuesV () : Function<dim>() {}
 
-    virtual double value(const Point<dim>   &p,
-                         const unsigned int  component = 0) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component = 0) const override;
   };
 
 
 
 
   template <int dim>
-  double BoundaryValuesU<dim>::value(const Point<dim> &p,
+  double BoundaryValuesU<dim>::value(const Point<dim> & p,
                                      const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     if ((this->get_time() <  = 0.5) &&
         (p[0] < 0) &&
         (p[1] < 1./3) &&
-        (p[1] > -1./3))
+        (p[1] > -1. / 3))
       return std::sin(this->get_time() * 4 * numbers::PI);
     else
       return 0;
@@ -276,16 +276,16 @@ namespace Step23
 
 
   template <int dim>
-  double BoundaryValuesV<dim>::value(const Point<dim> &p,
+  double BoundaryValuesV<dim>::value(const Point<dim> & p,
                                      const unsigned int component) const
   {
-    (void) component;
+    (void)component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     if ((this->get_time() <  = 0.5) &&
         (p[0] < 0) &&
         (p[1] < 1./3) &&
-        (p[1] > -1./3))
+        (p[1] > -1. / 3))
       return (std::cos(this->get_time() * 4 * numbers::PI) *
               4 * numbers::PI);
     else
@@ -311,7 +311,7 @@ namespace Step23
   WaveEquation<dim>::WaveEquation() :
     fe(1),
     dof_handler(triangulation),
-    time_step(1./64),
+    time_step(1. / 64),
     time(time_step),
     timestep_number(1),
     theta(0.5)
@@ -411,8 +411,8 @@ namespace Step23
   template <int dim>
   void WaveEquation<dim>::solve_u()
   {
-    SolverControl           solver_control(1000, 1e-8*system_rhs.l2_norm());
-    SolverCG<>              cg(solver_control);
+    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     cg.solve(matrix_u, solution_u, system_rhs,
              PreconditionIdentity());
@@ -426,8 +426,8 @@ namespace Step23
   template <int dim>
   void WaveEquation<dim>::solve_v()
   {
-    SolverControl           solver_control(1000, 1e-8*system_rhs.l2_norm());
-    SolverCG<>              cg(solver_control);
+    SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     cg.solve(matrix_v, solution_v, system_rhs,
              PreconditionIdentity());
@@ -514,7 +514,7 @@ namespace Step23
     Vector<double> tmp(solution_u.size());
     Vector<double> forcing_terms(solution_u.size());
 
-    for (; time <  = 5; time+ = time_step, ++timestep_number)
+    for (; time < = 5; time + = time_step, ++timestep_number)
       {
         std::cout << "Time step " << timestep_number
                   << " at t=" << time
@@ -526,20 +526,20 @@ namespace Step23
         system_rhs.add(time_step, tmp);
 
         laplace_matrix.vmult(tmp, old_solution_u);
-        system_rhs.add(-theta * (1-theta) * time_step * time_step, tmp);
+        system_rhs.add(-theta * (1 - theta) * time_step * time_step, tmp);
 
         RightHandSide<dim> rhs_function;
         rhs_function.set_time(time);
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
                                             rhs_function, tmp);
-        forcing_terms = tmp;
+        forcing_terms   = tmp;
         forcing_terms * = theta * time_step;
 
-        rhs_function.set_time(time-time_step);
+        rhs_function.set_time(time - time_step);
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
                                             rhs_function, tmp);
 
-        forcing_terms.add((1-theta) * time_step, tmp);
+        forcing_terms.add((1 - theta) * time_step, tmp);
 
         system_rhs.add(theta * time_step, forcing_terms);
 
@@ -554,7 +554,7 @@ namespace Step23
           BoundaryValuesU<dim> boundary_values_u_function;
           boundary_values_u_function.set_time(time);
 
-          std::map<types::global_dof_index,double> boundary_values;
+          std::map<types::global_dof_index, double> boundary_values;
           VectorTools::interpolate_boundary_values(dof_handler,
                                                    0,
                                                    boundary_values_u_function,
@@ -592,7 +592,7 @@ namespace Step23
         system_rhs += tmp;
 
         laplace_matrix.vmult(tmp, old_solution_u);
-        system_rhs.add(-time_step * (1-theta), tmp);
+        system_rhs.add(-time_step * (1 - theta), tmp);
 
         system_rhs += forcing_terms;
 
@@ -600,7 +600,7 @@ namespace Step23
           BoundaryValuesV<dim> boundary_values_v_function;
           boundary_values_v_function.set_time(time);
 
-          std::map<types::global_dof_index,double> boundary_values;
+          std::map<types::global_dof_index, double> boundary_values;
           VectorTools::interpolate_boundary_values(dof_handler,
                                                    0,
                                                    boundary_values_v_function,

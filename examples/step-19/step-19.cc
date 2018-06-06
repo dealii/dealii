@@ -72,21 +72,21 @@ namespace Step19
   {
     static const char *message
       =
-        "\n"
-        "Converter from deal.II intermediate format to other graphics formats.\n"
-        "\n"
-        "Usage:\n"
-        "    ./step-19 [-p parameter_file] list_of_input_files \n"
-        "              [-x output_format] [-o output_file]\n"
-        "\n"
-        "Parameter sequences in brackets can be omitted if a parameter file is\n"
-        "specified on the command line and if it provides values for these\n"
-        "missing parameters.\n"
-        "\n"
-        "The parameter file has the following format and allows the following\n"
-        "values(you can cut and paste this and use it for your own parameter\n"
-        "file):\n"
-        "\n";
+      "\n"
+      "Converter from deal.II intermediate format to other graphics formats.\n"
+      "\n"
+      "Usage:\n"
+      "    ./step-19 [-p parameter_file] list_of_input_files \n"
+      "              [-x output_format] [-o output_file]\n"
+      "\n"
+      "Parameter sequences in brackets can be omitted if a parameter file is\n"
+      "specified on the command line and if it provides values for these\n"
+      "missing parameters.\n"
+      "\n"
+      "The parameter file has the following format and allows the following\n"
+      "values(you can cut and paste this and use it for your own parameter\n"
+      "file):\n"
+      "\n";
     std::cout << message;
 
     prm.print_parameters(std::cout, ParameterHandler::Text);
@@ -186,7 +186,7 @@ namespace Step19
     // numbers of iterations that a user should be able to specify are in the
     // range 1...1000, with a default value of 42:
     prm.declare_entry("Dummy iterations", "42",
-                      Patterns::Integer(1,1000),
+                      Patterns::Integer(1, 1000),
                       "A dummy parameter asking for an integer");
 
     // Next, let us declare a sub-section (the equivalent to a
@@ -369,7 +369,7 @@ namespace Step19
   template <int dim, int spacedim>
   void do_convert()
   {
-    DataOutReader<dim,spacedim> merged_data;
+    DataOutReader<dim, spacedim> merged_data;
 
     {
       std::ifstream input(input_file_names[0]);
@@ -385,7 +385,7 @@ namespace Step19
         std::ifstream input(input_file_names[i]);
         AssertThrow(input, ExcIO());
 
-        DataOutReader<dim,spacedim> additional_data;
+        DataOutReader<dim, spacedim> additional_data;
         additional_data.read(input);
         merged_data.merge(additional_data);
       }
@@ -444,42 +444,42 @@ namespace Step19
 
     switch (dimensions.first)
       {
-      case 1:
-        switch (dimensions.second)
-          {
-          case 1:
-            do_convert <1,1> ();
-            return;
+        case 1:
+          switch (dimensions.second)
+            {
+              case 1:
+                do_convert<1, 1>();
+                return;
 
-          case 2:
-            do_convert <1,2> ();
-            return;
-          }
-        AssertThrow(false, ExcNotImplemented());
-        break;
+              case 2:
+                do_convert<1, 2>();
+                return;
+            }
+          AssertThrow(false, ExcNotImplemented());
+          break;
 
-      case 2:
-        switch (dimensions.second)
-          {
-          case 2:
-            do_convert <2,2> ();
-            return;
+        case 2:
+          switch (dimensions.second)
+            {
+              case 2:
+                do_convert<2, 2>();
+                return;
 
-          case 3:
-            do_convert <2,3> ();
-            return;
-          }
-        AssertThrow(false, ExcNotImplemented());
-        break;
+              case 3:
+                do_convert<2, 3>();
+                return;
+            }
+          AssertThrow(false, ExcNotImplemented());
+          break;
 
-      case 3:
-        switch (dimensions.second)
-          {
-          case 3:
-            do_convert <3,3> ();
-            return;
-          }
-        AssertThrow(false, ExcNotImplemented());
+        case 3:
+          switch (dimensions.second)
+            {
+              case 3:
+                do_convert<3, 3>();
+                return;
+            }
+          AssertThrow(false, ExcNotImplemented());
       }
 
     AssertThrow(false, ExcNotImplemented());

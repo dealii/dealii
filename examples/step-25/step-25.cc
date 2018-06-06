@@ -101,20 +101,20 @@ namespace Step25
     void run();
 
   private:
-    void make_grid_and_dofs();
-    void assemble_system();
-    void compute_nl_term(const Vector<double> &old_data,
-                         const Vector<double> &new_data,
-                         Vector<double>       &nl_term) const;
-    void compute_nl_matrix(const Vector<double> &old_data,
-                           const Vector<double> &new_data,
-                           SparseMatrix<double> &nl_matrix) const;
+    void         make_grid_and_dofs();
+    void         assemble_system();
+    void         compute_nl_term(const Vector<double> &old_data,
+                                 const Vector<double> &new_data,
+                                 Vector<double> &      nl_term) const;
+    void         compute_nl_matrix(const Vector<double> &old_data,
+                                   const Vector<double> &new_data,
+                                   SparseMatrix<double> &nl_matrix) const;
     unsigned int solve();
-    void output_results(const unsigned int timestep_number) const;
+    void         output_results(const unsigned int timestep_number) const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -123,13 +123,13 @@ namespace Step25
 
     const unsigned int n_global_refinements;
 
-    double time;
+    double       time;
     const double final_time, time_step;
     const double theta;
 
-    Vector<double>       solution, solution_update, old_solution;
-    Vector<double>       M_x_velocity;
-    Vector<double>       system_rhs;
+    Vector<double> solution, solution_update, old_solution;
+    Vector<double> M_x_velocity;
+    Vector<double> system_rhs;
 
     const unsigned int output_timestep_skip;
   };
@@ -155,7 +155,7 @@ namespace Step25
   public:
     ExactSolution(const unsigned int n_components = 1,
                   const double time = 0.) : Function<dim>(n_components, time) {}
-    virtual double value(const Point<dim> &p,
+    virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
 
@@ -167,47 +167,47 @@ namespace Step25
 
     switch (dim)
       {
-      case 1:
-      {
-        const double m = 0.5;
-        const double c1 = 0.;
-        const double c2 = 0.;
+        case 1:
+          {
+            const double m  = 0.5;
+            const double c1 = 0.;
+            const double c2 = 0.;
         return -4.*std::atan(m /
                              std::sqrt(1.-m*m) *
-                             std::sin(std::sqrt(1.-m*m)*t+c2) /
-                             std::cosh(m*p[0]+c1));
-      }
+                                   std::sin(std::sqrt(1. - m * m) * t + c2) /
+                                   std::cosh(m * p[0] + c1));
+          }
 
-      case 2:
-      {
-        const double theta  = numbers::PI/4.;
-        const double lambda  = 1.;
-        const double a0  = 1.;
-        const double s   = 1.;
-        const double arg = p[0] * std::cos(theta) +
+        case 2:
+          {
+            const double theta  = numbers::PI / 4.;
+            const double lambda = 1.;
+            const double a0     = 1.;
+            const double s      = 1.;
+            const double arg    = p[0] * std::cos(theta) +
                            std::sin(theta) *
                            (p[1] * std::cosh(lambda) +
-                            t * std::sinh(lambda));
-        return 4.*std::atan(a0*std::exp(s*arg));
-      }
+                                                  t * std::sinh(lambda));
+            return 4. * std::atan(a0 * std::exp(s * arg));
+          }
 
-      case 3:
-      {
-        const double theta  = numbers::PI/4;
-        const double phi = numbers::PI/4;
-        const double tau = 1.;
-        const double c0  = 1.;
-        const double s   = 1.;
-        const double arg = p[0]*std::cos(theta) +
-                           p[1]*std::sin(theta) * std::cos(phi) +
-                           std::sin(theta) * std::sin(phi) *
-                           (p[2]*std::cosh(tau)+t*std::sinh(tau));
-        return 4.*std::atan(c0*std::exp(s*arg));
-      }
+        case 3:
+          {
+            const double theta = numbers::PI / 4;
+            const double phi   = numbers::PI / 4;
+            const double tau   = 1.;
+            const double c0    = 1.;
+            const double s     = 1.;
+            const double arg   = p[0] * std::cos(theta) +
+                               p[1] * std::sin(theta) * std::cos(phi) +
+                               std::sin(theta) * std::sin(phi) *
+                                 (p[2] * std::cosh(tau) + t * std::sinh(tau));
+            return 4. * std::atan(c0 * std::exp(s * arg));
+          }
 
-      default:
-        Assert(false, ExcNotImplemented());
-        return -1e8;
+        default:
+          Assert(false, ExcNotImplemented());
+          return -1e8;
       }
   }
 
@@ -226,12 +226,12 @@ namespace Step25
       Function<dim>(n_components, time)
     {}
 
-    virtual double value(const Point<dim> &p,
+    virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double InitialValues<dim>::value(const Point<dim> &p,
+  double InitialValues<dim>::value(const Point<dim> & p,
                                    const unsigned int component) const
   {
     return ExactSolution<dim>(1, this->get_time()).value(p, component);
@@ -274,7 +274,7 @@ namespace Step25
     n_global_refinements(6),
     time(-5.4414),
     final_time(2.7207),
-    time_step(10*1./std::pow(2.,1.*n_global_refinements)),
+    time_step(10 * 1. / std::pow(2., 1. * n_global_refinements)),
     theta(0.5),
     output_timestep_skip(1)
   {}
@@ -311,8 +311,8 @@ namespace Step25
     DoFTools::make_sparsity_pattern(dof_handler, dsp);
     sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit  (sparsity_pattern);
-    mass_matrix.reinit    (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
+    mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);
 
     MatrixCreator::create_mass_matrix(dof_handler,
@@ -322,11 +322,11 @@ namespace Step25
                                          QGauss<dim>(3),
                                          laplace_matrix);
 
-    solution.reinit       (dof_handler.n_dofs());
-    solution_update.reinit     (dof_handler.n_dofs());
-    old_solution.reinit   (dof_handler.n_dofs());
-    M_x_velocity.reinit    (dof_handler.n_dofs());
-    system_rhs.reinit     (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    solution_update.reinit(dof_handler.n_dofs());
+    old_solution.reinit(dof_handler.n_dofs());
+    M_x_velocity.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
   }
 
   // @sect4{SineGordonProblem::assemble_system}
@@ -349,11 +349,11 @@ namespace Step25
     // First we assemble the Jacobian matrix $F'_h(U^{n,l})$, where $U^{n,l}$
     // is stored in the vector <code>solution</code> for convenience.
     system_matrix.copy_from(mass_matrix);
-    system_matrix.add(std::pow(time_step*theta,2), laplace_matrix);
+    system_matrix.add(std::pow(time_step * theta, 2), laplace_matrix);
 
     SparseMatrix<double> tmp_matrix(sparsity_pattern);
     compute_nl_matrix(old_solution, solution, tmp_matrix);
-    system_matrix.add(std::pow(time_step*theta,2), tmp_matrix);
+    system_matrix.add(std::pow(time_step * theta, 2), tmp_matrix);
 
     // Next we compute the right-hand side vector. This is just the
     // combination of matrix-vector products implied by the description of
@@ -364,17 +364,17 @@ namespace Step25
 
     mass_matrix.vmult(system_rhs, solution);
     laplace_matrix.vmult(tmp_vector, solution);
-    system_rhs.add(std::pow(time_step*theta, 2), tmp_vector);
+    system_rhs.add(std::pow(time_step * theta, 2), tmp_vector);
 
     mass_matrix.vmult(tmp_vector, old_solution);
     system_rhs.add(-1.0, tmp_vector);
     laplace_matrix.vmult(tmp_vector, old_solution);
-    system_rhs.add(std::pow(time_step,2)*theta*(1 - theta), tmp_vector);
+    system_rhs.add(std::pow(time_step, 2) * theta * (1 - theta), tmp_vector);
 
     system_rhs.add(-time_step, M_x_velocity);
 
     compute_nl_term(old_solution, solution, tmp_vector);
-    system_rhs.add(std::pow(time_step,2)*theta, tmp_vector);
+    system_rhs.add(std::pow(time_step, 2) * theta, tmp_vector);
 
     system_rhs *= -1.;
   }
@@ -404,26 +404,26 @@ namespace Step25
   template <int dim>
   void SineGordonProblem<dim>::compute_nl_term(const Vector<double> &old_data,
                                                const Vector<double> &new_data,
-                                               Vector<double>       &nl_term) const
+                                               Vector<double> &nl_term) const
   {
     nl_term = 0;
     const QGauss<dim> quadrature_formula(3);
     FEValues<dim>     fe_values(fe, quadrature_formula,
                                 update_values |
                                 update_JxW_values |
-                                update_quadrature_points);
+                              update_quadrature_points);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    Vector<double> local_nl_term(dofs_per_cell);
+    Vector<double>                       local_nl_term(dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    std::vector<double> old_data_values(n_q_points);
-    std::vector<double> new_data_values(n_q_points);
+    std::vector<double>                  old_data_values(n_q_points);
+    std::vector<double>                  new_data_values(n_q_points);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
       {
@@ -444,7 +444,7 @@ namespace Step25
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             local_nl_term(i) += (std::sin(theta * new_data_values[q_point] +
-                                          (1-theta) * old_data_values[q_point]) *
+                        (1 - theta) * old_data_values[q_point]) *
                                  fe_values.shape_value(i, q_point) *
                                  fe_values.JxW (q_point));
 
@@ -467,8 +467,8 @@ namespace Step25
   // below, respectively.
   template <int dim>
   void SineGordonProblem<dim>::compute_nl_matrix(const Vector<double> &old_data,
-                                                 const Vector<double> &new_data,
-                                                 SparseMatrix<double> &nl_matrix) const
+    const Vector<double> &new_data,
+    SparseMatrix<double> &nl_matrix) const
   {
     QGauss<dim>   quadrature_formula(3);
     FEValues<dim> fe_values(fe, quadrature_formula,
@@ -479,12 +479,12 @@ namespace Step25
 
     FullMatrix<double> local_nl_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    std::vector<double> old_data_values(n_q_points);
-    std::vector<double> new_data_values(n_q_points);
+    std::vector<double>                  old_data_values(n_q_points);
+    std::vector<double>                  new_data_values(n_q_points);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
 
     for (; cell != endc; ++cell)
       {
@@ -502,8 +502,8 @@ namespace Step25
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               local_nl_matrix(i,j) += (std::cos(theta * new_data_values[q_point] +
-                                                (1-theta) * old_data_values[q_point]) *
-                                       fe_values.shape_value(i, q_point) *
+                          (1 - theta) * old_data_values[q_point]) *
+                 fe_values.shape_value(i, q_point) *
                                        fe_values.shape_value(j, q_point) *
                                        fe_values.JxW (q_point));
 
@@ -514,7 +514,7 @@ namespace Step25
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             nl_matrix.add(local_dof_indices[i], local_dof_indices[j],
-                          local_nl_matrix(i,j));
+                          local_nl_matrix(i, j));
       }
   }
 
@@ -548,8 +548,8 @@ namespace Step25
   unsigned int
   SineGordonProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12*system_rhs.l2_norm());
-    SolverCG<> cg(solver_control);
+    SolverControl solver_control(1000, 1e-12 * system_rhs.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
@@ -611,7 +611,7 @@ namespace Step25
       VectorTools::project(dof_handler,
                            constraints,
                            QGauss<dim>(3),
-                           InitialValues<dim> (1, time),
+                           InitialValues<dim>(1, time),
                            solution);
     }
 
@@ -644,7 +644,7 @@ namespace Step25
         // linear solver iterations it took us. When the loop below is done,
         // we have (an approximation of) $U^n$.
         double initial_rhs_norm = 0.;
-        bool first_iteration = true;
+        bool   first_iteration  = true;
         do
           {
             assemble_system();
@@ -675,10 +675,10 @@ namespace Step25
         // update $MV^n$ directly:
         Vector<double> tmp_vector(solution.size());
         laplace_matrix.vmult(tmp_vector, solution);
-        M_x_velocity.add(-time_step*theta, tmp_vector);
+        M_x_velocity.add(-time_step * theta, tmp_vector);
 
         laplace_matrix.vmult(tmp_vector, old_solution);
-        M_x_velocity.add(-time_step*(1-theta), tmp_vector);
+        M_x_velocity.add(-time_step * (1 - theta), tmp_vector);
 
         compute_nl_term(old_solution, solution, tmp_vector);
         M_x_velocity.add(-time_step, tmp_vector);

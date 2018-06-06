@@ -78,10 +78,10 @@ namespace Step36
     void run();
 
   private:
-    void make_grid_and_dofs();
-    void assemble_system();
+    void         make_grid_and_dofs();
+    void         assemble_system();
     unsigned int solve();
-    void output_results() const;
+    void         output_results() const;
 
     Triangulation<dim> triangulation;
     FE_Q<dim>          fe;
@@ -124,9 +124,9 @@ namespace Step36
   {
 //TODO investigate why the minimum number of refinement steps required to obtain the correct eigenvalue degeneracies is 6
     parameters.declare_entry("Global mesh refinement steps", "5",
-                             Patterns::Integer(0, 20),
-                             "The number of times the 1-cell coarse mesh should "
-                             "be refined globally for our computations.");
+      Patterns::Integer(0, 20),
+      "The number of times the 1-cell coarse mesh should "
+      "be refined globally for our computations.");
     parameters.declare_entry("Number of eigenvalues/eigenfunctions", "5",
                              Patterns::Integer(0, 100),
                              "The number of eigenvalues/eigenfunctions "
@@ -231,11 +231,11 @@ namespace Step36
   template <int dim>
   void EigenvalueProblem<dim>::assemble_system()
   {
-    QGauss<dim>   quadrature_formula(2);
+    QGauss<dim> quadrature_formula(2);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                              update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -255,7 +255,7 @@ namespace Step36
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);
@@ -273,8 +273,8 @@ namespace Step36
                 += (fe_values.shape_grad(i, q_point) *
                     fe_values.shape_grad(j, q_point)
                     +
-                    potential_values[q_point] *
-                    fe_values.shape_value(i, q_point) *
+                   potential_values[q_point] *
+                     fe_values.shape_value(i, q_point) *
                     fe_values.shape_value(j, q_point)
                    ) * fe_values.JxW (q_point);
 
@@ -320,7 +320,7 @@ namespace Step36
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (constraints.is_constrained(i))
         {
-          const double ev = stiffness_matrix(i,i)/mass_matrix(i,i);
+          const double ev         = stiffness_matrix(i, i) / mass_matrix(i, i);
           min_spurious_eigenvalue = std::min(min_spurious_eigenvalue, ev);
           max_spurious_eigenvalue = std::max(max_spurious_eigenvalue, ev);
         }
@@ -346,7 +346,7 @@ namespace Step36
   {
     // We start here, as we normally do, by assigning convergence control we
     // want:
-    SolverControl solver_control(dof_handler.n_dofs(), 1e-9);
+    SolverControl                    solver_control(dof_handler.n_dofs(), 1e-9);
     SLEPcWrappers::SolverKrylovSchur eigensolver(solver_control);
 
     // Before we actually solve for the eigenfunctions and -values, we have to
@@ -409,7 +409,7 @@ namespace Step36
     for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       data_out.add_data_vector(eigenfunctions[i],
                                std::string("eigenfunction_") +
-                               Utilities::int_to_string(i));
+                                 Utilities::int_to_string(i));
 
     // The only thing worth discussing may be that because the potential is
     // specified as a function expression in the input file, it would be nice
@@ -481,7 +481,7 @@ int main(int argc, char **argv)
 
       // This program can only be run in serial. Otherwise, throw an exception.
       AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-                  ExcMessage("This program can only be run in serial, use ./step-36"));
+        ExcMessage("This program can only be run in serial, use ./step-36"));
 
       EigenvalueProblem<2> problem("step-36.prm");
       problem.run();
