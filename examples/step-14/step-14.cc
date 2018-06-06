@@ -2339,7 +2339,7 @@ namespace Step14
       // threads through a mutex each time they write to (and modify the
       // structure of) this map.
       FaceIntegrals face_integrals;
-      for (active_cell_iterator cell = DualSolver < dim > ::dof_handler.begin_active();
+      for (active_cell_iterator cell = DualSolver<dim>::dof_handler.begin_active();
            cell != DualSolver<dim>::dof_handler.end();
            ++cell)
         for (unsigned int face_no = 0;
@@ -2374,10 +2374,10 @@ namespace Step14
       // there, and add them up. Only take minus one half of the jump term,
       // since the other half will be taken by the neighboring cell.
       unsigned int present_cell = 0;
-      for (active_cell_iterator cell = DualSolver < dim > ::dof_handler.begin_active();
+      for (active_cell_iterator cell = DualSolver<dim>::dof_handler.begin_active();
            cell != DualSolver<dim>::dof_handler.end();
            ++cell, ++present_cell)
-        for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell;
+        for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           {
             Assert(face_integrals.find(cell->face(face_no)) !=

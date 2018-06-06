@@ -753,7 +753,7 @@ namespace Step39
 
     estimates.block(0).reinit(triangulation.n_active_cells());
     unsigned int i = 0;
-    for (typename Triangulation < dim > ::active_cell_iterator cell = triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell,++i)
       cell->set_user_index(i);
 
@@ -822,7 +822,7 @@ namespace Step39
     errors.block(0).reinit(triangulation.n_active_cells());
     errors.block(1).reinit(triangulation.n_active_cells());
     unsigned int i = 0;
-    for (typename Triangulation < dim > ::active_cell_iterator cell = triangulation.begin_active();
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell,++i)
       cell->set_user_index(i);
 

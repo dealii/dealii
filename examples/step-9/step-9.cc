@@ -760,7 +760,7 @@ namespace Step9
     // the direction of flow at this point; we obtain this information
     // using the FEFaceValues object and only decide within the main loop
     // whether a quadrature point is on the inflow boundary.
-    for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
       if (cell->face(face)->at_boundary())
         {
           // Ok, this face of the present cell is on the boundary of the
@@ -1108,7 +1108,7 @@ namespace Step9
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
     active_neighbors.clear();
-    for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell; ++face_no)
+    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
       if (!cell->at_boundary(face_no))
         {
           // First define an abbreviation for the iterator to the face and

@@ -581,14 +581,14 @@ namespace Step51
       fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell),
       fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
     {
-      for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         for (unsigned int i = 0; i < fe_local.dofs_per_cell; ++i)
           {
             if (fe_local.has_support_on_face(i, face))
               fe_local_support_on_face[face].push_back(i);
           }
 
-      for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
           {
             if (fe.has_support_on_face(i, face))
@@ -794,7 +794,7 @@ namespace Step51
     // Face terms are assembled on all faces of all elements. This is in
     // contrast to more traditional DG methods, where each face is only visited
     // once in the assembly procedure.
-    for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
       {
         scratch.fe_face_values_local.reinit(loc_cell, face);
         scratch.fe_face_values.reinit(cell, face);
@@ -1323,7 +1323,7 @@ namespace Step51
     cell = triangulation.begin(),
                                                endc = triangulation.end();
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->face(face)->at_boundary())
           if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
               ||

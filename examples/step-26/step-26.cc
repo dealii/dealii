@@ -354,11 +354,11 @@ namespace Step26
                                                       0.6, 0.4);
 
     if (triangulation.n_levels() > max_grid_level)
-      for (typename Triangulation < dim > ::active_cell_iterator
+      for (typename Triangulation<dim>::active_cell_iterator
            cell = triangulation.begin_active(max_grid_level);
            cell != triangulation.end(); ++cell)
         cell->clear_refine_flag();
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active(min_grid_level);
          cell != triangulation.end_active(min_grid_level); ++cell)
       cell->clear_coarsen_flag();

@@ -973,7 +973,7 @@ namespace Step28
     // hand the result off to this very same function again, but with the cell
     // that has children replaced by one of its children:
     else
-      for (unsigned int child = 0; child < GeometryInfo < dim > ::max_children_per_cell; ++child)
+      for (unsigned int child = 0; child < GeometryInfo<dim>::max_children_per_cell; ++child)
         {
           FullMatrix<double> new_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
           fe.get_prolongation_matrix(child).mmult(new_matrix,
@@ -1495,7 +1495,7 @@ namespace Step28
     // add a few checks to see that the locations we compute are within the
     // bounds of the arrays in which we have to look up materials.) At the end
     // of the loop, we set material identifiers accordingly:
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = coarse_grid.begin_active();
          cell != coarse_grid.end();
          ++cell)

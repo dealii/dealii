@@ -1955,7 +1955,7 @@ namespace Step44
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       {
@@ -1997,7 +1997,7 @@ namespace Step44
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       {

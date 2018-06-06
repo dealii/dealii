@@ -313,7 +313,7 @@ namespace Step46
   {
     GridGenerator::subdivided_hyper_cube(triangulation, 8, -1, 1);
 
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -323,7 +323,7 @@ namespace Step46
           cell->face(f)->set_all_boundary_ids(1);
 
 
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       if (((std::fabs(cell->center()[0]) < 0.25)
@@ -353,7 +353,7 @@ namespace Step46
   void
   FluidStructureProblem<dim>::set_active_fe_indices()
   {
-    for (typename hp::DoFHandler < dim > ::active_cell_iterator
+    for (typename hp::DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       {
@@ -409,7 +409,7 @@ namespace Step46
     // introduction:
     {
       std::vector<types::global_dof_index> local_face_dof_indices(stokes_fe.dofs_per_face);
-      for (typename hp::DoFHandler < dim > ::active_cell_iterator
+      for (typename hp::DoFHandler<dim>::active_cell_iterator
            cell = dof_handler.begin_active();
            cell != dof_handler.end(); ++cell)
         if (cell_is_in_fluid_domain(cell))
@@ -990,7 +990,7 @@ namespace Step46
     // more. The structure of these nested conditions is much the same as we
     // encountered when assembling interface terms in
     // <code>assemble_system</code>.
-    for (typename hp::DoFHandler < dim > ::active_cell_iterator
+    for (typename hp::DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)

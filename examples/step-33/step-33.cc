@@ -1141,7 +1141,7 @@ namespace Step33
                               "whether the named boundary allows gas to "
                               "penetrate or is a rigid wall");
 
-            for (unsigned int di = 0; di < EulerEquations < dim > ::n_components; ++di)
+            for (unsigned int di = 0; di < EulerEquations<dim>::n_components; ++di)
               {
                 prm.declare_entry("w_" + Utilities::int_to_string(di),
                   "outflow",
@@ -1209,7 +1209,7 @@ namespace Step33
 
             const bool no_penetration = prm.get_bool("no penetration");
 
-            for (unsigned int di = 0; di < EulerEquations < dim > ::n_components; ++di)
+            for (unsigned int di = 0; di < EulerEquations<dim>::n_components; ++di)
               {
                 const std::string boundary_type
                   = prm.get("w_" + Utilities::int_to_string(di));
@@ -1470,7 +1470,7 @@ namespace Step33
         // whether we are working on an external or internal face; if it is an
         // external face, the fourth argument denoting the degrees of freedom
         // indices of the neighbor is ignored, so we pass an empty vector):
-        for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell;
+        for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           if (cell->at_boundary(face_no))
             {

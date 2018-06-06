@@ -994,7 +994,7 @@ namespace Step22
     // Dirichlet boundary conditions, i.e.  to faces that are located at 0 in
     // the last coordinate direction. See the example description above for
     // details.
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)

@@ -967,7 +967,7 @@ namespace Step42
         cell = triangulation.begin_active(),
                                                endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell;
+          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
                ++face_no)
             if (cell->face(face_no)->at_boundary())
               {
@@ -1263,7 +1263,7 @@ namespace Step42
 
     for (; cell != endc; ++cell)
       if (!cell->is_artificial())
-        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
               cell->face(face)->boundary_id() == 1)
@@ -1442,7 +1442,7 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
                 &&
                 cell->face(face)->boundary_id() == 1)
@@ -1575,7 +1575,7 @@ namespace Step42
                 }
             }
 
-          for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
                 && cell->face(face)->boundary_id() == 1)
               {
@@ -1889,7 +1889,7 @@ namespace Step42
   {
     if (refinement_strategy == RefinementStrategy::refine_global)
       {
-        for (typename Triangulation < dim > ::active_cell_iterator
+        for (typename Triangulation<dim>::active_cell_iterator
              cell = triangulation.begin_active();
              cell != triangulation.end(); ++cell)
           if (cell->is_locally_owned())
@@ -2128,7 +2128,7 @@ namespace Step42
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
               cell->face(face)->boundary_id() == 1)

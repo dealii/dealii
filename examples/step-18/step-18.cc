@@ -798,7 +798,7 @@ namespace Step18
                  outer_radius = 1;
     GridGenerator::cylinder_shell(triangulation,
                                   3, inner_radius, outer_radius);
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell=triangulation.begin_active();
          cell!=triangulation.end(); ++cell)
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -1615,7 +1615,7 @@ namespace Step18
 
     std::vector<bool> vertex_touched(triangulation.n_vertices(),
                                      false);
-    for (typename DoFHandler < dim > ::active_cell_iterator
+    for (typename DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -1662,7 +1662,7 @@ namespace Step18
     // pointer of a cell which we should not have accessed, a segmentation
     // fault will let us know that this should not have happened:
     unsigned int our_cells = 0;
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       if (cell->is_locally_owned())
@@ -1695,7 +1695,7 @@ namespace Step18
     // quadrature point objects corresponding to this cell in the vector of
     // such objects:
     unsigned int history_index = 0;
-    for (typename Triangulation < dim > ::active_cell_iterator
+    for (typename Triangulation<dim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell)
       if (cell->is_locally_owned())
@@ -1780,7 +1780,7 @@ namespace Step18
 
     // Then loop over all cells and do the job in the cells that belong to our
     // subdomain:
-    for (typename DoFHandler < dim > ::active_cell_iterator
+    for (typename DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
          cell != dof_handler.end(); ++cell)
       if (cell->is_locally_owned())

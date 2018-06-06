@@ -3496,7 +3496,7 @@ namespace Step32
                                         0.3, 0.1);
 
       if (triangulation.n_levels() > max_grid_level)
-        for (typename Triangulation < dim > ::active_cell_iterator
+        for (typename Triangulation<dim>::active_cell_iterator
              cell = triangulation.begin_active(max_grid_level);
              cell != triangulation.end(); ++cell)
           cell->clear_refine_flag();

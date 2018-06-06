@@ -476,7 +476,7 @@ namespace Step29
                                                endc = triangulation.end();
 
     for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->face(face)->at_boundary() &&
             ((cell->face(face)->center() - transducer).norm_square() < 0.01))
           {
@@ -687,7 +687,7 @@ namespace Step29
         // is at the boundary, and second has the correct boundary indicator
         // associated with $\Gamma_2$, the part of the boundary where we have
         // absorbing boundary conditions:
-        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary() &&
               (cell->face(face)->boundary_id() == 0))
             {

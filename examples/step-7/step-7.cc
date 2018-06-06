@@ -673,7 +673,7 @@ namespace Step7
         // <code>run()</code> function further below. (The default value of
         // boundary indicators is <code>0</code>, so faces can only have an
         // indicator equal to <code>1</code> if we have explicitly set it.)
-        for (unsigned int face_number = 0; face_number < GeometryInfo < dim > ::faces_per_cell; ++face_number)
+        for (unsigned int face_number = 0; face_number < GeometryInfo<dim>::faces_per_cell; ++face_number)
           if (cell->face(face_number)->at_boundary()
               &&
               (cell->face(face_number)->boundary_id() == 1))

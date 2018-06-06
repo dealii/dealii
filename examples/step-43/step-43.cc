@@ -1336,7 +1336,7 @@ namespace Step43
                                           global_S_variation,
                                           local_dof_indices);
 
-        for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell;
+        for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           if (cell->at_boundary(face_no))
             {

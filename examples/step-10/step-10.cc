@@ -363,7 +363,7 @@ namespace Step10
               endc                = dof_handler.end();
             long double perimeter = 0;
             for (; cell != endc; ++cell)
-              for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell; ++face_no)
+              for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
                 if (cell->face(face_no)->at_boundary())
                   {
                     // We reinit the FEFaceValues object with the cell

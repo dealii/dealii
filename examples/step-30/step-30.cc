@@ -484,7 +484,7 @@ namespace Step30
 
         cell->get_dof_indices(dofs);
 
-        for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell; ++face_no)
+        for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
           {
             typename DoFHandler<dim>::face_iterator face=
               cell->face(face_no);
@@ -712,7 +712,7 @@ namespace Step30
           Point<dim> jump;
           Point<dim> area;
 
-          for (unsigned int face_no = 0; face_no < GeometryInfo < dim > ::faces_per_cell; ++face_no)
+          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell; ++face_no)
             {
               typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 

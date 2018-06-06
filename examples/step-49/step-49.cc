@@ -74,7 +74,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
     std::map<types::boundary_id, unsigned int> boundary_count;
     for (auto cell : triangulation.active_cell_iterators())
       {
-        for (unsigned int face = 0; face < GeometryInfo < dim > ::faces_per_cell; ++face)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;
