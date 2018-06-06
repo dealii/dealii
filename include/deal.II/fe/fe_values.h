@@ -3187,7 +3187,7 @@ public:
    */
   DeclException1(
     ExcAccessToUninitializedField,
-    char *,
+    std::string,
     << "You are requesting information from an FEValues/FEFaceValues/FESubfaceValues "
     << "object for which this kind of information has not been computed. What "
     << "information these objects compute is determined by the update_* flags you "

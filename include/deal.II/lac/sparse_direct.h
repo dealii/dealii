@@ -275,7 +275,7 @@ public:
    */
   DeclException2(
     ExcUMFPACKError,
-    char *,
+    std::string,
     int,
     << "UMFPACK routine " << arg1 << " returned error status " << arg2 << "."
     << "\n\n"

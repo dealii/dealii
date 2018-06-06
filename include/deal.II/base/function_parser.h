@@ -312,7 +312,7 @@ public:
    */
   DeclException2(ExcParseError,
                  int,
-                 char *,
+                 std::string,
                  << "Parsing Error at Column " << arg1
                  << ". The parser said: " << arg2);
 

@@ -186,7 +186,7 @@ namespace LAPACKSupport
    * A LAPACK function returned an error code.
    */
   DeclException2(ExcErrorCode,
-                 char *,
+                 std::string,
                  types::blas_int,
                  << "The function " << arg1 << " returned with an error code "
                  << arg2);
@@ -217,7 +217,7 @@ namespace LAPACKSupport
    */
   DeclException1(
     ExcMissing,
-    char *,
+    std::string,
     << "When you ran 'cmake' during installation of deal.II, "
     << "no suitable installation of the BLAS or LAPACK library could "
     << "be found. Consequently, the function <" << arg1
