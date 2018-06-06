@@ -578,7 +578,7 @@ public:
    * describe a symmetric tensor. In $d$ space dimensions, this number equals
    * $\frac 12 (d^2+d)$ for symmetric tensors of rank 2.
    */
-  static const unsigned int n_independent_components =
+  static constexpr unsigned int n_independent_components =
     internal::SymmetricTensorAccessors::StorageType<rank_, dim, Number>::
       n_independent_components;
 
