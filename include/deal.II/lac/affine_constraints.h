@@ -211,7 +211,7 @@ public:
   /**
    * Move constructor
    */
-  AffineConstraints(AffineConstraints &&affine_constraints) = default;
+  AffineConstraints(AffineConstraints &&affine_constraints) = default; // NOLINT
 
   /**
    * Copy operator. Like for many other large objects, this operator
@@ -229,7 +229,7 @@ public:
    * Move assignment operator
    */
   AffineConstraints &
-  operator=(AffineConstraints &&affine_constraints) = default;
+  operator=(AffineConstraints &&affine_constraints) = default; // NOLINT
 
   /**
    * Copy the given object to the current one.
