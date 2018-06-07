@@ -309,9 +309,9 @@ ScaLAPACKMatrix<NumberType>::copy_to(FullMatrix<NumberType> &matrix) const
   Assert(n_columns == int(matrix.n()),
          ExcDimensionMismatch(n_columns, matrix.n()));
 
+  matrix = 0.;
   if (grid->mpi_process_is_active)
     {
-      matrix = 0.;
       for (int i = 0; i < n_local_rows; ++i)
         {
           const int glob_i = global_row(i);
@@ -327,16 +327,29 @@ ScaLAPACKMatrix<NumberType>::copy_to(FullMatrix<NumberType> &matrix) const
   // we could move the following lines under the main loop above,
   // but they would be dependent on glob_i and glob_j, which
   // won't make it much prettier
-  if (property == LAPACKSupport::lower_triangular)
-    for (unsigned int i = 0; i < matrix.n(); ++i)
-      for (unsigned int j = i + 1; j < matrix.m(); ++j)
-        matrix(i, j) =
-          (state == LAPACKSupport::inverse_matrix ? matrix(j, i) : 0.);
-  else if (property == LAPACKSupport::upper_triangular)
-    for (unsigned int i = 0; i < matrix.n(); ++i)
-      for (unsigned int j = 0; j < i; ++j)
-        matrix(i, j) =
-          (state == LAPACKSupport::inverse_matrix ? matrix(j, i) : 0.);
+  if (state == LAPACKSupport::cholesky)
+    {
+      if (property == LAPACKSupport::lower_triangular)
+        for (unsigned int i = 0; i < matrix.n(); ++i)
+          for (unsigned int j = i + 1; j < matrix.m(); ++j)
+            matrix(i, j) = 0.;
+      else if (property == LAPACKSupport::upper_triangular)
+        for (unsigned int i = 0; i < matrix.n(); ++i)
+          for (unsigned int j = 0; j < i; ++j)
+            matrix(i, j) = 0.;
+    }
+  else if (property == LAPACKSupport::symmetric &&
+           state == LAPACKSupport::inverse_matrix)
+    {
+      if (uplo == 'L')
+        for (unsigned int i = 0; i < matrix.n(); ++i)
+          for (unsigned int j = i + 1; j < matrix.m(); ++j)
+            matrix(i, j) = matrix(j, i);
+      else if (uplo == 'U')
+        for (unsigned int i = 0; i < matrix.n(); ++i)
+          for (unsigned int j = 0; j < i; ++j)
+            matrix(i, j) = matrix(j, i);
+    }
 }
 
 
@@ -943,69 +956,105 @@ ScaLAPACKMatrix<NumberType>::invert()
   const bool is_symmetric = (property == LAPACKSupport::symmetric ||
                              state == LAPACKSupport::State::cholesky);
 
-  // Matrix is neither in Cholesky nor LU state.
-  // Compute the required factorizations based on the property of the matrix.
-  if (!(state == LAPACKSupport::State::lu ||
-        state == LAPACKSupport::State::cholesky))
-    {
-      if (is_symmetric)
-        compute_cholesky_factorization();
-      else
-        compute_lu_factorization();
-    }
-  if (grid->mpi_process_is_active)
-    {
-      int         info  = 0;
-      NumberType *A_loc = &this->values[0];
+  // Check whether matrix is triangular and is in an unfactorized state.
+  const bool is_triangular = (property == LAPACKSupport::upper_triangular ||
+                              property == LAPACKSupport::lower_triangular) &&
+                             (state == LAPACKSupport::State::matrix ||
+                              state == LAPACKSupport::State::inverse_matrix);
 
-      if (is_symmetric)
+  if (is_triangular)
+    {
+      if (grid->mpi_process_is_active)
         {
-          ppotri(&uplo,
+          const char uploTriangular =
+            property == LAPACKSupport::upper_triangular ? 'U' : 'L';
+          const char  diag  = 'N';
+          int         info  = 0;
+          NumberType *A_loc = &this->values[0];
+          ptrtri(&uploTriangular,
+                 &diag,
                  &n_columns,
                  A_loc,
                  &submatrix_row,
                  &submatrix_column,
                  descriptor,
                  &info);
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("ppotri", info));
+          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("ptrtri", info));
+          // The inversion is stored in the same part as the triangular matrix,
+          // so we don't need to re-set the property here.
         }
-      else
+    }
+  else
+    {
+      // Matrix is neither in Cholesky nor LU state.
+      // Compute the required factorizations based on the property of the
+      // matrix.
+      if (!(state == LAPACKSupport::State::lu ||
+            state == LAPACKSupport::State::cholesky))
         {
-          int lwork = -1, liwork = -1;
-          work.resize(1);
-          iwork.resize(1);
+          if (is_symmetric)
+            compute_cholesky_factorization();
+          else
+            compute_lu_factorization();
+        }
+      if (grid->mpi_process_is_active)
+        {
+          int         info  = 0;
+          NumberType *A_loc = &this->values[0];
 
-          pgetri(&n_columns,
-                 A_loc,
-                 &submatrix_row,
-                 &submatrix_column,
-                 descriptor,
-                 ipiv.data(),
-                 work.data(),
-                 &lwork,
-                 iwork.data(),
-                 &liwork,
-                 &info);
+          if (is_symmetric)
+            {
+              ppotri(&uplo,
+                     &n_columns,
+                     A_loc,
+                     &submatrix_row,
+                     &submatrix_column,
+                     descriptor,
+                     &info);
+              AssertThrow(info == 0,
+                          LAPACKSupport::ExcErrorCode("ppotri", info));
+              property = LAPACKSupport::Property::symmetric;
+            }
+          else
+            {
+              int lwork = -1, liwork = -1;
+              work.resize(1);
+              iwork.resize(1);
 
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgetri", info));
-          lwork  = work[0];
-          liwork = iwork[0];
-          work.resize(lwork);
-          iwork.resize(liwork);
+              pgetri(&n_columns,
+                     A_loc,
+                     &submatrix_row,
+                     &submatrix_column,
+                     descriptor,
+                     ipiv.data(),
+                     work.data(),
+                     &lwork,
+                     iwork.data(),
+                     &liwork,
+                     &info);
 
-          pgetri(&n_columns,
-                 A_loc,
-                 &submatrix_row,
-                 &submatrix_column,
-                 descriptor,
-                 ipiv.data(),
-                 work.data(),
-                 &lwork,
-                 iwork.data(),
-                 &liwork,
-                 &info);
+              AssertThrow(info == 0,
+                          LAPACKSupport::ExcErrorCode("pgetri", info));
+              lwork  = work[0];
+              liwork = iwork[0];
+              work.resize(lwork);
+              iwork.resize(liwork);
 
-          AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgetri", info));
+              pgetri(&n_columns,
+                     A_loc,
+                     &submatrix_row,
+                     &submatrix_column,
+                     descriptor,
+                     ipiv.data(),
+                     work.data(),
+                     &lwork,
+                     iwork.data(),
+                     &liwork,
+                     &info);
+
+              AssertThrow(info == 0,
+                          LAPACKSupport::ExcErrorCode("pgetri", info));
+            }
         }
     }
   state = LAPACKSupport::State::inverse_matrix;

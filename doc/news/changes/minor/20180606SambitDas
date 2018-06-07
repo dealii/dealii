@@ -1,0 +1,3 @@
+Improved: Extend ScaLAPACKMatrix::invert() to use pXtrtri for inversion of triangular matrices.
+<br>
+(Sambit Das 2018/06/06)

@@ -41,7 +41,23 @@ create_spd(FullMatrix &A)
       }
 }
 
-
+// create random invertible lower triangular matrix
+template <typename FullMatrix>
+void
+create_random_lt(FullMatrix &A)
+{
+  const unsigned int size = A.n();
+  Assert(size == A.m(), ExcDimensionMismatch(size, A.m()));
+  A = 0.;
+  for (unsigned int i = 0; i < size; ++i)
+    for (unsigned int j = 0; j <= i; ++j)
+      {
+        if (i == j)
+          A(i, j) = (typename FullMatrix::value_type)(1.);
+        else
+          A(i, j) = random_value<typename FullMatrix::value_type>();
+      }
+}
 
 template <typename FullMatrix>
 void
