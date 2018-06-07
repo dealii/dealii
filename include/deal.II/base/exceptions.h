@@ -224,8 +224,8 @@ private:
     class Exception1 : public dealii::ExceptionBase      \
     {                                                    \
     public:                                              \
-      Exception1(const type1 a1) : arg1(a1)              \
-      {} /*NOLINT*/                                      \
+      Exception1(type1 const &a1) : arg1(a1)             \
+      {}                                                 \
       virtual ~Exception1() noexcept                     \
       {}                                                 \
       virtual void                                       \
@@ -235,7 +235,7 @@ private:
       }                                                  \
                                                          \
     private:                                             \
-      const type1 arg1;                                  \
+      type1 const arg1;                                  \
     }
 
 
@@ -245,26 +245,23 @@ private:
  *
  * @ingroup Exceptions
  */
-#  define DeclException2(Exception2, type1, type2, outsequence) \
-    class Exception2 : public dealii::ExceptionBase             \
-    {                                                           \
-    public:                                                     \
-      Exception2(const type1 a1, const type2 a2) :              \
-        /*NOLINT*/                                              \
-        arg1(a1),                                               \
-        arg2(a2)                                                \
-      {}                                                        \
-      virtual ~Exception2() noexcept                            \
-      {}                                                        \
-      virtual void                                              \
-      print_info(std::ostream &out) const override              \
-      {                                                         \
-        out << "    " outsequence << std::endl;                 \
-      }                                                         \
-                                                                \
-    private:                                                    \
-      const type1 arg1;                                         \
-      const type2 arg2;                                         \
+#  define DeclException2(Exception2, type1, type2, outsequence)         \
+    class Exception2 : public dealii::ExceptionBase                     \
+    {                                                                   \
+    public:                                                             \
+      Exception2(type1 const &a1, type2 const &a2) : arg1(a1), arg2(a2) \
+      {}                                                                \
+      virtual ~Exception2() noexcept                                    \
+      {}                                                                \
+      virtual void                                                      \
+      print_info(std::ostream &out) const override                      \
+      {                                                                 \
+        out << "    " outsequence << std::endl;                         \
+      }                                                                 \
+                                                                        \
+    private:                                                            \
+      type1 const arg1;                                                 \
+      type2 const arg2;                                                 \
     }
 
 
@@ -278,8 +275,7 @@ private:
     class Exception3 : public dealii::ExceptionBase                    \
     {                                                                  \
     public:                                                            \
-      Exception3(const type1 a1, const type2 a2, const type3 a3) :     \
-        /*NOLINT*/                                                     \
+      Exception3(type1 const &a1, type2 const &a2, type3 const &a3) :  \
         arg1(a1),                                                      \
         arg2(a2),                                                      \
         arg3(a3)                                                       \
@@ -293,9 +289,9 @@ private:
       }                                                                \
                                                                        \
     private:                                                           \
-      const type1 arg1;                                                \
-      const type2 arg2;                                                \
-      const type3 arg3;                                                \
+      type1 const arg1;                                                \
+      type2 const arg2;                                                \
+      type3 const arg3;                                                \
     }
 
 
@@ -309,11 +305,10 @@ private:
     class Exception4 : public dealii::ExceptionBase                           \
     {                                                                         \
     public:                                                                   \
-      Exception4(const type1 a1,                                              \
-                 const type2 a2, /*NOLINT*/                                   \
-                 const type3 a3,                                              \
-                 const type4 a4) :                                            \
-        /*NOLINT*/                                                            \
+      Exception4(type1 const &a1,                                             \
+                 type2 const &a2,                                             \
+                 type3 const &a3,                                             \
+                 type4 const &a4) :                                           \
         arg1(a1),                                                             \
         arg2(a2),                                                             \
         arg3(a3),                                                             \
@@ -328,10 +323,10 @@ private:
       }                                                                       \
                                                                               \
     private:                                                                  \
-      const type1 arg1;                                                       \
-      const type2 arg2;                                                       \
-      const type3 arg3;                                                       \
-      const type4 arg4;                                                       \
+      type1 const arg1;                                                       \
+      type2 const arg2;                                                       \
+      type3 const arg3;                                                       \
+      type4 const arg4;                                                       \
     }
 
 
@@ -346,12 +341,11 @@ private:
     class Exception5 : public dealii::ExceptionBase             \
     {                                                           \
     public:                                                     \
-      Exception5(const type1 a1,                                \
-                 const type2 a2,                                \
-                 const type3 a3, /*NOLINT*/                     \
-                 const type4 a4,                                \
-                 const type5 a5) :                              \
-        /*NOLINT*/                                              \
+      Exception5(type1 const &a1,                               \
+                 type2 const &a2,                               \
+                 type3 const &a3,                               \
+                 type4 const &a4,                               \
+                 type5 const &a5) :                             \
         arg1(a1),                                               \
         arg2(a2),                                               \
         arg3(a3),                                               \
@@ -367,11 +361,11 @@ private:
       }                                                         \
                                                                 \
     private:                                                    \
-      const type1 arg1;                                         \
-      const type2 arg2;                                         \
-      const type3 arg3;                                         \
-      const type4 arg4;                                         \
-      const type5 arg5;                                         \
+      type1 const arg1;                                         \
+      type2 const arg2;                                         \
+      type3 const arg3;                                         \
+      type4 const arg4;                                         \
+      type5 const arg5;                                         \
     }
 
 #else /*ifndef DOXYGEN*/
@@ -587,7 +581,7 @@ namespace StandardExceptions
    * file.
    */
   DeclException1(ExcFileNotOpen,
-                 char *,
+                 std::string,
                  << "Could not open file " << arg1 << ".");
 
   /**

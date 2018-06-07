@@ -197,8 +197,8 @@ public:
 
   /// The requested type and the stored type are different
   DeclException2(ExcTypeMismatch,
-                 char *,
-                 char *,
+                 std::string,
+                 std::string,
                  << "The requested type " << arg1 << " and the stored type "
                  << arg2 << " must coincide.");
 

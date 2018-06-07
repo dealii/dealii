@@ -81,6 +81,7 @@ SET(_unity_include_src
   timer.cc
   time_stepping.cc
   utilities.cc
+  vectorization.cc
   )
 
 SET(_separate_src
