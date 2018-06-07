@@ -2869,8 +2869,8 @@ namespace VectorTools
           // now that we have a q_collection object with all the right
           // quadrature points, create an hp::FEFaceValues object that we can
           // use to evaluate the boundary values at
-          const dealii::hp::MappingCollection<dim, spacedim> mapping_collection(
-            mapping); // NOLINT
+          const auto mapping_collection =
+            dealii::hp::MappingCollection<dim, spacedim>(mapping);
           dealii::hp::FEFaceValues<dim, spacedim> x_fe_values(
             mapping_collection,
             finite_elements,
