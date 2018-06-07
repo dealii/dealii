@@ -1243,6 +1243,75 @@ namespace ColorEnriched
             }
           ++map_index; // map_index should be unique to cells
         }
+
+
+      /*
+       * Treat interface between enriched cells specially
+       * Since the function
+       * hp::FECollection< dim, spacedim >::find_least_face_dominating_fe
+       * sometimes incorrectly returns the first element, i.e
+       * enriched FE consisting of only FE_Nothing, of fe_collection.
+       * New elements needs to be added to FECollection object to help
+       * find the correct enriched FE element underlying the spaces in the
+       * adjacent cells. This is automatically done by creating appropriate
+       * new set in fe_sets.
+       *
+       * Consider a domain with three predicates and hence with three different
+       * enrichment functions. Let the enriched finite element of a cell with
+       * enrichment functions 1 and 2 be represented by [1 1 0], with the last
+       * entry as zero since the 3rd enrichment function is not relevant for
+       * the cell. If the interface has enriched FE [1 0 1] and [0 1 1]
+       * on adjacent cells, the an enriched FE [0 0 1] should exist and is
+       * found as the dominating finite element for the two cells by
+       * DoFTools::make_hanging_node_constraints using a call to the function
+       * hp::FECollection::find_least_face_dominating_fe.
+       * Denoting the fe set in adjacent cells as {1,3} and {2,3}, this
+       * implies that an fe set {3} needs to be added! Based on the
+       * predicate configuration, this may not be automatically done.
+       */
+
+      // loop through faces
+      for (auto cell = dof_handler.begin_active(); cell != dof_handler.end();
+           ++cell)
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+             ++face)
+          {
+            unsigned int fe_index = cell->active_fe_index();
+            auto         fe_set   = fe_sets[fe_index];
+
+            // find active indices of neighboring cells
+            if (!cell->at_boundary(face))
+              {
+                unsigned int nbr_fe_index = cell->neighbor(face)->active_fe_index();
+                // find corresponding fe set
+                auto nbr_fe_set = fe_sets[nbr_fe_index];
+
+                // find intersection of the fe_sets
+                std::set<unsigned int> intersection_set;
+                for (auto s : fe_set)
+                  if (nbr_fe_set.find(s) != nbr_fe_set.end())
+                    intersection_set.insert(s);
+
+                // add only the new sets
+                bool found = false;
+                if (!intersection_set.empty())
+                  {
+                    for (unsigned int j = 0; j < fe_sets.size(); ++j)
+                      {
+                        if (fe_sets[j] == intersection_set)
+                          {
+                            found = true;
+                            break;
+                          }
+                      }
+
+                    if (!found)
+                      {
+                        fe_sets.push_back(intersection_set);
+                      }
+                  }
+              }
+          }
     }
 
 
@@ -1343,7 +1412,7 @@ namespace ColorEnriched
               AssertIndexRange(ind, functions.size());
               AssertIndexRange(ind, color_enrichments.size());
 
-              // Assume a active predicate colors {1,2} for a cell.
+              // Assume an active predicate colors {1,2} for a cell.
               // We then need to create a vector of FE enriched elements
               // with vec_fe_enriched[0] = vec_fe_enriched[1] = &fe_enriched
               // which can later be associated with enrichment functions.
