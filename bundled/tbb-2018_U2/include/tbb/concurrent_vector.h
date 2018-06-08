@@ -74,7 +74,7 @@ namespace internal {
     //! Exception helper function
     template<typename T>
     void handle_unconstructed_elements(T* array, size_t n_of_elements){
-        std::memset( array, 0, n_of_elements * sizeof( T ) );
+        std::memset( (void*)array, 0, n_of_elements * sizeof( T ) );
     }
 
     //! Base class of concurrent vector implementation.
