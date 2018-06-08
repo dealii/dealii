@@ -17,7 +17,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-constexpr unsigned int VectorizedArray<double>::n_array_elements;
-constexpr unsigned int VectorizedArray<float>::n_array_elements;
+const unsigned int VectorizedArray<double>::n_array_elements;
+const unsigned int VectorizedArray<float>::n_array_elements;
 
 DEAL_II_NAMESPACE_CLOSE
