@@ -946,6 +946,14 @@ private:
 
 #ifndef DOXYGEN
 
+// provide declarations for static members
+template <int rank, int dim, typename Number>
+const unsigned int SymmetricTensor<rank, dim, Number>::dimension;
+
+template <int rank_, int dim, typename Number>
+constexpr unsigned int
+  SymmetricTensor<rank_, dim, Number>::n_independent_components;
+
 namespace internal
 {
   namespace SymmetricTensorAccessors
