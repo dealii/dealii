@@ -104,11 +104,11 @@
  * generally coincide with entire code blocks.
  *
  * The point here is this: If we wanted to use threads to exploit the
- * independence of tasks 2 and 3, we would start two threads and run each of
- * tasks 2 and 3 on its own thread; we would then wait for the two threads to
- * finish (an operation called "joining a thread") and go on with statement
- * 4. Code to achieve this would look like this (the actual syntax is
- * explained in more detail below):
+ * independence of tasks 2 and 3, we would start two threads and run
+ * each of tasks 2 and 3 on its own thread; we would then wait for the
+ * two threads to finish (an operation called "joining a thread") and
+ * go on with statement 4. Code to achieve this would look like this
+ * (the actual syntax is explained in more detail below):
  * @code
    dof_handler.distribute_dofs (fe);
 
