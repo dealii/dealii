@@ -958,7 +958,7 @@ namespace StandardExceptions
    * The constructor takes a single <tt>char*</tt>, the output of
    * cudaGetErrorString.
    */
-  DeclException1(ExcCudaError, char *, << arg1);
+  DeclException1(ExcCudaError, const char *, << arg1);
   /**
    * This exception is raised if an error happened in a cuSPARSE function.
    */
