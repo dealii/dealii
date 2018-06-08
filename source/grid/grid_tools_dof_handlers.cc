@@ -650,7 +650,7 @@ namespace GridTools
             std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
               cells = find_cells_adjacent_to_vertex(
                 mesh, my_cell->vertex_index(local_vertex_index));
-            for (auto cell : cells)
+            for (const auto &cell : cells)
               if (cell != my_cell)
                 cells_to_add.push_back(cell);
           }
@@ -689,10 +689,10 @@ namespace GridTools
                 auto tentative_cells = find_cells_adjacent_to_vertex(
                   mesh,
                   my_cell->vertex_index(first_vertex + (d << free_direction)));
-                for (auto cell : tentative_cells)
+                for (const auto &cell : tentative_cells)
                   {
                     bool cell_not_yet_present = true;
-                    for (auto other_cell : cells_to_add)
+                    for (const auto &other_cell : cells_to_add)
                       if (cell == other_cell)
                         {
                           cell_not_yet_present = false;
