@@ -22,7 +22,7 @@
  * function if cell and color of the function are provided.
  */
 
-#include <deal.II/fe/fe_enriched.templates.h>
+#include <deal.II/fe/fe_enriched.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>

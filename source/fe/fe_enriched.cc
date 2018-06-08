@@ -17,7 +17,6 @@
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_enriched.h>
-#include <deal.II/fe/fe_enriched.templates.h>
 #include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/lac/sparsity_tools.h>
@@ -1287,7 +1286,8 @@ namespace ColorEnriched
             // find active indices of neighboring cells
             if (!cell->at_boundary(face))
               {
-                unsigned int nbr_fe_index = cell->neighbor(face)->active_fe_index();
+                unsigned int nbr_fe_index =
+                  cell->neighbor(face)->active_fe_index();
                 // find corresponding fe set
                 auto nbr_fe_set = fe_sets[nbr_fe_index];
 

@@ -18,7 +18,7 @@
 // function. Check if the function correctly finds if two subdomains
 // share an edge/node.
 
-#include <deal.II/fe/fe_enriched.templates.h>
+#include <deal.II/fe/fe_enriched.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
