@@ -1189,6 +1189,7 @@ namespace Utilities
         std::string decompressed_buffer;
 
         // first decompress the buffer
+        (void)allow_compression;
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
           {
