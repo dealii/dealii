@@ -351,6 +351,43 @@ namespace internal
 {
   namespace BlockLinearOperatorImplementation
   {
+    // A helper function to apply a given vmult, or Tvmult to a vector with
+    // intermediate storage, similar to the corresponding helper
+    // function for LinearOperator. Here, two operators are used.
+    // The first one takes care of the first "column" and typically doesn't add.
+    // On the other hand, the second operator is normally an adding one.
+    template <typename Function1,
+              typename Function2,
+              typename Range,
+              typename Domain>
+    void
+    apply_with_intermediate_storage(const Function1 &first_op,
+                                    const Function2 &loop_op,
+                                    Range &          v,
+                                    const Domain &   u,
+                                    bool             add)
+    {
+      GrowingVectorMemory<Range> vector_memory;
+
+      typename VectorMemory<Range>::Pointer tmp(vector_memory);
+      tmp->reinit(v, /*bool omit_zeroing_entries =*/true);
+
+      const unsigned int n = u.n_blocks();
+      const unsigned int m = v.n_blocks();
+
+      for (unsigned int i = 0; i < m; ++i)
+        {
+          first_op(*tmp, u, i, 0);
+          for (unsigned int j = 1; j < n; ++j)
+            loop_op(*tmp, u, i, j);
+        }
+
+      if (add)
+        v += *tmp;
+      else
+        v = *tmp;
+    }
+
     // Populate the LinearOperator interfaces with the help of the
     // BlockLinearOperator functions
     template <typename Range, typename Domain, typename BlockPayload>
@@ -384,96 +421,138 @@ namespace internal
         v.collect_sizes();
       };
 
-      op.vmult = [=](Range &v, const Domain &u) {
+      op.vmult = [&op](Range &v, const Domain &u) {
         const unsigned int m = op.n_block_rows();
         const unsigned int n = op.n_block_cols();
         Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
         Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
 
-        // Bug: We need a mechanism similar to
-        // "apply_with_intermediate_storage" for LinearOperator to do the
-        // matrix vector multiplication correctly. Currently, if u and v
-        // are equal, the first vmult will garble up the ith block and
-        // subsequent multiplications are wrong.
-        Assert(!PointerComparison::equal(&v, &u),
-               ExcMessage("BlockLinearOperator::vmult currently requires that "
-                          "source and destination vectors are different memory "
-                          "locations"));
-
-        for (unsigned int i = 0; i < m; ++i)
+        if (PointerComparison::equal(&v, &u))
           {
-            op.block(i, 0).vmult(v.block(i), u.block(0));
-            for (unsigned int j = 1; j < n; ++j)
+            const auto first_op = [&op](Range &            v,
+                                        const Domain &     u,
+                                        const unsigned int i,
+                                        const unsigned int j) {
+              op.block(i, j).vmult(v.block(i), u.block(j));
+            };
+
+            const auto loop_op = [&op](Range &            v,
+                                       const Domain &     u,
+                                       const unsigned int i,
+                                       const unsigned int j) {
               op.block(i, j).vmult_add(v.block(i), u.block(j));
+            };
+
+            apply_with_intermediate_storage(first_op, loop_op, v, u, false);
+          }
+        else
+          {
+            for (unsigned int i = 0; i < m; ++i)
+              {
+                op.block(i, 0).vmult(v.block(i), u.block(0));
+                for (unsigned int j = 1; j < n; ++j)
+                  op.block(i, j).vmult_add(v.block(i), u.block(j));
+              }
           }
       };
 
-      op.vmult_add = [=](Range &v, const Domain &u) {
+      op.vmult_add = [&op](Range &v, const Domain &u) {
         const unsigned int m = op.n_block_rows();
         const unsigned int n = op.n_block_cols();
         Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
         Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
 
-        // Bug: We need a mechanism similar to
-        // "apply_with_intermediate_storage" for LinearOperator to do the
-        // matrix vector multiplication correctly. Currently, if u and v
-        // are equal, the first vmult will garble up the ith block and
-        // subsequent multiplications are wrong.
-        Assert(
-          !PointerComparison::equal(&v, &u),
-          ExcMessage("BlockLinearOperator::vmult_add currently requires that "
-                     "source and destination vectors are different memory "
-                     "locations"));
-
-        for (unsigned int i = 0; i < m; ++i)
-          for (unsigned int j = 0; j < n; ++j)
-            op.block(i, j).vmult_add(v.block(i), u.block(j));
-      };
-
-      op.Tvmult = [=](Domain &v, const Range &u) {
-        const unsigned int n = op.n_block_cols();
-        const unsigned int m = op.n_block_rows();
-        Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
-        Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
-
-        // Bug: We need a mechanism similar to
-        // "apply_with_intermediate_storage" for LinearOperator to do the
-        // matrix vector multiplication correctly. Currently, if u and v
-        // are equal, the first vmult will garble up the ith block and
-        // subsequent multiplications are wrong.
-        Assert(!PointerComparison::equal(&v, &u),
-               ExcMessage("BlockLinearOperator::Tvmult currently requires that "
-                          "source and destination vectors are different memory "
-                          "locations"));
-
-        for (unsigned int i = 0; i < n; ++i)
+        if (PointerComparison::equal(&v, &u))
           {
-            op.block(0, i).Tvmult(v.block(i), u.block(0));
-            for (unsigned int j = 1; j < m; ++j)
-              op.block(j, i).Tvmult_add(v.block(i), u.block(j));
+            const auto first_op = [&op](Range &            v,
+                                        const Domain &     u,
+                                        const unsigned int i,
+                                        const unsigned int j) {
+              op.block(i, j).vmult(v.block(i), u.block(j));
+            };
+
+            const auto loop_op = [&op](Range &            v,
+                                       const Domain &     u,
+                                       const unsigned int i,
+                                       const unsigned int j) {
+              op.block(i, j).vmult_add(v.block(i), u.block(j));
+            };
+
+            apply_with_intermediate_storage(first_op, loop_op, v, u, true);
+          }
+        else
+          {
+            for (unsigned int i = 0; i < m; ++i)
+              for (unsigned int j = 0; j < n; ++j)
+                op.block(i, j).vmult_add(v.block(i), u.block(j));
           }
       };
 
-      op.Tvmult_add = [=](Domain &v, const Range &u) {
+      op.Tvmult = [&op](Domain &v, const Range &u) {
         const unsigned int n = op.n_block_cols();
         const unsigned int m = op.n_block_rows();
         Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
         Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
 
-        // Bug: We need a mechanism similar to
-        // "apply_with_intermediate_storage" for LinearOperator to do the
-        // matrix vector multiplication correctly. Currently, if u and v
-        // are equal, the first vmult will garble up the ith block and
-        // subsequent multiplications are wrong.
-        Assert(
-          !PointerComparison::equal(&v, &u),
-          ExcMessage("BlockLinearOperator::Tvmult_add currently requires that "
-                     "source and destination vectors are different memory "
-                     "locations"));
+        if (PointerComparison::equal(&v, &u))
+          {
+            const auto first_op = [&op](Range &            v,
+                                        const Domain &     u,
+                                        const unsigned int i,
+                                        const unsigned int j) {
+              op.block(j, i).Tvmult(v.block(i), u.block(j));
+            };
 
-        for (unsigned int i = 0; i < n; ++i)
-          for (unsigned int j = 0; j < m; ++j)
-            op.block(j, i).Tvmult_add(v.block(i), u.block(j));
+            const auto loop_op = [&op](Range &            v,
+                                       const Domain &     u,
+                                       const unsigned int i,
+                                       const unsigned int j) {
+              op.block(j, i).Tvmult_add(v.block(i), u.block(j));
+            };
+
+            apply_with_intermediate_storage(first_op, loop_op, v, u, false);
+          }
+        else
+          {
+            for (unsigned int i = 0; i < n; ++i)
+              {
+                op.block(0, i).Tvmult(v.block(i), u.block(0));
+                for (unsigned int j = 1; j < m; ++j)
+                  op.block(j, i).Tvmult_add(v.block(i), u.block(j));
+              }
+          }
+      };
+
+      op.Tvmult_add = [&op](Domain &v, const Range &u) {
+        const unsigned int n = op.n_block_cols();
+        const unsigned int m = op.n_block_rows();
+        Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
+        Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+        if (PointerComparison::equal(&v, &u))
+          {
+            const auto first_op = [&op](Range &            v,
+                                        const Domain &     u,
+                                        const unsigned int i,
+                                        const unsigned int j) {
+              op.block(j, i).Tvmult(v.block(i), u.block(j));
+            };
+
+            const auto loop_op = [&op](Range &            v,
+                                       const Domain &     u,
+                                       const unsigned int i,
+                                       const unsigned int j) {
+              op.block(j, i).Tvmult_add(v.block(i), u.block(j));
+            };
+
+            apply_with_intermediate_storage(first_op, loop_op, v, u, true);
+          }
+        else
+          {
+            for (unsigned int i = 0; i < n; ++i)
+              for (unsigned int j = 0; j < m; ++j)
+                op.block(j, i).Tvmult_add(v.block(i), u.block(j));
+          }
       };
     }
 
