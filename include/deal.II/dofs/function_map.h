@@ -15,6 +15,7 @@
 
 #ifndef dealii_function_map_h
 #define dealii_function_map_h
+#warning This file is deprecated.
 
 #include <deal.II/base/config.h>
 
@@ -73,13 +74,16 @@ class Function;
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
 template <int dim, typename Number = double>
-struct FunctionMap
+struct DEAL_II_DEPRECATED FunctionMap
 {
   /**
    * Declare the type as discussed above. Since we can't name it FunctionMap
    * (as that would ambiguate a possible constructor of this class), name it
    * in the fashion of the standard container local typedefs.
+   *
+   * @deprecated Use the alias type directly.
    */
+  DEAL_II_DEPRECATED
   typedef std::map<types::boundary_id, const Function<dim, Number> *> type;
 };
 
