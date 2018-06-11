@@ -271,6 +271,34 @@ extern "C"
            int *      liwork,
            int *      info);
 
+
+  /**
+   * PDTRTRI computes the inverse of a upper or lower triangular
+   * distributed matrix sub( A ) = A(IA:IA+N-1,JA:JA+N-1).
+   *
+   * http://www.netlib.org/scalapack/explore-html/d9/dc0/pdtrtri_8f_source.html
+   * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lpdtri.htm
+   * https://software.intel.com/en-us/mkl-developer-reference-c-p-trtri
+   */
+  void
+  pdtrtri_(const char *UPLO,
+           const char *DIAG,
+           const int * N,
+           double *    A,
+           const int * IA,
+           const int * JA,
+           const int * DESCA,
+           int *       INFO);
+  void
+  pstrtri_(const char *UPLO,
+           const char *DIAG,
+           const int * N,
+           float *     A,
+           const int * IA,
+           const int * JA,
+           const int * DESCA,
+           int *       INFO);
+
   /**
    * Estimate the reciprocal of the condition number (in the
    * l1-norm) of a real symmetric positive definite distributed matrix
@@ -1117,6 +1145,45 @@ pgetri(const int *N,
   psgetri_(N, A, IA, JA, DESCA, ipiv, work, lwork, iwork, liwork, info);
 }
 
+template <typename number>
+inline void
+ptrtri(const char * /*UPLO*/,
+       const char * /*DIAG*/,
+       const int * /*N*/,
+       number * /*A*/,
+       const int * /*IA*/,
+       const int * /*JA*/,
+       const int * /*DESCA*/,
+       int * /*INFO*/)
+{
+  Assert(false, dealii::ExcNotImplemented());
+}
+
+inline void
+ptrtri(const char *UPLO,
+       const char *DIAG,
+       const int * N,
+       double *    A,
+       const int * IA,
+       const int * JA,
+       const int * DESCA,
+       int *       INFO)
+{
+  pdtrtri_(UPLO, DIAG, N, A, IA, JA, DESCA, INFO);
+}
+
+inline void
+ptrtri(const char *UPLO,
+       const char *DIAG,
+       const int * N,
+       float *     A,
+       const int * IA,
+       const int * JA,
+       const int * DESCA,
+       int *       INFO)
+{
+  pstrtri_(UPLO, DIAG, N, A, IA, JA, DESCA, INFO);
+}
 
 template <typename number>
 inline void
