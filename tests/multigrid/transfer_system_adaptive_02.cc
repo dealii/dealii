@@ -152,8 +152,8 @@ check(const FiniteElement<dim> &fe)
     DoFRenumbering::component_wise(mg_dof_handler, level);
 
   std::vector<std::set<unsigned int>> boundary_indices(tr.n_levels());
-  typename FunctionMap<dim>::type     dirichlet_boundary;
-  Functions::ZeroFunction<dim>        dirichlet_bc(fe.n_components());
+  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
+  Functions::ZeroFunction<dim> dirichlet_bc(fe.n_components());
   dirichlet_boundary[3] = &dirichlet_bc;
 
   MGConstrainedDoFs mg_constrained_dofs;

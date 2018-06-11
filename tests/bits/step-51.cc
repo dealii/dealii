@@ -350,8 +350,8 @@ namespace Step51
 
     constraints.clear();
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    typename FunctionMap<dim>::type boundary_functions;
-    Solution<dim>                   solution_function;
+    std::map<types::boundary_id, const Function<dim> *> boundary_functions;
+    Solution<dim>                                       solution_function;
     boundary_functions[0] = &solution_function;
     VectorTools::project_boundary_values(dof_handler,
                                          boundary_functions,

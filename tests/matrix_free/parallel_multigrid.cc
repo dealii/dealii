@@ -74,9 +74,9 @@ public:
     addit_data.level_mg_handler = level;
 
     // extract the constraints due to Dirichlet boundary conditions
-    ConstraintMatrix                constraints;
-    Functions::ZeroFunction<dim>    zero;
-    typename FunctionMap<dim>::type functions;
+    ConstraintMatrix                                    constraints;
+    Functions::ZeroFunction<dim>                        zero;
+    std::map<types::boundary_id, const Function<dim> *> functions;
     for (std::set<types::boundary_id>::const_iterator it =
            dirichlet_boundaries.begin();
          it != dirichlet_boundaries.end();

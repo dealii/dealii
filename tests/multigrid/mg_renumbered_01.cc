@@ -340,8 +340,8 @@ template <int dim>
 void
 LaplaceProblem<dim>::test()
 {
-  typename FunctionMap<dim>::type dirichlet_boundary;
-  Functions::ZeroFunction<dim>    dirichlet_bc(fe.n_components());
+  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
+  Functions::ZeroFunction<dim> dirichlet_bc(fe.n_components());
   dirichlet_boundary[0] = &dirichlet_bc;
 
   const unsigned int min_l = mg_matrices.min_level();

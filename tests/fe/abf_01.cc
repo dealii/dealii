@@ -499,7 +499,7 @@ project(const Mapping<dim> &    mapping,
                  // the different boundary parts. We want the
                  // @p{function} to hold on all parts of the
                  // boundary
-        typename FunctionMap<dim>::type boundary_functions;
+        std::map<types::boundary_id, const Function<dim>*> boundary_functions;
         for (types::boundary_id c=0; c<255; ++c)
           boundary_functions[c] = &function;
         project_boundary_values (dof, boundary_functions, q_boundary,

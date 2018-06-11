@@ -163,7 +163,7 @@ check()
           DoFHandler<dim> dof(tr);
           dof.distribute_dofs(fe);
 
-          typename FunctionMap<dim>::type function_map;
+          std::map<types::boundary_id, const Function<dim> *> function_map;
           function_map[0] = function_list[i];
 
           // interpolate boundary values

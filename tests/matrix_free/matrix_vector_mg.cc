@@ -96,8 +96,8 @@ test()
   mg_sparsities.resize(0, nlevels - 1);
   mg_ref_matrices.resize(0, nlevels - 1);
 
-  typename FunctionMap<dim>::type dirichlet_boundary;
-  Functions::ZeroFunction<dim>    homogeneous_dirichlet_bc(1);
+  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
+  Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
   std::vector<std::set<types::global_dof_index>> boundary_indices(nlevels);
   MGTools::make_boundary_list(dof, dirichlet_boundary, boundary_indices);

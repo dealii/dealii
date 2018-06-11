@@ -63,10 +63,11 @@ public:
 
 
   void
-  initialize(const Mapping<dim> &                   mapping,
-             const DoFHandler<dim> &                dof_handler,
-             const MGConstrainedDoFs &              mg_constrained_dofs,
-             const typename FunctionMap<dim>::type &dirichlet_boundary,
+  initialize(const Mapping<dim> &     mapping,
+             const DoFHandler<dim> &  dof_handler,
+             const MGConstrainedDoFs &mg_constrained_dofs,
+             const std::map<types::boundary_id, const Function<dim> *>
+               &                dirichlet_boundary,
              const unsigned int level = numbers::invalid_unsigned_int)
   {
     const QGauss<1>                                  quad(n_q_points_1d);
@@ -513,9 +514,9 @@ do_test(const DoFHandler<dim> &dof)
   DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
   hanging_node_constraints.close();
 
-  MGConstrainedDoFs               mg_constrained_dofs;
-  Functions::ZeroFunction<dim>    zero_function;
-  typename FunctionMap<dim>::type dirichlet_boundary;
+  MGConstrainedDoFs                                   mg_constrained_dofs;
+  Functions::ZeroFunction<dim>                        zero_function;
+  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
   mg_constrained_dofs.initialize(dof, dirichlet_boundary);
 

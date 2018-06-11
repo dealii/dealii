@@ -48,7 +48,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   dof.distribute_dofs(fe);
 
   Functions::ConstantFunction<dim> constant_function(1., dim);
-  typename FunctionMap<dim>::type  function_map;
+  std::map<types::boundary_id, const Function<dim> *> function_map;
   for (unsigned int j = 0; j < GeometryInfo<dim>::faces_per_cell; ++j)
     function_map[j] = &constant_function;
 

@@ -22,8 +22,9 @@
 // check
 //   DoFTools::
 //   make_boundary_sparsity_pattern (const DoFHandler<dim> &,
-//                                   const typename FunctionMap<dim>::type &
-//                                   const std::vector<unsigned int> &
+//                                   const std::map<types::boundary_id, const
+//                                   Function<dim>*> & const
+//                                   std::vector<unsigned int> &
 //                               BlockDynamicSparsityPattern  &);
 
 
@@ -42,7 +43,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   set.insert(0);
   DoFTools::map_dof_to_boundary_indices(dof_handler, set, map);
 
-  typename FunctionMap<dim>::type boundary_ids;
+  std::map<types::boundary_id, const Function<dim> *> boundary_ids;
   boundary_ids[0] = nullptr;
   const types::global_dof_index n_boundary_dofs =
     dof_handler.n_boundary_dofs(boundary_ids);

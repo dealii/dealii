@@ -59,8 +59,7 @@ check_select(const FiniteElement<dim> &fe,
   DoFHandler<dim> &dof = mgdof;
   mgdof.distribute_dofs(fe);
   mgdof.distribute_mg_dofs(fe);
-  DoFRenumbering::component_wise(static_cast<DoFHandler<dim> &>(mgdof),
-                                 target_component);
+  DoFRenumbering::component_wise(mgdof, target_component);
   vector<types::global_dof_index> ndofs(
     *std::max_element(target_component.begin(), target_component.end()) + 1);
   DoFTools::count_dofs_per_component(dof, ndofs, true, target_component);

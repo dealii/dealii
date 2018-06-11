@@ -146,8 +146,7 @@ check_renumbering(DoFHandler<dim> &mgdof, bool discontinuous)
       // behavior of the
       // DoFRenumbering::component_wise set
       // of functions before December 2005
-      DoFRenumbering::component_wise(static_cast<DoFHandler<dim> &>(mgdof),
-                                     order);
+      DoFRenumbering::component_wise(mgdof, order);
       print_dofs(mgdof, level);
     }
 }

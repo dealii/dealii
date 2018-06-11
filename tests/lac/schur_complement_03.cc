@@ -344,12 +344,13 @@ namespace Step22
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
     FEValuesExtractors::Scalar pressure(dim);
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim - 1>(degree + 1),
-                                       typename FunctionMap<dim>::type(),
-                                       solution,
-                                       estimated_error_per_cell,
-                                       fe.component_mask(pressure));
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      QGauss<dim - 1>(degree + 1),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      solution,
+      estimated_error_per_cell,
+      fe.component_mask(pressure));
     GridRefinement::refine_and_coarsen_fixed_number(triangulation,
                                                     estimated_error_per_cell,
                                                     0.3,

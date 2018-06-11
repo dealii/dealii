@@ -288,11 +288,12 @@ namespace Step27
   LaplaceProblem<dim>::postprocess(const unsigned int cycle)
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       face_quadrature_collection,
-                                       typename FunctionMap<dim>::type(),
-                                       solution,
-                                       estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      face_quadrature_collection,
+      std::map<types::boundary_id, const Function<dim> *>(),
+      solution,
+      estimated_error_per_cell);
 
 
     Vector<float> smoothness_indicators(triangulation.n_active_cells());
