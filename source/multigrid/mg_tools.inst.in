@@ -106,14 +106,16 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension > 1
       template void
       make_boundary_list(const DoFHandler<deal_II_dimension> &,
-                         const FunctionMap<deal_II_dimension>::type &,
+                         const std::map<types::boundary_id,
+                                        const Function<deal_II_dimension> *> &,
                          std::vector<std::set<types::global_dof_index>> &,
                          const ComponentMask &);
 #endif
 
       template void
       make_boundary_list(const DoFHandler<deal_II_dimension> &,
-                         const FunctionMap<deal_II_dimension>::type &,
+                         const std::map<types::boundary_id,
+                                        const Function<deal_II_dimension> *> &,
                          std::vector<IndexSet> &,
                          const ComponentMask &);
 

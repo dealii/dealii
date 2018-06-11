@@ -469,12 +469,12 @@ void Step6<dim>::solve()
 // Secondly, the function wants a list of boundary indicators for those
 // boundaries where we have imposed Neumann values of the kind
 // $\partial_n u(\mathbf x) = h(\mathbf x)$, along with a function $h(\mathbf
-// x)$ for each such boundary. This information is represented by an object of
-// type <code>FunctionMap::type</code> that is a typedef to a map from boundary
-// indicators to function objects describing the Neumann boundary values. In the
-// present example program, we do not use Neumann boundary values, so this map
-// is empty, and in fact constructed using the default constructor of the map in
-// the place where the function call expects the respective function argument.
+// x)$ for each such boundary. This information is represented by a map from
+// boundary indicators to function objects describing the Neumann boundary
+// values. In the present example program, we do not use Neumann boundary
+// values, so this map is empty, and in fact constructed using the default
+// constructor of the map in the place where the function call expects the
+// respective function argument.
 //
 // The output is a vector of values for all active cells. While it may
 // make sense to compute the <b>value</b> of a solution degree of freedom
@@ -487,11 +487,12 @@ void Step6<dim>::refine_grid()
 {
   Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate(dof_handler,
-                                     QGauss<dim - 1>(3),
-                                     typename FunctionMap<dim>::type(),
-                                     solution,
-                                     estimated_error_per_cell);
+  KellyErrorEstimator<dim>::estimate(
+    dof_handler,
+    QGauss<dim - 1>(3),
+    std::map<types::boundary_id, const Function<dim> *>(),
+    solution,
+    estimated_error_per_cell);
 
   // The above function returned one error indicator value for each cell in
   // the <code>estimated_error_per_cell</code> array. Refinement is now done

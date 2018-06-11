@@ -21,128 +21,152 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
 #if deal_II_dimension == 1 && deal_II_dimension <= deal_II_space_dimension
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const Quadrature<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const VEC &,
-        Vector<float> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const Quadrature<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const VEC &,
+      Vector<float> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const Quadrature<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const VEC &,
-        Vector<float> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const Quadrature<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const VEC &,
+      Vector<float> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const Quadrature<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const std::vector<const VEC *> &,
-        std::vector<Vector<float> *> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const Quadrature<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const std::vector<const VEC *> &,
+      std::vector<Vector<float> *> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const Quadrature<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const std::vector<const VEC *> &,
-        std::vector<Vector<float> *> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const Quadrature<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const std::vector<const VEC *> &,
+      std::vector<Vector<float> *> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const hp::QCollection<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const VEC &,
-        Vector<float> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const hp::QCollection<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const VEC &,
+      Vector<float> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const hp::QCollection<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const VEC &,
-        Vector<float> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const hp::QCollection<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const VEC &,
+      Vector<float> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const hp::QCollection<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const std::vector<const VEC *> &,
-        std::vector<Vector<float> *> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const hp::QCollection<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const std::vector<const VEC *> &,
+      std::vector<Vector<float> *> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
     template void
-    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
-      estimate<VEC, DH<deal_II_dimension, deal_II_space_dimension>>(
-        const DH<deal_II_dimension, deal_II_space_dimension> &,
-        const hp::QCollection<deal_II_dimension - 1> &,
-        const FunctionMap<deal_II_space_dimension, VEC::value_type>::type &,
-        const std::vector<const VEC *> &,
-        std::vector<Vector<float> *> &,
-        const ComponentMask &,
-        const Function<deal_II_space_dimension> *,
-        const unsigned int,
-        const types::subdomain_id,
-        const types::material_id,
-        const Strategy);
+    KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::estimate<
+      VEC,
+      DH<deal_II_dimension, deal_II_space_dimension>>(
+      const DH<deal_II_dimension, deal_II_space_dimension> &,
+      const hp::QCollection<deal_II_dimension - 1> &,
+      const std::map<types::boundary_id,
+                     const Function<deal_II_space_dimension, VEC::value_type> *>
+        &,
+      const std::vector<const VEC *> &,
+      std::vector<Vector<float> *> &,
+      const ComponentMask &,
+      const Function<deal_II_space_dimension> *,
+      const unsigned int,
+      const types::subdomain_id,
+      const types::material_id,
+      const Strategy);
 
 #endif
   }

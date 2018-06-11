@@ -763,15 +763,16 @@ namespace Step17
     const Vector<double> localized_solution(solution);
 
     Vector<float> local_error_per_cell(triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim - 1>(2),
-                                       typename FunctionMap<dim>::type(),
-                                       localized_solution,
-                                       local_error_per_cell,
-                                       ComponentMask(),
-                                       nullptr,
-                                       MultithreadInfo::n_threads(),
-                                       this_mpi_process);
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      QGauss<dim - 1>(2),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      localized_solution,
+      local_error_per_cell,
+      ComponentMask(),
+      nullptr,
+      MultithreadInfo::n_threads(),
+      this_mpi_process);
 
     // Now all processes have computed error indicators for their own
     // cells and stored them in the respective elements of the

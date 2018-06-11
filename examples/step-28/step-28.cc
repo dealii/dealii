@@ -1053,11 +1053,12 @@ namespace Step28
   template <int dim>
   void EnergyGroup<dim>::estimate_errors(Vector<float> &error_indicators) const
   {
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim - 1>(fe.degree + 1),
-                                       typename FunctionMap<dim>::type(),
-                                       solution,
-                                       error_indicators);
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      QGauss<dim - 1>(fe.degree + 1),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      solution,
+      error_indicators);
     error_indicators /= solution.linfty_norm();
   }
 

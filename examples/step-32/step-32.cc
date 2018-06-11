@@ -3486,7 +3486,7 @@ namespace Step32
       KellyErrorEstimator<dim>::estimate(
         temperature_dof_handler,
         QGauss<dim - 1>(parameters.temperature_degree + 1),
-        typename FunctionMap<dim>::type(),
+        std::map<types::boundary_id, const Function<dim> *>(),
         temperature_solution,
         estimated_error_per_cell,
         ComponentMask(),

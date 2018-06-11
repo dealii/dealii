@@ -23,8 +23,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/thread_management.h>
 
-#include <deal.II/dofs/function_map.h>
-
 #include <deal.II/lac/affine_constraints.h>
 
 #include <map>

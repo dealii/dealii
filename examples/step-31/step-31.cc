@@ -1973,11 +1973,12 @@ namespace Step31
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate(temperature_dof_handler,
-                                       QGauss<dim - 1>(temperature_degree + 1),
-                                       typename FunctionMap<dim>::type(),
-                                       temperature_solution,
-                                       estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(
+      temperature_dof_handler,
+      QGauss<dim - 1>(temperature_degree + 1),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      temperature_solution,
+      estimated_error_per_cell);
 
     GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
                                                       estimated_error_per_cell,

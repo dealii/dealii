@@ -21,6 +21,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/smartpointer.h>
@@ -29,7 +30,6 @@
 #include <deal.II/dofs/dof_faces.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/dof_levels.h>
-#include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/number_cache.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -855,8 +855,6 @@ public:
    * reason that a @p map rather than a @p set is used is the same as
    * described in the documentation of that variant of
    * DoFTools::make_boundary_sparsity_pattern() that takes a map.
-   * To this end, the type of the @p boundary_ids argument is the same
-   * as typename FunctionMap<spacedim,number>::type.
    *
    * There is, however, another overload of this function that takes
    * a @p set argument (see below).

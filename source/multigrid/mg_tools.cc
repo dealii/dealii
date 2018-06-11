@@ -1253,8 +1253,9 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   make_boundary_list(
-    const DoFHandler<dim, spacedim> &               dof,
-    const typename FunctionMap<dim>::type &         function_map,
+    const DoFHandler<dim, spacedim> &dof,
+    const std::map<types::boundary_id, const Function<spacedim> *>
+      &                                             function_map,
     std::vector<std::set<types::global_dof_index>> &boundary_indices,
     const ComponentMask &                           component_mask)
   {
@@ -1263,10 +1264,8 @@ namespace MGTools
                                 dof.get_triangulation().n_global_levels()));
 
     std::set<types::boundary_id> boundary_ids;
-    typename std::map<types::boundary_id, const Function<dim> *>::const_iterator
-      it = function_map.begin();
-    for (; it != function_map.end(); ++it)
-      boundary_ids.insert(it->first);
+    for (const auto &boundary_function : function_map)
+      boundary_ids.insert(boundary_function.first);
 
     std::vector<IndexSet> boundary_indexset;
     make_boundary_list(dof, boundary_ids, boundary_indexset, component_mask);
@@ -1278,20 +1277,19 @@ namespace MGTools
 
   template <int dim, int spacedim>
   void
-  make_boundary_list(const DoFHandler<dim, spacedim> &      dof,
-                     const typename FunctionMap<dim>::type &function_map,
-                     std::vector<IndexSet> &                boundary_indices,
-                     const ComponentMask &                  component_mask)
+  make_boundary_list(const DoFHandler<dim, spacedim> &           dof,
+                     const std::map<types::boundary_id,
+                                    const Function<spacedim> *> &function_map,
+                     std::vector<IndexSet> &boundary_indices,
+                     const ComponentMask &  component_mask)
   {
     Assert(boundary_indices.size() == dof.get_triangulation().n_global_levels(),
            ExcDimensionMismatch(boundary_indices.size(),
                                 dof.get_triangulation().n_global_levels()));
 
     std::set<types::boundary_id> boundary_ids;
-    typename std::map<types::boundary_id, const Function<dim> *>::const_iterator
-      it = function_map.begin();
-    for (; it != function_map.end(); ++it)
-      boundary_ids.insert(it->first);
+    for (const auto &boundary_function : function_map)
+      boundary_ids.insert(boundary_function.first);
 
     make_boundary_list(dof, boundary_ids, boundary_indices, component_mask);
   }

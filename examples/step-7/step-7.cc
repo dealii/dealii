@@ -819,7 +819,7 @@ namespace Step7
             KellyErrorEstimator<dim>::estimate(
               dof_handler,
               QGauss<dim - 1>(3),
-              typename FunctionMap<dim>::type(),
+              std::map<types::boundary_id, const Function<dim> *>(),
               solution,
               estimated_error_per_cell);
 

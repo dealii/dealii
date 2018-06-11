@@ -618,7 +618,7 @@ code like the following:
     stokes_component_mask[d] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
                                       face_q_collection,
-                                      typename FunctionMap<dim>::type(),
+                                      std::map<types::boundary_id, const Function<dim>*>(),
                                       solution,
                                       stokes_estimated_error_per_cell,
                                       stokes_component_mask);
@@ -628,7 +628,7 @@ code like the following:
     elasticity_component_mask[dim+1+d] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
                                       face_q_collection,
-                                      typename FunctionMap<dim>::type(),
+                                      std::map<types::boundary_id, const Function<dim>*>(),
                                       solution,
                                       elasticity_estimated_error_per_cell,
                                       elasticity_component_mask);

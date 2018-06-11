@@ -1444,15 +1444,16 @@ namespace Step18
   {
     // First, let each process compute error indicators for the cells it owns:
     Vector<float> error_per_cell(triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate(dof_handler,
-                                       QGauss<dim - 1>(2),
-                                       typename FunctionMap<dim>::type(),
-                                       incremental_displacement,
-                                       error_per_cell,
-                                       ComponentMask(),
-                                       nullptr,
-                                       MultithreadInfo::n_threads(),
-                                       this_mpi_process);
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      QGauss<dim - 1>(2),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      incremental_displacement,
+      error_per_cell,
+      ComponentMask(),
+      nullptr,
+      MultithreadInfo::n_threads(),
+      this_mpi_process);
 
     // Then set up a global vector into which we merge the local indicators
     // from each of the %parallel processes:

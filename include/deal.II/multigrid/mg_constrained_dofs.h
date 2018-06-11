@@ -31,8 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 class DoFHandler;
-template <int dim, typename Number>
-struct FunctionMap;
 
 
 /**
@@ -81,8 +79,9 @@ public:
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED void
-  initialize(const DoFHandler<dim, spacedim> &      dof,
-             const typename FunctionMap<dim>::type &function_map,
+  initialize(const DoFHandler<dim, spacedim> &dof,
+             const std::map<types::boundary_id, const Function<spacedim> *>
+               &                  function_map,
              const ComponentMask &component_mask = ComponentMask());
 
   /**
@@ -272,9 +271,9 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
 template <int dim, int spacedim>
 inline void
 MGConstrainedDoFs::initialize(
-  const DoFHandler<dim, spacedim> &      dof,
-  const typename FunctionMap<dim>::type &function_map,
-  const ComponentMask &                  component_mask)
+  const DoFHandler<dim, spacedim> &                               dof,
+  const std::map<types::boundary_id, const Function<spacedim> *> &function_map,
+  const ComponentMask &component_mask)
 {
   initialize(dof);
 

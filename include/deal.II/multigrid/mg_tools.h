@@ -208,8 +208,9 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   make_boundary_list(
-    const DoFHandler<dim, spacedim> &               mg_dof,
-    const typename FunctionMap<dim>::type &         function_map,
+    const DoFHandler<dim, spacedim> &mg_dof,
+    const std::map<types::boundary_id, const Function<spacedim> *>
+      &                                             function_map,
     std::vector<std::set<types::global_dof_index>> &boundary_indices,
     const ComponentMask &component_mask = ComponentMask());
 
@@ -222,10 +223,11 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  make_boundary_list(const DoFHandler<dim, spacedim> &      mg_dof,
-                     const typename FunctionMap<dim>::type &function_map,
-                     std::vector<IndexSet> &                boundary_indices,
-                     const ComponentMask &component_mask = ComponentMask());
+  make_boundary_list(const DoFHandler<dim, spacedim> &           mg_dof,
+                     const std::map<types::boundary_id,
+                                    const Function<spacedim> *> &function_map,
+                     std::vector<IndexSet> &boundary_indices,
+                     const ComponentMask &  component_mask = ComponentMask());
 
   /**
    * The same function as above, but return an IndexSet rather than a

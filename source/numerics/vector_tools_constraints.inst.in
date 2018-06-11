@@ -26,38 +26,42 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #  if deal_II_dimension != 1
       template void
       compute_nonzero_normal_flux_constraints(
-        const DoFHandler<deal_II_dimension> & dof_handler,
-        const unsigned int                    first_vector_component,
-        const std::set<types::boundary_id> &  boundary_ids,
-        FunctionMap<deal_II_dimension>::type &function_map,
-        AffineConstraints<double> &           constraints,
-        const Mapping<deal_II_dimension> &    mapping);
+        const DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                   first_vector_component,
+        const std::set<types::boundary_id> & boundary_ids,
+        const std::map<types::boundary_id, const Function<deal_II_dimension> *>
+          &                               function_map,
+        AffineConstraints<double> &       constraints,
+        const Mapping<deal_II_dimension> &mapping);
 
       template void
       compute_nonzero_normal_flux_constraints(
         const hp::DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                       first_vector_component,
         const std::set<types::boundary_id> &     boundary_ids,
-        FunctionMap<deal_II_dimension>::type &   function_map,
-        AffineConstraints<double> &              constraints,
-        const Mapping<deal_II_dimension> &       mapping);
+        const std::map<types::boundary_id, const Function<deal_II_dimension> *>
+          &                               function_map,
+        AffineConstraints<double> &       constraints,
+        const Mapping<deal_II_dimension> &mapping);
 
       template void
       compute_nonzero_tangential_flux_constraints(
-        const DoFHandler<deal_II_dimension> & dof_handler,
-        const unsigned int                    first_vector_component,
-        const std::set<types::boundary_id> &  boundary_ids,
-        FunctionMap<deal_II_dimension>::type &function_map,
-        AffineConstraints<double> &           constraints,
-        const Mapping<deal_II_dimension> &    mapping);
+        const DoFHandler<deal_II_dimension> &dof_handler,
+        const unsigned int                   first_vector_component,
+        const std::set<types::boundary_id> & boundary_ids,
+        const std::map<types::boundary_id, const Function<deal_II_dimension> *>
+          &                               function_map,
+        AffineConstraints<double> &       constraints,
+        const Mapping<deal_II_dimension> &mapping);
       template void
       compute_nonzero_tangential_flux_constraints(
         const hp::DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                       first_vector_component,
         const std::set<types::boundary_id> &     boundary_ids,
-        FunctionMap<deal_II_dimension>::type &   function_map,
-        AffineConstraints<double> &              constraints,
-        const Mapping<deal_II_dimension> &       mapping);
+        const std::map<types::boundary_id, const Function<deal_II_dimension> *>
+          &                               function_map,
+        AffineConstraints<double> &       constraints,
+        const Mapping<deal_II_dimension> &mapping);
 
       template void
       compute_no_normal_flux_constraints(
