@@ -730,6 +730,7 @@ TimerOutput::print_summary() const
         }
     }
   else
+    // output_type == cpu_and_wall_times_grouped
     {
       const double total_wall_time = timer_all.wall_time();
       double       total_cpu_time =
@@ -750,64 +751,27 @@ TimerOutput::print_summary() const
 
       // generate a nice table
       out_stream << "\n\n+---------------------------------------------"
-                 << extra_dash << "+";
-
-      if (output_type != wall_times)
-        out_stream << "------------+------------+";
-
-      if (output_type != cpu_times)
-        out_stream << "------------+------------+";
-
-      out_stream << "\n";
-
-      if (output_type == cpu_times)
-        out_stream << "| Total CPU time elapsed since start          ";
-      else if (output_type == wall_times)
-        out_stream << "| Total wallclock time elapsed since start    ";
-      else
-        out_stream << "| Total CPU/wall time elapsed since start     ";
-
-      out_stream << extra_space << "|";
-
-      if (output_type != wall_times)
-        out_stream << std::setw(10) << std::setprecision(3) << std::right
-                   << total_cpu_time << "s |            |";
-
-      if (output_type != cpu_times)
-        out_stream << std::setw(10) << std::setprecision(3) << std::right
-                   << total_wall_time << "s |            |";
-
-      out_stream << "\n|                                             "
-                 << extra_space << "|";
-
-      if (output_type != wall_times)
-        out_stream << "            |            |";
-
-      if (output_type != cpu_times)
-        out_stream << "            |            |";
-
-      out_stream << "\n| Section                         " << extra_space
-                 << "| no. calls |";
-
-      // FIXME: do we need this?
-      out_stream << std::setw(10) << std::setprecision(3);
-
-      if (output_type != wall_times)
-        out_stream << "  CPU time  | % of total |";
-
-      if (output_type != cpu_times)
-        out_stream << "  wall time | % of total |";
-
-      out_stream << "\n+---------------------------------" << extra_dash
-                 << "+-----------+";
-
-      if (output_type != wall_times)
-        out_stream << "------------+------------+";
-
-      if (output_type != cpu_times)
-        out_stream << "------------+------------+";
-
-      out_stream << std::endl;
+                 << extra_dash << "+"
+                 << "------------+------------+"
+                 << "------------+------------+"
+                 << "\n"
+                 << "| Total CPU/wall time elapsed since start     "
+                 << extra_space << "|" << std::setw(10) << std::setprecision(3)
+                 << std::right << total_cpu_time << "s |            |"
+                 << std::setw(10) << std::setprecision(3) << std::right
+                 << total_wall_time << "s |            |"
+                 << "\n|                                             "
+                 << extra_space << "|"
+                 << "            |            |"
+                 << "            |            |"
+                 << "\n| Section                         " << extra_space
+                 << "| no. calls |" << std::setw(10) << std::setprecision(3)
+                 << "  CPU time  | % of total |"
+                 << "  wall time | % of total |"
+                 << "\n+---------------------------------" << extra_dash
+                 << "+-----------+"
+                 << "------------+------------+"
+                 << "------------+------------+" << std::endl;
 
       for (std::map<std::string, Section>::const_iterator i = sections.begin();
            i != sections.end();
@@ -882,15 +846,10 @@ TimerOutput::print_summary() const
         }
 
       out_stream << "+---------------------------------" << extra_dash
-                 << "+-----------+";
-
-      if (output_type != wall_times)
-        out_stream << "------------+------------+";
-
-      if (output_type != cpu_times)
-        out_stream << "------------+------------+";
-
-      out_stream << std::endl << std::endl;
+                 << "+-----------+"
+                 << "------------+------------+"
+                 << "------------+------------+" << std::endl
+                 << std::endl;
 
       if (output_type != wall_times && time_gap > 0.0)
         out_stream
