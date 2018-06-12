@@ -169,8 +169,10 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
         # Only run this check if it hasn't successfully run previously.
         MESSAGE(STATUS "Performing Test BOOST_SERIALIZATION_USABLE")
 
-        FILE(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
-        FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
+        SET(_binary_test_dir ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBugWorkdir)
+
+        FILE(REMOVE_RECURSE ${_binary_test_dir})
+        FILE(MAKE_DIRECTORY ${_binary_test_dir})
         EXECUTE_PROCESS(
           COMMAND ${CMAKE_COMMAND}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
@@ -181,7 +183,7 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
             "-DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}"
             "-DBOOST_LIBRARIES=${BOOST_LIBRARIES}"
             ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/TestBoostBug
-          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
+          WORKING_DIRECTORY ${_binary_test_dir}
           RESULT_VARIABLE _result
           OUTPUT_QUIET
           ERROR_QUIET
@@ -189,7 +191,7 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
         IF(${_result} EQUAL 0)
           EXECUTE_PROCESS(
             COMMAND ${CMAKE_COMMAND} --build . --target run
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
+            WORKING_DIRECTORY ${_binary_test_dir}
             RESULT_VARIABLE _result
             OUTPUT_QUIET
             ERROR_QUIET
@@ -209,8 +211,8 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
           "The externally provided Boost.Serialization library "
           "failed to pass a crucial test. \n"
           "Therefore, the bundled boost package is used. \n"
-          "The configured testing project can be found at "
-          "${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug"
+          "The configured testing project can be found at \n"
+          "${_binary_test_dir}"
           )
         SET(BOOST_ADDITIONAL_ERROR_STRING
           "The externally provided Boost.Serialization library "
