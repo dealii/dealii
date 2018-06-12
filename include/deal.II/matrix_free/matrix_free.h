@@ -3271,10 +3271,17 @@ namespace internal
                                   VectorDataExchange<dim, Number> &exchanger)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
-      vec.update_ghost_values();
+      {
+        // don't forget to set ghosts_were_set, that otherwise happens
+        // inside VectorDataExchange::update_ghost_values_start()
+        exchanger.ghosts_were_set = vec.has_ghost_elements();
+        vec.update_ghost_values();
+      }
     else
-      for (unsigned int i = 0; i < vec.n_blocks(); ++i)
-        update_ghost_values_start(vec.block(i), exchanger, channel + i);
+      {
+        for (unsigned int i = 0; i < vec.n_blocks(); ++i)
+          update_ghost_values_start(vec.block(i), exchanger, channel + i);
+      }
   }
 
 

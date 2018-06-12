@@ -100,7 +100,6 @@ test()
   tria.refine_global(1);
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
-  cell                                                   = tria.begin_active();
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm() < 0.2)
@@ -172,6 +171,10 @@ test()
       out.reinit(in);
       ref.reinit(in);
 
+      // after initialization via MatrixFree we are in the write state for
+      // ghosts
+      AssertThrow(in.has_ghost_elements() == false, ExcInternalError());
+
       // fill each block with random numbers and do the block-wise
       // matrix-vector product for reference
       for (unsigned int block = 0; block < n_blocks; ++block)
@@ -186,6 +189,10 @@ test()
           mf_ref.vmult(ref.block(block), in.block(block));
         }
 
+      // explicitly update ghosts so that we can read them:
+      in.update_ghost_values();
+      AssertThrow(in.has_ghost_elements(), ExcInternalError());
+
       deallog << "Norm of difference with " << n_blocks << " blocks:";
 
       // run 10 times to make a possible error more
@@ -193,6 +200,10 @@ test()
       for (unsigned int run = 0; run < 10; ++run)
         {
           mf.vmult(out, in);
+
+          // since we made "in" ghosted, make sure it is still ghosted
+          AssertThrow(in.has_ghost_elements(), ExcInternalError());
+
           out -= ref;
           const double diff_norm = out.linfty_norm();
           deallog << " " << diff_norm;
