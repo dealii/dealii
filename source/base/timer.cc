@@ -745,14 +745,13 @@ TimerOutput::print_summary() const
                  << "| Total CPU/wall time elapsed since start     "
                  << extra_space << "|" << std::setw(10) << std::setprecision(3)
                  << std::right << total_cpu_time << "s |            |"
-                 << std::setw(10) << std::setprecision(3) << std::right
                  << total_wall_time << "s |            |"
                  << "\n|                                             "
                  << extra_space << "|"
                  << "            |            |"
                  << "            |            |"
                  << "\n| Section                         " << extra_space
-                 << "| no. calls |" << std::setw(10) << std::setprecision(3)
+                 << "| no. calls |"
                  << "  CPU time  | % of total |"
                  << "  wall time | % of total |"
                  << "\n+---------------------------------" << extra_dash
