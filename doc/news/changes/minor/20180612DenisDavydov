@@ -1,0 +1,4 @@
+Bugfix: Fixed a bug where VectorDataExchange::ghosts_were_set was
+not set inside MatrixFree::cell_loop() for block vectors
+with many blocks.
+(Denis Davydov 2018/06/12)

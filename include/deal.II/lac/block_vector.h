@@ -186,6 +186,15 @@ public:
              ::dealii::VectorOperation::unknown);
 
   /**
+   * Returns `false` as this is a serial block vector.
+   *
+   * This functionality only needs to be called if using MPI based vectors and
+   * exists in other objects for compatibility.
+   */
+  bool
+  has_ghost_elements() const;
+
+  /**
    * Copy operator: fill all components of the vector with the given scalar
    * value.
    */
@@ -442,6 +451,15 @@ BlockVector<Number>::compress(::dealii::VectorOperation::values operation)
 {
   for (size_type i = 0; i < this->n_blocks(); ++i)
     this->components[i].compress(operation);
+}
+
+
+
+template <typename Number>
+inline bool
+BlockVector<Number>::has_ghost_elements() const
+{
+  return false;
 }
 
 

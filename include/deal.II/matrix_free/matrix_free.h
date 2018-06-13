@@ -3158,6 +3158,10 @@ namespace internal
   reset_ghost_values(const std::vector<VectorStruct> &vec,
                      VectorDataExchange<dim, Number> &exchanger)
   {
+    // return immediately if there is nothing to do.
+    if (exchanger.ghosts_were_set == true)
+      return;
+
     for (unsigned int comp = 0; comp < vec.size(); comp++)
       reset_ghost_values(vec[comp], exchanger);
   }
@@ -3169,6 +3173,10 @@ namespace internal
   reset_ghost_values(const std::vector<VectorStruct *> &vec,
                      VectorDataExchange<dim, Number> &  exchanger)
   {
+    // return immediately if there is nothing to do.
+    if (exchanger.ghosts_were_set == true)
+      return;
+
     for (unsigned int comp = 0; comp < vec.size(); comp++)
       reset_ghost_values(*vec[comp], exchanger);
   }
@@ -3181,6 +3189,10 @@ namespace internal
                            std::integral_constant<bool, true>,
                            VectorDataExchange<dim, Number> &exchanger)
   {
+    // return immediately if there is nothing to do.
+    if (exchanger.ghosts_were_set == true)
+      return;
+
     for (unsigned int i = 0; i < vec.n_blocks(); ++i)
       reset_ghost_values(vec.block(i), exchanger);
   }
@@ -3278,10 +3290,17 @@ namespace internal
                                   VectorDataExchange<dim, Number> &exchanger)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
-      vec.update_ghost_values();
+      {
+        // don't forget to set ghosts_were_set, that otherwise happens
+        // inside VectorDataExchange::update_ghost_values_start()
+        exchanger.ghosts_were_set = vec.has_ghost_elements();
+        vec.update_ghost_values();
+      }
     else
-      for (unsigned int i = 0; i < vec.n_blocks(); ++i)
-        update_ghost_values_start(vec.block(i), exchanger, channel + i);
+      {
+        for (unsigned int i = 0; i < vec.n_blocks(); ++i)
+          update_ghost_values_start(vec.block(i), exchanger, channel + i);
+      }
   }
 
 
