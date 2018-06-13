@@ -682,9 +682,13 @@ public:
      */
     wall_times,
     /**
-     * Output both CPU and wall clock times.
+     * Output both CPU and wall clock times in separate tables.
      */
-    cpu_and_wall_times
+    cpu_and_wall_times,
+    /**
+     * Output both CPU and wall clock times in a single table.
+     */
+    cpu_and_wall_times_grouped
   };
 
   /**
